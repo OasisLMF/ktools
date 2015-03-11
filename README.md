@@ -45,7 +45,7 @@ Then make using the following command;
 $ make
 ```
 
-Next run the automated test to check the installation and numerical results;
+Next run the automated test to check the build and numerical results;
 ``` sh
 $ make check
 ```

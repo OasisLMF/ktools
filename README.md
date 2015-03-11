@@ -1,6 +1,6 @@
 # Oasis Kernel
 
-This is the Posix-compliant Oasis In-Memory Kernel.
+This is the POSIX-compliant Oasis In-Memory Kernel.
 
 ### Alpha
 

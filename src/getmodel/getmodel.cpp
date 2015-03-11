@@ -1,0 +1,348 @@
+/*
+* Copyright (c)2015 Oasis LMF Limited 
+* All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions
+* are met:
+*
+*   * Redistributions of source code must retain the above copyright
+*     notice, this list of conditions and the following disclaimer.
+*
+*   * Redistributions in binary form must reproduce the above copyright
+*     notice, this list of conditions and the following disclaimer in
+*     the documentation and/or other materials provided with the
+*     distribution.
+*
+*   * Neither the original author of this software nor the names of its
+*     contributors may be used to endorse or promote products derived
+*     from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+* "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+* LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+* FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+* COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+* INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+* BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+* OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
+* AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+* OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
+* THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+* DAMAGE.
+*/
+
+
+#ifdef _MSC_VER 
+#include <windows.h>
+#include <io.h>
+#endif
+
+#include <stdio.h>
+#include <stdlib.h> 
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <fcntl.h>
+
+#include <map>
+#include <vector>
+
+#ifdef __unix 
+#include <unistd.h>
+#endif
+
+#include "../include/oasis.h"
+
+
+#define BUFSIZE 4096
+bool verbose = false;
+bool raw_mode = false;
+
+unsigned int outputstreamtype = 1;	// OASIS STREAM TYPE
+
+#pragma pack(push, 1)
+struct idx {
+	int event_id;
+	long long offset;
+};
+#pragma pack(pop)
+struct idxrec {
+	long long offset;
+	int length;
+};
+
+struct idx32 {
+	int event_id;
+	int offset;
+};
+struct idxrec32 {
+	int offset;
+	int length;
+};
+
+bool getdamagebindictionary(std::vector<damagebindictionary> &damagebindictionary_vec_)
+{
+	std::ostringstream oss;
+	oss << "damage_bin_dict.bin";
+
+	FILE *fin = fopen(oss.str().c_str(), "rb");
+	if (fin == NULL){
+		std::cerr << "getdamagebindictionary: Unable to open " << oss.str() << "\n";
+		exit(-1);
+	}
+	fseek(fin, 0L, SEEK_END);
+	long sz = ftell(fin);
+	fseek(fin, 0L, SEEK_SET);
+	unsigned int nrec = sz / sizeof(damagebindictionary);
+	damagebindictionary *s1 = new damagebindictionary[nrec];
+	if (fread(s1, sizeof(damagebindictionary), nrec, fin) != nrec) {
+		std::cerr << "Error reading file\n";
+		exit(-1);
+	}
+
+	for (unsigned int i = 0; i < nrec; i++){
+		damagebindictionary_vec_.push_back(s1[i]);
+	}
+	delete[] s1;
+
+	fclose(fin);
+	return true;
+}
+
+
+void getindex(std::map<int, idxrec> &imap_, int chunkid_)
+{
+	std::ostringstream oss;
+
+	oss << "cdf/damage_cdf_chunk_" << chunkid_ << ".idx";
+	FILE *fin = fopen(oss.str().c_str(), "rb");
+	idx x;
+	idx y;
+	int i = fread(&x, sizeof(idx), 1, fin);
+	i = fread(&y, sizeof(idx), 1, fin);
+	while (i == 1){
+		idxrec z;
+		z.offset = x.offset;
+		z.length = (int)(y.offset - x.offset);
+		imap_[x.event_id] = z;
+		x = y;
+		i = fread(&y, sizeof(idx), 1, fin);
+	}
+	idxrec z;
+	z.offset = x.offset;
+	z.length = -1;
+	imap_[x.event_id] = z;
+
+}
+
+FILE *fin;
+// FILE *fout;
+void sendevent(int event_id_, std::map<int, idxrec> &imap_)
+{
+	if (verbose) {
+		std::cerr << "Event id " << event_id_
+			<< " offset " << imap_[event_id_].offset
+			<< "\n"
+			;
+	}
+#ifdef _MSC_VER 
+	_fseeki64(fin, imap_[event_id_].offset, SEEK_SET);
+#endif
+#ifdef __unix 
+	fseeko(fin, imap_[event_id_].offset, SEEK_SET);
+#endif
+	int i = 0;
+	int length = imap_[event_id_].length;
+
+	while (i < length) {
+		int c = fgetc(fin);
+		putc(c, stdout);
+		//putc(c, fout);
+		i++;
+	}
+	if (length == -1) {	// last event in file
+		int c = fgetc(fin);
+		while (c != EOF) {
+			putc(c, stdout);
+			//putc(c, fout);
+			c = fgetc(fin);
+		}
+	}
+}
+
+struct damageFact {
+	int event_id;
+	int item_id;
+	float tiv;
+	int group_id;
+};
+
+
+void sendevent_new(int event_id_, std::map<int, idxrec> &imap_, int max_no_of_bins_, float *interpolation_)
+{
+	if (verbose) {
+		std::cerr << "Event id " << event_id_
+			<< " offset " << imap_[event_id_].offset
+			<< "\n"
+			;
+	}
+
+	int length = imap_[event_id_].length;
+	if (length == -1) {
+        #ifdef _MSC_VER 
+		_fseeki64(fin, 0, SEEK_END);
+		#endif
+        #ifdef __unix 
+		fseeko(fin, 0, SEEK_END);
+		#endif
+		long long fs = ftell(fin);
+		length = (int)(fs - imap_[event_id_].offset);
+	}
+	#ifdef _MSC_VER 
+		_fseeki64(fin, imap_[event_id_].offset, SEEK_SET);
+	#endif
+	#ifdef __unix 
+		fseeko(fin, imap_[event_id_].offset, SEEK_SET);
+	#endif
+
+	float *binp = new float[max_no_of_bins_];
+	int no_of_bins = 0;
+	while (length > 0) {
+		damagecdfrec2 df;
+		fread(&df, sizeof(damagecdfrec2), 1, fin);
+		if (df.event_id != event_id_){
+			std::cout << "Event ID: " << event_id_ << "not found\n";
+			exit(-1);
+		}
+		fread(&no_of_bins, sizeof(no_of_bins), 1, fin);
+		fread(binp, sizeof(float), no_of_bins, fin);
+		int len = sizeof(damagecdfrec2);
+		char *p = (char *)&df;
+		int i = 0;
+		while (i < len) {
+			putc(*p, stdout);
+			p++;
+			i++;
+		}
+		fwrite(&no_of_bins, sizeof(int), 1, stdout); // output count of bins being processed
+		float *q = binp;
+		for (i = 0; i < no_of_bins; i++){
+			fwrite(q, sizeof(float), 1, stdout);
+			if (raw_mode == false) {
+				float *bin_mean = interpolation_ + i;
+				fwrite(bin_mean, sizeof(float), 1, stdout);
+			}
+			q++;
+		}
+		int rec_length = sizeof(damagecdfrec2) + sizeof(no_of_bins) + (sizeof(float)*no_of_bins);
+
+		length = length - rec_length;
+		if (length < 0) {
+			std::cout << "Error Event record format error\n";
+			exit(-1);
+		}
+	}
+
+	delete[] binp;
+}
+
+void doitlocal(int chunkid_)
+{
+    #ifdef _MSC_VER 
+	DWORD dwRead = 0;
+	HANDLE hStdin, hStdout;
+	bool bSuccess = true;
+    #endif
+
+	int event_id = 0;
+//	int areaperil_id = 0;
+//	int vulnerability_id = 0;
+//	int threadID = 0;
+
+    #ifdef _MSC_VER 
+	hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
+	hStdin = GetStdHandle(STD_INPUT_HANDLE);
+	if (
+		(hStdout == INVALID_HANDLE_VALUE) ||
+		(hStdin == INVALID_HANDLE_VALUE)
+		)
+		ExitProcess(1);
+	#endif
+    #ifdef __unix 
+	freopen(NULL, "rb", stdin);
+	freopen(NULL, "wb", stdout);
+	#endif
+	std::map<int, idxrec> imap;
+
+	getindex(imap, chunkid_);
+
+	std::vector<damagebindictionary> damagebindictionary_vec;
+	getdamagebindictionary(damagebindictionary_vec);
+
+    float *interpolation = new float[damagebindictionary_vec.size()];
+	for (unsigned int i = 0; i < damagebindictionary_vec.size(); i++){
+		interpolation[i] = damagebindictionary_vec[i].interpolation;
+	}
+
+	#ifdef _MSC_VER 
+	setmode(fileno(stdout), O_BINARY);
+	#endif
+
+	std::ostringstream oss;
+
+	oss.str("");
+	oss << "cdf/damage_cdf_chunk_" << chunkid_ << ".bin";
+	fin = fopen(oss.str().c_str(), "rb");
+	if (fin == NULL) {
+		std::cerr << "Error opening file : " << oss.str() << "\n";
+		exit(-1);
+	}
+
+	if (raw_mode == false) fwrite(&outputstreamtype, sizeof(outputstreamtype), 1, stdout);
+
+	while (1){
+        #ifdef __WINDOWS
+			bSuccess = ReadFile(hStdin, &event_id, sizeof(int), &dwRead, NULL);
+			while (bSuccess == true && dwRead == 0) {
+				#ifdef __WINDOWS
+				std::this_thread::yield();
+				#endif
+				bSuccess = ReadFile(hStdin, &event_id, sizeof(int), &dwRead, NULL);
+				if (bSuccess == true && dwRead == 0) {
+					bSuccess = false;
+				}
+			}
+			if (bSuccess == false) 	break;
+        #endif
+		#ifdef __unix 
+				if (fread(&event_id, sizeof(int), 1, stdin) != 1) break;
+        #endif
+		//sendevent(event_id, imap);
+		sendevent_new(event_id, imap, damagebindictionary_vec.size(),interpolation);
+	}
+	delete[] interpolation;
+}
+
+void usage(char *progname)
+{
+    std::cerr << "Usage: " << progname << " chunkid \n";
+    std::cerr << "Usage: " << progname << " chunkid  mode\n";
+    std::cerr << "Mode -r: raw mode\n";
+    exit(-1);
+}
+int main(int argc, char *argv[])
+{
+	if (argc < 2) usage(argv[0]);
+
+	if (argc == 3) {
+		std::string s = "-v";
+		if (argv[2] == s) verbose = true;
+		s = "-r";
+		if (argv[2] == s) raw_mode = true; // input = output no interpretation used for debugging
+	}
+	if (argc < 2) usage(argv[0]);
+	int chunkid = atoi(argv[1]);
+	doitlocal(chunkid);
+
+}

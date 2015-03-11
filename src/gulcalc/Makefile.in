@@ -1,0 +1,28 @@
+all: gulcalc
+ 
+objects := $(patsubst %.cpp,%.o,$(wildcard *.cpp))
+
+#getmodel: getmodel.cpp
+#	g++ -Wall -fexceptions -std=c++11 -g  -O0 -o $@ getmodel.cpp 
+
+
+%.o: %.cpp
+	g++ -Wall -Wno-unused-result -fexceptions  -std=c++11  -O3 -c $<  
+
+
+gulcalc : $(objects)
+	g++ -o gulcalc  $(objects) -static
+
+
+clean:
+	-rm -f *.o
+	-rm -f gulcalc 
+
+install:
+	cp gulcalc ~/bin
+
+uninstall:
+	-rm -f ~/bin/gulcalc
+
+.PHONY: all clean install
+

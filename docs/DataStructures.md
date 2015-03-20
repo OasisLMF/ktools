@@ -18,7 +18,7 @@ Eve is an 'event emitter' and its job is to read a list of events from file and 
 Data packet structure
 
 | Name              | Type   |  Bytes | Description                                                         | Example     |
-|:------------------|--------|--------| :-------------------------------------------------------------------|-------------|
+|:------------------|--------|--------| :-------------------------------------------------------------------|------------:|
 | event_id          | int    |    4   | Oasis event_id                                                      |   4545      |
 
 #### getmodel
@@ -32,7 +32,7 @@ Same as eve output or a binary file of the same input format can be piped into g
 Header packet structure
 
 | Name              | Type   |  Bytes | Description                                                         | Example     |
-|:------------------|--------|--------| :-------------------------------------------------------------------|-------------|
+|:------------------|--------|--------| :-------------------------------------------------------------------|------------:|
 | stream type       | int    |    4   | Identifier of the data stream structure. 1 is Oasis                 |     1       |
 | event_id          | int    |    4   | Oasis event_id                                                      |   4545      |
 | areaperil_id      | int    |    4   | Oasis areaperil_id                                                  |  345456     |
@@ -41,7 +41,7 @@ Header packet structure
 Data packet structure (record repeated no_of_bin times)
 
 | Name              | Type   |  Bytes | Description                                                         | Example     |
-|:------------------|--------|--------| :-------------------------------------------------------------------|-------------|
+|:------------------|--------|--------| :-------------------------------------------------------------------|------------:|
 | prob_to           | float  |    4   | The cumulative probability at the upper damage bin threshold        |     0.765   |
 | bin_mean          | float  |    4   | The conditional mean of the damage bin                              |     0.45    |
 
@@ -56,14 +56,14 @@ Same as getmodel output or a binary file of the same format can be piped into gu
 Header packet structure
 
 | Name              | Type   |  Bytes | Description                                                         | Example     |
-|:------------------|--------|--------| :-------------------------------------------------------------------|-------------|
+|:------------------|--------|--------| :-------------------------------------------------------------------|------------:|
 | event_id          | int    |    4   | Oasis event_id                                                      |   4545      |
 | item_id           | int    |    4   | Oasis item_id                                                       |    300      |
 
 Data packet structure
 
 | Name              | Type   |  Bytes | Description                                                         | Example     |
-|:------------------|--------|--------| :-------------------------------------------------------------------|-------------|
+|:------------------|--------|--------| :-------------------------------------------------------------------|------------:|
 | idx               | int    |    4   | Sample index                                                        |     10      |
 | gul               | float  |    4   | The conditional mean of the damage bin                              | 5675.675    |
 
@@ -78,7 +78,7 @@ Same as getmodel output or a binary file of the same format can be piped into cd
 Csv file with the following fields;
 
 | Name              | Type   |  Bytes | Description                                                         | Example     |
-|:------------------|--------|--------| :-------------------------------------------------------------------|-------------|
+|:------------------|--------|--------| :-------------------------------------------------------------------|------------:|
 | event_id          | int    |    4   | Oasis event_id                                                      |   4545      |
 | areaperil_id      | int    |    4   | Oasis areaperil_id                                                  |  345456     |
 | vulnerability_id  | int    |    4   | Oasis vulnerability_id                                              |   345       |
@@ -97,7 +97,7 @@ Same as gulcalc output or a binary file of the same format can be piped into gul
 Csv file with the following fields;
 
 | Name              | Type   |  Bytes | Description                                                         | Example     |
-|:------------------|--------|--------| :-------------------------------------------------------------------|-------------|
+|:------------------|--------|--------| :-------------------------------------------------------------------|------------:|
 | event_id          | int    |    4   | Oasis event_id                                                      |   4545      |
 | item_id           | int    |    4   | Oasis item_id                                                       |    300      |
 | idx               | int    |    4   | Sample index                                                        |     10      |

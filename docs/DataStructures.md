@@ -8,11 +8,7 @@ Most components in the toolkit have a standard input (stdin) and output (stdout)
 
 #### eve
 
-Eve is an 'event emitter' and its job is to read a list of events from file and send out a subset of events as a binary data stream. 
-
-##### Input
-* Format: binary file with filename e_chunk_{chunk_id}_data.bin
-* Data: event_id as 4 byte int.
+Eve is an 'event emitter' and its job is to read a list of events from file and send out a subset of events as a binary data stream. It has no standard input.
 
 ##### Output
 Data packet structure

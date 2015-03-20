@@ -4,7 +4,7 @@
 
 This section outlines the data structures of the components of ktools.
 
-Most components in the toolkit have a standard input (stdin) and output (stdout) data stream structure. These data structures are not defined explicitly as meta data in the code as they would be in a database language, and they have been designed to minimise the volume flowing through the pipeline. For example, indexes which are common to a block of data are defined as a header record and then only the variable data records that are relevant to the header key are part of the data stream. The names of the data fields given below are unimportant, only their positions in the data stream matters.
+Most components in the toolkit have a standard input (stdin) and output (stdout) data stream structure. These data structures are not defined explicitly as meta data in the code as they would be in a database language, and they have been designed to minimise the volume flowing through the pipeline. For example, indexes which are common to a block of data are defined as a header record and then only the variable data records that are relevant to the header key are part of the data stream. The names of the data fields given below are unimportant, only their position in the data stream in order to perform the calculations defined in the program.
 
 #### eve
 
@@ -95,6 +95,7 @@ Same as gulcalc output or a binary file of the same format can be piped into gul
 
 ##### Output
 Csv file with the following fields;
+
 | Name              | Type   |  Bytes | Description                                                         | Example     |
 |:------------------|--------|--------| :-------------------------------------------------------------------|-------------|
 | event_id          | int    |    4   | Oasis event_id                                                      |   4545      |

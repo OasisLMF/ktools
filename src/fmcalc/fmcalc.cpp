@@ -272,7 +272,7 @@ void dofm(int event_id_, std::vector<gulGulSampeslevel> &event_guls_,
 	outputfm(fm_level2);
 }
 
-void doit(std::map<int, fmdata> &fmd_level1_, std::map<int, fmdata> &fmd_level3_)
+void doit(std::map<int, fmdata> &fmd_level1_, std::map<int, fmdata> &fmd_level2_)
 {
 
 #ifdef _MSC_VER
@@ -299,7 +299,7 @@ void doit(std::map<int, fmdata> &fmd_level1_, std::map<int, fmdata> &fmd_level3_
 
 	while (i != 0) {
 		if (p.event_id != last_event_id) {
-			dofm(last_event_id, event_guls, fmd_level1_, fmd_level3_);
+			dofm(last_event_id, event_guls, fmd_level1_, fmd_level2_);
 			event_guls.clear();
 			last_event_id = p.event_id;
 		}

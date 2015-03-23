@@ -31,7 +31,10 @@
 * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 * DAMAGE.
 */
-
+/*
+	Calculate the GUL
+	Author: Ben Matharu  email: ben.matharu@oasislmf.org
+*/
 #ifdef _MSC_VER
 #include <windows.h>
 #include <io.h>
@@ -117,6 +120,7 @@ int _outrec_count = 0;
 double _gul_limit = 0.0;
 bool _userandomtable = false;
 int _chunk_id = -1;
+bool _newstream = false;
 
 gulGulSampeslevel2 *_buf = 0;
 
@@ -208,9 +212,9 @@ bool getexposures(std::map<exposure_key, std::vector<exposure_rec> > &exposure_m
 	fclose(fin);
 	return true;
 }
-double getgul(damagebindictionary &b, gulGulSamples &g)
+float getgul(damagebindictionary &b, gulGulSamples &g)
 {
-	double gul = 0;
+	float gul = 0;
 	if (b.bin_from == b.bin_to) {
 		gul = b.bin_to * g.tiv;
 		return gul;
@@ -254,12 +258,12 @@ void outputgul(gulGulSampeslevel2 &gg)
 	}
 	_outrec_count++;
 }
-void output_mean(const exposure_rec &er, prob_mean *pp, int bin_count, double &gul_mean,  double &std_dev)
+void output_mean(const exposure_rec &er, prob_mean *pp, int bin_count, float &gul_mean,  float &std_dev)
 {
 	float last_prob_to = 0;
 	gul_mean = 0;
 	std_dev = 0;
-	double ctr_var = 0;
+	float ctr_var = 0;
 
 	for (int bin_index = 0; bin_index < bin_count; bin_index++){
 		prob3 p;
@@ -272,7 +276,7 @@ void output_mean(const exposure_rec &er, prob_mean *pp, int bin_count, double &g
 		ctr_var = ctr_var + ((p.prob_to - p.prob_from) *p.bin_mean*p.bin_mean * er.tiv * er.tiv);
 		pp++;
 	}
-	double g2 = gul_mean * gul_mean;
+	float g2 = gul_mean * gul_mean;
 	std_dev = ctr_var - g2;
 	std_dev = sqrt(std_dev);
 }
@@ -304,8 +308,8 @@ damagecdfrec2 *d = (damagecdfrec2 *)rec;
 			int *bin_count = (int *)b;
 			b = b + sizeof(int);
 			prob_mean *pp = (prob_mean *)b;
-			double std_dev;
-			double gul_mean;
+			float std_dev;
+			float gul_mean;
 			output_mean(*iter, pp, *bin_count, gul_mean, std_dev);
 			gx.event_id = d->event_id;
 			gx.item_id = iter->item_id;
@@ -395,6 +399,8 @@ void doit()
 	freopen(NULL, "rb", stdin);
 	freopen(NULL, "wb", stdout);
 #endif
+	int gulstream_type = 2;
+	fwrite(&gulstream_type, sizeof(gulstream_type), 1, stdout);
     _buf = new gulGulSampeslevel2[_gularraysize];
     char *rec = new char[max_recsize];
     damagecdfrec2 *d = (damagecdfrec2 *)rec;
@@ -434,6 +440,7 @@ void doit()
 
 	fwrite(_buf, sizeof(gulGulSampeslevel2), _bufoffset, stdout);
 }
+
 void help()
 {
 
@@ -447,7 +454,7 @@ void help()
 int main(int argc, char *argv[])
 {
     int opt;
-     while ((opt = getopt(argc, argv, "RrL:S:C:")) != -1) {
+     while ((opt = getopt(argc, argv, "NRrL:S:C:")) != -1) {
         switch (opt) {
         case 'S':
 			_samplesize = atoi(optarg);
@@ -462,8 +469,11 @@ int main(int argc, char *argv[])
         case 'L':
 			_gul_limit = atof(optarg);
 			break;
-		case 'C':
+	case 'C':
 			_chunk_id = atoi(optarg);
+			break;
+	case 'N':
+			_newstream=true;
 			break;
         default: /* '?' */
            help();
@@ -486,6 +496,6 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    doit();
+    if (_newstream == false) doit();
 
 }

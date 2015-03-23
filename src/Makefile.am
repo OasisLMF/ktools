@@ -4,8 +4,6 @@ all clean uninstall install ktools:
 	cd eve && $(MAKE) $@
 	cd cdftocsv && $(MAKE) $@
 	cd gultocsv && $(MAKE) $@
-	cd fmcalc && $(MAKE) $@
-	cd fmtocsv && $(MAKE) $@
 
 .PHONY: all clean install
 

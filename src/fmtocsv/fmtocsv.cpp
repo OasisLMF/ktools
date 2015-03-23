@@ -1,5 +1,5 @@
 /*
-* Copyright (c)2015 Oasis LMF Limited 
+* Copyright (c)2015 Oasis LMF Limited
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
@@ -31,72 +31,70 @@
 * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 * DAMAGE.
 */
-
+/*
+Convert fm output to csv
+Author: Ben Matharu  email: ben.matharu@oasislmf.org
+*/
 #include <iostream>
-#include <stdlib.h>
-#include <fstream>
-#include <sstream>
-#include <math.h>
+#include <stdio.h>
+
 #ifdef _MSC_VER
 #include <fcntl.h>
 #include <io.h>
 #endif 
-#include "../include/oasis.h"
 
 using namespace std;
 
-void emitevents(int chunk_id_,int pno_,int total_)
+const int mean_idx = 1 << 24;
+
+struct fmlevelhdr {
+	int event_id;
+	int prog_id;
+	int layer_id;
+	int output_id;
+};
+
+struct fmlevelrec {
+	int sidx;
+	float loss;
+};
+
+
+void doit()
 {
 
 #ifdef _MSC_VER
-        _setmode(_fileno(stdout), O_BINARY);
-        _setmode(_fileno(stdin), O_BINARY);
-#else
-        freopen(NULL, "rb", stdin);
-        freopen(NULL, "wb", stdout);
+	_setmode(_fileno(stdout), O_BINARY);
+	_setmode(_fileno(stdin), O_BINARY);
 #endif
 
-    std::ostringstream oss;
-    oss << "e_chunk_" << chunk_id_ << "_data.bin";
-    FILE *fin = fopen(oss.str().c_str(), "rb");
-    if (fin == NULL){
-                cerr << "emitevents: cannot open " << oss.str().c_str() << "\n";
-                exit(-1);
-    }
-    fseek(fin, 0L, SEEK_END);
-    long endpos = ftell(fin);
-
-    int total_events =  endpos / 4;
-    int chunksize = (int) ceil((float)total_events / total_);
-    int end_pos = chunksize * pno_*4;
-    pno_--;
-    int start_pos = chunksize * pno_*4;
-    fseek(fin, start_pos, SEEK_SET);
-    while(start_pos < end_pos) {
-        int c = fgetc(fin);
-        if (c == EOF) break;
-        fputc(c,stdout);
-        start_pos++;
-    }
-
-    fclose(fin);
-    return;
+#ifdef __unix
+	freopen(NULL, "rb", stdin);
+	freopen(NULL, "wb", stdout);
+#endif
+	printf ("\"event_id\", \"prog_id\", \"layer_id\", \"output_id\", \"sidx\", \"loss\"\n");
+	fmlevelhdr p;
+	int i = fread(&p, sizeof(fmlevelhdr), 1, stdin);
+	int count = 0;
+	while (i != 0) {
+		fmlevelrec q;
+		i = fread(&q, sizeof(fmlevelrec), 1, stdin);
+		while (i != 0) {
+			count++;
+			if (q.sidx == 0) break;
+			if (q.sidx == mean_idx) q.sidx = 0;
+			printf("%d, %d, %d, %d, %d, %f\n", p.event_id, p.prog_id, p.layer_id, p.output_id, q.sidx, q.loss);
+			if (p.event_id == 26 && p.prog_id == 1 && p.layer_id == 2 && p.output_id == 6 && q.sidx == 100){
+				cout << "Were here";
+			}
+			i = fread(&q, sizeof(fmlevelrec), 1, stdin);
+		}
+		if (i) i = fread(&p, sizeof(fmlevelhdr), 1, stdin);
+	}
 
 }
-
-int main(int argc, char *argv[])
+int main()
 {
-    if (argc != 4) {
-        cerr << "usage: chunkid processno totalprocesses\n"
-        ;
-        return -1;
-    }
-
-    int chunkid = atoi(argv[1]);
-    int pno = atoi(argv[2]);
-    int total = atoi(argv[3]);
-
-    emitevents(chunkid,pno,total);
-
-    return 0;
+	doit();
+	return 0;
 }

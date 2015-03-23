@@ -34,6 +34,13 @@
 
 #include <iostream>
 #include <stdio.h>
+#include <stdlib.h>
+
+#ifdef _MSC_VER
+#include <fcntl.h>
+#include <io.h>
+#endif
+
 
 using namespace std;
 #include "../include/oasis.h"
@@ -41,7 +48,7 @@ using namespace std;
 void doit()
 {
 
-#ifdef __MSCVER__
+#ifdef _MSC_VER
         _setmode(_fileno(stdout), O_BINARY);
         _setmode(_fileno(stdin), O_BINARY);
 #endif
@@ -51,8 +58,16 @@ void doit()
         freopen(NULL, "wb", stdout);
 #endif
 
+	int stream_type = 0;
+	int i = fread(&stream_type, sizeof(stream_type), 1, stdin);
+	if (stream_type != 2) {
+		std::cerr << "invalid stream time";
+		exit(-1);
+	}
+
+
     gulGulSampeslevel2 p;
-    int i = fread(&p, sizeof(gulGulSampeslevel2), 1, stdin);
+    i = fread(&p, sizeof(gulGulSampeslevel2), 1, stdin);
     while (i != 0) {
         printf("%d, %d, %d, %f\n", p.event_id,p.item_id,p.sidx, p.gul);
         i = fread(&p, sizeof(gulGulSampeslevel2), 1, stdin);

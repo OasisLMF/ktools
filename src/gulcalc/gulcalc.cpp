@@ -122,7 +122,7 @@ bool _userandomtable = false;
 int _chunk_id = -1;
 bool _newstream = false;
 
-gulGulSampeslevel2 *_buf = 0;
+gulGulSampeslevel *_buf = 0;
 
 int _bufoffset=0;
 
@@ -242,7 +242,7 @@ float getgul(damagebindictionary &b, gulGulSamples &g)
 
 	return gul;
 }
-void outputgul(gulGulSampeslevel2 &gg)
+void outputgul(gulGulSampeslevel &gg)
 {
     // int pid = getpid();
     // fprintf(stderr,"%d: Gul::outputgul ********* BUF POINTER SET to %p!!! *******\n",pid, _buf);
@@ -251,7 +251,7 @@ void outputgul(gulGulSampeslevel2 &gg)
 		_bufoffset++;
 	}
 	else {
-        fwrite(_buf, sizeof(gulGulSampeslevel2), _gularraysize, stdout);
+        fwrite(_buf, sizeof(gulGulSampeslevel), _gularraysize, stdout);
 		_bufoffset = 0;
 		_buf[_bufoffset] = gg;
 		_bufoffset++;
@@ -284,7 +284,7 @@ void output_mean(const exposure_rec &er, prob_mean *pp, int bin_count, float &gu
 void processrec(char *rec, int recsize,
 	const std::vector<damagebindictionary> &damagebindictionary_vec_,
 	const std::map<exposure_key, std::vector<exposure_rec>> &exposures_map_,
-	std::vector<gulGulSampeslevel2> &event_guls_,
+	std::vector<gulGulSampeslevel> &event_guls_,
 	getRands &rnd_)
 {
 damagecdfrec2 *d = (damagecdfrec2 *)rec;
@@ -301,7 +301,7 @@ damagecdfrec2 *d = (damagecdfrec2 *)rec;
 	if (pos != exposures_map_.end()){
 		auto iter = pos->second.begin();
 		while (iter != pos->second.end()){
-            gulGulSampeslevel2 gx;
+            gulGulSampeslevel gx;
 			gx.event_id = d->event_id;
 			gx.item_id = iter->item_id;
 			char *b = rec + sizeof(damagecdfrec2);
@@ -353,7 +353,7 @@ damagecdfrec2 *d = (damagecdfrec2 *)rec;
 						g.bin_mean = p.bin_mean;
 						g.rval = rval;
 						g.sidx = i + 1;
-						gulGulSampeslevel2 gg;
+						gulGulSampeslevel gg;
 						damagebindictionary b = damagebindictionary_vec_[g.bin_index];
 						// gg.gul = (b.bin_from + ((g.rval - g.prob_from) / (g.prob_to - g.prob_from) * (b.bin_to - b.bin_from))) * g.tiv;
 						gg.gul = getgul(b, g);
@@ -380,7 +380,7 @@ damagecdfrec2 *d = (damagecdfrec2 *)rec;
 
 }
 
-void doit()
+void doitold()
 {
     std::vector<damagebindictionary> damagebindictionary_vec;
     getdamagebindictionary(damagebindictionary_vec);
@@ -401,10 +401,10 @@ void doit()
 #endif
 	int gulstream_type = 2;
 	fwrite(&gulstream_type, sizeof(gulstream_type), 1, stdout);
-    _buf = new gulGulSampeslevel2[_gularraysize];
+    _buf = new gulGulSampeslevel[_gularraysize];
     char *rec = new char[max_recsize];
     damagecdfrec2 *d = (damagecdfrec2 *)rec;
-    std::vector<gulGulSampeslevel2> event_guls;
+    std::vector<gulGulSampeslevel> event_guls;
     int last_event_id = -1;
     int stream_type = 0;
 	bool bSuccess = getrecx((char *)&stream_type, stdin, sizeof(stream_type));
@@ -438,7 +438,70 @@ void doit()
 		processrec(rec, recsize, damagebindictionary_vec, exposure_map, event_guls,rnd);
 	}
 
-	fwrite(_buf, sizeof(gulGulSampeslevel2), _bufoffset, stdout);
+	fwrite(_buf, sizeof(gulGulSampeslevel), _bufoffset, stdout);
+}
+
+
+void doit()
+{
+	std::vector<damagebindictionary> damagebindictionary_vec;
+	getdamagebindictionary(damagebindictionary_vec);
+	std::map<exposure_key, std::vector<exposure_rec> > exposure_map;
+	getexposures(exposure_map);
+
+	int total_bins = damagebindictionary_vec.size();
+	int max_recsize = (int)(total_bins * 8) + sizeof(damagecdfrec2)+sizeof(int);
+
+#ifdef _MSC_VER 
+	_setmode(_fileno(stdout), O_BINARY);
+	_setmode(_fileno(stdin), O_BINARY);
+#endif
+
+#ifdef __unix 
+	freopen(NULL, "rb", stdin);
+	freopen(NULL, "wb", stdout);
+#endif
+	int gulstream_type = 2;
+	if (_newstream == true) gulstream_type = 1;
+	fwrite(&gulstream_type, sizeof(gulstream_type), 1, stdout);
+	_buf = new gulGulSampeslevel[_gularraysize];
+	char *rec = new char[max_recsize];
+	damagecdfrec2 *d = (damagecdfrec2 *)rec;
+	std::vector<gulGulSampeslevel> event_guls;
+	int last_event_id = -1;
+	int stream_type = 0;
+	bool bSuccess = getrecx((char *)&stream_type, stdin, sizeof(stream_type));
+	if (bSuccess == false) {
+		cerr << "Error: no stream type returned\n";
+		return; // exit thread if failed
+	}
+	getRands rnd(_userandomtable, _chunk_id);
+
+	for (;;)
+	{
+		//damagecdfrec2 c;
+		char *p = rec;
+		bSuccess = getrecx(p, stdin, sizeof(damagecdfrec2));
+		if (bSuccess == false) break;
+		p = p + sizeof(damagecdfrec2);
+		bSuccess = getrecx(p, stdin, sizeof(int)); // we now have bin count
+		int *q = (int *)p;
+		p = p + sizeof(int);
+		int recsize = (*q) * 8;
+		// we should now have damagecdfrec2 in memory
+		bSuccess = getrecx(p, stdin, recsize);
+		recsize += sizeof(damagecdfrec2)+sizeof(int);
+		if (d->event_id != last_event_id) {
+			//if (last_event_id != -1) dofm(event_guls);
+			last_event_id = d->event_id;
+			event_guls.clear();
+		}
+
+
+		processrec(rec, recsize, damagebindictionary_vec, exposure_map, event_guls, rnd);
+	}
+
+	fwrite(_buf, sizeof(gulGulSampeslevel), _bufoffset, stdout);
 }
 
 void help()
@@ -496,6 +559,7 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    if (_newstream == false) doit();
+    if (_newstream == false) doitold();
+	if (_newstream == true) doit();
 
 }

@@ -188,9 +188,9 @@ void genLevel2(int event_id_, std::vector<fmlevel> &fm_level2_, std::vector<fmle
 
 
 void genLevel1(int event_id_, std::vector<fmlevel> &fm_level1_, std::map<int, float> &back_alloc_,
-	std::vector<gulGulSampeslevel2> &event_guls_, std::map<int, fmdata> &fmd_level1_)
+	std::vector<gulGulSampeslevel> &event_guls_, std::map<int, fmdata> &fmd_level1_)
 {
-	std::vector<gulGulSampeslevel2>::iterator iter = event_guls_.begin();
+	std::vector<gulGulSampeslevel>::iterator iter = event_guls_.begin();
 	while (iter != event_guls_.end()){
 		fmlevel f;
 		f.sidx = iter->sidx;
@@ -261,7 +261,7 @@ void outputfm(std::vector<fmlevel> fm_level_)
 	fwrite(&frec, sizeof(fmlevelrec), 1, stdout);
 
 }
-void dofm(int event_id_, std::vector<gulGulSampeslevel2> &event_guls_,
+void dofm(int event_id_, std::vector<gulGulSampeslevel> &event_guls_,
 	std::map<int, fmdata> &fmd_level1_, std::map<int, fmdata> &fmd_level2_)
 {
 	std::vector<fmlevel> fm_level1;
@@ -292,9 +292,9 @@ void doit(std::map<int, fmdata> &fmd_level1_, std::map<int, fmdata> &fmd_level3_
 		std::cerr << "invalid stream time";
 		exit(-1);
 	}
-	std::vector<gulGulSampeslevel2> event_guls;
-	gulGulSampeslevel2 p;
-	i = fread(&p, sizeof(gulGulSampeslevel2), 1, stdin);
+	std::vector<gulGulSampeslevel> event_guls;
+	gulGulSampeslevel p;
+	i = fread(&p, sizeof(gulGulSampeslevel), 1, stdin);
 	int last_event_id = p.event_id;
 
 	while (i != 0) {
@@ -305,7 +305,7 @@ void doit(std::map<int, fmdata> &fmd_level1_, std::map<int, fmdata> &fmd_level3_
 		}
 		if (p.sidx >= 0) event_guls.push_back(p);
 
-		i = fread(&p, sizeof(gulGulSampeslevel2), 1, stdin);
+		i = fread(&p, sizeof(gulGulSampeslevel), 1, stdin);
 	}
 
 }

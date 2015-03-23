@@ -66,11 +66,11 @@ void doit()
 	}
 
 
-    gulGulSampeslevel2 p;
-    i = fread(&p, sizeof(gulGulSampeslevel2), 1, stdin);
+    gulGulSampeslevel p;
+    i = fread(&p, sizeof(gulGulSampeslevel), 1, stdin);
     while (i != 0) {
         printf("%d, %d, %d, %f\n", p.event_id,p.item_id,p.sidx, p.gul);
-        i = fread(&p, sizeof(gulGulSampeslevel2), 1, stdin);
+        i = fread(&p, sizeof(gulGulSampeslevel), 1, stdin);
     }
 
 }

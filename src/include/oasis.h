@@ -47,7 +47,7 @@ struct damagebindictionary {
         int interval_type;
 };
 
-struct gulGulSampeslevel2 {
+struct gulGulSampeslevel {
 	int event_id;
 	int item_id;
 	int sidx;		// This has be stored for thresholds cannot be implied

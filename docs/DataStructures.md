@@ -49,19 +49,28 @@ gulcalc takes the cdfs as standard input and based on the sampling parameters sp
 Same as getmodel output or a binary file of the same format can be piped into gulcalc.
 
 ##### Output
-Header packet structure
+Stream Header packet structure
+
+| Name              | Type   |  Bytes | Description                                                         | Example     |
+|:------------------|--------|--------| :-------------------------------------------------------------------|------------:|
+| stream_id         | int    |    4   | Identifier of the data stream structure. 1 is Oasis                 |     1       |
+| no_of_samples     | int    |    4   | The number of samples                                               |    100      |
+
+Gul Header packet structure
 
 | Name              | Type   |  Bytes | Description                                                         | Example     |
 |:------------------|--------|--------| :-------------------------------------------------------------------|------------:|
 | event_id          | int    |    4   | Oasis event_id                                                      |   4545      |
 | item_id           | int    |    4   | Oasis item_id                                                       |    300      |
 
-Data packet structure
+Gul data packet structure
 
 | Name              | Type   |  Bytes | Description                                                         | Example     |
 |:------------------|--------|--------| :-------------------------------------------------------------------|------------:|
 | idx               | int    |    4   | Sample index                                                        |     10      |
-| gul               | float  |    4   | The conditional mean of the damage bin                              | 5675.675    |
+| gul               | float  |    4   | The ground up loss for the sample                                   | 5675.675    |
+
+The gul data packet size is no_of_samples + 2 (mean and standard deviation are included as sample idx 0 and -1, respectively).
 
 #### cdftocsv
 

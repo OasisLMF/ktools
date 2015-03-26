@@ -32,6 +32,8 @@
 * DAMAGE.
 */
 
+const int mean_idx = 1 << 24;
+
 #pragma pack(push, 1)
 struct damagecdfrec2 {
         int event_id;
@@ -50,6 +52,16 @@ struct damagebindictionary {
 struct gulGulSampeslevel {
 	int event_id;
 	int item_id;
+	int sidx;		// This has be stored for thresholds cannot be implied
+	float gul;		// may want to cut down to singe this causes 4 byte padding for allignment
+};
+
+struct gulSampeslevelHeader {
+	int event_id;
+	int item_id;
+};
+
+struct gulSampeslevelRec {
 	int sidx;		// This has be stored for thresholds cannot be implied
 	float gul;		// may want to cut down to singe this causes 4 byte padding for allignment
 };

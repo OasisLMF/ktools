@@ -249,26 +249,14 @@ void sendevent_new(int event_id_, std::map<int, idxrec> &imap_, int max_no_of_bi
 
 void doitlocal(int chunkid_)
 {
-    #ifdef _MSC_VER 
-	DWORD dwRead = 0;
-	HANDLE hStdin, hStdout;
-	bool bSuccess = true;
-    #endif
-
+ 
 	int event_id = 0;
-//	int areaperil_id = 0;
-//	int vulnerability_id = 0;
-//	int threadID = 0;
 
-    #ifdef _MSC_VER 
-	hStdout = GetStdHandle(STD_OUTPUT_HANDLE);
-	hStdin = GetStdHandle(STD_INPUT_HANDLE);
-	if (
-		(hStdout == INVALID_HANDLE_VALUE) ||
-		(hStdin == INVALID_HANDLE_VALUE)
-		)
-		ExitProcess(1);
-	#endif
+#ifdef _MSC_VER 
+	_setmode(_fileno(stdout), O_BINARY);
+	_setmode(_fileno(stdin), O_BINARY);
+#endif
+
     #ifdef __unix 
 	freopen(NULL, "rb", stdin);
 	freopen(NULL, "wb", stdout);
@@ -285,10 +273,6 @@ void doitlocal(int chunkid_)
 		interpolation[i] = damagebindictionary_vec[i].interpolation;
 	}
 
-	#ifdef _MSC_VER 
-	setmode(fileno(stdout), O_BINARY);
-	#endif
-
 	std::ostringstream oss;
 
 	oss.str("");
@@ -302,22 +286,9 @@ void doitlocal(int chunkid_)
 	if (raw_mode == false) fwrite(&outputstreamtype, sizeof(outputstreamtype), 1, stdout);
 
 	while (1){
-        #ifdef __WINDOWS
-			bSuccess = ReadFile(hStdin, &event_id, sizeof(int), &dwRead, NULL);
-			while (bSuccess == true && dwRead == 0) {
-				#ifdef __WINDOWS
-				std::this_thread::yield();
-				#endif
-				bSuccess = ReadFile(hStdin, &event_id, sizeof(int), &dwRead, NULL);
-				if (bSuccess == true && dwRead == 0) {
-					bSuccess = false;
-				}
-			}
-			if (bSuccess == false) 	break;
-        #endif
-		#ifdef __unix 
-				if (fread(&event_id, sizeof(int), 1, stdin) != 1) break;
-        #endif
+       
+		if (fread(&event_id, sizeof(int), 1, stdin) != 1) break;
+        
 		//sendevent(event_id, imap);
 		sendevent_new(event_id, imap, damagebindictionary_vec.size(),interpolation);
 	}

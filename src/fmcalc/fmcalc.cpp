@@ -53,7 +53,6 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 using namespace std;
 #include "../include/oasis.h"
 
-const int mean_idx = 1 << 24;
 
 struct fmdata {
 	int item_id;
@@ -288,24 +287,53 @@ void doit(std::map<int, fmdata> &fmd_level1_, std::map<int, fmdata> &fmd_level2_
 	
 	int stream_type = 0;
 	int i = fread(&stream_type, sizeof(stream_type), 1, stdin);
-	if (stream_type != 2) {
+	if (stream_type != 1 && stream_type != 2) {
 		std::cerr << "invalid stream time";
 		exit(-1);
 	}
 	std::vector<gulGulSampeslevel> event_guls;
-	gulGulSampeslevel p;
-	i = fread(&p, sizeof(gulGulSampeslevel), 1, stdin);
-	int last_event_id = p.event_id;
-
-	while (i != 0) {
-		if (p.event_id != last_event_id) {
-			dofm(last_event_id, event_guls, fmd_level1_, fmd_level2_);
-			event_guls.clear();
-			last_event_id = p.event_id;
-		}
-		if (p.sidx >= 0) event_guls.push_back(p);
-
+	int last_event_id = -1;
+	if (stream_type == 2) {
+		gulGulSampeslevel p;
 		i = fread(&p, sizeof(gulGulSampeslevel), 1, stdin);
+		last_event_id = p.event_id;
+		while (i != 0) {
+			if (p.event_id != last_event_id) {
+				dofm(last_event_id, event_guls, fmd_level1_, fmd_level2_);
+				event_guls.clear();
+				last_event_id = p.event_id;
+			}
+			if (p.sidx == mean_idx) p.sidx = 0;
+			if (p.sidx >= 0) event_guls.push_back(p);
+
+			i = fread(&p, sizeof(gulGulSampeslevel), 1, stdin);
+		}
+	}
+	
+	
+	if (stream_type == 1) {
+		while (i != 0){
+			gulSampeslevelHeader gh;
+			i = fread(&gh, sizeof(gh), 1, stdin);
+			if (gh.event_id != last_event_id ) {
+				if (last_event_id != -1) dofm(last_event_id, event_guls, fmd_level1_, fmd_level2_);
+				event_guls.clear();
+				last_event_id = gh.event_id;
+			}
+			while (i != 0){
+				gulSampeslevelRec gr;
+				i = fread(&gr, sizeof(gr), 1, stdin);
+				if (i == 0) break;
+				if (gr.sidx == 0) break;
+				if (gr.sidx == mean_idx) gr.sidx = 0;
+				gulGulSampeslevel gs;
+				gs.event_id = gh.event_id;
+				gs.item_id = gh.item_id;
+				gs.sidx = gr.sidx;
+				gs.gul = gr.gul;
+				event_guls.push_back(gs);
+			}
+		}
 	}
 
 }

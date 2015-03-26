@@ -50,6 +50,8 @@
 #include <fstream>
 #include <sstream>
 
+#include <memory.h>
+
 #include "getopt.h"
 #include "getrands.h"
 // #include <unistd.h>
@@ -59,6 +61,7 @@
 bool verbose = false;
 
 using namespace std;
+
 
 struct gulGulSamples {
 	int event_id;
@@ -120,9 +123,12 @@ int _outrec_count = 0;
 double _gul_limit = 0.0;
 bool _userandomtable = false;
 int _chunk_id = -1;
-bool _newstream = false;
+bool _newstream = true;
 
-gulGulSampeslevel *_buf = 0;
+gulGulSampeslevel *_bufold = 0;
+
+unsigned char *_buf = 0;
+int _bufsize = 0;
 
 int _bufoffset=0;
 
@@ -242,22 +248,79 @@ float getgul(damagebindictionary &b, gulGulSamples &g)
 
 	return gul;
 }
-void outputgul(gulGulSampeslevel &gg)
+
+void outputgulold(gulGulSampeslevel &gg)
 {
     // int pid = getpid();
     // fprintf(stderr,"%d: Gul::outputgul ********* BUF POINTER SET to %p!!! *******\n",pid, _buf);
 	if (_bufoffset < _gularraysize) {
-		_buf[_bufoffset] = gg;
+		_bufold[_bufoffset] = gg;
 		_bufoffset++;
 	}
 	else {
-        fwrite(_buf, sizeof(gulGulSampeslevel), _gularraysize, stdout);
+        fwrite(_bufold, sizeof(gulGulSampeslevel), _gularraysize, stdout);
 		_bufoffset = 0;
-		_buf[_bufoffset] = gg;
+		_bufold[_bufoffset] = gg;
 		_bufoffset++;
 	}
 	_outrec_count++;
 }
+
+void outputgulnewold(gulGulSampeslevel &gg)
+{
+	// int pid = getpid();
+	// fprintf(stderr,"%d: Gul::outputgul ********* BUF POINTER SET to %p!!! *******\n",pid, _buf);
+	// _bufoffset now refers to bytes
+	if (_bufoffset >= _bufsize) {
+		fwrite(_buf, sizeof(unsigned char), _bufoffset, stdout);
+		_bufoffset = 0;
+	}
+	memcpy(_buf + _bufoffset, &gg, sizeof(gg));
+	_bufoffset += sizeof(gg);
+	_outrec_count++;
+}
+
+gulSampeslevelHeader _lastheader;
+bool _isFirstEvent = true;
+
+void outputgulnew(gulGulSampeslevel &gg)
+{
+	if (_bufoffset >= _bufsize) {
+		fwrite(_buf, sizeof(unsigned char), _bufoffset, stdout);
+		_bufoffset = 0;
+	}
+
+	if (gg.event_id != _lastheader.event_id || gg.item_id != _lastheader.item_id) {
+		if (_isFirstEvent == false){
+			gulSampeslevelRec r;
+			r.sidx = 0;
+			r.gul = 0;
+			memcpy(_buf + _bufoffset, &r, sizeof(gulSampeslevelRec));
+			_bufoffset += sizeof(gulSampeslevelRec);	// null terminate list
+		}
+		else {
+			_isFirstEvent = false;
+		}
+		_lastheader.event_id = gg.event_id;
+		_lastheader.item_id = gg.item_id;
+		memcpy(_buf + _bufoffset, &_lastheader, sizeof(_lastheader));
+		_bufoffset += sizeof(_lastheader);
+	}
+
+	gulSampeslevelRec r;
+	r.sidx = gg.sidx;
+	r.gul = gg.gul;
+	memcpy(_buf + _bufoffset, &r, sizeof(gulSampeslevelRec));
+	_bufoffset += sizeof(gulSampeslevelRec);
+
+}
+
+void outputgul(gulGulSampeslevel &gg)
+{
+	if (_newstream == false) outputgulnewold(gg);
+	if (_newstream == true) outputgulnew(gg);
+}
+
 void output_mean(const exposure_rec &er, prob_mean *pp, int bin_count, float &gul_mean,  float &std_dev)
 {
 	float last_prob_to = 0;
@@ -314,7 +377,7 @@ damagecdfrec2 *d = (damagecdfrec2 *)rec;
 			gx.event_id = d->event_id;
 			gx.item_id = iter->item_id;
 			gx.gul = gul_mean;
-			gx.sidx = 0;
+			gx.sidx = mean_idx;
 			outputgul(gx);
 			gx.event_id = d->event_id;
 			gx.item_id = iter->item_id;
@@ -401,7 +464,7 @@ void doitold()
 #endif
 	int gulstream_type = 2;
 	fwrite(&gulstream_type, sizeof(gulstream_type), 1, stdout);
-    _buf = new gulGulSampeslevel[_gularraysize];
+    _bufold = new gulGulSampeslevel[_gularraysize];
     char *rec = new char[max_recsize];
     damagecdfrec2 *d = (damagecdfrec2 *)rec;
     std::vector<gulGulSampeslevel> event_guls;
@@ -462,9 +525,14 @@ void doit()
 	freopen(NULL, "wb", stdout);
 #endif
 	int gulstream_type = 2;
-	if (_newstream == true) gulstream_type = 1;
+	if (_newstream == true) {
+		gulstream_type = 1;
+	}
 	fwrite(&gulstream_type, sizeof(gulstream_type), 1, stdout);
-	_buf = new gulGulSampeslevel[_gularraysize];
+	
+	_bufsize = sizeof(gulGulSampeslevel)* _gularraysize;
+	_buf = new unsigned char[_bufsize + sizeof(gulGulSampeslevel)]; // make the allocation bigger by 1 record to avoid overrunning
+	
 	char *rec = new char[max_recsize];
 	damagecdfrec2 *d = (damagecdfrec2 *)rec;
 	std::vector<gulGulSampeslevel> event_guls;
@@ -497,12 +565,13 @@ void doit()
 			event_guls.clear();
 		}
 
-
 		processrec(rec, recsize, damagebindictionary_vec, exposure_map, event_guls, rnd);
 	}
 
-	fwrite(_buf, sizeof(gulGulSampeslevel), _bufoffset, stdout);
+	fwrite(_buf, sizeof(unsigned char), _bufoffset, stdout);
+
 }
+	// fwrite(_buf, sizeof(unsigned char), _bufoffset, stdout);
 
 void help()
 {
@@ -517,7 +586,7 @@ void help()
 int main(int argc, char *argv[])
 {
     int opt;
-     while ((opt = getopt(argc, argv, "NRrL:S:C:")) != -1) {
+     while ((opt = getopt(argc, argv, "ORrL:S:C:")) != -1) {
         switch (opt) {
         case 'S':
 			_samplesize = atoi(optarg);
@@ -535,8 +604,8 @@ int main(int argc, char *argv[])
 	case 'C':
 			_chunk_id = atoi(optarg);
 			break;
-	case 'N':
-			_newstream=true;
+	case 'O':
+			_newstream=false;
 			break;
         default: /* '?' */
            help();
@@ -559,7 +628,7 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    if (_newstream == false) doitold();
-	if (_newstream == true) doit();
+    //if (_newstream == false) doitold();
+	doit();
 
 }

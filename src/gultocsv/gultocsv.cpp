@@ -36,6 +36,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
 #ifdef _MSC_VER
 #include <fcntl.h>
 #include <io.h>
@@ -44,6 +45,7 @@
 
 using namespace std;
 #include "../include/oasis.h"
+#include "../include/cxxopts/cxxopts.hpp"
 
 void doit()
 {
@@ -90,8 +92,10 @@ void doit()
 	}
 
 }
+
 int main()
 {
+
     doit();
     return 0;
 }

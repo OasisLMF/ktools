@@ -35,7 +35,7 @@
 const int mean_idx = 1 << 24;
 
 #pragma pack(push, 1)
-struct damagecdfrec2 {
+struct damagecdfrec {
         int event_id;
         int areaperil_id;
         int vulnerabilty_id;

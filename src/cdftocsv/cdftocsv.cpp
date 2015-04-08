@@ -105,8 +105,8 @@ struct prob_mean {
 void processrec(char *rec, int recsize,
         const std::vector<damagebindictionary> &damagebindictionary_vec_)
 {
-    damagecdfrec2 *d = (damagecdfrec2 *)rec;
-    char *b = rec + sizeof(damagecdfrec2);
+    damagecdfrec *d = (damagecdfrec *)rec;
+    char *b = rec + sizeof(damagecdfrec);
     int *bin_count = (int *)b;
     // fprintf(stderr,"Bin count %d\n",*bin_count);
     b = b + sizeof(int);
@@ -134,7 +134,7 @@ std::vector<damagebindictionary> damagebindictionary_vec;
 getdamagebindictionary(damagebindictionary_vec);
 int total_bins = damagebindictionary_vec.size();
 if (total_bins == 0 ) total_bins = 10000;
-int max_recsize = (int)(total_bins * 8) + sizeof(damagecdfrec2)+sizeof(int);
+int max_recsize = (int)(total_bins * 8) + sizeof(damagecdfrec)+sizeof(int);
 
 char *rec = new char[max_recsize];
 int stream_type = 0;
@@ -145,16 +145,16 @@ bool bSuccess = getrecx((char *)&stream_type, stdin, sizeof(stream_type));
 
     for(;;){
         char *p = rec;
-        bSuccess = getrecx(p, stdin, sizeof(damagecdfrec2));
+        bSuccess = getrecx(p, stdin, sizeof(damagecdfrec));
         if (bSuccess == false) break;
-         p = p + sizeof(damagecdfrec2);
+         p = p + sizeof(damagecdfrec);
         bSuccess = getrecx(p, stdin, sizeof(int)); // we now have bin count
         int *q = (int *)p;
         p = p + sizeof(int);
         int recsize = (*q) * 8;
-                // we should now have damagecdfrec2 in memory
+                // we should now have damagecdfrec in memory
         bSuccess = getrecx(p, stdin, recsize);
-        recsize += sizeof(damagecdfrec2)+sizeof(int);
+        recsize += sizeof(damagecdfrec)+sizeof(int);
 
         processrec(rec, recsize, damagebindictionary_vec);
     }

@@ -350,7 +350,7 @@ void processrec(char *rec, int recsize,
 	std::vector<gulGulSampeslevel> &event_guls_,
 	getRands &rnd_)
 {
-damagecdfrec2 *d = (damagecdfrec2 *)rec;
+damagecdfrec *d = (damagecdfrec *)rec;
 	char *endofRec = rec + recsize;
 	long long p1 = rnd_.getp1(_reconcilationmode);	// prime p1	make these long to force below expression to not have sign problem
 	long long p2 = rnd_.getp2((unsigned int)p1);  // prime no p2
@@ -367,7 +367,7 @@ damagecdfrec2 *d = (damagecdfrec2 *)rec;
             gulGulSampeslevel gx;
 			gx.event_id = d->event_id;
 			gx.item_id = iter->item_id;
-			char *b = rec + sizeof(damagecdfrec2);
+			char *b = rec + sizeof(damagecdfrec);
 			int *bin_count = (int *)b;
 			b = b + sizeof(int);
 			prob_mean *pp = (prob_mean *)b;
@@ -451,7 +451,7 @@ void doitold()
 	getexposures(exposure_map);
 
     int total_bins = damagebindictionary_vec.size();
-	int max_recsize = (int)(total_bins * 8) + sizeof(damagecdfrec2)+sizeof(int);
+	int max_recsize = (int)(total_bins * 8) + sizeof(damagecdfrec)+sizeof(int);
 
 #ifdef _MSC_VER 
 	_setmode(_fileno(stdout), O_BINARY);
@@ -466,7 +466,7 @@ void doitold()
 	fwrite(&gulstream_type, sizeof(gulstream_type), 1, stdout);
     _bufold = new gulGulSampeslevel[_gularraysize];
     char *rec = new char[max_recsize];
-    damagecdfrec2 *d = (damagecdfrec2 *)rec;
+    damagecdfrec *d = (damagecdfrec *)rec;
     std::vector<gulGulSampeslevel> event_guls;
     int last_event_id = -1;
     int stream_type = 0;
@@ -479,18 +479,18 @@ void doitold()
 
     for (;;)
 	{
-		//damagecdfrec2 c;
+		//damagecdfrec c;
 		char *p = rec;
-		bSuccess = getrecx(p, stdin, sizeof(damagecdfrec2));
+		bSuccess = getrecx(p, stdin, sizeof(damagecdfrec));
 		if (bSuccess == false) break;
-		p = p + sizeof(damagecdfrec2);
+		p = p + sizeof(damagecdfrec);
 		bSuccess = getrecx(p, stdin, sizeof(int)); // we now have bin count
 		int *q = (int *)p;
 		p = p + sizeof(int);
 		int recsize = (*q) * 8;
-		// we should now have damagecdfrec2 in memory
+		// we should now have damagecdfrec in memory
 		bSuccess = getrecx(p, stdin, recsize);
-		recsize += sizeof(damagecdfrec2)+sizeof(int);
+		recsize += sizeof(damagecdfrec)+sizeof(int);
 		if (d->event_id != last_event_id) {
 			//if (last_event_id != -1) dofm(event_guls);
 			last_event_id = d->event_id;
@@ -513,7 +513,7 @@ void doit()
 	getexposures(exposure_map);
 
 	int total_bins = damagebindictionary_vec.size();
-	int max_recsize = (int)(total_bins * 8) + sizeof(damagecdfrec2)+sizeof(int);
+	int max_recsize = (int)(total_bins * 8) + sizeof(damagecdfrec)+sizeof(int);
 
 #ifdef _MSC_VER 
 	_setmode(_fileno(stdout), O_BINARY);
@@ -534,7 +534,7 @@ void doit()
 	_buf = new unsigned char[_bufsize + sizeof(gulGulSampeslevel)]; // make the allocation bigger by 1 record to avoid overrunning
 	
 	char *rec = new char[max_recsize];
-	damagecdfrec2 *d = (damagecdfrec2 *)rec;
+	damagecdfrec *d = (damagecdfrec *)rec;
 	std::vector<gulGulSampeslevel> event_guls;
 	int last_event_id = -1;
 	int stream_type = 0;
@@ -547,18 +547,18 @@ void doit()
 
 	for (;;)
 	{
-		//damagecdfrec2 c;
+		//damagecdfrec c;
 		char *p = rec;
-		bSuccess = getrecx(p, stdin, sizeof(damagecdfrec2));
+		bSuccess = getrecx(p, stdin, sizeof(damagecdfrec));
 		if (bSuccess == false) break;
-		p = p + sizeof(damagecdfrec2);
+		p = p + sizeof(damagecdfrec);
 		bSuccess = getrecx(p, stdin, sizeof(int)); // we now have bin count
 		int *q = (int *)p;
 		p = p + sizeof(int);
 		int recsize = (*q) * 8;
-		// we should now have damagecdfrec2 in memory
+		// we should now have damagecdfrec in memory
 		bSuccess = getrecx(p, stdin, recsize);
-		recsize += sizeof(damagecdfrec2)+sizeof(int);
+		recsize += sizeof(damagecdfrec)+sizeof(int);
 		if (d->event_id != last_event_id) {
 			//if (last_event_id != -1) dofm(event_guls);
 			last_event_id = d->event_id;

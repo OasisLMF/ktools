@@ -209,15 +209,15 @@ void sendevent_new(int event_id_, std::map<int, idxrec> &imap_, int max_no_of_bi
 	float *binp = new float[max_no_of_bins_];
 	int no_of_bins = 0;
 	while (length > 0) {
-		damagecdfrec2 df;
-		fread(&df, sizeof(damagecdfrec2), 1, fin);
+		damagecdfrec df;
+		fread(&df, sizeof(damagecdfrec), 1, fin);
 		if (df.event_id != event_id_){
 			std::cout << "Event ID: " << event_id_ << "not found\n";
 			exit(-1);
 		}
 		fread(&no_of_bins, sizeof(no_of_bins), 1, fin);
 		fread(binp, sizeof(float), no_of_bins, fin);
-		int len = sizeof(damagecdfrec2);
+		int len = sizeof(damagecdfrec);
 		char *p = (char *)&df;
 		int i = 0;
 		while (i < len) {
@@ -235,7 +235,7 @@ void sendevent_new(int event_id_, std::map<int, idxrec> &imap_, int max_no_of_bi
 			}
 			q++;
 		}
-		int rec_length = sizeof(damagecdfrec2) + sizeof(no_of_bins) + (sizeof(float)*no_of_bins);
+		int rec_length = sizeof(damagecdfrec) + sizeof(no_of_bins) + (sizeof(float)*no_of_bins);
 
 		length = length - rec_length;
 		if (length < 0) {

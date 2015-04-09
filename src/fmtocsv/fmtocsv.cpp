@@ -37,15 +37,16 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 */
 #include <iostream>
 #include <stdio.h>
+#include <stdlib.h>
 
 #ifdef _MSC_VER
 #include <fcntl.h>
 #include <io.h>
 #endif 
 
-using namespace std;
+#include "../include/oasis.h"
 
-const int mean_idx = 1 << 24;
+using namespace std;
 
 struct fmlevelhdr {
 	int event_id;
@@ -63,18 +64,31 @@ struct fmlevelrec {
 void doit()
 {
 
-#ifdef _MSC_VER
-	_setmode(_fileno(stdout), O_BINARY);
-	_setmode(_fileno(stdin), O_BINARY);
-#endif
-
-#ifdef __unix
 	freopen(NULL, "rb", stdin);
 	freopen(NULL, "wb", stdout);
-#endif
+
+	int fmstream_type;
+
+	int i = fread(&fmstream_type, sizeof(fmstream_type), 1, stdin);
+
+	int stream_type = fmstream_type & fmstream_id ;
+
+	if (stream_type != fmstream_id) {
+		std::cerr << "Not a fm stream type\n";
+		exit(-1);
+	}
+	stream_type = streamno_mask & fmstream_type;
+	if (stream_type != 1 ) {
+		std::cerr << "Unsupported fm stream type: " << stream_type << "\n";
+		exit(-1);
+	}
+
+	int sample_size = 0;
+	i = fread(&sample_size, sizeof(sample_size), 1, stdin);
+	
 	printf ("\"event_id\", \"prog_id\", \"layer_id\", \"output_id\", \"sidx\", \"loss\"\n");
 	fmlevelhdr p;
-	int i = fread(&p, sizeof(fmlevelhdr), 1, stdin);
+	i = fread(&p, sizeof(fmlevelhdr), 1, stdin);
 	int count = 0;
 	while (i != 0) {
 		fmlevelrec q;

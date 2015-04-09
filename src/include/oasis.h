@@ -34,6 +34,14 @@
 
 const int mean_idx = 1 << 24;
 
+// Stream types
+const unsigned int cdfstream_id = 0;		// high byte is zero
+const unsigned int gulstream_id = 1 << 24;
+const unsigned int fmstream_id = 2 << 24;
+const unsigned int outputstream_id = 3 << 24;
+
+const unsigned int streamno_mask = 0x00FFFFFF;
+
 #pragma pack(push, 1)
 struct damagecdfrec {
         int event_id;
@@ -49,19 +57,19 @@ struct damagebindictionary {
         int interval_type;
 };
 
-struct gulGulSampeslevel {
+struct gulSampleslevel {
 	int event_id;
 	int item_id;
 	int sidx;		// This has be stored for thresholds cannot be implied
 	float gul;		// may want to cut down to singe this causes 4 byte padding for allignment
 };
 
-struct gulSampeslevelHeader {
+struct gulSampleslevelHeader {
 	int event_id;
 	int item_id;
 };
 
-struct gulSampeslevelRec {
+struct gulSampleslevelRec {
 	int sidx;		// This has be stored for thresholds cannot be implied
 	float gul;		// may want to cut down to singe this causes 4 byte padding for allignment
 };

@@ -50,29 +50,31 @@ using namespace std;
 void doit()
 {
 
-#ifdef _MSC_VER
-        _setmode(_fileno(stdout), O_BINARY);
-        _setmode(_fileno(stdin), O_BINARY);
-#endif
 
-#ifdef __unix
-        freopen(NULL, "rb", stdin);
-        freopen(NULL, "wb", stdout);
-#endif
+    freopen(NULL, "rb", stdin);
+    freopen(NULL, "wb", stdout);
 
-	int stream_type = 0;
-	int i = fread(&stream_type, sizeof(stream_type), 1, stdin);
+
+	int gulstream_type = 0;
+	int i = fread(&gulstream_type, sizeof(gulstream_type), 1, stdin);
+	int stream_type = gulstream_type & gulstream_id ;
+
+	if (stream_type != gulstream_id) {
+		std::cerr << "Not a gul stream type\n";
+		exit(-1);
+	}
+	stream_type = streamno_mask &gulstream_type;
 	if (stream_type != 1 && stream_type != 2) {
-		std::cerr << "invalid stream time";
+		std::cerr << "Unsupported gul stream type\n";
 		exit(-1);
 	}
 
 	if (stream_type == 1){
 		while (i != 0){
-			gulSampeslevelHeader gh;
+			gulSampleslevelHeader gh;
 			i = fread(&gh, sizeof(gh), 1, stdin);
 			while (i != 0){
-				gulSampeslevelRec gr;
+				gulSampleslevelRec gr;
 				i = fread(&gr, sizeof(gr), 1, stdin);
 				if (i == 0) break;
 				if (gr.sidx == 0) break;
@@ -82,12 +84,12 @@ void doit()
 		}
 	}
 	if (stream_type == 2){
-		gulGulSampeslevel p;
-		i = fread(&p, sizeof(gulGulSampeslevel), 1, stdin);
+		gulSampleslevel p;
+		i = fread(&p, sizeof(p), 1, stdin);
 		while (i != 0) {
 			if (p.sidx == mean_idx) p.sidx = 0;
 			printf("%d, %d, %d, %f\n", p.event_id, p.item_id, p.sidx, p.gul);
-			i = fread(&p, sizeof(gulGulSampeslevel), 1, stdin);
+			i = fread(&p, sizeof(p), 1, stdin);
 		}
 	}
 

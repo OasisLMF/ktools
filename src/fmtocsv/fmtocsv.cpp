@@ -48,18 +48,6 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 using namespace std;
 
-struct fmlevelhdr {
-	int event_id;
-	int prog_id;
-	int layer_id;
-	int output_id;
-};
-
-struct fmlevelrec {
-	int sidx;
-	float loss;
-};
-
 
 void doit()
 {

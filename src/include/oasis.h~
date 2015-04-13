@@ -32,71 +32,47 @@
 * DAMAGE.
 */
 
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
+const int mean_idx = 1 << 24;
 
+// Stream types
+const unsigned int cdfstream_id = 0;		// high byte is zero
+const unsigned int gulstream_id = 1 << 24;
+const unsigned int fmstream_id = 2 << 24;
+const unsigned int outputstream_id = 3 << 24;
 
-#ifdef _MSC_VER
-#include <fcntl.h>
-#include <io.h>
-#endif
+const unsigned int streamno_mask = 0x00FFFFFF;
 
+#pragma pack(push, 1)
+struct damagecdfrec {
+        int event_id;
+        int areaperil_id;
+        int vulnerabilty_id;
+};
 
-using namespace std;
-#include "../include/oasis.h"
+struct damagebindictionary {
+        int bin_index;
+        float bin_from;
+        float bin_to;
+        float interpolation;
+        int interval_type;
+};
 
-void doit()
-{
+struct gulSampleslevel {
+	int event_id;
+	int item_id;
+	int sidx;		// This has be stored for thresholds cannot be implied
+	float gul;		// may want to cut down to singe this causes 4 byte padding for allignment
+};
 
+struct gulSampleslevelHeader {
+	int event_id;
+	int item_id;
+};
 
-    freopen(NULL, "rb", stdin);
-    freopen(NULL, "wb", stdout);
+struct gulSampleslevelRec {
+	int sidx;		// This has be stored for thresholds cannot be implied
+	float gul;		// may want to cut down to singe this causes 4 byte padding for allignment
+};
 
+#pragma pack(pop)
 
-	int gulstream_type = 0;
-	int i = fread(&gulstream_type, sizeof(gulstream_type), 1, stdin);
-	int stream_type = gulstream_type & gulstream_id ;
-
-	if (stream_type != gulstream_id) {
-		std::cerr << "Not a gul stream type\n";
-		exit(-1);
-	}
-	stream_type = streamno_mask &gulstream_type;
-	if (stream_type != 1 && stream_type != 2) {
-		std::cerr << "Unsupported gul stream type\n";
-		exit(-1);
-	}
-
-	if (stream_type == 1){
-		while (i != 0){
-			gulSampleslevelHeader gh;
-			i = fread(&gh, sizeof(gh), 1, stdin);
-			while (i != 0){
-				gulSampleslevelRec gr;
-				i = fread(&gr, sizeof(gr), 1, stdin);
-				if (i == 0) break;
-				if (gr.sidx == 0) break;
-				if (gr.sidx == mean_idx) gr.sidx = 0;
-				printf("%d, %d, %d, %f\n", gh.event_id, gh.item_id, gr.sidx, gr.gul);
-			}
-		}
-	}
-	if (stream_type == 2){
-		gulSampleslevel p;
-		i = fread(&p, sizeof(p), 1, stdin);
-		while (i != 0) {
-			if (p.sidx == mean_idx) p.sidx = 0;
-			printf("%d, %d, %d, %f\n", p.event_id, p.item_id, p.sidx, p.gul);
-			i = fread(&p, sizeof(p), 1, stdin);
-		}
-	}
-
-}
-
-int main()
-{
-
-    doit();
-    return 0;
-}

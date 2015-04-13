@@ -74,5 +74,19 @@ struct gulSampleslevelRec {
 	float gul;		// may want to cut down to singe this causes 4 byte padding for allignment
 };
 
+struct fmlevelhdr {
+	int event_id;
+	int prog_id;
+	int layer_id;
+	int output_id;
+};
+
+struct fmlevelrec {
+	int sidx;
+	float loss;
+};
+
 #pragma pack(pop)
+
+
 

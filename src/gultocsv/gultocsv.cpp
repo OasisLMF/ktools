@@ -69,6 +69,8 @@ void doit()
 	}
 
 	if (stream_type == 1){
+		int samplesize=0;
+		fread(&samplesize, sizeof(samplesize), 1, stdin);
 		while (i != 0){
 			gulSampleslevelHeader gh;
 			i = fread(&gh, sizeof(gh), 1, stdin);
@@ -83,6 +85,8 @@ void doit()
 		}
 	}
 	if (stream_type == 2){
+		int samplesize=0;
+		fread(&samplesize, sizeof(samplesize), 1, stdin);
 		gulSampleslevel p;
 		i = fread(&p, sizeof(p), 1, stdin);
 		while (i != 0) {

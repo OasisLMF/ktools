@@ -1,10 +1,34 @@
-# getmodel
+# Reference Model
 
-#### Introduction
+This section provides an explanation of the reference model of the SDK, which is a reference implementation of each of the components in the framework. 
 
-This section provides a specification of getmodel.
+The set of core components provided in this release is as follows;
+* **eve** is the process distributing utility. Based on the number of events in the input and the number of processes specified as a parameter, eve distributes the events to the processes. The output streams into getmodel.
+* **getmodel** is a CDF plug-in to generate the CDFs for a specified list of events. It is the reference example of a plug-in using Oasis kernel format data in binary format. getmodel streams into gulcalc or can be output to a binary file.
+* **gulcalc** is the core component which performs the GUL sampling calculations and numerical integration. The output is the Oasis format gul samples table. This can be output to a binary file or streamed into the fmcalc or an output calculation.
+* **fmcalc** is the core component which performs the Insured Loss sampling calculations and numerical integration. The output is the Oasis format loss samples table. This can be output to a binary file or streamed into an output calculation.
+* **outputcalc** performs an output analysis on the gul or loss samples. The reference example is an event loss table containing TIV, sample mean and standard deviation for each event at portfolio/programme summary level. The results are written directly into csv file as there is no downstream processing.
 
-getmodel generates a stream of cumulative effective damageability distributions (cdfs) from an input list of events. Specifically, it reads pre-generated Oasis format cdfs and converts them into a binary stream. This source data originates from an Oasis back-end database when the program is invoked by Oasis webservices.  To invoke it on a standalone basis, the source data must have been generated as binary files.
+In addition some components which convert the binary output of each calculation step to csv format are provided.
+* **cdftocsv** is a utility to convert binary format CDFs to a csv. getmodel standard output can be streamed directly into cdftocsv, or a binary file of the same format can be input.
+* **gultocsv** is a utility to convert binary format GULs to a csv. gulcalc standard output can be streamed directly into gultocsv, or a binary file of the same format can be input.
+* **fmtocsv** is a utility to convert binary format losses to a csv. fmcalc standard output can be streamed directly into fmtocsv, or a binary file of the same format can be input.
+
+Figure 1 shows the data stream workflow of the reference model with its particular internal data files.
+
+##### Figure 1. Reference Model Workflow
+![alt text](https://github.com/OasisLMF/ktools/blob/master/docs/img/KtoolsWorkflow.jpg "Reference Model Workflow")
+
+The input data for the reference components, shown as red source files, are the Events, Exposure Instance, Damage Bin Dictionary and FM Instance.  These are Oasis concepts with Oasis format data as outlined below. 
+
+Figure 2 shows the workflows for the data conversion components.
+
+##### Figure 2. Data Conversion Workflows
+![alt text](https://github.com/OasisLMF/ktools/blob/master/docs/img/Dbtools.jpg "Data Conversion Workflows")
+
+#### getmodel
+
+getmodel generates a stream of effective damageability distributions (cdfs) from an input list of events. Specifically, it reads pre-generated Oasis format cdfs and converts them into a binary stream. This source data originates from an Oasis back-end database when the program is invoked by Oasis webservices.  To invoke it on a standalone basis, the source data must have been generated as binary files.
 
 As well as being a core component of the Oasis in-memory kernel, getmodel also acts as a reference example of the class of programs which generates the damage distributions for an event set and streams them into memory. It is envisaged that model developers who wish to use ktools (the Oasis Developer Toolkit) as a back-end calculator of their existing platforms can write their own version of getmodel, reading in their own source data and converting it into Oasis format cdfs. As long as the standard input and output structures are adhered to, the program can be written in any langauge and read any input data.
 

@@ -20,7 +20,7 @@ However it is possible to write the results of each calculation to a binary file
 At present, intermediate stage binaries are required to be read back into memory for downstream calculations.
 
 ##### Figure 3. Multiple output file processing
-![alt text](https://github.com/OasisLMF/ktools/blob/master/docs/img/SingleOutput.jpg "Multiple output file processing")
+![alt text](https://github.com/OasisLMF/ktools/blob/master/docs/img/MultipleOutput1.jpg "Multiple output file processing")
 
 The reference model demonstrates an implementation of the principal calculation components, along with some data conversion components which convert binary files to csv files. 
 

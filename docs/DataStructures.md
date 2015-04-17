@@ -59,7 +59,7 @@ Header packet structure
 
 | Name              | Type   |  Bytes | Description                                                         | Example     |
 |:------------------|--------|--------| :-------------------------------------------------------------------|------------:|
-| stream_id         | int    |   1|3  | Identifier of the data stream type.                                 |    0|1      |
+| stream_id         | int    |   1/3  | Identifier of the data stream type.                                 |    0/1      |
 | event_id          | int    |    4   | Oasis event_id                                                      |   4545      |
 | areaperil_id      | int    |    4   | Oasis areaperil_id                                                  |  345456     |
 | vulnerability_id  | int    |    4   | Oasis vulnerability_id                                              |   345       |
@@ -84,7 +84,8 @@ Stream Header packet structure
 
 | Name              | Type   |  Bytes | Description                                                         | Example     |
 |:------------------|--------|--------| :-------------------------------------------------------------------|------------:|
-| stream_id         | int    |   1|3  | Identifier of the data stream type.                                 |    1|1      |
+| stream_id         | int    |   1/3  | Identifier of the data stream type.                                 |    1/1      |
+| no_of_samples     | int    |   4    | Number of samples                                                   |    100      |
 
 Gul header packet structure
 
@@ -97,7 +98,7 @@ Gul data packet structure
 
 | Name              | Type   |  Bytes | Description                                                         | Example     |
 |:------------------|--------|--------| :-------------------------------------------------------------------|------------:|
-| idx               | int    |   1|3  | Sample index                                                        |    0|10     |
+| idx               | int    |   1/3  | Sample index                                                        |    0/10     |
 | gul               | float  |    4   | The ground up loss for the sample                                   | 5675.675    |
 
 The data packet may be a variable length and so an idx of 0|0 identifies the end of the data packet.

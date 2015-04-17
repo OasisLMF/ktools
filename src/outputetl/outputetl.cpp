@@ -33,6 +33,9 @@
 */
 
 #include <iostream>
+#include <fstream>
+#include <sstream>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <map>
@@ -97,20 +100,77 @@ bool operator<(const output_key& lhs, const output_key& rhs)
 
         return lhs.layer_id < rhs.layer_id;
 }
-void dofmsummary(std::map<output_key, std::vector<float> > &output_map_, unsigned int sample_size_)
+struct vecrec {
+    float loss;
+    float tiv;
+};
+
+struct fmxref
+{
+    int item_id;
+    int output_id;
+};
+
+void loadfmxref(std::map<int,int> &fmxref_)
+{
+    std::ostringstream oss;
+    oss << "fm/fmxref.bin";
+
+    FILE *fin = fopen(oss.str().c_str(), "rb");
+    if (fin == NULL){
+            cerr << "Error opening " << oss.str() << "\n";
+            exit(EXIT_FAILURE);
+    }
+    fmxref rec;
+
+    int i = fread(&rec, sizeof(rec), 1, fin);
+    while (i != 0) {
+        fmxref_[rec.output_id] = rec.item_id;
+        i = fread(&rec, sizeof(rec), 1, fin);
+    }
+
+    fclose(fin);
+
+}
+
+void loadexposure(std::map<int,float> &itemtiv_)
+{
+    std::ostringstream oss;
+    oss << "exposures.bin";
+
+    FILE *fin = fopen(oss.str().c_str(), "rb");
+    if (fin == NULL){
+            cerr << "Error opening " << oss.str() << "\n";
+            exit(EXIT_FAILURE);
+    }
+    exposure rec;
+
+    int i = fread(&rec, sizeof(rec), 1, fin);
+    while (i != 0) {
+        itemtiv_[rec.item_id] = rec.tiv;
+        i = fread(&rec, sizeof(rec), 1, fin);
+    }
+
+    fclose(fin);
+}
+
+
+void dofmsummary(std::map<output_key, std::vector<vecrec> > &output_map_, unsigned int sample_size_)
 {
     auto iter = output_map_.begin();
     while (iter != output_map_.end()){
-        cerr << iter->first.prog_id << iter->first.layer_id << ","
+        cout << iter->first.prog_id << iter->first.layer_id << ","
              << iter->first.event_id << ","
              ;
 
        auto iter2 = iter->second.begin();
        float sumloss = 0.0;
        float sumlosssqr = 0.0;
+       float maxsumtiv = 0.0;
        while (iter2 != iter->second.end()){
-           sumloss+=*iter2;
-           sumlosssqr += (*iter2 * *iter2);
+           sumloss+= iter2->loss;
+           sumlosssqr += (iter2->loss * iter2->loss);
+           if (iter2->tiv > maxsumtiv) maxsumtiv = iter2->tiv;
            iter2++;
        }
 // sqrt((sum(z.sumlosssqr) - (sum(z.sumloss)*sum(z.sumloss)/(@sample_size * @sample_size)))/(@sample_size -1)) AS SD
@@ -118,23 +178,22 @@ void dofmsummary(std::map<output_key, std::vector<float> > &output_map_, unsigne
        float mean = sumloss / sample_size_;
        float sd = sqrt((sumlosssqr - ((sumloss*sumloss)/(sample_size_*sample_size_)))/(sample_size_ - 1));
 
-       cerr << mean << ","
-       << sd << "\n";
+       cout << mean << "," << sd << "," << maxsumtiv << "\n";
 
        iter++;
     }
 }
 
-void dofmoutput(unsigned int sample_size_)
+
+void dofmoutput(std::map<int,int> &fmxref_,std::map<int,float> &exposure_,unsigned int sample_size_)
 {
    std::cerr << "TODO samples: " << sample_size_ << "\n";
     fmlevelhdr p;
     int i = fread(&p, sizeof(fmlevelhdr), 1, stdin);
-    int top = 7250;
     int count=0;
     dumpfmheader(p);
 
-    std::map<output_key, std::vector<float> > output_map;
+    std::map<output_key, std::vector<vecrec> > output_map;
 
     int last_event_id = 0;
 
@@ -142,9 +201,8 @@ void dofmoutput(unsigned int sample_size_)
             fmlevelrec q;
             i = fread(&q, sizeof(fmlevelrec), 1, stdin);
             //dumpfmlevelrec(q);
-            while (i != 0) {
-                if (q.sidx == 0) break;
-                if (q.sidx == mean_idx) q.sidx = 0;
+            while (i != 0) {                
+                if (q.sidx == mean_idx) q.sidx = 0;                
               // if (count < top) fprintf(stderr, "%d, %d, %d, %d, %d, %f\n", p.prog_id, p.layer_id, p.event_id, p.output_id, q.sidx, q.loss);
                // if (count < top && q.sidx > 0 ) fprintf(stderr, "%d%d | %d | %d | %d | %f | %f\n", p.prog_id, p.layer_id, p.event_id, p.output_id, q.sidx, q.loss,sum_loss);
                 if (last_event_id != p.event_id ) { // can be made more efficent since event can only change at fmlevelhdr
@@ -160,21 +218,29 @@ void dofmoutput(unsigned int sample_size_)
                     k.prog_id = p.prog_id;
                     auto pos = output_map.find(k);
                     if (pos == output_map.end()){
-                        std::vector<float> v(sample_size_, 0.0);
+                        std::vector<vecrec> v(sample_size_, {0.0, 0.0});
                         output_map[k] = v;
                     }
-                    output_map[k][q.sidx] += q.loss;
+                    output_map[k][q.sidx].loss += q.loss;
+                    float tiv = exposure_[fmxref_[p.output_id]];
+                    output_map[k][q.sidx].tiv += tiv;
                 }
 
                 i = fread(&q, sizeof(fmlevelrec), 1, stdin);
+                if (q.sidx == 0 ) break;
                 count++;
             }
             if (i) i = fread(&p, sizeof(fmlevelhdr), 1, stdin);
     }
 
+    dofmsummary(output_map,sample_size_);
+
 }
 
-void doit()
+
+
+
+void doit(std::map<int,int> &fmxref_,std::map<int,float> &exposure_)
 {
     unsigned int gulfmstream_type = 0;
     int i = fread(&gulfmstream_type, sizeof(gulfmstream_type), 1, stdin);
@@ -214,7 +280,7 @@ void doit()
         unsigned int samplesize;
         i = fread(&samplesize, sizeof(samplesize), 1, stdin);
         if (i == 1){
-            dofmoutput(samplesize);
+            dofmoutput(fmxref_,exposure_,samplesize);
         }else {
              std::cerr << "Stream read error\n";
         }
@@ -255,12 +321,13 @@ int main(int argc, char* argv[])
            help();
            exit(EXIT_FAILURE);
         }
-#endif
     }
+#endif
 
    if (inFile.length() > 0){
         if (freopen(inFile.c_str(), "rb", stdin) == NULL) {
             cerr << "Error opening " << inFile << "\n";
+            exit(-1);
          }
    }else {
        freopen(NULL, "rb", stdin);
@@ -269,13 +336,18 @@ int main(int argc, char* argv[])
    if (outFile.length() > 0){
        if (freopen(outFile.c_str(), "wb", stdout) == NULL) {
            cerr << "Error opening " << outFile << "\n";
+           exit(-1);
         }
    }else{
        freopen(NULL, "wb", stdout);
    }
 
-    doit();
-    return 0;
+   std::map<int,int> fmxref;
+   loadfmxref(fmxref);
+   std::map<int,float> exposure;
+   loadexposure(exposure);
+   doit(fmxref,exposure);
+   return 0;
 
 }
 

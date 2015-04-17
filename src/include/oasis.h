@@ -88,5 +88,11 @@ struct fmlevelrec {
 
 #pragma pack(pop)
 
-
+struct exposure{
+	int item_id;
+	int areaperil_id;
+	int vulnerability_id;
+	int group_id;
+	float tiv;
+};
 

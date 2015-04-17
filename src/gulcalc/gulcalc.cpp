@@ -75,13 +75,6 @@ struct gulGulSamples {
 };
 
 
-struct exposure{
-	int item_id;
-	int areaperil_id;
-	int vulnerability_id;
-	int group_id;
-	float tiv;
-};
 struct exposure_key{
 	int areaperil_id;
 	int vulnerability_id;

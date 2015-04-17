@@ -44,6 +44,10 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <io.h>
 #endif 
 
+#ifdef __unix
+    #include <unistd.h>
+#endif
+
 #include "../include/oasis.h"
 
 using namespace std;
@@ -95,8 +99,33 @@ void doit()
 	}
 
 }
+
+void help()
+{
+
+    cerr << "-I inputfilename\n"
+        << "-O outputfielname\n"
+        ;
+}
+
 int main()
 {
+#ifdef __unixx
+    while ((opt = getopt(argc, argv, "hI:O:")) != -1) {
+        switch (opt) {
+        case 'I':
+            inFile = optarg;
+            break;
+         case 'O':
+            outFile = optarg;
+            break;
+        case 'h':
+           help();
+           exit(EXIT_FAILURE);
+        }
+    }
+#endif
+
 	doit();
 	return 0;
 }

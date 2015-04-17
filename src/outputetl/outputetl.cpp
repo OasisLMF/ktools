@@ -159,7 +159,7 @@ void dofmsummary(std::map<output_key, std::vector<vecrec> > &output_map_, unsign
 {
     auto iter = output_map_.begin();
     while (iter != output_map_.end()){
-        cout << iter->first.prog_id << iter->first.layer_id << ","
+        cout << "'" << iter->first.prog_id << "_" << iter->first.layer_id << "',"
              << iter->first.event_id << ","
              ;
 
@@ -187,7 +187,6 @@ void dofmsummary(std::map<output_key, std::vector<vecrec> > &output_map_, unsign
 
 void dofmoutput(std::map<int,int> &fmxref_,std::map<int,float> &exposure_,unsigned int sample_size_)
 {
-   std::cerr << "TODO samples: " << sample_size_ << "\n";
     fmlevelhdr p;
     int i = fread(&p, sizeof(fmlevelhdr), 1, stdin);
     int count=0;
@@ -225,47 +224,69 @@ void dofmoutput(std::map<int,int> &fmxref_,std::map<int,float> &exposure_,unsign
                     output_map[k][q.sidx].tiv += tiv;
                 }
 
-                i = fread(&q, sizeof(fmlevelrec), 1, stdin);
+                i = fread(&q, sizeof(q), 1, stdin);
                 if (q.sidx == 0 ) break;
                 count++;
             }
-            if (i) i = fread(&p, sizeof(fmlevelhdr), 1, stdin);
+            if (i) i = fread(&p, sizeof(p), 1, stdin);
     }
 
     dofmsummary(output_map,sample_size_);
 
 }
-void dogulsummary(std::vector<vecrec> &output_vec_, unsigned int sample_size_)
+void dogulsummary(int event_id_,std::vector<vecrec> &output_vec_, unsigned int sample_size_)
 {
+
+        cout << "'ALL'" << "," << event_id_  << "," ;
+
+       auto iter = output_vec_.begin();
+       float sumloss = 0.0;
+       float sumlosssqr = 0.0;
+       float maxsumtiv = 0.0;
+       while (iter != output_vec_.end()){
+           sumloss+= iter->loss;
+           sumlosssqr += (iter->loss * iter->loss);
+           if (iter->tiv > maxsumtiv) maxsumtiv = iter->tiv;
+           iter++;
+       }
+// sqrt((sum(z.sumlosssqr) - (sum(z.sumloss)*sum(z.sumloss)/(@sample_size * @sample_size)))/(@sample_size -1)) AS SD
+
+       float mean = sumloss / sample_size_;
+       float sd = sqrt((sumlosssqr - ((sumloss*sumloss)/(sample_size_*sample_size_)))/(sample_size_ - 1));
+
+       cout << mean << "," << sd << "," << maxsumtiv << "\n";
+
 
 }
 void doguloutput(std::map<int,int> &fmxref_,std::map<int,float> &exposure_,unsigned int sample_size_)
 {
+    int count=0;
     gulSampleslevelHeader gh;
     int i = fread(&gh, sizeof(gh), 1, stdin);
     int last_event_id = 0;
     std::vector<vecrec> output_vec(sample_size_, {0.0, 0.0}) ;
-    while (i != 0){
+    while (i != 0) {
         gulSampleslevelRec gr;
         i = fread(&gr, sizeof(gr), 1, stdin);
-        if (i == 0) break;
-        if (gr.sidx == mean_idx) gr.sidx = 0;
-        if (last_event_id != gh.event_id ) { // can be made more efficent since event can only change at fmlevelhdr
-            // std::cerr << "TODO: Got all event elements now do outer query event_id : " << last_event_id << "\n";
-            last_event_id = gh.event_id;
-            dogulsummary(output_vec,sample_size_);
-            output_vec = std::vector<vecrec>(sample_size_,{0.0,0.0});
-        }
-        if (gr.sidx > 0 ) {
-            output_vec[gr.sidx].loss += gr.gul;
-            float tiv = exposure_[gh.item_id];
-            output_vec[gr.sidx].tiv += tiv;
-        }
+        while (i != 0){
+            if (gr.sidx == mean_idx) gr.sidx = 0;
+            if (last_event_id != gh.event_id ) { // can be made more efficent since event can only change at fmlevelhdr
+                // std::cerr << "TODO: Got all event elements now do outer query event_id : " << last_event_id << "\n";
+                if (last_event_id) dogulsummary(last_event_id,output_vec,sample_size_);
+                last_event_id = gh.event_id;
+                output_vec = std::vector<vecrec>(sample_size_,{0.0,0.0});
+            }
+            if (gr.sidx > 0 ) {
+                output_vec[gr.sidx].loss += gr.gul;
+                float tiv = exposure_[gh.item_id];
+                output_vec[gr.sidx].tiv += tiv;
+            }
 
-        i = fread(&q, sizeof(fmlevelrec), 1, stdin);
-        if (gh.sidx == 0 ) break;
-        count++;
-//        printf("%d, %d, %d, %f\n", gh.event_id, gh.item_id, gr.sidx, gr.gul);
+            i = fread(&gr, sizeof(gr), 1, stdin);
+            if (gr.sidx == 0 ) break;
+            count++;
+        }
+        if (i) i = fread(&gh, sizeof(gh), 1, stdin);
     }
 }
 

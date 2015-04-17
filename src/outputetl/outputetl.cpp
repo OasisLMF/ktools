@@ -191,7 +191,6 @@ void dofmoutput(std::map<int,int> &fmxref_,std::map<int,float> &exposure_,unsign
     fmlevelhdr p;
     int i = fread(&p, sizeof(fmlevelhdr), 1, stdin);
     int count=0;
-    dumpfmheader(p);
 
     std::map<output_key, std::vector<vecrec> > output_map;
 
@@ -202,7 +201,7 @@ void dofmoutput(std::map<int,int> &fmxref_,std::map<int,float> &exposure_,unsign
             i = fread(&q, sizeof(fmlevelrec), 1, stdin);
             //dumpfmlevelrec(q);
             while (i != 0) {                
-                if (q.sidx == mean_idx) q.sidx = 0;                
+                if (q.sidx == mean_idx) q.sidx = 0;
               // if (count < top) fprintf(stderr, "%d, %d, %d, %d, %d, %f\n", p.prog_id, p.layer_id, p.event_id, p.output_id, q.sidx, q.loss);
                // if (count < top && q.sidx > 0 ) fprintf(stderr, "%d%d | %d | %d | %d | %f | %f\n", p.prog_id, p.layer_id, p.event_id, p.output_id, q.sidx, q.loss,sum_loss);
                 if (last_event_id != p.event_id ) { // can be made more efficent since event can only change at fmlevelhdr
@@ -236,8 +235,39 @@ void dofmoutput(std::map<int,int> &fmxref_,std::map<int,float> &exposure_,unsign
     dofmsummary(output_map,sample_size_);
 
 }
+void dogulsummary(std::vector<vecrec> &output_vec_, unsigned int sample_size_)
+{
 
+}
+void doguloutput(std::map<int,int> &fmxref_,std::map<int,float> &exposure_,unsigned int sample_size_)
+{
+    gulSampleslevelHeader gh;
+    int i = fread(&gh, sizeof(gh), 1, stdin);
+    int last_event_id = 0;
+    std::vector<vecrec> output_vec(sample_size_, {0.0, 0.0}) ;
+    while (i != 0){
+        gulSampleslevelRec gr;
+        i = fread(&gr, sizeof(gr), 1, stdin);
+        if (i == 0) break;
+        if (gr.sidx == mean_idx) gr.sidx = 0;
+        if (last_event_id != gh.event_id ) { // can be made more efficent since event can only change at fmlevelhdr
+            // std::cerr << "TODO: Got all event elements now do outer query event_id : " << last_event_id << "\n";
+            last_event_id = gh.event_id;
+            dogulsummary(output_vec,sample_size_);
+            output_vec = std::vector<vecrec>(sample_size_,{0.0,0.0});
+        }
+        if (gr.sidx > 0 ) {
+            output_vec[gr.sidx].loss += gr.gul;
+            float tiv = exposure_[gh.item_id];
+            output_vec[gr.sidx].tiv += tiv;
+        }
 
+        i = fread(&q, sizeof(fmlevelrec), 1, stdin);
+        if (gh.sidx == 0 ) break;
+        count++;
+//        printf("%d, %d, %d, %f\n", gh.event_id, gh.item_id, gr.sidx, gr.gul);
+    }
+}
 
 
 void doit(std::map<int,int> &fmxref_,std::map<int,float> &exposure_)
@@ -249,18 +279,14 @@ void doit(std::map<int,int> &fmxref_,std::map<int,float> &exposure_)
         int stream_type = gulfmstream_type & streamno_mask ;
 
         if (stream_type == 1) {
-            while (i != 0){
-                gulSampleslevelHeader gh;
-                i = fread(&gh, sizeof(gh), 1, stdin);
-                while (i != 0){
-                    gulSampleslevelRec gr;
-                    i = fread(&gr, sizeof(gr), 1, stdin);
-                    if (i == 0) break;
-                    if (gr.sidx == 0) break;
-                    if (gr.sidx == mean_idx) gr.sidx = 0;
-                    printf("%d, %d, %d, %f\n", gh.event_id, gh.item_id, gr.sidx, gr.gul);
-                }
+            unsigned int samplesize;
+            i = fread(&samplesize, sizeof(samplesize), 1, stdin);
+            if (i == 1){
+                doguloutput(fmxref_,exposure_,samplesize);
+            }else {
+                 std::cerr << "Stream read error\n";
             }
+            return;
         }
 
         if (stream_type == 2) {

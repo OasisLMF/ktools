@@ -43,6 +43,10 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifdef __unix
+    #include <unistd.h>
+#endif
+
 #ifdef _MSC_VER
 #include <fcntl.h>
 #include <io.h>
@@ -262,9 +266,6 @@ void dofm(int event_id_, std::vector<gulSampleslevel> &event_guls_,
 
 void doit(std::map<int, fmdata> &fmd_level1_, std::map<int, fmdata> &fmd_level2_)
 {
-
-	freopen(NULL, "rb", stdin);
-	freopen(NULL, "wb", stdout);
 	
 	unsigned int fmstream_type = 1 | fmstream_id;
 	
@@ -327,7 +328,7 @@ void doit(std::map<int, fmdata> &fmd_level1_, std::map<int, fmdata> &fmd_level2_
 				gs.item_id = gh.item_id;
 				gs.sidx = gr.sidx;
 				gs.gul = gr.gul;
-				event_guls.push_back(gs);
+                if (gs.sidx >= 0) event_guls.push_back(gs);
 			}
 		}
 	}
@@ -357,8 +358,57 @@ void init(std::map<int, fmdata> &fmd_level1_, std::map<int, fmdata> &fmd_level2_
 	fclose(fin);
 }
 
-int main()
+void help()
 {
+
+    cerr << "-I inputfilename\n"
+        << "-O outputfielname\n"
+        ;
+}
+
+
+int main(int argc, char* argv[])
+{
+    int opt;
+    std::string inFile;
+    std::string outFile;
+
+#ifdef __unix
+    while ((opt = getopt(argc, argv, "hI:O:")) != -1) {
+        switch (opt) {
+        case 'I':
+            inFile = optarg;
+            break;
+         case 'O':
+            outFile = optarg;
+            break;
+        case 'h':
+           help();
+           exit(EXIT_FAILURE);
+        }
+    }
+#endif
+
+   if (inFile.length() > 0){
+        if (freopen(inFile.c_str(), "rb", stdin) == NULL) {
+            cerr << "Error opening " << inFile << "\n";
+            exit(-1);
+         }
+   }else {
+       freopen(NULL, "rb", stdin);
+   }
+
+   if (outFile.length() > 0){
+       if (freopen(outFile.c_str(), "wb", stdout) == NULL) {
+           cerr << "Error opening " << outFile << "\n";
+           exit(-1);
+        }
+   }else{
+       freopen(NULL, "wb", stdout);
+   }
+
+
+
 	std::map<int, fmdata> fmd_level1;
 	std::map<int, fmdata> fmd_level2;
 	init(fmd_level1, fmd_level2);

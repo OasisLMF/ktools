@@ -6,7 +6,7 @@ all clean uninstall install ktools:
 	cd gultocsv && $(MAKE) $@
 	cd fmcalc && $(MAKE) $@
 	cd fmtocsv && $(MAKE) $@
-	cd outputetl && $(MAKE) $@
+	cd outputcalc && $(MAKE) $@
 
 .PHONY: all clean install
 

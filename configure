@@ -2689,7 +2689,7 @@ END
     as_fn_error $? "Your 'rm' program is bad, sorry." "$LINENO" 5
   fi
 fi
-ac_config_files="$ac_config_files Makefile src/Makefile src/getmodel/Makefile src/gulcalc/Makefile src/eve/Makefile src/cdftocsv/Makefile src/gultocsv/Makefile src/outputetl/Makefile"
+ac_config_files="$ac_config_files Makefile src/Makefile src/getmodel/Makefile src/gulcalc/Makefile src/eve/Makefile src/cdftocsv/Makefile src/gultocsv/Makefile src/outputcalc/Makefile"
 
 ac_config_headers="$ac_config_headers src/config.h:cfg0"
 
@@ -5392,7 +5392,7 @@ do
     "src/eve/Makefile") CONFIG_FILES="$CONFIG_FILES src/eve/Makefile" ;;
     "src/cdftocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/cdftocsv/Makefile" ;;
     "src/gultocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/gultocsv/Makefile" ;;
-    "src/outputetl/Makefile") CONFIG_FILES="$CONFIG_FILES src/outputetl/Makefile" ;;
+    "src/outputcalc/Makefile") CONFIG_FILES="$CONFIG_FILES src/outputcalc/Makefile" ;;
     "src/config.h") CONFIG_HEADERS="$CONFIG_HEADERS src/config.h:cfg0" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
 

@@ -3,7 +3,7 @@ all clean uninstall install ktools:
 	cd getmodel && $(MAKE) $@
 	cd eve && $(MAKE) $@
 	cd cdftocsv && $(MAKE) $@
-	cd outputetl && $(MAKE) $@
+	cd outputcalc && $(MAKE) $@
 	cd gultocsv && $(MAKE) $@
 
 .PHONY: all clean install

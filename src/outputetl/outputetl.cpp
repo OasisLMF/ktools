@@ -216,7 +216,7 @@ void dofmoutput(std::map<int,int> &fmxref_,std::map<int,float> &exposure_,unsign
                     k.prog_id = p.prog_id;
                     auto pos = output_map.find(k);
                     if (pos == output_map.end()){
-                        std::vector<vecrec> v(sample_size_, {0.0, 0.0});
+                        std::vector<vecrec> v(sample_size_+1, {0.0, 0.0});
                         output_map[k] = v;
                     }
                     output_map[k][q.sidx].loss += q.loss;
@@ -274,7 +274,7 @@ void doguloutput(std::map<int,int> &fmxref_,std::map<int,float> &exposure_,unsig
                 // std::cerr << "TODO: Got all event elements now do outer query event_id : " << last_event_id << "\n";
                 if (last_event_id) dogulsummary(last_event_id,output_vec,sample_size_);
                 last_event_id = gh.event_id;
-                output_vec = std::vector<vecrec>(sample_size_,{0.0,0.0});
+                output_vec = std::vector<vecrec>(sample_size_+1,{0.0,0.0});
             }
             if (gr.sidx > 0 ) {
                 output_vec[gr.sidx].loss += gr.gul;

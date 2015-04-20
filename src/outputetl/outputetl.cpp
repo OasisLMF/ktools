@@ -176,8 +176,7 @@ void dofmsummary(std::map<output_key, std::vector<vecrec> > &output_map_, unsign
 // sqrt((sum(z.sumlosssqr) - (sum(z.sumloss)*sum(z.sumloss)/(@sample_size * @sample_size)))/(@sample_size -1)) AS SD
 
        float mean = sumloss / sample_size_;
-       float sd = sqrt((sumlosssqr - ((sumloss*sumloss)/(sample_size_*sample_size_)))/(sample_size_ - 1));
-
+       float sd = sqrt((sumlosssqr - ((sumloss*sumloss)/sample_size_))/(sample_size_ - 1));
        cout << mean << "," << sd << "," << maxsumtiv << "\n";
 
        iter++;

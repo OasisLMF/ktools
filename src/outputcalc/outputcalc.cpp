@@ -176,7 +176,8 @@ void dofmsummary(std::map<output_key, std::vector<vecrec> > &output_map_, unsign
 // sqrt((sum(z.sumlosssqr) - (sum(z.sumloss)*sum(z.sumloss)/(@sample_size * @sample_size)))/(@sample_size -1)) AS SD
 
        float mean = sumloss / sample_size_;
-       float sd = sqrt((sumlosssqr - ((sumloss*sumloss)/sample_size_))/(sample_size_ - 1));
+       float sd = 0;
+       if (sample_size_ > 1) sd = sqrt((sumlosssqr - ((sumloss*sumloss)/sample_size_))/(sample_size_ - 1));
        cout << mean << "," << sd << "," << maxsumtiv << "\n";
 
        iter++;
@@ -251,13 +252,14 @@ void dogulsummary(int event_id_,std::vector<vecrec> &output_vec_, unsigned int s
 // sqrt((sum(z.sumlosssqr) - (sum(z.sumloss)*sum(z.sumloss)/(@sample_size * @sample_size)))/(@sample_size -1)) AS SD
 
        float mean = sumloss / sample_size_;
-       float sd = sqrt((sumlosssqr - ((sumloss*sumloss)/(sample_size_*sample_size_)))/(sample_size_ - 1));
+       float sd = 0;
+       if (sample_size_ > 1) sd = sqrt((sumlosssqr - ((sumloss*sumloss)/sample_size_))/(sample_size_ - 1));
 
        cout << mean << "," << sd << "," << maxsumtiv << "\n";
 
 
 }
-void doguloutput(std::map<int,int> &fmxref_,std::map<int,float> &exposure_,unsigned int sample_size_)
+void doguloutput(std::map<int,float> &exposure_,unsigned int sample_size_)
 {
     int count=0;
     gulSampleslevelHeader gh;
@@ -302,7 +304,7 @@ void doit(std::map<int,int> &fmxref_,std::map<int,float> &exposure_)
             unsigned int samplesize;
             i = fread(&samplesize, sizeof(samplesize), 1, stdin);
             if (i == 1){
-                doguloutput(fmxref_,exposure_,samplesize);
+                doguloutput(exposure_,samplesize);
             }else {
                  std::cerr << "Stream read error\n";
             }

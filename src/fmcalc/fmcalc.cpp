@@ -66,9 +66,15 @@ struct fmdata {
 	int policytc_id;
 	int layer_id;
 	int calcrule_id;
+	int allocrule_id;
 	float deductible;
 	float limits;
 	float share_prop_of_lim;
+	float deductible_prop_of_loss;
+	float limit_prop_of_loss;
+	float deductible_prop_of_tiv;
+	float limit_prop_of_tiv;
+	float deductible_prop_of_limit;
 };
 
 struct fmrec {

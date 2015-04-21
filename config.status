@@ -393,7 +393,7 @@ on `(hostname || uname -n) 2>/dev/null | sed 1q`
 "
 
 # Files that config.status was made for.
-config_files=" Makefile src/Makefile src/getmodel/Makefile src/gulcalc/Makefile src/eve/Makefile src/cdftocsv/Makefile src/gultocsv/Makefile src/outputcalc/Makefile"
+config_files=" Makefile src/Makefile src/getmodel/Makefile src/gulcalc/Makefile src/eve/Makefile src/cdftocsv/Makefile src/gultocsv/Makefile src/outputcalc/Makefile src/fmtocsv/Makefile src/fmdatatocsv/Makefile src/fmcalc/Makefile"
 config_headers=" src/config.h:cfg0"
 config_commands=" depfiles"
 
@@ -554,6 +554,9 @@ do
     "src/cdftocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/cdftocsv/Makefile" ;;
     "src/gultocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/gultocsv/Makefile" ;;
     "src/outputcalc/Makefile") CONFIG_FILES="$CONFIG_FILES src/outputcalc/Makefile" ;;
+    "src/fmtocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/fmtocsv/Makefile" ;;
+    "src/fmdatatocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/fmdatatocsv/Makefile" ;;
+    "src/fmcalc/Makefile") CONFIG_FILES="$CONFIG_FILES src/fmcalc/Makefile" ;;
     "src/config.h") CONFIG_HEADERS="$CONFIG_HEADERS src/config.h:cfg0" ;;
     "depfiles") CONFIG_COMMANDS="$CONFIG_COMMANDS depfiles" ;;
 

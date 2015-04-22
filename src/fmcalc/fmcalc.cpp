@@ -283,12 +283,15 @@ void doit(std::map<int, fmdata> &fmd_level1_, std::map<int, fmdata> &fmd_level2_
 				dofm(last_event_id, event_guls, fmd_level1_, fmd_level2_);
 				event_guls.clear();
 				last_event_id = p.event_id;
-			}
+			}            
 			if (p.sidx == mean_idx) p.sidx = 0;
 			if (p.sidx >= 0) event_guls.push_back(p);
 
 			i = fread(&p, sizeof(gulSampleslevel), 1, stdin);
 		}
+        if (i==0){
+            if (last_event_id != -1) dofm(p.event_id, event_guls, fmd_level1_, fmd_level2_);
+        }
 	}
 	
 	
@@ -299,11 +302,14 @@ void doit(std::map<int, fmdata> &fmd_level1_, std::map<int, fmdata> &fmd_level2_
 		while (i != 0){
 			gulSampleslevelHeader gh;
 			i = fread(&gh, sizeof(gh), 1, stdin);
-			if (gh.event_id != last_event_id ) {
+            if (gh.event_id != last_event_id && i==1) {
 				if (last_event_id != -1) dofm(last_event_id, event_guls, fmd_level1_, fmd_level2_);
 				event_guls.clear();
 				last_event_id = gh.event_id;
 			}
+            if (i==0){
+                if (last_event_id != -1) dofm(gh.event_id, event_guls, fmd_level1_, fmd_level2_);
+            }
 			while (i != 0){
 				gulSampleslevelRec gr;
 				i = fread(&gr, sizeof(gr), 1, stdin);

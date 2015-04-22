@@ -289,6 +289,7 @@ void doguloutput(std::map<int,float> &exposure_,unsigned int sample_size_)
         }
         if (i) i = fread(&gh, sizeof(gh), 1, stdin);
     }
+    dogulsummary(gh.event_id,output_vec,sample_size_);
 }
 
 

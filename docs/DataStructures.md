@@ -1,4 +1,4 @@
-# Data Structures
+# Specification
 
 ### Introduction
 
@@ -8,22 +8,22 @@ Most components have a standard input (stdin) and output (stdout) data stream st
 
 #### Stream types
 
-The architecture supports multiple stream types. Therefore a developer can define a new type of data stream within the framework by specifying a unique stream_id of the stdout of one or more of the components.
+The architecture supports multiple stream types. Therefore a developer can define a new type of data stream within the framework by specifying a unique stream_id of the stdout of one or more of the components, or even write a new component which performs an intermediate calculation between the existing components.
 
-The stream_id is the first 4 byte header of the stdout streams. The higher byte is reserved to identify the component to which the stream type relates, and the 2nd to 4th bytes hold the identifier of the stream type. 
+The stream_id is the first 4 byte header of the stdout streams. The higher byte is reserved to identify the type of stream, and the 2nd to 4th bytes hold the identifier of the stream.
 
 The current reserved values are as follows;
 
 Higher byte;
 
-| Byte 1 |  Component    |
-|:-------|:--------------|
-|    0   | getmodel      |
-|    1   | gulcalc       |
-|    2   | fmcalc        |
-|    3   | outputcalc    |
+| Byte 1 |  Stream type   |
+|:-------|:---------------|
+|    0   | getmodel       |
+|    1   | gulcalc        |
+|    2   | fmcalc         |
+|    3   | outputcalc     |
 
-Ktools reserved stream_ids;
+Reserved stream_ids;
 
 | Byte 1 | Bytes 2-4 |  Description                                                        		 |
 |:-------|-----------|:--------------------------------------------------------------------------|
@@ -31,6 +31,11 @@ Ktools reserved stream_ids;
 |    1   |     1     |  gulcalc - Reference example for Oasis format ground up loss sample output|
 |    2   |     1     |  fmcalc - Reference example for Oasis format insured loss sample output   |
 |    3   |     1     |  outputcalc - Reference example for Oasis format Event Loss Table         |
+
+There are rules about which stream types can be accepted as inputs to the components. These are;
+* gulcalc can only take stream type 0 (getmodel standard output) as input
+* fmcalc can only take stream type 1 (gulcalc standard output) as input
+* outputcalc can take either stream type 1 (gulcalc standard output) or 2 (fmcalc standard output) as input
 
 #### eve
 
@@ -45,7 +50,7 @@ Data packet structure
 |:------------------|--------|--------| :-------------------------------------------------------------------|------------:|
 | event_id          | int    |    4   | Oasis event_id                                                      |   4545      |
 
-Note that eve currently has no stdout stream_type header.
+Note that eve currently has no stream_type header.
 
 #### getmodel
 
@@ -74,7 +79,7 @@ Data packet structure (record repeated no_of_bin times)
 
 #### gulcalc
 
-gulcalc is the component which calculates ground up loss. It takes the cdfs as standard input and based on the sampling parameters specified, performs Monte Carlo sampling and numerical integration. The output is a table of ground up loss samples in Oasis kernel format, with mean (IDX=0) and standard deviation (IDX=-1).
+gulcalc is the component which calculates ground up loss. It takes the cdfs as standard input and based on the sampling parameters specified, performs Monte Carlo sampling and numerical integration. The output is a table of ground up loss samples in Oasis kernel format, with mean (sidx=0) and standard deviation (sidx=-1).
 
 ##### Input
 Same as getmodel output or a binary file of the same data structure can be piped into gulcalc.
@@ -98,32 +103,32 @@ Gul data packet structure
 
 | Name              | Type   |  Bytes | Description                                                         | Example     |
 |:------------------|--------|--------| :-------------------------------------------------------------------|------------:|
-| idx               | int    |   1/3  | Sample index                                                        |    0/10     |
+| sidx              | int    |   1/3  | Sample index                                                        |    0/10     |
 | gul               | float  |    4   | The ground up loss for the sample                                   | 5675.675    |
 
-The data packet may be a variable length and so an idx of 0|0 identifies the end of the data packet.
+The data packet may be a variable length and so an sidx of 0/0 identifies the end of the data packet.
 
-The 4 byte idx field has a structure similar to the stream_id, in that the higher byte is reserved to have a special meaning, and bytes 2-4 hold the identifier.
+The 4 byte sidx field has a structure similar to the stream_id, in that the higher byte is reserved to have a special meaning, and bytes 2-4 hold the identifier.
 The higher byte reserved values are;
 
 | Byte 1 |  Meaning                  |
 |:-------|:--------------------------|
-|    0   | normal sample (idx>0)     |
+|    0   | normal sample (sidx>0)    |
 |    1   | mean / standard deviation |
 
-The idx reserved values are;
+The sidx reserved values are;
 
-| Byte 1 | Bytes 2-4 |  Description                   |
-|:-------|-----------|:-------------------------------|
-|    1   |     0     |  mean                          |
-|    1   |     -1    |  standard deviation            |
-|    0   |     0     |  data packet terminator        |
+| Byte 1 | Bytes 2-4 |  Description              |
+|:-------|-----------|:--------------------------|
+|    1   |     0     |  mean                     |
+|    1   |     -1    |  standard deviation       |
+|    0   |     0     |  data packet terminator   |
 
-A normal sample idx starts at 1 and has a higher byte of 0. For example, the idx for sample 100 is stored as 0|100.
+A normal sample index starts at 1 and has a higher byte of 0. For example, the sidx for sample 100 is stored as 0/100.
 
 #### fmcalc
 
-fmcalc is the component which takes the gulcalc output stream as standard input and applies the policy terms and conditions to produce insured loss samples. The output is a table of insured loss samples in Oasis kernel format, including the insured loss for the mean ground up loss (IDX=0).
+fmcalc is the component which takes the gulcalc output stream as standard input and applies the policy terms and conditions to produce insured loss samples. The output is a table of insured loss samples in Oasis kernel format, including the insured loss for the mean ground up loss (sidx=0).
 
 ##### Input
 Same as gulcalc output or a binary file of the same data structure can be piped into fmcalc.
@@ -131,29 +136,30 @@ Same as gulcalc output or a binary file of the same data structure can be piped 
 ##### Output
 Stream Header packet structure
 
-| Name              | Type   |  Bytes | Description                                                         | Example     |
-|:------------------|--------|--------| :-------------------------------------------------------------------|------------:|
-| stream_id         | int    |   1|3  | Identifier of the data stream type.                                 |    2|1      |
+| Name              | Type   |  Bytes | Description                          | Example     |
+|:------------------|--------|--------| :------------------------------------|------------:|
+| stream_id         | int    |   1/3  | Identifier of the data stream type.  |    2/1      |
+| no_of_samples     | int    |   4    | Number of samples                    |    100      |
 
 Fm header packet structure
 
-| Name              | Type   |  Bytes | Description                                                         | Example     |
-|:------------------|--------|--------| :-------------------------------------------------------------------|------------:|
-| event_id          | int    |    4   | Oasis event_id                                                      |   4545      |
-| prog_id           | int    |    4   | Oasis prog_id                                                       |    300      |
-| layer_id          | int    |    4   | Oasis layer_id                                                      |    300      |
-| output_id         | int    |    4   | Oasis output_id                                                     |    300      |
+| Name              | Type   |  Bytes | Description                          | Example     |
+|:------------------|--------|--------| :------------------------------------|------------:|
+| event_id          | int    |    4   | Oasis event_id                       |   4545      |
+| prog_id           | int    |    4   | Oasis prog_id                        |    300      |
+| layer_id          | int    |    4   | Oasis layer_id                       |    300      |
+| output_id         | int    |    4   | Oasis output_id                      |    300      |
 
 Fm data packet structure
 
-| Name              | Type   |  Bytes | Description                                                         | Example     |
-|:------------------|--------|--------| :-------------------------------------------------------------------|------------:|
-| idx               | int    |   1|3  | Sample index                                                        |    0|10     |
-| loss              | float  |    4   | The insured loss for the sample                                     | 5625.675    |
+| Name              | Type   |  Bytes | Description                          | Example     |
+|:------------------|--------|--------| :------------------------------------|------------:|
+| sidx              | int    |   1/3  | Sample index                         |    0/10     |
+| loss              | float  |    4   | The insured loss for the sample      | 5625.675    |
 
-The data packet may be a variable length and so an idx of 0|0 identifies the end of the data packet.
+The data packet may be a variable length and so a sidx of 0/0 identifies the end of the data packet.
 
-The idx field is the same as the idx in the gul stdout stream. 
+The sidx field is the same as the sidx in the gul stdout stream. 
 
 #### cdftocsv
 
@@ -188,7 +194,7 @@ Csv file with the following fields;
 |:------------------|--------|--------| :-------------------------------------------------------------------|------------:|
 | event_id          | int    |    4   | Oasis event_id                                                      |   4545      |
 | item_id           | int    |    4   | Oasis item_id                                                       |    300      |
-| idx               | int    |    4   | Sample index                                                        |     10      |
+| sidx              | int    |    4   | Sample index                                                        |     10      |
 | gul               | float  |    4   | The ground up loss value                                            | 5675.675    |
 
 #### fmtocsv
@@ -207,5 +213,5 @@ Csv file with the following fields;
 | prog_id           | int    |    4   | Oasis prog_id                                                       |    1        |
 | layer_id          | int    |    4   | Oasis layer_id                                                      |    1        |
 | output_id         | int    |    4   | Oasis output_id                                                     |    5        |
-| idx               | int    |    4   | Sample index                                                        |    10       |
+| sidx              | int    |    4   | Sample index                                                        |    10       |
 | loss              | float  |    4   | The insured loss value                                              | 5375.675    |

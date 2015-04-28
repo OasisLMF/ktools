@@ -293,7 +293,7 @@ void doguloutput(std::map<int,float> &exposure_,unsigned int sample_size_)
 }
 
 
-void doit(std::map<int,int> &fmxref_,std::map<int,float> &exposure_)
+void doit(std::map<int,float> &exposure_)
 {
     unsigned int gulfmstream_type = 0;
     int i = fread(&gulfmstream_type, sizeof(gulfmstream_type), 1, stdin);
@@ -326,10 +326,12 @@ void doit(std::map<int,int> &fmxref_,std::map<int,float> &exposure_)
     }
 
     if (isFMStream(gulfmstream_type) == true){
+   	std::map<int,int> fmxref;
+   	loadfmxref(fmxref);
         unsigned int samplesize;
         i = fread(&samplesize, sizeof(samplesize), 1, stdin);
         if (i == 1){
-            dofmoutput(fmxref_,exposure_,samplesize);
+            dofmoutput(fmxref,exposure_,samplesize);
         }else {
              std::cerr << "Stream read error\n";
         }
@@ -391,11 +393,9 @@ int main(int argc, char* argv[])
        freopen(NULL, "wb", stdout);
    }
 
-   std::map<int,int> fmxref;
-   loadfmxref(fmxref);
    std::map<int,float> exposure;
    loadexposure(exposure);
-   doit(fmxref,exposure);
+   doit(exposure);
    return 0;
 
 }

@@ -41,20 +41,15 @@
 #include <fcntl.h>
 #include <io.h>
 #endif 
-#include "../include/oasis.h"
+#include "../include/oasis.hpp"
 
 using namespace std;
 
 void emitevents(int chunk_id_,int pno_,int total_)
 {
 
-#ifdef _MSC_VER
-        _setmode(_fileno(stdout), O_BINARY);
-        _setmode(_fileno(stdin), O_BINARY);
-#else
-        freopen(NULL, "rb", stdin);
-        freopen(NULL, "wb", stdout);
-#endif
+    freopen(NULL, "rb", stdin);
+    freopen(NULL, "wb", stdout);
 
     std::ostringstream oss;
     oss << "e_chunk_" << chunk_id_ << "_data.bin";

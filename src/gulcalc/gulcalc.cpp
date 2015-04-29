@@ -53,10 +53,10 @@
 #include <memory.h>
 
 #include "getopt.h"
-#include "getrands.h"
+#include "getrands.hpp"
 // #include <unistd.h>
 
-#include "../include/oasis.h"
+#include "../include/oasis.hpp"
 
 bool verbose = false;
 

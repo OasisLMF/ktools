@@ -55,7 +55,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <vector>
 #include <map>
 using namespace std;
-#include "../include/oasis.h"
+#include "../include/oasis.hpp"
 
 
 struct fmrec {

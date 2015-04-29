@@ -35,7 +35,6 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <iomanip>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -54,7 +53,7 @@
 #endif
 
 using namespace std;
-#include "../include/oasis.h"
+#include "../include/oasis.hpp"
 
 bool isGulStream(unsigned int stream_type)
 {
@@ -180,7 +179,7 @@ void dofmsummary(std::map<output_key, std::vector<vecrec> > &output_map_, unsign
        float mean = sumloss / sample_size_;
        float sd = 0;
        if (sample_size_ > 1) sd = sqrt((sumlosssqr - ((sumloss*sumloss)/sample_size_))/(sample_size_ - 1));
-       cout << mean << "," << sd << "," << std::setprecision(9) << maxsumtiv << "\n";
+       cout << mean << "," << sd << "," << maxsumtiv << "\n";
 
        iter++;
     }
@@ -264,7 +263,7 @@ void dogulsummary(int event_id_,std::vector<vecrec> &output_vec_, unsigned int s
        float sd = 0;
        if (sample_size_ > 1) sd = sqrt((sumlosssqr - ((sumloss*sumloss)/sample_size_))/(sample_size_ - 1));
 
-       cout << mean << "," << sd << "," << std::setprecision(9) << maxsumtiv << "\n";
+       cout << mean << "," << sd << "," << maxsumtiv << "\n";
 
 
 }

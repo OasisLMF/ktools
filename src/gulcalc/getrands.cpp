@@ -32,7 +32,7 @@
 * DAMAGE.
 */
 
-#include "getrands.h"
+#include "getrands.hpp"
 #include <iostream>
 #include <fstream>
 #include <sstream>

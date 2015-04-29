@@ -44,7 +44,7 @@
 
 
 using namespace std;
-#include "../include/oasis.h"
+#include "../include/oasis.hpp"
 
 void doit()
 {

@@ -52,7 +52,7 @@
 #include <unistd.h>
 #endif
 
-#include "../include/oasis.h"
+#include "../include/oasis.hpp"
 
 
 #define BUFSIZE 4096

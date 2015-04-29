@@ -48,7 +48,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
     #include <unistd.h>
 #endif
 
-#include "../include/oasis.h"
+#include "../include/oasis.hpp"
 
 using namespace std;
 

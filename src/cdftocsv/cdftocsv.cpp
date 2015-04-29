@@ -37,7 +37,7 @@
 #include <stdlib.h>
 #include <vector>
 
-#include "../include/oasis.h"
+#include "../include/oasis.hpp"
 
 #include <iostream>
 #include <fstream>

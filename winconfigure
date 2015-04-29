@@ -1,3 +1,16 @@
 #!/bin/sh
+SYSNAME=`uname -o`
 
-./configure  --host x86_64-w64-mingw32 --prefix=/cygdrive/c/oasis
+echo "$SYSNAME"
+
+if [ "$SYSNAME" = "Cygwin" ]; then
+   ./configure  --build=x86_64 --host i686-w64-mingw32 --prefix=/cygdrive/c/oasis
+   exit 0
+else
+   DIST_ID=`lsb_release -i -s`
+   if [ "$DIST_ID" = "Ubuntu" ]; then
+	./configure  --host x86_64-w64-mingw32 --prefix=/cygdrive/c/oasis
+	exit 0
+   fi
+   echo "Must run this under cygwin"
+fi

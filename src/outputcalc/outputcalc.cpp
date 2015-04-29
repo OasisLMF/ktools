@@ -111,7 +111,7 @@ struct fmxref
     int output_id;
 };
 
-void loadfmxref(std::map<int,int> &fmxref_)
+void loadfmxref(std::map<int,std::vector<int> > &fmxref_)
 {
     std::ostringstream oss;
     oss << "fm/fmxref.bin";
@@ -125,7 +125,8 @@ void loadfmxref(std::map<int,int> &fmxref_)
 
     int i = fread(&rec, sizeof(rec), 1, fin);
     while (i != 0) {
-        fmxref_[rec.output_id] = rec.item_id;
+
+        fmxref_[rec.output_id].push_back(rec.item_id);
         i = fread(&rec, sizeof(rec), 1, fin);
     }
 
@@ -185,7 +186,7 @@ void dofmsummary(std::map<output_key, std::vector<vecrec> > &output_map_, unsign
 }
 
 
-void dofmoutput(std::map<int,int> &fmxref_,std::map<int,float> &exposure_,unsigned int sample_size_)
+void dofmoutput(std::map<int,std::vector<int> > &fmxref_,std::map<int,float> &exposure_,unsigned int sample_size_)
 {
     fmlevelhdr p;
     int i = fread(&p, sizeof(fmlevelhdr), 1, stdin);
@@ -219,8 +220,15 @@ void dofmoutput(std::map<int,int> &fmxref_,std::map<int,float> &exposure_,unsign
                         std::vector<vecrec> v(sample_size_+1, {0.0, 0.0});
                         output_map[k] = v;
                     }
+                    float tiv = 0;
                     output_map[k][q.sidx].loss += q.loss;
-                    float tiv = exposure_[fmxref_[p.output_id]];
+                    auto iter = fmxref_[p.output_id].begin();
+                    while (iter != fmxref_[p.output_id].end()){
+                        tiv += exposure_[*iter];
+                        iter++;
+                    }
+
+                    //float tiv = exposure_[item_id];
                     output_map[k][q.sidx].tiv += tiv;
                 }
 
@@ -326,7 +334,7 @@ void doit(std::map<int,float> &exposure_)
     }
 
     if (isFMStream(gulfmstream_type) == true){
-   	std::map<int,int> fmxref;
+    std::map<int,std::vector<int> > fmxref;
    	loadfmxref(fmxref);
         unsigned int samplesize;
         i = fread(&samplesize, sizeof(samplesize), 1, stdin);

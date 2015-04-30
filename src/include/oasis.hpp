@@ -33,6 +33,12 @@
 */
 
 #pragma once
+
+#ifdef _MSC_VER
+#include <fcntl.h>
+#include <io.h>
+#endif 
+
 const int mean_idx = 1 << 24;
 
 // Stream types
@@ -123,3 +129,15 @@ inline int kfseek ( FILE * stream, long int offset, int origin )
 	return fseek(stream,offset, origin);
 }
 
+
+inline void initstreams(std::string infile, std::string outfile)
+{
+#if defined(_MSC_VER) || defined(__MINGW32__)
+	_setmode(_fileno(stdout), O_BINARY);
+	_setmode(_fileno(stdin), O_BINARY);
+#else
+	freopen(NULL, "rb", stdin);
+	freopen(NULL, "wb", stdout);
+#endif
+
+}

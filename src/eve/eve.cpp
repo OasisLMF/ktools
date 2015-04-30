@@ -37,20 +37,12 @@
 #include <fstream>
 #include <sstream>
 #include <math.h>
-#ifdef _MSC_VER
-#include <fcntl.h>
-#include <io.h>
-#endif 
 #include "../include/oasis.hpp"
 
 using namespace std;
 
 void emitevents(int chunk_id_,int pno_,int total_)
 {
-
-    freopen(NULL, "rb", stdin);
-    freopen(NULL, "wb", stdout);
-
     std::ostringstream oss;
     oss << "e_chunk_" << chunk_id_ << "_data.bin";
     FILE *fin = fopen(oss.str().c_str(), "rb");
@@ -91,6 +83,7 @@ int main(int argc, char *argv[])
     int pno = atoi(argv[2]);
     int total = atoi(argv[3]);
 
+    initstreams("","");
     emitevents(chunkid,pno,total);
 
     return 0;

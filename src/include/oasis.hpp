@@ -32,6 +32,7 @@
 * DAMAGE.
 */
 
+#pragma once
 const int mean_idx = 1 << 24;
 
 // Stream types
@@ -114,4 +115,11 @@ struct exposure{
 	int group_id;
 	float tiv;
 };
+
+
+// -- UTILITY inline functions 
+inline int kfseek ( FILE * stream, long int offset, int origin )
+{
+	return fseek(stream,offset, origin);
+}
 

@@ -150,7 +150,11 @@ void sendevent(int event_id_, std::map<int, idxrec> &imap_)
 	_fseeki64(fin, imap_[event_id_].offset, SEEK_SET);
 #endif
 #ifdef __unix 
+#ifdef __CYGWIN__
+	fseek(fin, imap_[event_id_].offset, SEEK_SET);
+#else
 	fseeko(fin, imap_[event_id_].offset, SEEK_SET);
+#endif
 #endif
 	int i = 0;
 	int length = imap_[event_id_].length;
@@ -190,21 +194,29 @@ void sendevent_new(int event_id_, std::map<int, idxrec> &imap_, int max_no_of_bi
 
 	int length = imap_[event_id_].length;
 	if (length == -1) {
-        #ifdef _MSC_VER 
+#ifdef _MSC_VER 
 		_fseeki64(fin, 0, SEEK_END);
-		#endif
-        #ifdef __unix 
+#endif
+#ifdef __unix 
+#ifdef __CYGWIN__
+		fseek(fin, 0, SEEK_END);
+#else
 		fseeko(fin, 0, SEEK_END);
-		#endif
+#endif
+#endif
 		long long fs = ftell(fin);
 		length = (int)(fs - imap_[event_id_].offset);
 	}
-	#ifdef _MSC_VER 
+#ifdef _MSC_VER 
 		_fseeki64(fin, imap_[event_id_].offset, SEEK_SET);
-	#endif
-	#ifdef __unix 
+#endif
+#ifdef __unix 
+#ifdef __CYGWIN__
+		fseek(fin, imap_[event_id_].offset, SEEK_SET);
+#else
 		fseeko(fin, imap_[event_id_].offset, SEEK_SET);
-	#endif
+#endif
+#endif
 
 	float *binp = new float[max_no_of_bins_];
 	int no_of_bins = 0;

@@ -34,7 +34,7 @@
 
 #pragma once
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || defined(__MINGW32__)
 #include <fcntl.h>
 #include <io.h>
 #endif 
@@ -132,6 +132,30 @@ inline int kfseek ( FILE * stream, long int offset, int origin )
 
 inline void initstreams(std::string infile, std::string outfile)
 {
+
+   if (inFile.length() > 0){
+        if (freopen(inFile.c_str(), "rb", stdin) == NULL) {
+            cerr << "Error opening " << inFile << "\n";
+            exit(-1);
+         }
+   }else {
+
+   	
+       freopen(NULL, "rb", stdin);
+   }
+
+   if (outFile.length() > 0){
+       if (freopen(outFile.c_str(), "wb", stdout) == NULL) {
+           cerr << "Error opening " << outFile << "\n";
+           exit(-1);
+        }
+   }else{
+       freopen(NULL, "wb", stdout);
+   }
+
+
+
+
 #if defined(_MSC_VER) || defined(__MINGW32__)
 	_setmode(_fileno(stdout), O_BINARY);
 	_setmode(_fileno(stdin), O_BINARY);

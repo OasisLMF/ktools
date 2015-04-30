@@ -3,6 +3,11 @@ SYSNAME=`uname -o`
 
 echo "$SYSNAME"
 
+touch aclocal.m4
+touch Makefile.in
+touch configure
+touch config.h.in
+
 if [ "$SYSNAME" = "Cygwin" ]; then
    ./configure  --build=x86_64 --host i686-w64-mingw32 --prefix=/cygdrive/c/oasis
    exit 0

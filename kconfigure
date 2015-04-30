@@ -1,9 +1,6 @@
 #!/bin/sh
-
 touch aclocal.m4
 touch Makefile.in
 touch configure
 touch config.h.in
-make
-~
-
+./configure

@@ -34,6 +34,11 @@
 
 #pragma once
 
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+
 #if defined(_MSC_VER) || defined(__MINGW32__)
 #include <fcntl.h>
 #include <io.h>
@@ -140,7 +145,7 @@ inline void initstreams(std::string infile, std::string outfile)
          }
    }else {
 
-   	
+
        freopen(NULL, "rb", stdin);
    }
 

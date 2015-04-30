@@ -135,12 +135,12 @@ inline int kfseek ( FILE * stream, long int offset, int origin )
 }
 
 
-inline void initstreams(std::string infile, std::string outfile)
+inline void initstreams(std::string inFile, std::string outFile)
 {
 
    if (inFile.length() > 0){
         if (freopen(inFile.c_str(), "rb", stdin) == NULL) {
-            cerr << "Error opening " << inFile << "\n";
+            std::cerr << "Error opening " << inFile << "\n";
             exit(-1);
          }
    }else {
@@ -151,7 +151,7 @@ inline void initstreams(std::string infile, std::string outfile)
 
    if (outFile.length() > 0){
        if (freopen(outFile.c_str(), "wb", stdout) == NULL) {
-           cerr << "Error opening " << outFile << "\n";
+           std::cerr << "Error opening " << outFile << "\n";
            exit(-1);
         }
    }else{

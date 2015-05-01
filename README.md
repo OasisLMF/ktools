@@ -60,8 +60,8 @@ Download and run the set-up program for Cygwin.
 The following Cygwin add-in packages are required;
 * gcc-g++
 * gcc-core
-* minw64-i686-gcc-g++
-* minw64-i686-gcc-core
+* mingw64-i686-gcc-g++
+* mingw64-i686-gcc-core
 * make
 
 ![alt text](https://github.com/OasisLMF/ktools/blob/master/docs/img/cygwin1.jpg "Add-in packages")

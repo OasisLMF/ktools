@@ -39,11 +39,6 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef _MSC_VER
-#include <fcntl.h>
-#include <io.h>
-#endif 
-
 #ifdef __unix
     #include <unistd.h>
 #endif
@@ -55,9 +50,6 @@ using namespace std;
 
 void doit()
 {
-
-	freopen(NULL, "rb", stdin);
-	freopen(NULL, "wb", stdout);
 
 	int fmstream_type;
 
@@ -125,7 +117,7 @@ int main()
         }
     }
 #endif
-
+    initstreams("", "");
 	doit();
 	return 0;
 }

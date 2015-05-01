@@ -47,11 +47,6 @@
     #include <unistd.h>
 #endif
 
-#ifdef _MSC_VER
-#include <fcntl.h>
-#include <io.h>
-#endif
-
 using namespace std;
 #include "../include/oasis.hpp"
 
@@ -383,24 +378,7 @@ int main(int argc, char* argv[])
     }
 #endif
 
-   if (inFile.length() > 0){
-        if (freopen(inFile.c_str(), "rb", stdin) == NULL) {
-            cerr << "Error opening " << inFile << "\n";
-            exit(-1);
-         }
-   }else {
-       freopen(NULL, "rb", stdin);
-   }
-
-   if (outFile.length() > 0){
-       if (freopen(outFile.c_str(), "wb", stdout) == NULL) {
-           cerr << "Error opening " << outFile << "\n";
-           exit(-1);
-        }
-   }else{
-       freopen(NULL, "wb", stdout);
-   }
-
+   initstreams(inFile, outFile);
    std::map<int,float> exposure;
    loadexposure(exposure);
    doit(exposure);

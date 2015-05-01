@@ -47,11 +47,6 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
     #include <unistd.h>
 #endif
 
-#ifdef _MSC_VER
-#include <fcntl.h>
-#include <io.h>
-#endif 
-
 #include <vector>
 #include <map>
 using namespace std;
@@ -382,26 +377,9 @@ int main(int argc, char* argv[])
     }
 #endif
 
-   if (inFile.length() > 0){
-        if (freopen(inFile.c_str(), "rb", stdin) == NULL) {
-            cerr << "Error opening " << inFile << "\n";
-            exit(-1);
-         }
-   }else {
-       freopen(NULL, "rb", stdin);
-   }
 
-   if (outFile.length() > 0){
-       if (freopen(outFile.c_str(), "wb", stdout) == NULL) {
-           cerr << "Error opening " << outFile << "\n";
-           exit(-1);
-        }
-   }else{
-       freopen(NULL, "wb", stdout);
-   }
-
-
-
+   initstreams(inFile, outFile);
+   
 	std::map<int, fmdata> fmd_level1;
 	std::map<int, fmdata> fmd_level2;
 	init(fmd_level1, fmd_level2);

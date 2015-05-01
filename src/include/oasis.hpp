@@ -135,31 +135,26 @@ inline int kfseek ( FILE * stream, long int offset, int origin )
 }
 
 
-inline void initstreams(std::string inFile, std::string outFile)
+inline void initstreams(std::string inFile_, std::string outFile_)
 {
 
-   if (inFile.length() > 0){
-        if (freopen(inFile.c_str(), "rb", stdin) == NULL) {
-            std::cerr << "Error opening " << inFile << "\n";
+   if (inFile_.length() > 0){
+        if (freopen(inFile_.c_str(), "rb", stdin) == NULL) {
+            std::cerr << "Error opening " << inFile_ << "\n";
             exit(-1);
          }
    }else {
-
-
        freopen(NULL, "rb", stdin);
    }
 
-   if (outFile.length() > 0){
-       if (freopen(outFile.c_str(), "wb", stdout) == NULL) {
-           std::cerr << "Error opening " << outFile << "\n";
+   if (outFile_.length() > 0){
+       if (freopen(outFile_.c_str(), "wb", stdout) == NULL) {
+           std::cerr << "Error opening " << outFile_ << "\n";
            exit(-1);
         }
    }else{
        freopen(NULL, "wb", stdout);
    }
-
-
-
 
 #if defined(_MSC_VER) || defined(__MINGW32__)
 	_setmode(_fileno(stdout), O_BINARY);

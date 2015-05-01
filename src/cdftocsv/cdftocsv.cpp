@@ -119,17 +119,6 @@ void processrec(char *rec, int recsize,
 void doit()
 {
 
-#ifdef _MSC_VER
-        _setmode(_fileno(stdout), O_BINARY);
-        _setmode(_fileno(stdin), O_BINARY);
-#endif
-
-#ifdef __unix
-        freopen(NULL, "rb", stdin);
-        freopen(NULL, "wb", stdout);
-#endif
-
-
 std::vector<damagebindictionary> damagebindictionary_vec;
 getdamagebindictionary(damagebindictionary_vec);
 int total_bins = damagebindictionary_vec.size();
@@ -164,6 +153,7 @@ bool bSuccess = getrecx((char *)&stream_type, stdin, sizeof(stream_type));
 
 int main()
 {
+	initstreams("","");
     doit();
     return 0;
 }

@@ -35,10 +35,6 @@
 	Calculate the GUL
 	Author: Ben Matharu  email: ben.matharu@oasislmf.org
 */
-#ifdef _MSC_VER
-#include <windows.h>
-#include <io.h>
-#endif
 
 #include <fcntl.h>
 #include <map>
@@ -435,67 +431,6 @@ damagecdfrec *d = (damagecdfrec *)rec;
 
 }
 
-void doitold()
-{
-    std::vector<damagebindictionary> damagebindictionary_vec;
-    getdamagebindictionary(damagebindictionary_vec);
-    std::map<exposure_key, std::vector<exposure_rec> > exposure_map;
-	getexposures(exposure_map);
-
-    int total_bins = damagebindictionary_vec.size();
-	int max_recsize = (int)(total_bins * 8) + sizeof(damagecdfrec)+sizeof(int);
-
-#ifdef _MSC_VER 
-	_setmode(_fileno(stdout), O_BINARY);
-	_setmode(_fileno(stdin), O_BINARY);
-#endif
-
-#ifdef __unix 
-	freopen(NULL, "rb", stdin);
-	freopen(NULL, "wb", stdout);
-#endif
-	int gulstream_type = 2;
-	fwrite(&gulstream_type, sizeof(gulstream_type), 1, stdout);
-    _bufold = new gulSampleslevel[_gularraysize];
-    char *rec = new char[max_recsize];
-    damagecdfrec *d = (damagecdfrec *)rec;
-    std::vector<gulSampleslevel> event_guls;
-    int last_event_id = -1;
-    int stream_type = 0;
-	bool bSuccess = getrecx((char *)&stream_type, stdin, sizeof(stream_type));
-    if (bSuccess == false) {
-		cerr << "Error: no stream type returned\n";
-		return; // exit thread if failed
-	}
-	getRands rnd(_userandomtable, _chunk_id);
-
-    for (;;)
-	{
-		//damagecdfrec c;
-		char *p = rec;
-		bSuccess = getrecx(p, stdin, sizeof(damagecdfrec));
-		if (bSuccess == false) break;
-		p = p + sizeof(damagecdfrec);
-		bSuccess = getrecx(p, stdin, sizeof(int)); // we now have bin count
-		int *q = (int *)p;
-		p = p + sizeof(int);
-		int recsize = (*q) * 8;
-		// we should now have damagecdfrec in memory
-		bSuccess = getrecx(p, stdin, recsize);
-		recsize += sizeof(damagecdfrec)+sizeof(int);
-		if (d->event_id != last_event_id) {
-			//if (last_event_id != -1) dofm(event_guls);
-			last_event_id = d->event_id;
-			event_guls.clear();
-		}
-
-
-		processrec(rec, recsize, damagebindictionary_vec, exposure_map, event_guls,rnd);
-	}
-
-	fwrite(_buf, sizeof(gulSampleslevel), _bufoffset, stdout);
-}
-
 
 void doit()
 {
@@ -506,10 +441,6 @@ void doit()
 
 	int total_bins = damagebindictionary_vec.size();
 	int max_recsize = (int)(total_bins * 8) + sizeof(damagecdfrec)+sizeof(int);
-
-
-	freopen(NULL, "rb", stdin);
-	freopen(NULL, "wb", stdout);
 
 	int gulstream_type = 2 | gulstream_id;
 	if (_newstream == true) {
@@ -619,6 +550,7 @@ int main(int argc, char *argv[])
     }
 
     //if (_newstream == false) doitold();
+    initstreams("", "");
 	doit();
 
 }

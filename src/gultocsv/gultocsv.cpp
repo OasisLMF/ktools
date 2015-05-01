@@ -37,22 +37,11 @@
 #include <stdlib.h>
 
 
-#ifdef _MSC_VER
-#include <fcntl.h>
-#include <io.h>
-#endif
-
-
 using namespace std;
 #include "../include/oasis.hpp"
 
 void doit()
 {
-
-
-    freopen(NULL, "rb", stdin);
-    freopen(NULL, "wb", stdout);
-
 
 	int gulstream_type = 0;
 	int i = fread(&gulstream_type, sizeof(gulstream_type), 1, stdin);
@@ -100,7 +89,7 @@ void doit()
 
 int main()
 {
-
+	initstreams("", "");
     doit();
     return 0;
 }

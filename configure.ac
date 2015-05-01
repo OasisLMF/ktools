@@ -30,9 +30,6 @@ AC_CHECK_HEADER_STDBOOL
 AC_C_INLINE
 AC_TYPE_INT64_T
 
-# Checks for library functions.
-AC_FUNC_FSEEKO
-AC_CHECK_FUNCS([sqrt])
 
 AC_CONFIG_FILES([Makefile
 		 src/Makefile

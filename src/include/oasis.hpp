@@ -129,11 +129,6 @@ struct exposure{
 
 
 // -- UTILITY inline functions 
-inline int kfseek ( FILE * stream, long int offset, int origin )
-{
-	return fseek(stream,offset, origin);
-}
-
 
 inline void initstreams(std::string inFile_, std::string outFile_)
 {

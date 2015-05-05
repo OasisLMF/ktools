@@ -10,9 +10,9 @@
 #include "../include/oasis.hpp"
 
 typedef unsigned char byte;
-int __exit(int status){ exit(status); return 1; }
-int __perror(const char * m) { perror(m); return 1; }
-int __close(int fd) { close(fd); return 1; }
+int ___exit(int status){ exit(status); return 1; }
+int ___perror(const char * m) { perror(m); return 1; }
+int ___close(int fd) { close(fd); return 1; }
 
 
 // TO DO
@@ -53,7 +53,6 @@ int doFM(int event_id_, std::vector<gulSampleslevel> &event_guls_, byte *fmd, in
 	
 	int numGuls = event_guls_.size();
 
-	
 	// set up the item to offset map and offset to item map - we need to do this for each event, as a small fraction of the items will be impacted by some of the event
 	int k=0;
 	for(int i=0; i< numGuls; i++)
@@ -72,7 +71,7 @@ int doFM(int event_id_, std::vector<gulSampleslevel> &event_guls_, byte *fmd, in
 
 	// allocate space for the levelLossWork table and initialise to zero
 	byte *levelLossWork = (byte *)calloc( 1, itemToOffsetMap.size() * (numSamples+1) * sizeof(float) );		
-	{	levelLossWork || __perror("Error allocating levelLossWork table :") && __exit(EXIT_FAILURE);	}
+	{	levelLossWork || ___perror("Error allocating levelLossWork table :") && ___exit(EXIT_FAILURE);	}
 		
 	// populate the levelLossWork table
 	for(int i=0; i<numGuls; i++)
@@ -80,7 +79,7 @@ int doFM(int event_id_, std::vector<gulSampleslevel> &event_guls_, byte *fmd, in
 	
 	// allocate space for the groundUpLossWork table and initialise to zero
 	byte *groundUpLossWork = (byte *)calloc( 1, itemToOffsetMap.size() * (numSamples+1) * sizeof(float) );		
-	{	groundUpLossWork || __perror("Error allocating levelLossWork table :") && __exit(EXIT_FAILURE);	}
+	{	groundUpLossWork || ___perror("Error allocating levelLossWork table :") && ___exit(EXIT_FAILURE);	}
 		
 	// populate the groundUpLossWork table
 	for(int i=0; i<numGuls; i++)
@@ -88,7 +87,7 @@ int doFM(int event_id_, std::vector<gulSampleslevel> &event_guls_, byte *fmd, in
 
 	// allocate space for the outputLossWork table and initialise to zero
 	byte *outputLossWork = (byte *)calloc( 1, itemToOffsetMap.size() * (numSamples+1) * sizeof(float) );		
-	{	levelLossWork || __perror("Error allocating outputLossWork table :") && __exit(EXIT_FAILURE);	}
+	{	levelLossWork || ___perror("Error allocating outputLossWork table :") && ___exit(EXIT_FAILURE);	}
 
 	// determine the maximum level
 	int maxLevel = 1;
@@ -160,9 +159,9 @@ int doFM(int event_id_, std::vector<gulSampleslevel> &event_guls_, byte *fmd, in
 
 		// set up aggWork table to hold the aggregations and initialise to zero
 		byte *aggLevelLossWork = (byte *)calloc(	1, sizeof(float) * aggMap.size() * (numSamples+1) );	
-		{ fmd || __perror("Error opening fm data file:" ) && __exit(EXIT_FAILURE); }
+		{ fmd || ___perror("Error opening fm data file:" ) && ___exit(EXIT_FAILURE); }
 		byte *aggGroundUpLossWork = (byte *)calloc(	1, sizeof(float) * aggMap.size() * (numSamples+1) );	
-		{ fmd || __perror("Error opening fm data file:" ) && __exit(EXIT_FAILURE); }
+		{ fmd || ___perror("Error opening fm data file:" ) && ___exit(EXIT_FAILURE); }
 		
 
 		// Calculate the Aggregations
@@ -355,7 +354,7 @@ int doFM(int event_id_, std::vector<gulSampleslevel> &event_guls_, byte *fmd, in
 					}
 					*/
 					else
-						__perror("unrecognised calcrule_id") || __exit(EXIT_FAILURE);	
+						___perror("unrecognised calcrule_id") || ___exit(EXIT_FAILURE);	
 					
 					
 					// Back Allocation
@@ -437,7 +436,7 @@ int doFM(int event_id_, std::vector<gulSampleslevel> &event_guls_, byte *fmd, in
 						}
 					}
 					else
-						__perror("unrecognised allocrule_id") || __exit(EXIT_FAILURE);	
+						___perror("unrecognised allocrule_id") || ___exit(EXIT_FAILURE);	
 				}
 			}
 			// fprintf(stderr, "doFM 7.4.2\n");
@@ -547,29 +546,35 @@ int main()
 {
 	// read in the FM data
 	FILE *fin = (FILE *)fopen("fm/fm_data.bin", "rb");	
-	{ fin || __perror("Error opening fm data file:" ) && __exit(EXIT_FAILURE); }
+	{ fin || ___perror("Error opening fm data file:" ) && ___exit(EXIT_FAILURE); }
     fseek (fin, 0, SEEK_END);   // non-portable ???
     size_t fmdFileSize=ftell (fin);
+    fseek (fin, 0, SEEK_SET);   // non-portable ???
 	fclose(fin);
 
     int fd = open("fm/fm_data.bin", O_RDONLY);
-    { fd == -1 && __perror("Error opening file for reading") && __exit(EXIT_FAILURE); }
+    { fd == -1 && ___perror("Error opening file for reading") && ___exit(EXIT_FAILURE); }
 
     byte *fmd = (byte *)mmap(0, fmdFileSize, PROT_READ, MAP_SHARED, fd, 0);
-    { ( fmd == MAP_FAILED ) && __perror("Error mmapping the file") && __close(fd) && __exit(EXIT_FAILURE); }
+    { ( fmd == MAP_FAILED ) && ___perror("Error mmapping the file") && ___close(fd) && ___exit(EXIT_FAILURE); }
 
-	freopen(NULL, "rb", stdin);
-	freopen(NULL, "wb", stdout);
+	for( byte *p=(byte *)fmd; p< fmd + fmdFileSize; p+=sizeof(fmdata))
+	{
+		fmdata *pfmd = (fmdata *)p;
+	}
 	
+	initstreams("", "");
+	
+	int gulstream_type = 0;
+	int i = fread(&gulstream_type, sizeof(gulstream_type), 1, stdin);
+
 	unsigned int fmstream_type = 1 | fmstream_id;
 	fwrite(&fmstream_type, sizeof(fmstream_type), 1, stdout);
 
-	int gulstream_type = 0;
-	int i = fread(&gulstream_type, sizeof(gulstream_type), 1, stdin);
 	int stream_type = gulstream_type & gulstream_id ;
-	{ stream_type != gulstream_id && fprintf(stderr, "Not a gul stream type\n") && __exit(EXIT_FAILURE); }
+	{ stream_type != gulstream_id && fprintf(stderr, "Not a gul stream type\n") && ___exit(EXIT_FAILURE); }
 	stream_type = streamno_mask &gulstream_type;
-	{ stream_type != 1 && fprintf(stderr, "Unsupported gul stream type\n") && __exit(EXIT_FAILURE); }
+	{ stream_type != 1 && fprintf(stderr, "Unsupported gul stream type\n") && ___exit(EXIT_FAILURE); }
 
 	int last_event_id = -1;
 	std::vector<gulSampleslevel> event_guls;

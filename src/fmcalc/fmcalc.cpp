@@ -6,7 +6,13 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
+
+#ifdef __MINGW32__
+#include "mman.h"
+#else
 #include <sys/mman.h>
+#endif
+
 #include "../include/oasis.hpp"
 
 typedef unsigned char byte;

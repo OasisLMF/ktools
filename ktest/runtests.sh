@@ -4,7 +4,7 @@ if [ ! -f ../src/eve/eve ]; then
     echo "Please run make all before make check"
     exit
 fi
-
+mkdir -p testout
 cd ../examples
 
 ../src/eve/eve 1 1 2 > ../ktest/testout/eveout1_1.bin

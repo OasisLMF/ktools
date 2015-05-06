@@ -32,6 +32,7 @@ AC_TYPE_INT64_T
 
 
 AC_CONFIG_FILES([Makefile
+		 ktest/Makefile
 		 src/Makefile
                  src/cdftocsv/Makefile
                  src/eve/Makefile

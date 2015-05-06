@@ -281,7 +281,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign
 EXTRA_DIST = winconfigure
-SUBDIRS = src
+SUBDIRS = src ktest
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
 

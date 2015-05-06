@@ -1,7 +1,7 @@
 all clean install ktools:
 	echo ""
 check:
-	echo "TODO" 
+	./runtests.sh 
 
 .PHONY: all clean install
 

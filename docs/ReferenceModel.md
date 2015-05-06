@@ -176,13 +176,13 @@ Each sampled damage is multiplied by the item TIV and output to the stdout strea
 A second calculation which occurs in the gulcalc program is of the mean and standard deviation of ground up loss. For each cdf, the mean and standard deviation of damage is calculated by numerical integration and the result is multiplied by the item TIV. The results are output to the stdout stream as IDX=0 (mean) and IDX=-1 (standard deviation), for each item and event.
 
 #### fmcalc
-blah blah
+fmcalc is the in-memory implementation of the Oasis Financial Module. It applies policy terms and conditions to the ground up losses and produces insured loss sample output.
 
 ##### Stream_id
 
 | Byte 1 | Bytes 2-4 |  Description                                   |
 |:-------|-----------|:-----------------------------------------------|
-|    2   |     1     |  fmcalc reference example                     |
+|    2   |     1     |  fmcalc reference example                      |
 
 ##### Parameters
 There are no parameters as all of the information is taken from the gul stdout stream and internal data.

@@ -21,7 +21,6 @@ Higher byte;
 |    0   | getmodel       |
 |    1   | gulcalc        |
 |    2   | fmcalc         |
-|    3   | outputcalc     |
 
 Reserved stream_ids;
 
@@ -30,7 +29,8 @@ Reserved stream_ids;
 |    0   |     1     |  getmodel - Reference example for Oasis format CDF output                 |
 |    1   |     1     |  gulcalc - Reference example for Oasis format ground up loss sample output|
 |    2   |     1     |  fmcalc - Reference example for Oasis format insured loss sample output   |
-|    3   |     1     |  outputcalc - Reference example for Oasis format Event Loss Table         |
+
+The final calculation component, outputcalc, has no stream_id as it outputs results directly to csv.
 
 There are rules about which stream types can be accepted as inputs to the components. These are;
 * gulcalc can only take stream type 0 (getmodel standard output) as input
@@ -160,6 +160,16 @@ Fm data packet structure
 The data packet may be a variable length and so a sidx of 0/0 identifies the end of the data packet.
 
 The sidx field is the same as the sidx in the gul stdout stream. 
+
+#### outputcalc
+
+outputcalc is the component which performs analysis on the sampled output from either the gulcalc or fmcalc program.  The output is a results table in csv format.
+
+##### Input
+gulcalc stdout or fmcalc stdout. Binary files of the same data structures can be piped into outputcalc.
+
+##### Output
+No standard output stream. The results table is exported to a csv file. See the [Reference model](ReferenceModel.md) for example output.
 
 #### cdftocsv
 

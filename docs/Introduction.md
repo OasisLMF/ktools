@@ -10,7 +10,7 @@ The principle is to stream data through by event end-to-end, with multiple proce
 
 ### Language
 
-The components can be written in any language as long as the input and output data structures of the compiled executable are adhered to.  The current set of components have been written in POSIX-compliant C++ and C.  This means that they can be compiled for instance in Linux and Windows Cygwin.
+The components can be written in any language as long as the input and output data structures of the compiled executable are adhered to.  The current set of components have been written in POSIX-compliant C++ and C.  This means that they can be compiled for instance in Linux and Windows.
 
 ### Components
 
@@ -33,3 +33,4 @@ $ eve 1 1 2 | getmodel 1 | gulcalc –S100 –C1 | fmcalc | outputcalc > output.
 
 Example bash shell, python and vbs scripts are provided along with a binary data package in the /examples folder to demonstrate usage of the toolkit.
 
+[Back to Contents](Contents.md)

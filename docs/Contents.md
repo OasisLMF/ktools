@@ -3,6 +3,6 @@
 ##### 1. Introduction to the Specification
 ##### 2. [Data streaming architecture overview](Overview.md)
 ##### 3. [Specification](DataStructures.md)
-##### 4. [Reference model](getmodel.md)
-##### 5. Coding philosopy
+##### 4. [Reference model](ReferenceModel.md)
+##### 5. Coding philosophy
 ##### 6. [Planned work](PlannedWork.md)

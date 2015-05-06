@@ -50,7 +50,7 @@ Data packet structure
 |:------------------|--------|--------| :-------------------------------------------------------------------|------------:|
 | event_id          | int    |    4   | Oasis event_id                                                      |   4545      |
 
-Note that eve currently has no stream_type header.
+Note that eve currently has no stream_id header.
 
 #### getmodel
 
@@ -141,7 +141,7 @@ Stream Header packet structure
 | stream_id         | int    |   1/3  | Identifier of the data stream type.  |    2/1      |
 | no_of_samples     | int    |   4    | Number of samples                    |    100      |
 
-Fm header packet structure
+fmcalc header packet structure
 
 | Name              | Type   |  Bytes | Description                          | Example     |
 |:------------------|--------|--------| :------------------------------------|------------:|
@@ -150,7 +150,7 @@ Fm header packet structure
 | layer_id          | int    |    4   | Oasis layer_id                       |    300      |
 | output_id         | int    |    4   | Oasis output_id                      |    300      |
 
-Fm data packet structure
+fmcalc data packet structure
 
 | Name              | Type   |  Bytes | Description                          | Example     |
 |:------------------|--------|--------| :------------------------------------|------------:|
@@ -163,7 +163,7 @@ The sidx field is the same as the sidx in the gul stdout stream.
 
 #### outputcalc
 
-outputcalc is the component which performs analysis on the sampled output from either the gulcalc or fmcalc program.  The output is a results table in csv format.
+outputcalc is the component which performs results analysis such as an event loss table or EP curve on the sampled output from either the gulcalc or fmcalc program.  The output is a results table in csv format.
 
 ##### Input
 gulcalc stdout or fmcalc stdout. Binary files of the same data structures can be piped into outputcalc.
@@ -176,7 +176,7 @@ No standard output stream. The results table is exported to a csv file. See the 
 A component which converts the getmodel output stream, or binary file with the same structure, to a csv file.
 
 ##### Input
-Same as getmodel output or a binary file of the same format can be piped into cdftocsv
+Same as getmodel output or a binary file of the same format can be piped into cdftocsv.
 
 ##### Output
 Csv file with the following fields;

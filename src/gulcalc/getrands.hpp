@@ -35,7 +35,7 @@
 #pragma once
 #include <stdio.h>
 #include <random>
-
+#include <map>
 
 class getRands {
 private:
@@ -48,6 +48,7 @@ private:
 	std::mt19937 _gen;
 	std::uniform_real_distribution<> _dis;
 	int _samplesize;
+    std::map<unsigned int,float> _rnd;
 public:
 	getRands(bool fromFile_, int chunkid_);
 	void clearbuff() {
@@ -59,7 +60,14 @@ public:
 			return _buf[ridx_];
 		}
 		else {
-			return (float) _dis(_gen);
+            auto iter=_rnd.find(ridx_);
+            if (iter != _rnd.end()) return iter->second;
+            else {
+                float f = (float) _dis(_gen);
+                _rnd[ridx_] = f;
+                return f;
+            }
+
 		}
 	}
 	unsigned int getp1(bool _reconcilationmode = false) const;

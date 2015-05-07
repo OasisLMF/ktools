@@ -112,6 +112,7 @@ double _gul_limit = 0.0;
 bool _userandomtable = false;
 int _chunk_id = -1;
 bool _newstream = true;
+bool _debug = false;
 
 gulSampleslevel *_bufold = 0;
 
@@ -237,24 +238,9 @@ float getgul(damagebindictionary &b, gulGulSamples &g)
 	return gul;
 }
 
-void outputgulold(gulSampleslevel &gg)
-{
-    // int pid = getpid();
-    // fprintf(stderr,"%d: Gul::outputgul ********* BUF POINTER SET to %p!!! *******\n",pid, _buf);
-	if (_bufoffset < _gularraysize) {
-		_bufold[_bufoffset] = gg;
-		_bufoffset++;
-	}
-	else {
-        fwrite(_bufold, sizeof(gulSampleslevel), _gularraysize, stdout);
-		_bufoffset = 0;
-		_bufold[_bufoffset] = gg;
-		_bufoffset++;
-	}
-	_outrec_count++;
-}
 
-void outputgulnewold(gulSampleslevel &gg)
+
+void outputgulold(gulSampleslevel &gg)
 {
 	// int pid = getpid();
 	// fprintf(stderr,"%d: Gul::outputgul ********* BUF POINTER SET to %p!!! *******\n",pid, _buf);
@@ -297,7 +283,7 @@ void outputgulnew(gulSampleslevel &gg)
 
 	gulSampleslevelRec r;
 	r.sidx = gg.sidx;
-	r.gul = gg.gul;
+	r.gul = gg.gul;    
 	memcpy(_buf + _bufoffset, &r, sizeof(gulSampleslevelRec));
 	_bufoffset += sizeof(gulSampleslevelRec);
 
@@ -305,7 +291,7 @@ void outputgulnew(gulSampleslevel &gg)
 
 void outputgul(gulSampleslevel &gg)
 {
-	if (_newstream == false) outputgulnewold(gg);
+    if (_newstream == false) outputgulold(gg);
 	if (_newstream == true) outputgulnew(gg);
 }
 
@@ -408,7 +394,8 @@ damagecdfrec *d = (damagecdfrec *)rec;
 						gulSampleslevel gg;
 						damagebindictionary b = damagebindictionary_vec_[g.bin_index];
 						// gg.gul = (b.bin_from + ((g.rval - g.prob_from) / (g.prob_to - g.prob_from) * (b.bin_to - b.bin_from))) * g.tiv;
-						gg.gul = getgul(b, g);
+                        if (_debug) gg.gul = rval;
+                        else gg.gul = getgul(b, g);
 						gg.sidx = g.sidx;
 						gg.event_id = g.event_id;
 						gg.item_id = g.item_id;
@@ -501,15 +488,16 @@ void help()
 
     cerr << "-S Samplesize\n"
         << "-r use randomtables\n"
-        << "-R reconcilation mode"
-        << "-C Chunk id"
+        << "-R reconcilation mode\n"
+        << "-C Chunk id\n"
+        << "-d debug (dump random numbers instead of gul)\n"
         ;
 }
 
 int main(int argc, char *argv[])
 {
     int opt;
-     while ((opt = getopt(argc, argv, "ORrL:S:C:")) != -1) {
+     while ((opt = getopt(argc, argv, "dORrL:S:C:")) != -1) {
         switch (opt) {
         case 'S':
 			_samplesize = atoi(optarg);
@@ -530,6 +518,9 @@ int main(int argc, char *argv[])
 	case 'O':
 			_newstream=false;
 			break;
+    case 'd':
+            _debug = true;
+            break;
         default: /* '?' */
            help();
             exit(EXIT_FAILURE);

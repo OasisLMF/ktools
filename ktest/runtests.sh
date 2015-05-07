@@ -7,11 +7,11 @@ fi
 mkdir -p testout
 CTRL=ctrl
 
-if [ ! -f cwbld ]; then
+if [ -f cwbld ]; then
 	CTRL=wctrl
 fi
 
-if [ ! -f uwbld ]; then
+if [ -f uwbld ]; then
 	echo "Windows test  not supported in Linux"
 	exit
 fi

@@ -5,3 +5,4 @@ check:
 
 .PHONY: all clean install
 
+EXTRA_DIST = runtests.sh 

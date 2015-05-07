@@ -5,7 +5,16 @@ if [ ! -f ../src/eve/eve ]; then
     exit
 fi
 mkdir -p testout
-cd ../examples
+
+if [ ! -d ctrl ]; then
+	tar -xzf ../ctrl.tar.gz
+fi
+
+cd ..
+if [ ! -d examples ]; then
+	tar -xzf examples.tar.gz
+fi
+cd examples
 # test eve
 ../src/eve/eve 1 1 2 > ../ktest/testout/eveout1_1.bin
 ../src/eve/eve 1 2 2 > ../ktest/testout/eveout1_2.bin

@@ -54,6 +54,11 @@ public:
 	void clearbuff() {
 		delete[]_buf;
 	}
+    void clearmap()
+    {
+        _rnd.clear();
+    }
+
 	inline float rnd(unsigned int ridx_)  {
 		if (_fromFile) {
 			if (ridx_ >= _buffersize) ridx_ = ridx_ - _buffersize;

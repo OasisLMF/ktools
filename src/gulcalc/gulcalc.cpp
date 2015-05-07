@@ -373,12 +373,13 @@ damagecdfrec *d = (damagecdfrec *)rec;
 			gx.sidx = -1;
 			outputgul(gx);
 			int ridx = 0; // dummy value
-			if (_userandomtable) ridx = ((iter->group_id * p1) + (d->event_id * p2)) % rnd_count;
+            if (_userandomtable) ridx = ((iter->group_id * p1) + (d->event_id * p2)) % rnd_count;
+            else ridx = iter->group_id ;
 			if (_reconcilationmode) ridx = ridx * _samplesize;
 			for (int i = 0; i < _samplesize; i++){
 				float  rval;
 				rval = rnd_.rnd(ridx + i);
-				float last_prob_to = 0;
+                float last_prob_to = 0;
 				pp = (prob_mean *)b;
 				for (int bin_index = 0; bin_index < *bin_count; bin_index++){
 					if ((char *)pp > endofRec) {
@@ -484,6 +485,7 @@ void doit()
 			//if (last_event_id != -1) dofm(event_guls);
 			last_event_id = d->event_id;
 			event_guls.clear();
+            if (_userandomtable == false) rnd.clearmap();
 		}
 
 		processrec(rec, recsize, damagebindictionary_vec, exposure_map, event_guls, rnd);

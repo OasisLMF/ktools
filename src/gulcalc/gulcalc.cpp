@@ -360,7 +360,7 @@ damagecdfrec *d = (damagecdfrec *)rec;
 			outputgul(gx);
 			int ridx = 0; // dummy value
             if (_userandomtable) ridx = ((iter->group_id * p1) + (d->event_id * p2)) % rnd_count;
-            else ridx = iter->group_id ;
+            else ridx = iter->group_id * _samplesize;
 			if (_reconcilationmode) ridx = ridx * _samplesize;
 			for (int i = 0; i < _samplesize; i++){
 				float  rval;

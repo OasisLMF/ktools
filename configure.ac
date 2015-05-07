@@ -44,3 +44,7 @@ AC_CONFIG_FILES([Makefile
                  src/gultocsv/Makefile
                  src/outputcalc/Makefile])
 AC_OUTPUT
+
+rm -f  /ktest/cwbld
+rm -f  /ktest/uwbld
+

@@ -85,7 +85,7 @@ gulcalc is the component which calculates ground up loss. It takes the cdfs as s
 Same as getmodel output or a binary file of the same data structure can be piped into gulcalc.
 
 ##### Output
-Stream Header packet structure
+Stream header packet structure
 
 | Name              | Type   |  Bytes | Description                                                         | Example     |
 |:------------------|--------|--------| :-------------------------------------------------------------------|------------:|

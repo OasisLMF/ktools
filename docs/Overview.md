@@ -23,4 +23,6 @@ At present, intermediate results binaries are required to be read back into memo
 
 The reference model demonstrates an implementation of the principal calculation components, along with some data conversion components which convert binary files to csv files. 
 
+[Go to Specification](Specification.md)
+
 [Back to Contents](Contents.md)

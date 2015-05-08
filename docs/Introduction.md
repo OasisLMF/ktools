@@ -48,4 +48,6 @@ Specifically, it contains a component **gendata** that generates the input data 
 
 gendata is an example of another class of components for extracting data to create the binary input files required by ktools, which is principally just the calculation componentware. It is planned to provide utilities which convert input data in csv format to binary format as part of the reference model, to make it easier for developers to import their data into ktools. 
 
+[Go to Data streaming architecture overview](Overview.md)
+
 [Back to Contents](Contents.md)

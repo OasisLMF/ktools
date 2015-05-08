@@ -72,13 +72,13 @@ Search for 'gcc' and 'make' to find all of the relevant packages (Only 'gcc' ill
 
 ### Instructions
 
-Copy ktools-[version].tar.gz onto your machine 
+Copy ktools-[version].tar.gz onto your machine. 
 
 Open a Cygwin terminal. 
 
 ![alt text](https://github.com/OasisLMF/ktools/blob/master/docs/img/cygwin2.jpg "Cygwin terminal")
 
-Change directory to the location of the tar.
+Change directory to the location of the tar.gz.
 
 Extract the files using the following command
 ``` sh

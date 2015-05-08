@@ -50,7 +50,7 @@ Data packet structure
 |:------------------|--------|--------| :-------------------------------------------------------------------|------------:|
 | event_id          | int    |    4   | Oasis event_id                                                      |   4545      |
 
-Note that eve currently has no stream_id header.
+Note that eve has no stream_id header.
 
 #### getmodel
 

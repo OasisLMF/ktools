@@ -1,6 +1,6 @@
 # Data Streaming Framework Overview
 
-This is the general data streaming framework showing the main components of the SDK.
+This is the general data streaming framework showing the main components of the toolkit.
 
 ##### Figure 1. Data streaming framework
 ![alt text](https://github.com/OasisLMF/ktools/blob/master/docs/img/DataStreamFramework.jpg "Data Streaming Framework")

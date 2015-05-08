@@ -156,7 +156,7 @@ The structure of the random number table is as follows;
 ##### Calculation
 The program constructs a cdf for each item, based on matching the areaperil_id and vulnerability_id from the stdin and the exposure data. The stdin stream is a block of cdfs which are ordered by event.
 
-For each item cdf and for the number of samples specified, the program reads a random number from the random number file and uses it to sample ground up loss from the cdf using one of three methods. If a random number file is not provided, a random number is generated on the fly for each event and group of items which have a common group_id using the Mersenne twister psuedo random number generator.
+For each item cdf and for the number of samples specified, the program reads a random number from the random number file and uses it to sample ground up loss from the cdf using one of three methods. If a random number file is not provided, a random number is generated on the fly for each event and group of items which have a common group_id using the Mersenne twister psuedo random number generator (the default RNG of the C++ v11 compiler).
 
 For a given damage interval corresponding to a cumulative probability interval that each random number falls within;
 * If the conditional mean damage (of the cdf) is the mid-point of the damage bin interval (of the damage bin dictionary) then the gulcalc program performs linear interpolation. 

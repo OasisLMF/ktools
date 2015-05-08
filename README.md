@@ -110,7 +110,7 @@ The executables are located in C:/Oasis/bin. You should add this bin folder to y
 
 ![alt text](https://github.com/OasisLMF/ktools/blob/master/docs/img/windowspath.jpg "Adding the path in system environment variables")
 
-The installation is complete. Restart the Cygwin session before usage to refresh the path.
+The installation is complete. Restart the Cygwin session to refresh the path before usage.
 
 ## Usage
 

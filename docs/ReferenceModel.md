@@ -268,4 +268,6 @@ The data structure of exposures.bin is given in the gulcalc section above, and t
 ##### Calculation
 The program sums the sampled losses from either gulcalc stream or fmstream across the portfolio/programme by event and sample, and then computes sample mean and standard deviation. It reads the TIVs from the exposure instance table and sums them for the group of items affected by each event.
 
+[Go to Planned work](PlannedWork.md)
+
 [Back to Contents](Contents.md)

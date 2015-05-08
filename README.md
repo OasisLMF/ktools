@@ -2,9 +2,11 @@
 
 This is the POSIX-compliant Oasis In-Memory Kernel SDK.
 
-### Beta
+### Release
 
-This library is in Beta. 
+This library is currently in Beta. Please click [here](https://github.com/OasisLMF/ktools/releases) to download the latest release. 
+
+The source code will change on a regular basis but only the releases are supported. Support enquiries should be sent to support@oasislmf.org.
 
 ## Linux Installation
 
@@ -14,7 +16,7 @@ The g++ compiler needs to be installed in Linux.
 
 ### Instructions
 
-If installing from a release tar.gz, copy ktools-[version].tar.gz onto your machine and untar.
+Copy ktools-[version].tar.gz onto your machine and untar.
 ``` sh
 $ tar -xvf ktools-[version].tar.gz
 ```
@@ -24,15 +26,8 @@ Go into the ktools folder and configure using the following command;
 $ cd ktools-[version]
 $ ./configure
 ```
-If installing from a git repository, clone the ktools repository onto your machine.
 
-Go into the ktools folder and configure using the following command;
-``` sh
-$ cd ktools
-$ ./kconfigure
-```
-
-After the configure stage for either source, make using the following command;
+Make using the following command;
 ``` sh
 $ make
 ```
@@ -41,7 +36,6 @@ Next run the automated test to check the build and numerical results;
 ``` sh
 $ make check
 ```
-No messages means the test completed successfully.
 
 Finally, install the executables using the following command;
 ``` sh
@@ -49,6 +43,15 @@ $ make install
 ```
 
 The installation is complete. The executables are located in ~/usr/local/bin. 
+
+If installing the latest code from the git repository, clone the ktools repository onto your machine.
+
+Go into the ktools folder and configure using the following command;
+``` sh
+$ cd ktools
+$ ./kconfigure
+```
+Follow the rest of the process as described above.
 
 ## Windows Installation
 
@@ -64,11 +67,18 @@ The following Cygwin add-in packages are required;
 * mingw64-i686-gcc-core
 * make
 
+Search for 'gcc' and 'make' to find all of the relevant packages (Only 'gcc' illustrated below).
 ![alt text](https://github.com/OasisLMF/ktools/blob/master/docs/img/cygwin1.jpg "Add-in packages")
 
 ### Instructions
 
-If installing from a release tar.gz, copy ktools-[version].tar.gz onto your machine and untar.
+Copy ktools-[version].tar.gz onto your machine 
+
+Open a Cygwin terminal. 
+![alt text](https://github.com/OasisLMF/ktools/blob/master/docs/img/cygwin2.jpg "Cygwin terminal")
+Change directory to the location of the tar.
+
+Extract the files using the following command
 ``` sh
 $ tar -xvf ktools-[version].tar.gz
 ```
@@ -78,15 +88,8 @@ Go into the ktools folder and configure using the following command;
 $ cd ktools-[version]
 $ ./winconfigure
 ```
-If installing from a git repository, clone the ktools repository onto your machine.
 
-Go into the ktools folder and configure using the following command;
-``` sh
-$ cd ktools
-$ ./winconfigure
-```
-
-After the configure stage for either source, make using the following command;
+Make using the following command;
 ``` sh
 $ make
 ```
@@ -95,7 +98,6 @@ Next run the automated test to check the build and numerical results;
 ``` sh
 $ make check
 ```
-No messages means the test completed successfully.
 
 Finally, install the executables using the following command;
 ``` sh

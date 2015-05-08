@@ -1,6 +1,6 @@
 # ktools
 
-This is the POSIX-compliant Oasis In-Memory Kernel SDK.
+This is the POSIX-compliant Oasis In-Memory Kernel toolkit.
 
 ### Release
 

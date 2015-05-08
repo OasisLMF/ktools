@@ -19,4 +19,7 @@ The plan is to enable intermediate calculation steps to be written out to disk w
 ##### Figure 2. Multiple output file processing - future
 ![alt text](https://github.com/OasisLMF/ktools/blob/master/docs/img/MultipleOutput2.jpg "Multiple output file processing")
 
+#### 4. Sidx field format in gulcalc and fmcalc
+The sample index field will be simplified to be a simple 4 byte integer format, with no higher byte special meaning. The sample index value for the mean will be changed to -1 (currently 0) and -2 for standard deviation (currently -1).
+
 [Back to Contents](Contents.md)

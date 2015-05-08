@@ -1,6 +1,6 @@
 # Reference Model
 
-This section provides an explanation of the reference model of the SDK, which is an implementation of each of the components in the framework. 
+This section provides an explanation of the reference model, which is an implementation of each of the components in the framework. 
 
 The set of core components provided in this release is as follows;
 * **eve** is the event distributing utility. Based on the number of events in the input and the number of processes specified as a parameter, eve outputs subsets of the events as a stream. The output streams into getmodel.
@@ -27,7 +27,7 @@ Figure 2 shows the workflows for the data conversion components.
 ![alt text](https://github.com/OasisLMF/ktools/blob/master/docs/img/Dbtools2.jpg "Data Conversion Workflows")
 
 ```
-Note that no examples of the component which generates the binary files have been provided in the SDK
+Note that no examples of the component which generates the binary files have been provided in the tool set 
 as yet. This component is, in general, specific to the technical environment and may also be calling 
 the data from a remote server as an API. However an example of 'gendata' is provided with Oasis R1.4 
 in a github project called 'oatools' which reads the input data from a SQL Server database.
@@ -39,7 +39,7 @@ The following sections explain the usage and internal processes and data require
 
 getmodel generates a stream of effective damageability distributions (cdfs) from an input list of events. Specifically, it reads pre-generated Oasis format cdfs and converts them into a binary stream. The source input data must have been generated as binary files by a separate program.
 
-This is reference example of the class of programs which generates the damage distributions for an event set and streams them into memory. It is envisaged that model developers who wish to use the SDK as a back-end calculator of their existing platforms can write their own version of getmodel, reading in their own source data and converting it into the standard output stream. As long as the standard input and output structures are adhered to, the program can be written in any langauge and read any input data.
+This is reference example of the class of programs which generates the damage distributions for an event set and streams them into memory. It is envisaged that model developers who wish to use the toolkit as a back-end calculator of their existing platforms can write their own version of getmodel, reading in their own source data and converting it into the standard output stream. As long as the standard input and output structures are adhered to, the program can be written in any langauge and read any input data.
 
 ##### Stream_id
 

@@ -40,18 +40,18 @@
 
 void doit()
 {
-    int eventid;
+    float randno;
     char line[4096];
     int lineno=0;
     while (fgets(line, sizeof(line), stdin) != 0)
     {
-       if (sscanf(line, "%d", &eventid) != 1){
+       if (sscanf(line, "%f", &randno) != 1){
            fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
            return;
        }
        else
        {
-           fwrite(&eventid, sizeof(eventid), 1, stdout);
+           fwrite(&randno, sizeof(randno), 1, stdout);
        }
        lineno++;
     }

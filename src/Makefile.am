@@ -1,4 +1,4 @@
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = gulcalc getmodel eve cdftocsv outputcalc gultocsv fmcalc fmtocsv fmdatatocsv randtocsv evetocsv evetobin
+SUBDIRS = gulcalc getmodel eve cdftocsv outputcalc gultocsv fmcalc fmtocsv fmdatatocsv randtocsv evetocsv evetobin randtobin
 include_HEADERS = include/oasis.hpp
 

@@ -40,6 +40,7 @@ AC_CONFIG_FILES([Makefile
                  src/fmdatatocsv/Makefile
                  src/fmtocsv/Makefile
                  src/randtocsv/Makefile
+                 src/evetocsv/Makefile
                  src/getmodel/Makefile
                  src/gulcalc/Makefile
                  src/gultocsv/Makefile

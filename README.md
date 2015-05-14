@@ -66,8 +66,9 @@ The following Cygwin add-in packages are required;
 * mingw64-i686-gcc-g++
 * mingw64-i686-gcc-core
 * make
+* diffutils
 
-Search for 'gcc' and 'make' to find all of the relevant packages (Only 'gcc' illustrated below).
+Search for 'gcc', 'make' and 'diffutils' to find all of the relevant packages (Only 'gcc' illustrated below).
 ![alt text](https://github.com/OasisLMF/ktools/blob/master/docs/img/cygwin1.jpg "Add-in packages")
 
 ### Instructions

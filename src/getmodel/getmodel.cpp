@@ -127,43 +127,9 @@ void getindex(std::map<int, idxrec> &imap_, int chunkid_)
 	z.offset = x.offset;
 	z.length = -1;
 	imap_[x.event_id] = z;
-
 }
 
 FILE *fin;
-// FILE *fout;
-void sendevent(int event_id_, std::map<int, idxrec> &imap_)
-{
-	if (verbose) {
-		std::cerr << "Event id " << event_id_
-			<< " offset " << imap_[event_id_].offset
-			<< "\n"
-			;
-	}
-#ifdef _MSC_VER 
-	_fseeki64(fin, imap_[event_id_].offset, SEEK_SET);
-#else
-	fseek(fin, imap_[event_id_].offset, SEEK_SET);
-#endif
-
-	int i = 0;
-	int length = imap_[event_id_].length;
-
-	while (i < length) {
-		int c = fgetc(fin);
-		putc(c, stdout);
-		//putc(c, fout);
-		i++;
-	}
-	if (length == -1) {	// last event in file
-		int c = fgetc(fin);
-		while (c != EOF) {
-			putc(c, stdout);
-			//putc(c, fout);
-			c = fgetc(fin);
-		}
-	}
-}
 
 struct damageFact {
 	int event_id;
@@ -173,7 +139,7 @@ struct damageFact {
 };
 
 
-void sendevent_new(int event_id_, std::map<int, idxrec> &imap_, int max_no_of_bins_, float *interpolation_)
+void sendevent(int event_id_, std::map<int, idxrec> &imap_, int max_no_of_bins_, float *interpolation_)
 {
 	if (verbose) {
 		std::cerr << "Event id " << event_id_
@@ -182,22 +148,24 @@ void sendevent_new(int event_id_, std::map<int, idxrec> &imap_, int max_no_of_bi
 			;
 	}
 
+    long long offset = imap_[event_id_].offset;
 	int length = imap_[event_id_].length;
-	if (length == -1) {
-#ifdef _MSC_VER 
+	if (length == -1) {    
+#if defined(_MSC_VER) || defined(__MINGW32__)
 		_fseeki64(fin, 0, SEEK_END);
 #else
 		fseek(fin, 0, SEEK_END);
 #endif
 		long long fs = ftell(fin);
 		length = (int)(fs - imap_[event_id_].offset);
-	}
-#ifdef _MSC_VER 
-		_fseeki64(fin, imap_[event_id_].offset, SEEK_SET);
+	}    
+#if defined(_MSC_VER) || defined(__MINGW32__)
+	_fseeki64(fin, imap_[event_id_].offset, SEEK_SET);
 #else
-		fseek(fin, imap_[event_id_].offset, SEEK_SET);
+        fseek(fin, offset, SEEK_SET);
 #endif
-
+    long long pos = ftell(fin);
+    std::cerr << "File pos : "  << pos << "\n";
 	float *binp = new float[max_no_of_bins_];
 	int no_of_bins = 0;
 	while (length > 0) {
@@ -239,7 +207,7 @@ void sendevent_new(int event_id_, std::map<int, idxrec> &imap_, int max_no_of_bi
 	delete[] binp;
 }
 
-void doitlocal(int chunkid_)
+void doit(int chunkid_)
 {
  
 	int event_id = 0;
@@ -269,11 +237,8 @@ void doitlocal(int chunkid_)
 	if (raw_mode == false) fwrite(&outputstreamtype, sizeof(outputstreamtype), 1, stdout);
 
 	while (1){
-       
-		if (fread(&event_id, sizeof(int), 1, stdin) != 1) break;
-        
-		//sendevent(event_id, imap);
-		sendevent_new(event_id, imap, damagebindictionary_vec.size(),interpolation);
+		if (fread(&event_id, sizeof(int), 1, stdin) != 1) break;        
+        sendevent(event_id, imap, damagebindictionary_vec.size(),interpolation);
 	}
 	delete[] interpolation;
 }
@@ -289,15 +254,22 @@ int main(int argc, char *argv[])
 {
 	if (argc < 2) usage(argv[0]);
 
-	if (argc == 3) {
-		std::string s = "-v";
-		if (argv[2] == s) verbose = true;
-		s = "-r";
-		if (argv[2] == s) raw_mode = true; // input = output no interpretation used for debugging
-	}
-	if (argc < 2) usage(argv[0]);
+    if (argc == 3) {
+        std::string s = "-v";
+        if (argv[2] == s) verbose = true;
+        s = "-r";
+        if (argv[2] == s) raw_mode = true; // input = output no interpretation used for debugging
+    }
+
 	int chunkid = atoi(argv[1]);
-	initstreams("", "");
-	doitlocal(chunkid);
+    std::string inFile = "";
+    std::string outFile = "";
+    if (argc == 4) {
+        inFile = argv[2];
+        outFile = argv[3];
+    }
+
+    initstreams(inFile, outFile);
+    doit(chunkid);
 
 }

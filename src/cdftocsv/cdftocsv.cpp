@@ -151,9 +151,16 @@ bool bSuccess = getrecx((char *)&stream_type, stdin, sizeof(stream_type));
 
 }
 
-int main()
+int main(int argc, char *argv[])
 {
-	initstreams("","");
+    std::string inFile = "";
+    std::string outFile = "";
+    if (argc == 3 ){
+        inFile = argv[1];
+        outFile = argv[2];
+    }
+
+    initstreams(inFile,outFile);
     doit();
     return 0;
 }

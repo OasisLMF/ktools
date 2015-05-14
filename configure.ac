@@ -5,6 +5,18 @@ AC_PREREQ([2.69])
 AC_INIT([ktools], [0.4.0], [support@oasislmf.org])
 AM_INIT_AUTOMAKE
 
+AC_MSG_CHECKING([Check for /usr/bin/diff ])
+if [[ -f /usr/bin/diff ]];
+then
+	AC_MSG_RESULT([yes])
+else
+	AC_MSG_RESULT([no])
+	AC_MSG_NOTICE([ /usr/bin/diff not found - cannot do make check])
+fi
+
+
+
+
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADERS([config.h])
 

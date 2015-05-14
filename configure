@@ -2815,6 +2815,22 @@ END
 fi
 
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking Check for /usr/bin/diff " >&5
+$as_echo_n "checking Check for /usr/bin/diff ... " >&6; }
+if [ -f /usr/bin/diff ];
+then
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+	{ $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+	{ $as_echo "$as_me:${as_lineno-$LINENO}:  /usr/bin/diff not found - cannot do make check" >&5
+$as_echo "$as_me:  /usr/bin/diff not found - cannot do make check" >&6;}
+fi
+
+
+
+
 
 ac_config_headers="$ac_config_headers config.h"
 

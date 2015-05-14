@@ -50,6 +50,7 @@ AC_CONFIG_FILES([Makefile
                  src/eve/Makefile
                  src/fmcalc/Makefile
                  src/fmdatatocsv/Makefile
+                 src/cdfdatatocsv/Makefile
                  src/fmtocsv/Makefile
                  src/randtocsv/Makefile
                  src/randtobin/Makefile

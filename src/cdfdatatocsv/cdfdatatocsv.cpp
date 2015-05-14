@@ -48,43 +48,10 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 using namespace std;
 
 
-struct fmdatazz {
-        int item_id;
-        int agg_id;
-        int prog_id;
-        int level_id;
-        int policytc_id;
-        int layer_id;
-        int calcrule_id;
-        int allocrule_id;
-        float deductible;
-        float limits;
-        float share_prop_of_lim;
-        float deductible_prop_of_loss;
-        float limit_prop_of_loss;
-        float deductible_prop_of_tiv;
-        float limit_prop_of_tiv;
-        float deductible_prop_of_limit;
-};
-
 
 void doit()
 {
-
-    printf ("\"item_id\", \"agg_id\", \"prog_id\", \"level_id\", \"policytc_id\", \"layer_id\", \"calcrule_id\", \"allocrule_id\",");
-    printf ("\"deductible\", \"limits\", \"share_prop_of_lim\", \"deductible_prop_of_loss\", \"limit_prop_of_loss\", \"deductible_prop_of_tiv\", \"limit_prop_of_tiv\", \"deductible_prop_of_limit\"\n");
-
-    fmdata q;
-    int i = fread(&q, sizeof(q), 1, stdin);
-    while (i != 0) {
-        printf("%d, %d, %d, %d, %d, %d, %d, %d, %f, %f, %f, %f, %f, %f, %f, %f\n",
-               q.item_id, q.agg_id, q.prog_id, q.level_id,
-               q.policytc_id, q.layer_id, q.calcrule_id, q.allocrule_id,
-               q.deductible, q.limits, q.share_prop_of_lim, q.deductible_prop_of_loss,
-               q.limit_prop_of_loss, q.deductible_prop_of_tiv, q.limit_prop_of_tiv, q.deductible_prop_of_limit);
-
-        i = fread(&q, sizeof(q), 1, stdin);
-    }
+	printf("TODO\n");
 }
 
 void help()

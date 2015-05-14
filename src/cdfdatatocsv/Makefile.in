@@ -76,8 +76,8 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-bin_PROGRAMS = fmdatatocsv$(EXEEXT)
-subdir = src/fmdatatocsv
+bin_PROGRAMS = cdfdatatocsv$(EXEEXT)
+subdir = src/cdfdatatocsv
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/depcomp
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -90,9 +90,9 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_fmdatatocsv_OBJECTS = fmdatatocsv.$(OBJEXT)
-fmdatatocsv_OBJECTS = $(am_fmdatatocsv_OBJECTS)
-fmdatatocsv_LDADD = $(LDADD)
+am_cdfdatatocsv_OBJECTS = cdfdatatocsv.$(OBJEXT)
+cdfdatatocsv_OBJECTS = $(am_cdfdatatocsv_OBJECTS)
+cdfdatatocsv_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -122,8 +122,8 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-SOURCES = $(fmdatatocsv_SOURCES)
-DIST_SOURCES = $(fmdatatocsv_SOURCES)
+SOURCES = $(cdfdatatocsv_SOURCES)
+DIST_SOURCES = $(cdfdatatocsv_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -240,7 +240,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-fmdatatocsv_SOURCES = fmdatatocsv.cpp
+cdfdatatocsv_SOURCES = cdfdatatocsv.cpp
 all: all-am
 
 .SUFFIXES:
@@ -254,9 +254,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/fmdatatocsv/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/cdfdatatocsv/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu src/fmdatatocsv/Makefile
+	  $(AUTOMAKE) --gnu src/cdfdatatocsv/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -318,9 +318,9 @@ uninstall-binPROGRAMS:
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
 
-fmdatatocsv$(EXEEXT): $(fmdatatocsv_OBJECTS) $(fmdatatocsv_DEPENDENCIES) $(EXTRA_fmdatatocsv_DEPENDENCIES) 
-	@rm -f fmdatatocsv$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(fmdatatocsv_OBJECTS) $(fmdatatocsv_LDADD) $(LIBS)
+cdfdatatocsv$(EXEEXT): $(cdfdatatocsv_OBJECTS) $(cdfdatatocsv_DEPENDENCIES) $(EXTRA_cdfdatatocsv_DEPENDENCIES) 
+	@rm -f cdfdatatocsv$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(cdfdatatocsv_OBJECTS) $(cdfdatatocsv_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -328,7 +328,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fmdatatocsv.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cdfdatatocsv.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

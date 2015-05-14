@@ -4857,7 +4857,7 @@ esac
 
 
 
-ac_config_files="$ac_config_files Makefile ktest/Makefile src/Makefile src/cdftocsv/Makefile src/eve/Makefile src/fmcalc/Makefile src/fmdatatocsv/Makefile src/fmtocsv/Makefile src/randtocsv/Makefile src/randtobin/Makefile src/evetocsv/Makefile src/evetobin/Makefile src/getmodel/Makefile src/gulcalc/Makefile src/gultocsv/Makefile src/outputcalc/Makefile"
+ac_config_files="$ac_config_files Makefile ktest/Makefile src/Makefile src/cdftocsv/Makefile src/eve/Makefile src/fmcalc/Makefile src/fmdatatocsv/Makefile src/cdfdatatocsv/Makefile src/fmtocsv/Makefile src/randtocsv/Makefile src/randtobin/Makefile src/evetocsv/Makefile src/evetobin/Makefile src/getmodel/Makefile src/gulcalc/Makefile src/gultocsv/Makefile src/outputcalc/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -5597,6 +5597,7 @@ do
     "src/eve/Makefile") CONFIG_FILES="$CONFIG_FILES src/eve/Makefile" ;;
     "src/fmcalc/Makefile") CONFIG_FILES="$CONFIG_FILES src/fmcalc/Makefile" ;;
     "src/fmdatatocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/fmdatatocsv/Makefile" ;;
+    "src/cdfdatatocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/cdfdatatocsv/Makefile" ;;
     "src/fmtocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/fmtocsv/Makefile" ;;
     "src/randtocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/randtocsv/Makefile" ;;
     "src/randtobin/Makefile") CONFIG_FILES="$CONFIG_FILES src/randtobin/Makefile" ;;

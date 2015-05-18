@@ -165,7 +165,6 @@ void sendevent(int event_id_, std::map<int, idxrec> &imap_, int max_no_of_bins_,
         fseek(fin, offset, SEEK_SET);
 #endif
     long long pos = ftell(fin);
-    std::cerr << "File pos : "  << pos << "\n";
 	float *binp = new float[max_no_of_bins_];
 	int no_of_bins = 0;
 	while (length > 0) {

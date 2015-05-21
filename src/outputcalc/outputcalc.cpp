@@ -129,6 +129,29 @@ void loadfmxref(std::map<int,std::vector<int> > &fmxref_)
 
 }
 
+
+void loadfmtiv(std::map<int,float > &fmtiv_,std::map<int,float> &exposure_)
+{
+    std::map<int,std::vector<int> > fmxref;
+    loadfmxref(fmxref);
+
+    auto iter = fmxref.begin();
+    while (iter != fmxref.end()){
+        float tiv = 0;
+        auto iter2 = iter->second.begin();
+        while (iter2 != iter->second.end()){
+            tiv += exposure_[*iter2];
+            iter2++;
+        }
+        fmtiv_[iter->first] = tiv;
+        iter++;
+    }
+
+
+}
+
+
+
 void loadexposure(std::map<int,float> &itemtiv_)
 {
     std::ostringstream oss;
@@ -181,7 +204,7 @@ void dofmsummary(std::map<output_key, std::vector<vecrec> > &output_map_, unsign
 }
 
 
-void dofmoutput(std::map<int,std::vector<int> > &fmxref_,std::map<int,float> &exposure_,unsigned int sample_size_)
+void dofmoutput(std::map<int,float > &fmtiv_,unsigned int sample_size_)
 {
     fmlevelhdr p;
     int i = fread(&p, sizeof(fmlevelhdr), 1, stdin);
@@ -215,15 +238,8 @@ void dofmoutput(std::map<int,std::vector<int> > &fmxref_,std::map<int,float> &ex
                         std::vector<vecrec> v(sample_size_+1, {0.0, 0.0});
                         output_map[k] = v;
                     }
-                    float tiv = 0;
                     output_map[k][q.sidx].loss += q.loss;
-                    auto iter = fmxref_[p.output_id].begin();
-                    while (iter != fmxref_[p.output_id].end()){
-                        tiv += exposure_[*iter];
-                        iter++;
-                    }
-
-                    //float tiv = exposure_[item_id];
+                    float tiv= fmtiv_[p.output_id];
                     output_map[k][q.sidx].tiv += tiv;
                 }
 
@@ -329,12 +345,12 @@ void doit(std::map<int,float> &exposure_)
     }
 
     if (isFMStream(gulfmstream_type) == true){
-    std::map<int,std::vector<int> > fmxref;
-   	loadfmxref(fmxref);
+        std::map<int,float > fmtiv;
+        loadfmtiv(fmtiv,exposure_);
         unsigned int samplesize;
         i = fread(&samplesize, sizeof(samplesize), 1, stdin);
         if (i == 1){
-            dofmoutput(fmxref,exposure_,samplesize);
+            dofmoutput(fmtiv,samplesize);
         }else {
              std::cerr << "Stream read error\n";
         }

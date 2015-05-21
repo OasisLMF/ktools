@@ -198,11 +198,11 @@ void dofmsummary(std::map<output_key, std::vector<vecrec> > &output_map_, unsign
        float sd = 0;
        if (sample_size_ > 1) {
            sd = (sumlosssqr - ((sumloss*sumloss)/sample_size_))/(sample_size_ - 1);
-           if (sd < 0) sd = 0;
+           float x = sd /sumlosssqr;
+           if (x < 0.0000001) sd = 0; // fix floating point precision problems caused by using large numbers
            sd = sqrt(sd);
        }
        cout << mean << "," << sd << "," << maxsumtiv << "\n";
-
        iter++;
     }
 }
@@ -278,7 +278,8 @@ void dogulsummary(int event_id_,std::vector<vecrec> &output_vec_, unsigned int s
        float sd = 0;
        if (sample_size_ > 1) {
            sd = (sumlosssqr - ((sumloss*sumloss)/sample_size_))/(sample_size_ - 1);
-           if (sd < 0) sd = 0;
+           float x = sd /sumlosssqr;
+           if (x < 0.0000001) sd = 0;   // fix floating point precision problems caused by using large numbers
            sd = sqrt(sd);
        }
        cout << mean << "," << sd << "," << maxsumtiv << "\n";

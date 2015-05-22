@@ -86,7 +86,7 @@ bool getdamagebindictionary(std::vector<damagebindictionary> &damagebindictionar
 		exit(-1);
 	}
 	fseek(fin, 0L, SEEK_END);
-	long sz = ftell(fin);
+	long long sz = fltell(fin);
 	fseek(fin, 0L, SEEK_SET);
 	unsigned int nrec = sz / sizeof(damagebindictionary);
 	damagebindictionary *s1 = new damagebindictionary[nrec];
@@ -151,23 +151,14 @@ void sendevent(int event_id_, std::map<int, idxrec> &imap_, int max_no_of_bins_,
     long long offset = imap_[event_id_].offset;
 	int length = imap_[event_id_].length;
 	if (length == -1) {    
-#if defined(_MSC_VER) || defined(__MINGW32__)
-		_fseeki64(fin, 0, SEEK_END);
-		long long fs = _ftelli64(fin);
-#else
-		fseek(fin, 0, SEEK_END);
-		long long fs = ftell(fin);
-#endif
-		length = (int)(fs - imap_[event_id_].offset);
+
+		flseek(fin, 0, SEEK_END);
+		long long fs = fltell(fin);
+		length = (int)(fs - offset);
 	}    
-#if defined(_MSC_VER) || defined(__MINGW32__)
-	_fseeki64(fin, imap_[event_id_].offset, SEEK_SET);
-	long long pos = _ftelli64(fin);
-#else
-        fseek(fin, offset, SEEK_SET);
-		long long pos = ftell(fin);
-#endif
     
+	flseek(fin, offset, SEEK_SET);
+	long long pos = fltell(fin);
 	float *binp = new float[max_no_of_bins_];
 	int no_of_bins = 0;
 	while (length > 0) {

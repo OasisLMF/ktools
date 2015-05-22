@@ -37,6 +37,7 @@
 #include <fstream>
 #include <sstream>
 #include <stdlib.h>
+#include "../include/oasis.hpp"
 
 
 bool isPrime(int number);
@@ -56,8 +57,8 @@ getRands::getRands(bool fromFile_, int chunkid_) : _gen(rd()), _dis(0, 1)
 			cerr << "getRands: cannot open " << oss.str().c_str() << "\n";
 			exit(-1);
 		}
-		fseek(fin, 0L, SEEK_END);
-		long p = ftell(fin);
+		flseek(fin, 0L, SEEK_END);
+		long long p = fltell(fin);
 		_buffersize = p / 4;
 		_buffersize = _buffersize - 1;		// first 4 bytes is the limit
 		fseek(fin, 0L, SEEK_SET);

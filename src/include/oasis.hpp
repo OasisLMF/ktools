@@ -42,6 +42,11 @@
 #if defined(_MSC_VER) || defined(__MINGW32__)
 #include <fcntl.h>
 #include <io.h>
+#define flseek _fseeki64
+#define fltell _ftelli64
+#else
+#define flseek fseek
+#define fltell ftell
 #endif 
 
 const int mean_idx = 1 << 24;

@@ -51,7 +51,7 @@ void emitevents(int chunk_id_,int pno_,int total_)
                 exit(-1);
     }
     fseek(fin, 0L, SEEK_END);
-    long endpos = ftell(fin);
+    long long  endpos = fltell(fin);
 
     int total_events =  endpos / 4;
     int chunksize = (int) ceil((float)total_events / total_);

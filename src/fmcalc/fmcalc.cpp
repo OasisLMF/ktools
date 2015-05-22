@@ -587,9 +587,9 @@ int main()
 	// read in the FM data
 	FILE *fin = (FILE *)fopen("fm/fm_data.bin", "rb");	
 	{ fin || ___perror("Error opening fm data file:" ) && ___exit(EXIT_FAILURE); }
-    fseek (fin, 0, SEEK_END);
-    size_t fmdFileSize=ftell (fin);
-    fseek (fin, 0, SEEK_SET);
+    flseek (fin, 0, SEEK_END);
+    size_t fmdFileSize=fltell (fin);
+    flseek (fin, 0, SEEK_SET);
 	fclose(fin);
 
     int fd = open("fm/fm_data.bin", O_RDONLY);

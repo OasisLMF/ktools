@@ -58,9 +58,9 @@ bool getdamagebindictionary(std::vector<damagebindictionary> &damagebindictionar
     if (fin == NULL){
         return false;
     }
-    fseek(fin, 0L, SEEK_END);
-    long sz = ftell(fin);
-    fseek(fin, 0L, SEEK_SET);
+    flseek(fin, 0L, SEEK_END);
+    long long sz = fltell(fin);
+    flseek(fin, 0L, SEEK_SET);
     unsigned int nrec = sz / sizeof(damagebindictionary);
     damagebindictionary *s1 = new damagebindictionary[nrec];
     if (fread(s1, sizeof(damagebindictionary), nrec, fin) != nrec) {

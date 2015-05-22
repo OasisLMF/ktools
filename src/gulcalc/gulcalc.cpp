@@ -149,9 +149,11 @@ bool getdamagebindictionary(std::vector<damagebindictionary> &damagebindictionar
 		cerr << "getdamagebindictionary: Unable to open " << oss.str() << "\n";
 		exit(-1);
 	}
-	fseek(fin, 0L, SEEK_END);
-	long sz = ftell(fin);
-	fseek(fin, 0L, SEEK_SET);
+
+	flseek(fin, 0L, SEEK_END);
+	long long sz = fltell(fin);
+
+	flseek(fin, 0L, SEEK_SET);
 	unsigned int nrec = sz / sizeof(damagebindictionary);
 	damagebindictionary *s1 = new damagebindictionary[nrec];
 	if (fread(s1, sizeof(damagebindictionary), nrec, fin) != nrec) {
@@ -180,9 +182,11 @@ bool getexposures(std::map<exposure_key, std::vector<exposure_rec> > &exposure_m
 		cerr << "getexposures: Unable to open " << oss.str() << "\n";
 		exit(-1);
 	}
-	fseek(fin, 0L, SEEK_END);
-	long sz = ftell(fin);
-	fseek(fin, 0L, SEEK_SET);
+
+	flseek(fin, 0L, SEEK_END);
+	long long sz = fltell(fin);
+	flseek(fin, 0L, SEEK_SET);
+
 	unsigned int nrec = sz / sizeof(exposure);
 	exposure *s1 = new exposure[nrec];
 	if (fread(s1, sizeof(exposure), nrec, fin) != nrec) {

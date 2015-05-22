@@ -138,8 +138,6 @@ inline void initstreams(std::string inFile_, std::string outFile_)
             std::cerr << "Error opening " << inFile_ << "\n";
             exit(-1);
          }
-   }else {
-       freopen(NULL, "rb", stdin);
    }
 
    if (outFile_.length() > 0){
@@ -147,8 +145,6 @@ inline void initstreams(std::string inFile_, std::string outFile_)
            std::cerr << "Error opening " << outFile_ << "\n";
            exit(-1);
         }
-   }else{
-       freopen(NULL, "wb", stdout);
    }
 
 #if defined(_MSC_VER) || defined(__MINGW32__)

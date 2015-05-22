@@ -153,18 +153,21 @@ void sendevent(int event_id_, std::map<int, idxrec> &imap_, int max_no_of_bins_,
 	if (length == -1) {    
 #if defined(_MSC_VER) || defined(__MINGW32__)
 		_fseeki64(fin, 0, SEEK_END);
+		long long fs = _ftelli64(fin);
 #else
 		fseek(fin, 0, SEEK_END);
-#endif
 		long long fs = ftell(fin);
+#endif
 		length = (int)(fs - imap_[event_id_].offset);
 	}    
 #if defined(_MSC_VER) || defined(__MINGW32__)
 	_fseeki64(fin, imap_[event_id_].offset, SEEK_SET);
+	long long pos = _ftelli64(fin);
 #else
         fseek(fin, offset, SEEK_SET);
+		long long pos = ftell(fin);
 #endif
-    long long pos = ftell(fin);
+    
 	float *binp = new float[max_no_of_bins_];
 	int no_of_bins = 0;
 	while (length > 0) {

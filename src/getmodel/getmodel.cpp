@@ -131,14 +131,6 @@ void getindex(std::map<int, idxrec> &imap_, int chunkid_)
 
 FILE *fin;
 
-struct damageFact {
-	int event_id;
-	int item_id;
-	float tiv;
-	int group_id;
-};
-
-
 void sendevent(int event_id_, std::map<int, idxrec> &imap_, int max_no_of_bins_, float *interpolation_)
 {
 	if (verbose) {

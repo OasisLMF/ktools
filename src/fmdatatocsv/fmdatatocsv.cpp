@@ -48,26 +48,6 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 using namespace std;
 
 
-struct fmdatazz {
-        int item_id;
-        int agg_id;
-        int prog_id;
-        int level_id;
-        int policytc_id;
-        int layer_id;
-        int calcrule_id;
-        int allocrule_id;
-        float deductible;
-        float limits;
-        float share_prop_of_lim;
-        float deductible_prop_of_loss;
-        float limit_prop_of_loss;
-        float deductible_prop_of_tiv;
-        float limit_prop_of_tiv;
-        float deductible_prop_of_limit;
-};
-
-
 void doit()
 {
 

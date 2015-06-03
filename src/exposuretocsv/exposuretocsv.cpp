@@ -1,5 +1,5 @@
 /*
-* Copyright (c)2015 Oasis LMF Limited
+* Copyright (c)2015 Oasis LMF Limited 
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
@@ -31,78 +31,31 @@
 * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 * DAMAGE.
 */
-/*
-Convert cdfdata to csv
-Author: Joh Carter  email: johanna.carter@oasislmf.org
-*/
+
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef __unix
-    #include <unistd.h>
-#endif
-
 #include "../include/oasis.hpp"
-
-using namespace std;
-
-struct cdfdata {
-	int event_id;
-	int areaperil_id;
-	int vulnerability_id;
-	int bin_index;
-	float prob_to;
-};
 
 void doit()
 {
-	printf("\"event_id\", \"areaperil_id\", \"vulnerability_id\", \"bin_index\", \"prob_to\"\n");
-	/*
-	This is a complex data structure because of the variable length cdfs. WIP.
-	*/
-	cdfdata q;
+	printf("\"item_id\", \"areaperil_id\", \"vulnerability_id\", \"tiv\", \"group_id\"\n");
+	
+	exposure q;
 	int i = fread(&q, sizeof(q), 1, stdin);
 	while (i != 0) {
-		printf("%d, %d, %d, %d, %f\n",
-			q.event_id, q.areaperil_id, q.vulnerability_id, q.bin_index, q.prob_to);
+		printf("%d, %d, %d, %f, %d\n",
+			q.item_id, q.areaperil_id, q.vulnerability_id, q.tiv, q.group_id);
 
 		i = fread(&q, sizeof(q), 1, stdin);
-	}
+    }
+
 }
 
-void help()
+int main()
 {
-
-    cerr << "-I inputfilename\n"
-        << "-O outputfielname\n"
-        ;
-}
-
-int main(int argc, char* argv[])
-{
-    int opt;
-     std::string inFile;
-     std::string outFile;
-
- #ifdef __unix
-     while ((opt = getopt(argc, argv, "hI:O:")) != -1) {
-         switch (opt) {
-         case 'I':
-             inFile = optarg;
-             break;
-          case 'O':
-             outFile = optarg;
-             break;
-         case 'h':
-            help();
-            exit(EXIT_FAILURE);
-         }
-     }
- #endif
-
-    initstreams(inFile, outFile);
-
-	doit();
-	return 0;
+	initstreams("", "");
+    doit();
+    return 0;
 }

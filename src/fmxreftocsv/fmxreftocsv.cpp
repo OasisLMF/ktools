@@ -32,7 +32,7 @@
 * DAMAGE.
 */
 /*
-Convert cdfdata to csv
+Convert fmxref output to csv
 Author: Joh Carter  email: johanna.carter@oasislmf.org
 */
 #include <iostream>
@@ -47,28 +47,26 @@ Author: Joh Carter  email: johanna.carter@oasislmf.org
 
 using namespace std;
 
-struct cdfdata {
-	int event_id;
-	int areaperil_id;
-	int vulnerability_id;
-	int bin_index;
-	float prob_to;
+
+struct fmxref {
+        int item_id;
+        int output_id;
 };
+
 
 void doit()
 {
-	printf("\"event_id\", \"areaperil_id\", \"vulnerability_id\", \"bin_index\", \"prob_to\"\n");
-	/*
-	This is a complex data structure because of the variable length cdfs. WIP.
-	*/
-	cdfdata q;
-	int i = fread(&q, sizeof(q), 1, stdin);
-	while (i != 0) {
-		printf("%d, %d, %d, %d, %f\n",
-			q.event_id, q.areaperil_id, q.vulnerability_id, q.bin_index, q.prob_to);
 
-		i = fread(&q, sizeof(q), 1, stdin);
-	}
+	printf("\"item_id\", \"output_id\"\n");
+    
+    fmxref q;
+    int i = fread(&q, sizeof(q), 1, stdin);
+    while (i != 0) {
+        printf("%d, %d\n",
+               q.item_id, q.output_id);
+
+        i = fread(&q, sizeof(q), 1, stdin);
+    }
 }
 
 void help()

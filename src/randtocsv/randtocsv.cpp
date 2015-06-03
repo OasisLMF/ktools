@@ -42,7 +42,9 @@ void doit()
 {
 
     float rand;
-
+	int size;
+	fread(&size, sizeof(size), 1, stdin);
+	printf("%d\n", size);
     while (fread(&rand, sizeof(rand), 1, stdin) == 1){
         printf("%f\n",rand);
     }

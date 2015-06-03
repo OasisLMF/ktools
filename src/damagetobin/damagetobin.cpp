@@ -40,18 +40,28 @@
 
 void doit()
 {
-	printf("\"item_id\", \"areaperil_id\", \"vulnerability_id\", \"group_id\", \"tiv\"\n");
-	
-	exposure q;
-	int i = fread(&q, sizeof(q), 1, stdin);
-	while (i != 0) {
-		printf("%d, %d, %d, %d, %f\n",
-			q.item_id, q.areaperil_id, q.vulnerability_id, q.group_id, q.tiv);
 
-		i = fread(&q, sizeof(q), 1, stdin);
+	damagebindictionary q;
+    char line[4096];
+    int lineno=0;
+	fgets(line, sizeof(line), stdin);
+	lineno++;
+    while (fgets(line, sizeof(line), stdin) != 0)
+    {
+		if (sscanf(line, "%d,%f,%f,%f,%d", &q.bin_index, &q.bin_from, &q.bin_to, &q.interpolation, &q.interval_type) != 5){
+           fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
+           return;
+       }
+
+	    else
+       {
+           fwrite(&q, sizeof(q), 1, stdout);
+       }
+       lineno++;
     }
 
 }
+
 
 int main()
 {

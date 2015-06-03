@@ -122,7 +122,6 @@ struct fmdata {
 	float deductible_prop_of_limit;
 };
 
-#pragma pack(pop)
 
 struct exposure{
 	int item_id;
@@ -132,7 +131,7 @@ struct exposure{
 	float tiv;
 };
 
-
+#pragma pack(pop)
 // -- UTILITY inline functions 
 
 inline void initstreams(std::string inFile_, std::string outFile_)

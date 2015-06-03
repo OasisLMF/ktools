@@ -41,8 +41,20 @@
 void doit()
 {
     float randno;
+	int size;
     char line[4096];
     int lineno=0;
+	fgets(line, sizeof(line), stdin);
+	if (sscanf(line, "%d", &size) != 1){
+		fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
+		return;
+	}
+	else
+	{
+		fwrite(&size, sizeof(size), 1, stdout);
+	}
+	lineno++;
+
     while (fgets(line, sizeof(line), stdin) != 0)
     {
        if (sscanf(line, "%f", &randno) != 1){

@@ -16,10 +16,6 @@ if [ -f uwbld ]; then
 	exit
 fi
 
-if [ ! -d $CTRL ]; then
-	tar -xzf ../$CTRL.tar.gz
-fi
-
 cd ..
 if [ ! -d examples ]; then
 	tar -xzf examples.tar.gz

@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([ktools], [0.4.0], [support@oasislmf.org])
+AC_INIT([ktools], [0.4.2], [support@oasislmf.org])
 AM_INIT_AUTOMAKE
 
 AC_MSG_CHECKING([Check for /usr/bin/diff ])
@@ -48,10 +48,15 @@ AC_CONFIG_FILES([Makefile
 		 src/Makefile
                  src/cdftocsv/Makefile
                  src/eve/Makefile
+		 src/damagetocsv/Makefile
+		 src/damagetobin/Makefile
+		 src/exposuretocsv/Makefile
+		 src/exposuretobin/Makefile
                  src/fmcalc/Makefile
                  src/fmdatatocsv/Makefile
                  src/cdfdatatocsv/Makefile
                  src/fmtocsv/Makefile
+                 src/fmxreftocsv/Makefile
                  src/randtocsv/Makefile
                  src/randtobin/Makefile
                  src/evetocsv/Makefile
@@ -62,6 +67,6 @@ AC_CONFIG_FILES([Makefile
                  src/outputcalc/Makefile])
 AC_OUTPUT
 
-rm -f  /ktest/cwbld
-rm -f  /ktest/uwbld
+rm -f  ktest/cwbld
+rm -f  ktest/uwbld
 

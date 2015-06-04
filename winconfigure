@@ -6,6 +6,9 @@ touch Makefile.in
 touch configure
 touch config.h.in
 
+rm -f ktest/cwbld
+rm -f ktest/uwbld
+ 
 if [ "$SYSNAME" = "Cygwin" ]; then
    ./configure  --build=x86_64 --host i686-w64-mingw32 --prefix=/cygdrive/c/oasis
    touch ktest/cwbld

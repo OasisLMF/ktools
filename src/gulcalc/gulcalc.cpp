@@ -106,7 +106,7 @@ struct prob3 {
 
 const int _gularraysize = 1000;
 bool _reconcilationmode = false;
-int _samplesize = 0;
+int _samplesize = -1;
 int _outrec_count = 0;
 double _gul_limit = 0.0;
 bool _userandomtable = false;
@@ -531,7 +531,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    if (_samplesize == 0 ){
+    if (_samplesize == -1 ){
         fprintf(stderr,"-S sample size parameter not supplied\n");
         exit(EXIT_FAILURE);
     }

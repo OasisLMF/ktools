@@ -123,7 +123,7 @@ std::vector<damagebindictionary> damagebindictionary_vec;
 getdamagebindictionary(damagebindictionary_vec);
 int total_bins = damagebindictionary_vec.size();
 if (total_bins == 0 ) total_bins = 10000;
-int max_recsize = (int)(total_bins * 8) + sizeof(damagecdfrec)+sizeof(int);
+int max_recsize = (int)(total_bins * sizeof(prob_mean)) + sizeof(damagecdfrec)+sizeof(int);
 
 char *rec = new char[max_recsize];
 int stream_type = 0;
@@ -140,7 +140,7 @@ bool bSuccess = getrecx((char *)&stream_type, stdin, sizeof(stream_type));
         bSuccess = getrecx(p, stdin, sizeof(int)); // we now have bin count
         int *q = (int *)p;
         p = p + sizeof(int);
-        int recsize = (*q) * 8;
+        int recsize = (*q) * sizeof(prob_mean);
                 // we should now have damagecdfrec in memory
         bSuccess = getrecx(p, stdin, recsize);
         recsize += sizeof(damagecdfrec)+sizeof(int);

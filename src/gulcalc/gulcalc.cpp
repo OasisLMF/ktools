@@ -458,7 +458,7 @@ void doit()
 	}
 	getRands rnd(_userandomtable, _chunk_id);
 
-	for (;;)
+    for (;;)
 	{
 		//damagecdfrec c;
 		char *p = rec;
@@ -501,7 +501,10 @@ void help()
 int main(int argc, char *argv[])
 {
     int opt;
-     while ((opt = getopt(argc, argv, "dORrL:S:C:")) != -1) {
+    std::string infile;
+    std::string outfile;
+
+     while ((opt = getopt(argc, argv, "dRrL:S:C:I:O:")) != -1) {
         switch (opt) {
         case 'S':
 			_samplesize = atoi(optarg);
@@ -519,8 +522,11 @@ int main(int argc, char *argv[])
 	case 'C':
 			_chunk_id = atoi(optarg);
 			break;
+       case 'I':
+                infile = optarg;
+                break;
 	case 'O':
-			_newstream=false;
+            outfile = optarg;
 			break;
     case 'd':
             _debug = true;
@@ -547,7 +553,7 @@ int main(int argc, char *argv[])
     }
 
     //if (_newstream == false) doitold();
-    initstreams("", "");
+    initstreams(infile, outfile);
 	doit();
 
 }

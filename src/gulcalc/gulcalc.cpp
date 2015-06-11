@@ -432,7 +432,7 @@ void doit()
 	getexposures(exposure_map);
 
 	int total_bins = damagebindictionary_vec.size();
-	int max_recsize = (int)(total_bins * 8) + sizeof(damagecdfrec)+sizeof(int);
+	int max_recsize = (int)(total_bins * sizeof(prob_mean)) + sizeof(damagecdfrec)+sizeof(int);
 
 	int gulstream_type = 2 | gulstream_id;
 	if (_newstream == true) {
@@ -468,7 +468,7 @@ void doit()
 		bSuccess = getrecx(p, stdin, sizeof(int)); // we now have bin count
 		int *q = (int *)p;
 		p = p + sizeof(int);
-		int recsize = (*q) * 8;
+		int recsize = (*q) * sizeof(prob_mean);
 		// we should now have damagecdfrec in memory
 		bSuccess = getrecx(p, stdin, recsize);
 		recsize += sizeof(damagecdfrec)+sizeof(int);

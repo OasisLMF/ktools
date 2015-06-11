@@ -77,7 +77,7 @@ bool getdamagebindictionary(std::vector<damagebindictionary> &damagebindictionar
     return true;
 }
 
-bool getrecx(char *rec_, FILE *stream, int recsize_)
+bool getrec(char *rec_, FILE *stream, int recsize_)
 {
     int totalread = 0;
     while (totalread != recsize_){
@@ -128,21 +128,25 @@ int max_recsize = (int)(total_bins * sizeof(prob_mean)) + sizeof(damagecdfrec)+s
 char *rec = new char[max_recsize];
 int stream_type = 0;
 
-bool bSuccess = getrecx((char *)&stream_type, stdin, sizeof(stream_type));
+bool bSuccess = getrec((char *)&stream_type, stdin, sizeof(stream_type));
 
     if (verbose) fprintf(stderr,"Stream type: %d", stream_type);
 
+    if (stream_type != 1) {
+        fprintf(stderr,"Invalid stream type %d expect stream type 1\n", stream_type);
+        exit(-1);
+    }
     for(;;){
         char *p = rec;
-        bSuccess = getrecx(p, stdin, sizeof(damagecdfrec));
+        bSuccess = getrec(p, stdin, sizeof(damagecdfrec));
         if (bSuccess == false) break;
          p = p + sizeof(damagecdfrec);
-        bSuccess = getrecx(p, stdin, sizeof(int)); // we now have bin count
+        bSuccess = getrec(p, stdin, sizeof(int)); // we now have bin count
         int *q = (int *)p;
         p = p + sizeof(int);
         int recsize = (*q) * sizeof(prob_mean);
                 // we should now have damagecdfrec in memory
-        bSuccess = getrecx(p, stdin, recsize);
+        bSuccess = getrec(p, stdin, recsize);
         recsize += sizeof(damagecdfrec)+sizeof(int);
 
         processrec(rec, recsize, damagebindictionary_vec);

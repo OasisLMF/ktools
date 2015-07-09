@@ -80,7 +80,6 @@ void doit()
 		while (i != 0) {
 			count++;
 			if (q.sidx == 0) break;
-			if (q.sidx == mean_idx) q.sidx = 0;
 			printf("%d, %d, %d, %d, %d, %f\n", p.event_id, p.prog_id, p.layer_id, p.output_id, q.sidx, q.loss);
 			if (p.event_id == 26 && p.prog_id == 1 && p.layer_id == 2 && p.output_id == 6 && q.sidx == 100){
 				cout << "Were here";

@@ -646,7 +646,7 @@ int main()
 				}
 				if (gr.sidx == 0) break; // this marks  the start of a new event, so process the one we have just read
 				if (gr.sidx == mean_idx) gr.sidx = 0;
-				if (gr.sidx < 0) continue;
+				if (gr.sidx == std_dev_idx) continue;
 				gulSampleslevel gs;
 				gs.event_id = gh.event_id;
 				gs.item_id = gh.item_id;

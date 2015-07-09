@@ -49,8 +49,11 @@
 #define fltell ftell
 #endif 
 
-const int mean_idx = 1 << 24;
-const int std_dev_idx = -1;
+//const int mean_idx = 1 << 24;
+//const int std_dev_idx = -1;
+const int mean_idx = -1;
+const int std_dev_idx = -2;
+
 
 // Stream types
 const unsigned int cdfstream_id = 0;		// high byte is zero

@@ -223,7 +223,6 @@ void dofmoutput(std::map<int,float > &fmtiv_,unsigned int sample_size_)
             i = fread(&q, sizeof(fmlevelrec), 1, stdin);
             //dumpfmlevelrec(q);
             while (i != 0) {                
-                if (q.sidx == mean_idx) q.sidx = 0;
               // if (count < top) fprintf(stderr, "%d, %d, %d, %d, %d, %f\n", p.prog_id, p.layer_id, p.event_id, p.output_id, q.sidx, q.loss);
                // if (count < top && q.sidx > 0 ) fprintf(stderr, "%d%d | %d | %d | %d | %f | %f\n", p.prog_id, p.layer_id, p.event_id, p.output_id, q.sidx, q.loss,sum_loss);
                 if (last_event_id != p.event_id ) { // can be made more efficent since event can only change at fmlevelhdr
@@ -296,7 +295,6 @@ void doguloutput(std::map<int,float> &exposure_,unsigned int sample_size_)
         gulSampleslevelRec gr;
         i = fread(&gr, sizeof(gr), 1, stdin);
         while (i != 0){
-            if (gr.sidx == mean_idx) gr.sidx = 0;
             if (last_event_id != gh.event_id ) { // can be made more efficent since event can only change at fmlevelhdr
                 // std::cerr << "TODO: Got all event elements now do outer query event_id : " << last_event_id << "\n";
                 if (last_event_id) dogulsummary(last_event_id,output_vec,sample_size_);
@@ -342,7 +340,6 @@ void doit(std::map<int,float> &exposure_)
             gulSampleslevel p;
             i = fread(&p, sizeof(gulSampleslevel), 1, stdin);
             while (i != 0) {
-                if (p.sidx == mean_idx) p.sidx = 0;
                 printf("%d, %d, %d, %f\n", p.event_id, p.item_id, p.sidx, p.gul);
                 i = fread(&p, sizeof(gulSampleslevel), 1, stdin);
             }

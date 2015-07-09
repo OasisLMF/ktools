@@ -504,11 +504,8 @@ int doFM(int event_id_, std::vector<gulSampleslevel> &event_guls_, byte *fmd, in
 						for(int i=0; i<=numSamples; i++)
 						{
 							byte *aggLevelLossWorkRow = aggLevelLossWork +  sizeof(float) * aggMap.size() * i;
-
-							if (i==0) 
-								fmrec.sidx = mean_idx;
-							else
-								fmrec.sidx = i;
+							
+							fmrec.sidx = i;
 							fmrec.loss= *(float *)( aggLevelLossWorkRow + aggMap[aggKey] );
 							fwrite( &fmrec, sizeof(fmrec), 1, stdout);
 						}
@@ -531,10 +528,7 @@ int doFM(int event_id_, std::vector<gulSampleslevel> &event_guls_, byte *fmd, in
 							{
 								byte *outputLossWorkRow = outputLossWork + sizeof(float) * i * itemToOffsetMap.size();
 
-								if (i==0) 
-									fmrec.sidx = mean_idx;
-								else
-									fmrec.sidx = i;
+								fmrec.sidx = i;
 								fmrec.loss= *(float *)(outputLossWorkRow + *k);
 								fwrite( &fmrec, sizeof(fmrec), 1, stdout);
 							}
@@ -556,10 +550,8 @@ int doFM(int event_id_, std::vector<gulSampleslevel> &event_guls_, byte *fmd, in
 						for(int i=0; i<=numSamples; i++)
 						{
 							byte *levelLossWorkRow = levelLossWork + sizeof(float) * i * itemToOffsetMap.size();
-							if (i==0) 
-								fmrec.sidx = mean_idx;
-							else
-								fmrec.sidx = i;
+							
+							fmrec.sidx = i;
 							fmrec.loss = *(float *)(levelLossWorkRow + itemOffset);
 							fwrite( &fmrec, sizeof(fmrec), 1, stdout);
 						}
@@ -645,8 +637,7 @@ int main()
 					break;
 				}
 				if (gr.sidx == 0) break; // this marks  the start of a new event, so process the one we have just read
-				if (gr.sidx == mean_idx) gr.sidx = 0;
-				if (gr.sidx < 0) continue;
+				if (gr.sidx == std_dev_idx ) continue;
 				gulSampleslevel gs;
 				gs.event_id = gh.event_id;
 				gs.item_id = gh.item_id;

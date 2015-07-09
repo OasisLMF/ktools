@@ -98,7 +98,7 @@ struct prob_mean {
 	float bin_mean;
 };
 
-struct prob3 {
+struct probrec {
 	float prob_from;
 	float prob_to;
 	float bin_mean;
@@ -307,7 +307,7 @@ void output_mean(const exposure_rec &er, prob_mean *pp, int bin_count, float &gu
 	float ctr_var = 0;
 
 	for (int bin_index = 0; bin_index < bin_count; bin_index++){
-		prob3 p;
+		probrec p;
 		if (bin_index == 0) p.prob_from = 0;
 		else p.prob_from = last_prob_to;
 		p.prob_to = pp->prob_to;
@@ -378,7 +378,7 @@ damagecdfrec *d = (damagecdfrec *)rec;
 						pp--;
 					}
 
-					prob3 p;
+					probrec p;
 					if (bin_index == 0) p.prob_from = 0;
 					else p.prob_from = last_prob_to;
 					p.prob_to = pp->prob_to;

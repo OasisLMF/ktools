@@ -63,7 +63,7 @@ getRands::getRands(bool fromFile_, int chunkid_) : _gen(rd()), _dis(0, 1)
 		_buffersize = _buffersize - 1;		// first 4 bytes is the limit
 		fseek(fin, 0L, SEEK_SET);
 
-		if (fread(&_samplesize, sizeof(int), 1, fin) != 1) {
+        if (fread(&_randsamplesize, sizeof(int), 1, fin) != 1) {
 			cerr << "Error reading random number file\n";
 			exit(-1);
 		}
@@ -85,7 +85,7 @@ unsigned int  getRands::getp1(bool _reconcilationmode) const
 		return getp2(i);
 	}
 	else {
-		unsigned int i = _buffersize / (2 * _samplesize);
+        unsigned int i = _buffersize / (2 * _randsamplesize);
 		return getp2(i);
 	}
 }
@@ -106,6 +106,6 @@ int getRands::rdxmax(bool _reconcilationmode) const
 		return _buffersize;
 	}
 	else{
-		return _buffersize / _samplesize;
+        return _buffersize / _randsamplesize;
 	}
 }

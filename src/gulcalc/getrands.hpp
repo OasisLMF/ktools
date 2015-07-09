@@ -47,7 +47,7 @@ private:
 	// std::random_device _rd;
 	std::mt19937 _gen;
 	std::uniform_real_distribution<> _dis;
-	int _samplesize;
+    int _randsamplesize;
     std::map<unsigned int,float> _rnd;
 public:
 	getRands(bool fromFile_, int chunkid_);

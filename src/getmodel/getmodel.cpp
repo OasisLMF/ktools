@@ -111,6 +111,10 @@ void getindex(std::map<int, idxrec> &imap_, int chunkid_)
 
 	oss << "cdf/damage_cdf_chunk_" << chunkid_ << ".idx";
 	FILE *fin = fopen(oss.str().c_str(), "rb");
+    if (fin == NULL){
+        perror("Error opening input file");
+        exit(-1);
+    }
 	idx x;
 	idx y;
 	int i = fread(&x, sizeof(idx), 1, fin);

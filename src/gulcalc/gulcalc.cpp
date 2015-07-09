@@ -360,7 +360,7 @@ damagecdfrec *d = (damagecdfrec *)rec;
 			gx.event_id = d->event_id;
 			gx.item_id = iter->item_id;
 			gx.gul = std_dev;
-			gx.sidx = -1;
+			gx.sidx = std_dev_idx;
 			outputgul(gx);
 			int ridx = 0; // dummy value
             if (_userandomtable) ridx = ((iter->group_id * p1) + (d->event_id * p2)) % rnd_count;

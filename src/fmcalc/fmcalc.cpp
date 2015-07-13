@@ -198,10 +198,10 @@ int doFM(int event_id_, std::vector<gulSampleslevel> &event_guls_, byte *fmd, in
 		}
 
 		// set up aggWork table to hold the aggregations and initialise to zero
-		byte *aggLevelLossWork = (byte *)calloc(	1, sizeof(float) * aggMap.size() * (numSamples+1) );	
-		{ fmd || ___perror("Error opening fm data file:" ) && ___exit(EXIT_FAILURE); }
-		byte *aggGroundUpLossWork = (byte *)calloc(	1, sizeof(float) * aggMap.size() * (numSamples+1) );	
-		{ fmd || ___perror("Error opening fm data file:" ) && ___exit(EXIT_FAILURE); }
+		byte *aggLevelLossWork = (byte *)calloc(	1, sizeof(float) * aggMap.size() * (numSamplesInBatch+1) );	
+		{ aggLevelLossWork || ___perror("Error allocating memory for aggLevelLossWork:" ) && ___exit(EXIT_FAILURE); }
+		byte *aggGroundUpLossWork = (byte *)calloc(	1, sizeof(float) * aggMap.size() * (numSamplesInBatch+1) );	
+		{ aggGroundUpLossWork || ___perror("Error allocating memory for aggGroundUpLossWork:" ) && ___exit(EXIT_FAILURE); }
 		
 
 		// Calculate the Aggregations
@@ -646,7 +646,7 @@ int main()
 				}
 				if (gr.sidx == 0) break; // this marks  the start of a new event, so process the one we have just read
 				if (gr.sidx == mean_idx) gr.sidx = 0;
-				if (gr.sidx == std_dev_idx) continue;
+				if (gr.sidx < 0) continue;
 				gulSampleslevel gs;
 				gs.event_id = gh.event_id;
 				gs.item_id = gh.item_id;

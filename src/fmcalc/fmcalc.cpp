@@ -198,9 +198,9 @@ int doFM(int event_id_, std::vector<gulSampleslevel> &event_guls_, byte *fmd, in
 		}
 
 		// set up aggWork table to hold the aggregations and initialise to zero
-		byte *aggLevelLossWork = (byte *)calloc(	1, sizeof(float) * aggMap.size() * (numSamplesInBatch+1) );	
+		byte *aggLevelLossWork = (byte *)calloc(	1, sizeof(float) * aggMap.size() * (numSamples+1) );	
 		{ aggLevelLossWork || ___perror("Error allocating memory for aggLevelLossWork:" ) && ___exit(EXIT_FAILURE); }
-		byte *aggGroundUpLossWork = (byte *)calloc(	1, sizeof(float) * aggMap.size() * (numSamplesInBatch+1) );	
+		byte *aggGroundUpLossWork = (byte *)calloc(	1, sizeof(float) * aggMap.size() * (numSamples+1) );	
 		{ aggGroundUpLossWork || ___perror("Error allocating memory for aggGroundUpLossWork:" ) && ___exit(EXIT_FAILURE); }
 		
 

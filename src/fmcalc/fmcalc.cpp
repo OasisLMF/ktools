@@ -49,6 +49,8 @@
 
 #include "../include/oasis.hpp"
 
+using namespace std;
+
 typedef unsigned char byte;
 int ___exit(int status) { exit(status); return 1; }
 int ___perror(const char * m) { perror(m); return 1; }
@@ -81,7 +83,14 @@ struct TCVal {
 	float deductible_prop_of_limit;
 };
 
-int doFM(int event_id_, std::vector<gulSampleslevel> &event_guls_, byte *fmd, int numFMDs, int numSamples)
+
+struct gulSampleslevela {
+	int item_id;
+	int sidx;		// This has be stored for thresholds cannot be implied
+	float gul;		// may want to cut down to singe this causes 4 byte padding for allignment
+};
+
+int doFM(int event_id_, std::vector<gulSampleslevela> &event_guls_, byte *fmd, int numFMDs, int numSamples)
 {
 	std::map<AggKey, std::vector<int> > aggToOffsetVector;
 	std::map<AggKey, int > levelMap;
@@ -578,8 +587,7 @@ int doFM(int event_id_, std::vector<gulSampleslevel> &event_guls_, byte *fmd, in
 	free(groundUpLossWork);
 }
 
-
-int main()
+int doit()
 {
 	// read in the FM data
 	FILE *fin = (FILE *)fopen("fm/fm_data.bin", "rb");
@@ -600,8 +608,6 @@ int main()
 		fmdata *pfmd = (fmdata *)p;
 	}
 
-	initstreams("", "");
-
 	int gulstream_type = 0;
 	int i = fread(&gulstream_type, sizeof(gulstream_type), 1, stdin);
 
@@ -614,7 +620,7 @@ int main()
 	{ stream_type != 1 && fprintf(stderr, "Unsupported gul stream type\n") && ___exit(EXIT_FAILURE); }
 
 	int last_event_id = -1;
-	std::vector<gulSampleslevel> event_guls;
+	std::vector<gulSampleslevela> event_guls;
 	if (stream_type == 1) {
 		int samplesize = 0;
 		fread(&samplesize, sizeof(samplesize), 1, stdin);
@@ -644,8 +650,8 @@ int main()
 				if (gr.sidx == 0) break; // this marks  the start of a new event, so process the one we have just read
 				if (gr.sidx == mean_idx) gr.sidx = 0;
 				if (gr.sidx == std_dev_idx) continue;
-				gulSampleslevel gs;
-				gs.event_id = gh.event_id;
+				gulSampleslevela gs;
+				// gs.event_id = gh.event_id;
 				gs.item_id = gh.item_id;
 				gs.sidx = gr.sidx;
 				gs.gul = gr.gul;
@@ -658,4 +664,35 @@ int main()
 	if (munmap(fmd, fmdFileSize) == -1)
 		perror("Error un-mmapping the file");
 	close(fd);
+}
+
+void help()
+{
+
+	cerr  << "Optional parameters:\n" 
+		<< "-I Inputfile\n"
+	     << "-O output file\n"
+	     ;
+}
+
+int main(int argc, char *argv[])
+{
+	int opt;
+	std::string infile;
+	std::string outfile;
+
+	while ((opt = getopt(argc, argv, "I:O:")) != -1) {
+		switch (opt) {
+		case 'I':
+			infile = optarg;
+			break;
+		case 'O':
+			outfile = optarg;
+			break;
+		}
+	}
+
+	initstreams(infile, outfile);
+	doit();
+	// help();
 }

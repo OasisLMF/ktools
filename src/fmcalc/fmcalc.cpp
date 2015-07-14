@@ -50,7 +50,7 @@
 #include "../include/oasis.hpp"
 
 typedef unsigned char byte;
-int ___exit(int status){ exit(status); return 1; }
+int ___exit(int status) { exit(status); return 1; }
 int ___perror(const char * m) { perror(m); return 1; }
 int ___close(int fd) { close(fd); return 1; }
 
@@ -64,8 +64,8 @@ struct AggKey {
 	int agg_id;
 	int layer_id;
 };
-inline bool operator==(const AggKey& lhs, const AggKey& rhs){ return lhs.prog_id == rhs.prog_id && lhs.agg_id == rhs.agg_id && lhs.layer_id == rhs.layer_id; }
-inline bool operator< (const AggKey& lhs, const AggKey& rhs){  if (lhs.prog_id < rhs.prog_id) return true; if( lhs.prog_id == rhs.prog_id && lhs.agg_id < rhs.agg_id) return true; if( lhs.prog_id == rhs.agg_id && lhs.agg_id == rhs.agg_id && lhs.layer_id < rhs.layer_id) return true; return false; }
+inline bool operator==(const AggKey& lhs, const AggKey& rhs) { return lhs.prog_id == rhs.prog_id && lhs.agg_id == rhs.agg_id && lhs.layer_id == rhs.layer_id; }
+inline bool operator< (const AggKey& lhs, const AggKey& rhs) {  if (lhs.prog_id < rhs.prog_id) return true; if ( lhs.prog_id == rhs.prog_id && lhs.agg_id < rhs.agg_id) return true; if ( lhs.prog_id == rhs.agg_id && lhs.agg_id == rhs.agg_id && lhs.layer_id < rhs.layer_id) return true; return false; }
 
 
 struct TCVal {
@@ -74,11 +74,11 @@ struct TCVal {
 	float deductible;
 	float limit;
 	float share_prop_of_lim;
-    float deductible_prop_of_loss;
-    float limit_prop_of_loss;
-    float deductible_prop_of_tiv;
-    float limit_prop_of_tiv;
-    float deductible_prop_of_limit;
+	float deductible_prop_of_loss;
+	float limit_prop_of_loss;
+	float deductible_prop_of_tiv;
+	float limit_prop_of_tiv;
+	float deductible_prop_of_limit;
 };
 
 int doFM(int event_id_, std::vector<gulSampleslevel> &event_guls_, byte *fmd, int numFMDs, int numSamples)
@@ -86,65 +86,65 @@ int doFM(int event_id_, std::vector<gulSampleslevel> &event_guls_, byte *fmd, in
 	std::map<AggKey, std::vector<int> > aggToOffsetVector;
 	std::map<AggKey, int > levelMap;
 	std::map<AggKey, int> aggMap;
-	int myLevel=1;
+	int myLevel = 1;
 
 	std::map<int, int> itemToOffsetMap;
 	std::map<int, int> offsetToItemMap;
-	
+
 	int numGuls = event_guls_.size();
 
 	// set up the item to offset map and offset to item map - we need to do this for each event, as a small fraction of the items will be impacted by some of the event
-	int k=0;
-	for(int i=0; i< numGuls; i++)
+	int k = 0;
+	for (int i = 0; i < numGuls; i++)
 	{
 		if ( event_guls_[i].sidx > 0 )
 			continue;
 		bool found = itemToOffsetMap.count(event_guls_[i].item_id);
-		if ( not found ) 
-		{ 
-			itemToOffsetMap[event_guls_[i].item_id]=k; 
+		if ( not found )
+		{
+			itemToOffsetMap[event_guls_[i].item_id] = k;
 			offsetToItemMap[k] = event_guls_[i].item_id;
-			k+=sizeof(float);
+			k += sizeof(float);
 		}
 	}
 	int numItems = itemToOffsetMap.size();
 
 	// allocate space for the levelLossWork table and initialise to zero
-	byte *levelLossWork = (byte *)calloc( 1, itemToOffsetMap.size() * (numSamples+1) * sizeof(float) );		
+	byte *levelLossWork = (byte *)calloc( 1, itemToOffsetMap.size() * (numSamples + 1) * sizeof(float) );
 	{	levelLossWork || ___perror("Error allocating levelLossWork table :") && ___exit(EXIT_FAILURE);	}
-		
+
 	// populate the levelLossWork table
-	for(int i=0; i<numGuls; i++)
+	for (int i = 0; i < numGuls; i++)
 		*(float *)(levelLossWork + sizeof(float) * ( itemToOffsetMap.size() * (event_guls_[i].sidx)  ) + itemToOffsetMap[event_guls_[i].item_id] ) = event_guls_[i].gul;
-	
+
 	// allocate space for the groundUpLossWork table and initialise to zero
-	byte *groundUpLossWork = (byte *)calloc( 1, itemToOffsetMap.size() * (numSamples+1) * sizeof(float) );		
+	byte *groundUpLossWork = (byte *)calloc( 1, itemToOffsetMap.size() * (numSamples + 1) * sizeof(float) );
 	{	groundUpLossWork || ___perror("Error allocating levelLossWork table :") && ___exit(EXIT_FAILURE);	}
-		
+
 	// populate the groundUpLossWork table
-	for(int i=0; i<numGuls; i++)
+	for (int i = 0; i < numGuls; i++)
 		*(float *)(groundUpLossWork + sizeof(float) * ( itemToOffsetMap.size() * (event_guls_[i].sidx)  ) + itemToOffsetMap[event_guls_[i].item_id] ) = event_guls_[i].gul;
 
 	// allocate space for the outputLossWork table and initialise to zero
-	byte *outputLossWork = (byte *)calloc( 1, itemToOffsetMap.size() * (numSamples+1) * sizeof(float) );		
+	byte *outputLossWork = (byte *)calloc( 1, itemToOffsetMap.size() * (numSamples + 1) * sizeof(float) );
 	{	levelLossWork || ___perror("Error allocating outputLossWork table :") && ___exit(EXIT_FAILURE);	}
 
 	// determine the maximum level
 	int maxLevel = 1;
-	while (1) 
+	while (1)
 	{
-		bool foundLevel=false;
-		for( byte *p=(byte *)fmd; p< fmd + numFMDs*sizeof(fmdata); p+=sizeof(fmdata))
+		bool foundLevel = false;
+		for ( byte *p = (byte *)fmd; p < fmd + numFMDs * sizeof(fmdata); p += sizeof(fmdata))
 		{
 			fmdata *pfmd = (fmdata *)p;
-			if (pfmd->level_id==maxLevel)
+			if (pfmd->level_id == maxLevel)
 			{
-				foundLevel=true;
+				foundLevel = true;
 				break;
 			}
 		}
 		if (foundLevel)
-			maxLevel++; 
+			maxLevel++;
 		else
 		{
 			maxLevel--; // we didn't find that value of maxlevel, but we did find the one below it
@@ -154,27 +154,27 @@ int doFM(int event_id_, std::vector<gulSampleslevel> &event_guls_, byte *fmd, in
 
 	// determine max layers in the final level
 	int maxLayer = 1;
-	for( byte *p=(byte *)fmd; p < (byte *)fmd + numFMDs*sizeof(fmdata); p+=sizeof(fmdata))
+	for ( byte *p = (byte *)fmd; p < (byte *)fmd + numFMDs * sizeof(fmdata); p += sizeof(fmdata))
 	{
 		fmdata *pfmd = (fmdata *)p;
-		if( pfmd->level_id == maxLevel && pfmd->layer_id > maxLayer )
+		if ( pfmd->level_id == maxLevel && pfmd->layer_id > maxLayer )
 			maxLayer = pfmd->layer_id;
 	}
 
-	for ( myLevel=1; myLevel<=maxLevel; myLevel++)
+	for ( myLevel = 1; myLevel <= maxLevel; myLevel++)
 	{
 		// set up item Index vector for each agg_id - a list of item indices to sum over for that agg_id
 		// also set up the aggregation index table and the T&C Map for the level
 		// note that not all Items aggregated need necessarily have an item for a particular event
 		std::map<AggKey, TCVal> TCMap;
 
-		int aggCount=0;
-		for( byte *p=(byte *)fmd; p< fmd + numFMDs*sizeof(fmdata); p+=sizeof(fmdata))
+		int aggCount = 0;
+		for ( byte *p = (byte *)fmd; p < fmd + numFMDs * sizeof(fmdata); p += sizeof(fmdata))
 		{
 			fmdata *pfmd = (fmdata *)p;
-			if( pfmd->level_id==myLevel )
+			if ( pfmd->level_id == myLevel )
 			{
-				if ( itemToOffsetMap.count(pfmd->item_id) ==1 )
+				if ( itemToOffsetMap.count(pfmd->item_id) == 1 )
 				{
 					AggKey aggKey = { pfmd->prog_id, pfmd->agg_id, pfmd->layer_id };
 					TCVal tcv = { pfmd->calcrule_id, pfmd->allocrule_id, pfmd->deductible, pfmd->limits, pfmd->share_prop_of_lim, pfmd->deductible_prop_of_loss, pfmd->limit_prop_of_loss, pfmd->deductible_prop_of_tiv, pfmd->limit_prop_of_tiv, pfmd->deductible_prop_of_limit};
@@ -186,10 +186,10 @@ int doFM(int event_id_, std::vector<gulSampleslevel> &event_guls_, byte *fmd, in
 					}
 					else
 					{
-						if ( aggToOffsetVector.count(aggKey)==0  )
+						if ( aggToOffsetVector.count(aggKey) == 0  )
 						{
 							aggMap[aggKey] = aggCount;
-							aggCount+=sizeof(float);
+							aggCount += sizeof(float);
 						}
 						aggToOffsetVector[aggKey].push_back( itemToOffsetMap[pfmd->item_id] );
 					}
@@ -198,44 +198,44 @@ int doFM(int event_id_, std::vector<gulSampleslevel> &event_guls_, byte *fmd, in
 		}
 
 		// set up aggWork table to hold the aggregations and initialise to zero
-		byte *aggLevelLossWork = (byte *)calloc(	1, sizeof(float) * aggMap.size() * (numSamples+1) );	
+		byte *aggLevelLossWork = (byte *)calloc(	1, sizeof(float) * aggMap.size() * (numSamples + 1) );
 		{ aggLevelLossWork || ___perror("Error allocating memory for aggLevelLossWork:" ) && ___exit(EXIT_FAILURE); }
-		byte *aggGroundUpLossWork = (byte *)calloc(	1, sizeof(float) * aggMap.size() * (numSamples+1) );	
+		byte *aggGroundUpLossWork = (byte *)calloc(	1, sizeof(float) * aggMap.size() * (numSamples + 1) );
 		{ aggGroundUpLossWork || ___perror("Error allocating memory for aggGroundUpLossWork:" ) && ___exit(EXIT_FAILURE); }
-		
+
 
 		// Calculate the Aggregations
-		for ( std::map<AggKey, std::vector<int> >::iterator j = aggToOffsetVector.begin(); j!=aggToOffsetVector.end(); j++)
+		for ( std::map<AggKey, std::vector<int> >::iterator j = aggToOffsetVector.begin(); j != aggToOffsetVector.end(); j++)
 		{
-			if ( TCMap.count(j->first)!=1)
+			if ( TCMap.count(j->first) != 1)
 				exit(EXIT_FAILURE);
 			TCVal tc = TCMap[j->first];
 
 			if ( tc.allocrule_id == -1 ) // only aggregate losses if there is more than one item in the aggregation
 				continue;
 
-			for(int i=0; i<= numSamples; i++)
+			for (int i = 0; i <= numSamples; i++)
 			{
-				byte *levelLossWorkRow = levelLossWork + sizeof(float) * ( i* itemToOffsetMap.size() );
+				byte *levelLossWorkRow = levelLossWork + sizeof(float) * ( i * itemToOffsetMap.size() );
 				byte *aggLevelLossWorkRow = aggLevelLossWork +  sizeof(float) * ( aggMap.size() * i );
 
 				std::vector<int> indexVector = j->second;
 
 				// aggregate the level losses
-				float levelLossSum=0.0;
-				for ( std::vector<int>::iterator k = indexVector.begin(); k!=indexVector.end(); k++)
+				float levelLossSum = 0.0;
+				for ( std::vector<int>::iterator k = indexVector.begin(); k != indexVector.end(); k++)
 				{
 					levelLossSum += *(float *)(levelLossWorkRow + *k );
 				}
 				*(float *)( aggLevelLossWorkRow + aggMap[j->first]  ) = levelLossSum;
 
 				// aggregate the GULs if needed
-				if ( tc.allocrule_id == 1 or tc.allocrule_id ==3 or tc.calcrule_id == 8 or tc.calcrule_id == 10  or tc.calcrule_id == 11 ) 
+				if ( tc.allocrule_id == 1 or tc.allocrule_id == 3 or tc.calcrule_id == 8 or tc.calcrule_id == 10  or tc.calcrule_id == 11 )
 				{
-					float groundUpLossSum=0.0;
-					byte *groundUpLossWorkRow = groundUpLossWork + sizeof(float) * ( i* itemToOffsetMap.size() );
+					float groundUpLossSum = 0.0;
+					byte *groundUpLossWorkRow = groundUpLossWork + sizeof(float) * ( i * itemToOffsetMap.size() );
 					byte *aggGroundUpLossWorkRow = aggGroundUpLossWork +  sizeof(float) * ( aggMap.size() * i );
-					for ( std::vector<int>::iterator k = indexVector.begin(); k!=indexVector.end(); k++)
+					for ( std::vector<int>::iterator k = indexVector.begin(); k != indexVector.end(); k++)
 					{
 						groundUpLossSum += *(float *)(groundUpLossWorkRow + *k );
 					}
@@ -243,19 +243,19 @@ int doFM(int event_id_, std::vector<gulSampleslevel> &event_guls_, byte *fmd, in
 				}
 			}
 		}
-	
+
 		// calculate losses from the aggregations and back allocate
-		for(int layer=1; layer<=( myLevel==maxLevel ? maxLayer : 1); layer++) // one level only unless we are at the final level - ie maxLevel
+		for (int layer = 1; layer <= ( myLevel == maxLevel ? maxLayer : 1); layer++) // one level only unless we are at the final level - ie maxLevel
 		{
-			for(int i=0; i<=numSamples; i++)
+			for (int i = 0; i <= numSamples; i++)
 			{
 				byte *levelLossWorkRow = levelLossWork + sizeof(float) * i * itemToOffsetMap.size();
-				byte *groundUpLossWorkRow = groundUpLossWork + sizeof(float) * i* itemToOffsetMap.size();
+				byte *groundUpLossWorkRow = groundUpLossWork + sizeof(float) * i * itemToOffsetMap.size();
 				byte *aggLevelLossWorkRow = aggLevelLossWork +  sizeof(float) * aggMap.size() * i;
 				byte *aggGroundUpLossWorkRow = aggGroundUpLossWork +  sizeof(float) * aggMap.size() * i;
 				byte *outputLossWorkRow = outputLossWork +  sizeof(float) * itemToOffsetMap.size() * i;
 
-				for(   std::map<AggKey, TCVal>::iterator j=TCMap.begin(); j!=TCMap.end(); j++)
+				for (   std::map<AggKey, TCVal>::iterator j = TCMap.begin(); j != TCMap.end(); j++)
 				{
 					// only work on the items for this layer
 					if ( (j->first).layer_id != layer)
@@ -267,9 +267,9 @@ int doFM(int event_id_, std::vector<gulSampleslevel> &event_guls_, byte *fmd, in
 					float totalGroundUpLoss = 0.0;
 					float totalRetainedLoss = 0.0;
 					std::vector<int> indexVector = aggToOffsetVector[j->first];
-					
+
 					float loss, gul;
-					if ( tc.allocrule_id==-1 )
+					if ( tc.allocrule_id == -1 )
 					{
 						int itemOffset = levelMap[j->first];
 						loss = *(float *)(levelLossWorkRow + itemOffset);
@@ -280,7 +280,7 @@ int doFM(int event_id_, std::vector<gulSampleslevel> &event_guls_, byte *fmd, in
 						loss = *(float *)(aggLevelLossWorkRow + aggMap[j->first] );
 						gul = *(float *)(aggGroundUpLossWorkRow + aggMap[j->first] );
 					}
-					
+
 
 					// only do a financial calculation if we have a single T&C term for this aggregation for this layer
 					// note that TCMap is set up for each specific level - see above
@@ -291,22 +291,20 @@ int doFM(int event_id_, std::vector<gulSampleslevel> &event_guls_, byte *fmd, in
 						//Function1 = IIf(Loss < Ded, 0, IIf(Loss > Ded + Lim, Lim, Loss - Ded))
 						if ( loss < tc.deductible )
 							loss = 0.0;
+						else if ( loss > tc.deductible + tc.limit )
+							loss = tc.limit;
 						else
-							if ( loss > tc.deductible + tc.limit )
-								loss = tc.limit;
-							else
-								loss -= tc.deductible;
+							loss -= tc.deductible;
 					}
 					else if (tc.calcrule_id == 2)
 					{
 						//Function2 = IIf(Loss < Ded, 0, IIf(Loss > Ded + Lim, Lim, Loss - Ded)) * Share
 						if ( loss < tc.deductible )
 							loss = 0.0;
+						else if ( loss > tc.deductible + tc.limit )
+							loss = tc.limit;
 						else
-							if ( loss > tc.deductible + tc.limit )
-								loss = tc.limit;
-							else
-								loss -= tc.deductible;
+							loss -= tc.deductible;
 						loss *= tc.share_prop_of_lim;
 					}
 					else if (tc.calcrule_id == 3)
@@ -314,10 +312,9 @@ int doFM(int event_id_, std::vector<gulSampleslevel> &event_guls_, byte *fmd, in
 						//Function3 = IIf(Loss < Ded, 0, IIf(Loss > Ded + Lim, Lim, Loss))
 						if ( loss < tc.deductible )
 							loss = 0.0;
-						else
-							if ( loss > tc.deductible + tc.limit )
-								loss = tc.limit;
-							//else loss is unchanged
+						else if ( loss > tc.deductible + tc.limit )
+							loss = tc.limit;
+						//else loss is unchanged
 					}
 					/*
 					if (tc.calcrule_id == 4)
@@ -394,69 +391,69 @@ int doFM(int event_id_, std::vector<gulSampleslevel> &event_guls_, byte *fmd, in
 					}
 					*/
 					else
-						___perror("unrecognised calcrule_id") || ___exit(EXIT_FAILURE);	
-					
-					
+						___perror("unrecognised calcrule_id") || ___exit(EXIT_FAILURE);
+
+
 					// Back Allocation
 					// if there is only one element in the aggregation, put the result straight back into levelLossWork - no need for aggregation and back allocation
-					if ( tc.allocrule_id==-1 )
+					if ( tc.allocrule_id == -1 )
 					{
 						int itemOffset = levelMap[j->first];
 						*(float *)(levelLossWorkRow + itemOffset ) = loss;
 					}
 					// no back allocation - write the result to the allocation table to await being output
 					// *(float *)( aggLevelLossWorkRow + aggMap[std::pair<int, int>(aggKey.prog_id, aggKey.agg_id)] ) = loss;
-					else if ( tc.allocrule_id==0 )								
+					else if ( tc.allocrule_id == 0 )
 					{
 						*(float *)( aggLevelLossWorkRow + aggMap[j->first] ) = loss;
 					}
 					// back-allocate the losses in proportion to the GULs ie proportion = ground up loss / sum of ground up losses
-					else if ( tc.allocrule_id==1 ) 
+					else if ( tc.allocrule_id == 1 )
 					{
 						totalGroundUpLoss = *(float *)( aggGroundUpLossWorkRow + aggMap[j->first]  );
-						for ( std::vector<int>::iterator k = indexVector.begin(); k!=indexVector.end(); k++)
+						for ( std::vector<int>::iterator k = indexVector.begin(); k != indexVector.end(); k++)
 						{
 							float prop = totalGroundUpLoss > 0.0 ? *(float *)(groundUpLossWorkRow + *k) / totalGroundUpLoss : 0.0;
 							float allocatedLoss = loss * prop;
 							// use the outputLossWork table if we are at the max level, so that one layer's losses doesn't over-write the previous level's losses needed to compute the other layers
-							if (myLevel==maxLevel)
+							if (myLevel == maxLevel)
 								*(float *)( outputLossWorkRow + *k ) = allocatedLoss;
 							else
 								*(float *)( levelLossWorkRow + *k ) = allocatedLoss;
 						}
 					}
-					// back allocate in proportion to the loss in the previous level 
+					// back allocate in proportion to the loss in the previous level
 					// ie proportion = loss in previous level / sum of the losses in the previous level
-					// NB 
-					else if ( tc.allocrule_id==2 ) 
+					// NB
+					else if ( tc.allocrule_id == 2 )
 					{
-							totalLevelLoss = *(float *)(aggLevelLossWorkRow + aggMap[j->first] );
-							for ( std::vector<int>::iterator k = indexVector.begin(); k!=indexVector.end(); k++)
-							{
-								float prop = totalLevelLoss > 0.0 ? *(float *)(levelLossWorkRow + *k) / totalLevelLoss : 0.0;
-								float allocatedLoss = loss * prop;
-								// use the outputLossWork table if we are at the max level, so that one layer's losses doesn't over-write the previous level's losses needed to compute the other layers
-								if (myLevel==maxLevel)
-									*(float *)( outputLossWorkRow + *k ) = allocatedLoss;
-								else
-									*(float *)( levelLossWorkRow + *k ) = allocatedLoss;
-							}
+						totalLevelLoss = *(float *)(aggLevelLossWorkRow + aggMap[j->first] );
+						for ( std::vector<int>::iterator k = indexVector.begin(); k != indexVector.end(); k++)
+						{
+							float prop = totalLevelLoss > 0.0 ? *(float *)(levelLossWorkRow + *k) / totalLevelLoss : 0.0;
+							float allocatedLoss = loss * prop;
+							// use the outputLossWork table if we are at the max level, so that one layer's losses doesn't over-write the previous level's losses needed to compute the other layers
+							if (myLevel == maxLevel)
+								*(float *)( outputLossWorkRow + *k ) = allocatedLoss;
+							else
+								*(float *)( levelLossWorkRow + *k ) = allocatedLoss;
+						}
 					}
 					// back allocate in proportion to the retained loss in the previous level
-					// ie proportion = retained loss in previous level / sum of the retained losses in the previous level 
+					// ie proportion = retained loss in previous level / sum of the retained losses in the previous level
 					// However, if the totalRetainedLoss is zero (eg because it's the first level), allocate back according to the GULs.
-					else if ( tc.allocrule_id==3 )
+					else if ( tc.allocrule_id == 3 )
 					{
 						totalRetainedLoss = *(float *)( aggGroundUpLossWorkRow + aggMap[j->first]  ) - *(float *)(aggLevelLossWorkRow + aggMap[j->first] );
 						if ( totalRetainedLoss == 0.0 )
 						{
 							totalGroundUpLoss = *(float *)( aggGroundUpLossWorkRow + aggMap[j->first]  );
-							for ( std::vector<int>::iterator k = indexVector.begin(); k!=indexVector.end(); k++)
+							for ( std::vector<int>::iterator k = indexVector.begin(); k != indexVector.end(); k++)
 							{
 								float prop = totalGroundUpLoss > 0.0 ? *(float *)(groundUpLossWorkRow + *k) / totalGroundUpLoss : 0.0;
 								float allocatedLoss = loss * prop;
 								// use the outputLossWork table if we are at the max level, so that one layer's losses doesn't over-write the previous level's losses needed to compute the other layers
-								if (myLevel==maxLevel)
+								if (myLevel == maxLevel)
 									*(float *)( outputLossWorkRow + *k ) = allocatedLoss;
 								else
 									*(float *)( levelLossWorkRow + *k ) = allocatedLoss;
@@ -464,11 +461,11 @@ int doFM(int event_id_, std::vector<gulSampleslevel> &event_guls_, byte *fmd, in
 						}
 						else
 						{
-							for ( std::vector<int>::iterator k = indexVector.begin(); k!=indexVector.end(); k++)
+							for ( std::vector<int>::iterator k = indexVector.begin(); k != indexVector.end(); k++)
 							{
-								float prop = totalRetainedLoss > 0.0 ? ( *(float *)(groundUpLossWorkRow + *k) - *(float *)(levelLossWorkRow + *k) ) / totalRetainedLoss : 0.0;
+								float prop = totalRetainedLoss > 0.0 ? ( *(float *)(groundUpLossWorkRow + *k) - * (float *)(levelLossWorkRow + *k) ) / totalRetainedLoss : 0.0;
 								float allocatedLoss = loss * prop;
-								if (myLevel==maxLevel)
+								if (myLevel == maxLevel)
 									*(float *)( outputLossWorkRow + *k ) = allocatedLoss;
 								else
 									*(float *)( levelLossWorkRow + *k ) = allocatedLoss;
@@ -476,7 +473,7 @@ int doFM(int event_id_, std::vector<gulSampleslevel> &event_guls_, byte *fmd, in
 						}
 					}
 					else
-						___perror("unrecognised allocrule_id") || ___exit(EXIT_FAILURE);	
+						___perror("unrecognised allocrule_id") || ___exit(EXIT_FAILURE);
 				}
 			}
 			// fprintf(stderr, "doFM 7.4.2\n");
@@ -485,12 +482,12 @@ int doFM(int event_id_, std::vector<gulSampleslevel> &event_guls_, byte *fmd, in
 			{
 				fmlevelhdr fmhd;
 				fmlevelrec fmrec;
-				for(   std::map<AggKey, TCVal>::iterator j=TCMap.begin(); j!=TCMap.end(); j++)
+				for (   std::map<AggKey, TCVal>::iterator j = TCMap.begin(); j != TCMap.end(); j++)
 				{
 					AggKey aggKey = j->first;
-					if ( aggKey.layer_id!=layer)
+					if ( aggKey.layer_id != layer)
 						continue;
-					if ( TCMap.count(aggKey)!=1)
+					if ( TCMap.count(aggKey) != 1)
 						continue;
 					TCVal tc = TCMap[aggKey];
 
@@ -501,15 +498,15 @@ int doFM(int event_id_, std::vector<gulSampleslevel> &event_guls_, byte *fmd, in
 						fmhd.layer_id = aggKey.layer_id;
 						fmhd.output_id = aggKey.agg_id;
 						fwrite(&fmhd, sizeof(fmlevelhdr), 1, stdout);
-						for(int i=0; i<=numSamples; i++)
+						for (int i = 0; i <= numSamples; i++)
 						{
 							byte *aggLevelLossWorkRow = aggLevelLossWork +  sizeof(float) * aggMap.size() * i;
 
-							if (i==0) 
+							if (i == 0)
 								fmrec.sidx = mean_idx;
 							else
 								fmrec.sidx = i;
-							fmrec.loss= *(float *)( aggLevelLossWorkRow + aggMap[aggKey] );
+							fmrec.loss = *(float *)( aggLevelLossWorkRow + aggMap[aggKey] );
 							fwrite( &fmrec, sizeof(fmrec), 1, stdout);
 						}
 						fmrec.sidx = 0;
@@ -518,31 +515,31 @@ int doFM(int event_id_, std::vector<gulSampleslevel> &event_guls_, byte *fmd, in
 					}
 					else if ( tc.allocrule_id == 1 || tc.allocrule_id == 2 || tc.allocrule_id == 3 ) // output from the levelLoss table
 					{
-						for( std::vector<int>::iterator k=aggToOffsetVector[aggKey].begin(); k!=aggToOffsetVector[aggKey].end(); k++)
+						for ( std::vector<int>::iterator k = aggToOffsetVector[aggKey].begin(); k != aggToOffsetVector[aggKey].end(); k++)
 						{
 							fmhd.event_id = event_id_;
 							fmhd.prog_id = aggKey.prog_id;
 							fmhd.layer_id = aggKey.layer_id;
 							fmhd.output_id = offsetToItemMap[*k];
 							fwrite(&fmhd, sizeof(fmlevelhdr), 1, stdout);
-							
+
 							// *k is the offset of the item
-							for(int i=0; i<=numSamples; i++)
+							for (int i = 0; i <= numSamples; i++)
 							{
 								byte *outputLossWorkRow = outputLossWork + sizeof(float) * i * itemToOffsetMap.size();
 
-								if (i==0) 
+								if (i == 0)
 									fmrec.sidx = mean_idx;
 								else
 									fmrec.sidx = i;
-								fmrec.loss= *(float *)(outputLossWorkRow + *k);
+								fmrec.loss = *(float *)(outputLossWorkRow + *k);
 								fwrite( &fmrec, sizeof(fmrec), 1, stdout);
 							}
 							fmrec.sidx = 0;
 							fmrec.loss = 0.0;
 							fwrite( &fmrec, sizeof(fmrec), 1, stdout);
 						}
-					}  // 
+					}  //
 					else if ( tc.allocrule_id == -1 )
 					{
 						int itemOffset = levelMap[j->first];
@@ -553,10 +550,10 @@ int doFM(int event_id_, std::vector<gulSampleslevel> &event_guls_, byte *fmd, in
 						fmhd.output_id = offsetToItemMap[itemOffset];
 						fwrite(&fmhd, sizeof(fmlevelhdr), 1, stdout);
 
-						for(int i=0; i<=numSamples; i++)
+						for (int i = 0; i <= numSamples; i++)
 						{
 							byte *levelLossWorkRow = levelLossWork + sizeof(float) * i * itemToOffsetMap.size();
-							if (i==0) 
+							if (i == 0)
 								fmrec.sidx = mean_idx;
 							else
 								fmrec.sidx = i;
@@ -569,7 +566,7 @@ int doFM(int event_id_, std::vector<gulSampleslevel> &event_guls_, byte *fmd, in
 					}
 				}
 			}
-		}	
+		}
 		free(aggLevelLossWork);
 		free(aggGroundUpLossWork);
 		aggMap.clear();
@@ -585,26 +582,26 @@ int doFM(int event_id_, std::vector<gulSampleslevel> &event_guls_, byte *fmd, in
 int main()
 {
 	// read in the FM data
-	FILE *fin = (FILE *)fopen("fm/fm_data.bin", "rb");	
+	FILE *fin = (FILE *)fopen("fm/fm_data.bin", "rb");
 	{ fin || ___perror("Error opening fm data file:" ) && ___exit(EXIT_FAILURE); }
-    flseek (fin, 0, SEEK_END);
-    size_t fmdFileSize=fltell (fin);
-    flseek (fin, 0, SEEK_SET);
+	flseek (fin, 0, SEEK_END);
+	size_t fmdFileSize = fltell (fin);
+	flseek (fin, 0, SEEK_SET);
 	fclose(fin);
 
-    int fd = open("fm/fm_data.bin", O_RDONLY);
-    { fd == -1 && ___perror("Error opening file for reading") && ___exit(EXIT_FAILURE); }
+	int fd = open("fm/fm_data.bin", O_RDONLY);
+	{ fd == -1 && ___perror("Error opening file for reading") && ___exit(EXIT_FAILURE); }
 
-    byte *fmd = (byte *)mmap(0, fmdFileSize, PROT_READ, MAP_SHARED, fd, 0);
-    { ( fmd == MAP_FAILED ) && ___perror("Error mmapping the file") && ___close(fd) && ___exit(EXIT_FAILURE); }
+	byte *fmd = (byte *)mmap(0, fmdFileSize, PROT_READ, MAP_SHARED, fd, 0);
+	{ ( fmd == MAP_FAILED ) && ___perror("Error mmapping the file") && ___close(fd) && ___exit(EXIT_FAILURE); }
 
-	for( byte *p=(byte *)fmd; p< fmd + fmdFileSize; p+=sizeof(fmdata))
+	for ( byte *p = (byte *)fmd; p < fmd + fmdFileSize; p += sizeof(fmdata))
 	{
 		fmdata *pfmd = (fmdata *)p;
 	}
-	
+
 	initstreams("", "");
-	
+
 	int gulstream_type = 0;
 	int i = fread(&gulstream_type, sizeof(gulstream_type), 1, stdin);
 
@@ -613,7 +610,7 @@ int main()
 
 	int stream_type = gulstream_type & gulstream_id ;
 	{ stream_type != gulstream_id && fprintf(stderr, "Not a gul stream type\n") && ___exit(EXIT_FAILURE); }
-	stream_type = streamno_mask &gulstream_type;
+	stream_type = streamno_mask & gulstream_type;
 	{ stream_type != 1 && fprintf(stderr, "Unsupported gul stream type\n") && ___exit(EXIT_FAILURE); }
 
 	int last_event_id = -1;
@@ -621,15 +618,15 @@ int main()
 	if (stream_type == 1) {
 		int samplesize = 0;
 		fread(&samplesize, sizeof(samplesize), 1, stdin);
-		fwrite(&samplesize, sizeof(samplesize), 1, stdout);		
-		while (i != 0){
+		fwrite(&samplesize, sizeof(samplesize), 1, stdout);
+		while (i != 0) {
 			gulSampleslevelHeader gh;
 			i = fread(&gh, sizeof(gh), 1, stdin);
-			if (gh.event_id != last_event_id ) 
+			if (gh.event_id != last_event_id )
 			{
-				if (last_event_id != -1) 
+				if (last_event_id != -1)
 				{
-					doFM(last_event_id, event_guls, fmd, fmdFileSize/sizeof(fmdata), samplesize);
+					doFM(last_event_id, event_guls, fmd, fmdFileSize / sizeof(fmdata), samplesize);
 				}
 				event_guls.clear();
 				last_event_id = gh.event_id;
@@ -638,10 +635,10 @@ int main()
 			{
 				gulSampleslevelRec gr;
 				i = fread(&gr, sizeof(gr), 1, stdin);
-				if (i == 0) 
+				if (i == 0)
 				{
 					// reached the end of the file, so process the last event before we break from this loop and terminate the higher level loopm(i==0)
-					doFM(last_event_id, event_guls, fmd, fmdFileSize/sizeof(fmdata), samplesize);
+					doFM(last_event_id, event_guls, fmd, fmdFileSize / sizeof(fmdata), samplesize);
 					break;
 				}
 				if (gr.sidx == 0) break; // this marks  the start of a new event, so process the one we have just read
@@ -652,13 +649,13 @@ int main()
 				gs.item_id = gh.item_id;
 				gs.sidx = gr.sidx;
 				gs.gul = gr.gul;
-				
-				event_guls.push_back(gs);			
+
+				event_guls.push_back(gs);
 			}
 		}
 	}
 
-	if (munmap(fmd, fmdFileSize) == -1) 
+	if (munmap(fmd, fmdFileSize) == -1)
 		perror("Error un-mmapping the file");
-    close(fd);
+	close(fd);
 }

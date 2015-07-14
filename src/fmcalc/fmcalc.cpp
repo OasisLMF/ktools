@@ -56,11 +56,14 @@ int ___exit(int status) { exit(status); return 1; }
 int ___perror(const char * m) { perror(m); return 1; }
 int ___close(int fd) { close(fd); return 1; }
 
+bool verbose = false;
+
+int max_gulrecs = 0;
+int max_event_id = 0;
+
 
 // TO DO
 // add TIV to TCVal for Functions 4 & 6
-
-
 struct AggKey {
 	int prog_id;
 	int agg_id;
@@ -630,6 +633,10 @@ int doit()
 			i = fread(&gh, sizeof(gh), 1, stdin);
 			if (gh.event_id != last_event_id )
 			{
+				if (max_gulrecs < event_guls.size()) {
+					max_gulrecs = event_guls.size();
+					max_event_id = last_event_id;
+				}
 				if (last_event_id != -1)
 				{
 					doFM(last_event_id, event_guls, fmd, fmdFileSize / sizeof(fmdata), samplesize);
@@ -643,6 +650,10 @@ int doit()
 				i = fread(&gr, sizeof(gr), 1, stdin);
 				if (i == 0)
 				{
+					if (max_gulrecs < event_guls.size()) {
+						max_gulrecs = event_guls.size();
+						max_event_id = last_event_id;
+					}
 					// reached the end of the file, so process the last event before we break from this loop and terminate the higher level loopm(i==0)
 					doFM(last_event_id, event_guls, fmd, fmdFileSize / sizeof(fmdata), samplesize);
 					break;
@@ -669,10 +680,12 @@ int doit()
 void help()
 {
 
-	cerr  << "Optional parameters:\n" 
-		<< "-I Inputfile\n"
-	     << "-O output file\n"
-	     ;
+	cerr  << "Optional parameters:\n"
+	      << "-I Inputfile\n"
+	      << "-O output file\n"
+	      << "-v verbose\n"
+	      << "-h Help\n"
+	      ;
 }
 
 int main(int argc, char *argv[])
@@ -681,7 +694,7 @@ int main(int argc, char *argv[])
 	std::string infile;
 	std::string outfile;
 
-	while ((opt = getopt(argc, argv, "I:O:")) != -1) {
+	while ((opt = getopt(argc, argv, "hvI:O:")) != -1) {
 		switch (opt) {
 		case 'I':
 			infile = optarg;
@@ -689,10 +702,23 @@ int main(int argc, char *argv[])
 		case 'O':
 			outfile = optarg;
 			break;
+		case 'v':
+			verbose = true;
+			break;
+		case 'h':
+			help();
+			exit(0);
+			break;
+		default: /* '?' */
+			help();
+			exit(EXIT_FAILURE);
 		}
 	}
 
 	initstreams(infile, outfile);
 	doit();
+	if (verbose) {
+		cerr << "max gulrecs:  " << max_gulrecs << " for event " << max_event_id << "\n";
+	}
 	// help();
 }

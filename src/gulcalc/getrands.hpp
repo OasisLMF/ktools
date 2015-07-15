@@ -37,6 +37,8 @@
 #include <random>
 #include <unordered_map>
 
+#define RND_VECTOR_SIZE 1000000
+
 class getRands {
 private:
 	bool _fromFile;
@@ -48,7 +50,8 @@ private:
 	std::mt19937 _gen;
 	std::uniform_real_distribution<> _dis;
     int _randsamplesize;
-    std::unordered_map<unsigned int,float> _rnd;
+    // std::unordered_map<unsigned int,float> _rnd;
+    std::vector<float> _rnd;
 public:
 	getRands(bool fromFile_, int chunkid_);
 	void clearbuff() {
@@ -57,6 +60,7 @@ public:
     void clearmap()
     {
         _rnd.clear();
+        _rnd.resize(RND_VECTOR_SIZE,-1);
     }
 
 	inline float rnd(unsigned int ridx_)  {
@@ -65,6 +69,13 @@ public:
 			return _buf[ridx_];
 		}
 		else {
+			float f = _rnd [ridx_ % RND_VECTOR_SIZE] ;
+			if ( f < 0 ) {
+				f = (float) _dis(_gen);
+				_rnd [ridx_ % RND_VECTOR_SIZE] = f;
+			}
+			return f;
+			/*
             auto iter=_rnd.find(ridx_);
             if (iter != _rnd.end()) return iter->second;
             else {
@@ -72,7 +83,7 @@ public:
                 _rnd[ridx_] = f;
                 return f;
             }
-
+			*/
 		}
 	}
 	unsigned int getp1(bool _reconcilationmode = false) const;

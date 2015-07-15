@@ -74,6 +74,8 @@ getRands::getRands(bool fromFile_, int chunkid_) : _gen(rd()), _dis(0, 1)
 			exit(-1);
 		}
 		fclose(fin);
+	}else {
+		_rnd.resize(RND_VECTOR_SIZE,-1);
 	}
 }
 

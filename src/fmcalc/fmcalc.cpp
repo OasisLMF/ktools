@@ -720,5 +720,4 @@ int main(int argc, char *argv[])
 	if (verbose) {
 		cerr << "max gulrecs:  " << max_gulrecs << " for event " << max_event_id << "\n";
 	}
-	// help();
 }

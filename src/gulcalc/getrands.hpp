@@ -35,7 +35,7 @@
 #pragma once
 #include <stdio.h>
 #include <random>
-#include <map>
+#include <unordered_map>
 
 class getRands {
 private:
@@ -48,7 +48,7 @@ private:
 	std::mt19937 _gen;
 	std::uniform_real_distribution<> _dis;
     int _randsamplesize;
-    std::map<unsigned int,float> _rnd;
+    std::unordered_map<unsigned int,float> _rnd;
 public:
 	getRands(bool fromFile_, int chunkid_);
 	void clearbuff() {

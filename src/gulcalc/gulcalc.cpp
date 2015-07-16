@@ -111,24 +111,19 @@ int _outrec_count = 0;
 double _gul_limit = 0.0;
 bool _userandomtable = false;
 int _chunk_id = -1;
-bool _newstream = true;
 bool _debug = false;
-
-gulSampleslevel *_bufold = 0;
 
 unsigned char *_buf = 0;
 int _bufsize = 0;
 
 int _bufoffset=0;
 
-bool getrecx(char *rec_, FILE *stream, int recsize_)
+bool getrec(char *rec_, FILE *stream, int recsize_)
 {
-//    fprintf(stderr,"***** IN getrecx recsize %d ***************\n", recsize_);
     int totalread = 0;
     while (totalread != recsize_){
         int ch = getc( stream );
         if (ch == EOF) {
-            // fprintf(stderr,"getrecx: GOT END OF FILE %p recsize %d\n", stream, recsize_);
             return false;
         }
         *rec_ = ch;
@@ -235,33 +230,15 @@ float getgul(damagebindictionary &b, gulGulSamples &g)
 
 	double cc = g.prob_from - g.rval;
 	gul = (b.bin_from + (sqrt(bb*bb - (4 * aa*cc)) - bb) / (2 * aa)) * g.tiv;
-	//double gul2 = (b.bin_from - (sqrt(bb*bb - (4 * aa*cc)) - bb) / (2 * aa)) * g.tiv;
-	//if (gul1 > gul2) gul = gul1;
-	//else gul = gul2;
 
 	return gul;
 }
 
 
-
-void outputgulold(gulSampleslevel &gg)
-{
-	// int pid = getpid();
-	// fprintf(stderr,"%d: Gul::outputgul ********* BUF POINTER SET to %p!!! *******\n",pid, _buf);
-	// _bufoffset now refers to bytes
-	if (_bufoffset >= _bufsize) {
-		fwrite(_buf, sizeof(unsigned char), _bufoffset, stdout);
-		_bufoffset = 0;
-	}
-	memcpy(_buf + _bufoffset, &gg, sizeof(gg));
-	_bufoffset += sizeof(gg);
-	_outrec_count++;
-}
-
 gulSampleslevelHeader _lastheader;
 bool _isFirstEvent = true;
 
-void outputgulnew(gulSampleslevel &gg)
+void outputgul(gulSampleslevel &gg)
 {
 	if (_bufoffset >= _bufsize) {
 		fwrite(_buf, sizeof(unsigned char), _bufoffset, stdout);
@@ -293,11 +270,6 @@ void outputgulnew(gulSampleslevel &gg)
 
 }
 
-void outputgul(gulSampleslevel &gg)
-{
-    if (_newstream == false) outputgulold(gg);
-	if (_newstream == true) outputgulnew(gg);
-}
 
 void output_mean(const exposure_rec &er, prob_mean *pp, int bin_count, float &gul_mean,  float &std_dev)
 {
@@ -319,6 +291,7 @@ void output_mean(const exposure_rec &er, prob_mean *pp, int bin_count, float &gu
 	}
 	float g2 = gul_mean * gul_mean;
 	std_dev = ctr_var - g2;
+    if (std_dev < 0) std_dev  = 0;
 	std_dev = sqrt(std_dev);
 }
 
@@ -434,10 +407,8 @@ void doit()
 	int total_bins = damagebindictionary_vec.size();
 	int max_recsize = (int)(total_bins * sizeof(prob_mean)) + sizeof(damagecdfrec)+sizeof(int);
 
-	int gulstream_type = 2 | gulstream_id;
-	if (_newstream == true) {
-		gulstream_type = 1 | gulstream_id;
-	}
+    int	gulstream_type = 1 | gulstream_id;
+
 	fwrite(&gulstream_type, sizeof(gulstream_type), 1, stdout);
 
 	// Now output the sample size
@@ -451,7 +422,7 @@ void doit()
 	std::vector<gulSampleslevel> event_guls;
 	int last_event_id = -1;
 	int stream_type = 0;
-	bool bSuccess = getrecx((char *)&stream_type, stdin, sizeof(stream_type));
+    bool bSuccess = getrec((char *)&stream_type, stdin, sizeof(stream_type));
 	if (bSuccess == false) {
 		cerr << "Error: no stream type returned\n";
 		return; // exit thread if failed
@@ -462,15 +433,15 @@ void doit()
 	{
 		//damagecdfrec c;
 		char *p = rec;
-		bSuccess = getrecx(p, stdin, sizeof(damagecdfrec));
+        bSuccess = getrec(p, stdin, sizeof(damagecdfrec));
 		if (bSuccess == false) break;
 		p = p + sizeof(damagecdfrec);
-		bSuccess = getrecx(p, stdin, sizeof(int)); // we now have bin count
+        bSuccess = getrec(p, stdin, sizeof(int)); // we now have bin count
 		int *q = (int *)p;
 		p = p + sizeof(int);
 		int recsize = (*q) * sizeof(prob_mean);
 		// we should now have damagecdfrec in memory
-		bSuccess = getrecx(p, stdin, recsize);
+        bSuccess = getrec(p, stdin, recsize);
 		recsize += sizeof(damagecdfrec)+sizeof(int);
 		if (d->event_id != last_event_id) {
 			//if (last_event_id != -1) dofm(event_guls);
@@ -485,7 +456,7 @@ void doit()
 	fwrite(_buf, sizeof(unsigned char), _bufoffset, stdout);
 
 }
-	// fwrite(_buf, sizeof(unsigned char), _bufoffset, stdout);
+
 
 void help()
 {
@@ -552,7 +523,6 @@ int main(int argc, char *argv[])
         exit(EXIT_FAILURE);
     }
 
-    //if (_newstream == false) doitold();
     initstreams(infile, outfile);
 	doit();
 

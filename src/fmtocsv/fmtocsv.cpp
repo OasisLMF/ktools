@@ -88,13 +88,6 @@ void doit()
 
 }
 
-void help()
-{
-
-    cerr << "-I inputfilename\n"
-        << "-O outputfielname\n"
-        ;
-}
 
 int main()
 {

@@ -293,6 +293,7 @@ void doguloutput(std::map<int,float> &exposure_,unsigned int sample_size_)
     std::vector<vecrec> output_vec(sample_size_, {0.0, 0.0}) ;
     while (i != 0) {
         gulSampleslevelRec gr;
+        float tiv = exposure_[gh.item_id];
         i = fread(&gr, sizeof(gr), 1, stdin);
         while (i != 0){
             if (last_event_id != gh.event_id ) { // can be made more efficent since event can only change at fmlevelhdr
@@ -303,7 +304,6 @@ void doguloutput(std::map<int,float> &exposure_,unsigned int sample_size_)
             }
             if (gr.sidx > 0 ) {
                 output_vec[gr.sidx].loss += gr.gul;
-                float tiv = exposure_[gh.item_id];
                 output_vec[gr.sidx].tiv += tiv;
             }
 

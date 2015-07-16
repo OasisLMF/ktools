@@ -98,21 +98,6 @@ void help()
 
 int main()
 {
-#ifdef __unixx
-    while ((opt = getopt(argc, argv, "hI:O:")) != -1) {
-        switch (opt) {
-        case 'I':
-            inFile = optarg;
-            break;
-         case 'O':
-            outFile = optarg;
-            break;
-        case 'h':
-           help();
-           exit(EXIT_FAILURE);
-        }
-    }
-#endif
     initstreams("", "");
 	doit();
 	return 0;

@@ -59,10 +59,24 @@ cd examples
 ../src/evetocsv/evetocsv < ../examples/e_chunk_1_data.bin > ../ktest/testout/e_chunk_1_data.csv
 ../src/evetobin/evetobin < ../ktest/testout/e_chunk_1_data.csv > ../ktest/testout/e_chunk_1_data.bin
 
-#../src/randtocsv/randtocsv < ../examples/random_1.bin > ../ktest/testout/random_1.csv
-#../src/randtobin/randtobin < ../ktest/testout/random_1.csv > ../ktest/testout/random_1.bin
+../src/randtocsv/randtocsv < ../examples/random_1.bin > ../ktest/testout/random_1.csv
+../src/randtobin/randtobin < ../ktest/testout/random_1.csv | ../src/randtocsv/randtocsv > ../ktest/testout/random_12.csv
 
-#diff ../examples/random_1.bin ../ktest/testout/random_1.bin
+../src/exposuretocsv/exposuretocsv < ../examples/exposures.bin > ../ktest/testout/exposures.csv
+../src/exposuretobin/exposuretobin < ../ktest/testout/exposures.csv > ../ktest/testout/exposures.bin
+
+../src/damagetocsv/damagetocsv < ../examples/damage_bin_dict.bin > ../ktest/testout/damage_bin_dict.csv
+../src/damagetobin/damagetobin < ../ktest/testout/damage_bin_dict.csv > ../ktest/testout/damage_bin_dict.bin
+
+../src/cdfdatatocsv/cdfdatatocsv < ../examples/cdf/damage_cdf_chunk_1.bin > ../ktest/testout/damage_cdf_chunk_1.csv
+#../src/cdfdatatobin/cdfdatatobin < ../ktest/testout/damage_cdf_chunk_1.csv > ../ktest/testout/damage_cdf_chunk_1.bin
+
+../src/fmdatatocsv/fmdatatocsv < ../examples/fm/fm_data.bin > ../ktest/testout/fm_data.csv
+../src/fmdatatocsv/fmdatatocsv < ../ktest/testout/fm_data.csv > ../ktest/testout/fm_data.bin
+
+../src/fmxreftocsv/fmxreftocsv < ../examples/fm/fmxref.bin > ../ktest/testout/fmxref.csv
+../src/fmxreftocsv/fmxreftocsv < ../ktest/testout/fmxref.csv > ../ktest/testout/fmxref.bin
+
 
 cd ../ktest/testout
 md5sum -c ../$CTRL.md5

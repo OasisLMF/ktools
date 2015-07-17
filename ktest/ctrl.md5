@@ -1,9 +1,14 @@
+a8db10e45131b299e23d13e668c5ae60 *damage_bin_dict.bin
+227bae6e3f2d9ddd3de237975e983a11 *damage_bin_dict.csv
+3ac7a6a859f1769c3caedbf7102a050d *damage_cdf_chunk_1.csv
 ecbfac83e2f92a9aea040803187b3e9e *e_chunk_1_data.bin
 1b6b7d0df66b4b80bb48e9ae7e6e1ede *e_chunk_1_data.csv
 3c0e17ccf09ab5e585108e0d8b51361a *eveout1_1.bin
 bd4c5080642fa638bec3bec9f10c7034 *eveout1_2.bin
 5b13d9c7d6b6d98444de6cf1def05d7b *eveout2_1.bin
 a9bb13f1aca9467759380281c1ad35c1 *eveout2_2.bin
+08ec8c4f70ed84b4c89993e4e073dad2 *exposures.bin
+0124c7bc8f8bf145d8a525f5f0bf6ccd *exposures.csv
 bd5c78cc30a07eb691a5d08cad876c6b *fmcalcout1_1.bin
 4012dd0f936839ca4e5b1e6cd15e73a2 *fmcalcout1_1.csv
 d13d67bce19460f1198502eba96dd374 *fmout1.csv
@@ -18,3 +23,5 @@ b14ba43629f6e014de604e4ad3ee261e *getmodelout2_1.bin
 f51392baf662ff11927919e77e58ef30 *gulcalcout2_1.bin
 bdf22b592c294aac2f2d8f5de65fd134 *gulcalcout2_2.bin
 fed8f62782c572f1fb66228216fa5b18 *gulout1.csv
+7abd0564cccd13a329d46e3c49e448de *random_1.csv
+7abd0564cccd13a329d46e3c49e448de *random_12.csv

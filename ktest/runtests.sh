@@ -72,10 +72,10 @@ cd examples
 #../src/cdfdatatobin/cdfdatatobin < ../ktest/testout/damage_cdf_chunk_1.csv > ../ktest/testout/damage_cdf_chunk_1.bin
 
 ../src/fmdatatocsv/fmdatatocsv < ../examples/fm/fm_data.bin > ../ktest/testout/fm_data.csv
-../src/fmdatatocsv/fmdatatocsv < ../ktest/testout/fm_data.csv > ../ktest/testout/fm_data.bin
+../src/fmdatatobin/fmdatatobin < ../ktest/testout/fm_data.csv > ../ktest/testout/fm_data.bin
 
 ../src/fmxreftocsv/fmxreftocsv < ../examples/fm/fmxref.bin > ../ktest/testout/fmxref.csv
-../src/fmxreftocsv/fmxreftocsv < ../ktest/testout/fmxref.csv > ../ktest/testout/fmxref.bin
+../src/fmxreftobin/fmxreftobin < ../ktest/testout/fmxref.csv > ../ktest/testout/fmxref.bin
 
 
 cd ../ktest/testout

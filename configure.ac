@@ -54,9 +54,11 @@ AC_CONFIG_FILES([Makefile
 		 src/exposuretobin/Makefile
                  src/fmcalc/Makefile
                  src/fmdatatocsv/Makefile
+                 src/fmdatatobin/Makefile
                  src/cdfdatatocsv/Makefile
                  src/fmtocsv/Makefile
                  src/fmxreftocsv/Makefile
+                 src/fmxreftobin/Makefile
                  src/randtocsv/Makefile
                  src/randtobin/Makefile
                  src/evetocsv/Makefile

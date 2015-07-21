@@ -165,7 +165,7 @@ The data packet may be a variable length and so a sidx of 0 identifies the end o
 
 The sidx field is the same as the sidx in the gul stdout stream. 
 
-[return to top](#specification)
+[Return to top](#specification)
 
 ## outputcalc <a id="outputcalc"></a>
 

@@ -1,7 +1,7 @@
 # Planned work
 
-#### 1. Generate data components
-Reference examples of components that generate the input binaries will be provided.  These will convert csv files into binaries to help users generate their own input binary data.
+#### 1. Generate cdf data component
+Reference examples of components that generate the input binaries from csv have been provided.  One outstanding component to convert cdf data from csv to binary will be provided.
 
 #### 2. Remove chunk concept from eve and getmodel
 The input data for the reference components eve and getmodel can be split across several files, where each is identified by a chunk_id under a fixed naming convention. Eve and getmodel have 'chunk_id' as an input parameter which identifies the relevant input binary file. 
@@ -19,7 +19,13 @@ The plan is to enable intermediate calculation steps to be written out to disk w
 ##### Figure 2. Multiple output file processing - future
 ![alt text](https://github.com/OasisLMF/ktools/blob/master/docs/img/MultipleOutput2.jpg "Multiple output file processing")
 
-#### 4. Sidx field format in gulcalc and fmcalc
-The sample index field will be simplified to be a simple 4 byte integer format, with no higher byte special meaning. The sample index value for the mean will be changed to -1 (currently 0) and -2 for standard deviation (currently -1).
+#### 4. Reduce sidx field from 4 bytes to 2 bytes
+The sample index field is currently a 4 byte integer format for simplicity of design but we estimate gulcalc stdout data volumes could be reduced by approximately 25% if we reduce it to 2 bytes. This would mean a maximum number of samples of 64,000.
+
+#### 5. Add random number limit as a parameter to gulcalc
+There is a fixed limit of 1 million random numbers per event when the dynamic random number option (no -r parameter) is used in gulcalc. This limit was imposed to improve performance.  We plan to add this limit as an optional parameter to gulcalc.
+
+#### 6. fmcalc code re-factor
+The fmcalc code will be re-factored to improve efficiency, performance and extensibility.
 
 [Back to Contents](Contents.md)

@@ -22,7 +22,7 @@ The components can be written in any language as long as the data structures of 
 
 ### Components
 
-The set of components in the Reference Model provided in this release is as follows;
+The set of components in the Reference Model provided is as follows;
 * **eve** is the process distributing utility. Based on the number of events in the input and the number of processes specified as a parameter, eve distributes the events to the processes. The output streams into getmodel.
 * **getmodel** is a CDF plug-in to generate the CDFs for a specified list of events. It is the reference example of a plug-in using Oasis kernel format data in binary format. getmodel streams into gulcalc or can be output to a binary file.
 * **gulcalc** is the core component which performs the GUL sampling calculations and numerical integration. The output is the Oasis format gul results table. This can be output to a binary file or streamed into another plug-in component, such as a Financial Module or output calculation.
@@ -31,7 +31,21 @@ The set of components in the Reference Model provided in this release is as foll
 * **cdftocsv** is a utility to output binary format CDFs to a csv.
 * **gultocsv** is a utility to output binary format GULs to a csv.
 * **fmtocsv** is a utility to output binary format losses to a csv. 
-
+* **evetobin** is a utility to convert a list of event_ids into binary format.
+* **damagetobin** is a utility to convert the Oasis damage bin dictionary table into binary format. 
+* **exposuretobin** is a utility to convert the Oasis exposure instance table into binary format. 
+* **randtobin** is a utility to convert a list of random numbers into binary format. 
+* **cdfdatatobin** is a utility to convert the Oasis cdf data into binary format.
+* **fmdatatobin** is a utility to convert the Oasis FM instance data into binary format.
+* **fmxreftobin** is a utility to convert the Oasis FM xref table into binary format.
+* **evetocsv** is a utility to convert the event binary into csv format.
+* **damagetocsv** is a utility to convert the Oasis damage bin dictionary binary into csv format.
+* **exposuretocsv** is a utility to convert the Oasis exposure instance binary into csv format.
+* **randtocsv** is a utility to convert the random numbers binary into csv format.
+* **cdfdatatocsv** is a utility to convert the Oasis cdf data binary into csv format.
+* **fmdatatocsv** is a utility to convert the Oasis FM instance binary into csv format.
+* **fmxreftocsv** is a utility to convert the Oasis FM xref binary into csv format.
+ 
 ### Usage
 
 Standard piping syntax can be used to invoke the components at the command line. For example the following command invokes eve, getmodel, gulcalc, fmcalc, and outputcalc, and exports the results to a csv file.
@@ -44,9 +58,9 @@ Example bash shell, python and vbs scripts are provided along with a binary data
 ### Related projects
 [oatools](https://github.com/OasisLMF/oatools) is a related (private) github project containing additional components which are specific to an implementation of the in-memory kernel in Oasis. 
 
-Specifically, it contains a component **gendata** that generates the input data required for the in-memory calculations as binary files, reading from an Oasis SQL Server back-end database. In order to generate the package of executables for the Oasis implementation it is necessary to first build ktools in Windows, and then build oatools in Windows. 
+Specifically, it contains a component **gendata** that generates the input data required for the in-memory calculations as binary files, reading from an Oasis SQL Server back-end database. In order to generate the package of executables for the Oasis implementation it is necessary to first build ktools, and then build oatools. 
 
-gendata is an example of another class of components for extracting data to create the binary input files required by ktools, which is principally just the calculation componentware. It is planned to provide utilities which convert input data in csv format to binary format as part of the reference model, to make it easier for developers to import their data into ktools. 
+gendata is an example of an implementation-specific component for extracting data to create the binary input files required by ktools, which is principally just the calculation componentware.  The input data conversion tools provided in ktools are intended to allow users to generate the required input binaries from csv independently of the original data store and technical environment. 
 
 [Go to Data streaming architecture overview](Overview.md)
 

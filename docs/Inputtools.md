@@ -14,10 +14,9 @@ The following components convert input data in csv format to the binary format r
 These components are intended to allow users to generate the required input binaries from csv independently of the original data store and technical environment. All that needs to be done is first generate the csv files from the data store (SQL Server database, etc).
 
 ```
-Note that [oatools](https://github.com/OasisLMF/oatools) contains a component 'gendata' which generates all of 
-the input binaries directly from a SQL Server Oasis back-end database. This component is specific to the 
-implementation of the in-memory kernel as a calculation back-end to the Oasis mid-tier which is why it is kept
-in a separate project.
+Note that oatools contains a component 'gendata' which generates all of the input binaries directly from a SQL 
+Server Oasis back-end database. This component is specific to the implementation of the in-memory kernel as a
+calculation back-end to the Oasis mid-tier which is why it is kept in a separate project.
 ```
 
 The following components convert the binary input data required by the calculation components in the reference model into csv format;

@@ -3,7 +3,7 @@
 This is the general data streaming framework showing the main components of the toolkit.
 
 ##### Figure 1. Data streaming framework
-![alt text](https://github.com/OasisLMF/ktools/blob/master/docs/img/DataStreamFramework.jpg "Data Streaming Framework")
+![alt text](img/DataStreamFramework.jpg "Data Streaming Framework")
 
 The in-memory data streams are initiated by the process 'eve' (meaning 'event emitter' rather than in the biblical sense) and shown by solid arrows. The read/write data flows are shown as dashed arrows. Multiple arrows mean multiple processes. 
 

@@ -28,4 +28,6 @@ There is a fixed limit of 1 million random numbers per event when the dynamic ra
 #### 6. fmcalc code re-factor
 The fmcalc code will be re-factored to improve efficiency, performance and extensibility.
 
+[Go to Random numbers](RandomNumbers.md)
+
 [Back to Contents](Contents.md)

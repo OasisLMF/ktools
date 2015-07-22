@@ -4,9 +4,11 @@ This is the POSIX-compliant Oasis In-Memory Kernel toolkit.
 
 ### Release
 
-This library is currently in Beta. Please click [here](https://github.com/OasisLMF/ktools/releases) to download the latest release. 
+Please click [here](https://github.com/OasisLMF/ktools/releases) to download the latest release. 
 
 The source code will change on a regular basis but only the releases are supported. Support enquiries should be sent to support@oasislmf.org.
+
+The instructions for the Windows build below are for 32-bit executables as the Cygwin mingw cross compiler for Windows does not support 64-bit executables. Until an automated build process for 64-bit is made available, the 64-bit Windows executables will be provided with each release.
 
 ## Linux Installation
 

@@ -10,7 +10,7 @@ The item_id, group_id data is provided by the user in the exposure input file (e
 
 ### Methodology
 
-The method of assigning random numbers in gulcalc uses an random number index (ridx) which is used as a position reference into a list of random numbers.  N random numbers corresponding to the runtime number of samples are drawn from the list starting at the ridx position.
+The method of assigning random numbers in gulcalc uses an random number index (ridx) which is used as a position reference into a list of random numbers.  S random numbers corresponding to the runtime number of samples are drawn from the list starting at the ridx position.
 
 There are three options in ktools for choosing random numbers to apply in the sampling process.
 
@@ -28,13 +28,13 @@ This will run 100 samples using dynamically generated random numbers.
 ##### Method
 
 Random numbers are sampled dynamically using the Mersenne twister psuedo random number generator (the default RNG of the C++ v11 compiler). 
-A sparse array capable of holding 1 million random numbers is allocated to each event. The RIDX is generated from the group_id and number of samples N using the following modulus function;
+A sparse array capable of holding 1 million random numbers is allocated to each event. The RIDX is generated from the group_id and number of samples S using the following modulus function;
 
-ridx=mod(group_id x N, 1000000)
+ridx=mod(group_id x S, 1000000)
 
 This formula pseudo-randomly assigns ridx indexes to each GROUP_ID between 0 and 999,999. 
 
-As a ridx is sampled, the section in the array starting at the ridx position of length N is populated with random numbers unless they have already been populated, in which case the existing random numbers are re-used.
+As a ridx is sampled, the section in the array starting at the ridx position of length S is populated with random numbers unless they have already been populated, in which case the existing random numbers are re-used.
 
 The array is cleared for the next event and a new set of random numbers is generated.  
 
@@ -76,8 +76,8 @@ This will run 100 samples using random numbers from file random_1.bin in reconci
 
 Reconciliation mode uses the same method as 2. but calculates the ridx in the same way as Oasis classic, thereby producing exactly the same losses for comparison.  
 
-In Oasis classic, random numbers are held in a matrix with the sample index in columns and the ridx is a reference into a row of random numbers for a sample set of size N.  
+In Oasis classic, random numbers are held in a matrix with the sample index in columns and the ridx is a reference into a row of random numbers for a sample set of size S.  
 
-In reconciliation mode, the divisor D is set to the total number of rows. This is calculated from the number of columns N which is the first 4 byte integer value in the random number file.
+In reconciliation mode, the divisor D is set to the total number of rows. This is calculated from the number of columns S which is the first 4 byte integer value in the random number file.
 
 [Back to Contents](Contents.md)

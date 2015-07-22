@@ -8,7 +8,7 @@ The following components convert the binary output of each calculation component
 Figure 1 shows the workflows for the data conversion components.
 
 ##### Figure 1. Data Conversion Workflows
-![alt text](https://github.com/OasisLMF/ktools/blob/master/docs/img/Dbtools2.jpg "Data Conversion Workflows")
+![alt text](img/Dbtools2.jpg "Data Conversion Workflows")
 
 ## cdftocsv <a id="cdftocsv"></a>
 

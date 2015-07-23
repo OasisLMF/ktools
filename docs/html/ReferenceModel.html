@@ -20,14 +20,14 @@
 </ul>
 <p>Other components in the Reference Model include;</p>
 <ul>
-<li><strong><a href="Inputtools.md">Input data components</a></strong> to convert input data between csv and binary.<br /></li>
-<li><strong><a href="Outputtools.md">Output data components</a></strong> to convert the binary data stream output to csv.</li>
+<li><strong><a href="Inputtools.html">Input data components</a></strong> to convert input data between csv and binary.<br /></li>
+<li><strong><a href="Outputtools.html">Output data components</a></strong> to convert the binary data stream output to csv.</li>
 </ul>
 <p>Figure 1 shows the data stream workflow of the reference model with its particular internal data files.</p>
 <h5 id="figure-1.-reference-model-workflow">Figure 1. Reference Model Workflow</h5>
 <p><img src="img/KtoolsWorkflow.jpg" title="Reference Model Workflow" alt="alt text" /></p>
 <p>The input data for the reference components, shown as red source files, are the events, Damage CDFs, Exposure Instance, Damage Bin Dictionary and FM Instance. These are Oasis concepts with Oasis format data as outlined below.</p>
-<p>The following sections explain the usage and internal processes of each of the reference components. The standard input and output data streams for the components are generic and are covered in the Specification. The input data requirements are covered in <a href="Inputtools.md">Input data components</a>.</p>
+<p>The following sections explain the usage and internal processes of each of the reference components. The standard input and output data streams for the components are generic and are covered in the Specification. The input data requirements are covered in <a href="Inputtools.html">Input data components</a>.</p>
 <p><a id="eve"></a></p>
 <h2 id="eve">eve</h2>
 <p>eve takes as input a list of event ids in binary format and generates a partition of event ids as a binary data stream, according to the parameters supplied.</p>
@@ -246,7 +246,7 @@ $ outputcalc &lt; fm.bin &gt; output.csv</code></pre>
 <h5 id="calculation-3">Calculation</h5>
 <p>The program sums the sampled losses from either gulcalc stream or fmstream across the portfolio/programme by event and sample, and then computes sample mean and standard deviation. It reads the TIVs from the exposure instance table and sums them for the group of items affected by each event.</p>
 <p><a href="#referencemodel">Return to top</a></p>
-<p><a href="Inputtools.md">Go to Input data tools</a></p>
-<p><a href="Contents.md">Back to Contents</a></p>
+<p><a href="Inputtools.html">Go to Input data tools</a></p>
+<p><a href="Contents.html">Back to Contents</a></p>
 </body>
 </html>

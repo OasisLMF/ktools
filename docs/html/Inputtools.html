@@ -16,7 +16,7 @@
 <li><strong><a href="#exposuretobin">exposuretobin</a></strong> is a utility to convert the Oasis exposure instance table into binary format.<br /></li>
 <li><strong><a href="#randtobin">randtobin</a></strong> is a utility to convert a list of random numbers into binary format.<br /></li>
 <li><strong><a href="#cdfdatatobin">cdfdatatobin</a></strong> is a utility to convert the Oasis cdf data into binary format.<br /></li>
-<li><strong><a href="#fmdatatobin">fmdatatobin</a></strong> is a utility to convert the Oasis FM instance data into binary format.<br /></li>
+<li><strong><a href="#.htmlatatobin">.htmlatatobin</a></strong> is a utility to convert the Oasis FM instance data into binary format.<br /></li>
 <li><strong><a href="#fmxreftobin">fmxreftobin</a></strong> is a utility to convert the Oasis FM xref table into binary format.</li>
 </ul>
 <p>These components are intended to allow users to generate the required input binaries from csv independently of the original data store and technical environment. All that needs to be done is first generate the csv files from the data store (SQL Server database, etc).</p>
@@ -30,7 +30,7 @@ calculation back-end to the Oasis mid-tier which is why it is kept in a separate
 <li><strong><a href="#exposuretocsv">exposuretocsv</a></strong> is a utility to convert the Oasis exposure instance binary into csv format.<br /></li>
 <li><strong><a href="#randtocsv">randtocsv</a></strong> is a utility to convert the random numbers binary into csv format.<br /></li>
 <li><strong><a href="#cdfdatatocsv">cdfdatatocsv</a></strong> is a utility to convert the Oasis cdf data binary into csv format.<br /></li>
-<li><strong><a href="#fmdatatocsv">fmdatatocsv</a></strong> is a utility to convert the Oasis FM instance binary into csv format.<br /></li>
+<li><strong><a href="#.htmlatatocsv">.htmlatatocsv</a></strong> is a utility to convert the Oasis FM instance binary into csv format.<br /></li>
 <li><strong><a href="#fmxreftocsv">fmxreftocsv</a></strong> is a utility to convert the Oasis FM xref binary into csv format.</li>
 </ul>
 <p>These components are provided for convenience of viewing the data and debugging.</p>
@@ -313,9 +313,9 @@ parallelized across the processes. This feature may be removed in future release
 <h4 id="cdfdatatocsv">cdfdatatocsv</h4>
 <pre><code>$ cdfdatatocsv &lt; damage_cdf_chunk_1.bin &gt; damage_cdf_chunk_1.csv</code></pre>
 <p><a href="#inputtools">Return to top</a></p>
-<p><a id="fmdata"></a></p>
+<p><a id=".htmlata"></a></p>
 <h2 id="fm-data">FM data</h2>
-<p>The fmdata binary file contains the policy terms and conditions required to perform a loss calculation, and is required for fmcalc only. The source format is Oasis FM Instance data, which is the Oasis native format data tables which describe an insurance programme. These four tables have been combined into one with the below structure.</p>
+<p>The .htmlata binary file contains the policy terms and conditions required to perform a loss calculation, and is required for fmcalc only. The source format is Oasis FM Instance data, which is the Oasis native format data tables which describe an insurance programme. These four tables have been combined into one with the below structure.</p>
 <p>This file should be located in a fm sub-directory of the main working directory and have the following filename.</p>
 <ul>
 <li>fm/fm_data.bin</li>
@@ -448,10 +448,10 @@ parallelized across the processes. This feature may be removed in future release
 </tbody>
 </table>
 <p>The data should be ordered by item_id and not contain any nulls (replace with 0).</p>
-<h4 id="fmdatatobin">fmdatatobin</h4>
-<pre><code>$ fmdatatobin &lt; fm_data.csv &gt; fm_data.bin</code></pre>
-<h4 id="fmdatatocsv">fmdatatocsv</h4>
-<pre><code>$ fmdatatocsv &lt; fm_data.bin &gt; fm_data.csv</code></pre>
+<h4 id=".htmlatatobin">.htmlatatobin</h4>
+<pre><code>$ .htmlatatobin &lt; fm_data.csv &gt; fm_data.bin</code></pre>
+<h4 id=".htmlatatocsv">.htmlatatocsv</h4>
+<pre><code>$ .htmlatatocsv &lt; fm_data.bin &gt; fm_data.csv</code></pre>
 <p><a href="#inputtools">Return to top</a></p>
 <p><a id="fmxref"></a></p>
 <h2 id="fm-xref">FM xref</h2>
@@ -494,7 +494,7 @@ parallelized across the processes. This feature may be removed in future release
 <h4 id="fmxreftocsv">fmxreftocsv</h4>
 <pre><code>$ fmxreftocsv &lt; fmxref.bin &gt; fmxref.csv</code></pre>
 <p><a href="#inputtools">Return to top</a></p>
-<p><a href="Outputtools.md">Go to Output data tools</a></p>
-<p><a href="Contents.md">Back to Contents</a></p>
+<p><a href="Outputtools.html">Go to Output data tools</a></p>
+<p><a href="Contents.html">Back to Contents</a></p>
 </body>
 </html>

@@ -18,10 +18,10 @@
 <h4 id="multi-output-workflows">3. Multi-output workflows</h4>
 <p>Currently if the results of the intermediate calculation steps are required to be persisted, then they must be written out to disk and read back into memory to continue downstream processing.</p>
 <h5 id="figure-1.-multiple-output-file-processing---now">Figure 1. Multiple output file processing - now</h5>
-<p><img src="img/MultipleOutput1.jpg" title="Multiple output file processing" alt="alt text" /></p>
+<p><img src="../img/MultipleOutput1.jpg" title="Multiple output file processing" alt="alt text" /></p>
 <p>The plan is to enable intermediate calculation steps to be written out to disk whilst continuing the in-memory workflow.</p>
 <h5 id="figure-2.-multiple-output-file-processing---future">Figure 2. Multiple output file processing - future</h5>
-<p><img src="img/MultipleOutput2.jpg" title="Multiple output file processing" alt="alt text" /></p>
+<p><img src="../img/MultipleOutput2.jpg" title="Multiple output file processing" alt="alt text" /></p>
 <h4 id="reduce-sidx-field-from-4-bytes-to-2-bytes">4. Reduce sidx field from 4 bytes to 2 bytes</h4>
 <p>The sample index field is currently a 4 byte integer format for simplicity of design but we estimate gulcalc stdout data volumes could be reduced by approximately 25% if we reduce it to 2 bytes. This would mean a maximum number of samples of 64,000.</p>
 <h4 id="add-random-number-limit-as-a-parameter-to-gulcalc">5. Add random number limit as a parameter to gulcalc</h4>

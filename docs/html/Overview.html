@@ -11,15 +11,15 @@
 <h1 id="data-streaming-framework-overview">Data Streaming Framework Overview</h1>
 <p>This is the general data streaming framework showing the main components of the toolkit.</p>
 <h5 id="figure-1.-data-streaming-framework">Figure 1. Data streaming framework</h5>
-<p><img src="img/DataStreamFramework.jpg" title="Data Streaming Framework" alt="alt text" /></p>
+<p><img src="../img/DataStreamFramework.jpg" title="Data Streaming Framework" alt="alt text" /></p>
 <p>The in-memory data streams are initiated by the process 'eve' (meaning 'event emitter' rather than in the biblical sense) and shown by solid arrows. The read/write data flows are shown as dashed arrows. Multiple arrows mean multiple processes.</p>
 <p>The calculation components are <em>getmodel</em>, <em>gulcalc</em>, <em>fmcalc</em> and <em>outputcalc</em>. Each has its own internal data requirements and in the reference model provided with this specification, and displayed in Figure 1, the internal data inputs come from the same source.<br />However all components are plug-and-play, so the internal data for each can be retrieved from independent external sources.</p>
 <p>The standard workflow is straight through in-memory processing to produce a single output file. This minimises the amount of disk I/O at each stage and results in the best performance. This workflow is shown in Figure 2.</p>
 <h5 id="figure-2.-straight-through-processing">Figure 2. Straight-through processing</h5>
-<p><img src="img/SingleOutput.jpg" title="Straight-through processing" alt="alt text" /></p>
+<p><img src="../img/SingleOutput.jpg" title="Straight-through processing" alt="alt text" /></p>
 <p>However it is possible to write the results of each calculation to a binary file, if the data is required to be persisted. This workflow is shown in Figure 3.<br />At present, intermediate results binaries are required to be read back into memory for downstream calculations.</p>
 <h5 id="figure-3.-multiple-output-file-processing">Figure 3. Multiple output file processing</h5>
-<p><img src="img/MultipleOutput1.jpg" title="Multiple output file processing" alt="alt text" /></p>
+<p><img src="../img/MultipleOutput1.jpg" title="Multiple output file processing" alt="alt text" /></p>
 <p>The reference model demonstrates an implementation of the principal calculation components, along with some data conversion components which convert binary files to csv files.</p>
 <p><a href="Specification.html">Go to Specification</a></p>
 <p><a href="Contents.html">Back to Contents</a></p>

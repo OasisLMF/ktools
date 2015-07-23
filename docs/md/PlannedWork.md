@@ -13,11 +13,11 @@ Note that the events can still be chunked and each chunk distributed to a separa
 #### 3. Multi-output workflows
 Currently if the results of the intermediate calculation steps are required to be persisted, then they must be written out to disk and read back into memory to continue downstream processing.
 ##### Figure 1. Multiple output file processing - now
-![alt text](img/MultipleOutput1.jpg "Multiple output file processing")
+![alt text](../img/MultipleOutput1.jpg "Multiple output file processing")
 
 The plan is to enable intermediate calculation steps to be written out to disk whilst continuing the in-memory workflow.
 ##### Figure 2. Multiple output file processing - future
-![alt text](img/MultipleOutput2.jpg "Multiple output file processing")
+![alt text](../img/MultipleOutput2.jpg "Multiple output file processing")
 
 #### 4. Reduce sidx field from 4 bytes to 2 bytes
 The sample index field is currently a 4 byte integer format for simplicity of design but we estimate gulcalc stdout data volumes could be reduced by approximately 25% if we reduce it to 2 bytes. This would mean a maximum number of samples of 64,000.

@@ -1,0 +1,500 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+</head>
+<body>
+<h1 id="input-data-tools">Input data tools <a id="inputtools"></a></h1>
+<p>The following components convert input data in csv format to the binary format required by the calculation components in the reference model;</p>
+<ul>
+<li><strong><a href="#events">evetobin</a></strong> is a utility to convert a list of event_ids into binary format.<br /></li>
+<li><strong><a href="#damagebins">damagetobin</a></strong> is a utility to convert the Oasis damage bin dictionary table into binary format.<br /></li>
+<li><strong><a href="#exposuretobin">exposuretobin</a></strong> is a utility to convert the Oasis exposure instance table into binary format.<br /></li>
+<li><strong><a href="#randtobin">randtobin</a></strong> is a utility to convert a list of random numbers into binary format.<br /></li>
+<li><strong><a href="#cdfdatatobin">cdfdatatobin</a></strong> is a utility to convert the Oasis cdf data into binary format.<br /></li>
+<li><strong><a href="#fmdatatobin">fmdatatobin</a></strong> is a utility to convert the Oasis FM instance data into binary format.<br /></li>
+<li><strong><a href="#fmxreftobin">fmxreftobin</a></strong> is a utility to convert the Oasis FM xref table into binary format.</li>
+</ul>
+<p>These components are intended to allow users to generate the required input binaries from csv independently of the original data store and technical environment. All that needs to be done is first generate the csv files from the data store (SQL Server database, etc).</p>
+<pre><code>Note that oatools contains a component &#39;gendata&#39; which generates all of the input binaries directly from a SQL 
+Server Oasis back-end database. This component is specific to the implementation of the in-memory kernel as a
+calculation back-end to the Oasis mid-tier which is why it is kept in a separate project.</code></pre>
+<p>The following components convert the binary input data required by the calculation components in the reference model into csv format;</p>
+<ul>
+<li><strong><a href="#events">evetocsv</a></strong> is a utility to convert the event binary into csv format.<br /></li>
+<li><strong><a href="#damagebins">damagetocsv</a></strong> is a utility to convert the Oasis damage bin dictionary binary into csv format.<br /></li>
+<li><strong><a href="#exposuretocsv">exposuretocsv</a></strong> is a utility to convert the Oasis exposure instance binary into csv format.<br /></li>
+<li><strong><a href="#randtocsv">randtocsv</a></strong> is a utility to convert the random numbers binary into csv format.<br /></li>
+<li><strong><a href="#cdfdatatocsv">cdfdatatocsv</a></strong> is a utility to convert the Oasis cdf data binary into csv format.<br /></li>
+<li><strong><a href="#fmdatatocsv">fmdatatocsv</a></strong> is a utility to convert the Oasis FM instance binary into csv format.<br /></li>
+<li><strong><a href="#fmxreftocsv">fmxreftocsv</a></strong> is a utility to convert the Oasis FM xref binary into csv format.</li>
+</ul>
+<p>These components are provided for convenience of viewing the data and debugging.</p>
+<p><a id="events"></a></p>
+<h2 id="events">Events</h2>
+<p>One or more event binaries are required by eve and getmodel. It must have the following filename format, each uniquely identified by a chunk number (integer &gt;=0);</p>
+<ul>
+<li>e_chunk_{chunk}_data.bin</li>
+</ul>
+<p>The chunks represent subsets of events.</p>
+<pre><code>In general more than 1 chunk of events is not necessary for the in-memory kernel as the computation can be 
+parallelized across the processes. This feature may be removed in future releases.</code></pre>
+<h4 id="file-format">File format</h4>
+<p>The csv file should contain a list of event_ids (integers) and no header.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Type</th>
+<th align="left">Bytes</th>
+<th align="left">Description</th>
+<th align="right">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">event_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis event_id</td>
+<td align="right">4545</td>
+</tr>
+</tbody>
+</table>
+<h4 id="evetobin">evetobin</h4>
+<pre><code>$ evetobin &lt; e_chunk_1_data.csv &gt; e_chunk_1_data.bin</code></pre>
+<h4 id="evetocsv">evetocsv</h4>
+<pre><code>$ evetocsv &lt; e_chunk_1_data.bin &gt; e_chunk_1_data.csv</code></pre>
+<p><a href="#inputtools">Return to top</a></p>
+<h2 id="damage-bins">Damage bins <a id="damagebins"></a></h2>
+<p>The damage bin dictionary is a reference table in Oasis which defines how the effective damageability cdfs are discretized on a relative damage scale (normally between 0 and 1). It is required by getmodel and gulcalc and must have the following filename format;</p>
+<ul>
+<li>damage_bin_dict.bin</li>
+</ul>
+<h4 id="file-format-1">File format</h4>
+<p>The csv file should contain the following fields and include a header row.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Type</th>
+<th align="left">Bytes</th>
+<th align="left">Description</th>
+<th align="right">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">bin_index</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Identifier of the damage bin</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">bin_from</td>
+<td align="left">float</td>
+<td align="left">4</td>
+<td align="left">Lower damage threshold for the bin</td>
+<td align="right">0.01</td>
+</tr>
+<tr class="odd">
+<td align="left">bin_to</td>
+<td align="left">float</td>
+<td align="left">4</td>
+<td align="left">Upper damage threshold for the bin</td>
+<td align="right">0.02</td>
+</tr>
+<tr class="even">
+<td align="left">interpolation</td>
+<td align="left">float</td>
+<td align="left">4</td>
+<td align="left">Interpolation damage value for the bin (usually the mid-point)</td>
+<td align="right">0.015</td>
+</tr>
+<tr class="odd">
+<td align="left">interval_type</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Identifier of the interval type, e.g. closed, open</td>
+<td align="right">1201</td>
+</tr>
+</tbody>
+</table>
+<p>The data should be ordered by bin_index ascending with bin_index starting from 1 and not contain nulls.</p>
+<h4 id="damagetobin">damagetobin</h4>
+<pre><code>$ damagetobin &lt; damage_bin_dict.csv &gt; damage_bin_dict.bin</code></pre>
+<h4 id="damagetocsv">damagetocsv</h4>
+<pre><code>$ damagetocsv &lt; damage_bin_dict.bin &gt; damage_bin_dict.csv</code></pre>
+<p><a href="#inputtools">Return to top</a></p>
+<p><a id="exposures"></a></p>
+<h2 id="exposures">Exposures</h2>
+<p>The exposures binary contains the list of exposures for which ground up loss will be sampled in the kernel calculations. The data format is that of the Oasis Exposure instance. It is required by gulcalc and outputcalc and must have the following filename format;</p>
+<ul>
+<li>exposures.bin</li>
+</ul>
+<h4 id="file-format-2">File format</h4>
+<p>The csv file should contain the following fields and include a header row.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Type</th>
+<th align="left">Bytes</th>
+<th align="left">Description</th>
+<th align="right">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">item_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Identifier of the exposure item</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">areaperil_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Identifier of the locator and peril of the item</td>
+<td align="right">4545</td>
+</tr>
+<tr class="odd">
+<td align="left">vulnerability_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Identifier of the vulnerability distribution of the item</td>
+<td align="right">345456</td>
+</tr>
+<tr class="even">
+<td align="left">tiv</td>
+<td align="left">float</td>
+<td align="left">4</td>
+<td align="left">The total insured value of the item</td>
+<td align="right">200000</td>
+</tr>
+<tr class="odd">
+<td align="left">group_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Identifier of the correlation group of the item</td>
+<td align="right">1</td>
+</tr>
+</tbody>
+</table>
+<p>The data should be ordered by areaperil_id, vulnerability_id ascending and not contain nulls.</p>
+<h4 id="exposuretobin">exposuretobin</h4>
+<pre><code>$ exposuretobin &lt; exposures.csv &gt; exposures.bin</code></pre>
+<h4 id="exposuretocsv">exposuretocsv</h4>
+<pre><code>$ exposuretocsv &lt; exposures.bin &gt; exposures.csv</code></pre>
+<p><a href="#inputtools">Return to top</a></p>
+<p><a id="random"></a></p>
+<h2 id="random-numbers">Random numbers</h2>
+<p>One or more random number files may be provided for the gulcalc component as an option (using gulcalc -r parameter) The random number binary contains a list of random numbers used for ground up loss sampling in the kernel calculation. It should be provided for the same number of chunks as events and must have the following filename format;</p>
+<ul>
+<li>random_{chunk}.bin</li>
+</ul>
+<p>If the gulcalc -r parameter is not used, the random number binary is not required and random numbers are generated dynamically in the calculation.</p>
+<h4 id="file-format-3">File format</h4>
+<p>The csv file should contain the runtime number of samples as the first value followed by a simple list of random numbers. It should not contain any headers.</p>
+<p>First value;</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Type</th>
+<th align="left">Bytes</th>
+<th align="left">Description Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">number of samples</td>
+<td align="left">integer</td>
+<td align="left">4</td>
+<td align="left">Runtime number of samples</td>
+<td align="right">100</td>
+</tr>
+</tbody>
+</table>
+<p>Subsequent values;</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Type</th>
+<th align="left">Bytes</th>
+<th align="left">Description</th>
+<th align="right">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">rand</td>
+<td align="left">float</td>
+<td align="left">4</td>
+<td align="left">Random number between 0 and 1</td>
+<td align="right">0.75875</td>
+</tr>
+</tbody>
+</table>
+<p>The first value in the file is an exception and should contain the runtime number of samples (integer &gt; 0). This is required for running gulcalc in 'Reconciliation mode' (using gulcalc -R parameter) which uses the same random numbers as Oasis classic and produces identical sampled values. If not running in reconciliation mode, it is not used and can be set to 1.</p>
+<h4 id="randtobin">randtobin</h4>
+<pre><code>$ randtobin &lt; random_1.csv &gt; random_1.bin</code></pre>
+<h4 id="randtocsv">randtocsv</h4>
+<pre><code>$ randtocsv &lt; random_1.bin &gt; random_1.csv</code></pre>
+<p><a href="#inputtools">Return to top</a></p>
+<p><a id="cdfs"></a></p>
+<h2 id="cdfs">CDFs</h2>
+<p>One or more cdf data files are required for the getmodel component, as well as an index file containing the starting positions of each event block. These should be located in a cdf sub-directory of the main working directory and have the following filename format;</p>
+<ul>
+<li>cdf/damage_cdf_chunk_{chunk}.bin<br /></li>
+<li>cdf/damage_cdf_chunk_{chunk}.idx</li>
+</ul>
+<p>If chunked, the binary file should contain the cdf data for the same events as the corresponding chunk event binary.</p>
+<h4 id="file-format-4">File format</h4>
+<p>The csv file should contain the following fields and include a header row.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Type</th>
+<th align="left">Bytes</th>
+<th align="left">Description</th>
+<th align="right">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">event_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis event_id</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">areaperil_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis areaperil_id</td>
+<td align="right">4545</td>
+</tr>
+<tr class="odd">
+<td align="left">vulnerability_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis vulnerability_id</td>
+<td align="right">345456</td>
+</tr>
+<tr class="even">
+<td align="left">bin_index</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Identifier of the damage bin</td>
+<td align="right">10</td>
+</tr>
+<tr class="odd">
+<td align="left">prob_to</td>
+<td align="left">float</td>
+<td align="left">4</td>
+<td align="left">The cumulative probability at the upper damage bin threshold</td>
+<td align="right">0.765</td>
+</tr>
+</tbody>
+</table>
+<p>The data should be ordered by event_id, areaperil_id, vulnerability_id, bin_index ascending with bin_index starting at 1, and not contain nulls. All bins corresponding to the bin indexes in the damage bin dictionary should be present, except records may be truncated after the last bin where the prob_to = 1.</p>
+<h4 id="cdfdatatobin">cdfdatatobin</h4>
+<p>Not yet implemented. A component will be provided to produce both binary and index file from the csv.</p>
+<h4 id="cdfdatatocsv">cdfdatatocsv</h4>
+<pre><code>$ cdfdatatocsv &lt; damage_cdf_chunk_1.bin &gt; damage_cdf_chunk_1.csv</code></pre>
+<p><a href="#inputtools">Return to top</a></p>
+<p><a id="fmdata"></a></p>
+<h2 id="fm-data">FM data</h2>
+<p>The fmdata binary file contains the policy terms and conditions required to perform a loss calculation, and is required for fmcalc only. The source format is Oasis FM Instance data, which is the Oasis native format data tables which describe an insurance programme. These four tables have been combined into one with the below structure.</p>
+<p>This file should be located in a fm sub-directory of the main working directory and have the following filename.</p>
+<ul>
+<li>fm/fm_data.bin</li>
+</ul>
+<h4 id="file-format-5">File format</h4>
+<p>The csv file should contain the following fields and include a header row.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Type</th>
+<th align="left">Bytes</th>
+<th align="left">Description</th>
+<th align="right">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">item_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Identifier of the exposure item</td>
+<td align="right">56745</td>
+</tr>
+<tr class="even">
+<td align="left">agg_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis Financial Module agg_id</td>
+<td align="right">546</td>
+</tr>
+<tr class="odd">
+<td align="left">prog_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis Financial Module prog_id</td>
+<td align="right">4</td>
+</tr>
+<tr class="even">
+<td align="left">level_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis Financial Module level_id</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">policytc_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis Financial Module policytc_id</td>
+<td align="right">34</td>
+</tr>
+<tr class="even">
+<td align="left">layer_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis Financial Module layer_id</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">calcrule_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis Financial Module calcrule_id</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="left">allocrule_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis Financial Module allocrule_id</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">deductible</td>
+<td align="left">float</td>
+<td align="left">4</td>
+<td align="left">Deductible</td>
+<td align="right">50</td>
+</tr>
+<tr class="even">
+<td align="left">limit</td>
+<td align="left">float</td>
+<td align="left">4</td>
+<td align="left">Limit</td>
+<td align="right">100000</td>
+</tr>
+<tr class="odd">
+<td align="left">share_prop_of_lim</td>
+<td align="left">float</td>
+<td align="left">4</td>
+<td align="left">Share/participation as a proportion of limit</td>
+<td align="right">0.25</td>
+</tr>
+<tr class="even">
+<td align="left">deductible_prop_of_loss</td>
+<td align="left">float</td>
+<td align="left">4</td>
+<td align="left">Deductible as a proportion of loss</td>
+<td align="right">0.05</td>
+</tr>
+<tr class="odd">
+<td align="left">limit_prop_of_loss</td>
+<td align="left">float</td>
+<td align="left">4</td>
+<td align="left">Limit as a proportion of loss</td>
+<td align="right">0.5</td>
+</tr>
+<tr class="even">
+<td align="left">deductible_prop_of_tiv</td>
+<td align="left">float</td>
+<td align="left">4</td>
+<td align="left">Deductible as a proportion of TIV</td>
+<td align="right">0.05</td>
+</tr>
+<tr class="odd">
+<td align="left">limit_prop_of_tiv</td>
+<td align="left">float</td>
+<td align="left">4</td>
+<td align="left">Limit as a proportion of TIV</td>
+<td align="right">0.8</td>
+</tr>
+<tr class="even">
+<td align="left">deductible_prop_of_limit</td>
+<td align="left">float</td>
+<td align="left">4</td>
+<td align="left">Deductible as a proportion of limit</td>
+<td align="right">0.1</td>
+</tr>
+</tbody>
+</table>
+<p>The data should be ordered by item_id and not contain any nulls (replace with 0).</p>
+<h4 id="fmdatatobin">fmdatatobin</h4>
+<pre><code>$ fmdatatobin &lt; fm_data.csv &gt; fm_data.bin</code></pre>
+<h4 id="fmdatatocsv">fmdatatocsv</h4>
+<pre><code>$ fmdatatocsv &lt; fm_data.bin &gt; fm_data.csv</code></pre>
+<p><a href="#inputtools">Return to top</a></p>
+<p><a id="fmxref"></a></p>
+<h2 id="fm-xref">FM xref</h2>
+<p>The fmxref binary file contains cross reference data linking the output_id in the fmcalc output back to item_id, and is required for outputcalc only. This should be located in a fm sub-directory of the main working directory and have the following filename.</p>
+<ul>
+<li>fm/fmxref.bin</li>
+</ul>
+<h4 id="file-format-6">File format</h4>
+<p>The csv file should contain the following fields and include a header row.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Type</th>
+<th align="left">Bytes</th>
+<th align="left">Description</th>
+<th align="right">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">item_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Identifier of the exposure item</td>
+<td align="right">56745</td>
+</tr>
+<tr class="even">
+<td align="left">output_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis Financial Module output_id</td>
+<td align="right">546</td>
+</tr>
+</tbody>
+</table>
+<p>The data should not contain any nulls.</p>
+<h4 id="fmxreftobin">fmxreftobin</h4>
+<pre><code>$ fmxreftobin &lt; fmxref.csv &gt; fmxref.bin</code></pre>
+<h4 id="fmxreftocsv">fmxreftocsv</h4>
+<pre><code>$ fmxreftocsv &lt; fmxref.bin &gt; fmxref.csv</code></pre>
+<p><a href="#inputtools">Return to top</a></p>
+<p><a href="Outputtools.md">Go to Output data tools</a></p>
+<p><a href="Contents.md">Back to Contents</a></p>
+</body>
+</html>

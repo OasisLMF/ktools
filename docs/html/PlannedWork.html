@@ -1,0 +1,34 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+</head>
+<body>
+<h1 id="planned-work">Planned work</h1>
+<h4 id="generate-cdf-data-component">1. Generate cdf data component</h4>
+<p>Reference examples of components that generate the input binaries from csv have been provided. One outstanding component to convert cdf data from csv to binary will be provided.</p>
+<h4 id="remove-chunk-concept-from-eve-and-getmodel">2. Remove chunk concept from eve and getmodel</h4>
+<p>The input data for the reference components eve and getmodel can be split across several files, where each is identified by a chunk_id under a fixed naming convention. Eve and getmodel have 'chunk_id' as an input parameter which identifies the relevant input binary file.</p>
+<p>Because chunk is an Oasis mid-tier concept, the chunk parameter will be removed and each internal data input to the ktools reference model will be a single consolidated file.</p>
+<p>Note that the events can still be chunked and each chunk distributed to a separate back-end running the in-memory kernel.</p>
+<h4 id="multi-output-workflows">3. Multi-output workflows</h4>
+<p>Currently if the results of the intermediate calculation steps are required to be persisted, then they must be written out to disk and read back into memory to continue downstream processing.</p>
+<h5 id="figure-1.-multiple-output-file-processing---now">Figure 1. Multiple output file processing - now</h5>
+<p><img src="img/MultipleOutput1.jpg" title="Multiple output file processing" alt="alt text" /></p>
+<p>The plan is to enable intermediate calculation steps to be written out to disk whilst continuing the in-memory workflow.</p>
+<h5 id="figure-2.-multiple-output-file-processing---future">Figure 2. Multiple output file processing - future</h5>
+<p><img src="img/MultipleOutput2.jpg" title="Multiple output file processing" alt="alt text" /></p>
+<h4 id="reduce-sidx-field-from-4-bytes-to-2-bytes">4. Reduce sidx field from 4 bytes to 2 bytes</h4>
+<p>The sample index field is currently a 4 byte integer format for simplicity of design but we estimate gulcalc stdout data volumes could be reduced by approximately 25% if we reduce it to 2 bytes. This would mean a maximum number of samples of 64,000.</p>
+<h4 id="add-random-number-limit-as-a-parameter-to-gulcalc">5. Add random number limit as a parameter to gulcalc</h4>
+<p>There is a fixed limit of 1 million random numbers per event when the dynamic random number option (no -r parameter) is used in gulcalc. This limit was imposed to improve performance. We plan to add this limit as an optional parameter to gulcalc.</p>
+<h4 id="fmcalc-code-re-factor">6. fmcalc code re-factor</h4>
+<p>The fmcalc code will be re-factored to improve efficiency, performance and extensibility.</p>
+<p><a href="RandomNumbers.md">Go to Random numbers</a></p>
+<p><a href="Contents.md">Back to Contents</a></p>
+</body>
+</html>

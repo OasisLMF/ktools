@@ -70,7 +70,8 @@ void doit()
 	int sample_size = 0;
 	i = fread(&sample_size, sizeof(sample_size), 1, stdin);
 	
-	printf ("\"event_id\", \"prog_id\", \"layer_id\", \"output_id\", \"sidx\", \"loss\"\n");
+	// RK: remove header, we write without header as standard
+	// printf ("\"event_id\", \"prog_id\", \"layer_id\", \"output_id\", \"sidx\", \"loss\"\n");
 	fmlevelhdr p;
 	i = fread(&p, sizeof(fmlevelhdr), 1, stdin);
 	int count = 0;

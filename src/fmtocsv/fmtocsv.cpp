@@ -40,13 +40,14 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <stdlib.h>
 
 #ifdef __unix
-    #include <unistd.h>
+#include <unistd.h>
 #endif
 
 #include "../include/oasis.hpp"
 
 using namespace std;
 
+bool skipheader = false;
 
 void doit()
 {
@@ -69,9 +70,9 @@ void doit()
 
 	int sample_size = 0;
 	i = fread(&sample_size, sizeof(sample_size), 1, stdin);
-	
-	// RK: remove header, we write without header as standard
-	// printf ("\"event_id\", \"prog_id\", \"layer_id\", \"output_id\", \"sidx\", \"loss\"\n");
+
+	if (skipheader == false) 	printf ("\"event_id\", \"prog_id\", \"layer_id\", \"output_id\", \"sidx\", \"loss\"\n");
+
 	fmlevelhdr p;
 	i = fread(&p, sizeof(fmlevelhdr), 1, stdin);
 	int count = 0;
@@ -89,10 +90,42 @@ void doit()
 
 }
 
-
-int main()
+void help()
 {
-    initstreams("", "");
+
+	cerr << "-I inputfilename\n"
+	     << "-O outputfielname\n"
+	     << "-s skip header\n"
+	     ;
+}
+
+int main(int argc, char* argv[])
+{
+
+	int opt;
+	std::string inFile;
+	std::string outFile;
+
+#ifdef __unix
+	while ((opt = getopt(argc, argv, "shI:O:")) != -1) {
+		switch (opt) {
+		case 'I':
+			inFile = optarg;
+			break;
+		case 'O':
+			outFile = optarg;
+			break;
+		case 's':
+			skipheader = true;
+			break;
+		case 'h':
+			help();
+			exit(EXIT_FAILURE);
+		}
+	}
+#endif
+
+	initstreams(inFile, outFile);
 	doit();
 	return 0;
 }

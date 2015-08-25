@@ -36,9 +36,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifdef __unix
+#include <unistd.h>
+#endif
 
 using namespace std;
 #include "../include/oasis.hpp"
+
+bool skipheader = false;
 
 void doit()
 {
@@ -57,6 +62,7 @@ void doit()
 		exit(-1);
 	}
 
+	if (skipheader == false) printf ("\"event_id\", \"item_id\", \"sidx\", \"gul\"\n");
 	if (stream_type == 1){
 		int samplesize=0;
 		fread(&samplesize, sizeof(samplesize), 1, stdin);
@@ -85,9 +91,42 @@ void doit()
 
 }
 
-int main()
+void help()
 {
-	initstreams("", "");
-    doit();
-    return 0;
+
+	cerr << "-I inputfilename\n"
+	     << "-O outputfielname\n"
+	     << "-s skip header\n"
+	     ;
+}
+
+int main(int argc, char* argv[])
+{
+
+	int opt;
+	std::string inFile;
+	std::string outFile;
+
+#ifdef __unix
+	while ((opt = getopt(argc, argv, "shI:O:")) != -1) {
+		switch (opt) {
+		case 'I':
+			inFile = optarg;
+			break;
+		case 'O':
+			outFile = optarg;
+			break;
+		case 's':
+			skipheader = true;
+			break;
+		case 'h':
+			help();
+			exit(EXIT_FAILURE);
+		}
+	}
+#endif
+
+	initstreams(inFile, outFile);
+	doit();
+	return 0;
 }

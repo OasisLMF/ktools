@@ -75,6 +75,8 @@ struct idxrec32 {
 	int length;
 };
 
+std::string progname;
+
 bool getdamagebindictionary(std::vector<damagebindictionary> &damagebindictionary_vec_)
 {
 	std::ostringstream oss;
@@ -82,7 +84,9 @@ bool getdamagebindictionary(std::vector<damagebindictionary> &damagebindictionar
 
 	FILE *fin = fopen(oss.str().c_str(), "rb");
 	if (fin == NULL){
-		std::cerr << "getdamagebindictionary: Unable to open " << oss.str() << "\n";
+		std::ostringstream poss;    	
+		poss <<  progname << " : Error opening input file "  << oss.str();
+        perror(poss.str().c_str());
 		exit(-1);
 	}
 	fseek(fin, 0L, SEEK_END);
@@ -91,7 +95,9 @@ bool getdamagebindictionary(std::vector<damagebindictionary> &damagebindictionar
 	unsigned int nrec = sz / sizeof(damagebindictionary);
 	damagebindictionary *s1 = new damagebindictionary[nrec];
 	if (fread(s1, sizeof(damagebindictionary), nrec, fin) != nrec) {
-		std::cerr << "Error reading file\n";
+		std::ostringstream poss;    	
+			poss <<  progname << " : Error reading file "  << oss.str();
+        perror(poss.str().c_str());
 		exit(-1);
 	}
 
@@ -112,7 +118,9 @@ void getindex(std::map<int, idxrec> &imap_, int chunkid_)
 	oss << "cdf/damage_cdf_chunk_" << chunkid_ << ".idx";
 	FILE *fin = fopen(oss.str().c_str(), "rb");
     if (fin == NULL){
-        perror("Error opening input file");
+		std::ostringstream poss;    	
+			poss <<  progname << " : Error opening input file "  << oss.str();
+        perror(poss.str().c_str());
         exit(-1);
     }
 	idx x;
@@ -161,7 +169,7 @@ void sendevent(int event_id_, std::map<int, idxrec> &imap_, int max_no_of_bins_,
 		damagecdfrec df;
 		fread(&df, sizeof(damagecdfrec), 1, fin);
 		if (df.event_id != event_id_){
-			std::cout << "Event ID: " << event_id_ << "not found\n";
+			std::cerr << progname << ": Event ID: " << event_id_ << "not found\n";
 			exit(-1);
 		}
 		fread(&no_of_bins, sizeof(no_of_bins), 1, fin);
@@ -188,7 +196,7 @@ void sendevent(int event_id_, std::map<int, idxrec> &imap_, int max_no_of_bins_,
 
 		length = length - rec_length;
 		if (length < 0) {
-			std::cout << "Error Event record format error\n";
+			std::cerr << progname << ": Error Event record format error\n";
 			exit(-1);
 		}
 	}
@@ -219,7 +227,9 @@ void doit(int chunkid_)
 	oss << "cdf/damage_cdf_chunk_" << chunkid_ << ".bin";
 	fin = fopen(oss.str().c_str(), "rb");
 	if (fin == NULL) {
-		std::cerr << "Error opening file : " << oss.str() << "\n";
+		std::ostringstream poss;    	
+		poss <<  progname << " : Error opening input file "  << oss.str();
+        perror(poss.str().c_str());
 		exit(-1);
 	}
 
@@ -232,7 +242,7 @@ void doit(int chunkid_)
 	delete[] interpolation;
 }
 
-void usage(char *progname)
+void usage()
 {
     std::cerr << "Usage: " << progname << " chunkid \n";
     std::cerr << "Usage: " << progname << " chunkid  mode\n";
@@ -241,7 +251,8 @@ void usage(char *progname)
 }
 int main(int argc, char *argv[])
 {
-	if (argc < 2) usage(argv[0]);
+	progname = argv[0];
+	if (argc < 2) usage();
 
     if (argc == 3) {
         std::string s = "-v";

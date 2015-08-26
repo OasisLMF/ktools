@@ -74,7 +74,7 @@ void doit()
 				i = fread(&gr, sizeof(gr), 1, stdin);
 				if (i == 0) break;
 				if (gr.sidx == 0) break;
-				printf("%d, %d, %d, %f\n", gh.event_id, gh.item_id, gr.sidx, gr.gul);
+				printf("%d, %d, %d, %.2f\n", gh.event_id, gh.item_id, gr.sidx, gr.gul);
 			}
 		}
 	}
@@ -84,7 +84,7 @@ void doit()
 		gulSampleslevel p;
 		i = fread(&p, sizeof(p), 1, stdin);
 		while (i != 0) {
-			printf("%d, %d, %d, %f\n", p.event_id, p.item_id, p.sidx, p.gul);
+			printf("%d, %d, %d, %.2f\n", p.event_id, p.item_id, p.sidx, p.gul);
 			i = fread(&p, sizeof(p), 1, stdin);
 		}
 	}

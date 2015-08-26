@@ -82,7 +82,7 @@ void doit()
 		while (i != 0) {
 			count++;
 			if (q.sidx == 0) break;
-			printf("%d, %d, %d, %d, %d, %f\n", p.event_id, p.prog_id, p.layer_id, p.output_id, q.sidx, q.loss);
+			printf("%d, %d, %d, %d, %d, %.2f\n", p.event_id, p.prog_id, p.layer_id, p.output_id, q.sidx, q.loss);
 			i = fread(&q, sizeof(fmlevelrec), 1, stdin);
 		}
 		if (i) i = fread(&p, sizeof(fmlevelhdr), 1, stdin);

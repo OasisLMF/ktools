@@ -18,7 +18,7 @@ The principle is to stream data through by event end-to-end, with multiple proce
 
 ### Language
 
-The components can be written in any language as long as the data structures of the binary streams are adhered to.  The current set of components have been written in POSIX-compliant C++ and C.  This means that they can be compiled in Linux and Windows using the GNU compiler toolchain.
+The components can be written in any language as long as the data structures of the binary streams are adhered to.  The current set of components have been written in POSIX-compliant C++ and C.  This means that they can be compiled in Linux and Windows using the latest GNU compiler toolchain.
 
 ### Components
 

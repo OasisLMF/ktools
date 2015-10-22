@@ -85,6 +85,11 @@ struct gulSampleslevel {
 	float gul;		// may want to cut down to singe this causes 4 byte padding for allignment
 };
 
+struct gulSampleslevelEventRec {
+	int item_id;
+	int sidx;		// This has be stored for thresholds cannot be implied
+	float gul;		// may want to cut down to singe this causes 4 byte padding for allignment
+};
 struct gulSampleslevelHeader {
 	int event_id;
 	int item_id;

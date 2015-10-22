@@ -77,7 +77,7 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-bin_PROGRAMS = fmcalc$(EXEEXT)
+bin_PROGRAMS = fmcalc$(EXEEXT) fmcalc_beta$(EXEEXT)
 subdir = src/fmcalc
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/depcomp $(include_HEADERS)
@@ -94,6 +94,9 @@ PROGRAMS = $(bin_PROGRAMS)
 am_fmcalc_OBJECTS = fmcalc.$(OBJEXT) mman.$(OBJEXT)
 fmcalc_OBJECTS = $(am_fmcalc_OBJECTS)
 fmcalc_LDADD = $(LDADD)
+am_fmcalc_beta_OBJECTS = fmcalc_beta.$(OBJEXT)
+fmcalc_beta_OBJECTS = $(am_fmcalc_beta_OBJECTS)
+fmcalc_beta_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -135,8 +138,8 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-SOURCES = $(fmcalc_SOURCES)
-DIST_SOURCES = $(fmcalc_SOURCES)
+SOURCES = $(fmcalc_SOURCES) $(fmcalc_beta_SOURCES)
+DIST_SOURCES = $(fmcalc_SOURCES) $(fmcalc_beta_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -282,6 +285,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 fmcalc_SOURCES = fmcalc.cpp mman.c
+fmcalc_beta_SOURCES = fmcalc_beta.cpp
 include_HEADERS = mman.h
 all: all-am
 
@@ -364,6 +368,10 @@ fmcalc$(EXEEXT): $(fmcalc_OBJECTS) $(fmcalc_DEPENDENCIES) $(EXTRA_fmcalc_DEPENDE
 	@rm -f fmcalc$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(fmcalc_OBJECTS) $(fmcalc_LDADD) $(LIBS)
 
+fmcalc_beta$(EXEEXT): $(fmcalc_beta_OBJECTS) $(fmcalc_beta_DEPENDENCIES) $(EXTRA_fmcalc_beta_DEPENDENCIES) 
+	@rm -f fmcalc_beta$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(fmcalc_beta_OBJECTS) $(fmcalc_beta_LDADD) $(LIBS)
+
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
 
@@ -371,6 +379,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fmcalc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fmcalc_beta.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mman.Po@am__quote@
 
 .c.o:

@@ -155,6 +155,7 @@ struct gulRec {
 struct policytcvidx {
 	int policytc_id;
 	int agg_id;
+	int next_vidx = -1;
 	std::vector<int> item_idx;
 };
 
@@ -164,75 +165,15 @@ struct LossRec {
 	int agg_id;
 	int policytc_id;
 	int allocrule_id;
+	int next_vec_idx = -1;
 	const std::vector<int> *item_idx;
 };
 
 
-inline void dofmcalc(vector <gulRec> &agg_vec_, int level_)
-{
-	policy_tc_key ptk;
-	ptk.layer_id = 1;
-	ptk.level_id = level_;
-
-	for (auto &x : agg_vec_) {
-		ptk.agg_id = x.agg_id;
-
-		const int policytc_id = policy_tc_vec_vec_vec[ptk.level_id][ptk.agg_id][ptk.layer_id];
-
-		auto profile = profile_vec[policytc_id];
-		if (profile.calcrule_id == 1) {
-			float ded = 0;
-			float lim = 0;
-			for (auto y : profile.tc_vec) {
-				if (y.tc_id == deductible) ded = y.tc_val;
-				if (y.tc_id == limit) lim = y.tc_val;
-			}
-			float loss = x.gul - ded;
-			if (loss < 0) loss = 0;
-			if (loss > lim) loss = lim;
-			x.gul = loss;
-		}
-		if (profile.calcrule_id == 12) {
-			for (auto &z : profile.tc_vec) {
-				if (z.tc_id == deductible) {
-					float loss = x.gul - z.tc_val;
-					if (loss < 0) loss = 0;
-					x.gul = loss;
-					break;
-				}
-			}
-		}
-	}
-}
-
 inline void dofmcalc(vector <LossRec> &agg_vec_)
 {
-	for (auto &x : agg_vec_) {
-		auto profile = profile_vec[x.policytc_id];
-		if (profile.calcrule_id == 21) {
-			float ded = 0;
-			float lim = 0;
-			for (auto y : profile.tc_vec) {
-				if (y.tc_id == deductible) ded = y.tc_val;
-				if (y.tc_id == limit) lim = y.tc_val;
-			}
-			float loss = x.loss - ded;
-			if (loss < 0) loss = 0;
-			if (loss > lim) loss = lim;
-			x.retained_loss = x.loss - loss;
-			x.loss = loss;
-		}
-		if (profile.calcrule_id == 212) {
-			for (auto &z : profile.tc_vec) {
-				if (z.tc_id == deductible) {
-					float loss = x.loss - z.tc_val;
-					if (loss < 0) loss = 0;
-					x.retained_loss = x.loss - loss;
-					x.loss = loss;
-					break;
-				}
-			}
-		}
+	for (LossRec &x : agg_vec_) {
+		const profile_rec &profile = profile_vec[x.policytc_id];		
 		x.allocrule_id = profile.allocrule_id;
 		switch (profile.calcrule_id) {
 			case 1:
@@ -294,7 +235,7 @@ inline void dofmcalc_r(std::vector<std::map<int, int>>  &aggid_to_vectorlookups_
 	std::map<fmlevelhdr, std::vector<fmlevelrec> > &outmap_, fmlevelhdr &fmhdr_, int sidx_, const std::vector<std::vector<std::vector<policytcvidx>>> &avxs_, int layer_, 
 	const std::vector<int> &items_, const std::vector<float> &guls_)
 {
-	const vector <LossRec> &prev_agg_vec = agg_vecs_[level_ - 1];
+	vector <LossRec> &prev_agg_vec = agg_vecs_[level_ - 1];
 	vector <LossRec> &agg_vec = agg_vecs_[level_];
 	const std::vector<std::vector<policytcvidx>> &avx = avxs_[level_];
 	agg_vec.clear();
@@ -310,11 +251,16 @@ inline void dofmcalc_r(std::vector<std::map<int, int>>  &aggid_to_vectorlookups_
 	for (unsigned int i = 0;i < prev_agg_vec.size();i++){ // loop through previous levels of agg_vec
 		if (prev_agg_vec[i].agg_id != 0) {
 			int agg_id = pfm_vec_vec[level_][prev_agg_vec[i].agg_id];
-			int vec_idx = aggid_to_vectorlookup[agg_id];
-			agg_vec[vec_idx].loss += prev_agg_vec[i].loss;
-			agg_vec[vec_idx].agg_id = agg_id;
-			agg_vec[vec_idx].policytc_id = avx[layer_][vec_idx].policytc_id; 
-			// agg_vec[vec_idx].policytc_id = policy_tc_vec_vec_vec[level_][agg_id][layer_];
+			if (prev_agg_vec[i].next_vec_idx == -1) {	// next_vec_idx can be zero
+				prev_agg_vec[i].next_vec_idx = aggid_to_vectorlookup[agg_id];
+			}
+			int vec_idx = prev_agg_vec[i].next_vec_idx;
+			if (agg_vec[vec_idx].policytc_id == 0) { // policytc_id cannot be zero - first position in lookup vector not used
+				agg_vec[vec_idx].policytc_id = avx[layer_][vec_idx].policytc_id;
+				agg_vec[vec_idx].agg_id = agg_id;
+				agg_vec[vec_idx].item_idx = &avx[layer_][vec_idx].item_idx;
+			}			
+			agg_vec[vec_idx].loss += prev_agg_vec[i].loss;						
 		}
 		else {
 			fprintf(stderr, "Missing agg_id for index %d policytc_id: %d\n", i, prev_agg_vec[i].policytc_id);
@@ -447,10 +393,7 @@ void dofm(int event_id_, const std::vector<int> &items_, std::vector<vector<floa
 				}
 				else {
 					for (unsigned int layer = 1; layer < policy_tc_vec_vec_vec[zzlevel][agg_id].size(); layer++) { // loop through layers
-						struct policytcvidx a;
 						const int policytc_id = policy_tc_vec_vec_vec[zzlevel][agg_id][layer];
-						a.agg_id = agg_id;
-						a.policytc_id = policytc_id;
 						next[layer][iter->second].agg_id;
 						int current_idx = aggid_to_vectorlookup[agg_id];
 						for (int x : prev[previous_layer][i].item_idx) {
@@ -500,9 +443,9 @@ void dofm(int event_id_, const std::vector<int> &items_, std::vector<vector<floa
 	}
 	aggid_to_vectorlookups.clear();
 	// Do output
-	for (auto x : outmap) {
+	for (const auto &x : outmap) {
 		fwrite(&x.first, sizeof(x.first), 1, stdout);
-		for (auto y : x.second) {
+		for (const auto &y : x.second) {
 			fwrite(&y, sizeof(y), 1, stdout);
 		}
 		fmlevelrec r;

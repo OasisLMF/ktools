@@ -4857,7 +4857,7 @@ esac
 
 
 
-ac_config_files="$ac_config_files Makefile ktest/Makefile src/Makefile src/cdftocsv/Makefile src/eve/Makefile src/damagetocsv/Makefile src/damagetobin/Makefile src/exposuretocsv/Makefile src/exposuretobin/Makefile src/fmcalc/Makefile src/fmdatatocsv/Makefile src/fmprofiletocsv/Makefile src/fmprofiletobin/Makefile src/fmpolicytctocsv/Makefile src/fmdatatobin/Makefile src/cdfdatatocsv/Makefile src/fmtocsv/Makefile src/fmxreftocsv/Makefile src/fmxreftobin/Makefile src/randtocsv/Makefile src/randtobin/Makefile src/evetocsv/Makefile src/evetobin/Makefile src/getmodel/Makefile src/gulcalc/Makefile src/gultocsv/Makefile src/outputcalc/Makefile"
+ac_config_files="$ac_config_files Makefile ktest/Makefile src/Makefile src/cdftocsv/Makefile src/eve/Makefile src/damagetocsv/Makefile src/damagetobin/Makefile src/exposuretocsv/Makefile src/exposuretobin/Makefile src/fmcalc/Makefile src/fmdatatocsv/Makefile src/fmprofiletocsv/Makefile src/fmprofiletobin/Makefile src/fmpolicytctocsv/Makefile src/fmprogrammetobin/Makefile src/fmdatatobin/Makefile src/cdfdatatocsv/Makefile src/fmtocsv/Makefile src/fmxreftocsv/Makefile src/fmxreftobin/Makefile src/randtocsv/Makefile src/randtobin/Makefile src/evetocsv/Makefile src/evetobin/Makefile src/getmodel/Makefile src/gulcalc/Makefile src/gultocsv/Makefile src/outputcalc/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -5604,6 +5604,7 @@ do
     "src/fmprofiletocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/fmprofiletocsv/Makefile" ;;
     "src/fmprofiletobin/Makefile") CONFIG_FILES="$CONFIG_FILES src/fmprofiletobin/Makefile" ;;
     "src/fmpolicytctocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/fmpolicytctocsv/Makefile" ;;
+    "src/fmprogrammetobin/Makefile") CONFIG_FILES="$CONFIG_FILES src/fmprogrammetobin/Makefile" ;;
     "src/fmdatatobin/Makefile") CONFIG_FILES="$CONFIG_FILES src/fmdatatobin/Makefile" ;;
     "src/cdfdatatocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/cdfdatatocsv/Makefile" ;;
     "src/fmtocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/fmtocsv/Makefile" ;;

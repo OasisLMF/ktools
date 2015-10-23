@@ -86,8 +86,8 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-bin_PROGRAMS = fmprofiletobin$(EXEEXT)
-subdir = src/fmprofiletobin
+bin_PROGRAMS = fmprogrammetobin$(EXEEXT)
+subdir = src/fmprogrammetobin
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -99,9 +99,9 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_fmprofiletobin_OBJECTS = fmprofiletobin.$(OBJEXT)
-fmprofiletobin_OBJECTS = $(am_fmprofiletobin_OBJECTS)
-fmprofiletobin_LDADD = $(LDADD)
+am_fmprogrammetobin_OBJECTS = fmprogrammetobin.$(OBJEXT)
+fmprogrammetobin_OBJECTS = $(am_fmprogrammetobin_OBJECTS)
+fmprogrammetobin_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -131,8 +131,8 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-SOURCES = $(fmprofiletobin_SOURCES)
-DIST_SOURCES = $(fmprofiletobin_SOURCES)
+SOURCES = $(fmprogrammetobin_SOURCES)
+DIST_SOURCES = $(fmprogrammetobin_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -250,7 +250,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-fmprofiletobin_SOURCES = fmprofiletobin.cpp
+fmprogrammetobin_SOURCES = fmprogrammetobin.cpp 
 all: all-am
 
 .SUFFIXES:
@@ -264,9 +264,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/fmprofiletobin/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/fmprogrammetobin/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu src/fmprofiletobin/Makefile
+	  $(AUTOMAKE) --gnu src/fmprogrammetobin/Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \
@@ -327,9 +327,9 @@ uninstall-binPROGRAMS:
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
 
-fmprofiletobin$(EXEEXT): $(fmprofiletobin_OBJECTS) $(fmprofiletobin_DEPENDENCIES) $(EXTRA_fmprofiletobin_DEPENDENCIES) 
-	@rm -f fmprofiletobin$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(fmprofiletobin_OBJECTS) $(fmprofiletobin_LDADD) $(LIBS)
+fmprogrammetobin$(EXEEXT): $(fmprogrammetobin_OBJECTS) $(fmprogrammetobin_DEPENDENCIES) $(EXTRA_fmprogrammetobin_DEPENDENCIES) 
+	@rm -f fmprogrammetobin$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(fmprogrammetobin_OBJECTS) $(fmprogrammetobin_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -337,7 +337,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fmprofiletobin.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fmprogrammetobin.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

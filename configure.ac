@@ -55,6 +55,7 @@ AC_CONFIG_FILES([Makefile
                  src/fmcalc/Makefile
                  src/fmdatatocsv/Makefile
                  src/fmprofiletocsv/Makefile
+                 src/fmpolicytctocsv/Makefile
                  src/fmdatatobin/Makefile
                  src/cdfdatatocsv/Makefile
                  src/fmtocsv/Makefile

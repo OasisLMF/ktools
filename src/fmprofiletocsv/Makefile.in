@@ -86,8 +86,8 @@ POST_INSTALL = :
 NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
-bin_PROGRAMS = damagetocsv$(EXEEXT)
-subdir = src/damagetocsv
+bin_PROGRAMS = fmprofiletocsv$(EXEEXT)
+subdir = src/fmprofiletocsv
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
@@ -99,9 +99,9 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_damagetocsv_OBJECTS = damagetocsv.$(OBJEXT)
-damagetocsv_OBJECTS = $(am_damagetocsv_OBJECTS)
-damagetocsv_LDADD = $(LDADD)
+am_fmprofiletocsv_OBJECTS = fmprofiletocsv.$(OBJEXT)
+fmprofiletocsv_OBJECTS = $(am_fmprofiletocsv_OBJECTS)
+fmprofiletocsv_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -131,8 +131,8 @@ AM_V_CXXLD = $(am__v_CXXLD_@AM_V@)
 am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
-SOURCES = $(damagetocsv_SOURCES)
-DIST_SOURCES = $(damagetocsv_SOURCES)
+SOURCES = $(fmprofiletocsv_SOURCES)
+DIST_SOURCES = $(fmprofiletocsv_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -250,7 +250,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-damagetocsv_SOURCES = damagetocsv.cpp
+fmprofiletocsv_SOURCES = fmprofiletocsv.cpp
 all: all-am
 
 .SUFFIXES:
@@ -264,9 +264,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/damagetocsv/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/fmprofiletocsv/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu src/damagetocsv/Makefile
+	  $(AUTOMAKE) --gnu src/fmprofiletocsv/Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \
@@ -327,9 +327,9 @@ uninstall-binPROGRAMS:
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
 
-damagetocsv$(EXEEXT): $(damagetocsv_OBJECTS) $(damagetocsv_DEPENDENCIES) $(EXTRA_damagetocsv_DEPENDENCIES) 
-	@rm -f damagetocsv$(EXEEXT)
-	$(AM_V_CXXLD)$(CXXLINK) $(damagetocsv_OBJECTS) $(damagetocsv_LDADD) $(LIBS)
+fmprofiletocsv$(EXEEXT): $(fmprofiletocsv_OBJECTS) $(fmprofiletocsv_DEPENDENCIES) $(EXTRA_fmprofiletocsv_DEPENDENCIES) 
+	@rm -f fmprofiletocsv$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(fmprofiletocsv_OBJECTS) $(fmprofiletocsv_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -337,7 +337,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/damagetocsv.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fmprofiletocsv.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

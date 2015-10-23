@@ -94,24 +94,13 @@ struct pfmkey {
 	int item_id;
 };
 
-struct policy_tc {
-	int layer_id;
-	int PolicyTC_id;
-};
-
 int max_layer = 0;
 
 std::vector<std::vector<int>> pfm_vec_vec;  // initialized from fm/programme.bin  pfm_vec_vec[level_id][item_id] returns agg_id [we ignore prog_id not passed through the system]
 
-struct policy_tc_key {
-	//int prog_id;
-	int layer_id;
-	int level_id;
-	int agg_id;
-};
-
 std::vector<vector<vector<int>>> policy_tc_vec_vec_vec;
-enum tc {
+
+enum tc {			// tc = terms and conditions
 	deductible,
 	limit,
 	share_prop_of_limit,
@@ -309,7 +298,7 @@ inline void dofmcalc_r(std::vector<std::map<int, int>>  &aggid_to_vectorlookups_
 void dofm(int event_id_, const std::vector<int> &items_, std::vector<vector<float>> &event_guls_, int max_level_)
 {
 	
-	int level = 1;
+	const int level = 1;
 	std::vector<std::map<int, int>>  aggid_to_vectorlookups(max_level_ + 1);
 
 	std::map<int, int> &aggid_to_vectorlookup = aggid_to_vectorlookups[level];	
@@ -322,11 +311,10 @@ void dofm(int event_id_, const std::vector<int> &items_, std::vector<vector<floa
 	fmhdr.prog_id = 1;
 	fmhdr.layer_id = 1;
 
-	policy_tc_key ptk;
-	ptk.layer_id = 1;
-	ptk.level_id = level;
-	// const vector <int> &r = policy_tc_vec_vec_vec[ptk.layer_id][ptk.level_id];
-
+	//policy_tc_key ptk;
+//	ptk.layer_id = 1;
+//	ptk.level_id = level;
+	const int layer_id = 1;
 	std::vector<std::vector<std::vector<policytcvidx>>> avxs;
 
 	avxs.resize(max_level_ + 1);
@@ -341,7 +329,7 @@ void dofm(int event_id_, const std::vector<int> &items_, std::vector<vector<floa
 			if (iter == aggid_to_vectorlookup.end()) {
 				policytcvidx a;
 				a.agg_id = agg_id;
-				a.policytc_id = policy_tc_vec_vec_vec[ptk.level_id][agg_id][ptk.layer_id];
+				a.policytc_id = policy_tc_vec_vec_vec[level][agg_id][layer_id];
 				avx[1].push_back(a);			// populate the first layer
 				avx[1][avx[1].size() - 1].item_idx.push_back(i);
 				aggid_to_vectorlookup[agg_id] = avx[1].size() - 1;
@@ -542,26 +530,21 @@ void init_policytc()
 	int max_level = 0;
 	int i = fread(&f, sizeof(f), 1, fin);
 	while (i != 0) {
-		policy_tc_key k;
-		//	k.prog_id = f.prog_id;
-		k.level_id = f.level_id;
+	
 		if (f.level_id > max_level) max_level = f.level_id;
 		if (f.layer_id > max_layer) max_layer = f.layer_id;
-		k.agg_id = f.agg_id;
-		k.layer_id = f.layer_id;	
-		
-		// policy_tc_map[k] = f.PolicyTC_id;
-		if (policy_tc_vec_vec_vec.size() < k.level_id + 1) {
-			policy_tc_vec_vec_vec.resize(k.level_id + 1);
+	
+		if (policy_tc_vec_vec_vec.size() < f.level_id + 1) {
+			policy_tc_vec_vec_vec.resize(f.level_id + 1);
 		}
-		if (policy_tc_vec_vec_vec[k.level_id].size() < k.agg_id + 1) {
-			policy_tc_vec_vec_vec[k.level_id].resize(k.agg_id + 1);
+		if (policy_tc_vec_vec_vec[f.level_id].size() < f.agg_id + 1) {
+			policy_tc_vec_vec_vec[f.level_id].resize(f.agg_id + 1);
 		}
 
-		if (policy_tc_vec_vec_vec[k.level_id][k.agg_id].size() < k.layer_id + 1) {
-			policy_tc_vec_vec_vec[k.level_id][k.agg_id].resize(k.layer_id + 1);
+		if (policy_tc_vec_vec_vec[f.level_id][f.agg_id].size() < f.layer_id + 1) {
+			policy_tc_vec_vec_vec[f.level_id][f.agg_id].resize(f.layer_id + 1);
 		}
-		policy_tc_vec_vec_vec[k.level_id][k.agg_id][k.layer_id] = f.PolicyTC_id;
+		policy_tc_vec_vec_vec[f.level_id][f.agg_id][f.layer_id] = f.PolicyTC_id;
 
 		i = fread(&f, sizeof(f), 1, fin);
 	}

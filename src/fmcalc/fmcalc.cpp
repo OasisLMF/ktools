@@ -70,7 +70,16 @@ struct AggKey {
 	int layer_id;
 };
 inline bool operator==(const AggKey& lhs, const AggKey& rhs) { return lhs.prog_id == rhs.prog_id && lhs.agg_id == rhs.agg_id && lhs.layer_id == rhs.layer_id; }
-inline bool operator< (const AggKey& lhs, const AggKey& rhs) {  if (lhs.prog_id < rhs.prog_id) return true; if ( lhs.prog_id == rhs.prog_id && lhs.agg_id < rhs.agg_id) return true; if ( lhs.prog_id == rhs.agg_id && lhs.agg_id == rhs.agg_id && lhs.layer_id < rhs.layer_id) return true; return false; }
+inline bool operator< (const AggKey& lhs, const AggKey& rhs) 
+{  
+	if (lhs.prog_id < rhs.prog_id) 
+		return true; 
+	if ( lhs.prog_id == rhs.prog_id && lhs.agg_id < rhs.agg_id) 
+		return true; 
+	if ( lhs.prog_id == rhs.prog_id && lhs.agg_id == rhs.agg_id && lhs.layer_id < rhs.layer_id) 
+		return true; 
+	return false;
+}
 
 
 struct TCVal {

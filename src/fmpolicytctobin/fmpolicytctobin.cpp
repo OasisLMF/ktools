@@ -56,7 +56,7 @@ void doit()
 	lineno++;
     while (fgets(line, sizeof(line), stdin) != 0)
     {
-		if (sscanf(line, "%d,%d,%d,%d,%d", &q.prog_id, &q.level_id, &q.agg_id, &q.layer_id, &q.PolicyTC_id) != 5){
+		if (sscanf(line, "%d,%d,%d,%d,%d", &q.prog_id, &q.layer_id, &q.level_id, &q.agg_id, &q.PolicyTC_id) != 5){
            fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
            return;
        }

@@ -56,13 +56,13 @@ struct fm_programme {
 void doit()
 {
 
-    printf ("\"prog_id\", \"level_id\", \"agg_id\",\"item_id\"\n");
+    printf ("\"prog_id\", \"item_id\", \"level_id\",\"agg_id\"\n");
     
 
     fm_programme q;
     int i = fread(&q, sizeof(q), 1, stdin);
     while (i != 0) {
-        printf("%d, %d, %d, %d\n", q.prog_id, q.level_id, q.agg_id, q.item_id );
+        printf("%d, %d, %d, %d\n", q.prog_id, q.item_id, q.level_id, q.agg_id );
         i = fread(&q, sizeof(q), 1, stdin);
     }
 }

@@ -177,7 +177,7 @@ inline void dofmcalc(vector <LossRec> &agg_vec_)
 				float loss = x.loss - ded;
 				if (loss < 0) loss = 0;
 				if (loss > lim) loss = lim;
-				x.retained_loss = x.loss - loss;
+				x.retained_loss = x.retained_loss + ( x.loss - loss);
 				x.loss = loss;
 			}
 			break;
@@ -196,16 +196,37 @@ inline void dofmcalc(vector <LossRec> &agg_vec_)
 				if (x.loss > (ded + lim)) loss = limit;
 				else loss = x.loss - ded;
 				if (loss < 0) loss = 0;
-				x.loss = loss * share;								
+				x.retained_loss = x.retained_loss + ( x.loss - loss);
+				x.loss = loss * share;
+
 			}
 			break;
+			case 11:
+				{
+					float ded = 0;
+					for (auto y : profile.tc_vec) {
+						if (y.tc_id == deductible) ded = y.tc_val;					
+					}
+					float loss = 0;
+					if (x.retained_loss < ded) {
+						loss = x.loss - (ded - x.retained_loss);
+						if (loss < 0) loss = 0;
+						x.retained_loss = x.retained_loss + ( x.loss - loss);
+					}else {
+						loss = x.loss;
+						// retained loss stays the same
+					}
+
+					x.loss = loss ;					
+				}
+				break;
 			case 12:
 			{
 				for (auto &z : profile.tc_vec) {
 					if (z.tc_id == deductible) {
 						float loss = x.loss - z.tc_val;
 						if (loss < 0) loss = 0;
-						x.retained_loss = x.loss - loss;
+						x.retained_loss = x.retained_loss + ( x.loss - loss);
 						x.loss = loss;
 						break;
 					}

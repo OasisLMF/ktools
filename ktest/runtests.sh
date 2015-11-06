@@ -71,7 +71,6 @@ installertest()
 	../src/damagetobin/damagetobin < ../ktest/testout/damage_bin_dict.csv > ../ktest/testout/damage_bin_dict.bin
 
 	../src/cdfdatatocsv/cdfdatatocsv < ../examples/cdf/damage_cdf_chunk_1.bin > ../ktest/testout/damage_cdf_chunk_1.csv
-	#../src/cdfdatatobin/cdfdatatobin < ../ktest/testout/damage_cdf_chunk_1.csv > ../ktest/testout/damage_cdf_chunk_1.bin
 
 	../src/fmdatatocsv/fmdatatocsv < ../examples/fm/fm_data.bin > ../ktest/testout/fm_data.csv
 	../src/fmdatatobin/fmdatatobin < ../ktest/testout/fm_data.csv > ../ktest/testout/fm_data.bin
@@ -81,6 +80,10 @@ installertest()
 
 
 	cd ../ktest/testout
+	../../src/cdfdatatobin/cdfdatatobin damage_cdf_chunk_11 102 < damage_cdf_chunk_1.csv
+	../../src/cdfdatatocsv/cdfdatatocsv < damage_cdf_chunk_11.bin > damage_cdf_chunk_11.csv
+	diff damage_cdf_chunk_1.csv damage_cdf_chunk_11.csv
+	
 	md5sum -c ../$CTRL.md5
 
 	if [ "$?" -ne "0" ]; then

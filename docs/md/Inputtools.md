@@ -176,7 +176,17 @@ The csv file should contain the following fields and include a header row.
 The data should be ordered by event_id, areaperil_id, vulnerability_id, bin_index ascending with bin_index starting at 1, and not contain nulls. All bins corresponding to the bin indexes in the damage bin dictionary should be present, except records may be truncated after the last bin where the prob_to = 1.
 
 #### cdfdatatobin
-Not yet implemented. A component will be provided to produce both binary and index file from the csv.
+```
+$ cdfdatatobin damage_cdf_chunk_1 102 < damage_cdf_chunk_1.bin
+```
+This command will create a binary file damage_cdf_chunk_1.bin and an index file damage_cdf_chunk_1.idx in the working directory.
+
+In general the usage is;
+
+```
+$ cdfdatatobin damage_cdf_chunk_[chunk] [maxbins] < input.csv
+```
+chunk is an integer and maxbins is the maximum number of bins in the cdf. input.csv must conform to the csv format given above.
 
 #### cdfdatatocsv
 ```

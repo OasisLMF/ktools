@@ -73,6 +73,7 @@ The following Cygwin add-in packages are required;
 * mingw64-i686-gcc-core
 * make
 * diffutils
+* automake
 
 Search for 'gcc', 'make' and 'diffutils' to find all of the relevant packages (Only 'gcc' illustrated below).
 ![alt text](docs/img/cygwin1.jpg "Add-in packages")

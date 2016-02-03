@@ -44,6 +44,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <stdlib.h>
 #include <algorithm>
 #include <fcntl.h>
+#include <assert.h>
 
 #ifdef __unix
     #include <unistd.h>
@@ -252,7 +253,8 @@ inline void dofmcalc_r(std::vector<std::map<int, int>>  &aggid_to_vectorlookups_
 	std::map<int, int> &aggid_to_vectorlookup = aggid_to_vectorlookups_[level_];
 
 	if (agg_vec.size() == 0) {
-		agg_vec.resize(aggid_to_vectorlookup.size());
+        int size = aggid_to_vectorlookup.size();
+        agg_vec.resize(size);
 	}
 	else {
 		for (unsigned int i = 0;i < agg_vec.size();i++) agg_vec[i].loss = 0;
@@ -324,21 +326,16 @@ void dofm(int event_id_, const std::vector<int> &items_, std::vector<vector<floa
 
 	std::map<int, int> &aggid_to_vectorlookup = aggid_to_vectorlookups[level];	
 
-	int current_sidx = 0;
-	int max_agg_id_used = 0;
 	std::map<fmlevelhdr, std::vector<fmlevelrec>> outmap;
 	fmlevelhdr fmhdr;
 	fmhdr.event_id = event_id_;
 	fmhdr.prog_id = 1;
 	fmhdr.layer_id = 1;
 
-	//policy_tc_key ptk;
-//	ptk.layer_id = 1;
-//	ptk.level_id = level;
 	const int layer_id = 1;
 	std::vector<std::vector<std::vector<policytcvidx>>> avxs;
 
-	avxs.resize(max_level_ + 1);
+    avxs.resize(max_level_ + 1);
 	if (event_guls_.size() > 0) {
 		auto &guls = event_guls_[0];		// pick any set of events they'll all have the same size we just want teh size
 		std::vector<std::vector<policytcvidx>> &avx = avxs[1];
@@ -361,11 +358,12 @@ void dofm(int event_id_, const std::vector<int> &items_, std::vector<vector<floa
 			
 		}
 		
-		int i = 0;
-		for (auto &x : aggid_to_vectorlookup) {
-			x.second = i;
-			i++;
-		}
+        // int i = 0;
+        //for (auto &x : aggid_to_vectorlookup) {
+        //    fprintf(stderr,"aggid = %d for avx[1][%d] \n",x.second,i);
+        //	x.second = i;
+        //	i++;
+        //}
 
 		for (unsigned int zzlevel = 2;zzlevel < avxs.size();zzlevel++) {
 			std::vector<std::vector<policytcvidx>>  &prev = avxs[zzlevel-1];
@@ -412,11 +410,11 @@ void dofm(int event_id_, const std::vector<int> &items_, std::vector<vector<floa
 
 				}
 			}
-			i = 0;
-			for (auto &x : aggid_to_vectorlookup) {		// setup aggid_to_vectorlookup for indexing agg_vec
-				x.second = i;
-				i++;
-			}
+            //int i = 0;
+            //for (auto &x : aggid_to_vectorlookup) {		// setup aggid_to_vectorlookup for indexing agg_vec
+            //	x.second = i;
+            //	i++;
+            //}
 		}
 	}
 
@@ -438,16 +436,51 @@ void dofm(int event_id_, const std::vector<int> &items_, std::vector<vector<floa
 				last_agg_id = agg_id;				 
 			}			
 			agg_vec[vec_idx].loss += guls[i];
-			agg_vec[vec_idx].agg_id = avx[1][i].agg_id;
-			agg_vec[vec_idx].item_idx = &avx[1][i].item_idx;
-			agg_vec[vec_idx].policytc_id = avx[1][i].policytc_id;
+            int vid = aggid_to_vectorlookup[agg_idx];
+            agg_vec[vec_idx].agg_id = avx[1][vid].agg_id;
+            agg_vec[vec_idx].item_idx = &avx[1][vid].item_idx;
+            agg_vec[vec_idx].policytc_id = avx[1][vid].policytc_id;
+
 
 		}
 
 		dofmcalc(agg_vec);
 		int sidx = idx;
 		if (sidx == 0) sidx = -1;
-		dofmcalc_r(aggid_to_vectorlookups, agg_vecs, level + 1, max_level_, outmap, fmhdr, sidx,avxs,1, items_, guls);
+
+        if (level == max_level_) {
+            int layer = 1;
+            fmlevelrec rec;
+            rec.sidx = sidx;
+            fmhdr.layer_id = layer;
+            for (auto x : agg_vec) {
+                if (x.allocrule_id == -1 || x.allocrule_id == 0 ) { // no back allocation
+                    fmhdr.output_id = x.agg_id;
+                    rec.loss = x.loss;
+                    outmap[fmhdr].push_back(rec);			// neglible cost
+                }
+                if (x.allocrule_id == 1) {	// back allocate as a proportion of the total of the original guls
+                    float gultotal = 0;
+                    int vec_idx = aggid_to_vectorlookup[x.agg_id];		// Same index applies to avx as to agg_vec
+                    for (int idx : avx[layer][vec_idx].item_idx) {
+                        gultotal += guls[idx];
+                    }
+                    for (int idx : avx[layer][vec_idx].item_idx) {
+                        float prop = guls[idx] / gultotal;
+                        fmhdr.output_id = items_[idx];
+                        rec.loss = x.loss * prop;
+                        outmap[fmhdr].push_back(rec);			// neglible cost
+                    }
+
+                }
+            }
+            if (layer < max_layer) {
+                layer++;
+                dofmcalc_r(aggid_to_vectorlookups, agg_vecs, level, max_level_, outmap, fmhdr, sidx, avxs, layer,items_, guls);
+            }
+        }else {
+            dofmcalc_r(aggid_to_vectorlookups, agg_vecs, level + 1, max_level_, outmap, fmhdr, sidx,avxs,1, items_, guls);
+        }
 
 	}
 	aggid_to_vectorlookups.clear();
@@ -588,11 +621,7 @@ void init_programme(int &maxLevel_)
 
 	int i = fread(&f, sizeof(f), 1, fin);
 	while (i != 0) {
-		pfmkey k; 
-
-		k.level_id = f.level_id;
 		if (maxLevel_ < f.level_id) maxLevel_ = f.level_id;
-		k.item_id = f.item_id;
 
 		if (pfm_vec_vec.size() < f.level_id + 1) {
 			pfm_vec_vec.resize(f.level_id + 1);

@@ -436,7 +436,7 @@ void dofm(int event_id_, const std::vector<int> &items_, std::vector<vector<floa
 				last_agg_id = agg_id;				 
 			}			
 			agg_vec[vec_idx].loss += guls[i];
-            int vid = aggid_to_vectorlookup[agg_idx];
+            int vid = aggid_to_vectorlookup[agg_id];
             agg_vec[vec_idx].agg_id = avx[1][vid].agg_id;
             agg_vec[vec_idx].item_idx = &avx[1][vid].item_idx;
             agg_vec[vec_idx].policytc_id = avx[1][vid].policytc_id;

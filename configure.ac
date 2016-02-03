@@ -70,6 +70,7 @@ AC_CONFIG_FILES([Makefile
                  src/randtobin/Makefile
                  src/evetocsv/Makefile
                  src/evetobin/Makefile
+                 src/gultobin/Makefile
                  src/getmodel/Makefile
                  src/gulcalc/Makefile
                  src/gultocsv/Makefile

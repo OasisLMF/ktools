@@ -40,18 +40,48 @@
 
 void doit()
 {
-    int eventid;
+
+  gulSampleslevel q;
     char line[4096];
     int lineno=0;
+  fgets(line, sizeof(line), stdin);
+  lineno++;
+  int gulstream_type = 16777217;
+  fwrite(&gulstream_type, sizeof(int), 1, stdout);
+  int samplesize = 1;
+  fwrite(&samplesize, sizeof(int), 1, stdout);
+  gulSampleslevelHeader gh;
+  gh.event_id = -1;
     while (fgets(line, sizeof(line), stdin) != 0)
     {
-       if (sscanf(line, "%d", &eventid) != 1){
+    if (sscanf(line, "%d,%d,%d,%f", &q.event_id, &q.item_id, &q.sidx, &q.gul) != 4){
            fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
            return;
        }
-       else
+      else
        {
-           fwrite(&eventid, sizeof(eventid), 1, stdout);
+          if (gh.event_id != q.event_id || gh.item_id != q.item_id){
+            if (gh.event_id != -1){
+              gulSampleslevelRec gr;
+              gr.sidx =  0;
+              gr.gul =  0;
+              fwrite(&gr, sizeof(gr), 1, stdout);  
+            }
+            gh.event_id = q.event_id;
+            gh.item_id = q.item_id;  
+            fwrite(&gh, sizeof(gh), 1, stdout);
+            gulSampleslevelRec gr;
+            gr.sidx = q.sidx;
+            gr.gul = q.gul;
+            fwrite(&gr, sizeof(gr), 1, stdout);
+          }else {
+            gulSampleslevelRec gr;
+            gr.sidx = q.sidx;
+            gr.gul = q.gul;
+            fwrite(&gr, sizeof(gr), 1, stdout);
+          }
+          
+          
        }
        lineno++;
     }
@@ -61,7 +91,7 @@ void doit()
 
 int main()
 {
-	initstreams("", "");
-    doit();
-    return 0;
+  initstreams("", "");
+  doit();
+  return 0;
 }

@@ -209,9 +209,10 @@ inline void dofmcalc(vector <LossRec> &agg_vec_)
 					for (auto y : profile.tc_vec) {
 						if (y.tc_id == deductible) ded = y.tc_val;					
 					}
+					// Function 11: Applies a floor on retained loss (minimum deductible)
 					float loss = 0;
 					if (x.retained_loss < ded) {
-						loss = x.loss - (ded - x.retained_loss);
+						loss = x.loss + x.retained_loss - ded;
 						if (loss < 0) loss = 0;
 						x.retained_loss = x.retained_loss + ( x.loss - loss);
 					}else {
@@ -235,6 +236,88 @@ inline void dofmcalc(vector <LossRec> &agg_vec_)
 				}
 			}
 			break;
+			case 3:
+			{
+				float ded = 0;
+				float lim = 0;
+				for (auto y : profile.tc_vec) {
+					if (y.tc_id == deductible) ded = y.tc_val;
+					if (y.tc_id == limit) lim = y.tc_val;
+				}
+				//Function3 = IIf(Loss < Ded, 0, IIf(Loss > Ded, Lim, Loss))
+				float loss = x.loss;
+				if (loss < ded) loss = 0;
+				else loss = loss;
+				if (loss > lim) loss = lim;
+				x.retained_loss = x.retained_loss + ( x.loss - loss);
+				x.loss = loss;
+					}
+				}
+			}
+			break;
+			case 10:
+				{
+					float ded = 0;
+					for (auto y : profile.tc_vec) {
+						if (y.tc_id == deductible) ded = y.tc_val;					
+					}
+					// Function 10: Applies a cap on retained loss (maximum deductible)
+					float loss = 0;
+					if (x.retained_loss > ded) {
+						loss = x.loss + x.retained_loss - ded;
+						if (loss < 0) loss = 0;
+						x.retained_loss = x.retained_loss + ( x.loss - loss);
+					}else {
+						loss = x.loss;
+						// retained loss stays the same
+					}
+
+					x.loss = loss ;					
+				}
+				break;
+			case 5:
+			{				
+				float ded = 0;
+				float lim = 0;
+				for (auto y : profile.tc_vec) {
+					if (y.tc_id == deductible_prop_of_loss) ded = y.tc_val;
+					if (y.tc_id == limit_prop_of_loss) lim = y.tc_val;
+				}
+				//Function5 = Loss * (Lim - Ded)
+				float loss = x.loss * (lim - ded);
+				x.retained_loss = x.retained_loss + ( x.loss - loss);
+				x.loss = loss;
+			}
+			break;
+			case 9:
+			{				
+				float ded = 0;
+				float lim = 0;
+				for (auto y : profile.tc_vec) {
+					if (y.tc_id == deductible_prop_of_limit) ded = y.tc_val;
+					if (y.tc_id == limit) lim = y.tc_val;
+				}
+				//Function9 = IIf(Loss < (Ded * lim), 0, IIf(Loss > (ded* lim) + Lim, Lim, Loss - (Ded * lim))
+				float loss = x.loss - (ded * lim);
+				if (loss < 0) loss = 0;
+				if (loss > lim) loss = lim;
+				x.retained_loss = x.retained_loss + ( x.loss - loss);
+				x.loss = loss;
+			}
+			break;
+			case 14:
+			{				
+				float lim = 0;
+				for (auto y : profile.tc_vec) {
+					if (y.tc_id == limit) lim = y.tc_val;
+				}
+				//Function14 =  IIf(Loss > lim, Lim, Loss)
+				float loss = x.loss;
+				if (loss > lim) loss = lim;
+				x.retained_loss = x.retained_loss + ( x.loss - loss);
+				x.loss = loss;
+			}
+			break;			
 			default:
 			{
 				fprintf(stderr, "Unknown calc rule %d\n", profile.calcrule_id);

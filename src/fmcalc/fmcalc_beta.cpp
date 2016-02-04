@@ -355,7 +355,8 @@ inline void dofmcalc_r(std::vector<std::map<int, int>>  &aggid_to_vectorlookups_
 				agg_vec[vec_idx].agg_id = agg_id;
 				agg_vec[vec_idx].item_idx = &avx[layer_][vec_idx].item_idx;
 			}			
-			agg_vec[vec_idx].loss += prev_agg_vec[i].loss;						
+			agg_vec[vec_idx].loss += prev_agg_vec[i].loss;
+			agg_vec[vec_idx].retained_loss += prev_agg_vec[i].retained_loss;						
 		}
 		else {
 			fprintf(stderr, "Missing agg_id for index %d policytc_id: %d\n", i, prev_agg_vec[i].policytc_id);

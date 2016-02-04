@@ -46,6 +46,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <fcntl.h>
 #include <assert.h>
 
+#include <fenv.h>
 #ifdef __unix
     #include <unistd.h>
 #endif
@@ -284,6 +285,7 @@ inline void dofmcalc_r(std::vector<std::map<int, int>>  &aggid_to_vectorlookups_
 
 	if (level_ == max_level_) {
 		fmlevelrec rec;
+        rec.loss = 0;
 		rec.sidx = sidx_;
 		fmhdr_.layer_id = layer_;
 		for (auto x : agg_vec) {
@@ -299,7 +301,8 @@ inline void dofmcalc_r(std::vector<std::map<int, int>>  &aggid_to_vectorlookups_
 					gultotal += guls_[idx];
 				}
 				for (int idx : avx[layer_][vec_idx].item_idx) {
-					float prop = guls_[idx] / gultotal;
+                    float prop = 0;
+                    if (gultotal > 0) prop = guls_[idx] / gultotal;
 					fmhdr_.output_id = items_[idx];
 					rec.loss = x.loss * prop;
 					outmap_[fmhdr_].push_back(rec);			// neglible cost
@@ -451,6 +454,7 @@ void dofm(int event_id_, const std::vector<int> &items_, std::vector<vector<floa
         if (level == max_level_) {
             int layer = 1;
             fmlevelrec rec;
+            rec.loss = 0;
             rec.sidx = sidx;
             fmhdr.layer_id = layer;
             for (auto x : agg_vec) {
@@ -466,7 +470,8 @@ void dofm(int event_id_, const std::vector<int> &items_, std::vector<vector<floa
                         gultotal += guls[idx];
                     }
                     for (int idx : avx[layer][vec_idx].item_idx) {
-                        float prop = guls[idx] / gultotal;
+                        float prop = 0;
+                        if (gultotal > 0) prop = guls[idx] / gultotal;
                         fmhdr.output_id = items_[idx];
                         rec.loss = x.loss * prop;
                         outmap[fmhdr].push_back(rec);			// neglible cost
@@ -738,6 +743,7 @@ int main(int argc, char* argv[])
    // posix_fadvise(fileno(stdin), 0, 0, POSIX_FADV_SEQUENTIAL);
 #endif
      
+    feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
 	int maxlevel = 0;
 	init(maxlevel);
 	doit(maxlevel);

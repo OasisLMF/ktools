@@ -46,9 +46,10 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <fcntl.h>
 #include <assert.h>
 
-#include <fenv.h>
+
 #ifdef __unix
     #include <unistd.h>
+	#include <fenv.h>
 #endif
 
 #include <vector>
@@ -822,9 +823,10 @@ int main(int argc, char* argv[])
    
 #ifdef __unix
    // posix_fadvise(fileno(stdin), 0, 0, POSIX_FADV_SEQUENTIAL);
+       feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
 #endif
      
-    feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
+
 	int maxlevel = 0;
 	init(maxlevel);
 	doit(maxlevel);

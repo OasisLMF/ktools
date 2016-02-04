@@ -50,8 +50,6 @@
 
 
 #define BUFSIZE 4096
-bool verbose = false;
-bool raw_mode = false;
 
 unsigned int outputstreamtype = 1;	// OASIS STREAM TYPE
 
@@ -145,13 +143,7 @@ FILE *fin;
 
 void sendevent(int event_id_, std::map<int, idxrec> &imap_, int max_no_of_bins_, float *interpolation_)
 {
-	if (verbose) {
-		std::cerr << "Event id " << event_id_
-			<< " offset " << imap_[event_id_].offset
-			<< "\n"
-			;
-	}
-
+	
     long long offset = imap_[event_id_].offset;
 	int length = imap_[event_id_].length;
 	if (length == -1) {    
@@ -185,11 +177,9 @@ void sendevent(int event_id_, std::map<int, idxrec> &imap_, int max_no_of_bins_,
 		fwrite(&no_of_bins, sizeof(int), 1, stdout); // output count of bins being processed
 		float *q = binp;
 		for (i = 0; i < no_of_bins; i++){
-			fwrite(q, sizeof(float), 1, stdout);
-			if (raw_mode == false) {
-				float *bin_mean = interpolation_ + i;
-				fwrite(bin_mean, sizeof(float), 1, stdout);
-			}
+			fwrite(q, sizeof(float), 1, stdout);			
+			float *bin_mean = interpolation_ + i;
+			fwrite(bin_mean, sizeof(float), 1, stdout);			
 			q++;
 		}
 		int rec_length = sizeof(damagecdfrec) + sizeof(no_of_bins) + (sizeof(float)*no_of_bins);
@@ -233,7 +223,7 @@ void doit(int chunkid_)
 		exit(-1);
 	}
 
-	if (raw_mode == false) fwrite(&outputstreamtype, sizeof(outputstreamtype), 1, stdout);
+	fwrite(&outputstreamtype, sizeof(outputstreamtype), 1, stdout);
 
 	while (1){
 		if (fread(&event_id, sizeof(int), 1, stdin) != 1) break;        
@@ -245,31 +235,16 @@ void doit(int chunkid_)
 void usage()
 {
     std::cerr << "Usage: " << progname << " chunkid \n";
-    std::cerr << "Usage: " << progname << " chunkid  mode\n";
-    std::cerr << "Mode -r: raw mode\n";
     exit(-1);
 }
 int main(int argc, char *argv[])
 {
 	progname = argv[0];
-	if (argc < 2) usage();
-
-    if (argc == 3) {
-        std::string s = "-v";
-        if (argv[2] == s) verbose = true;
-        s = "-r";
-        if (argv[2] == s) raw_mode = true; // input = output no interpretation used for debugging
-    }
+	if (argc != 2) usage();
 
 	int chunkid = atoi(argv[1]);
-    std::string inFile = "";
-    std::string outFile = "";
-    if (argc == 4) {
-        inFile = argv[2];
-        outFile = argv[3];
-    }
 
-    initstreams(inFile, outFile);
+    initstreams("", "");
     doit(chunkid);
 
 }

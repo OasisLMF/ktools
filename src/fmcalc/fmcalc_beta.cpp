@@ -789,6 +789,7 @@ void help()
 
     cerr << "-I inputfilename\n"
         << "-O outputfielname\n"
+        << "-M maxlevel\n"
         ;
 }
 
@@ -798,16 +799,19 @@ int main(int argc, char* argv[])
 
     std::string inFile;
     std::string outFile;
-
+    int new_max = -1;
 #ifdef __unix
 	int opt;
-    while ((opt = getopt(argc, argv, "hI:O:")) != -1) {
+    while ((opt = getopt(argc, argv, "hI:O:M:")) != -1) {
         switch (opt) {
         case 'I':
             inFile = optarg;
             break;
          case 'O':
             outFile = optarg;
+            break;
+         case 'M':
+            new_max = atoi(optarg);
             break;
         case 'h':
            help();
@@ -829,6 +833,7 @@ int main(int argc, char* argv[])
 
 	int maxlevel = 0;
 	init(maxlevel);
+	if (new_max > -1) maxlevel = new_max;
 	doit(maxlevel);
 	return 0;
 }

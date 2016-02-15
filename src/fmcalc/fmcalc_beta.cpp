@@ -196,7 +196,7 @@ inline void dofmcalc(vector <LossRec> &agg_vec_)
 				}
 				//Function2 = IIf(Loss < Ded, 0, IIf(Loss > Ded + Lim, Lim, Loss - Ded)) * Share	
 				float loss = 0;
-				if (x.loss > (ded + lim)) loss = limit;
+				if (x.loss > (ded + lim)) loss = lim;
 				else loss = x.loss - ded;
 				if (loss < 0) loss = 0;
 				x.retained_loss = x.retained_loss + ( x.loss - loss);

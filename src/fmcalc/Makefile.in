@@ -104,7 +104,7 @@ PROGRAMS = $(bin_PROGRAMS)
 am_fmcalc_OBJECTS = fmcalc.$(OBJEXT) mman.$(OBJEXT)
 fmcalc_OBJECTS = $(am_fmcalc_OBJECTS)
 fmcalc_LDADD = $(LDADD)
-am_fmcalc_beta_OBJECTS = fmcalc_beta.$(OBJEXT)
+am_fmcalc_beta_OBJECTS = fmcalc_beta.$(OBJEXT) main.$(OBJEXT)
 fmcalc_beta_OBJECTS = $(am_fmcalc_beta_OBJECTS)
 fmcalc_beta_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -296,7 +296,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 fmcalc_SOURCES = fmcalc.cpp mman.c
-fmcalc_beta_SOURCES = fmcalc_beta.cpp
+fmcalc_beta_SOURCES = fmcalc_beta.cpp main.cpp
 include_HEADERS = mman.h
 all: all-am
 
@@ -390,6 +390,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fmcalc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fmcalc_beta.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mman.Po@am__quote@
 
 .c.o:

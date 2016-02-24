@@ -37,6 +37,9 @@ Example implmentation for FM with back allocation
 Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 */
+
+#include "fmcalc.hpp"
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -52,11 +55,8 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 //	#include <fenv.h>
 #endif
 
-#include <vector>
-#include <map>
-
 using namespace std;
-#include "../include/oasis.hpp"
+
 
 // NOTE: we use multui dimensional arrays rather tham map with keys for performance resons
 struct fm_programme {
@@ -144,25 +144,9 @@ struct gulRec {
 	float gul;		// may want to cut down to singe this causes 4 byte padding for allignment
 };
 
-struct policytcvidx {
-	int policytc_id;
-	int agg_id;
-	int next_vidx = -1;
-	std::vector<int> item_idx;
-};
-
-struct LossRec {
-	float loss;
-	float retained_loss;
-	int agg_id;
-	int policytc_id;
-	int allocrule_id;
-	int next_vec_idx = -1;
-	const std::vector<int> *item_idx;
-};
 
 
-inline void dofmcalc(vector <LossRec> &agg_vec_)
+inline void fmcalc::dofmcalc(vector <LossRec> &agg_vec_)
 {
 	for (LossRec &x : agg_vec_) {
 		const profile_rec &profile = profile_vec[x.policytc_id];		
@@ -325,7 +309,7 @@ inline void dofmcalc(vector <LossRec> &agg_vec_)
 	}
 }
 
-inline void dofmcalc_r(std::vector<std::map<int, int>>  &aggid_to_vectorlookups_, vector<vector <LossRec>> &agg_vecs_, int level_, int max_level_,
+inline void fmcalc::dofmcalc_r(std::vector<std::map<int, int>>  &aggid_to_vectorlookups_, vector<vector <LossRec>> &agg_vecs_, int level_, int max_level_,
 	std::map<fmlevelhdr, std::vector<fmlevelrec> > &outmap_, fmlevelhdr &fmhdr_, int sidx_, const std::vector<std::vector<std::vector<policytcvidx>>> &avxs_, int layer_, 
 	const std::vector<int> &items_, const std::vector<float> &guls_)
 {
@@ -404,11 +388,11 @@ inline void dofmcalc_r(std::vector<std::map<int, int>>  &aggid_to_vectorlookups_
 	}
 }
 
-void dofm(int event_id_, const std::vector<int> &items_, std::vector<vector<float>> &event_guls_, int max_level_)
+void fmcalc::dofm(int event_id_, const std::vector<int> &items_, std::vector<vector<float>> &event_guls_)
 {
 	
 	const int level = 1;
-	std::vector<std::map<int, int>>  aggid_to_vectorlookups(max_level_ + 1);
+	std::vector<std::map<int, int>>  aggid_to_vectorlookups(maxLevel_ + 1);
 
 	std::map<int, int> &aggid_to_vectorlookup = aggid_to_vectorlookups[level];	
 
@@ -421,7 +405,7 @@ void dofm(int event_id_, const std::vector<int> &items_, std::vector<vector<floa
 	const int layer_id = 1;
 	std::vector<std::vector<std::vector<policytcvidx>>> avxs;
 
-    avxs.resize(max_level_ + 1);
+    avxs.resize(maxLevel_ + 1);
 	if (event_guls_.size() > 0) {
 		auto &guls = event_guls_[0];		// pick any set of events they'll all have the same size we just want teh size
 		std::vector<std::vector<policytcvidx>> &avx = avxs[1];
@@ -504,7 +488,7 @@ void dofm(int event_id_, const std::vector<int> &items_, std::vector<vector<floa
 		}
 	}
 
-	vector<vector <LossRec>>agg_vecs(max_level_ + 1);
+	vector<vector <LossRec>>agg_vecs(maxLevel_ + 1);
 	vector <LossRec> &agg_vec = agg_vecs[level];
 
 	agg_vec.resize(aggid_to_vectorlookup.size());
@@ -534,7 +518,7 @@ void dofm(int event_id_, const std::vector<int> &items_, std::vector<vector<floa
 		int sidx = idx;
 		if (sidx == 0) sidx = -1;
 
-        if (level == max_level_) {
+        if (level == maxLevel_) {
             int layer = 1;
             fmlevelrec rec;
             rec.loss = 0;
@@ -564,10 +548,10 @@ void dofm(int event_id_, const std::vector<int> &items_, std::vector<vector<floa
             }
             if (layer < max_layer) {
                 layer++;
-                dofmcalc_r(aggid_to_vectorlookups, agg_vecs, level, max_level_, outmap, fmhdr, sidx, avxs, layer,items_, guls);
+                dofmcalc_r(aggid_to_vectorlookups, agg_vecs, level, maxLevel_, outmap, fmhdr, sidx, avxs, layer,items_, guls);
             }
         }else {
-            dofmcalc_r(aggid_to_vectorlookups, agg_vecs, level + 1, max_level_, outmap, fmhdr, sidx,avxs,1, items_, guls);
+            dofmcalc_r(aggid_to_vectorlookups, agg_vecs, level + 1, maxLevel_, outmap, fmhdr, sidx,avxs,1, items_, guls);
         }
 
 	}
@@ -586,78 +570,7 @@ void dofm(int event_id_, const std::vector<int> &items_, std::vector<vector<floa
 }
 
 
-void doit(int &maxLevel_)
-{
-
-	unsigned int fmstream_type = 1 | fmstream_id;
-
-	fwrite(&fmstream_type, sizeof(fmstream_type), 1, stdout);
-
-	int gulstream_type = 0;
-	int i = fread(&gulstream_type, sizeof(gulstream_type), 1, stdin);
-
-	int stream_type = gulstream_type & gulstream_id;
-
-	if (stream_type != gulstream_id) {
-		std::cerr << "Not a gul stream type\n";
-		exit(-1);
-	}
-	stream_type = streamno_mask &gulstream_type;
-	if (stream_type != 1) {
-		std::cerr << "Unsupported gul stream type\n";
-		exit(-1);
-	}
-
-	int last_event_id = -1;
-	if (stream_type == 1) {
-		int samplesize = 0;
-		i = fread(&samplesize, sizeof(samplesize), 1, stdin);
-		fwrite(&samplesize, sizeof(samplesize), 1, stdout);
-		std::vector<vector<float>> event_guls(samplesize + 1);
-		std::vector<int> items;
-		items.reserve(500000);
-		while (i != 0) {
-			gulSampleslevelHeader gh;
-			i = fread(&gh, sizeof(gh), 1, stdin);
-			if (gh.event_id != last_event_id && i == 1) {
-				if (last_event_id != -1) {
-					dofm(last_event_id, items, event_guls, maxLevel_);
-				}
-
-				items.clear();
-				for (unsigned int i = 0;i < event_guls.size();i++) event_guls[i].clear();
-				last_event_id = gh.event_id;
-			}
-			if (i == 0) {
-				if (last_event_id != -1) {
-					dofm(last_event_id, items, event_guls, maxLevel_);
-				}
-			}
-			while (i != 0) {
-				gulSampleslevelRec gr;
-				i = fread(&gr, sizeof(gr), 1, stdin);
-				if (i == 0) {
-					dofm(last_event_id, items, event_guls, maxLevel_);
-					break;
-				}
-				if (gr.sidx == 0) break;
-				//				if (gr.sidx == mean_idx) gr.sidx = 0;
-				gulSampleslevelEventRec gs;
-				gs.item_id = gh.item_id;
-				gs.sidx = gr.sidx;
-				gs.gul = gr.gul;
-				if (gs.sidx >= -1) {
-					int sidx = gs.sidx;
-					if (sidx == -1) sidx = 0;
-					event_guls[sidx].push_back(gs.gul);
-				}
-				if (gr.sidx == -1)  items.push_back(gh.item_id);
-			}
-		}
-	}
-}
-
-void init_policytc()
+void fmcalc::init_policytc()
 {
 	std::ostringstream oss;
 	oss << "fm/fm_policytc.bin";
@@ -694,7 +607,7 @@ void init_policytc()
 
 }
 
-void init_programme(int &maxLevel_)
+void fmcalc::init_programme()
 {
 	std::ostringstream oss;
 	oss << "fm/fm_programme.bin";
@@ -737,7 +650,8 @@ inline void add_tc(unsigned char tc_id, float &tc_val, std::vector<tc_rec> &tc_v
 		tc_vec.push_back(t);
 	}
 }
-void init_profile()
+
+void fmcalc::init_profile()
 {
 
 	std::ostringstream oss;
@@ -778,63 +692,10 @@ void init_profile()
 	fclose(fin);
 }
 
-void init(int &maxLevel_)
+void fmcalc::init()
 {
 	init_policytc();
-	init_programme(maxLevel_);
+	init_programme();
 	init_profile();
 }
 
-void help()
-{
-
-    cerr << "-I inputfilename\n"
-        << "-O outputfielname\n"
-        << "-M maxlevel\n"
-        ;
-}
-
-
-int main(int argc, char* argv[])
-{
-
-    std::string inFile;
-    std::string outFile;
-    int new_max = -1;
-#ifdef __unix
-	int opt;
-    while ((opt = getopt(argc, argv, "hI:O:M:")) != -1) {
-        switch (opt) {
-        case 'I':
-            inFile = optarg;
-            break;
-         case 'O':
-            outFile = optarg;
-            break;
-         case 'M':
-            new_max = atoi(optarg);
-            break;
-        case 'h':
-           help();
-           exit(EXIT_FAILURE);
-        default:
-            help();
-            exit(EXIT_FAILURE);
-        }
-    }
-#endif
-
-   initstreams(inFile, outFile);
-   
-#ifdef __unix
-   // posix_fadvise(fileno(stdin), 0, 0, POSIX_FADV_SEQUENTIAL);
-   //    feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
-#endif
-     
-
-	int maxlevel = 0;
-	init(maxlevel);
-	if (new_max > -1) maxlevel = new_max;
-	doit(maxlevel);
-	return 0;
-}

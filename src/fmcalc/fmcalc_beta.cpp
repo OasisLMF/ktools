@@ -570,8 +570,10 @@ void fmcalc::dofm(int event_id_, const std::vector<int> &items_, std::vector<vec
 }
 
 
-void fmcalc::init_policytc()
+void fmcalc::init_policytc(int maxRunLevel)
 {
+    if (maxRunLevel == -1) maxRunLevel = 10000;
+
 	std::ostringstream oss;
 	oss << "fm/fm_policytc.bin";
 
@@ -585,29 +587,29 @@ void fmcalc::init_policytc()
 	int max_level = 0;
 	int i = fread(&f, sizeof(f), 1, fin);
 	while (i != 0) {
+        if 	(f.level_id <= maxRunLevel){
+            if (f.level_id > max_level) max_level = f.level_id;
+            if (f.layer_id > max_layer) max_layer = f.layer_id;
 	
-		if (f.level_id > max_level) max_level = f.level_id;
-		if (f.layer_id > max_layer) max_layer = f.layer_id;
-	
-		if (policy_tc_vec_vec_vec.size() < f.level_id + 1) {
-			policy_tc_vec_vec_vec.resize(f.level_id + 1);
-		}
-		if (policy_tc_vec_vec_vec[f.level_id].size() < f.agg_id + 1) {
-			policy_tc_vec_vec_vec[f.level_id].resize(f.agg_id + 1);
-		}
+            if (policy_tc_vec_vec_vec.size() < f.level_id + 1) {
+                policy_tc_vec_vec_vec.resize(f.level_id + 1);
+            }
+            if (policy_tc_vec_vec_vec[f.level_id].size() < f.agg_id + 1) {
+                policy_tc_vec_vec_vec[f.level_id].resize(f.agg_id + 1);
+            }
 
-		if (policy_tc_vec_vec_vec[f.level_id][f.agg_id].size() < f.layer_id + 1) {
-			policy_tc_vec_vec_vec[f.level_id][f.agg_id].resize(f.layer_id + 1);
-		}
-		policy_tc_vec_vec_vec[f.level_id][f.agg_id][f.layer_id] = f.PolicyTC_id;
-
+            if (policy_tc_vec_vec_vec[f.level_id][f.agg_id].size() < f.layer_id + 1) {
+                policy_tc_vec_vec_vec[f.level_id][f.agg_id].resize(f.layer_id + 1);
+            }
+            policy_tc_vec_vec_vec[f.level_id][f.agg_id][f.layer_id] = f.PolicyTC_id;
+        }
 		i = fread(&f, sizeof(f), 1, fin);
 	}
 	fclose(fin);
 
 }
 
-void fmcalc::init_programme()
+void fmcalc::init_programme(int maxRunLevel)
 {
 	std::ostringstream oss;
 	oss << "fm/fm_programme.bin";
@@ -619,22 +621,24 @@ void fmcalc::init_programme()
 	}
 
 	fm_programme f;
+    if (maxRunLevel == -1) maxRunLevel = 10000;
 
 	int i = fread(&f, sizeof(f), 1, fin);
 	while (i != 0) {
-		if (maxLevel_ < f.level_id) maxLevel_ = f.level_id;
+        if (f.level_id <= maxRunLevel){
+            if (maxLevel_ < f.level_id) maxLevel_ = f.level_id;
 
-		if (pfm_vec_vec.size() < f.level_id + 1) {
-			pfm_vec_vec.resize(f.level_id + 1);
-		}
-		if (pfm_vec_vec[f.level_id].size() < f.item_id + 1) {
-			pfm_vec_vec[f.level_id].resize(f.item_id + 1);
-		}
-		pfm_vec_vec[f.level_id][f.item_id] = f.agg_id;
-		if (f.agg_id == 0) {
-			fprintf(stderr, "Invalid agg id from fm_programme.bin\n");
-		}
-
+            if (pfm_vec_vec.size() < f.level_id + 1) {
+                pfm_vec_vec.resize(f.level_id + 1);
+            }
+            if (pfm_vec_vec[f.level_id].size() < f.item_id + 1) {
+                pfm_vec_vec[f.level_id].resize(f.item_id + 1);
+            }
+            pfm_vec_vec[f.level_id][f.item_id] = f.agg_id;
+            if (f.agg_id == 0) {
+                fprintf(stderr, "Invalid agg id from fm_programme.bin\n");
+            }
+        }
 		i = fread(&f, sizeof(f), 1, fin);
 	}
 	fclose(fin);
@@ -692,10 +696,10 @@ void fmcalc::init_profile()
 	fclose(fin);
 }
 
-void fmcalc::init()
+void fmcalc::init(int MaxRunLevel)
 {
-	init_policytc();
-	init_programme();
+    init_policytc(MaxRunLevel);
+    init_programme(MaxRunLevel);
 	init_profile();
 }
 

@@ -56,9 +56,8 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 void doit(int &maxLevel)
 {
-	fmcalc fc;
-	
-	if (maxLevel > -1) fc.setmaxlevel(maxLevel);
+    fmcalc fc(maxLevel);
+		
 
 	unsigned int fmstream_type = 1 | fmstream_id;
 

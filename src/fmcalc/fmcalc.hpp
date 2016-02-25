@@ -28,13 +28,13 @@ class fmcalc {
 public:
 	void setmaxlevel(int maxlevel) { if (maxlevel > -1) maxLevel_ = maxlevel; }
 	void dofm(int event_id_, const std::vector<int> &items_, std::vector<std::vector<float>> &event_guls_);
-	fmcalc() { init(); }
+	fmcalc(int maxRunLevel) { init(maxRunLevel); }
 private:
-	int maxLevel_;
-	void init_programme();
+	int maxLevel_ = 0;
+	void init_programme(int maxrunLevel);
 	void init_profile();
-	void init();
-	void init_policytc();
+	void init(int MaxRunLevel);
+	void init_policytc(int MaxRunLevel);
 	inline void dofmcalc_r(std::vector<std::map<int, int>>  &aggid_to_vectorlookups_, std::vector<std::vector <LossRec>> &agg_vecs_, 
 		int level_, int max_level_,	std::map<fmlevelhdr, std::vector<fmlevelrec> > &outmap_, 
 		fmlevelhdr &fmhdr_, int sidx_, const std::vector<std::vector<std::vector<policytcvidx>>> &avxs_, int layer_, 

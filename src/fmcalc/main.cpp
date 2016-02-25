@@ -51,8 +51,6 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
     #include <unistd.h>
 #endif
 
-#include "../include/oasis.hpp"
-
 
 void doit(int &maxLevel)
 {

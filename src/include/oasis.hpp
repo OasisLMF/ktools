@@ -38,6 +38,7 @@
 #include <fstream>
 #include <sstream>
 #include <string>
+#include <stdlib.h>
 
 #if defined(_MSC_VER) || defined(__MINGW32__)
 #include <fcntl.h>

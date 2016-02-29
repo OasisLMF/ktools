@@ -56,7 +56,7 @@ struct fm_programme {
 void doit()
 {
 
-    printf ("\"prog_id\", \"item_id\", \"level_id\",\"agg_id\"\n");
+    printf ("\"prog_id\", \"input_id\", \"level_id\",\"agg_id\"\n");
     
 
     fm_programme q;

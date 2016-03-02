@@ -300,6 +300,33 @@ inline void fmcalc::dofmcalc(vector <LossRec> &agg_vec_)
 				x.retained_loss = x.retained_loss + ( x.loss - loss);
 				x.loss = loss;
 			}
+			break;
+			case 15:
+			{
+				float lim = 0;
+				for (auto y : profile.tc_vec) {
+					if (y.tc_id == limit_prop_of_loss) lim = y.tc_val;
+				}
+				//Function15 =  Loss * lim
+				float loss = x.loss;
+				loss = loss * lim;
+				x.retained_loss = x.retained_loss + (x.loss - loss);
+				x.loss = loss;
+			}
+			break;
+			case 16:
+			{
+				float ded = 0;
+				for (auto y : profile.tc_vec) {
+					if (y.tc_id == deductible_prop_of_loss) ded = y.tc_val;
+				}
+				//Function16 =  Loss - (loss * ded)
+				float loss = x.loss;
+				loss = loss - (loss * ded);
+				if (loss < 0) loss = 0;
+				x.retained_loss = x.retained_loss + (x.loss - loss);
+				x.loss = loss;
+			}
 			break;	
 			default:
 			{

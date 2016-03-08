@@ -10,8 +10,9 @@ bd4c5080642fa638bec3bec9f10c7034 *eveout1_2.bin
 a9bb13f1aca9467759380281c1ad35c1 *eveout2_2.bin
 08ec8c4f70ed84b4c89993e4e073dad2 *exposures.bin
 0124c7bc8f8bf145d8a525f5f0bf6ccd *exposures.csv
-90ace8d9863bbe78762ba049ed5cbf68 *fm_data.bin
-dd91f25ca1098e2638d696bbce8e7a86 *fm_data.csv
+b3d3b20f37746795a62d314e737ba97f *fm_policytc.bin
+471f98cd0966cd47ddd96e022d8d29ab *fm_profile.bin
+db1047db812415a427b17b2cb0a6825b *fm_programme.bin
 69461c7915eb44e29fda387b5d1b6386 *fmcalcout1_1.bin
 a7c37a52df6b732cbfcf418bba6448f2 *fmcalcout1_1.csv
 964bcc3e94737c0e1dc5fee358ac113b *fmout1.csv

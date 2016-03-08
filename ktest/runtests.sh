@@ -72,8 +72,14 @@ installertest()
 
 	../src/cdfdatatocsv/cdfdatatocsv < ../examples/cdf/damage_cdf_chunk_1.bin > ../ktest/testout/damage_cdf_chunk_1.csv
 
-	../src/fmdatatocsv/fmdatatocsv < ../examples/fm/fm_data.bin > ../ktest/testout/fm_data.csv
-	../src/fmdatatobin/fmdatatobin < ../ktest/testout/fm_data.csv > ../ktest/testout/fm_data.bin
+	../src/fmprogrammetocsv/fmprogrammetocsv < ../examples/fm/fm_programme.bin > ../ktest/testout/fm_programme.csv
+	../src/fmprogrammetobin/fmprogrammetobin < ../ktest/testout/fm_programme.csv > ../ktest/testout/fm_programme.bin
+
+	../src/fmpolicytctocsv/fmpolicytctocsv < ../examples/fm/fm_policytc.bin > ../ktest/testout/fm_policytc.csv
+	../src/fmpolicytctobin/fmpolicytctobin < ../ktest/testout/fm_policytc.csv > ../ktest/testout/fm_policytc.bin
+
+	../src/fmprofiletocsv/fmprofiletocsv < ../examples/fm/fm_profile.bin > ../ktest/testout/fm_profile.csv
+	../src/fmprofiletobin/fmprofiletobin < ../ktest/testout/fm_profile.csv > ../ktest/testout/fm_profile.bin
 
 	../src/fmxreftocsv/fmxreftocsv < ../examples/fm/fmxref.bin > ../ktest/testout/fmxref.csv
 	../src/fmxreftobin/fmxreftobin < ../ktest/testout/fmxref.csv > ../ktest/testout/fmxref.bin

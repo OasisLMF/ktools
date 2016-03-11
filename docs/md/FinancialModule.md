@@ -46,7 +46,7 @@ The Profiles currently supported are as follows;
 | Limit as a proportion of loss                                      | 13        |   15        |
 | Deductible as a proportion of loss                                 | 14        |   16        |
 
-See [FM Profiles][fmprofiles.md) for more details. 
+See [FM Profiles](fmprofiles.md) for more details. 
 
 ## Design
 

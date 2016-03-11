@@ -7,7 +7,10 @@ The following components convert input data in csv format to the binary format r
 * **[exposuretobin](#exposuretobin)** is a utility to convert the Oasis exposure instance table into binary format. 
 * **[randtobin](#randtobin)** is a utility to convert a list of random numbers into binary format. 
 * **[cdfdatatobin](#cdfdatatobin)** is a utility to convert the Oasis cdf data into binary format.
-* **[fmdatatobin](#fmdatatobin)** is a utility to convert the Oasis FM instance data into binary format.
+* **[fmdatatobin](#fmdatatobin)** is a utility to convert the Oasis FM instance data into binary format (to be deprecated).
+* **[fmprogrammetobin](#fmprogrammetobin)** is a utility to convert the Oasis FM programme data into binary format.
+* **[fmprofiletobin](#fmprofiletobin)** is a utility to convert the Oasis FM profile data into binary format.
+* **[fmpolicytctobin](#fmpolicytctobin)** is a utility to convert the Oasis FM policytc data into binary format.
 * **[fmxreftobin](#fmxreftobin)** is a utility to convert the Oasis FM xref table into binary format.
 
 
@@ -25,7 +28,10 @@ The following components convert the binary input data required by the calculati
 * **[exposuretocsv](#exposuretocsv)** is a utility to convert the Oasis exposure instance binary into csv format.
 * **[randtocsv](#randtocsv)** is a utility to convert the random numbers binary into csv format.
 * **[cdfdatatocsv](#cdfdatatocsv)** is a utility to convert the Oasis cdf data binary into csv format.
-* **[fmdatatocsv](#fmdatatocsv)** is a utility to convert the Oasis FM instance binary into csv format.
+* **[fmdatatocsv](#fmdatatocsv)** is a utility to convert the Oasis FM instance binary into csv format (to be deprecated).
+* **[fmprogrammetocsv](#fmprogrammetocsv)** is a utility to convert the Oasis FM programme data into csv format.
+* **[fmprofiletocsv](#fmprofiletocsv)** is a utility to convert the Oasis FM profile data into csv format.
+* **[fmpolicytctocsv](#fmpolicytctocsv)** is a utility to convert the Oasis FM policytc data into csv format.
 * **[fmxreftocsv](#fmxreftocsv)** is a utility to convert the Oasis FM xref binary into csv format.
 
 These components are provided for convenience of viewing the data and debugging.
@@ -196,8 +202,8 @@ $ cdfdatatocsv < damage_cdf_chunk_1.bin > damage_cdf_chunk_1.csv
 [Return to top](#inputtools)
 
 <a id="fmdata"></a>
-## FM data 
-The fmdata binary file contains the policy terms and conditions required to perform a loss calculation, and is required for fmcalc only. The source format is Oasis FM Instance data, which is the Oasis native format data tables which describe an insurance programme. These four tables have been combined into one with the below structure.
+## fm data 
+The fm data binary file contains the policy terms and conditions required to perform a loss calculation, and is required for fmcalc only. The source format is Oasis FM Instance data, which is the Oasis native format data tables which describe an insurance programme. These four tables have been combined into one with the below structure.
 
 This file should be located in a fm sub-directory of the main working directory and have the following filename.
 * fm/fm_data.bin
@@ -237,10 +243,123 @@ $ fmdatatobin < fm_data.csv > fm_data.bin
 $ fmdatatocsv < fm_data.bin > fm_data.csv
 ``` 
 
+<a id="fmprogramme"></a>
+## fm programme 
+The fm programme binary file contains the level heirarchy and defines aggregations of losses required to perform a loss calculation, and is required for fmcalc only. 
+
+This file should be located in a fm sub-directory of the main working directory and have the following filename.
+* fm/fm_programme.bin
+
+#### File format
+The csv file should contain the following fields and include a header row.
+
+
+| Name                     | Type   |  Bytes | Description                                    | Example     |
+|:-------------------------|--------|--------| :----------------------------------------------|------------:|
+| prog_id                  | int    |    4   | Oasis Financial Module prog_id                 |    1        |
+| from_agg_id              | int    |    4   | Oasis Financial Module from_agg_id             |    1        |
+| level_id                 | int    |    4   | Oasis Financial Module level_id                |     1       |
+| to_agg_id                | int    |    4   | Oasis Financial Module to_agg_id               |     1       |
+
+* All fields must have integer values and no nulls
+* Must have at least one level where level_id = 1, 2, 3 ...
+* For level_id = 1, the set of values in from_agg_id must be equal to the set of item_ids in the input ground up loss stream (which has fields event_id, item_id, idx, gul).  Therefore level 1 always defines a group of items.
+* For subsequent levels, the from_agg_id must be the distinct values from the previous level to_agg_id field.
+* Each programme table may only have a single integer value in prog_id. Note that this field is a cross-reference to a separate prog dictionary and business meaningful information such as account number, and is not currently used in calculations.  This field may be deprecated in future versions.
+* The from_agg_id and to_agg_id values, for each level, should be a contiguous block of integers (a sequence with no gaps).  This is not a strict rule in this version and it will work with non-contiguous integers, but it is recommended as best practice.
+
+#### fmprogrammetobin
+```
+$ fmprogrammetobin < fm_programme.csv > fm_programme.bin
+``` 
+
+#### fmprogrammetocsv
+```
+$ fmprogrammetocsv < fm_programme.bin > fm_programme.csv
+```
+
+<a id="fmprofile"></a>
+## fm profile
+The fmprofile binary file contains the list of calculation rules with profile values (policytc_ids) that appear in the policytc file. This is required for fmcalc only. 
+
+This file should be located in a fm sub-directory of the main working directory and have the following filename.
+* fm/fm_profile.bin
+
+#### File format
+The csv file should contain the following fields and include a header row.
+
+| Name                     | Type   |  Bytes | Description                                    | Example     |
+|:-------------------------|--------|--------| :----------------------------------------------|------------:|
+| policytc_id              | int    |    4   | Oasis Financial Module policytc_id             |     34      |
+| calcrule_id              | int    |    4   | Oasis Financial Module calcrule_id             |      1      |
+| allocrule_id             | int    |    4   | Oasis Financial Module allocrule_id            |      0      |
+| sourcerule_id            | int    |    4   | Oasis Financial Module sourcerule_id           |      0      |
+| levelrule_id             | int    |    4   | Oasis Financial Module levelrule_id            |      0      |
+| ccy_id                   | int    |    4   | Oasis Financial Module ccy_id                  |      0      |
+| deductible               | float  |    4   | Deductible                                     |   50        |
+| limit                    | float  |    4   | Limit                                          |   100000    |
+| share_prop_of_lim        | float  |    4   | Share/participation as a proportion of limit   |   0         |
+| deductible_prop_of_loss  | float  |    4   | Deductible as a proportion of loss             |   0         |
+| limit_prop_of_loss       | float  |    4   | Limit as a proportion of loss                  |   0         |
+| deductible_prop_of_tiv   | float  |    4   | Deductible as a proportion of TIV              |   0         |
+| limit_prop_of_tiv        | float  |    4   | Limit as a proportion of TIV                   |   0         |
+| deductible_prop_of_limit | float  |    4   | Deductible as a proportion of limit            |   0         |
+
+* All distinct policytc_id values that appear in the policytc table must appear once in the policytc_id field of the profile table. We suggest that policytc_id=1 is included by default using calcrule_id = 12 and DED = 0 as a default 'null' calculation rule whenever no terms and conditions apply to a particular level_id / agg_id in the policytc table.
+* All data fields that are required by the relevant profile must be provided, with the correct calcrule_id (see FM Profiles)
+* Any fields that are not required for the profile should be set to zero.
+* allocrule_id may be set to 0 or 1 for each policytc_id.  Generally, it is recommended to use 0 everywhere except for the final level calculations when back-allocated losses are required, else 0 everywhere.
+* The fields not currently used at all are ccy_id, sourcerule_id and levelrule_id
+
+#### fmprofiletobin
+```
+$ fmprofiletobin < fm_profile.csv > fm_profile.bin
+``` 
+
+#### fmprofiletocsv
+```
+$ fmprofiletocsv < fm_profile.bin > fm_profile.csv
+```
+
+<a id="fmpolicytc"></a>
+## fm policytc
+The fm policytc binary file contains the cross reference between the aggregations of losses defined in the fm programme file at a particular level and the calculation rule that should be applied as defined in the fm profile file. This is required for fmcalc only. 
+
+This file should be located in a fm sub-directory of the main working directory and have the following filename.
+* fm/fm_policytc.bin
+
+#### File format
+The csv file should contain the following fields and include a header row.
+
+
+| Name                     | Type   |  Bytes | Description                                    | Example     |
+|:-------------------------|--------|--------| :----------------------------------------------|------------:|
+| prog_id                  | int    |    4   | Oasis Financial Module prog_id                 |    1        |
+| layer_id                 | int    |    4   | Oasis Financial Module layer_id                |    1        |
+| level_id                 | int    |    4   | Oasis Financial Module level_id                |     1       |
+| agg_id                   | int    |    4   | Oasis Financial Module agg_id                  |     1       |
+| policytc_id              | int    |    4   | Oasis Financial Module policytc_id             |     1       |
+
+* All fields must have integer values and no nulls
+* Must contain the same levels as the fm programme where level_id = 1, 2, 3 ...
+* For every distinct combination of to_agg_id and level_id in the programme table, there must be a corresponding record matching level_id and agg_id values in the policytc table with a valid value in the policytc_id field.  
+* layer_id = 1 at all levels except the last where there may be multiple layers, with layer_id = 1, 2, 3 ... This allows for the specification of several policy contracts applied to the same aggregation of losses defined in the programme table.
+ 
+#### fmpolicytctobin
+```
+$ fmpolicytctobin < fm_policytc.csv > fm_policytc.bin
+``` 
+
+#### fmpolicytctocsv
+```
+$ fmpolicytctocsv < fm_policytc.bin > fm_policytc.csv
+```
+
 [Return to top](#inputtools)
 
+
 <a id="fmxref"></a>
-## FM xref 
+## fm xref 
 The fmxref binary file contains cross reference data linking the output_id in the fmcalc output back to item_id, and is required for outputcalc only. This should be located in a fm sub-directory of the main working directory and have the following filename.
 
 * fm/fmxref.bin

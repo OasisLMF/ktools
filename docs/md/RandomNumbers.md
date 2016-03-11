@@ -80,4 +80,6 @@ In Oasis classic, random numbers are held in a matrix with the sample index in c
 
 In reconciliation mode, the divisor D is set to the total number of rows. This is calculated from the number of columns S which is the first 4 byte integer value in the random number file.
 
+[Go to Financial Module](FinancialModule.md)
+
 [Back to Contents](Contents.md)

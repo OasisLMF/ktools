@@ -9,7 +9,7 @@ all: ../pdf/ktools.pdf ../epub/ktools.epub
 	wkhtmltopdf  ../html/Introduction.html ../html/Contents.html  ../html/Overview.html  ../html/Specification.html ../html/ReferenceModel.html ../html/Inputtools.html ../html/Outputtools.html ../html/PlannedWork.html ../html/RandomNumbers.html ../epub/ktools.epub
  
 ../pdf/ktools.pdf: $(patsubst %.md,../html/%.html,$(wildcard *.md)) ../html/README.html Makefile 
-	wkhtmltopdf  ../html/Introduction.html ../html/Contents.html  ../html/Overview.html  ../html/Specification.html ../html/ReferenceModel.html ../html/Inputtools.html ../html/Outputtools.html ../html/PlannedWork.html ../html/RandomNumbers.html ../pdf/ktools.pdf
+	wkhtmltopdf  ../html/Introduction.html ../html/Contents.html  ../html/Overview.html  ../html/Specification.html ../html/ReferenceModel.html ../html/Inputtools.html ../html/Outputtools.html ../html/PlannedWork.html ../html/RandomNumbers.html ../html/FinancialModule.html  ../html/fmprofiles.html ../pdf/ktools.pdf
  
 
 clean:

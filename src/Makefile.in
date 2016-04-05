@@ -300,7 +300,7 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AUTOMAKE_OPTIONS = foreign
-SUBDIRS = gulcalc getmodel eve cdftocsv outputcalc gultocsv fmcalc fmtocsv fmdatatocsv fmdatatobin cdfdatatocsv cdfdatatobin randtocsv evetocsv evetobin randtobin exposuretobin exposuretocsv damagetobin damagetocsv fmxreftocsv fmxreftobin fmprofiletocsv fmpolicytctocsv  fmpolicytctobin fmprofiletobin fmprogrammetobin fmprogrammetocsv gultobin
+SUBDIRS = gulcalc getmodel eve cdftocsv outputcalc gultocsv fmcalc fmtocsv cdfdatatocsv cdfdatatobin randtocsv evetocsv evetobin randtobin exposuretobin exposuretocsv damagetobin damagetocsv fmxreftocsv fmxreftobin fmprofiletocsv fmpolicytctocsv  fmpolicytctobin fmprofiletobin fmprogrammetobin fmprogrammetocsv gultobin
 include_HEADERS = include/oasis.hpp
 all: all-recursive
 

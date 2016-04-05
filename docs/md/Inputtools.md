@@ -7,7 +7,6 @@ The following components convert input data in csv format to the binary format r
 * **[exposuretobin](#exposuretobin)** is a utility to convert the Oasis exposure instance table into binary format. 
 * **[randtobin](#randtobin)** is a utility to convert a list of random numbers into binary format. 
 * **[cdfdatatobin](#cdfdatatobin)** is a utility to convert the Oasis cdf data into binary format.
-* **[fmdatatobin](#fmdatatobin)** is a utility to convert the Oasis FM instance data into binary format (to be deprecated).
 * **[fmprogrammetobin](#fmprogrammetobin)** is a utility to convert the Oasis FM programme data into binary format.
 * **[fmprofiletobin](#fmprofiletobin)** is a utility to convert the Oasis FM profile data into binary format.
 * **[fmpolicytctobin](#fmpolicytctobin)** is a utility to convert the Oasis FM policytc data into binary format.
@@ -28,7 +27,6 @@ The following components convert the binary input data required by the calculati
 * **[exposuretocsv](#exposuretocsv)** is a utility to convert the Oasis exposure instance binary into csv format.
 * **[randtocsv](#randtocsv)** is a utility to convert the random numbers binary into csv format.
 * **[cdfdatatocsv](#cdfdatatocsv)** is a utility to convert the Oasis cdf data binary into csv format.
-* **[fmdatatocsv](#fmdatatocsv)** is a utility to convert the Oasis FM instance binary into csv format (to be deprecated).
 * **[fmprogrammetocsv](#fmprogrammetocsv)** is a utility to convert the Oasis FM programme data into csv format.
 * **[fmprofiletocsv](#fmprofiletocsv)** is a utility to convert the Oasis FM profile data into csv format.
 * **[fmpolicytctocsv](#fmpolicytctocsv)** is a utility to convert the Oasis FM policytc data into csv format.
@@ -200,48 +198,6 @@ $ cdfdatatocsv < damage_cdf_chunk_1.bin > damage_cdf_chunk_1.csv
 ```
 
 [Return to top](#inputtools)
-
-<a id="fmdata"></a>
-## fm data 
-The fm data binary file contains the policy terms and conditions required to perform a loss calculation, and is required for fmcalc only. The source format is Oasis FM Instance data, which is the Oasis native format data tables which describe an insurance programme. These four tables have been combined into one with the below structure.
-
-This file should be located in a fm sub-directory of the main working directory and have the following filename.
-* fm/fm_data.bin
-
-#### File format
-The csv file should contain the following fields and include a header row.
-
-
-| Name                     | Type   |  Bytes | Description                                    | Example     |
-|:-------------------------|--------|--------| :----------------------------------------------|------------:|
-| item_id                  | int    |    4   | Identifier of the exposure item                |    56745    |
-| agg_id                   | int    |    4   | Oasis Financial Module agg_id                  |     546     |
-| prog_id                  | int    |    4   | Oasis Financial Module prog_id                 |     4       |
-| level_id                 | int    |    4   | Oasis Financial Module level_id                |     1       |
-| policytc_id              | int    |    4   | Oasis Financial Module policytc_id             |     34      |
-| layer_id                 | int    |    4   | Oasis Financial Module layer_id                |      1      |
-| calcrule_id              | int    |    4   | Oasis Financial Module calcrule_id             |      2      |
-| allocrule_id             | int    |    4   | Oasis Financial Module allocrule_id            |      0      |
-| deductible               | float  |    4   | Deductible                                     |   50        |
-| limit                    | float  |    4   | Limit                                          |   100000    |
-| share_prop_of_lim        | float  |    4   | Share/participation as a proportion of limit   |   0.25      |
-| deductible_prop_of_loss  | float  |    4   | Deductible as a proportion of loss             |   0.05      |
-| limit_prop_of_loss       | float  |    4   | Limit as a proportion of loss                  |   0.5       |
-| deductible_prop_of_tiv   | float  |    4   | Deductible as a proportion of TIV              |   0.05      |
-| limit_prop_of_tiv        | float  |    4   | Limit as a proportion of TIV                   |   0.8       |
-| deductible_prop_of_limit | float  |    4   | Deductible as a proportion of limit            |   0.1       |
-
-The data should be ordered by item_id and not contain any nulls (replace with 0).
-
-#### fmdatatobin
-```
-$ fmdatatobin < fm_data.csv > fm_data.bin
-``` 
-
-#### fmdatatocsv
-```
-$ fmdatatocsv < fm_data.bin > fm_data.csv
-``` 
 
 <a id="fmprogramme"></a>
 ## fm programme 

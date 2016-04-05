@@ -12,10 +12,10 @@
 <h3 id="introduction">Introduction</h3>
 <p>This section specifies the components and data stream structures in the in-memory kernel.<br />These components are;</p>
 <ul>
-<li><strong><a href="#eve">eve</a></strong><br /></li>
-<li><strong><a href="#getmodel">getmodel</a></strong><br /></li>
-<li><strong><a href="#gulcalc">gulcalc</a></strong><br /></li>
-<li><strong><a href="#fmcalc">fmcalc</a></strong><br /></li>
+<li><strong><a href="#eve">eve</a></strong></li>
+<li><strong><a href="#getmodel">getmodel</a></strong></li>
+<li><strong><a href="#gulcalc">gulcalc</a></strong></li>
+<li><strong><a href="#fmcalc">fmcalc</a></strong></li>
 <li><strong><a href="#outputcalc">outputcalc</a></strong></li>
 </ul>
 <p>Most components have a standard input (stdin) and output (stdout) data stream structure. These data structures are not defined explicitly as meta data in the code as they would be in a database language, and they have been designed to minimise the volume flowing through the pipeline. For example, indexes which are common to a block of data are defined as a header record and then only the variable data records that are relevant to the header key are part of the data stream. The names of the data fields given below are unimportant, only their position in the data stream in order to perform the calculations defined in the program.</p>
@@ -76,8 +76,8 @@
 <p>The final calculation component, outputcalc, has no stream_id as it outputs results directly to csv.</p>
 <p>There are rules about which stream types can be accepted as inputs to the components. These are;</p>
 <ul>
-<li>gulcalc can only take stream type 0 (getmodel standard output) as input<br /></li>
-<li>fmcalc can only take stream type 1 (gulcalc standard output) as input<br /></li>
+<li>gulcalc can only take stream type 0 (getmodel standard output) as input</li>
+<li>fmcalc can only take stream type 1 (gulcalc standard output) as input</li>
 <li>outputcalc can take either stream type 1 (gulcalc standard output) or 2 (fmcalc standard output) as input</li>
 </ul>
 <p><a id="eve"></a></p>

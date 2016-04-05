@@ -12,15 +12,15 @@
 <p>This section provides an explanation of the reference model, which is an implementation of each of the components in the framework.</p>
 <p>The set of core components provided in this release is as follows;</p>
 <ul>
-<li><strong><a href="#eve">eve</a></strong> is the event distributing utility. Based on the number of events in the input and the number of processes specified as a parameter, eve outputs subsets of the events as a stream. The output streams into getmodel.<br /></li>
-<li><strong><a href="#getmodel">getmodel</a></strong> generates a stream of effective damageability cdfs for the input stream of events. The reference example reads in Oasis format damage cdf data from binary file. getmodel streams into gulcalc or can be output to a binary file.<br /></li>
-<li><strong><a href="#gulcalc">gulcalc</a></strong> performs the ground up loss sampling calculations and numerical integration. The output is the Oasis kernel gul sample table. This can be output to a binary file or streamed into fmcalc or outputcalc.<br /></li>
-<li><strong><a href="#fmcalc">fmcalc</a></strong> performs the insured loss calculations on the ground up loss samples and mean. The output is the Oasis format loss sample table. The functionality covered in fmcalc is the same as the current financial Module in Oasis R1.4 (see R1.2 Financial Module documentation for more information). The result can be output to a binary file or streamed into outputcalc.<br /></li>
+<li><strong><a href="#eve">eve</a></strong> is the event distributing utility. Based on the number of events in the input and the number of processes specified as a parameter, eve outputs subsets of the events as a stream. The output streams into getmodel.</li>
+<li><strong><a href="#getmodel">getmodel</a></strong> generates a stream of effective damageability cdfs for the input stream of events. The reference example reads in Oasis format damage cdf data from binary file. getmodel streams into gulcalc or can be output to a binary file.</li>
+<li><strong><a href="#gulcalc">gulcalc</a></strong> performs the ground up loss sampling calculations and numerical integration. The output is the Oasis kernel gul sample table. This can be output to a binary file or streamed into fmcalc or outputcalc.</li>
+<li><strong><a href="#fmcalc">fmcalc</a></strong> performs the insured loss calculations on the ground up loss samples and mean. The output is the Oasis format loss sample table. The functionality covered in fmcalc is the same as the current financial Module in Oasis R1.4 (see R1.2 Financial Module documentation for more information). The result can be output to a binary file or streamed into outputcalc.</li>
 <li><strong><a href="#outputcalc">outputcalc</a></strong> performs an output analysis on the ground up or loss samples. The reference example is an event loss table containing TIV, sample mean and standard deviation for each event at portfolio/programme summary level. The results are written directly into csv file as there is no downstream processing.</li>
 </ul>
 <p>Other components in the Reference Model include;</p>
 <ul>
-<li><strong><a href="Inputtools.html">Input data components</a></strong> to convert input data between csv and binary.<br /></li>
+<li><strong><a href="Inputtools.html">Input data components</a></strong> to convert input data between csv and binary.</li>
 <li><strong><a href="Outputtools.html">Output data components</a></strong> to convert the binary data stream output to csv.</li>
 </ul>
 <p>Figure 1 shows the data stream workflow of the reference model with its particular internal data files.</p>
@@ -35,8 +35,8 @@
 <p>None. The output stream is a simple list of event_ids (4 byte integers).</p>
 <h5 id="parameters">Parameters</h5>
 <ul>
-<li>chunk number - corresponds to the chunk number in the input file (see below)<br /></li>
-<li>process number - the process number that determines which partition of events are streamed out<br /></li>
+<li>chunk number - corresponds to the chunk number in the input file (see below)</li>
+<li>process number - the process number that determines which partition of events are streamed out</li>
 <li>number of processes - the total number of processes which determines the number of partitions</li>
 </ul>
 <h5 id="usage">Usage</h5>
@@ -91,7 +91,7 @@ $ getmodel 1 &lt; e_chunk1_data.bin &gt; cdf_chunk1.bin </code></pre>
 </ul>
 <p>And in a cdf specific subdirectory;</p>
 <ul>
-<li>cdf/damage_cdf_chunk_{chunk_id}.bin<br /></li>
+<li>cdf/damage_cdf_chunk_{chunk_id}.bin</li>
 <li>cdf/damage_cdf_chunk_{chunk_id}.idx</li>
 </ul>
 <p>The cdfs are ordered by event and streamed out in blocks for each event.</p>
@@ -122,11 +122,11 @@ $ getmodel 1 &lt; e_chunk1_data.bin &gt; cdf_chunk1.bin </code></pre>
 <h5 id="parameters-2">Parameters</h5>
 <p>The parameters are;</p>
 <ul>
-<li>-C chunk_id<br /></li>
-<li>-S number of samples<br /></li>
-<li>-R reconciliation mode (optional)<br /></li>
-<li>-r read random numbers from file (optional)<br /></li>
-<li>-L loss threshold (optional)<br /></li>
+<li>-C chunk_id</li>
+<li>-S number of samples</li>
+<li>-R reconciliation mode (optional)</li>
+<li>-r read random numbers from file (optional)</li>
+<li>-L loss threshold (optional)</li>
 <li>-d output random numbers (optional)</li>
 </ul>
 <h5 id="usage-2">Usage</h5>
@@ -140,7 +140,7 @@ $ gulcalc -C1 -S100 &lt; cdf_chunk1.bin &gt; gul_chunk1.bin </code></pre>
 <h5 id="internal-data-2">Internal data</h5>
 <p>The program requires the damage bin dictionary for the model and the exposure instance table, both as binary files. The files are picked up from the directory where the program is invoked and have the following filenames;</p>
 <ul>
-<li>damage_bin_dictionary.bin<br /></li>
+<li>damage_bin_dictionary.bin</li>
 <li>exposures.bin</li>
 </ul>
 <p>If the user specifies -r as a parameter, then the program also picks up a random number file from the working directory. The filename is;<br />random_{chunk_id}.bin</p>
@@ -149,8 +149,8 @@ $ gulcalc -C1 -S100 &lt; cdf_chunk1.bin &gt; gul_chunk1.bin </code></pre>
 <p>For each item cdf and for the number of samples specified, the program reads a random number from the random number file if the -r parameter is used and uses it to sample ground up loss from the cdf using one of three methods. If the -r parameter is not used, a random number is generated on the fly for each event and group of items which have a common group_id using the Mersenne twister psuedo random number generator (the default RNG of the C++ v11 compiler).</p>
 <p>For a given damage interval corresponding to a cumulative probability interval that each random number falls within;</p>
 <ul>
-<li>If the conditional mean damage (of the cdf) is the mid-point of the damage bin interval (of the damage bin dictionary) then the gulcalc program performs linear interpolation.<br /></li>
-<li>If the conditional mean damage is equal to the lower and upper damage threshold of the damage bin interval (i.e the bin represents a damage value, not a range) then that value is sampled.<br /></li>
+<li>If the conditional mean damage (of the cdf) is the mid-point of the damage bin interval (of the damage bin dictionary) then the gulcalc program performs linear interpolation.</li>
+<li>If the conditional mean damage is equal to the lower and upper damage threshold of the damage bin interval (i.e the bin represents a damage value, not a range) then that value is sampled.</li>
 <li>Else, the gulcalc program performs quadrative interpolation.</li>
 </ul>
 <p>An example of the three cases and methods is given below;</p>

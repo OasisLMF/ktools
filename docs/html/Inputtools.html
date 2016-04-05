@@ -11,12 +11,14 @@
 <h1 id="input-data-tools">Input data tools <a id="inputtools"></a></h1>
 <p>The following components convert input data in csv format to the binary format required by the calculation components in the reference model;</p>
 <ul>
-<li><strong><a href="#events">evetobin</a></strong> is a utility to convert a list of event_ids into binary format.<br /></li>
-<li><strong><a href="#damagebins">damagetobin</a></strong> is a utility to convert the Oasis damage bin dictionary table into binary format.<br /></li>
-<li><strong><a href="#exposuretobin">exposuretobin</a></strong> is a utility to convert the Oasis exposure instance table into binary format.<br /></li>
-<li><strong><a href="#randtobin">randtobin</a></strong> is a utility to convert a list of random numbers into binary format.<br /></li>
-<li><strong><a href="#cdfdatatobin">cdfdatatobin</a></strong> is a utility to convert the Oasis cdf data into binary format.<br /></li>
-<li><strong><a href="#.htmlatatobin">.htmlatatobin</a></strong> is a utility to convert the Oasis FM instance data into binary format.<br /></li>
+<li><strong><a href="#events">evetobin</a></strong> is a utility to convert a list of event_ids into binary format.</li>
+<li><strong><a href="#damagebins">damagetobin</a></strong> is a utility to convert the Oasis damage bin dictionary table into binary format.</li>
+<li><strong><a href="#exposuretobin">exposuretobin</a></strong> is a utility to convert the Oasis exposure instance table into binary format.</li>
+<li><strong><a href="#randtobin">randtobin</a></strong> is a utility to convert a list of random numbers into binary format.</li>
+<li><strong><a href="#cdfdatatobin">cdfdatatobin</a></strong> is a utility to convert the Oasis cdf data into binary format.</li>
+<li><strong><a href="#fmprogrammetobin">fmprogrammetobin</a></strong> is a utility to convert the Oasis FM programme data into binary format.</li>
+<li><strong><a href="#fmprofiletobin">fmprofiletobin</a></strong> is a utility to convert the Oasis FM profile data into binary format.</li>
+<li><strong><a href="#fmpolicytctobin">fmpolicytctobin</a></strong> is a utility to convert the Oasis FM policytc data into binary format.</li>
 <li><strong><a href="#fmxreftobin">fmxreftobin</a></strong> is a utility to convert the Oasis FM xref table into binary format.</li>
 </ul>
 <p>These components are intended to allow users to generate the required input binaries from csv independently of the original data store and technical environment. All that needs to be done is first generate the csv files from the data store (SQL Server database, etc).</p>
@@ -25,12 +27,14 @@ Server Oasis back-end database. This component is specific to the implementation
 calculation back-end to the Oasis mid-tier which is why it is kept in a separate project.</code></pre>
 <p>The following components convert the binary input data required by the calculation components in the reference model into csv format;</p>
 <ul>
-<li><strong><a href="#events">evetocsv</a></strong> is a utility to convert the event binary into csv format.<br /></li>
-<li><strong><a href="#damagebins">damagetocsv</a></strong> is a utility to convert the Oasis damage bin dictionary binary into csv format.<br /></li>
-<li><strong><a href="#exposuretocsv">exposuretocsv</a></strong> is a utility to convert the Oasis exposure instance binary into csv format.<br /></li>
-<li><strong><a href="#randtocsv">randtocsv</a></strong> is a utility to convert the random numbers binary into csv format.<br /></li>
-<li><strong><a href="#cdfdatatocsv">cdfdatatocsv</a></strong> is a utility to convert the Oasis cdf data binary into csv format.<br /></li>
-<li><strong><a href="#.htmlatatocsv">.htmlatatocsv</a></strong> is a utility to convert the Oasis FM instance binary into csv format.<br /></li>
+<li><strong><a href="#events">evetocsv</a></strong> is a utility to convert the event binary into csv format.</li>
+<li><strong><a href="#damagebins">damagetocsv</a></strong> is a utility to convert the Oasis damage bin dictionary binary into csv format.</li>
+<li><strong><a href="#exposuretocsv">exposuretocsv</a></strong> is a utility to convert the Oasis exposure instance binary into csv format.</li>
+<li><strong><a href="#randtocsv">randtocsv</a></strong> is a utility to convert the random numbers binary into csv format.</li>
+<li><strong><a href="#cdfdatatocsv">cdfdatatocsv</a></strong> is a utility to convert the Oasis cdf data binary into csv format.</li>
+<li><strong><a href="#fmprogrammetocsv">fmprogrammetocsv</a></strong> is a utility to convert the Oasis FM programme data into csv format.</li>
+<li><strong><a href="#fmprofiletocsv">fmprofiletocsv</a></strong> is a utility to convert the Oasis FM profile data into csv format.</li>
+<li><strong><a href="#fmpolicytctocsv">fmpolicytctocsv</a></strong> is a utility to convert the Oasis FM policytc data into csv format.</li>
 <li><strong><a href="#fmxreftocsv">fmxreftocsv</a></strong> is a utility to convert the Oasis FM xref binary into csv format.</li>
 </ul>
 <p>These components are provided for convenience of viewing the data and debugging.</p>
@@ -253,7 +257,7 @@ parallelized across the processes. This feature may be removed in future release
 <h2 id="cdfs">CDFs</h2>
 <p>One or more cdf data files are required for the getmodel component, as well as an index file containing the starting positions of each event block. These should be located in a cdf sub-directory of the main working directory and have the following filename format;</p>
 <ul>
-<li>cdf/damage_cdf_chunk_{chunk}.bin<br /></li>
+<li>cdf/damage_cdf_chunk_{chunk}.bin</li>
 <li>cdf/damage_cdf_chunk_{chunk}.idx</li>
 </ul>
 <p>If chunked, the binary file should contain the cdf data for the same events as the corresponding chunk event binary.</p>
@@ -309,16 +313,20 @@ parallelized across the processes. This feature may be removed in future release
 </table>
 <p>The data should be ordered by event_id, areaperil_id, vulnerability_id, bin_index ascending with bin_index starting at 1, and not contain nulls. All bins corresponding to the bin indexes in the damage bin dictionary should be present, except records may be truncated after the last bin where the prob_to = 1.</p>
 <h4 id="cdfdatatobin">cdfdatatobin</h4>
-<p>Not yet implemented. A component will be provided to produce both binary and index file from the csv.</p>
+<pre><code>$ cdfdatatobin damage_cdf_chunk_1 102 &lt; damage_cdf_chunk_1.bin</code></pre>
+<p>This command will create a binary file damage_cdf_chunk_1.bin and an index file damage_cdf_chunk_1.idx in the working directory.</p>
+<p>In general the usage is;</p>
+<pre><code>$ cdfdatatobin damage_cdf_chunk_[chunk] [maxbins] &lt; input.csv</code></pre>
+<p>chunk is an integer and maxbins is the maximum number of bins in the cdf. input.csv must conform to the csv format given above.</p>
 <h4 id="cdfdatatocsv">cdfdatatocsv</h4>
 <pre><code>$ cdfdatatocsv &lt; damage_cdf_chunk_1.bin &gt; damage_cdf_chunk_1.csv</code></pre>
 <p><a href="#inputtools">Return to top</a></p>
-<p><a id=".htmlata"></a></p>
-<h2 id="fm-data">FM data</h2>
-<p>The .htmlata binary file contains the policy terms and conditions required to perform a loss calculation, and is required for fmcalc only. The source format is Oasis FM Instance data, which is the Oasis native format data tables which describe an insurance programme. These four tables have been combined into one with the below structure.</p>
+<p><a id="fmprogramme"></a></p>
+<h2 id="fm-programme">fm programme</h2>
+<p>The fm programme binary file contains the level heirarchy and defines aggregations of losses required to perform a loss calculation, and is required for fmcalc only.</p>
 <p>This file should be located in a fm sub-directory of the main working directory and have the following filename.</p>
 <ul>
-<li>fm/fm_data.bin</li>
+<li>fm/fm_programme.bin</li>
 </ul>
 <h4 id="file-format-5">File format</h4>
 <p>The csv file should contain the following fields and include a header row.</p>
@@ -334,33 +342,67 @@ parallelized across the processes. This feature may be removed in future release
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">item_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
-<td align="left">Identifier of the exposure item</td>
-<td align="right">56745</td>
-</tr>
-<tr class="even">
-<td align="left">agg_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
-<td align="left">Oasis Financial Module agg_id</td>
-<td align="right">546</td>
-</tr>
-<tr class="odd">
 <td align="left">prog_id</td>
 <td align="left">int</td>
 <td align="left">4</td>
 <td align="left">Oasis Financial Module prog_id</td>
-<td align="right">4</td>
+<td align="right">1</td>
 </tr>
 <tr class="even">
+<td align="left">from_agg_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis Financial Module from_agg_id</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
 <td align="left">level_id</td>
 <td align="left">int</td>
 <td align="left">4</td>
 <td align="left">Oasis Financial Module level_id</td>
 <td align="right">1</td>
 </tr>
+<tr class="even">
+<td align="left">to_agg_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis Financial Module to_agg_id</td>
+<td align="right">1</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>All fields must have integer values and no nulls</li>
+<li>Must have at least one level where level_id = 1, 2, 3 ...</li>
+<li>For level_id = 1, the set of values in from_agg_id must be equal to the set of item_ids in the input ground up loss stream (which has fields event_id, item_id, idx, gul). Therefore level 1 always defines a group of items.</li>
+<li>For subsequent levels, the from_agg_id must be the distinct values from the previous level to_agg_id field.</li>
+<li>Each programme table may only have a single integer value in prog_id. Note that this field is a cross-reference to a separate prog dictionary and business meaningful information such as account number, and is not currently used in calculations. This field may be deprecated in future versions.</li>
+<li>The from_agg_id and to_agg_id values, for each level, should be a contiguous block of integers (a sequence with no gaps). This is not a strict rule in this version and it will work with non-contiguous integers, but it is recommended as best practice.</li>
+</ul>
+<h4 id="fmprogrammetobin">fmprogrammetobin</h4>
+<pre><code>$ fmprogrammetobin &lt; fm_programme.csv &gt; fm_programme.bin</code></pre>
+<h4 id="fmprogrammetocsv">fmprogrammetocsv</h4>
+<pre><code>$ fmprogrammetocsv &lt; fm_programme.bin &gt; fm_programme.csv</code></pre>
+<p><a id="fmprofile"></a></p>
+<h2 id="fm-profile">fm profile</h2>
+<p>The fmprofile binary file contains the list of calculation rules with profile values (policytc_ids) that appear in the policytc file. This is required for fmcalc only.</p>
+<p>This file should be located in a fm sub-directory of the main working directory and have the following filename.</p>
+<ul>
+<li>fm/fm_profile.bin</li>
+</ul>
+<h4 id="file-format-6">File format</h4>
+<p>The csv file should contain the following fields and include a header row.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Type</th>
+<th align="left">Bytes</th>
+<th align="left">Description</th>
+<th align="right">Example</th>
+</tr>
+</thead>
+<tbody>
 <tr class="odd">
 <td align="left">policytc_id</td>
 <td align="left">int</td>
@@ -369,24 +411,38 @@ parallelized across the processes. This feature may be removed in future release
 <td align="right">34</td>
 </tr>
 <tr class="even">
-<td align="left">layer_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
-<td align="left">Oasis Financial Module layer_id</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
 <td align="left">calcrule_id</td>
 <td align="left">int</td>
 <td align="left">4</td>
 <td align="left">Oasis Financial Module calcrule_id</td>
-<td align="right">2</td>
+<td align="right">1</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">allocrule_id</td>
 <td align="left">int</td>
 <td align="left">4</td>
 <td align="left">Oasis Financial Module allocrule_id</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">sourcerule_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis Financial Module sourcerule_id</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">levelrule_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis Financial Module levelrule_id</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">ccy_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis Financial Module ccy_id</td>
 <td align="right">0</td>
 </tr>
 <tr class="odd">
@@ -408,58 +464,131 @@ parallelized across the processes. This feature may be removed in future release
 <td align="left">float</td>
 <td align="left">4</td>
 <td align="left">Share/participation as a proportion of limit</td>
-<td align="right">0.25</td>
+<td align="right">0</td>
 </tr>
 <tr class="even">
 <td align="left">deductible_prop_of_loss</td>
 <td align="left">float</td>
 <td align="left">4</td>
 <td align="left">Deductible as a proportion of loss</td>
-<td align="right">0.05</td>
+<td align="right">0</td>
 </tr>
 <tr class="odd">
 <td align="left">limit_prop_of_loss</td>
 <td align="left">float</td>
 <td align="left">4</td>
 <td align="left">Limit as a proportion of loss</td>
-<td align="right">0.5</td>
+<td align="right">0</td>
 </tr>
 <tr class="even">
 <td align="left">deductible_prop_of_tiv</td>
 <td align="left">float</td>
 <td align="left">4</td>
 <td align="left">Deductible as a proportion of TIV</td>
-<td align="right">0.05</td>
+<td align="right">0</td>
 </tr>
 <tr class="odd">
 <td align="left">limit_prop_of_tiv</td>
 <td align="left">float</td>
 <td align="left">4</td>
 <td align="left">Limit as a proportion of TIV</td>
-<td align="right">0.8</td>
+<td align="right">0</td>
 </tr>
 <tr class="even">
 <td align="left">deductible_prop_of_limit</td>
 <td align="left">float</td>
 <td align="left">4</td>
 <td align="left">Deductible as a proportion of limit</td>
-<td align="right">0.1</td>
+<td align="right">0</td>
 </tr>
 </tbody>
 </table>
-<p>The data should be ordered by item_id and not contain any nulls (replace with 0).</p>
-<h4 id=".htmlatatobin">.htmlatatobin</h4>
-<pre><code>$ .htmlatatobin &lt; fm_data.csv &gt; fm_data.bin</code></pre>
-<h4 id=".htmlatatocsv">.htmlatatocsv</h4>
-<pre><code>$ .htmlatatocsv &lt; fm_data.bin &gt; fm_data.csv</code></pre>
+<ul>
+<li>All distinct policytc_id values that appear in the policytc table must appear once in the policytc_id field of the profile table. We suggest that policytc_id=1 is included by default using calcrule_id = 12 and DED = 0 as a default 'null' calculation rule whenever no terms and conditions apply to a particular level_id / agg_id in the policytc table.</li>
+<li>All data fields that are required by the relevant profile must be provided, with the correct calcrule_id (see FM Profiles)</li>
+<li>Any fields that are not required for the profile should be set to zero.</li>
+<li>allocrule_id may be set to 0 or 1 for each policytc_id. Generally, it is recommended to use 0 everywhere except for the final level calculations when back-allocated losses are required, else 0 everywhere.</li>
+<li>The fields not currently used at all are ccy_id, sourcerule_id and levelrule_id</li>
+</ul>
+<h4 id="fmprofiletobin">fmprofiletobin</h4>
+<pre><code>$ fmprofiletobin &lt; fm_profile.csv &gt; fm_profile.bin</code></pre>
+<h4 id="fmprofiletocsv">fmprofiletocsv</h4>
+<pre><code>$ fmprofiletocsv &lt; fm_profile.bin &gt; fm_profile.csv</code></pre>
+<p><a id="fmpolicytc"></a></p>
+<h2 id="fm-policytc">fm policytc</h2>
+<p>The fm policytc binary file contains the cross reference between the aggregations of losses defined in the fm programme file at a particular level and the calculation rule that should be applied as defined in the fm profile file. This is required for fmcalc only.</p>
+<p>This file should be located in a fm sub-directory of the main working directory and have the following filename.</p>
+<ul>
+<li>fm/fm_policytc.bin</li>
+</ul>
+<h4 id="file-format-7">File format</h4>
+<p>The csv file should contain the following fields and include a header row.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Type</th>
+<th align="left">Bytes</th>
+<th align="left">Description</th>
+<th align="right">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">prog_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis Financial Module prog_id</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">layer_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis Financial Module layer_id</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">level_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis Financial Module level_id</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">agg_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis Financial Module agg_id</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">policytc_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis Financial Module policytc_id</td>
+<td align="right">1</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>All fields must have integer values and no nulls</li>
+<li>Must contain the same levels as the fm programme where level_id = 1, 2, 3 ...</li>
+<li>For every distinct combination of to_agg_id and level_id in the programme table, there must be a corresponding record matching level_id and agg_id values in the policytc table with a valid value in the policytc_id field.<br /></li>
+<li>layer_id = 1 at all levels except the last where there may be multiple layers, with layer_id = 1, 2, 3 ... This allows for the specification of several policy contracts applied to the same aggregation of losses defined in the programme table.</li>
+</ul>
+<h4 id="fmpolicytctobin">fmpolicytctobin</h4>
+<pre><code>$ fmpolicytctobin &lt; fm_policytc.csv &gt; fm_policytc.bin</code></pre>
+<h4 id="fmpolicytctocsv">fmpolicytctocsv</h4>
+<pre><code>$ fmpolicytctocsv &lt; fm_policytc.bin &gt; fm_policytc.csv</code></pre>
 <p><a href="#inputtools">Return to top</a></p>
 <p><a id="fmxref"></a></p>
-<h2 id="fm-xref">FM xref</h2>
+<h2 id="fm-xref">fm xref</h2>
 <p>The fmxref binary file contains cross reference data linking the output_id in the fmcalc output back to item_id, and is required for outputcalc only. This should be located in a fm sub-directory of the main working directory and have the following filename.</p>
 <ul>
 <li>fm/fmxref.bin</li>
 </ul>
-<h4 id="file-format-6">File format</h4>
+<h4 id="file-format-8">File format</h4>
 <p>The csv file should contain the following fields and include a header row.</p>
 <table>
 <thead>

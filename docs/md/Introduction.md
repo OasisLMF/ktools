@@ -36,14 +36,12 @@ The set of components in the Reference Model provided is as follows;
 * **exposuretobin** is a utility to convert the Oasis exposure instance table into binary format. 
 * **randtobin** is a utility to convert a list of random numbers into binary format. 
 * **cdfdatatobin** is a utility to convert the Oasis cdf data into binary format.
-* **fmdatatobin** is a utility to convert the Oasis FM instance data into binary format.
 * **fmxreftobin** is a utility to convert the Oasis FM xref table into binary format.
 * **evetocsv** is a utility to convert the event binary into csv format.
 * **damagetocsv** is a utility to convert the Oasis damage bin dictionary binary into csv format.
 * **exposuretocsv** is a utility to convert the Oasis exposure instance binary into csv format.
 * **randtocsv** is a utility to convert the random numbers binary into csv format.
 * **cdfdatatocsv** is a utility to convert the Oasis cdf data binary into csv format.
-* **fmdatatocsv** is a utility to convert the Oasis FM instance binary into csv format.
 * **fmxreftocsv** is a utility to convert the Oasis FM xref binary into csv format.
  
 ### Usage

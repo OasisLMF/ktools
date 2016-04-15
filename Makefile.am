@@ -1,3 +1,3 @@
 AUTOMAKE_OPTIONS = foreign
-EXTRA_DIST = winconfigure examples.tar.gz
+EXTRA_DIST = win32configure  win64configure examples.tar.gz
 SUBDIRS = src ktest

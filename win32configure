@@ -14,11 +14,5 @@ if [ "$SYSNAME" = "Cygwin" ]; then
    touch ktest/cwbld
    exit 0
 else
-   DIST_ID=`lsb_release -i -s`
-   if [ "$DIST_ID" = "Ubuntu" ]; then
-	./configure  --host x86_64-w64-mingw32 --prefix=/cygdrive/c/oasis
-   	touch ktest/uwbld
-	exit 0
-   fi
    echo "Must run this under cygwin"
 fi

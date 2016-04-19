@@ -69,13 +69,21 @@ Download and run the set-up program for Cygwin.
 The following Cygwin add-in packages are required;
 * gcc-g++
 * gcc-core
-* mingw64-i686-gcc-g++
-* mingw64-i686-gcc-core
 * make
 * diffutils
 * automake
 
-Search for 'gcc', 'make' and 'diffutils' to find all of the relevant packages (Only 'gcc' illustrated below).
+To build Windows 32-bit executables;
+
+* mingw64-i686-gcc-g++
+* mingw64-i686-gcc-core
+
+To build Windows 64-bit executables;
+
+* mingw64-x86_64-gcc-g++
+* mingw64-x86_64-gcc-core
+
+Search for 'mingw', gcc', 'make' and 'diffutils' to find all of the relevant packages (Only 'gcc' illustrated below).
 ![alt text](docs/img/cygwin1.jpg "Add-in packages")
 
 ### Instructions
@@ -94,9 +102,16 @@ $ tar -xvf ktools-[version].tar.gz
 ```
 
 Go into the ktools folder and configure using the following command;
+
+To build Windows 32-bit executables;
 ``` sh
 $ cd ktools-[version]
-$ ./winconfigure
+$ ./win32configure
+```
+or, to build Windows 64-bit executables;
+``` sh
+$ cd ktools-[version]
+$ ./win64configure
 ```
 
 Make using the following command;

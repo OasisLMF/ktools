@@ -118,8 +118,10 @@ int _bufsize = 0;
 
 int _bufoffset=0;
 
-bool getrec(char *rec_, FILE *stream, int recsize_)
+inline bool getrec(char *rec_, FILE *stream, int recsize_)
 {
+	if (fread(rec_, 1, recsize_, stream) == recsize_) return true;
+/*	
     int totalread = 0;
     while (totalread != recsize_){
         int ch = getc( stream );
@@ -130,8 +132,8 @@ bool getrec(char *rec_, FILE *stream, int recsize_)
         totalread++;
         rec_++;
     }
-
-	return true;
+*/
+	return false;
 
 }
 bool getdamagebindictionary(std::vector<damagebindictionary> &damagebindictionary_vec_)

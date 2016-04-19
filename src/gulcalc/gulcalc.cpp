@@ -78,11 +78,11 @@ struct exposure_key{
 
 bool operator<(const exposure_key& lhs, const exposure_key& rhs)
 {
-	if (lhs.vulnerability_id != rhs.vulnerability_id) {
-		return lhs.vulnerability_id < rhs.vulnerability_id;
+	if (lhs.areaperil_id != rhs.areaperil_id) {
+		return lhs.areaperil_id < rhs.areaperil_id;
 	}
 	else {
-		return lhs.areaperil_id < rhs.areaperil_id;
+		return lhs.vulnerability_id < rhs.vulnerability_id;
 	}
 }
 

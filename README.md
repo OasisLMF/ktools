@@ -8,7 +8,7 @@ Please click [here](https://github.com/OasisLMF/ktools/releases) to download the
 
 The source code will change on a regular basis but only the releases are supported. Support enquiries should be sent to support@oasislmf.org.
 
-The instructions for the Windows build below are for 32-bit executables as the Cygwin mingw cross compiler for Windows does not support 64-bit executables. Until an automated build process for 64-bit is made available, the 64-bit Windows executables will be provided with each release.
+There are build instructions for Windows 32-bit and 64-bit executables. 
 
 Note that the dynamic random number option in the Windows build uses a deterministic seed due to a bug in the mingw compiler. We recommend the random number file option (gulcalc -r) should be used in Windows. 
 

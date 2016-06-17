@@ -9,8 +9,10 @@ installertest()
 	mkdir -p testout
 	CTRL=ctrl
 
-	if [ -f cwbld ]; then
-		CTRL=wctrl
+	if [ -f cw32bld ]; then
+		CTRL=w32ctrl
+	elif [ -f cw64bld ]; then
+		CTRL=w64ctrl	
 	fi
 
 	if [ -f uwbld ]; then

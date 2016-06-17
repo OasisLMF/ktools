@@ -1,4 +1,9 @@
 #!/bin/sh
+
+rm -f ktest/cw32bld
+rm -f ktest/cw64bld
+rm -f ktest/uwbld
+
 touch aclocal.m4
 touch Makefile.in
 touch configure

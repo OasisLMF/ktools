@@ -11,7 +11,7 @@ rm -f ktest/uwbld
  
 if [ "$SYSNAME" = "Cygwin" ]; then
    ./configure  --build=x86_64 --host i686-w64-mingw32 --prefix=/cygdrive/c/oasis
-   touch ktest/cwbld
+   touch ktest/cw32bld
    exit 0
 else
    echo "Must run this under cygwin"

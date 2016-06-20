@@ -100,7 +100,7 @@ void help()
 {
 
 	std::cerr << "-i Intensitybins\n"
-		<< "-n No intenisty uncertainty\n";
+		<< "-n No intenisty uncertainty\n"
 		;
 }
 

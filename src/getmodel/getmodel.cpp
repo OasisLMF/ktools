@@ -108,6 +108,7 @@ void getmodel::getVulnerabilities()
         exit(EXIT_FAILURE);
     }
     int current_vulnerability_id = -1;
+	fread(&_num_damage_bins, sizeof(_num_damage_bins), 1, fin);
 
     while (fread(&vulnerability, sizeof(vulnerability), 1, fin) != 0) {
         if (vulnerability.vulnerability_id != current_vulnerability_id)
@@ -289,10 +290,8 @@ int getmodel::getVulnerabilityIndex(int intensity_bin_index, int damage_bin_inde
     return (intensity_bin_index - 1) + ((damage_bin_index - 1) * _num_intensity_bins);
 }
 
-void getmodel::init(int num_damage_bins)
+void getmodel::init()
 {
-    _num_damage_bins = num_damage_bins;
-
 	getIntensityInfo();
 
     getItems();

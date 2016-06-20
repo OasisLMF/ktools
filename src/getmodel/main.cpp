@@ -53,11 +53,11 @@ void help()
 		;
 }
 
-void doIt(int numDamageBins)
+void doIt()
 {
 
 	getmodel cdf_generator;
-	cdf_generator.init(numDamageBins);
+	cdf_generator.init();
 
 	int event_id = -1;
 	std::list<int> event_ids;
@@ -74,20 +74,15 @@ int main(int argc, char** argv)
 {
 	std::string inFile;
 	std::string outFile;
-    int numDamageBins = 100;
-	bool noIntensityUncertainty = false;
 	int opt;
-	while ((opt = getopt(argc, argv, "hI:O:d:M:")) != -1) {
+	while ((opt = getopt(argc, argv, "hI:O:")) != -1) {
 		switch (opt) {
 		case 'I':
 			inFile = optarg;
 			break;
 		case 'O':
 			outFile = optarg;
-			break;
-		case 'd':
-			numDamageBins = std::stoi(optarg);
-			break;
+			break;		
 		case 'h':
 			help();
 			exit(EXIT_FAILURE);
@@ -98,6 +93,6 @@ int main(int argc, char** argv)
 	}
 	
 	initstreams(inFile, outFile);
-	doIt(numDamageBins);
+	doIt();
 	return 0;
 }

@@ -12,7 +12,7 @@ public:
 
     getmodel();
     ~getmodel();
-    void init(int numDamageBins);
+    void init();
 	void doCdf(std::list<int> event_ids);
 
 private:

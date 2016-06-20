@@ -12,7 +12,7 @@ public:
 
     getmodel();
     ~getmodel();
-    void init(int numDamageBins, bool hasIntensityUncertainty=false);
+    void init(int numDamageBins);
 	void doCdf(std::list<int> event_ids);
 
 private:
@@ -21,8 +21,8 @@ private:
 	std::map<int, std::set<int>> _vulnerability_ids_by_area_peril;
 	std::set<int> _area_perils;
 	std::vector<float> _mean_damage_bins;
-    int _num_intensity_bins = 100;
-    int _num_damage_bins = 100;
+    int _num_intensity_bins = -1;
+    int _num_damage_bins = -1;
     int _has_intensity_uncertainty = false;
     Result* _temp_results;
 
@@ -30,7 +30,7 @@ private:
     void getExposures();
     void getDamageBinDictionary();
     void getItems();
-	void getIntensityBins();
+	void getIntensityInfo();
     void doCdfInner(std::list<int> &event_ids, std::map<int, EventIndex> &event_index_by_event_id);
     void doCdfInnerNoIntensityUncertainty(std::list<int> &event_ids, std::map<int, EventIndex> &event_index_by_event_id);
 

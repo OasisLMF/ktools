@@ -46,19 +46,18 @@
 
 void help()
 {
-	std::cerr 
-        << "-I input filename\n"
+	std::cerr
+		<< "-I input filename\n"
 		<< "-O output filename\n"
 		<< "-d number of damage bins\n"
-		<< "-n No intenisty uncertainty\n";
-
+		;
 }
 
-void doIt(int numDamageBins,  bool  hasIntensityUncertainty)
+void doIt(int numDamageBins)
 {
 
 	getmodel cdf_generator;
-	cdf_generator.init(numDamageBins, hasIntensityUncertainty);
+	cdf_generator.init(numDamageBins);
 
 	int event_id = -1;
 	std::list<int> event_ids;
@@ -78,7 +77,7 @@ int main(int argc, char** argv)
     int numDamageBins = 100;
 	bool noIntensityUncertainty = false;
 	int opt;
-	while ((opt = getopt(argc, argv, "hnI:O:d:M:")) != -1) {
+	while ((opt = getopt(argc, argv, "hI:O:d:M:")) != -1) {
 		switch (opt) {
 		case 'I':
 			inFile = optarg;
@@ -88,9 +87,6 @@ int main(int argc, char** argv)
 			break;
 		case 'd':
 			numDamageBins = std::stoi(optarg);
-			break;
-		case 'n':
-			noIntensityUncertainty=true;
 			break;
 		case 'h':
 			help();
@@ -102,6 +98,6 @@ int main(int argc, char** argv)
 	}
 	
 	initstreams(inFile, outFile);
-	doIt(numDamageBins, !noIntensityUncertainty);
+	doIt(numDamageBins);
 	return 0;
 }

@@ -140,15 +140,15 @@ void getmodel::getExposures()
     }
     fclose(fin);   
 }
-void getmodel::getIntensityBins()
+void getmodel::getIntensityInfo()
 {
 	FILE* fin = fopen(FOOTPRINT_FILE, "rb");
 	if (fin == nullptr) {
 		std::cerr << "Error opening " << FOOTPRINT_FILE << "\n";
 		exit(EXIT_FAILURE);
 	}
-	fread(&_num_intensity_bins, sizeof(_num_intensity_bins), 1, fin);
-	
+	fread(&_num_intensity_bins, sizeof(_num_intensity_bins), 1, fin);	
+	fread(&_has_intensity_uncertainty, sizeof(_has_intensity_uncertainty), 1, fin);
 	fclose(fin);
 }
 
@@ -289,12 +289,11 @@ int getmodel::getVulnerabilityIndex(int intensity_bin_index, int damage_bin_inde
     return (intensity_bin_index - 1) + ((damage_bin_index - 1) * _num_intensity_bins);
 }
 
-void getmodel::init(int num_damage_bins, bool has_intensity_uncertainty)
+void getmodel::init(int num_damage_bins)
 {
     _num_damage_bins = num_damage_bins;
-    _has_intensity_uncertainty = has_intensity_uncertainty;
 
-	getIntensityBins();
+	getIntensityInfo();
 
     getItems();
     //getExposures();

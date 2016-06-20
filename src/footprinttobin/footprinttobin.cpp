@@ -45,6 +45,7 @@ using namespace std;
 
 #include "../include/oasis.hpp"
 int intensity_bins_ = -1;
+int hasIntensityUncertainty_ = true;
 
 void doit()
 {
@@ -66,6 +67,8 @@ void doit()
 
 	fwrite(&intensity_bins_, sizeof(intensity_bins_), 1, foutx);
 	idx.offset += sizeof(intensity_bins_);
+	fwrite(&hasIntensityUncertainty_, sizeof(hasIntensityUncertainty_), 1, foutx);
+	idx.offset += sizeof(hasIntensityUncertainty_);
 	while (fgets(line, sizeof(line), stdin) != 0)
 	{
 		if (sscanf(line, "%d,%d,%d,%f", &event_id, &r.areaperil_id, &r.intensity_bin_id, &r.probability) != 4) {
@@ -96,7 +99,8 @@ void doit()
 void help()
 {
 
-	std::cerr << "-I Intensitybins\n"
+	std::cerr << "-i Intensitybins\n"
+		<< "-n No intenisty uncertainty\n";
 		;
 }
 
@@ -105,11 +109,14 @@ int main(int argc, char *argv[])
 {
 	int opt;
 	
-	while ((opt = getopt(argc, argv, "hI:")) != -1) {
+	while ((opt = getopt(argc, argv, "hni:")) != -1) {
 		switch (opt) {
-		case 'I':
+		case 'i':
 			intensity_bins_ = atoi(optarg);
 			break;		
+		case 'n':
+			hasIntensityUncertainty_ = false;
+			break;
 		case 'h':
 			help();
 			exit(EXIT_FAILURE);

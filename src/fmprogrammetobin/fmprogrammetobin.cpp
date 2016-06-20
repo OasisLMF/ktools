@@ -38,14 +38,6 @@
 
 #include "../include/oasis.hpp"
 
-struct fm_programme {
-	int prog_id;
-	int level_id;
-	int agg_id;
-	int item_id;
-};
-
-
 void doit()
 {
 
@@ -56,7 +48,7 @@ void doit()
 	lineno++;
     while (fgets(line, sizeof(line), stdin) != 0)
     {
-		if (sscanf(line, "%d,%d,%d,%d", &q.prog_id, &q.item_id, &q.level_id, &q.agg_id) != 4){
+		if (sscanf(line, "%d,%d,%d",  &q.from_agg_id, &q.level_id, &q.to_agg_id) != 3){
            fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
            return;
        }

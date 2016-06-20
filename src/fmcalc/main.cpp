@@ -46,11 +46,33 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <fcntl.h>
 #include <assert.h>
 #include "fmcalc.hpp"
+#include "../include/oasis.hpp"
+
+#if defined(_MSC_VER)
+#include "../wingetopt/wingetopt.h"
+#else
+#include <getopt.h>
+#endif
 
 #ifdef __unix
     #include <unistd.h>
 #endif
 
+int getmaxnoofitems()
+{
+	FILE *fin = fopen(ITEMS_FILE, "rb");
+	if (fin == NULL) {
+		fprintf(stderr,"Error cannot open items.bin");
+		exit(-1);
+	}
+
+	flseek(fin, 0L, SEEK_END);
+	long long p = fltell(fin);
+	p = p / sizeof(item);
+	fclose(fin);
+	return int(p);
+
+}
 
 void doit(int &maxLevel)
 {
@@ -70,6 +92,7 @@ void doit(int &maxLevel)
 		std::cerr << "Not a gul stream type\n";
 		exit(-1);
 	}
+
 	stream_type = streamno_mask &gulstream_type;
 	if (stream_type != 1) {
 		std::cerr << "Unsupported gul stream type\n";
@@ -81,9 +104,11 @@ void doit(int &maxLevel)
 		int samplesize = 0;
 		i = fread(&samplesize, sizeof(samplesize), 1, stdin);
 		fwrite(&samplesize, sizeof(samplesize), 1, stdout);
-		std::vector<std::vector<float>> event_guls(samplesize + 1);
+		std::vector<std::vector<float>> event_guls(samplesize + 2);	// one additional for mean and tiv
 		std::vector<int> items;
-		items.reserve(500000);
+		int max_no_of_items = getmaxnoofitems();
+		int current_item_index = 0;
+		
 		while (i != 0) {
 			gulSampleslevelHeader gh;
 			i = fread(&gh, sizeof(gh), 1, stdin);
@@ -109,29 +134,37 @@ void doit(int &maxLevel)
 					break;
 				}
 				if (gr.sidx == 0) break;
-				//				if (gr.sidx == mean_idx) gr.sidx = 0;
 				gulSampleslevelEventRec gs;
 				gs.item_id = gh.item_id;
 				gs.sidx = gr.sidx;
-				gs.gul = gr.gul;
-				if (gs.sidx >= -1) {
-					int sidx = gs.sidx;
-					if (sidx == -1) sidx = 0;
-					event_guls[sidx].push_back(gs.gul);
+				gs.loss = gr.loss;
+				if (gr.sidx >= mean_idx) {
+					if (gr.sidx == mean_idx) {
+						items.push_back(gh.item_id);
+						for (unsigned int i = 0; i < event_guls.size(); i++) event_guls[i].resize(items.size());
+						current_item_index = items.size() - 1;
+					}
+					int sidx = gs.sidx + 1;
+					if (gs.sidx == mean_idx) sidx = 1;
+					event_guls[sidx][current_item_index] = gs.loss;
+					if (gs.sidx == mean_idx) { // add additional row for tiv
+						sidx = 0;
+						gs.loss = fc.gettiv(gs.item_id);
+						event_guls[sidx][current_item_index] = gs.loss;
+					}					
 				}
-				if (gr.sidx == -1)  items.push_back(gh.item_id);
+				
 			}
 		}
 	}
 }
-
 
 void help()
 {
 
     std::cerr << "-I inputfilename\n"
         << "-O outputfielname\n"
-        << "-M maxlevel\n"
+        << "-M maxlevel (optional)\n"
         ;
 }
 
@@ -142,9 +175,10 @@ int main(int argc, char* argv[])
     std::string inFile;
     std::string outFile;
     int new_max = -1;
-#ifdef __unix
+	bool deprecated = false;
+
 	int opt;
-    while ((opt = getopt(argc, argv, "hI:O:M:")) != -1) {
+    while ((opt = getopt(argc, argv, "ohI:O:M:")) != -1) {
         switch (opt) {
         case 'I':
             inFile = optarg;
@@ -154,7 +188,7 @@ int main(int argc, char* argv[])
             break;
          case 'M':
             new_max = atoi(optarg);
-            break;
+            break;	
         case 'h':
            help();
            exit(EXIT_FAILURE);
@@ -163,19 +197,11 @@ int main(int argc, char* argv[])
             exit(EXIT_FAILURE);
         }
     }
-#endif
+
 
    initstreams(inFile, outFile);
    
-#ifdef __unix
-   // posix_fadvise(fileno(stdin), 0, 0, POSIX_FADV_SEQUENTIAL);
-   //    feenableexcept(FE_DIVBYZERO | FE_INVALID | FE_OVERFLOW);
-#endif
-     
-
-//	int maxlevel = 0;
-//	init(maxlevel);
-//	if (new_max > -1) maxlevel = new_max;
 	doit(new_max);
+   
 	return 0;
 }

@@ -9,8 +9,8 @@
 </head>
 <body>
 <h1 id="planned-work">Planned work</h1>
-<h4 id="generate-cdfs-in-getmodel">1. Generate cdfs in getmodel</h4>
-<p>The cdf data is assumed to be pre-calculated and read into ktools from binaries. This will be changed to calculate cdfs as part of getmodel from the model file inputs.</p>
+<h4 id="generate-cdf-data-component">1. Generate cdf data component</h4>
+<p>Reference examples of components that generate the input binaries from csv have been provided. One outstanding component to convert cdf data from csv to binary will be provided.</p>
 <h4 id="remove-chunk-concept-from-eve-and-getmodel">2. Remove chunk concept from eve and getmodel</h4>
 <p>The input data for the reference components eve and getmodel can be split across several files, where each is identified by a chunk_id under a fixed naming convention. Eve and getmodel have 'chunk_id' as an input parameter which identifies the relevant input binary file.</p>
 <p>Because chunk is an Oasis mid-tier concept, the chunk parameter will be removed and each internal data input to the ktools reference model will be a single consolidated file.</p>
@@ -26,8 +26,8 @@
 <p>The sample index field is currently a 4 byte integer format for simplicity of design but we estimate gulcalc stdout data volumes could be reduced by approximately 25% if we reduce it to 2 bytes. This would mean a maximum number of samples of 64,000.</p>
 <h4 id="add-random-number-limit-as-a-parameter-to-gulcalc">5. Add random number limit as a parameter to gulcalc</h4>
 <p>There is a fixed limit of 1 million random numbers per event when the dynamic random number option (no -r parameter) is used in gulcalc. This limit was imposed to improve performance. We plan to add this limit as an optional parameter to gulcalc.</p>
-<h4 id="more-outputs">6. More outputs</h4>
-<p>More in-memory output components to calculate EP curves and event/year loss tables at different summary levels will be added.</p>
+<h4 id="fmcalc-code-re-factor">6. fmcalc code re-factor</h4>
+<p>The fmcalc code will be re-factored to improve efficiency, performance and extensibility.</p>
 <p><a href="RandomNumbers.html">Go to Random numbers</a></p>
 <p><a href="Contents.html">Back to Contents</a></p>
 </body>

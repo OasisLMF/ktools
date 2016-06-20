@@ -41,13 +41,11 @@
 
 using namespace std;
 
-void emitevents(int chunk_id_,int pno_,int total_)
+void emitevents(int pno_,int total_)
 {
-    std::ostringstream oss;
-    oss << "e_chunk_" << chunk_id_ << "_data.bin";
-    FILE *fin = fopen(oss.str().c_str(), "rb");
+    FILE *fin = fopen(EVENTS_FILE, "rb");
     if (fin == NULL){
-                cerr << "emitevents: cannot open " << oss.str().c_str() << "\n";
+                cerr << "emitevents: cannot open " << EVENTS_FILE << "\n";
                 exit(-1);
     }
     fseek(fin, 0L, SEEK_END);
@@ -73,18 +71,17 @@ void emitevents(int chunk_id_,int pno_,int total_)
 
 int main(int argc, char *argv[])
 {
-    if (argc != 4) {
-        cerr << "usage: chunkid processno totalprocesses\n"
+    if (argc != 3) {
+        cerr << "usage: processno totalprocesses\n"
         ;
         return -1;
     }
 
-    int chunkid = atoi(argv[1]);
-    int pno = atoi(argv[2]);
-    int total = atoi(argv[3]);
+    int pno = atoi(argv[1]);
+    int total = atoi(argv[2]);
 
     initstreams("","");
-    emitevents(chunkid,pno,total);
+    emitevents(pno,total);
 
     return 0;
 }

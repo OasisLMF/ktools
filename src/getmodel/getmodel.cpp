@@ -31,220 +31,388 @@
 * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 * DAMAGE.
 */
+/*
+    Author: Mark Pinkerton  email: mark.pinkerton@oasislmf.org
 
-#include <stdio.h>
-#include <stdlib.h> 
+*/  
+#include "string.h"
 #include <iostream>
-#include <fstream>
-#include <sstream>
-#include <fcntl.h>
-
+#include <list>
+#include <set>
 #include <map>
-#include <vector>
-
-#ifdef __unix 
-#include <unistd.h>
-#endif
-
+#include "getmodel.hpp"
 #include "../include/oasis.hpp"
 
-
-#define BUFSIZE 4096
-
-unsigned int outputstreamtype = 1;	// OASIS STREAM TYPE
-
-#pragma pack(push, 1)
-struct idx {
-	int event_id;
-	long long offset;
-};
-#pragma pack(pop)
-struct idxrec {
-	long long offset;
-	int length;
-};
-
-struct idx32 {
-	int event_id;
-	int offset;
-};
-struct idxrec32 {
-	int offset;
-	int length;
-};
-
-std::string progname;
-
-bool getdamagebindictionary(std::vector<damagebindictionary> &damagebindictionary_vec_)
+struct Exposure 
 {
-	std::ostringstream oss;
-	oss << "damage_bin_dict.bin";
+    int location_id;
+    int areaperil_id;
+    int vulnerability_id;
+    int group_id;
+    float tiv;
+};
 
-	FILE *fin = fopen(oss.str().c_str(), "rb");
-	if (fin == NULL){
-		std::ostringstream poss;    	
-		poss <<  progname << " : Error opening input file "  << oss.str();
-        perror(poss.str().c_str());
-		exit(-1);
-	}
-	fseek(fin, 0L, SEEK_END);
-	long long sz = fltell(fin);
-	fseek(fin, 0L, SEEK_SET);
-	unsigned int nrec = sz / sizeof(damagebindictionary);
-	damagebindictionary *s1 = new damagebindictionary[nrec];
-	if (fread(s1, sizeof(damagebindictionary), nrec, fin) != nrec) {
-		std::ostringstream poss;    	
-			poss <<  progname << " : Error reading file "  << oss.str();
-        perror(poss.str().c_str());
-		exit(-1);
-	}
 
-	for (unsigned int i = 0; i < nrec; i++){
-		damagebindictionary_vec_.push_back(s1[i]);
-	}
-	delete[] s1;
+struct Result {
 
-	fclose(fin);
-	return true;
+    Result(): prob(0.0), damage(0.0) {
+        //
+    }
+
+    Result(float damage, float prob);
+
+    float prob;
+    float damage;
+};
+
+Result::Result(float prob, float damage):
+     prob(prob), damage(damage)
+{
+    //
 }
 
+const std::string EXPOSURE_FILENAME = "exposures.bin";
+/*
+const std::string VULNERABILITY_FILENAME = "vulnerability.bin";
+const std::string EVENT_FILENAME = "eventfootprint.bin";
+const std::string EVENT_INDEX_FILENAME = "eventfootprint.idx";
+const std::string DAMAGE_BIN_DICT_FILENAME = "damage_bin_dict.bin";
+*/
+// Is this the number of damage bins?
+const int MAX_RESULTS = 100;
 
-void getindex(std::map<int, idxrec> &imap_, int chunkid_)
+const size_t SIZE_OF_INT = sizeof(int);
+const size_t SIZE_OF_FLOAT = sizeof(float);
+const size_t SIZE_OF_RESULT = sizeof(Result);
+
+const unsigned int OUTPUT_STREAM_TYPE = 1;
+
+getmodel::getmodel()
 {
-	std::ostringstream oss;
+    //
+}
 
-	oss << "cdf/damage_cdf_chunk_" << chunkid_ << ".idx";
-	FILE *fin = fopen(oss.str().c_str(), "rb");
-    if (fin == NULL){
-		std::ostringstream poss;    	
-			poss <<  progname << " : Error opening input file "  << oss.str();
+getmodel::~getmodel()
+{
+    if (_temp_results != nullptr) delete _temp_results;
+}
+
+void getmodel::getVulnerabilities()
+{
+    // Read the vulnerabilities
+    Vulnerability vulnerability;
+
+    FILE *fin = fopen(VULNERABILITY_FILE, "rb");
+    if (fin == nullptr) {
+        std::cerr << "Error opening " << VULNERABILITY_FILE << "\n";
+        exit(EXIT_FAILURE);
+    }
+    int current_vulnerability_id = -1;
+
+    while (fread(&vulnerability, sizeof(vulnerability), 1, fin) != 0) {
+        if (vulnerability.vulnerability_id != current_vulnerability_id)
+        {
+            _vulnerabilities[vulnerability.vulnerability_id] = std::vector<float>(_num_intensity_bins * _num_damage_bins, 0.0);
+            current_vulnerability_id = vulnerability.vulnerability_id;
+        }
+        int vulnerabilityIndex = getVulnerabilityIndex(vulnerability.intensity_bin_id, vulnerability.damage_bin_id);
+        _vulnerabilities[vulnerability.vulnerability_id][vulnerabilityIndex] = vulnerability.probability;
+    }
+    fclose(fin);
+}
+
+void getmodel::getExposures()
+{
+    // Read the exposures and generate a set of vulnerabilities by area peril
+    Exposure exposure_key;
+
+    FILE* fin = fopen(EXPOSURE_FILENAME.c_str(), "rb");
+    if (fin == nullptr) {
+        std::cerr << "Error opening " << EXPOSURE_FILENAME << "\n";
+        exit(EXIT_FAILURE);
+    }
+
+    while (fread(&exposure_key, sizeof(exposure_key), 1, fin) != 0) {
+        if (_vulnerability_ids_by_area_peril.count(exposure_key.areaperil_id) == 0)
+            _vulnerability_ids_by_area_peril[exposure_key.areaperil_id] = std::set<int>();
+        _vulnerability_ids_by_area_peril[exposure_key.areaperil_id].insert(exposure_key.vulnerability_id);
+        _area_perils.insert(exposure_key.areaperil_id);
+    }
+    fclose(fin);   
+}
+
+void getmodel::getItems()
+{
+    // Read the exposures and generate a set of vulnerabilities by area peril
+    item item_rec;
+
+    FILE* fin = fopen(ITEMS_FILE, "rb");
+    if (fin == nullptr) {
+        std::cerr << "Error opening " << ITEMS_FILE << "\n";
+        exit(EXIT_FAILURE);
+    }
+
+    while (fread(&item_rec, sizeof(item_rec), 1, fin) != 0) {
+        if (_vulnerability_ids_by_area_peril.count(item_rec.areaperil_id) == 0)
+            _vulnerability_ids_by_area_peril[item_rec.areaperil_id] = std::set<int>();
+        _vulnerability_ids_by_area_peril[item_rec.areaperil_id].insert(item_rec.vulnerability_id);
+        _area_perils.insert(item_rec.areaperil_id);
+    }
+    fclose(fin);
+}
+
+void getmodel::getDamageBinDictionary()
+{
+    FILE *fin = fopen(DAMAGE_BIN_DICT_FILE, "rb");
+    if (fin == nullptr) {
+        std::ostringstream poss;
+        poss << "Error opening " << DAMAGE_BIN_DICT_FILE;
+        exit(-1);
+    }
+    fseek(fin, 0L, SEEK_END);
+    long long sz = fltell(fin);
+    fseek(fin, 0L, SEEK_SET);
+    int nrec = sz / sizeof(damagebindictionary);
+    
+    damagebindictionary *damage_bins = new damagebindictionary[nrec];
+    
+    if (fread(damage_bins, sizeof(damagebindictionary), nrec, fin) != nrec) {
+        std::ostringstream poss;
+        poss << "Error reading file " << DAMAGE_BIN_DICT_FILE;
         perror(poss.str().c_str());
         exit(-1);
     }
-	idx x;
-	idx y;
-	int i = fread(&x, sizeof(idx), 1, fin);
-	i = fread(&y, sizeof(idx), 1, fin);
-	while (i == 1){
-		idxrec z;
-		z.offset = x.offset;
-		z.length = (int)(y.offset - x.offset);
-		imap_[x.event_id] = z;
-		x = y;
-		i = fread(&y, sizeof(idx), 1, fin);
-	}
-	idxrec z;
-	z.offset = x.offset;
-	z.length = -1;
-	imap_[x.event_id] = z;
-}
 
-FILE *fin;
+    fclose(fin);
 
-void sendevent(int event_id_, std::map<int, idxrec> &imap_, int max_no_of_bins_, float *interpolation_)
-{
-	
-    long long offset = imap_[event_id_].offset;
-	int length = imap_[event_id_].length;
-	if (length == -1) {    
-
-		flseek(fin, 0, SEEK_END);
-		long long fs = fltell(fin);
-		length = (int)(fs - offset);
-	}    
+    _mean_damage_bins = std::vector<float>(nrec);
+    for (int i = 0; i < nrec; i++) {
+        _mean_damage_bins[i] = damage_bins[i].interpolation;
+    }
     
-	flseek(fin, offset, SEEK_SET);
-	long long pos = fltell(fin);
-	float *binp = new float[max_no_of_bins_];
-	int no_of_bins = 0;
-	while (length > 0) {
-		damagecdfrec df;
-		fread(&df, sizeof(damagecdfrec), 1, fin);
-		if (df.event_id != event_id_){
-			std::cerr << progname << ": Event ID: " << event_id_ << "not found\n";
-			exit(-1);
-		}
-		fread(&no_of_bins, sizeof(no_of_bins), 1, fin);
-		fread(binp, sizeof(float), no_of_bins, fin);
-		int len = sizeof(damagecdfrec);
-		char *p = (char *)&df;
-		int i = 0;
-		while (i < len) {
-			putc(*p, stdout);
-			p++;
-			i++;
-		}
-		fwrite(&no_of_bins, sizeof(int), 1, stdout); // output count of bins being processed
-		float *q = binp;
-		for (i = 0; i < no_of_bins; i++){
-			fwrite(q, sizeof(float), 1, stdout);			
-			float *bin_mean = interpolation_ + i;
-			fwrite(bin_mean, sizeof(float), 1, stdout);			
-			q++;
-		}
-		int rec_length = sizeof(damagecdfrec) + sizeof(no_of_bins) + (sizeof(float)*no_of_bins);
-
-		length = length - rec_length;
-		if (length < 0) {
-			std::cerr << progname << ": Error Event record format error\n";
-			exit(-1);
-		}
-	}
-
-	delete[] binp;
+    delete[] damage_bins;
 }
 
-void doit(int chunkid_)
+void getmodel::initOutputStream()
 {
- 
-	int event_id = 0;
-
-	std::map<int, idxrec> imap;
-
-	getindex(imap, chunkid_);
-
-	std::vector<damagebindictionary> damagebindictionary_vec;
-	getdamagebindictionary(damagebindictionary_vec);
-
-    float *interpolation = new float[damagebindictionary_vec.size()];
-	for (unsigned int i = 0; i < damagebindictionary_vec.size(); i++){
-		interpolation[i] = damagebindictionary_vec[i].interpolation;
-	}
-
-	std::ostringstream oss;
-
-	oss.str("");
-	oss << "cdf/damage_cdf_chunk_" << chunkid_ << ".bin";
-	fin = fopen(oss.str().c_str(), "rb");
-	if (fin == NULL) {
-		std::ostringstream poss;    	
-		poss <<  progname << " : Error opening input file "  << oss.str();
-        perror(poss.str().c_str());
-		exit(-1);
-	}
-
-	fwrite(&outputstreamtype, sizeof(outputstreamtype), 1, stdout);
-
-	while (1){
-		if (fread(&event_id, sizeof(int), 1, stdin) != 1) break;        
-        sendevent(event_id, imap, damagebindictionary_vec.size(),interpolation);
-	}
-	delete[] interpolation;
+    fwrite(&OUTPUT_STREAM_TYPE, sizeof(OUTPUT_STREAM_TYPE), 1, stdout);
 }
 
-void usage()
+void getmodel::doResults(
+    int& event_id, 
+    int& areaperil_id, 
+    std::map<int, std::set<int>>& vulnerabilities_by_area_peril, 
+    std::map<int, std::vector<float>>& vulnerabilities, 
+    std::vector<float> intensity) const
 {
-    std::cerr << "Usage: " << progname << " chunkid \n";
-    exit(-1);
+    for (int vulnerability_id : vulnerabilities_by_area_peril[areaperil_id])
+    {
+        auto results = new Result[_num_damage_bins];
+        int result_index = 0;
+        auto vulnerability = vulnerabilities[vulnerability_id];
+        int vulnerability_index = 0;
+        float cumulative_prob = 0;
+        for (int damage_bin_index = 0; damage_bin_index < _num_damage_bins; damage_bin_index++)
+        {
+            float prob = 0.0f;
+            for (int intensity_bin_index = 0;
+                    intensity_bin_index < _num_intensity_bins;
+                    intensity_bin_index++)
+            {
+                prob +=
+                    vulnerability[vulnerability_index++] * intensity[intensity_bin_index];
+            }
+
+            //if (prob > 0 || damage_bin_index == 0)
+            //{
+            cumulative_prob += prob;
+            results[result_index++] =
+                Result(cumulative_prob, _mean_damage_bins[damage_bin_index]);
+            //}
+        }
+
+        int num_results = result_index;
+        fwrite(&event_id, SIZE_OF_INT, 1, stdout);
+        fwrite(&areaperil_id, SIZE_OF_INT, 1, stdout);
+        fwrite(&vulnerability_id, SIZE_OF_INT, 1, stdout);
+        fwrite(&num_results, SIZE_OF_INT, 1, stdout);
+        fwrite(results, SIZE_OF_RESULT, num_results, stdout);
+
+        delete results;
+    }
 }
-int main(int argc, char *argv[])
+
+void getmodel::doResultsNoIntensityUncertainty(
+    int &event_id,
+    int &areaperil_id,
+    std::map<int, std::set<int>> &vulnerabilities_by_area_peril,
+    std::map<int, std::vector<float>> &vulnerabilities,
+    int intensity_bin_index) const
 {
-	progname = argv[0];
-	if (argc != 2) usage();
+    for (int vulnerability_id : vulnerabilities_by_area_peril[areaperil_id])
+    {
+        int result_index = 0;
+        float cumulative_prob = 0;
+        for (int damage_bin_index = 1; damage_bin_index <= _num_damage_bins; damage_bin_index++)
+        {
+            float prob = vulnerabilities[vulnerability_id][getVulnerabilityIndex(intensity_bin_index, damage_bin_index)];
 
-	int chunkid = atoi(argv[1]);
+            //if (prob > 0 || damage_bin_index == 0)
+            //{
+                cumulative_prob += prob;
+                _temp_results[result_index++].prob = cumulative_prob;
+            //}
+         }
 
-    initstreams("", "");
-    doit(chunkid);
+        int num_results = result_index;
+        fwrite(&event_id, SIZE_OF_INT, 1, stdout);
+        fwrite(&areaperil_id, SIZE_OF_INT, 1, stdout);
+        fwrite(&vulnerability_id, SIZE_OF_INT, 1, stdout);
+        fwrite(&num_results, SIZE_OF_INT, 1, stdout);
+        fwrite(_temp_results, SIZE_OF_RESULT, num_results, stdout);
+    }
+}
 
+int getmodel::getVulnerabilityIndex(int intensity_bin_index, int damage_bin_index) const
+{
+    return (intensity_bin_index - 1) + ((damage_bin_index - 1) * _num_intensity_bins);
+}
+
+void getmodel::init(int num_damage_bins, int num_intensity_bins, bool has_intensity_uncertainty)
+{
+    _num_damage_bins = num_damage_bins;
+    _num_intensity_bins = num_intensity_bins;
+    _has_intensity_uncertainty = has_intensity_uncertainty;
+
+    getItems();
+    //getExposures();
+    getVulnerabilities();
+    getDamageBinDictionary();
+
+    _temp_results = new Result[_num_damage_bins];
+    for (int damage_bin_index = 1; damage_bin_index <= _num_damage_bins; damage_bin_index++)
+    {
+        _temp_results[damage_bin_index - 1] = Result(0.0, _mean_damage_bins[damage_bin_index - 1]);
+    }
+}
+
+void getmodel::doCdf(std::list<int> event_ids)
+{
+    FILE* fin = fopen(FOOTPRINT_IDX_FILE, "rb");
+    if (fin == nullptr) {
+        std::cerr << "Error opening " << FOOTPRINT_IDX_FILE << "\n";
+        exit(EXIT_FAILURE);
+    }
+
+    EventIndex event_index;
+    std::map<int, EventIndex> event_index_by_event_id;
+    while (fread(&event_index, sizeof(event_index), 1, fin) != 0) {
+        event_index_by_event_id[event_index.event_id] = event_index;
+    }
+    fclose(fin);
+
+    initOutputStream();
+
+    if (_has_intensity_uncertainty)
+    {
+        doCdfInner(event_ids, event_index_by_event_id);
+    }
+    else
+    {
+        doCdfInnerNoIntensityUncertainty(event_ids, event_index_by_event_id);
+    }
+}
+
+void getmodel::doCdfInner(
+    std::list<int> &event_ids, 
+    std::map<int, EventIndex> &event_index_by_event_id)
+{
+    auto sizeof_EventKey = sizeof(EventRow);
+    auto fin = fopen(FOOTPRINT_FILE, "rb");
+    auto intensity = std::vector<float>(_num_intensity_bins , 0.0f);
+
+    for (int event_id : event_ids)
+    {
+        int current_areaperil_id = -1;
+        bool do_cdf_for_area_peril = false;
+        intensity = std::vector<float>(_num_intensity_bins, 0.0f);
+
+        if (event_index_by_event_id.count(event_id) == 0) continue;
+        fseek(fin, event_index_by_event_id[event_id].offset, 0);
+        EventRow event_key;
+        int number_of_event_records = event_index_by_event_id[event_id].size / sizeof_EventKey;
+        for (int i = 0; i < number_of_event_records; i++)
+        {
+            fread(&event_key, sizeof(event_key), 1, fin);
+            if (event_key.areaperil_id != current_areaperil_id)
+            {
+                if (do_cdf_for_area_peril)
+                {
+                    // Generate and write the results
+                    doResults(
+                        event_id,
+                        current_areaperil_id,
+                        _vulnerability_ids_by_area_peril,
+                        _vulnerabilities,
+                        intensity);
+                    intensity = std::vector<float>(_num_intensity_bins , 0.0f);
+                }
+                current_areaperil_id = event_key.areaperil_id;
+                do_cdf_for_area_peril = (_area_perils.count(current_areaperil_id) == 1);
+            }
+            if (do_cdf_for_area_peril)
+            {
+                intensity[event_key.intensity_bin_id - 1] = event_key.probability;
+            }
+        }
+        // Write out results for last event record
+        if (do_cdf_for_area_peril)
+        {
+            // Generate and write the results
+            doResults(
+                event_id,
+                current_areaperil_id,
+                _vulnerability_ids_by_area_peril,
+                _vulnerabilities,
+                intensity);
+        }
+    }
+
+    fclose(fin);
+}
+
+void getmodel::doCdfInnerNoIntensityUncertainty(
+    std::list<int> &event_ids, 
+    std::map<int, EventIndex> &event_index_by_event_id)
+{
+    auto sizeof_EventKey = sizeof(EventRow);
+    auto fin = fopen(FOOTPRINT_FILE, "rb");
+
+    for (int event_id : event_ids)
+    {
+        if (event_index_by_event_id.count(event_id) == 0) continue;
+        fseek(fin, event_index_by_event_id[event_id].offset, 0);
+
+        int number_of_event_records = event_index_by_event_id[event_id].size / sizeof_EventKey;
+        for (int i = 0; i < number_of_event_records; i++)
+        {
+            EventRow event_key;
+            fread(&event_key, sizeof(event_key), 1, fin);
+
+            bool do_cdf_for_area_peril = (_area_perils.count(event_key.areaperil_id) == 1);
+            if (do_cdf_for_area_peril)
+            {
+                // Generate and write the results
+                doResultsNoIntensityUncertainty(
+
+                    event_id,
+                    event_key.areaperil_id,
+                    _vulnerability_ids_by_area_peril,
+                    _vulnerabilities,
+                    event_key.intensity_bin_id);
+            }
+        }
+    }
+
+    fclose(fin);
 }

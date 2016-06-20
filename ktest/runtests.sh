@@ -7,12 +7,11 @@ installertest()
 	    exit
 	fi
 	mkdir -p testout
+
 	CTRL=ctrl
 
-	if [ -f cw32bld ]; then
-		CTRL=w32ctrl
-	elif [ -f cw64bld ]; then
-		CTRL=w64ctrl	
+	if [ -f cwbld ]; then
+		CTRL=wctrl
 	fi
 
 	if [ -f uwbld ]; then
@@ -25,91 +24,117 @@ installertest()
 		tar -xzf examples.tar.gz
 	fi
 	cd examples
+	mkdir -p work/gul1
+	mkdir -p work/gul2
+	mkdir -p work/fm1
+	mkdir -p work/fm2
 	# test eve
-	../src/eve/eve 1 1 2 > ../ktest/testout/eveout1_1.bin
-	../src/eve/eve 1 2 2 > ../ktest/testout/eveout1_2.bin
-	../src/eve/eve 2 1 2 > ../ktest/testout/eveout2_1.bin
-	../src/eve/eve 2 2 2 > ../ktest/testout/eveout2_2.bin
+	../src/eve/eve 1 2 > ../ktest/testout/eveout1.bin
+	../src/eve/eve 2 2 > ../ktest/testout/eveout2.bin
 
-	# test getmodel
-	../src/eve/eve 1 1 2 | ../src/getmodel/getmodel 1  > ../ktest/testout/getmodelout1_1.bin
-	../src/eve/eve 1 2 2 | ../src/getmodel/getmodel 1  > ../ktest/testout/getmodelout1_2.bin
-	../src/eve/eve 2 1 2 | ../src/getmodel/getmodel 2  > ../ktest/testout/getmodelout2_1.bin
-	../src/eve/eve 2 2 2 | ../src/getmodel/getmodel 2  > ../ktest/testout/getmodelout2_2.bin
 
-	# test gulcalc
-	../src/eve/eve 1 1 2 | ../src/getmodel/getmodel 1 | ../src/gulcalc/gulcalc -C1 -S100 -R -r > ../ktest/testout/gulcalcout1_1.bin
-	../src/eve/eve 1 2 2 | ../src/getmodel/getmodel 1 | ../src/gulcalc/gulcalc -C1 -S100 -R -r > ../ktest/testout/gulcalcout1_2.bin
-	../src/eve/eve 2 1 2 | ../src/getmodel/getmodel 2 | ../src/gulcalc/gulcalc -C1 -S100 -R -r > ../ktest/testout/gulcalcout2_1.bin
-	../src/eve/eve 2 2 2 | ../src/getmodel/getmodel 2 | ../src/gulcalc/gulcalc -C1 -S100 -R -r > ../ktest/testout/gulcalcout2_2.bin
-
+	# # test getmodel
+	 ../src/eve/eve 1 1 | ../src/getmodel/getmodel -i 121 -d 102 > ../ktest/testout/getmodelout.bin
+	
+	# test gulcalc item stream and coverage stream
+	../src/eve/eve 1 1 | ../src/getmodel/getmodel -i 121 -d 102 | ../src/gulcalc/gulcalc -S100 -L0.1 -r -i - > ../ktest/testout/gulcalci.bin
+	../src/eve/eve 1 1 | ../src/getmodel/getmodel -i 121 -d 102 | ../src/gulcalc/gulcalc -S100 -L0.1 -r -c - > ../ktest/testout/gulcalcc.bin
+	
 	# test fmcalc
-	../src/eve/eve 1 1 2 | ../src/getmodel/getmodel 1 | ../src/gulcalc/gulcalc -C1 -S100 -R -r | ../src/fmcalc/fmcalc >  ../ktest/testout/fmcalcout1_1.bin
+	 ../src/fmcalc/fmcalc > ../ktest/testout/fmcalc.bin < ../ktest/testout/gulcalci.bin
+	
+	# test summary samples
+	 ../src/summarycalc/summarycalc -g -1 ../ktest/testout/gulsummarycalc1.bin  < ../ktest/testout/gulcalcc.bin  
+	 ../src/summarycalc/summarycalc -g -2 ../ktest/testout/gulsummarycalc2.bin  < ../ktest/testout/gulcalcc.bin  
+	 ../src/summarycalc/summarycalc -f -1 ../ktest/testout/fmsummarycalc1.bin   < ../ktest/testout/fmcalc.bin
+	 ../src/summarycalc/summarycalc -f -2 ../ktest/testout/fmsummarycalc2.bin   < ../ktest/testout/fmcalc.bin
+	cp ../ktest/testout/gulsummarycalc2.bin work/gul2/gulsummarycalc2.bin
+	cp ../ktest/testout/fmsummarycalc2.bin work/fm2/fmsummarycalc2.bin
+	cp ../ktest/testout/gulsummarycalc1.bin work/gul1/gulsummarycalc1.bin
+	cp ../ktest/testout/fmsummarycalc1.bin work/fm1/fmsummarycalc1.bin
+	# test eltcalc
+	../src/eltcalc/eltcalc < ../ktest/testout/gulsummarycalc1.bin > ../ktest/testout/gulelt1.csv
+	../src/eltcalc/eltcalc < ../ktest/testout/gulsummarycalc2.bin > ../ktest/testout/gulelt2.csv
+	../src/eltcalc/eltcalc < ../ktest/testout/fmsummarycalc1.bin > ../ktest/testout/fmelt1.csv
+	../src/eltcalc/eltcalc < ../ktest/testout/fmsummarycalc2.bin > ../ktest/testout/fmelt2.csv
 
-	# test outputcalc
-	../src/eve/eve 1 1 1 | ../src/getmodel/getmodel 1 | ../src/gulcalc/gulcalc -C1 -S100 -R -r | ../src/outputcalc/outputcalc >  ../ktest/testout/gulout1.csv
+	# test leccalc
+	../src/leccalc/leccalc -F ../ktest/testout/gul_full_uncertainty_aep_1.csv -Kgul1 
+	../src/leccalc/leccalc -W ../ktest/testout/gul_wheatsheaf_aep_1.csv -Kgul1 
+	../src/leccalc/leccalc -S ../ktest/testout/gul_sample_mean_aep_1.csv -Kgul1
+	../src/leccalc/leccalc -M ../ktest/testout/gul_wheatsheaf_mean_aep_1.csv -Kgul1
+    ../src/leccalc/leccalc -f ../ktest/testout/gul_full_uncertainty_oep_1.csv -Kgul1 
+	../src/leccalc/leccalc -w ../ktest/testout/gul_wheatsheaf_oep_1.csv -Kgul1 
+	../src/leccalc/leccalc -s ../ktest/testout/gul_sample_mean_oep_1.csv -Kgul1 
+    ../src/leccalc/leccalc -m ../ktest/testout/gul_wheatsheaf_mean_oep_1.csv -Kgul1
 
-	../src/eve/eve 1 1 1 | ../src/getmodel/getmodel 1 | ../src/gulcalc/gulcalc -C1 -S100 -R -r | ../src/fmcalc/fmcalc | ../src/outputcalc/outputcalc >  ../ktest/testout/fmout1.csv
+	../src/leccalc/leccalc -F ../ktest/testout/fm_full_uncertainty_aep_1.csv -Kfm1 
+	../src/leccalc/leccalc -W ../ktest/testout/fm_wheatsheaf_aep_1.csv -Kfm1 
+	../src/leccalc/leccalc -S ../ktest/testout/fm_sample_mean_aep_1.csv -Kfm1
+	../src/leccalc/leccalc -M ../ktest/testout/fm_wheatsheaf_mean_aep_1.csv -Kfm1
+    ../src/leccalc/leccalc -f ../ktest/testout/fm_full_uncertainty_oep_1.csv -Kfm1 
+	../src/leccalc/leccalc -w ../ktest/testout/fm_wheatsheaf_oep_1.csv -Kfm1 
+	../src/leccalc/leccalc -s ../ktest/testout/fm_sample_mean_oep_1.csv -Kfm1 
+    ../src/leccalc/leccalc -m ../ktest/testout/fm_wheatsheaf_mean_oep_1.csv -Kfm1
 
-	# test data conversion utilities
+	# test pltcalc
+	../src/pltcalc/pltcalc < ../ktest/testout/gulsummarycalc1.bin > ../ktest/testout/gulplt1.csv
+	../src/pltcalc/pltcalc < ../ktest/testout/gulsummarycalc2.bin > ../ktest/testout/gulplt2.csv
+	../src/pltcalc/pltcalc < ../ktest/testout/fmsummarycalc1.bin > ../ktest/testout/fmplt1.csv
+	../src/pltcalc/pltcalc < ../ktest/testout/fmsummarycalc2.bin > ../ktest/testout/fmplt2.csv
+	
+		# test data conversion utilities
 	# stdout to csv
-	../src/cdftocsv/cdftocsv < ../ktest/testout/getmodelout1_1.bin > ../ktest/testout/getmodelout1_1.csv
+	../src/cdftocsv/cdftocsv < ../ktest/testout/getmodelout.bin > ../ktest/testout/getmodelout.csv
 
-	../src/gultocsv/gultocsv < ../ktest/testout/gulcalcout1_1.bin > ../ktest/testout/gulcalcout1_1.csv
+	../src/gultocsv/gultocsv < ../ktest/testout/gulcalci.bin > ../ktest/testout/gulcalci.csv
+	../src/gultocsv/gultocsv < ../ktest/testout/gulcalcc.bin > ../ktest/testout/gulcalcc.csv
+	../src/fmtocsv/fmtocsv < ../ktest/testout/fmcalc.bin > ../ktest/testout/fmcalc.csv
 
-	../src/fmtocsv/fmtocsv < ../ktest/testout/fmcalcout1_1.bin > ../ktest/testout/fmcalcout1_1.csv
+	../src/summarycalctocsv/summarycalctocsv < ../ktest/testout/gulsummarycalc2.bin > ../ktest/testout/gulsummarycalc2.csv
+	../src/summarycalctocsv/summarycalctocsv < ../ktest/testout/gulsummarycalc1.bin > ../ktest/testout/gulsummarycalc1.csv
+	../src/summarycalctocsv/summarycalctocsv < ../ktest/testout/fmsummarycalc2.bin > ../ktest/testout/fmsummarycalc2.csv
+	../src/summarycalctocsv/summarycalctocsv < ../ktest/testout/fmsummarycalc1.bin > ../ktest/testout/fmsummarycalc1.csv
 
 	# input data to csv and bin
-	../src/evetocsv/evetocsv < ../examples/e_chunk_1_data.bin > ../ktest/testout/e_chunk_1_data.csv
-	../src/evetobin/evetobin < ../ktest/testout/e_chunk_1_data.csv > ../ktest/testout/e_chunk_1_data.bin
-
-	../src/randtocsv/randtocsv < ../examples/random_1.bin > ../ktest/testout/random_1.csv
-	../src/randtobin/randtobin < ../ktest/testout/random_1.csv | ../src/randtocsv/randtocsv > ../ktest/testout/random_12.csv
-
-	../src/exposuretocsv/exposuretocsv < ../examples/exposures.bin > ../ktest/testout/exposures.csv
-	../src/exposuretobin/exposuretobin < ../ktest/testout/exposures.csv > ../ktest/testout/exposures.bin
-
-	../src/damagetocsv/damagetocsv < ../examples/damage_bin_dict.bin > ../ktest/testout/damage_bin_dict.csv
-	../src/damagetobin/damagetobin < ../ktest/testout/damage_bin_dict.csv > ../ktest/testout/damage_bin_dict.bin
-
-	../src/cdfdatatocsv/cdfdatatocsv < ../examples/cdf/damage_cdf_chunk_1.bin > ../ktest/testout/damage_cdf_chunk_1.csv
-
-	../src/fmprogrammetocsv/fmprogrammetocsv < ../examples/fm/fm_programme.bin > ../ktest/testout/fm_programme.csv
-	../src/fmprogrammetobin/fmprogrammetobin < ../ktest/testout/fm_programme.csv > ../ktest/testout/fm_programme.bin
-
-	../src/fmpolicytctocsv/fmpolicytctocsv < ../examples/fm/fm_policytc.bin > ../ktest/testout/fm_policytc.csv
-	../src/fmpolicytctobin/fmpolicytctobin < ../ktest/testout/fm_policytc.csv > ../ktest/testout/fm_policytc.bin
-
-	../src/fmprofiletocsv/fmprofiletocsv < ../examples/fm/fm_profile.bin > ../ktest/testout/fm_profile.csv
-	../src/fmprofiletobin/fmprofiletobin < ../ktest/testout/fm_profile.csv > ../ktest/testout/fm_profile.bin
-
-	../src/fmxreftocsv/fmxreftocsv < ../examples/fm/fmxref.bin > ../ktest/testout/fmxref.csv
-	../src/fmxreftobin/fmxreftobin < ../ktest/testout/fmxref.csv > ../ktest/testout/fmxref.bin
-
-
-	cd ../ktest/testout
-	../../src/cdfdatatobin/cdfdatatobin damage_cdf_chunk_11 102 < damage_cdf_chunk_1.csv
-	../../src/cdfdatatocsv/cdfdatatocsv < damage_cdf_chunk_11.bin > damage_cdf_chunk_11.csv
-	diff damage_cdf_chunk_1.csv damage_cdf_chunk_11.csv
+	../src/evetocsv/evetocsv < ../examples/input/events.bin | ../src/evetobin/evetobin > ../ktest/testout/events.bin
 	
-	md5sum -c ../$CTRL.md5
+	../src/randtocsv/randtocsv < ../examples/static/random.bin | ../src/randtobin/randtobin > ../ktest/testout/random.bin
 
-	if [ "$?" -ne "0" ]; then
-	  echo "Sorry check failed\n"
-	  exit 1
-	else
-	  echo "All tests passed.\n"
-	 exit 0
-	fi
+	 ../src/itemtocsv/itemtocsv < ../examples/input/items.bin | ../src/itemtobin/itemtobin > ../ktest/testout/items.bin
 
+	 ../src/coveragetocsv/coveragetocsv < ../examples/input/coverages.bin | ../src/coveragetobin/coveragetobin > ../ktest/testout/coverages.bin
 
+	../src/damagebintocsv/damagebintocsv < ../examples/static/damage_bin_dict.bin | ../src/damagebintobin/damagebintobin > ../ktest/testout/damage_bin_dict.bin
+	
+	../src/fmprogrammetocsv/fmprogrammetocsv < ../examples/input/fm_programme.bin | ../src/fmprogrammetobin/fmprogrammetobin > ../ktest/testout/fm_programme.bin
+	
+	../src/fmprofiletocsv/fmprofiletocsv < ../examples/input/fm_profile.bin | ../src/fmprofiletobin/fmprofiletobin > ../ktest/testout/fm_profile.bin
+	
+	../src/fmpolicytctocsv/fmpolicytctocsv < ../examples/input/fm_policytc.bin | ../src/fmpolicytctobin/fmpolicytctobin > ../ktest/testout/fm_policytc.bin
+	
+	../src/fmxreftocsv/fmxreftocsv < ../examples/input/fm_xref.bin | ../src/fmxreftobin/fmxreftobin > ../ktest/testout/fm_xref.bin
+
+	../src/gulsummaryxreftocsv/gulsummaryxreftocsv < ../examples/input/gulsummaryxref.bin | ../src/gulsummaryxreftobin/gulsummaryxreftobin > ../ktest/testout/gulsummaryxref.bin
+	
+	../src/fmsummaryxreftocsv/fmsummaryxreftocsv < ../examples/input/fmsummaryxref.bin | ../src/fmsummaryxreftobin/fmsummaryxreftobin > ../ktest/testout/fmsummaryxref.bin
+
+	../src/occurrencetocsv/occurrencetocsv < ../examples/static/occurrence.bin | ../src/occurrencetobin/occurrencetobin -P10000 > ../ktest/testout/occurrence.bin
+	
+	cd ../ktest/testout
+
+	
+	 md5sum -c ../$CTRL.md5
+
+	 if [ "$?" -ne "0" ]; then
+	   echo "Sorry check failed\n"
+	   exit 1
+	 else
+	   echo "All tests passed.\n"
+	  exit 0
+	 fi
+
+	echo "Finished.  Check sums to do."
 }
-
-ftest()
-{
-	echo "todo"
-}
-
 
 installertest
-ftest

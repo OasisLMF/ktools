@@ -102,7 +102,7 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(includedir)"
 PROGRAMS = $(bin_PROGRAMS)
 am_gulcalc_OBJECTS = gulcalc.$(OBJEXT) getrands.$(OBJEXT) \
-	primetest.$(OBJEXT)
+	primetest.$(OBJEXT) main.$(OBJEXT)
 gulcalc_OBJECTS = $(am_gulcalc_OBJECTS)
 gulcalc_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -273,6 +273,7 @@ pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
+runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
@@ -281,8 +282,8 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-gulcalc_SOURCES = gulcalc.cpp getrands.cpp primetest.cpp 
-include_HEADERS = getrands.hpp
+gulcalc_SOURCES = gulcalc.cpp getrands.cpp primetest.cpp main.cpp
+include_HEADERS = getrands.hpp gulcalc.hpp
 all: all-am
 
 .SUFFIXES:
@@ -371,6 +372,7 @@ distclean-compile:
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getrands.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gulcalc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/primetest.Po@am__quote@
 
 .cpp.o:

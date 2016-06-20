@@ -38,23 +38,6 @@
 
 #include "../include/oasis.hpp"
 
-struct fm_profile {
-    int policytc_id;
-    int calcrule_id;
-    int allocrule_id;
-    int sourcerule_id;
-    int levelrule_id;
-    int ccy_id;
-    float deductible;
-    float limits;
-    float share_prop_of_lim;
-    float deductible_prop_of_loss;
-    float limit_prop_of_loss;
-    float deductible_prop_of_tiv;
-    float limit_prop_of_tiv;
-    float deductible_prop_of_limit;
-};
-
 void doit()
 {
 
@@ -65,8 +48,8 @@ void doit()
 	lineno++;
     while (fgets(line, sizeof(line), stdin) != 0)
     {
-		if (sscanf(line, "%d,%d,%d,%d,%d,%d,%f,%f,%f,%f,%f,%f,%f,%f", &q.policytc_id, &q.calcrule_id, &q.allocrule_id, &q.sourcerule_id, &q.levelrule_id, &q.ccy_id, &q.deductible, &q.limits, &q.share_prop_of_lim, 
-              &q.deductible_prop_of_loss, &q.limit_prop_of_loss, &q.deductible_prop_of_tiv, &q.limit_prop_of_tiv, &q.deductible_prop_of_limit) != 14){
+		if (sscanf(line, "%d,%d,%d,%d,%f,%f,%f,%f,%f,%f,%f,%f", &q.policytc_id, &q.calcrule_id, &q.allocrule_id, &q.ccy_id, &q.deductible, &q.limits, &q.share_prop_of_lim, 
+              &q.deductible_prop_of_loss, &q.limit_prop_of_loss, &q.deductible_prop_of_tiv, &q.limit_prop_of_tiv, &q.deductible_prop_of_limit) != 12){
            fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
            return;
        }

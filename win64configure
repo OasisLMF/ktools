@@ -7,7 +7,7 @@ touch configure
 touch config.h.in
 
 rm -f ktest/cw32bld
-rm -f ktest/cw64bld
+rm -f ktest/cw62bld
 rm -f ktest/uwbld
  
 if [ "$SYSNAME" = "Cygwin" ]; then

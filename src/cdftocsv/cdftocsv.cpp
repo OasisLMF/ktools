@@ -51,10 +51,8 @@ using namespace std;
 
 bool getdamagebindictionary(std::vector<damagebindictionary> &damagebindictionary_vec_)
 {
-    std::ostringstream oss;
-    oss << "damage_bin_dict.bin";
 
-    FILE *fin = fopen(oss.str().c_str(), "rb");
+    FILE *fin = fopen(DAMAGE_BIN_DICT_FILE, "rb");
     if (fin == NULL){
         return false;
     }
@@ -112,7 +110,7 @@ void processrec(char *rec, int recsize,
     b = b + sizeof(int);
     prob_mean *pp = (prob_mean *)b;
     for (int bin_index = 0; bin_index < *bin_count; bin_index++){
-        fprintf(stdout,"%d, %d, %d, %d %f %f\n",d->event_id, d->areaperil_id, d->vulnerabilty_id,bin_index+1,pp->prob_to,pp->bin_mean );
+        fprintf(stdout,"%d, %d, %d, %d, %f, %f\n",d->event_id, d->areaperil_id, d->vulnerabilty_id,bin_index+1,pp->prob_to,pp->bin_mean );
         pp++;
     }
 }

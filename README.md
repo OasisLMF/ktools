@@ -8,7 +8,7 @@ Please click [here](https://github.com/OasisLMF/ktools/releases) to download the
 
 The source code will change on a regular basis but only the releases are supported. Support enquiries should be sent to support@oasislmf.org.
 
-There are build instructions for Windows 32-bit and 64-bit executables. 
+The instructions for the Windows build below are for 32-bit executables as the Cygwin mingw cross compiler for Windows does not support 64-bit executables. Until an automated build process for 64-bit is made available, the 64-bit Windows executables will be provided with each release.
 
 Note that the dynamic random number option in the Windows build uses a deterministic seed due to a bug in the mingw compiler. We recommend the random number file option (gulcalc -r) should be used in Windows. 
 
@@ -69,21 +69,13 @@ Download and run the set-up program for Cygwin.
 The following Cygwin add-in packages are required;
 * gcc-g++
 * gcc-core
+* mingw64-i686-gcc-g++
+* mingw64-i686-gcc-core
 * make
 * diffutils
 * automake
 
-To build Windows 32-bit executables;
-
-* mingw64-i686-gcc-g++
-* mingw64-i686-gcc-core
-
-To build Windows 64-bit executables;
-
-* mingw64-x86_64-gcc-g++
-* mingw64-x86_64-gcc-core
-
-Search for 'mingw', gcc', 'make' and 'diffutils' to find all of the relevant packages (Only 'gcc' illustrated below).
+Search for 'gcc', 'make' and 'diffutils' to find all of the relevant packages (Only 'gcc' illustrated below).
 ![alt text](docs/img/cygwin1.jpg "Add-in packages")
 
 ### Instructions
@@ -102,16 +94,9 @@ $ tar -xvf ktools-[version].tar.gz
 ```
 
 Go into the ktools folder and configure using the following command;
-
-To build Windows 32-bit executables;
 ``` sh
 $ cd ktools-[version]
-$ ./win32configure
-```
-or, to build Windows 64-bit executables;
-``` sh
-$ cd ktools-[version]
-$ ./win64configure
+$ ./winconfigure
 ```
 
 Make using the following command;

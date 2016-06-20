@@ -17,29 +17,31 @@
 <h3 id="architecture">Architecture</h3>
 <p>The Kernel is provided as a toolkit of components (“ktools”) which can be invoked at the command line. Each component is a separately compiled executable with a binary data stream of inputs and outputs.<br />The principle is to stream data through by event end-to-end, with multiple processes being used either sequentially or concurrently, at the control of the user using a script file appropriate to the operating system.</p>
 <h3 id="language">Language</h3>
-<p>The components can be written in any language as long as the data structures of the binary streams are adhered to. The current set of components have been written in POSIX-compliant C++ and C. This means that they can be compiled in Linux and Windows using the latest GNU compiler toolchain.</p>
+<p>The components can be written in any language as long as the data structures of the binary streams are adhered to. The current set of components have been written in POSIX-compliant C++ and C. This means that they can be compiled in Linux and Windows using the GNU compiler toolchain.</p>
 <h3 id="components">Components</h3>
 <p>The set of components in the Reference Model provided is as follows;</p>
 <ul>
-<li><strong>eve</strong> is the process distributing utility. Based on the number of events in the input and the number of processes specified as a parameter, eve distributes the events to the processes. The output streams into getmodel.</li>
-<li><strong>getmodel</strong> is a CDF plug-in to generate the CDFs for a specified list of events. It is the reference example of a plug-in using Oasis kernel format data in binary format. getmodel streams into gulcalc or can be output to a binary file.</li>
-<li><strong>gulcalc</strong> is the core component which performs the GUL sampling calculations and numerical integration. The output is the Oasis format gul results table. This can be output to a binary file or streamed into another plug-in component, such as a Financial Module or output calculation.</li>
-<li><strong>fmcalc</strong> is the core component which performs the insured loss calculations from the input ground up loss samples. It has the same functionality as the Oasis Financial Module. The output is the Oasis format FM results table. This can be output to a binary file or streamed into an output calculation.</li>
-<li><strong>outputcalc</strong> performs results analysis on the ground up loss or insured loss samples, and exports the results table to a csv file. The example given produces an event loss table.</li>
-<li><strong>cdftocsv</strong> is a utility to output binary format CDFs to a csv.</li>
-<li><strong>gultocsv</strong> is a utility to output binary format GULs to a csv.</li>
-<li><strong>fmtocsv</strong> is a utility to output binary format losses to a csv.</li>
-<li><strong>evetobin</strong> is a utility to convert a list of event_ids into binary format.</li>
-<li><strong>damagetobin</strong> is a utility to convert the Oasis damage bin dictionary table into binary format.</li>
-<li><strong>exposuretobin</strong> is a utility to convert the Oasis exposure instance table into binary format.</li>
-<li><strong>randtobin</strong> is a utility to convert a list of random numbers into binary format.</li>
-<li><strong>cdfdatatobin</strong> is a utility to convert the Oasis cdf data into binary format.</li>
-<li><strong>fmxreftobin</strong> is a utility to convert the Oasis FM xref table into binary format.</li>
-<li><strong>evetocsv</strong> is a utility to convert the event binary into csv format.</li>
-<li><strong>damagetocsv</strong> is a utility to convert the Oasis damage bin dictionary binary into csv format.</li>
-<li><strong>exposuretocsv</strong> is a utility to convert the Oasis exposure instance binary into csv format.</li>
-<li><strong>randtocsv</strong> is a utility to convert the random numbers binary into csv format.</li>
-<li><strong>cdfdatatocsv</strong> is a utility to convert the Oasis cdf data binary into csv format.</li>
+<li><strong>eve</strong> is the process distributing utility. Based on the number of events in the input and the number of processes specified as a parameter, eve distributes the events to the processes. The output streams into getmodel.<br /></li>
+<li><strong>getmodel</strong> is a CDF plug-in to generate the CDFs for a specified list of events. It is the reference example of a plug-in using Oasis kernel format data in binary format. getmodel streams into gulcalc or can be output to a binary file.<br /></li>
+<li><strong>gulcalc</strong> is the core component which performs the GUL sampling calculations and numerical integration. The output is the Oasis format gul results table. This can be output to a binary file or streamed into another plug-in component, such as a Financial Module or output calculation.<br /></li>
+<li><strong>fmcalc</strong> is the core component which performs the insured loss calculations from the input ground up loss samples. It has the same functionality as the Oasis Financial Module. The output is the Oasis format FM results table. This can be output to a binary file or streamed into an output calculation.<br /></li>
+<li><strong>outputcalc</strong> performs results analysis on the ground up loss or insured loss samples, and exports the results table to a csv file. The example given produces an event loss table.<br /></li>
+<li><strong>cdftocsv</strong> is a utility to output binary format CDFs to a csv.<br /></li>
+<li><strong>gultocsv</strong> is a utility to output binary format GULs to a csv.<br /></li>
+<li><strong>fmtocsv</strong> is a utility to output binary format losses to a csv.<br /></li>
+<li><strong>evetobin</strong> is a utility to convert a list of event_ids into binary format.<br /></li>
+<li><strong>damagetobin</strong> is a utility to convert the Oasis damage bin dictionary table into binary format.<br /></li>
+<li><strong>exposuretobin</strong> is a utility to convert the Oasis exposure instance table into binary format.<br /></li>
+<li><strong>randtobin</strong> is a utility to convert a list of random numbers into binary format.<br /></li>
+<li><strong>cdfdatatobin</strong> is a utility to convert the Oasis cdf data into binary format.<br /></li>
+<li><strong>.htmlatatobin</strong> is a utility to convert the Oasis FM instance data into binary format.<br /></li>
+<li><strong>fmxreftobin</strong> is a utility to convert the Oasis FM xref table into binary format.<br /></li>
+<li><strong>evetocsv</strong> is a utility to convert the event binary into csv format.<br /></li>
+<li><strong>damagetocsv</strong> is a utility to convert the Oasis damage bin dictionary binary into csv format.<br /></li>
+<li><strong>exposuretocsv</strong> is a utility to convert the Oasis exposure instance binary into csv format.<br /></li>
+<li><strong>randtocsv</strong> is a utility to convert the random numbers binary into csv format.<br /></li>
+<li><strong>cdfdatatocsv</strong> is a utility to convert the Oasis cdf data binary into csv format.<br /></li>
+<li><strong>.htmlatatocsv</strong> is a utility to convert the Oasis FM instance binary into csv format.<br /></li>
 <li><strong>fmxreftocsv</strong> is a utility to convert the Oasis FM xref binary into csv format.</li>
 </ul>
 <h3 id="usage">Usage</h3>

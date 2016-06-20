@@ -36,9 +36,9 @@
 	Author: Ben Matharu  email: ben.matharu@oasislmf.org
 */
 
+#include "gulcalc.hpp"
+
 #include <fcntl.h>
-#include <map>
-#include <vector>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -48,35 +48,11 @@
 
 #include <memory.h>
 
-#include "getopt.h"
-#include "getrands.hpp"
-// #include <unistd.h>
-
 #include "../include/oasis.hpp"
-
-bool verbose = false;
 
 using namespace std;
 
-struct gulGulSamples {
-	int event_id;
-	int item_id;
-	float tiv;
-	int bin_index;
-	float prob_from;
-	float prob_to;
-	float bin_mean;
-	int sidx;
-	double rval;
-};
-
-
-struct exposure_key{
-	int areaperil_id;
-	int vulnerability_id;
-};
-
-bool operator<(const exposure_key& lhs, const exposure_key& rhs)
+bool operator<(const item_map_key& lhs, const item_map_key& rhs)
 {
 	if (lhs.areaperil_id != rhs.areaperil_id) {
 		return lhs.areaperil_id < rhs.areaperil_id;
@@ -86,129 +62,16 @@ bool operator<(const exposure_key& lhs, const exposure_key& rhs)
 	}
 }
 
-
-struct exposure_rec{
-	int item_id;
-	int group_id;
-	float tiv;
-};
-
-struct prob_mean {
-	float prob_to;
-	float bin_mean;
-};
-
 struct probrec {
 	float prob_from;
 	float prob_to;
 	float bin_mean;
 };
 
-const int _gularraysize = 1000;
-bool _reconcilationmode = false;
-int _samplesize = -1;
-int _outrec_count = 0;
-double _gul_limit = 0.0;
-bool _userandomtable = false;
-int _chunk_id = -1;
-bool _debug = false;
+gulSampleslevelHeader lastitemheader;
+gulSampleslevelHeader lastcoverageheader;
 
-unsigned char *_buf = 0;
-int _bufsize = 0;
-
-int _bufoffset=0;
-
-inline bool getrec(char *rec_, FILE *stream, int recsize_)
-{
-	if (fread(rec_, 1, recsize_, stream) == recsize_) return true;
-/*	
-    int totalread = 0;
-    while (totalread != recsize_){
-        int ch = getc( stream );
-        if (ch == EOF) {
-            return false;
-        }
-        *rec_ = ch;
-        totalread++;
-        rec_++;
-    }
-*/
-	return false;
-
-}
-bool getdamagebindictionary(std::vector<damagebindictionary> &damagebindictionary_vec_)
-{
-	std::ostringstream oss;
-	oss << "damage_bin_dict.bin";
-
-	FILE *fin = fopen(oss.str().c_str(), "rb");
-	if (fin == NULL){
-		cerr << "getdamagebindictionary: Unable to open " << oss.str() << "\n";
-		exit(-1);
-	}
-
-	flseek(fin, 0L, SEEK_END);
-	long long sz = fltell(fin);
-
-	flseek(fin, 0L, SEEK_SET);
-	unsigned int nrec = sz / sizeof(damagebindictionary);
-	damagebindictionary *s1 = new damagebindictionary[nrec];
-	if (fread(s1, sizeof(damagebindictionary), nrec, fin) != nrec) {
-		cerr << "Error reading file\n";
-		exit(-1);
-	}
-	damagebindictionary_vec_.clear();
-
-	for (unsigned int i = 0; i < nrec; i++){
-		damagebindictionary_vec_.push_back(s1[i]);
-	}
-	delete[] s1;
-	if (verbose) cerr << "damagebindictionary_vec row count " << damagebindictionary_vec_.size() << endl;
-
-	fclose(fin);
-	return true;
-}
-
-bool getexposures(std::map<exposure_key, std::vector<exposure_rec> > &exposure_map_)
-{
-	std::ostringstream oss;
-	oss << "exposures.bin";
-
-	FILE *fin = fopen(oss.str().c_str(), "rb");
-	if (fin == NULL){
-		cerr << "getexposures: Unable to open " << oss.str() << "\n";
-		exit(-1);
-	}
-
-	flseek(fin, 0L, SEEK_END);
-	long long sz = fltell(fin);
-	flseek(fin, 0L, SEEK_SET);
-
-	unsigned int nrec = sz / sizeof(exposure);
-	exposure *s1 = new exposure[nrec];
-	if (fread(s1, sizeof(exposure), nrec, fin) != nrec) {
-		cerr << "Error reading file\n";
-		exit(-1);
-	}
-
-    exposure_map_.clear();
-	for (unsigned int i = 0; i < nrec; i++){
-		exposure_key k;
-		k.areaperil_id = s1[i].areaperil_id;
-		k.vulnerability_id = s1[i].vulnerability_id;
-		exposure_rec r;
-		r.group_id = s1[i].group_id;
-		r.item_id = s1[i].item_id;
-		r.tiv = s1[i].tiv;
-		exposure_map_[k].push_back(r);
-		// exposure_vec_.push_back(s1[i]);
-	}
-	delete[] s1;
-	if (verbose) cerr << "exposure_vec_ row count " << exposure_map_.size() << endl;
-	fclose(fin);
-	return true;
-}
-float getgul(damagebindictionary &b, gulGulSamples &g)
+float gulcalc::getgul(damagebindictionary &b, gulGulSamples &g)
 {
 	float gul = 0;
 	if (b.bin_from == b.bin_to) {
@@ -236,44 +99,73 @@ float getgul(damagebindictionary &b, gulGulSamples &g)
 	return gul;
 }
 
-
-gulSampleslevelHeader _lastheader;
-bool _isFirstEvent = true;
-
-void outputgul(gulSampleslevel &gg)
+void gulcalc::covoutputgul(gulcoverageSampleslevel &gg)
 {
-	if (_bufoffset >= _bufsize) {
-		fwrite(_buf, sizeof(unsigned char), _bufoffset, stdout);
-		_bufoffset = 0;
+	if (coverageWriter_ == 0)  return;
+	if (covbufoffset_ >= bufsize) {
+		coverageWriter_(cbuf_,sizeof(unsigned char), covbufoffset_);
+		covbufoffset_ = 0;
 	}
 
-	if (gg.event_id != _lastheader.event_id || gg.item_id != _lastheader.item_id) {
-		if (_isFirstEvent == false){
+	if (gg.event_id != lastcoverageheader.event_id || gg.coverage_id != lastcoverageheader.item_id) {
+		if (isFirstCovEvent_ == false) {
 			gulSampleslevelRec r;
 			r.sidx = 0;
-			r.gul = 0;
-			memcpy(_buf + _bufoffset, &r, sizeof(gulSampleslevelRec));
-			_bufoffset += sizeof(gulSampleslevelRec);	// null terminate list
+			r.loss = 0;
+			memcpy(cbuf_ + covbufoffset_, &r, sizeof(gulSampleslevelRec));
+			covbufoffset_ += sizeof(gulSampleslevelRec);	// null terminate list
 		}
 		else {
-			_isFirstEvent = false;
+			isFirstCovEvent_ = false;
 		}
-		_lastheader.event_id = gg.event_id;
-		_lastheader.item_id = gg.item_id;
-		memcpy(_buf + _bufoffset, &_lastheader, sizeof(_lastheader));
-		_bufoffset += sizeof(_lastheader);
+		lastcoverageheader.event_id = gg.event_id;
+		lastcoverageheader.item_id = gg.coverage_id;
+		memcpy(cbuf_ + covbufoffset_, &lastcoverageheader, sizeof(lastcoverageheader));
+		covbufoffset_ += sizeof(lastcoverageheader);
 	}
 
 	gulSampleslevelRec r;
 	r.sidx = gg.sidx;
-	r.gul = gg.gul;    
-	memcpy(_buf + _bufoffset, &r, sizeof(gulSampleslevelRec));
-	_bufoffset += sizeof(gulSampleslevelRec);
+	r.loss = gg.loss;
+	memcpy(cbuf_ + covbufoffset_, &r, sizeof(gulSampleslevelRec));
+	covbufoffset_ += sizeof(gulSampleslevelRec);
 
 }
 
+void gulcalc::itemoutputgul(gulitemSampleslevel &gg)
+{
+	if (itemWriter_ == 0)  return;
+	if (itembufoffset_ >= bufsize) {
+		itemWriter_(ibuf_, sizeof(unsigned char), itembufoffset_);
+		itembufoffset_ = 0;
+	}
 
-void output_mean(const exposure_rec &er, prob_mean *pp, int bin_count, float &gul_mean,  float &std_dev)
+	if (gg.event_id != lastitemheader.event_id || gg.item_id != lastitemheader.item_id) {
+		if (isFirstItemEvent_ == false){
+			gulSampleslevelRec r;
+			r.sidx = 0;
+			r.loss = 0;
+			memcpy(ibuf_ + itembufoffset_, &r, sizeof(gulSampleslevelRec));
+			itembufoffset_ += sizeof(gulSampleslevelRec);	// null terminate list
+		}
+		else {
+			isFirstItemEvent_ = false;
+		}
+		lastitemheader.event_id = gg.event_id;
+		lastitemheader.item_id = gg.item_id;
+		memcpy(ibuf_ + itembufoffset_, &lastitemheader, sizeof(lastitemheader));
+		itembufoffset_ += sizeof(lastitemheader);
+	}
+
+	gulSampleslevelRec r;
+	r.sidx = gg.sidx;
+	r.loss = gg.loss;    
+	memcpy(ibuf_ + itembufoffset_, &r, sizeof(gulSampleslevelRec));
+	itembufoffset_ += sizeof(gulSampleslevelRec);
+
+}
+
+void gulcalc::output_mean(const item_map_rec &er, float tiv, prob_mean *pp, int bin_count, float &gul_mean,  float &std_dev)
 {
 	float last_prob_to = 0;
 	gul_mean = 0;
@@ -287,8 +179,8 @@ void output_mean(const exposure_rec &er, prob_mean *pp, int bin_count, float &gu
 		p.prob_to = pp->prob_to;
 		p.bin_mean = pp->bin_mean;
 		last_prob_to = pp->prob_to;
-		gul_mean = gul_mean + ((p.prob_to - p.prob_from) *p.bin_mean * er.tiv);
-		ctr_var = ctr_var + ((p.prob_to - p.prob_from) *p.bin_mean*p.bin_mean * er.tiv * er.tiv);
+		gul_mean = gul_mean + ((p.prob_to - p.prob_from) *p.bin_mean * tiv);
+		ctr_var = ctr_var + ((p.prob_to - p.prob_from) *p.bin_mean*p.bin_mean * tiv * tiv);
 		pp++;
 	}
 	float g2 = gul_mean * gul_mean;
@@ -297,53 +189,56 @@ void output_mean(const exposure_rec &er, prob_mean *pp, int bin_count, float &gu
 	std_dev = sqrt(std_dev);
 }
 
-void processrec(char *rec, int recsize,
-	const std::vector<damagebindictionary> &damagebindictionary_vec_,
-	const std::map<exposure_key, std::vector<exposure_rec>> &exposures_map_,
-	std::vector<gulSampleslevel> &event_guls_,
-	getRands &rnd_)
+void gulcalc::processrec(char *rec, int recsize)
 {
 damagecdfrec *d = (damagecdfrec *)rec;
 	char *endofRec = rec + recsize;
-	long long p1 = rnd_.getp1(_reconcilationmode);	// prime p1	make these long to force below expression to not have sign problem
-	long long p2 = rnd_.getp2((unsigned int)p1);  // prime no p2
-	int rnd_count = rnd_.rdxmax(_reconcilationmode);
+	//long long p1 = rnd_->getp1();	// prime p1	make these long to force below expression to not have sign problem
+	//long long p2 = rnd_->getp2((unsigned int)p1);  // prime no p2
+	//long long p3 = rnd_->getp2((unsigned int)samplesize_);	// use as additional offset to stop collision
+	int rnd_count = rnd_->rdxmax();
 
-	exposure_key k;
+	item_map_key k;
 	k.areaperil_id = d->areaperil_id;
 	k.vulnerability_id = d->vulnerabilty_id;
 
-	auto pos = exposures_map_.find(k);
-	if (pos != exposures_map_.end()){
+	auto pos = item_map_->find(k);
+	if (pos != item_map_->end()){
 		auto iter = pos->second.begin();
 		while (iter != pos->second.end()){
-            gulSampleslevel gx;
+			gulitemSampleslevel gx;
+			gulcoverageSampleslevel gc;
 			gx.event_id = d->event_id;
 			gx.item_id = iter->item_id;
+			gc.event_id = gx.event_id;
+			gc.coverage_id = iter->coverage_id;
 			char *b = rec + sizeof(damagecdfrec);
 			int *bin_count = (int *)b;
 			b = b + sizeof(int);
 			prob_mean *pp = (prob_mean *)b;
 			float std_dev;
 			float gul_mean;
-			output_mean(*iter, pp, *bin_count, gul_mean, std_dev);
-			gx.event_id = d->event_id;
-			gx.item_id = iter->item_id;
-			gx.gul = gul_mean;
+//			coveragerec cr=	(*coverages_)[iter->coverage_id];
+			float tiv = (*coverages_)[iter->coverage_id];
+			output_mean(*iter, tiv, pp, *bin_count, gul_mean, std_dev);			
+			gx.loss = gul_mean;
+			gc.loss = gul_mean;
 			gx.sidx = mean_idx;
-			outputgul(gx);
-			gx.event_id = d->event_id;
-			gx.item_id = iter->item_id;
-			gx.gul = std_dev;
+			gc.sidx = mean_idx;
+			itemoutputgul(gx);
+			covoutputgul(gc);			
+			gx.loss = std_dev;
+			gc.loss = std_dev;
 			gx.sidx = std_dev_idx;
-			outputgul(gx);
-			int ridx = 0; // dummy value
-            if (_userandomtable) ridx = ((iter->group_id * p1) + (d->event_id * p2)) % rnd_count;
-            else ridx = iter->group_id * _samplesize;
-			if (_reconcilationmode) ridx = ridx * _samplesize;
-			for (int i = 0; i < _samplesize; i++){
+			gc.sidx = std_dev_idx;
+			itemoutputgul(gx);
+			covoutputgul(gc);
+			int ridx = 0; // dummy value		
+            if (userandomtable_) ridx = ((iter->group_id * p1_*p3_) + (d->event_id * p2_)) % rnd_count;
+            else ridx = iter->group_id * samplesize_;
+			for (int i = 0; i < samplesize_; i++){
 				float  rval;
-				rval = rnd_.rnd(ridx + i);
+				rval = rnd_->rnd(ridx + i);
                 float last_prob_to = 0;
 				pp = (prob_mean *)b;
 				for (int bin_index = 0; bin_index < *bin_count; bin_index++){
@@ -363,24 +258,28 @@ damagecdfrec *d = (damagecdfrec *)rec;
 						gulGulSamples g;
 						g.event_id = d->event_id;
 						g.item_id = iter->item_id;
-						g.tiv = iter->tiv;
+						g.tiv = tiv;
 						g.bin_index = bin_index;
 						g.prob_from = p.prob_from;
 						g.prob_to = p.prob_to;
 						g.bin_mean = p.bin_mean;
 						g.rval = rval;
 						g.sidx = i + 1;
-						gulSampleslevel gg;
-						damagebindictionary b = damagebindictionary_vec_[g.bin_index];
-						// gg.gul = (b.bin_from + ((g.rval - g.prob_from) / (g.prob_to - g.prob_from) * (b.bin_to - b.bin_from))) * g.tiv;
-                        if (_debug) gg.gul = rval;
-                        else gg.gul = getgul(b, g);
+						gulitemSampleslevel gg;
+						gulcoverageSampleslevel ggc;
+						damagebindictionary b = (*damagebindictionary_vec_)[g.bin_index];
+                        if (debug_) gg.loss = rval;
+                        else gg.loss = getgul(b, g);
+						ggc.loss = gg.loss;
 						gg.sidx = g.sidx;
+						ggc.sidx = g.sidx;
 						gg.event_id = g.event_id;
 						gg.item_id = g.item_id;
-						// if (_fm_output) event_guls_.push_back(gg);
-						if (gg.gul >= _gul_limit) {
-							outputgul(gg);
+						ggc.coverage_id = iter->coverage_id;
+						ggc.event_id = g.event_id;
+						if (gg.loss >= gul_limit_) {
+							itemoutputgul(gg);
+							covoutputgul(ggc);
 						}
 						break; // break the for loop
 					}
@@ -392,140 +291,55 @@ damagecdfrec *d = (damagecdfrec *)rec;
 		}
 	}
 
-	// int ridx = ((d->group_id * p1) + (d->event_id * p2)) % rnd_count;
-     // fprintf(stderr,"AT THE END\n");
-    fflush(stderr);
-
 }
-
-
-void doit()
+void gulcalc::init()
 {
-	std::vector<damagebindictionary> damagebindictionary_vec;
-	getdamagebindictionary(damagebindictionary_vec);
-	std::map<exposure_key, std::vector<exposure_rec> > exposure_map;
-	getexposures(exposure_map);
+	int	gulstream_type = gul_item_stream | gulstream_id;
 
-	int total_bins = damagebindictionary_vec.size();
-	int max_recsize = (int)(total_bins * sizeof(prob_mean)) + sizeof(damagecdfrec)+sizeof(int);
+	if (itemWriter_ != 0) {
+		itemWriter_(&gulstream_type, sizeof(gulstream_type), 1);
+		itemWriter_(&samplesize_, sizeof(samplesize_), 1);
+	}
 
-    int	gulstream_type = 1 | gulstream_id;
+	gulstream_type = gul_coverage_stream | gulstream_id;
 
-	fwrite(&gulstream_type, sizeof(gulstream_type), 1, stdout);
+	if (coverageWriter_ != 0) {
+		coverageWriter_(&gulstream_type, sizeof(gulstream_type), 1);
+		coverageWriter_(&samplesize_, sizeof(samplesize_), 1);
+	}
+}
+void gulcalc::doit()
+{
+	init();
 
-	// Now output the sample size
-	fwrite(&_samplesize, sizeof(_samplesize), 1, stdout);
+	int total_bins = damagebindictionary_vec_->size();
+	int max_recsize = (int)(total_bins * sizeof(prob_mean)) + sizeof(damagecdfrec) + sizeof(int);
+	int last_event_id = -1;
 
-	_bufsize = sizeof(gulSampleslevel)* _gularraysize;
-	_buf = new unsigned char[_bufsize + sizeof(gulSampleslevel)]; // make the allocation bigger by 1 record to avoid overrunning
-	
 	char *rec = new char[max_recsize];
 	damagecdfrec *d = (damagecdfrec *)rec;
-	std::vector<gulSampleslevel> event_guls;
-	int last_event_id = -1;
-	int stream_type = 0;
-    bool bSuccess = getrec((char *)&stream_type, stdin, sizeof(stream_type));
-	if (bSuccess == false) {
-		cerr << "Error: no stream type returned\n";
-		return; // exit thread if failed
-	}
-	getRands rnd(_userandomtable, _chunk_id);
 
-    for (;;)
+	for (;;)
 	{
-		//damagecdfrec c;
 		char *p = rec;
-        bSuccess = getrec(p, stdin, sizeof(damagecdfrec));
+		bool bSuccess = iGetrec_(p, sizeof(damagecdfrec));
 		if (bSuccess == false) break;
 		p = p + sizeof(damagecdfrec);
-        bSuccess = getrec(p, stdin, sizeof(int)); // we now have bin count
+		bSuccess = iGetrec_(p, sizeof(int)); // we now have bin count
 		int *q = (int *)p;
 		p = p + sizeof(int);
 		int recsize = (*q) * sizeof(prob_mean);
 		// we should now have damagecdfrec in memory
-        bSuccess = getrec(p, stdin, recsize);
-		recsize += sizeof(damagecdfrec)+sizeof(int);
+		bSuccess = iGetrec_(p, recsize);
+		recsize += sizeof(damagecdfrec) + sizeof(int);
 		if (d->event_id != last_event_id) {
-			//if (last_event_id != -1) dofm(event_guls);
 			last_event_id = d->event_id;
-			event_guls.clear();
-            if (_userandomtable == false) rnd.clearmap();
+			if (userandomtable_ == false) rnd_->clearvec();
 		}
 
-		processrec(rec, recsize, damagebindictionary_vec, exposure_map, event_guls, rnd);
+		processrec(rec, recsize);
 	}
 
-	fwrite(_buf, sizeof(unsigned char), _bufoffset, stdout);
-
-}
-
-
-void help()
-{
-
-    cerr << "-S Samplesize\n"
-        << "-r use randomtables\n"
-        << "-R reconcilation mode\n"
-        << "-C Chunk id\n"
-        << "-d debug (dump random numbers instead of gul)\n"
-        ;
-}
-
-int main(int argc, char *argv[])
-{
-    int opt;
-    std::string infile;
-    std::string outfile;
-
-     while ((opt = getopt(argc, argv, "dRrL:S:C:I:O:")) != -1) {
-        switch (opt) {
-        case 'S':
-			_samplesize = atoi(optarg);
-			break;
-         case 'R':
-			_reconcilationmode = true;
-			_userandomtable = true;
-			break;
-        case 'r':
-			_userandomtable = true;
-			break;
-        case 'L':
-			_gul_limit = atof(optarg);
-			break;
-	case 'C':
-			_chunk_id = atoi(optarg);
-			break;
-       case 'I':
-                infile = optarg;
-                break;
-	case 'O':
-            outfile = optarg;
-			break;
-    case 'd':
-            _debug = true;
-            break;
-        default: /* '?' */
-           help();
-            exit(EXIT_FAILURE);
-        }
-    }
-
-    if (_samplesize == -1 ){
-        fprintf(stderr,"-S sample size parameter not supplied\n");
-        exit(EXIT_FAILURE);
-    }
-
-    if (_chunk_id == -1 ){
-        fprintf(stderr,"-C chunk id parameter not supplied\n");
-        exit(EXIT_FAILURE);
-    }
-
-     if (_chunk_id == -1 ){
-        fprintf(stderr,"-C chunk id parameter not supplied\n");
-        exit(EXIT_FAILURE);
-    }
-
-    initstreams(infile, outfile);
-	doit();
-
+	if (itemWriter_)  itemWriter_(ibuf_, sizeof(unsigned char), itembufoffset_);
+	if (coverageWriter_) coverageWriter_(cbuf_, sizeof(unsigned char), covbufoffset_);
 }

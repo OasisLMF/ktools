@@ -43,15 +43,14 @@ AC_C_INLINE
 AC_TYPE_INT64_T
 
 
-AC_CONFIG_FILES([Makefile
+AC_CONFIG_FILES([
+		 Makefile
 		 ktest/Makefile
 		 src/Makefile
                  src/cdftocsv/Makefile
                  src/eve/Makefile
-		 src/damagetocsv/Makefile
-		 src/damagetobin/Makefile
-		 src/exposuretocsv/Makefile
-		 src/exposuretobin/Makefile
+		 src/damagebintocsv/Makefile
+		 src/damagebintobin/Makefile
                  src/fmcalc/Makefile
                  src/fmprofiletocsv/Makefile
                  src/fmprofiletobin/Makefile
@@ -59,11 +58,7 @@ AC_CONFIG_FILES([Makefile
                  src/fmpolicytctobin/Makefile
 		 src/fmprogrammetobin/Makefile
 		 src/fmprogrammetocsv/Makefile
-                 src/cdfdatatocsv/Makefile
-                 src/cdfdatatobin/Makefile
                  src/fmtocsv/Makefile
-                 src/fmxreftocsv/Makefile
-                 src/fmxreftobin/Makefile
                  src/randtocsv/Makefile
                  src/randtobin/Makefile
                  src/evetocsv/Makefile
@@ -72,7 +67,31 @@ AC_CONFIG_FILES([Makefile
                  src/getmodel/Makefile
                  src/gulcalc/Makefile
                  src/gultocsv/Makefile
-                 src/outputcalc/Makefile])
+                 src/itemtobin/Makefile
+                 src/itemtocsv/Makefile
+                 src/coveragetobin/Makefile
+                 src/coveragetocsv/Makefile
+                 src/summarycalc/Makefile
+                 src/fmxreftocsv/Makefile
+                 src/fmxreftobin/Makefile
+                 src/summarycalctocsv/Makefile
+                 src/eltcalc/Makefile
+                 src/pltcalc/Makefile
+                 src/gulsummaryxreftobin/Makefile
+                 src/gulsummaryxreftocsv/Makefile
+                 src/fmsummaryxreftobin/Makefile
+                 src/fmsummaryxreftocsv/Makefile
+                 src/occurrencetobin/Makefile
+                 src/occurrencetocsv/Makefile
+                 src/leccalc/Makefile
+                 src/aalcalc/Makefile
+                 src/aalcalctocsv/Makefile
+                 src/aalsummary/Makefile
+                 src/vulnerabilitytobin/Makefile
+                 src/vulnerabilitytocsv/Makefile
+                 src/footprinttobin/Makefile
+                 src/footprinttocsv/Makefile
+                 ])
 AC_OUTPUT
 
 rm -f  ktest/cwbld

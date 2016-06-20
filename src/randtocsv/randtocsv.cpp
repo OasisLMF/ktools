@@ -35,25 +35,55 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
+#include <random>
 
 #include "../include/oasis.hpp"
 
+
+
+void genrandomnumbers(int total, int seed)
+{
+	std::random_device rd;
+	std::uniform_real_distribution<> dis(0, 1);
+	std::mt19937 mt;
+	if (seed > 0) mt.seed(seed);
+	else mt.seed(rd());
+	for (int i = 0; i < total; i++) {
+		float f = (float)dis(mt);
+		printf("%f\n", f);
+	}
+}
 void doit()
 {
 
     float rand;
-	int size;
-	fread(&size, sizeof(size), 1, stdin);
-	printf("%d\n", size);
     while (fread(&rand, sizeof(rand), 1, stdin) == 1){
         printf("%f\n",rand);
     }
 
 }
-
-int main()
+/*
+Normal usage just pipe the random number binary file
+with one argument of a integer - generate x number of random numbers
+with two argument of a integer - generate x number of random numbers with y as the seed
+*/
+int main(int argc, char *argv[])
 {
 	initstreams("", "");
-    doit();
-    return 0;
+	if (argc == 1) {
+		doit();
+		return 0;
+	}
+	if (argc == 2) {
+		int total = atoi(argv[1]);
+		genrandomnumbers(total,0);
+		return 0;
+	}
+    
+	if (argc == 3) {
+		int total = atoi(argv[1]);
+		int seedval = atoi(argv[2]);
+		genrandomnumbers(total,seedval);
+		return 0;
+	}
 }

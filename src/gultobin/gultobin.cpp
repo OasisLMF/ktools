@@ -36,43 +36,35 @@
 #include <stdio.h>
 #include <stdlib.h>
 
- #include <getopt.h>
-
 #include "../include/oasis.hpp"
-int samplesize = -1;
 
 void doit()
 {
 
-  gulSampleslevel q;
-  char line[4096];
-  int lineno=0;
-
+  gulitemSampleslevel q;
+    char line[4096];
+    int lineno=0;
   fgets(line, sizeof(line), stdin);
   lineno++;
-  int gulstream_type = 16777217;
+  int gulstream_type = gulstream_id | 1;
   fwrite(&gulstream_type, sizeof(int), 1, stdout);
+  int samplesize = 1;
   fwrite(&samplesize, sizeof(int), 1, stdout);
   gulSampleslevelHeader gh;
   gh.event_id = -1;
     while (fgets(line, sizeof(line), stdin) != 0)
     {
-    if (sscanf(line, "%d,%d,%d,%f", &q.event_id, &q.item_id, &q.sidx, &q.gul) != 4){
+    if (sscanf(line, "%d,%d,%d,%f", &q.event_id, &q.item_id, &q.sidx, &q.loss) != 4){
            fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
            return;
        }
       else
        {
-          if (q.sidx > samplesize) {
-            fprintf(stderr,"sidx = %d  samplesize = %d\n", q.sidx, samplesize);
-            fprintf(stderr,"sidx greater than sample size\n");
-            exit(-1);
-          }
           if (gh.event_id != q.event_id || gh.item_id != q.item_id){
             if (gh.event_id != -1){
               gulSampleslevelRec gr;
               gr.sidx =  0;
-              gr.gul =  0;
+              gr.loss =  0;
               fwrite(&gr, sizeof(gr), 1, stdout);  
             }
             gh.event_id = q.event_id;
@@ -80,12 +72,12 @@ void doit()
             fwrite(&gh, sizeof(gh), 1, stdout);
             gulSampleslevelRec gr;
             gr.sidx = q.sidx;
-            gr.gul = q.gul;
+            gr.loss = q.loss;
             fwrite(&gr, sizeof(gr), 1, stdout);
           }else {
             gulSampleslevelRec gr;
             gr.sidx = q.sidx;
-            gr.gul = q.gul;
+            gr.loss = q.loss;
             fwrite(&gr, sizeof(gr), 1, stdout);
           }
           
@@ -96,29 +88,9 @@ void doit()
 
 }
 
-void help()
-{
-    fprintf(stderr,"-S Samplesize\n" );    
-}
 
-int main(int argc, char *argv[])
+int main()
 {
-  int opt;
-  while ((opt = getopt(argc, argv, "S:")) != -1) {
-    switch (opt) {
-      case 'S':
-        samplesize = atoi(optarg);
-      break;
- 
-      default: /* '?' */
-           help();
-            exit(EXIT_FAILURE);
-      }
-  }
-  if (samplesize == -1 ){
-        fprintf(stderr,"-S sample size parameter not supplied\n");
-        exit(EXIT_FAILURE);
-  }
   initstreams("", "");
   doit();
   return 0;

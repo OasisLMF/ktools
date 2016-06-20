@@ -99,7 +99,7 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_getmodel_OBJECTS = getmodel.$(OBJEXT)
+am_getmodel_OBJECTS = getmodel.$(OBJEXT) main.$(OBJEXT)
 getmodel_OBJECTS = $(am_getmodel_OBJECTS)
 getmodel_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_@AM_V@)
@@ -242,6 +242,7 @@ pdfdir = @pdfdir@
 prefix = @prefix@
 program_transform_name = @program_transform_name@
 psdir = @psdir@
+runstatedir = @runstatedir@
 sbindir = @sbindir@
 sharedstatedir = @sharedstatedir@
 srcdir = @srcdir@
@@ -250,7 +251,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-getmodel_SOURCES = getmodel.cpp
+getmodel_SOURCES = getmodel.cpp main.cpp 
 all: all-am
 
 .SUFFIXES:
@@ -338,6 +339,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getmodel.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

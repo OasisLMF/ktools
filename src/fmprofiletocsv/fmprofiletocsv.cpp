@@ -39,6 +39,12 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <stdio.h>
 #include <stdlib.h>
 
+#if defined(_MSC_VER)
+#include "../wingetopt/wingetopt.h"
+#else
+#include <getopt.h>
+#endif
+
 #ifdef __unix
     #include <unistd.h>
 #endif
@@ -47,36 +53,20 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 using namespace std;
 
-struct fm_profile {
-    int policytc_id;
-    int calcrule_id;
-    int allocrule_id;
-    int sourcerule_id;
-    int levelrule_id;
-    int ccy_id;
-    float deductible;
-    float limits;
-    float share_prop_of_lim;
-    float deductible_prop_of_loss;
-    float limit_prop_of_loss;
-    float deductible_prop_of_tiv;
-    float limit_prop_of_tiv;
-    float deductible_prop_of_limit;
-};
-
 
 void doit()
 {
 
-    printf ("\"policytc_id\", \"calcrule_id\", \"allocrule_id\",\"sourcerule_id\",\"levelrule_id\",\"ccy_id\"");
-    printf ("\"deductible\", \"limits\", \"share_prop_of_lim\", \"deductible_prop_of_loss\", \"limit_prop_of_loss\", \"deductible_prop_of_tiv\", \"limit_prop_of_tiv\", \"deductible_prop_of_limit\"\n");
+    printf ("\"policytc_id\", \"calcrule_id\", \"allocrule_id\",\"ccy_id\", ");
+	printf("\"deductible\", \"limits\", \"share_prop_of_lim\", \"deductible_prop_of_loss\", \"limit_prop_of_loss\", ");
+	printf ("\"deductible_prop_of_tiv\", \"limit_prop_of_tiv\", \"deductible_prop_of_limit\"\n");
 
     fm_profile q;
     int i = fread(&q, sizeof(q), 1, stdin);
     while (i != 0) {
-        printf("%d, %d, %d, %d, %d, %d, %f, %f, %f, %f, %f, %f, %f, %f\n",
-               q.policytc_id, q.calcrule_id, q.allocrule_id, q.sourcerule_id,
-               q.levelrule_id, q.ccy_id, q.deductible, q.limits,
+        printf("%d, %d, %d, %d, %f, %f, %f, %f, %f, %f, %f, %f\n",
+               q.policytc_id, q.calcrule_id, q.allocrule_id, 
+               q.ccy_id, q.deductible, q.limits,
                q.share_prop_of_lim, q.deductible_prop_of_loss, q.limit_prop_of_loss, q.deductible_prop_of_tiv,
                q.limit_prop_of_tiv, q.deductible_prop_of_limit);
 
@@ -98,7 +88,6 @@ int main(int argc, char* argv[])
      std::string inFile;
      std::string outFile;
 
- #ifdef __unix
      while ((opt = getopt(argc, argv, "hI:O:")) != -1) {
          switch (opt) {
          case 'I':
@@ -112,7 +101,6 @@ int main(int argc, char* argv[])
             exit(EXIT_FAILURE);
          }
      }
- #endif
 
     initstreams(inFile, outFile);
 

@@ -39,7 +39,6 @@
 #include "../include/oasis.hpp"
 
 struct fm_policyTC {
-  int prog_id;
   int level_id;
   int agg_id;
   int layer_id;
@@ -56,7 +55,7 @@ void doit()
 	lineno++;
     while (fgets(line, sizeof(line), stdin) != 0)
     {
-		if (sscanf(line, "%d,%d,%d,%d,%d", &q.prog_id, &q.layer_id, &q.level_id, &q.agg_id, &q.PolicyTC_id) != 5){
+		if (sscanf(line, "%d,%d,%d,%d",  &q.layer_id, &q.level_id, &q.agg_id, &q.PolicyTC_id) != 4){
            fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
            return;
        }

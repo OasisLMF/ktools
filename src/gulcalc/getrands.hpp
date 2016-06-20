@@ -37,57 +37,55 @@
 #include <random>
 #include <unordered_map>
 
-#define RND_VECTOR_SIZE 1000000
+bool isPrime(int number);
 
 class getRands {
 private:
-	bool _fromFile;
-	float *_buf;
-	int _base_offset;
-	unsigned int _buffersize;
-	bool getNextBuffer();
-	// std::random_device _rd;
-	std::mt19937 _gen;
-	std::uniform_real_distribution<> _dis;
-    int _randsamplesize;
-    // std::unordered_map<unsigned int,float> _rnd;
-    std::vector<float> _rnd;
+	bool fromFile_;
+	int rand_vec_size_;
+	float *buf_;
+	int base_offset_;
+	unsigned int buffersize_;
+	std::mt19937 gen_;
+	std::uniform_real_distribution<> dis_;
+    //int _randsamplesize;
+    std::vector<float> rnd_;
+	int rand_seed_;
 public:
-	getRands(bool fromFile_, int chunkid_);
+	getRands(bool fromFile,int rand_vec_size, int rand_seed);
 	void clearbuff() {
-		delete[]_buf;
+		delete[]buf_;
 	}
-    void clearmap()
+    void clearvec()
     {
-        _rnd.clear();
-        _rnd.resize(RND_VECTOR_SIZE,-1);
+        rnd_.clear();
+        rnd_.resize(rand_vec_size_,-1);
     }
 
-	inline float rnd(unsigned int ridx_)  {
-		if (_fromFile) {
-			if (ridx_ >= _buffersize) ridx_ = ridx_ - _buffersize;
-			return _buf[ridx_];
+	inline float rnd(unsigned int ridx)  {
+		if (fromFile_) {
+			if (ridx >= buffersize_) ridx = ridx - buffersize_;
+			return buf_[ridx];
 		}
 		else {
-			float f = _rnd [ridx_ % RND_VECTOR_SIZE] ;
+			float f = rnd_ [ridx % rand_vec_size_] ;
 			if ( f < 0 ) {
-				f = (float) _dis(_gen);
-				_rnd [ridx_ % RND_VECTOR_SIZE] = f;
+				f = (float) dis_(gen_);
+				rnd_ [ridx % rand_vec_size_] = f;
 			}
 			return f;
-			/*
-            auto iter=_rnd.find(ridx_);
-            if (iter != _rnd.end()) return iter->second;
-            else {
-                float f = (float) _dis(_gen);
-                _rnd[ridx_] = f;
-                return f;
-            }
-			*/
+
 		}
 	}
-	unsigned int getp1(bool _reconcilationmode = false) const;
-	unsigned int getp2(unsigned int p1) const;
-	int count() { return _buffersize; }
-	int rdxmax(bool _reconcilationmode = false) const;
+
+	inline unsigned int getp1() const {  return getp2(buffersize_ / 2); }
+	inline unsigned int getp2(unsigned int p1) const { // get next prime after p1
+		int i = p1 + 1;
+		while (true) {
+			if (isPrime(i)) return i;
+			i++;
+		}
+	}
+	int count() { return buffersize_; }
+	inline int rdxmax() const { return buffersize_; }
 };

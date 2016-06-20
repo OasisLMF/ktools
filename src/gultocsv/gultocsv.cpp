@@ -36,6 +36,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#if defined(_MSC_VER)
+#include "../wingetopt/wingetopt.h"
+#else
+#include <getopt.h>
+#endif
+
+
 #ifdef __unix
 #include <unistd.h>
 #endif
@@ -44,6 +51,7 @@ using namespace std;
 #include "../include/oasis.hpp"
 
 bool skipheader = false;
+bool debugoutput = false;
 
 void doit()
 {
@@ -57,13 +65,10 @@ void doit()
 		exit(-1);
 	}
 	stream_type = streamno_mask &gulstream_type;
-	if (stream_type != 1 && stream_type != 2) {
-		std::cerr << "Unsupported gul stream type\n";
-		exit(-1);
-	}
 
-	if (skipheader == false) printf ("\"event_id\", \"item_id\", \"sidx\", \"gul\"\n");
-	if (stream_type == 1){
+	if (stream_type == 1 || stream_type == 2){
+		if (skipheader == false && stream_type==1) printf ("\"event_id\", \"item_id\", \"sidx\", \"loss\"\n");
+		if (skipheader == false && stream_type==2) printf ("\"event_id\", \"coverage_id\", \"sidx\", \"loss\"\n");
 		int samplesize=0;
 		fread(&samplesize, sizeof(samplesize), 1, stdin);
 		while (i != 0){
@@ -74,11 +79,16 @@ void doit()
 				i = fread(&gr, sizeof(gr), 1, stdin);
 				if (i == 0) break;
 				if (gr.sidx == 0) break;
-				printf("%d, %d, %d, %.2f\n", gh.event_id, gh.item_id, gr.sidx, gr.gul);
+				if(debugoutput) printf("%d, %d, %d, %f\n", gh.event_id, gh.item_id, gr.sidx, gr.loss);
+				else printf("%d, %d, %d, %.2f\n", gh.event_id, gh.item_id, gr.sidx, gr.loss);
 			}
 		}
+		return;
 	}
+	std::cerr << "Unsupported gul stream type\n";
+/*
 	if (stream_type == 2){
+		if (skipheader == false) printf ("\"event_id\", \"item_id\", \"sidx\", \"gul\"\n");
 		int samplesize=0;
 		fread(&samplesize, sizeof(samplesize), 1, stdin);
 		gulSampleslevel p;
@@ -87,7 +97,9 @@ void doit()
 			printf("%d, %d, %d, %.2f\n", p.event_id, p.item_id, p.sidx, p.gul);
 			i = fread(&p, sizeof(p), 1, stdin);
 		}
+		return;
 	}
+*/
 
 }
 
@@ -97,6 +109,7 @@ void help()
 	cerr << "-I inputfilename\n"
 	     << "-O outputfielname\n"
 	     << "-s skip header\n"
+		<< "-d debug output\n"
 	     ;
 }
 
@@ -107,8 +120,7 @@ int main(int argc, char* argv[])
 	std::string inFile;
 	std::string outFile;
 
-#ifdef __unix
-	while ((opt = getopt(argc, argv, "shI:O:")) != -1) {
+	while ((opt = getopt(argc, argv, "dshI:O:")) != -1) {
 		switch (opt) {
 		case 'I':
 			inFile = optarg;
@@ -119,12 +131,14 @@ int main(int argc, char* argv[])
 		case 's':
 			skipheader = true;
 			break;
+		case 'd':
+			debugoutput = true;
+			break;
 		case 'h':
 			help();
 			exit(EXIT_FAILURE);
 		}
 	}
-#endif
 
 	initstreams(inFile, outFile);
 	doit();

@@ -38,28 +38,21 @@
 
 #include "../include/oasis.hpp"
 
-struct fmxref {
-	int item_id;
-	int output_id;
-};
 
 void doit()
 {
 
-	fmxref q;
+	fmXref q;
     char line[4096];
     int lineno=0;
 	fgets(line, sizeof(line), stdin);
 	lineno++;
     while (fgets(line, sizeof(line), stdin) != 0)
     {
-		if (sscanf(line, "%d,%d", &q.item_id, &q.output_id) != 2){
+		if (sscanf(line, "%d,%d,%d", &q.output_id, &q.agg_id, &q.layer_id) != 3){
            fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
            return;
-       }
-
-	    else
-       {
+       }else{
            fwrite(&q, sizeof(q), 1, stdout);
        }
        lineno++;

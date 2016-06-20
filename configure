@@ -698,6 +698,7 @@ infodir
 docdir
 oldincludedir
 includedir
+runstatedir
 localstatedir
 sharedstatedir
 sysconfdir
@@ -773,6 +774,7 @@ datadir='${datarootdir}'
 sysconfdir='${prefix}/etc'
 sharedstatedir='${prefix}/com'
 localstatedir='${prefix}/var'
+runstatedir='${localstatedir}/run'
 includedir='${prefix}/include'
 oldincludedir='/usr/include'
 docdir='${datarootdir}/doc/${PACKAGE_TARNAME}'
@@ -1025,6 +1027,15 @@ do
   | -silent | --silent | --silen | --sile | --sil)
     silent=yes ;;
 
+  -runstatedir | --runstatedir | --runstatedi | --runstated \
+  | --runstate | --runstat | --runsta | --runst | --runs \
+  | --run | --ru | --r)
+    ac_prev=runstatedir ;;
+  -runstatedir=* | --runstatedir=* | --runstatedi=* | --runstated=* \
+  | --runstate=* | --runstat=* | --runsta=* | --runst=* | --runs=* \
+  | --run=* | --ru=* | --r=*)
+    runstatedir=$ac_optarg ;;
+
   -sbindir | --sbindir | --sbindi | --sbind | --sbin | --sbi | --sb)
     ac_prev=sbindir ;;
   -sbindir=* | --sbindir=* | --sbindi=* | --sbind=* | --sbin=* \
@@ -1162,7 +1173,7 @@ fi
 for ac_var in	exec_prefix prefix bindir sbindir libexecdir datarootdir \
 		datadir sysconfdir sharedstatedir localstatedir includedir \
 		oldincludedir docdir infodir htmldir dvidir pdfdir psdir \
-		libdir localedir mandir
+		libdir localedir mandir runstatedir
 do
   eval ac_val=\$$ac_var
   # Remove trailing slashes.
@@ -1315,6 +1326,7 @@ Fine tuning of the installation directories:
   --sysconfdir=DIR        read-only single-machine data [PREFIX/etc]
   --sharedstatedir=DIR    modifiable architecture-independent data [PREFIX/com]
   --localstatedir=DIR     modifiable single-machine data [PREFIX/var]
+  --runstatedir=DIR       modifiable per-process data [LOCALSTATEDIR/run]
   --libdir=DIR            object code libraries [EPREFIX/lib]
   --includedir=DIR        C header files [PREFIX/include]
   --oldincludedir=DIR     C header files for non-gcc [/usr/include]
@@ -4857,7 +4869,7 @@ esac
 
 
 
-ac_config_files="$ac_config_files Makefile ktest/Makefile src/Makefile src/cdftocsv/Makefile src/eve/Makefile src/damagetocsv/Makefile src/damagetobin/Makefile src/exposuretocsv/Makefile src/exposuretobin/Makefile src/fmcalc/Makefile src/fmprofiletocsv/Makefile src/fmprofiletobin/Makefile src/fmpolicytctocsv/Makefile src/fmpolicytctobin/Makefile src/fmprogrammetobin/Makefile src/fmprogrammetocsv/Makefile src/cdfdatatocsv/Makefile src/cdfdatatobin/Makefile src/fmtocsv/Makefile src/fmxreftocsv/Makefile src/fmxreftobin/Makefile src/randtocsv/Makefile src/randtobin/Makefile src/evetocsv/Makefile src/evetobin/Makefile src/gultobin/Makefile src/getmodel/Makefile src/gulcalc/Makefile src/gultocsv/Makefile src/outputcalc/Makefile"
+ac_config_files="$ac_config_files Makefile ktest/Makefile src/Makefile src/cdftocsv/Makefile src/eve/Makefile src/damagebintocsv/Makefile src/damagebintobin/Makefile src/fmcalc/Makefile src/fmprofiletocsv/Makefile src/fmprofiletobin/Makefile src/fmpolicytctocsv/Makefile src/fmpolicytctobin/Makefile src/fmprogrammetobin/Makefile src/fmprogrammetocsv/Makefile src/fmtocsv/Makefile src/randtocsv/Makefile src/randtobin/Makefile src/evetocsv/Makefile src/evetobin/Makefile src/gultobin/Makefile src/getmodel/Makefile src/gulcalc/Makefile src/gultocsv/Makefile src/itemtobin/Makefile src/itemtocsv/Makefile src/coveragetobin/Makefile src/coveragetocsv/Makefile src/summarycalc/Makefile src/fmxreftocsv/Makefile src/fmxreftobin/Makefile src/summarycalctocsv/Makefile src/eltcalc/Makefile src/pltcalc/Makefile src/gulsummaryxreftobin/Makefile src/gulsummaryxreftocsv/Makefile src/fmsummaryxreftobin/Makefile src/fmsummaryxreftocsv/Makefile src/occurrencetobin/Makefile src/occurrencetocsv/Makefile src/leccalc/Makefile src/aalcalc/Makefile src/aalcalctocsv/Makefile src/aalsummary/Makefile src/vulnerabilitytobin/Makefile src/vulnerabilitytocsv/Makefile src/footprinttobin/Makefile src/footprinttocsv/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -5595,10 +5607,8 @@ do
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
     "src/cdftocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/cdftocsv/Makefile" ;;
     "src/eve/Makefile") CONFIG_FILES="$CONFIG_FILES src/eve/Makefile" ;;
-    "src/damagetocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/damagetocsv/Makefile" ;;
-    "src/damagetobin/Makefile") CONFIG_FILES="$CONFIG_FILES src/damagetobin/Makefile" ;;
-    "src/exposuretocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/exposuretocsv/Makefile" ;;
-    "src/exposuretobin/Makefile") CONFIG_FILES="$CONFIG_FILES src/exposuretobin/Makefile" ;;
+    "src/damagebintocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/damagebintocsv/Makefile" ;;
+    "src/damagebintobin/Makefile") CONFIG_FILES="$CONFIG_FILES src/damagebintobin/Makefile" ;;
     "src/fmcalc/Makefile") CONFIG_FILES="$CONFIG_FILES src/fmcalc/Makefile" ;;
     "src/fmprofiletocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/fmprofiletocsv/Makefile" ;;
     "src/fmprofiletobin/Makefile") CONFIG_FILES="$CONFIG_FILES src/fmprofiletobin/Makefile" ;;
@@ -5606,11 +5616,7 @@ do
     "src/fmpolicytctobin/Makefile") CONFIG_FILES="$CONFIG_FILES src/fmpolicytctobin/Makefile" ;;
     "src/fmprogrammetobin/Makefile") CONFIG_FILES="$CONFIG_FILES src/fmprogrammetobin/Makefile" ;;
     "src/fmprogrammetocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/fmprogrammetocsv/Makefile" ;;
-    "src/cdfdatatocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/cdfdatatocsv/Makefile" ;;
-    "src/cdfdatatobin/Makefile") CONFIG_FILES="$CONFIG_FILES src/cdfdatatobin/Makefile" ;;
     "src/fmtocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/fmtocsv/Makefile" ;;
-    "src/fmxreftocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/fmxreftocsv/Makefile" ;;
-    "src/fmxreftobin/Makefile") CONFIG_FILES="$CONFIG_FILES src/fmxreftobin/Makefile" ;;
     "src/randtocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/randtocsv/Makefile" ;;
     "src/randtobin/Makefile") CONFIG_FILES="$CONFIG_FILES src/randtobin/Makefile" ;;
     "src/evetocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/evetocsv/Makefile" ;;
@@ -5619,7 +5625,30 @@ do
     "src/getmodel/Makefile") CONFIG_FILES="$CONFIG_FILES src/getmodel/Makefile" ;;
     "src/gulcalc/Makefile") CONFIG_FILES="$CONFIG_FILES src/gulcalc/Makefile" ;;
     "src/gultocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/gultocsv/Makefile" ;;
-    "src/outputcalc/Makefile") CONFIG_FILES="$CONFIG_FILES src/outputcalc/Makefile" ;;
+    "src/itemtobin/Makefile") CONFIG_FILES="$CONFIG_FILES src/itemtobin/Makefile" ;;
+    "src/itemtocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/itemtocsv/Makefile" ;;
+    "src/coveragetobin/Makefile") CONFIG_FILES="$CONFIG_FILES src/coveragetobin/Makefile" ;;
+    "src/coveragetocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/coveragetocsv/Makefile" ;;
+    "src/summarycalc/Makefile") CONFIG_FILES="$CONFIG_FILES src/summarycalc/Makefile" ;;
+    "src/fmxreftocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/fmxreftocsv/Makefile" ;;
+    "src/fmxreftobin/Makefile") CONFIG_FILES="$CONFIG_FILES src/fmxreftobin/Makefile" ;;
+    "src/summarycalctocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/summarycalctocsv/Makefile" ;;
+    "src/eltcalc/Makefile") CONFIG_FILES="$CONFIG_FILES src/eltcalc/Makefile" ;;
+    "src/pltcalc/Makefile") CONFIG_FILES="$CONFIG_FILES src/pltcalc/Makefile" ;;
+    "src/gulsummaryxreftobin/Makefile") CONFIG_FILES="$CONFIG_FILES src/gulsummaryxreftobin/Makefile" ;;
+    "src/gulsummaryxreftocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/gulsummaryxreftocsv/Makefile" ;;
+    "src/fmsummaryxreftobin/Makefile") CONFIG_FILES="$CONFIG_FILES src/fmsummaryxreftobin/Makefile" ;;
+    "src/fmsummaryxreftocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/fmsummaryxreftocsv/Makefile" ;;
+    "src/occurrencetobin/Makefile") CONFIG_FILES="$CONFIG_FILES src/occurrencetobin/Makefile" ;;
+    "src/occurrencetocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/occurrencetocsv/Makefile" ;;
+    "src/leccalc/Makefile") CONFIG_FILES="$CONFIG_FILES src/leccalc/Makefile" ;;
+    "src/aalcalc/Makefile") CONFIG_FILES="$CONFIG_FILES src/aalcalc/Makefile" ;;
+    "src/aalcalctocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/aalcalctocsv/Makefile" ;;
+    "src/aalsummary/Makefile") CONFIG_FILES="$CONFIG_FILES src/aalsummary/Makefile" ;;
+    "src/vulnerabilitytobin/Makefile") CONFIG_FILES="$CONFIG_FILES src/vulnerabilitytobin/Makefile" ;;
+    "src/vulnerabilitytocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/vulnerabilitytocsv/Makefile" ;;
+    "src/footprinttobin/Makefile") CONFIG_FILES="$CONFIG_FILES src/footprinttobin/Makefile" ;;
+    "src/footprinttocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/footprinttocsv/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac

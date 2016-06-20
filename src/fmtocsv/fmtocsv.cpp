@@ -39,6 +39,13 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <stdio.h>
 #include <stdlib.h>
 
+#if defined(_MSC_VER)
+#include "../wingetopt/wingetopt.h"
+#else
+#include <getopt.h>
+#endif
+
+
 #ifdef __unix
 #include <unistd.h>
 #endif
@@ -71,7 +78,7 @@ void doit()
 	int sample_size = 0;
 	i = fread(&sample_size, sizeof(sample_size), 1, stdin);
 
-	if (skipheader == false) 	printf ("\"event_id\", \"prog_id\", \"layer_id\", \"output_id\", \"sidx\", \"loss\"\n");
+	if (skipheader == false) 	printf ("\"event_id\", \"output_id\", \"sidx\", \"loss\"\n");
 
 	fmlevelhdr p;
 	i = fread(&p, sizeof(fmlevelhdr), 1, stdin);
@@ -82,7 +89,7 @@ void doit()
 		while (i != 0) {
 			count++;
 			if (q.sidx == 0) break;
-			printf("%d, %d, %d, %d, %d, %.2f\n", p.event_id, p.prog_id, p.layer_id, p.output_id, q.sidx, q.loss);
+			printf("%d, %d, %d, %.2f\n", p.event_id, p.output_id, q.sidx, q.loss);
 			i = fread(&q, sizeof(fmlevelrec), 1, stdin);
 		}
 		if (i) i = fread(&p, sizeof(fmlevelhdr), 1, stdin);
@@ -105,9 +112,8 @@ int main(int argc, char* argv[])
 	int opt;
 	std::string inFile;
 	std::string outFile;
-
-#ifdef __unix
-	while ((opt = getopt(argc, argv, "shI:O:")) != -1) {
+	bool deprecated = false;
+	while ((opt = getopt(argc, argv, "dshI:O:")) != -1) {
 		switch (opt) {
 		case 'I':
 			inFile = optarg;
@@ -118,12 +124,14 @@ int main(int argc, char* argv[])
 		case 's':
 			skipheader = true;
 			break;
+		case 'd':
+			deprecated = true;
+			break;
 		case 'h':
 			help();
 			exit(EXIT_FAILURE);
 		}
 	}
-#endif
 
 	initstreams(inFile, outFile);
 	doit();

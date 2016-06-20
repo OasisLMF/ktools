@@ -39,75 +39,35 @@
 #include <stdlib.h>
 #include "../include/oasis.hpp"
 
-
-bool isPrime(int number);
 std::random_device rd;
 using namespace std;
 
-getRands::getRands(bool fromFile_, int chunkid_) : _gen(rd()), _dis(0, 1)
+getRands::getRands(bool fromFile, int rand_vec_size,int rand_seed) : gen_(rd()), dis_(0, 1), rand_vec_size_(rand_vec_size), rand_seed_(rand_seed)
 {
+	if (rand_seed_ > 0) gen_.seed(rand_seed_);
+
 	FILE *fin;
-	std::ostringstream oss;
-	oss << "random_" << chunkid_ << ".bin";
-	_fromFile = fromFile_;
-	_base_offset = 0;
-	if (_fromFile) {
-		fin = fopen(oss.str().c_str(), "rb");
+	fromFile_ = fromFile;
+	base_offset_ = 0;
+	if (fromFile_) {
+		fin = fopen(RANDOM_FILE, "rb");
 		if (fin == NULL){
-			cerr << "getRands: cannot open " << oss.str().c_str() << "\n";
+			cerr << "getRands: cannot open " << RANDOM_FILE << "\n";
 			exit(-1);
 		}
 		flseek(fin, 0L, SEEK_END);
 		long long p = fltell(fin);
-		_buffersize = p / 4;
-		_buffersize = _buffersize - 1;		// first 4 bytes is the limit
+		buffersize_ = p / 4;
+//		_buffersize = _buffersize - 1;		// first 4 bytes is the limit
 		fseek(fin, 0L, SEEK_SET);
 
-        if (fread(&_randsamplesize, sizeof(int), 1, fin) != 1) {
-			cerr << "Error reading random number file\n";
-			exit(-1);
-		}
-
-		_buf = new float[_buffersize];
-		if (fread(_buf, sizeof(float), _buffersize, fin) != _buffersize) {
+		buf_ = new float[buffersize_];
+		if (fread(buf_, sizeof(float), buffersize_, fin) != buffersize_) {
 			cerr << "Error reading random number file\n";
 			exit(-1);
 		}
 		fclose(fin);
 	}else {
-		_rnd.resize(RND_VECTOR_SIZE,-1);
-	}
-}
-
-// first prime greater that ;
-unsigned int  getRands::getp1(bool _reconcilationmode) const
-{
-	if (_reconcilationmode == false) {
-		unsigned int i = _buffersize / 2;
-		return getp2(i);
-	}
-	else {
-        unsigned int i = _buffersize / (2 * _randsamplesize);
-		return getp2(i);
-	}
-}
-
-// get next prime after p1
-unsigned int  getRands::getp2(unsigned int p1) const
-{
-	int i = p1 + 1;
-	while (true){
-		if (isPrime(i)) return i;
-		i++;
-	}
-}
-
-int getRands::rdxmax(bool _reconcilationmode) const
-{
-	if (_reconcilationmode == false) {
-		return _buffersize;
-	}
-	else{
-        return _buffersize / _randsamplesize;
+		rnd_.resize(rand_vec_size,-1);
 	}
 }

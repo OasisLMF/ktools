@@ -47,22 +47,16 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 using namespace std;
 
-struct fm_programme {
-    int prog_id;
-    int level_id;
-    int to_agg_id;
-    int from_agg_id;
-};
 void doit()
 {
 
-    printf ("\"prog_id\", \"from_agg_id\", \"level_id\",\"to_agg_id\"\n");
+    printf ("\"from_agg_id\", \"level_id\",\"to_agg_id\"\n");
     
 
     fm_programme q;
     int i = fread(&q, sizeof(q), 1, stdin);
     while (i != 0) {
-        printf("%d, %d, %d, %d\n", q.prog_id, q.from_agg_id, q.level_id, q.to_agg_id );
+        printf("%d, %d, %d\n",  q.from_agg_id, q.level_id, q.to_agg_id );
         i = fread(&q, sizeof(q), 1, stdin);
     }
 }
@@ -77,11 +71,13 @@ void help()
 
 int main(int argc, char* argv[])
 {
-    int opt;
+    
      std::string inFile;
      std::string outFile;
 
  #ifdef __unix
+	 int opt;
+
      while ((opt = getopt(argc, argv, "hI:O:")) != -1) {
          switch (opt) {
          case 'I':

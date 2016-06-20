@@ -48,7 +48,6 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 using namespace std;
 
 struct fm_policyTC {
-	int prog_id;
 	int level_id;
 	int agg_id;
 	int layer_id;
@@ -59,13 +58,13 @@ struct fm_policyTC {
 void doit()
 {
 
-    //printf ("\"prog_id\", \"level_id\", \"agg_id\",\"layer_id\",\"PolicyTC_id\"\n");
-    printf ("\"prog_id\", \"layer_id\", \"level_id\",\"agg_id\",\"PolicyTC_id\"\n");
+    //printf ("\"level_id\", \"agg_id\",\"layer_id\",\"PolicyTC_id\"\n");
+    printf (" \"layer_id\", \"level_id\",\"agg_id\",\"PolicyTC_id\"\n");
 
     fm_policyTC q;
     int i = fread(&q, sizeof(q), 1, stdin);
     while (i != 0) {
-        printf("%d, %d, %d, %d, %d\n", q.prog_id, q.layer_id,q.level_id,q.agg_id, q.PolicyTC_id );
+        printf(" %d, %d, %d, %d\n",  q.layer_id,q.level_id,q.agg_id, q.PolicyTC_id );
         i = fread(&q, sizeof(q), 1, stdin);
     }
 }

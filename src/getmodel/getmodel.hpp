@@ -12,7 +12,7 @@ public:
 
     getmodel();
     ~getmodel();
-    void init(int numDamageBins, int numIntensityBins, bool hasIntensityUncertainty=false);
+    void init(int numDamageBins, bool hasIntensityUncertainty=false);
 	void doCdf(std::list<int> event_ids);
 
 private:
@@ -30,6 +30,7 @@ private:
     void getExposures();
     void getDamageBinDictionary();
     void getItems();
+	void getIntensityBins();
     void doCdfInner(std::list<int> &event_ids, std::map<int, EventIndex> &event_index_by_event_id);
     void doCdfInnerNoIntensityUncertainty(std::list<int> &event_ids, std::map<int, EventIndex> &event_index_by_event_id);
 

@@ -102,7 +102,7 @@ public:
 		isFirstCovEvent_ = true;
 		p1_ = rnd_->getp1();	// prime p1	make these long to force below expression to not have sign problem
 		p2_ = rnd_->getp2((unsigned int)p1_);  // prime no p2
-		p3_ = rnd_->getp2((unsigned int)samplesize_);	// use as additional offset to stop collision
+		p3_ = rnd_->getp2((unsigned int)samplesize_);	// use as additional offset to stop overlapping of random numbers 
 	}
 	~gulcalc() {
 		delete [] ibuf_;

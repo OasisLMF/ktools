@@ -175,7 +175,6 @@ int main(int argc, char* argv[])
     std::string inFile;
     std::string outFile;
     int new_max = -1;
-	bool deprecated = false;
 
 	int opt;
     while ((opt = getopt(argc, argv, "ohI:O:M:")) != -1) {

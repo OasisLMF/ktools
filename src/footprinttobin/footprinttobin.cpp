@@ -36,10 +36,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#if defined(_MSC_VER)
+#include "../wingetopt/wingetopt.h"
+#else
+#include <getopt.h>
+#endif
 using namespace std;
 
 #include "../include/oasis.hpp"
-
+int intensity_bins_ = -1;
 
 void doit()
 {
@@ -58,6 +63,9 @@ void doit()
 	idx.size = 0;
 	int event_id = 0;
 	int count = 0; // 11616 / 968*12
+
+	fwrite(&intensity_bins_, sizeof(intensity_bins_), 1, foutx);
+	idx.offset += sizeof(intensity_bins_);
 	while (fgets(line, sizeof(line), stdin) != 0)
 	{
 		if (sscanf(line, "%d,%d,%d,%f", &event_id, &r.areaperil_id, &r.intensity_bin_id, &r.probability) != 4) {
@@ -85,9 +93,36 @@ void doit()
 	fclose(fouty);
 }
 
+void help()
+{
+
+	std::cerr << "-I Intensitybins\n"
+		;
+}
+
 
 int main(int argc, char *argv[])
 {
+	int opt;
+	
+	while ((opt = getopt(argc, argv, "hI:")) != -1) {
+		switch (opt) {
+		case 'I':
+			intensity_bins_ = atoi(optarg);
+			break;		
+		case 'h':
+			help();
+			exit(EXIT_FAILURE);
+		default:
+			help();
+			exit(EXIT_FAILURE);
+		}
+	}
+	if (intensity_bins_ == -1) {
+		cerr << "Intensity bin paramter not supplied\n";
+		help();
+		exit(EXIT_FAILURE);
+	}
 
 	initstreams();
 	doit();

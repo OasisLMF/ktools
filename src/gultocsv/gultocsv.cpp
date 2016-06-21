@@ -106,7 +106,7 @@ int main(int argc, char* argv[])
 	std::string inFile;
 	std::string outFile;
 
-	while ((opt = getopt(argc, argv, "hsI:O:")) != -1) {
+	while ((opt = getopt(argc, argv, "hfsI:O:")) != -1) {
 		switch (opt) {
 		case 'I':
 			inFile = optarg;

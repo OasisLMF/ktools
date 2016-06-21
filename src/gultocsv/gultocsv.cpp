@@ -51,7 +51,7 @@ using namespace std;
 #include "../include/oasis.hpp"
 
 bool skipheader = false;
-bool debugoutput = false;
+bool fullprecision = false;
 
 void doit()
 {
@@ -79,27 +79,13 @@ void doit()
 				i = fread(&gr, sizeof(gr), 1, stdin);
 				if (i == 0) break;
 				if (gr.sidx == 0) break;
-				if(debugoutput) printf("%d, %d, %d, %f\n", gh.event_id, gh.item_id, gr.sidx, gr.loss);
+				if(fullprecision) printf("%d, %d, %d, %f\n", gh.event_id, gh.item_id, gr.sidx, gr.loss);
 				else printf("%d, %d, %d, %.2f\n", gh.event_id, gh.item_id, gr.sidx, gr.loss);
 			}
 		}
 		return;
 	}
 	std::cerr << "Unsupported gul stream type\n";
-/*
-	if (stream_type == 2){
-		if (skipheader == false) printf ("\"event_id\", \"item_id\", \"sidx\", \"gul\"\n");
-		int samplesize=0;
-		fread(&samplesize, sizeof(samplesize), 1, stdin);
-		gulSampleslevel p;
-		i = fread(&p, sizeof(p), 1, stdin);
-		while (i != 0) {
-			printf("%d, %d, %d, %.2f\n", p.event_id, p.item_id, p.sidx, p.gul);
-			i = fread(&p, sizeof(p), 1, stdin);
-		}
-		return;
-	}
-*/
 
 }
 
@@ -109,7 +95,7 @@ void help()
 	cerr << "-I inputfilename\n"
 	     << "-O outputfielname\n"
 	     << "-s skip header\n"
-		<< "-d debug output\n"
+		<< "-f full precision\n"
 	     ;
 }
 
@@ -120,7 +106,7 @@ int main(int argc, char* argv[])
 	std::string inFile;
 	std::string outFile;
 
-	while ((opt = getopt(argc, argv, "dshI:O:")) != -1) {
+	while ((opt = getopt(argc, argv, "hsI:O:")) != -1) {
 		switch (opt) {
 		case 'I':
 			inFile = optarg;
@@ -131,8 +117,8 @@ int main(int argc, char* argv[])
 		case 's':
 			skipheader = true;
 			break;
-		case 'd':
-			debugoutput = true;
+		case 'f':
+			fullprecision = true;
 			break;
 		case 'h':
 			help();

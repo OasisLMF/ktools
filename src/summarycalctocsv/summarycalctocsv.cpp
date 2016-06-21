@@ -50,6 +50,7 @@ using namespace std;
 #include "../include/oasis.hpp"
 
 bool skipheader = false;
+bool fullprecision = false;
 
 void doit()
 {
@@ -78,7 +79,8 @@ void doit()
 				i = fread(&sr, sizeof(sr), 1, stdin);
 				if (i == 0) break;
 				if (sr.sidx == 0) break;
-				printf("%d, %d, %d, %.2f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
+				if (fullprecision) printf("%d, %d, %d, %f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
+				else printf("%d, %d, %d, %.2f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);				
 			}
 		}
 		return;
@@ -93,6 +95,8 @@ void help()
 	cerr << "-I inputfilename\n"
 	     << "-O outputfielname\n"
 	     << "-s skip header\n"
+		<< "-f full precision\n"
+		<< "-h help\n"
 	     ;
 }
 
@@ -103,7 +107,7 @@ int main(int argc, char* argv[])
 	std::string inFile;
 	std::string outFile;
 
-	while ((opt = getopt(argc, argv, "shI:O:")) != -1) {
+	while ((opt = getopt(argc, argv, "fshI:O:")) != -1) {
 		switch (opt) {
 		case 'I':
 			inFile = optarg;
@@ -113,6 +117,9 @@ int main(int argc, char* argv[])
 			break;
 		case 's':
 			skipheader = true;
+			break;
+		case 'f':
+			fullprecision = true;
 			break;
 		case 'h':
 			help();

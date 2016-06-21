@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
 	bool noneTrue = true;
 	bool inputtypegul = false;
 	bool inputtypefm = false;
-	while ((opt = getopt(argc, argv, "fg0:1:2:3:4:5:6:7:8:9:")) != -1) {
+	while ((opt = getopt(argc, argv, "hfg0:1:2:3:4:5:6:7:8:9:")) != -1) {
 		switch (opt) {
 		case 'g':
 			inputtypegul = true;

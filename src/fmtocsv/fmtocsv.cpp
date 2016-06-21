@@ -55,6 +55,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 using namespace std;
 
 bool skipheader = false;
+bool fullprecision = false;
 
 void doit()
 {
@@ -89,7 +90,8 @@ void doit()
 		while (i != 0) {
 			count++;
 			if (q.sidx == 0) break;
-			printf("%d, %d, %d, %.2f\n", p.event_id, p.output_id, q.sidx, q.loss);
+			if (fullprecision) printf("%d, %d, %d, %f\n", p.event_id, p.output_id, q.sidx, q.loss);
+			else printf("%d, %d, %d, %.2f\n", p.event_id, p.output_id, q.sidx, q.loss);
 			i = fread(&q, sizeof(fmlevelrec), 1, stdin);
 		}
 		if (i) i = fread(&p, sizeof(fmlevelhdr), 1, stdin);
@@ -103,6 +105,8 @@ void help()
 	cerr << "-I inputfilename\n"
 	     << "-O outputfielname\n"
 	     << "-s skip header\n"
+		<< "-f full precision\n"
+		<< "-h help\n"
 	     ;
 }
 
@@ -112,8 +116,8 @@ int main(int argc, char* argv[])
 	int opt;
 	std::string inFile;
 	std::string outFile;
-	bool deprecated = false;
-	while ((opt = getopt(argc, argv, "dshI:O:")) != -1) {
+	
+	while ((opt = getopt(argc, argv, "fshI:O:")) != -1) {
 		switch (opt) {
 		case 'I':
 			inFile = optarg;
@@ -124,8 +128,8 @@ int main(int argc, char* argv[])
 		case 's':
 			skipheader = true;
 			break;
-		case 'd':
-			deprecated = true;
+		case 'f':
+			fullprecision = true;
 			break;
 		case 'h':
 			help();

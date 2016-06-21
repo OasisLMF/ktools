@@ -81,7 +81,7 @@ void doetloutput(int samplesize)
 			sd = sqrt(sd);
 		}
 		
-		printf("%d, %d, %.2f, %.2f, %.2f\n", sh.summary_id, sh.event_id,mean, sd, sh.expval);
+		printf("%d, %d, %f, %f, %f\n", sh.summary_id, sh.event_id,mean, sd, sh.expval);
 
 		if (i) i = fread(&sh, sizeof(sh), 1, stdin);
 		sumloss = 0.0;

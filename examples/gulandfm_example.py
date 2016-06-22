@@ -64,7 +64,7 @@ def doit():
 		procs.append(p1)		
 		print cmd
 		# This command sents gulcalc item losses (-i) to the named pipe, to be picked up by the listening command above, while gulcalc coverage losses (-c) are sent down the pipeline to summarycalc which is output to results. 
-		cmd="eve %d %d | getmodel -i 121 -d 102 | gulcalc -r -S%d -i %s -c - | summarycalc -g -%d - | summarycalctocsv > %s/gul_samples%d.csv " % (counter,total_processes,samplesize, fifo,summaryset, resultsfolder, counter )
+		cmd="eve %d %d | getmodel | gulcalc -r -S%d -i %s -c - | summarycalc -g -%d - | summarycalctocsv > %s/gul_samples%d.csv " % (counter,total_processes,samplesize, fifo,summaryset, resultsfolder, counter )
 		p1 = subprocess.Popen(cmd,shell=True)
 		procs.append(p1)
 		print cmd

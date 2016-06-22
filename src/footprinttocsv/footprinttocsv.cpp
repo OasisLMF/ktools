@@ -69,7 +69,7 @@ void printrows(int event_id, FILE *finx, long long size )
 	while (i < size) {
 		EventRow row;
 		fread(&row, sizeof(row), 1,finx);
-		printf("%d, %d, %d, %8e\n", event_id,row.areaperil_id,row.intensity_bin_id, row.probability);
+		printf("%d, %d, %d, %.10e\n", event_id,row.areaperil_id,row.intensity_bin_id, row.probability);
 
 		i += sizeof(row);
 	}

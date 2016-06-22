@@ -43,9 +43,16 @@ Author: Joh Carter  email: johanna.carter@oasislmf.org
     #include <unistd.h>
 #endif
 
+#if defined(_MSC_VER)
+#include "../wingetopt/wingetopt.h"
+#else
+#include <getopt.h>
+#endif
+
 #include "../include/oasis.hpp"
 
 using namespace std;
+bool skipheader = false;
 
 struct cdfdata {
 	int event_id;
@@ -55,35 +62,37 @@ struct cdfdata {
 	float prob_to;
 };
 
-#define MAX_NO_OF_BINS 1000
+void printrows(int event_id, FILE *finx, long long size )
+{
+	long long i=0;
+	
+	while (i < size) {
+		EventRow row;
+		fread(&row, sizeof(row), 1,finx);
+		printf("%d, %d, %d, %f\n", event_id,row.areaperil_id,row.intensity_bin_id, row.probability);
 
+		i += sizeof(row);
+	}
+}
 void doit()
 {
-	printf("\"event_id\", \"areaperil_id\", \"vulnerability_id\", \"bin_index\", \"prob_to\"\n");
-	/*
-	This is a complex data structure because of the variable length cdfs. WIP.
-	*/
+	if (skipheader == false) printf("\"event_id\", \"areaperil_id\", \"intensity_bin_id\", \"probability\"\n");
+	FILE *finx = fopen("footprint.bin", "rb");
+	FILE *finy = fopen("footprint.idx", "rb");
 
-    damagecdfrec df;
-    int no_of_bins = 0;
-    float binp[MAX_NO_OF_BINS];
-    int i = fread(&df, sizeof(df), 1, stdin);
-	while (i != 0) {
-        fread(&no_of_bins, sizeof(no_of_bins), 1, stdin);
-        fread(binp, sizeof(float), no_of_bins, stdin);
-        for(int j=0; j < no_of_bins; j++) {
-            cdfdata q;
-            q.event_id = df.event_id;
-            q.areaperil_id = df.areaperil_id;
-            q.vulnerability_id = df.vulnerabilty_id;
-            q.bin_index = j + 1;
-            q.prob_to = binp[j];
-            printf("%d, %d, %d, %d, %f\n",
-			q.event_id, q.areaperil_id, q.vulnerability_id, q.bin_index, q.prob_to);
-        }
+	EventIndex idx;
+	int intensity_bins;
+	int hasIntensityUncertainty;
 
-        i = fread(&df, sizeof(df), 1, stdin);
+	int i = fread(&idx, sizeof(idx), 1, finy);
+	while (i != 0) {		
+		fseek(finx, idx.offset, SEEK_SET);
+		printrows(idx.event_id, finx, idx.size);
+		i = fread(&idx, sizeof(idx), 1, finy);
 	}
+
+	fclose(finx);
+	fclose(finy);
 }
 
 void help()
@@ -96,8 +105,30 @@ void help()
 
 int main(int argc, char* argv[])
 {
+
+	int opt;
+	std::string inFile;
+	std::string outFile;
+
+	while ((opt = getopt(argc, argv, "fshI:O:")) != -1) {
+		switch (opt) {
+		case 'I':
+			inFile = optarg;
+			break;
+		case 'O':
+			outFile = optarg;
+			break;
+		case 's':
+			skipheader = true;
+			break;
+		case 'h':
+			help();
+			exit(EXIT_FAILURE);
+		}
+	}
+
+
     initstreams();
-	printf("TODO!!\n");
-	// doit();
+	doit();
 	return 0;
 }

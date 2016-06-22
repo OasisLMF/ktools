@@ -1,8 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LocalDebuggerCommandArguments>&lt; gulcalci_L.bin  &gt; fmben_L.bin</LocalDebuggerCommandArguments>
-    <LocalDebuggerWorkingDirectory>f:\oasisdev\fmbug</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerCommandArguments>&lt; vulnerability.bin &gt; zzz.csv</LocalDebuggerCommandArguments>
+    <LocalDebuggerWorkingDirectory>f:\junk\modeldata\modeldata</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

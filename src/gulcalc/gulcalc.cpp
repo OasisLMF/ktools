@@ -98,7 +98,34 @@ float gulcalc::getgul(damagebindictionary &b, gulGulSamples &g)
 
 	return gul;
 }
+void gulcalc::outputcoveragedata(int event_id)
+{
+	if (coverageWriter_ == 0)  return;
+	
+	for (auto c : cov_) {
+		gulcoverageSampleslevel gc;
+		gc.event_id = 1;
+		gc.coverage_id = c.first;
+		for (int i = 1; i < c.second.size(); i++) {
+			gc.sidx = i - 2;
+			gc.loss = c.second[i];
+			if (gc.sidx) {
+				covoutputgul(gc);
+			}
+		}		
+	}
+	cov_.clear();
+}
+void gulcalc::covoutputgulx(gulcoverageSampleslevel &gg)
+{
+	if (coverageWriter_ == 0)  return;
+	auto pos = cov_.find(gg.coverage_id);
+	if (pos == cov_.end()) {
+		cov_[gg.coverage_id].resize(samplesize_ + 3, 0);
+	}
+	cov_[gg.coverage_id][gg.sidx+2] += gg.loss;
 
+}
 void gulcalc::covoutputgul(gulcoverageSampleslevel &gg)
 {
 	if (coverageWriter_ == 0)  return;
@@ -226,13 +253,15 @@ damagecdfrec *d = (damagecdfrec *)rec;
 			gx.sidx = mean_idx;
 			gc.sidx = mean_idx;
 			itemoutputgul(gx);
-			covoutputgul(gc);			
+			//covoutputgul(gc);
+			covoutputgulx(gc);
 			gx.loss = std_dev;
 			gc.loss = std_dev;
 			gx.sidx = std_dev_idx;
 			gc.sidx = std_dev_idx;
 			itemoutputgul(gx);
-			covoutputgul(gc);
+			//covoutputgul(gc);
+			covoutputgulx(gc);
 			int ridx = 0; // dummy value		
             if (userandomtable_) ridx = ((iter->group_id * p1_*p3_) + (d->event_id * p2_)) % rnd_count;
             else ridx = iter->group_id * samplesize_;
@@ -279,7 +308,8 @@ damagecdfrec *d = (damagecdfrec *)rec;
 						ggc.event_id = g.event_id;
 						if (gg.loss >= gul_limit_) {
 							itemoutputgul(gg);
-							covoutputgul(ggc);
+							//covoutputgul(ggc);
+							covoutputgulx(ggc);
 						}
 						break; // break the for loop
 					}
@@ -334,12 +364,13 @@ void gulcalc::doit()
 		recsize += sizeof(damagecdfrec) + sizeof(int);
 		if (d->event_id != last_event_id) {
 			last_event_id = d->event_id;
+			outputcoveragedata(last_event_id);
 			if (userandomtable_ == false) rnd_->clearvec();
 		}
 
 		processrec(rec, recsize);
 	}
-
+	outputcoveragedata(d->event_id);
 	if (itemWriter_)  itemWriter_(ibuf_, sizeof(unsigned char), itembufoffset_);
 	if (coverageWriter_) coverageWriter_(cbuf_, sizeof(unsigned char), covbufoffset_);
 }

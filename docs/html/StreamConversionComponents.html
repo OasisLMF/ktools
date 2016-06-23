@@ -1,0 +1,552 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+</head>
+<body>
+<h1 id="stream-conversion-components">4.4 Stream conversion components <a id="streamconversioncomponents"></a></h1>
+<p>The following components convert the binary output of each calculation component to csv format;</p>
+<ul>
+<li><strong><a href="#cdftocsv">cdftocsv</a></strong> is a utility to convert binary format CDFs to a csv. getmodel standard output can be streamed directly into cdftocsv, or a binary file of the same format can be piped in.</li>
+<li><strong><a href="#gultocsv">gultocsv</a></strong> is a utility to convert binary format GULs to a csv. gulcalc standard output can be streamed directly into gultocsv, or a binary file of the same format can be piped in.</li>
+<li><strong><a href="#fmtocsv">fmtocsv</a></strong> is a utility to convert binary format losses to a csv. fmcalc standard output can be streamed directly into fmtocsv, or a binary file of the same format can be piped in.</li>
+<li><strong><a href="#summarycalctocsv">summarycalctocsv</a></strong> is a utility to convert binary format summarycalc losses to a csv. summarycalc standard output can be streamed directly into summarycalctocsv, or a binary file of the same format can be piped in.</li>
+<li><strong><a href="#aalcalctocsv">aalcalctocsv</a></strong> is a utility to convert binary format aalcalc losses to a csv. aalcalc standard output can be streamed directly into aalcalctocsv, or a binary file of the same format can be piped in.</li>
+</ul>
+<p>Additionally, the following component is provided to convert csv data into binary format;</p>
+<ul>
+<li><strong><a href="#gultobin">gultobin</a></strong> is a utility to convert gulcalc data in csv format into binary format such that it can be piped into fmcalc.</li>
+</ul>
+<p>Figure 1 shows the workflows for the binary stream to csv conversions.</p>
+<h5 id="figure-1.-stream-conversion-workflows">Figure 1. Stream conversion workflows</h5>
+<p><img src="../img/streamtocsv.jpg" title="Stream conversion workflows" alt="alt text" /></p>
+<p>Figure 2 shows the workflows for the gultobin component.</p>
+<h5 id="figure-2.-gultobin-workflows">Figure 2. gultobin workflows</h5>
+<p><img src="../img/gultobin.jpg" title="gultobin workflows" alt="alt text" /></p>
+<p><a id="cdftocsv"></a></p>
+<h3 id="cdftocsv">cdftocsv</h3>
+<hr />
+<p>A component which converts the getmodel output stream, or binary file with the same structure, to a csv file.</p>
+<h5 id="stdin-stream_id">Stdin stream_id</h5>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Byte 1</th>
+<th align="left">Bytes 2-4</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">0</td>
+<td align="left">1</td>
+<td align="left">getmodel stdout</td>
+</tr>
+</tbody>
+</table>
+<p>A binary file of the same format can be piped into cdftocsv.</p>
+<h5 id="usage">Usage</h5>
+<pre><code>$ [stdin component] | cdftocsv &gt; [output].csv
+$ cdftocsv &lt; [stdin].bin &gt; [output].csv</code></pre>
+<h5 id="example">Example</h5>
+<pre><code>$ eve 1 1 | getmodel | cdftocsv &gt; cdf.csv
+$ cdftocsv &lt; getmodel.bin &gt; cdf.csv </code></pre>
+<h5 id="output">Output</h5>
+<p>Csv file with the following fields;</p>
+<table>
+<colgroup>
+<col width="16%" />
+<col width="7%" />
+<col width="7%" />
+<col width="57%" />
+<col width="11%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Type</th>
+<th align="left">Bytes</th>
+<th align="left">Description</th>
+<th align="right">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">event_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis event_id</td>
+<td align="right">4545</td>
+</tr>
+<tr class="even">
+<td align="left">areaperil_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis areaperil_id</td>
+<td align="right">345456</td>
+</tr>
+<tr class="odd">
+<td align="left">vulnerability_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis vulnerability_id</td>
+<td align="right">345</td>
+</tr>
+<tr class="even">
+<td align="left">bin_index</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Damage bin index</td>
+<td align="right">20</td>
+</tr>
+<tr class="odd">
+<td align="left">prob_to</td>
+<td align="left">float</td>
+<td align="left">4</td>
+<td align="left">The cumulative probability at the upper damage bin threshold</td>
+<td align="right">0.765</td>
+</tr>
+<tr class="even">
+<td align="left">bin_mean</td>
+<td align="left">float</td>
+<td align="left">4</td>
+<td align="left">The conditional mean of the damage bin</td>
+<td align="right">0.45</td>
+</tr>
+</tbody>
+</table>
+<p><a href="#streamconversiontools">Return to top</a></p>
+<p><a id="gultocsv"></a></p>
+<h3 id="gultocsv">gultocsv</h3>
+<hr />
+<p>A component which converts the gulcalc output stream, or binary file with the same structure, to a csv file.</p>
+<h5 id="stdin-stream_id-1">Stdin stream_id</h5>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Byte 1</th>
+<th align="left">Bytes 2-4</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">1</td>
+<td align="left">1</td>
+<td align="left">gulcalc item stdout</td>
+</tr>
+<tr class="even">
+<td align="left">1</td>
+<td align="left">2</td>
+<td align="left">gulcalc coverage stdout</td>
+</tr>
+</tbody>
+</table>
+<p>A binary file of the same format can be piped into gultocsv.</p>
+<h5 id="usage-1">Usage</h5>
+<pre><code>$ [stdin component] | gultocsv &gt; [output].csv
+$ gultocsv &lt; [stdin].bin &gt; [output].csv</code></pre>
+<h5 id="example-1">Example</h5>
+<pre><code>$ eve 1 1 | getmodel | gulcalc -r -S100 -c - | gultocsv &gt; gulcalcc.csv
+$ gultocsv &lt; gulcalci.bin &gt; gulcalci.csv </code></pre>
+<h5 id="output-1">Output</h5>
+<p>Csv file with the following fields;</p>
+<p>gulcalc stream_id=1</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Type</th>
+<th align="left">Bytes</th>
+<th align="left">Description</th>
+<th align="right">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">event_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis event_id</td>
+<td align="right">4545</td>
+</tr>
+<tr class="even">
+<td align="left">item_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis item_id</td>
+<td align="right">300</td>
+</tr>
+<tr class="odd">
+<td align="left">sidx</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Sample index</td>
+<td align="right">10</td>
+</tr>
+<tr class="even">
+<td align="left">loss</td>
+<td align="left">float</td>
+<td align="left">4</td>
+<td align="left">The ground up loss value</td>
+<td align="right">5675.675</td>
+</tr>
+</tbody>
+</table>
+<p>gulcalc stream_id=2</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Type</th>
+<th align="left">Bytes</th>
+<th align="left">Description</th>
+<th align="right">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">event_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis event_id</td>
+<td align="right">4545</td>
+</tr>
+<tr class="even">
+<td align="left">coverage_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis coverage_id</td>
+<td align="right">150</td>
+</tr>
+<tr class="odd">
+<td align="left">sidx</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Sample index</td>
+<td align="right">10</td>
+</tr>
+<tr class="even">
+<td align="left">loss</td>
+<td align="left">float</td>
+<td align="left">4</td>
+<td align="left">The ground up loss value</td>
+<td align="right">5675.675</td>
+</tr>
+</tbody>
+</table>
+<p><a href="#streamconversiontools">Return to top</a></p>
+<p><a id="fmtocsv"></a></p>
+<h3 id="fmtocsv">fmtocsv</h3>
+<hr />
+<p>A component which converts the fmcalc output stream, or binary file with the same structure, to a csv file.</p>
+<h5 id="stdin-stream_id-2">Stdin stream_id</h5>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Byte 1</th>
+<th align="left">Bytes 2-4</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">2</td>
+<td align="left">1</td>
+<td align="left">fmcalc stdout</td>
+</tr>
+</tbody>
+</table>
+<p>A binary file of the same format can be piped into fmtocsv.</p>
+<h5 id="usage-2">Usage</h5>
+<pre><code>$ [stdin component] | fmtocsv &gt; [output].csv
+$ fmtocsv &lt; [stdin].bin &gt; [output].csv</code></pre>
+<h5 id="example-2">Example</h5>
+<pre><code>$ eve 1 1 | getmodel | gulcalc -r -S100 -i - | fmcalc | fmtocsv &gt; fmcalc.csv
+$ fmtocsv &lt; fmcalc.bin &gt; fmcalc.csv </code></pre>
+<h5 id="output-2">Output</h5>
+<p>Csv file with the following fields;</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Type</th>
+<th align="left">Bytes</th>
+<th align="left">Description</th>
+<th align="right">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">event_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis event_id</td>
+<td align="right">4545</td>
+</tr>
+<tr class="even">
+<td align="left">output_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis output_id</td>
+<td align="right">5</td>
+</tr>
+<tr class="odd">
+<td align="left">sidx</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Sample index</td>
+<td align="right">10</td>
+</tr>
+<tr class="even">
+<td align="left">loss</td>
+<td align="left">float</td>
+<td align="left">4</td>
+<td align="left">The insured loss value</td>
+<td align="right">5375.675</td>
+</tr>
+</tbody>
+</table>
+<p><a href="#streamconversioncomponents">Return to top</a></p>
+<p><a id="summarycalctocsv"></a></p>
+<h3 id="summarycalctocsv">summarycalctocsv</h3>
+<hr />
+<p>A component which converts the summarycalc output stream, or binary file with the same structure, to a csv file.</p>
+<h5 id="stdin-stream_id-3">Stdin stream_id</h5>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Byte 1</th>
+<th align="left">Bytes 2-4</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">3</td>
+<td align="left">1</td>
+<td align="left">summarycalc stdout</td>
+</tr>
+</tbody>
+</table>
+<p>A binary file of the same format can be piped into summarycalctocsv.</p>
+<h5 id="usage-3">Usage</h5>
+<pre><code>$ [stdin component] | summarycalctocsv &gt; [output].csv
+$ summarycalctocsv &lt; [stdin].bin &gt; [output].csv</code></pre>
+<h5 id="example-3">Example</h5>
+<pre><code>$ eve 1 1 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -1 - | summarycalctocsv &gt; summarycalc.csv
+$ summarycalctocsv &lt; summarycalc.bin &gt; summarycalc.csv </code></pre>
+<h5 id="output-3">Output</h5>
+<p>Csv file with the following fields;</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Type</th>
+<th align="left">Bytes</th>
+<th align="left">Description</th>
+<th align="right">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">event_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis event_id</td>
+<td align="right">4545</td>
+</tr>
+<tr class="even">
+<td align="left">summary_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis summary_id</td>
+<td align="right">3</td>
+</tr>
+<tr class="odd">
+<td align="left">sidx</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Sample index</td>
+<td align="right">10</td>
+</tr>
+<tr class="even">
+<td align="left">loss</td>
+<td align="left">float</td>
+<td align="left">4</td>
+<td align="left">The insured loss value</td>
+<td align="right">5375.675</td>
+</tr>
+</tbody>
+</table>
+<p><a href="#streamconversioncomponents">Return to top</a></p>
+<p><a id="aalcalctocsv"></a></p>
+<h3 id="aalcalctocsv">aalcalctocsv</h3>
+<hr />
+<p>A component which converts the aalcalc output stream, or binary file with the same structure, to a csv file.</p>
+<h5 id="stdin-stream_id-4">Stdin stream_id</h5>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Byte 1</th>
+<th align="left">Bytes 2-4</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">4</td>
+<td align="left">1</td>
+<td align="left">aalcalc stdout</td>
+</tr>
+</tbody>
+</table>
+<p>A binary file of the same format can be piped into aalcalctocsv.</p>
+<h5 id="usage-4">Usage</h5>
+<pre><code>$ [stdin component] | aalcalctocsv &gt; [output].csv
+$ aalcalctocsv &lt; [stdin].bin &gt; [output].csv</code></pre>
+<h5 id="example-4">Example</h5>
+<pre><code>$ eve 1 1 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -1 - | aalcalc | aalcalctocsv &gt; aalcalc.csv
+$ aalcalctocsv &lt; aalcalc.bin &gt; aalcalc.csv </code></pre>
+<h5 id="output-4">Output</h5>
+<p>Csv file with the following fields;</p>
+<table>
+<colgroup>
+<col width="17%" />
+<col width="7%" />
+<col width="7%" />
+<col width="56%" />
+<col width="11%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Type</th>
+<th align="left">Bytes</th>
+<th align="left">Description</th>
+<th align="right">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">summary_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">summary_id representing a grouping of losses</td>
+<td align="right">10</td>
+</tr>
+<tr class="even">
+<td align="left">type</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">1 for analytical mean, 2 for mean calculated from samples</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">mean</td>
+<td align="left">float</td>
+<td align="left">8</td>
+<td align="left">sum of period mean losses</td>
+<td align="right">67856.9</td>
+</tr>
+<tr class="even">
+<td align="left">mean_squared</td>
+<td align="left">float</td>
+<td align="left">8</td>
+<td align="left">sum of squared period mean losses</td>
+<td align="right">546577.8</td>
+</tr>
+<tr class="odd">
+<td align="left">max_exposure_value</td>
+<td align="left">float</td>
+<td align="left">8</td>
+<td align="left">maximum exposure value across all periods</td>
+<td align="right">10098730</td>
+</tr>
+</tbody>
+</table>
+<p><a href="#streamconversioncomponents">Return to top</a></p>
+<p><a id="gultobin"></a></p>
+<h3 id="gultobin">gultobin</h3>
+<hr />
+<p>A component which converts gulcalc data in csv format into gulcalc binary standard output, for stream_id=1 (item stream).</p>
+<h5 id="input-file-format">Input file format</h5>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Type</th>
+<th align="left">Bytes</th>
+<th align="left">Description</th>
+<th align="right">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">event_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis event_id</td>
+<td align="right">4545</td>
+</tr>
+<tr class="even">
+<td align="left">item_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis item_id</td>
+<td align="right">300</td>
+</tr>
+<tr class="odd">
+<td align="left">sidx</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Sample index</td>
+<td align="right">10</td>
+</tr>
+<tr class="even">
+<td align="left">loss</td>
+<td align="left">float</td>
+<td align="left">4</td>
+<td align="left">The ground up loss value</td>
+<td align="right">5675.675</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>For each event_id and item_id combination, a record for sidx = -1 (mean) and sidx = -2 (standard deviation) must be included, even if the loss values are zero.</li>
+<li>For each event_id and item_id combination, one or more sampled losses for sidx &gt; 0 may be provided, but records for samples with zero loss may be omitted.</li>
+</ul>
+<h5 id="parameters">Parameters</h5>
+<p>-S, the number of samples must be provided. This can be equal to or greater than maximum sample index value that appears in the csv data.</p>
+<h5 id="usage-5">Usage</h5>
+<pre><code>$ gultobin [parameters] &lt; [input].csv | [stdin component]
+$ gultobin [parameters] &lt; [input].csv &gt; [output].bin</code></pre>
+<h5 id="example-5">Example</h5>
+<pre><code>$ gultobin -S100 &lt; gulcalci.csv | fmcalc &gt; fmcalc.bin
+$ gultobin -S100 &lt; gulcalci.csv &gt; gulcalci.bin</code></pre>
+<h5 id="stdout-stream_id">Stdout stream_id</h5>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Byte 1</th>
+<th align="left">Bytes 2-4</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">1</td>
+<td align="left">1</td>
+<td align="left">gulcalc item stdout</td>
+</tr>
+</tbody>
+</table>
+<p><a href="#streamconversiontools">Return to top</a></p>
+<p><a href="FinancialModule.html">Go to 5. Financial Module</a></p>
+<p><a href="Contents.html">Back to Contents</a></p>
+</body>
+</html>

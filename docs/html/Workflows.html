@@ -1,0 +1,79 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+</head>
+<body>
+<h1 id="workflows">Workflows <a id="workflows"></a></h1>
+<p>ktools is capable of multiple output workflows. This brings much greater flexibility, but also more complexity for users of the toolkit.</p>
+<p>This section presents some example workflows, starting with single output workflows and then moving onto more complex multi-output workflows. There are some python scripts provided which execute some of the illustrative workflows using the example data in the repository. It is assumed that workflows will generally be run across multiple processes, with the number of processes being specified by the user.</p>
+<h3 id="portfolio-summary-level-insured-loss-event-loss-table">1. Portfolio summary level insured loss event loss table</h3>
+<p>In this example, the core workflow is run through fmcalc into summarycalc and then the losses are summarized by summary set 2, which is &quot;portfolio&quot; summary level.<br />
+This produces multiple output files when run with multiple processes, each containing a subset of the event set. The output files can be concatinated together at the end.</p>
+<pre><code>eve 1 2 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -2 - | eltcalc &gt; elt_p1.csv
+eve 2 2 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -2 - | eltcalc &gt; elt_p2.csv</code></pre>
+<h5 id="figure-1.-eltcalc-workflow">Figure 1. eltcalc workflow</h5>
+<p><img src="../img/eltcalc.jpg" title="eltcalc workflow" alt="alt text" /></p>
+<p>See example script <a href="../../examples/eltcalc_example.py">eltcalc_example.py</a><br />
+***</p>
+<h3 id="portfolio-summary-level-insured-loss-period-loss-table">2. Portfolio summary level insured loss period loss table</h3>
+<p>This is very similar to the first example, except the summary samples are run through pltcalc instead. The output files can be concatinated together at the end.</p>
+<pre><code>eve 1 2 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -2 - | pltcalc &gt; plt_p1.csv
+eve 2 2 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -2 - | pltcalc &gt; plt_p2.csv</code></pre>
+<h5 id="figure-2.-pltcalc-workflow">Figure 2. pltcalc workflow</h5>
+<p><img src="../img/pltcalc.jpg" title="eltcalc workflow" alt="alt text" /></p>
+<p>See example script <a href="../../examples/eltcalc_example.py">pltcalc_example.py</a><br />
+***</p>
+<h3 id="portfolio-summary-level-full-uncertainty-aggregate-and-occurrence-loss-exceedance-curves">3. Portfolio summary level full uncertainty aggregate and occurrence loss exceedance curves</h3>
+<p>In this example, the summary samples are calculated as in the first two examples, but the results are output to the work folder. Until this stage the calculation is run over multiple processes. Then, in a single process, leccalc reads the summarycalc binaries from the work folder and computes two loss exceedance curves in a single process. Note that you can output all eight loss exceedance curve variants in a single leccalc command.</p>
+<pre><code>eve 1 2 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -2 - &gt; work/summary2/p1.bin
+eve 2 2 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -2 - &gt; work/summary2/p1.bin
+leccalc -Ksummary2 -F lec_full_uncertainty_agg.csv -f lec_full_uncertainty_occ.csv</code></pre>
+<h5 id="figure-3.-leccalc-workflow">Figure 3. leccalc workflow</h5>
+<p><img src="../img/leccalc.jpg" title="leccalc workflow" alt="alt text" /></p>
+<p>See example script <a href="../../examples/leccalc_example.py">leccalc_example.py</a><br />
+***</p>
+<h3 id="portfolio-summary-level-average-annual-loss">4. Portfolio summary level average annual loss</h3>
+<p>This time, the samples are run through to aalcalc, and the aalcalc binaries are output to the work folder. Until this stage the calculation is run over multiple processes. Then, in a single process, aalsummary reads the aalcalc binaries from the work folder and computes the aal output.</p>
+<pre><code>eve 1 2 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -2 - | aalcalc &gt; work/summary2/p1.bin
+eve 2 2 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -2 - | aalcalc &gt; work/summary2/p2.bin
+aalsummary -Ksummary2 &gt; aal.csv</code></pre>
+<h5 id="figure-4.-aalcalc-workflow">Figure 4. aalcalc workflow</h5>
+<p><img src="../img/aalcalc.jpg" title="aalcalc workflow" alt="alt text" /></p>
+<p>See example script <a href="../../examples/aalcalc_example.py">aalcalc_example.py</a><br />
+***</p>
+<h2 id="multiple-output-workflows">Multiple output workflows</h2>
+<h3 id="ground-up-and-insured-loss-workflows">5. Ground up and insured loss workflows</h3>
+<p>gulcalc can generate two output streams at once: item level samples to pipe into fmcalc, and coverage level samples to pipe into summarycalc. This means that outputs for both ground up loss and insured loss can be generated in one workflow.<br />
+This is done by writing one stream to a file or named pipe, while streaming the other to standard output down the pipeline.</p>
+<pre><code>eve 1 2 | getmodel | gulcalc -r -S100 -i gulcalci1.bin -c - | summarycalc -g -2 - | eltcalc &gt; gul_elt_p1.csv
+eve 2 2 | getmodel | gulcalc -r -S100 -i gulcalci2.bin -c - | summarycalc -g -2 - | eltcalc &gt; gul_elt_p2.csv
+fmcalc &lt; gulcalci1.bin | summarycalc -f -2 - | eltcalc &gt; fm_elt_p1.csv
+fmcalc &lt; gulcalci2.bin | summarycalc -f -2 - | eltcalc &gt; fm_elt_p2.csv</code></pre>
+<p>Note that the gulcalc item stream does not need to be written off to disk, as it can be sent to a 'named pipe', which keeps the data in-memory and kicks off a new process. This is easy to do in Linux (but harder in Windows).</p>
+<p>Figure 5 illustrates an example workflow.</p>
+<h5 id="figure-5.-ground-up-and-insured-loss-example-workflow">Figure 5. Ground up and insured loss example workflow</h5>
+<p><img src="../img/gulandfm.jpg" title="Ground up and insured loss workflow" alt="alt text" /></p>
+<p>See example script <a href="../../examples/gulandfm_example.py">gulandfm_example.py</a><br />
+***</p>
+<h3 id="multiple-summary-level-workflows">6. Multiple summary level workflows</h3>
+<p>Summarycalc is capable of summarizing samples to up to 10 different user-defined levels for ground up loss and insured loss. This means that different outputs can be run on different summary levels. In this example, event loss tables for two different summary levels are generated.</p>
+<pre><code>eve 1 2 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -1 s1/p1.bin -2 s2/p1.bin
+eve 2 2 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -1 s1/p2.bin -2 s2/p2.bin
+eltcalc &lt; s1/p1.bin &gt; elt_s1_p1.csv
+eltcalc &lt; s1/p2.bin &gt; elt_s1_p2.csv
+eltcalc &lt; s2/p1.bin &gt; elt_s2_p1.csv
+eltcalc &lt; s2/p2.bin &gt; elt_s2_p2.csv</code></pre>
+<p>Again, the summarycalc streams can be sent to named pipes rather than written off to disk.</p>
+<p>Figure 6 illustrates multiple summary level streams, each of which can go to different output calculations.</p>
+<h5 id="figure-6.-multiple-summary-level-workflows">Figure 6. Multiple summary level workflows</h5>
+<p><img src="../img/summarycalc.jpg" title="Ground up and insured loss workflow" alt="alt text" /></p>
+<p><a href="#workflows">Return to top</a></p>
+<p><a href="RandomNumbers.html">Go to Appendix A Random numbers</a></p>
+<p><a href="Contents.html">Back to Contents</a></p>
+</body>
+</html>

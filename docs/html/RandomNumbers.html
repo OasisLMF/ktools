@@ -8,48 +8,48 @@
   <style type="text/css">code{white-space: pre;}</style>
 </head>
 <body>
-<h1 id="random-numbers">Random numbers <a id="randomnumbers"></a></h1>
+<h1 id="appendix-a-random-numbers">Appendix A: Random numbers <a id="randomnumbers"></a></h1>
 <p>Simple uniform random numbers are assigned to each event, group and sample number to sample ground up loss in the gulcalc process. A group is a collection of items which share the same group_id, and is the method of supporting spatial correlation in ground up loss sampling in Oasis and ktools.</p>
 <h4 id="correlation">Correlation</h4>
 <p>Items (typically representing, in insurance terms, the underlying risk coverages) that are assigned the same group_id will use the same random number to sample damage for a given event and sample number. Items with different group_ids will be assigned independent random numbers. Therefore sampled damage is fully correlated within groups and fully independent between groups, where group is an abstract collection of items defined by the user.</p>
-<p>The item_id, group_id data is provided by the user in the exposure input file (exposures.bin).</p>
+<p>The item_id, group_id data is provided by the user in the items input file (items.bin).</p>
 <h3 id="methodology">Methodology</h3>
-<p>The method of assigning random numbers in gulcalc uses an random number index (ridx) which is used as a position reference into a list of random numbers. S random numbers corresponding to the runtime number of samples are drawn from the list starting at the ridx position.</p>
-<p>There are three options in ktools for choosing random numbers to apply in the sampling process.</p>
+<p>The method of assigning random numbers in gulcalc uses an random number index (ridx) which is used as a position reference into a list of random numbers. S random numbers corresponding to the runtime number of samples are drawn from the list starting at the first ridx position.</p>
+<p>There are two options in ktools for choosing random numbers to apply in the sampling process.</p>
 <h4 id="generate-dynamically-during-the-calculation">1. Generate dynamically during the calculation</h4>
 <h5 id="usage">Usage</h5>
-<p>No random number parameters are required, this is the default.</p>
+<p>Use -R{number of random numbers} as a parameter.</p>
 <h5 id="example">Example</h5>
-<pre><code>$ gulcalc -C1 -S100</code></pre>
-<p>This will run 100 samples using dynamically generated random numbers.</p>
+<pre><code>$ gulcalc -S00 -R1000000</code></pre>
+<p>This will run 100 samples drawing from 1 million dynamically generated random numbers.</p>
 <h5 id="method">Method</h5>
-<p>Random numbers are sampled dynamically using the Mersenne twister psuedo random number generator (the default RNG of the C++ v11 compiler).<br />A sparse array capable of holding 1 million random numbers is allocated to each event. The RIDX is generated from the group_id and number of samples S using the following modulus function;</p>
-<p>ridx=mod(group_id x S, 1000000)</p>
-<p>This formula pseudo-randomly assigns ridx indexes to each GROUP_ID between 0 and 999,999.</p>
+<p>Random numbers are sampled dynamically using the Mersenne twister psuedo random number generator (the default RNG of the C++ v11 compiler).<br />
+A sparse array capable of holding R million random numbers is allocated to each event. The ridx is generated from the group_id and number of samples S using the following modulus function;</p>
+<p>ridx= mod(group_id x P1, R)</p>
+<ul>
+<li>P1 is the first prime number which is bigger than the number of samples, S.</li>
+</ul>
+<p>This formula pseudo-randomly assigns ridx indexes to each group_id between 0 and 999,999.</p>
 <p>As a ridx is sampled, the section in the array starting at the ridx position of length S is populated with random numbers unless they have already been populated, in which case the existing random numbers are re-used.</p>
 <p>The array is cleared for the next event and a new set of random numbers is generated.</p>
 <h4 id="use-numbers-from-random-number-file">2. Use numbers from random number file</h4>
 <h5 id="usage-1">Usage</h5>
 <p>Use -r as a parameter</p>
 <h5 id="example-1">Example</h5>
-<pre><code>$ gulcalc -C1 -S100 -r</code></pre>
-<p>This will run 100 samples using random numbers from file random_1.bin.</p>
+<pre><code>$ gulcalc -S100 -r</code></pre>
+<p>This will run 100 samples using random numbers from file random.bin in the static sub-directory.</p>
 <h5 id="method-1">Method</h5>
-<p>The random number file(s) is read into memory at the start of the gulcalc process. The same set of numbers are used for all events in the corresponding event file e_chunk_1_data.bin.</p>
-<p>The ridx is generated from the event_id and group_id using the following modulus function;</p>
-<p>ridx=mod(event_id x P1 + group_id x P2, D)</p>
-<p>D is the divisor of the modulus, equal to the total number of random numbers in the list.<br />P1 and P2 are the first two prime numbers which are greater than half of D.</p>
-<p>This formula pseudo-randomly assigns ridx indexes to each event_id and group_id combo between 0 and D-1.</p>
-<h4 id="use-numbers-from-random-number-file-in-reconciliation-mode">3. Use numbers from random number file in 'reconciliation mode'</h4>
-<h5 id="usage-2">Usage</h5>
-<p>Use -r -R as parameters</p>
-<h5 id="example-2">Example</h5>
-<pre><code>$ gulcalc -C1 -S100 -r -R</code></pre>
-<p>This will run 100 samples using random numbers from file random_1.bin in reconciliation mode.</p>
-<h5 id="method-2">Method</h5>
-<p>Reconciliation mode uses the same method as 2. but calculates the ridx in the same way as Oasis classic, thereby producing exactly the same losses for comparison.</p>
-<p>In Oasis classic, random numbers are held in a matrix with the sample index in columns and the ridx is a reference into a row of random numbers for a sample set of size S.</p>
-<p>In reconciliation mode, the divisor D is set to the total number of rows. This is calculated from the number of columns S which is the first 4 byte integer value in the random number file.</p>
+<p>The random number file(s) is read into memory at the start of the gulcalc process.</p>
+<p>The ridx is generated from the sample index (sidx), event_id and group_id using the following modulus function;</p>
+<p>ridx= sidx + mod(group_id x P1 x P3 + event_id x P2, R)</p>
+<ul>
+<li>R is the divisor of the modulus, equal to the total number of random numbers in the list.</li>
+<li>P1 and P2 are the first two prime numbers which are greater than half of R.</li>
+<li>P3 is the first prime number which is bigger than the number of samples, S.</li>
+</ul>
+<p>This formula pseudo-randomly assigns a starting position index to each event_id and group_id combo between 0 and R-1, and then S random numbers are drawn by incrementing the starting position by the sidx.</p>
+<p><a href="#financialmodule">Return to top</a></p>
+<p><a href="fmprofiles.html">Go to Appendix B FM Profiles</a></p>
 <p><a href="Contents.html">Back to Contents</a></p>
 </body>
 </html>

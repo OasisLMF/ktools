@@ -8,20 +8,24 @@
   <style type="text/css">code{white-space: pre;}</style>
 </head>
 <body>
-<h1 id="specification">Specification <a id="specification"></a></h1>
+<h1 id="specification">3. Specification <a id="specification"></a></h1>
 <h3 id="introduction">Introduction</h3>
-<p>This section specifies the components and data stream structures in the in-memory kernel.<br />These components are;</p>
+<p>This section specifies the core components and data stream structures in the in-memory kernel.<br />
+These components are;</p>
 <ul>
-<li><strong><a href="#eve">eve</a></strong><br /></li>
-<li><strong><a href="#getmodel">getmodel</a></strong><br /></li>
-<li><strong><a href="#gulcalc">gulcalc</a></strong><br /></li>
-<li><strong><a href="#fmcalc">fmcalc</a></strong><br /></li>
+<li><strong><a href="#eve">eve</a></strong></li>
+<li><strong><a href="#getmodel">getmodel</a></strong></li>
+<li><strong><a href="#gulcalc">gulcalc</a></strong></li>
+<li><strong><a href="#fmcalc">fmcalc</a></strong></li>
+<li><strong><a href="#summarycalc">summarycalc</a></strong></li>
 <li><strong><a href="#outputcalc">outputcalc</a></strong></li>
 </ul>
-<p>Most components have a standard input (stdin) and output (stdout) data stream structure. These data structures are not defined explicitly as meta data in the code as they would be in a database language, and they have been designed to minimise the volume flowing through the pipeline. For example, indexes which are common to a block of data are defined as a header record and then only the variable data records that are relevant to the header key are part of the data stream. The names of the data fields given below are unimportant, only their position in the data stream in order to perform the calculations defined in the program.</p>
+<p>The components have a standard input (stdin) and/or output (stdout) data stream structure. eve is the stream-initiating component which only has a standard output stream, whereas outputcalc is a stream-terminating component with only a standard input stream.</p>
+<p>The stream data structures have been designed to minimise the volume flowing through the pipeline, using data packet 'headers' to remove redundant data. For example, indexes which are common to a block of data are defined as a header record and then only the variable data records that are relevant to the header key are part of the data stream. The names of the data fields given below are unimportant, only their position in the data stream is important in order to perform the calculations defined in the program.</p>
+<p>An implementation of each of the above components is provided in the <a href="ReferenceModelOverview.html">Reference Model</a>, where usage instructions and command line parameters are provided.</p>
 <h4 id="stream-types">Stream types</h4>
 <p>The architecture supports multiple stream types. Therefore a developer can define a new type of data stream within the framework by specifying a unique stream_id of the stdout of one or more of the components, or even write a new component which performs an intermediate calculation between the existing components.</p>
-<p>The stream_id is the first 4 byte header of the stdout streams. The higher byte is reserved to identify the type of stream, and the 2nd to 4th bytes hold the identifier of the stream.</p>
+<p>The stream_id is the first 4 byte header of the stdout streams. The higher byte is reserved to identify the type of stream (which component), and the 2nd to 4th bytes hold the identifier of the stream. This is used for validation of pipeline commands to report errors if the components are not being used in the correct order.</p>
 <p>The current reserved values are as follows;</p>
 <p>Higher byte;</p>
 <table>
@@ -44,10 +48,19 @@
 <td align="left">2</td>
 <td align="left">fmcalc</td>
 </tr>
+<tr class="even">
+<td align="left">3</td>
+<td align="left">summarycalc</td>
+</tr>
 </tbody>
 </table>
 <p>Reserved stream_ids;</p>
 <table>
+<colgroup>
+<col width="8%" />
+<col width="10%" />
+<col width="81%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="left">Byte 1</th>
@@ -59,30 +72,41 @@
 <tr class="odd">
 <td align="left">0</td>
 <td align="left">1</td>
-<td align="left">getmodel - Reference example for Oasis format CDF output</td>
+<td align="left">getmodel - Reference example for Oasis format effective damageability CDF output</td>
 </tr>
 <tr class="even">
 <td align="left">1</td>
 <td align="left">1</td>
-<td align="left">gulcalc - Reference example for Oasis format ground up loss sample output</td>
+<td align="left">gulcalc - Reference example for Oasis format item level ground up loss sample output</td>
 </tr>
 <tr class="odd">
+<td align="left">1</td>
+<td align="left">2</td>
+<td align="left">gulcalc - Reference example for Oasis format coverage level ground up loss sample output</td>
+</tr>
+<tr class="even">
 <td align="left">2</td>
 <td align="left">1</td>
 <td align="left">fmcalc - Reference example for Oasis format insured loss sample output</td>
 </tr>
+<tr class="odd">
+<td align="left">3</td>
+<td align="left">1</td>
+<td align="left">summarycalc - Reference example for Oasis format summary level loss sample output</td>
+</tr>
 </tbody>
 </table>
-<p>The final calculation component, outputcalc, has no stream_id as it outputs results directly to csv.</p>
 <p>There are rules about which stream types can be accepted as inputs to the components. These are;</p>
 <ul>
-<li>gulcalc can only take stream type 0 (getmodel standard output) as input<br /></li>
-<li>fmcalc can only take stream type 1 (gulcalc standard output) as input<br /></li>
-<li>outputcalc can take either stream type 1 (gulcalc standard output) or 2 (fmcalc standard output) as input</li>
+<li>gulcalc can only take stream 0/1 (getmodel output) as input</li>
+<li>fmcalc can only take stream 1/1 (gulcalc item level output) as input</li>
+<li>summarycalc can take either stream 1/2 (gulcalc coverage level output) or 2/1 (fmcalc standard output) as input</li>
+<li>outputcalc can take only stream 3/1 (summarycalc output) as input</li>
 </ul>
 <p><a id="eve"></a></p>
 <h2 id="eve">eve</h2>
-<p>eve is an 'event emitter' and its job is to read a list of events from file and send out a subset of events as a binary data stream. It has no standard input.<br />eve is used to partition lists of events such that a workflow can be distributed across multiple processes.</p>
+<p>eve is an 'event emitter' and its job is to read a list of events from file and send out a subset of events as a binary data stream. It has no standard input.<br />
+eve is used to partition lists of events such that a workflow can be distributed across multiple processes.</p>
 <h5 id="output">Output</h5>
 <p>Data packet structure</p>
 <table>
@@ -109,13 +133,82 @@
 <p><a href="#specification">Return to top</a></p>
 <p><a id="getmodel"></a></p>
 <h2 id="getmodel">getmodel</h2>
-<p>getmodel is the component which generates a stream of cdfs for a given set of event_ids.</p>
+<p>getmodel is the component which generates a stream of effective damageability cdfs for a given set of event_ids.</p>
 <h5 id="input">Input</h5>
 <p>Same as eve output or a binary file of the same input format can be piped into getmodel.</p>
 <h5 id="output-1">Output</h5>
-<p>Header packet structure</p>
-<p>| Name | Type | Bytes | Description | Example |<br />|:------------------|--------|--------| :-------------------------------------------------------------------|------------:|<br />| stream_id | int | 1/3 | Identifier of the data stream type. | 0/1 |<br />| event_id | int | 4 | Oasis event_id | 4545 |<br />| areaperil_id | int | 4 | Oasis areaperil_id | 345456 |<br />| vulnerability_id | int | 4 | Oasis vulnerability_id | 345 |<br />| no_of_bins | int | 4 | Number of records (bins) in the data package | 20 |<br />Data packet structure (record repeated no_of_bin times)</p>
+<p>Stream header packet structure</p>
 <table>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Type</th>
+<th align="left">Bytes</th>
+<th align="left">Description</th>
+<th align="right">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">stream_id</td>
+<td align="left">int</td>
+<td align="left">1/3</td>
+<td align="left">Identifier of the data stream type.</td>
+<td align="right">0/1</td>
+</tr>
+</tbody>
+</table>
+<p>getmodel header packet structure</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Type</th>
+<th align="left">Bytes</th>
+<th align="left">Description</th>
+<th align="right">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">event_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis event_id</td>
+<td align="right">4545</td>
+</tr>
+<tr class="even">
+<td align="left">areaperil_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis areaperil_id</td>
+<td align="right">345456</td>
+</tr>
+<tr class="odd">
+<td align="left">vulnerability_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis vulnerability_id</td>
+<td align="right">345</td>
+</tr>
+<tr class="even">
+<td align="left">no_of_bins</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Number of records (bins) in the data package</td>
+<td align="right">20</td>
+</tr>
+</tbody>
+</table>
+<p>getmodel data packet structure (record repeated no_of_bin times)</p>
+<table>
+<colgroup>
+<col width="16%" />
+<col width="7%" />
+<col width="7%" />
+<col width="57%" />
+<col width="11%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="left">Name</th>
@@ -145,10 +238,11 @@
 <p><a href="#specification">Return to top</a></p>
 <p><a id="gulcalc"></a></p>
 <h2 id="gulcalc">gulcalc</h2>
-<p>gulcalc is the component which calculates ground up loss. It takes the cdfs as standard input and based on the sampling parameters specified, performs Monte Carlo sampling and numerical integration. The output is a table of ground up loss samples in Oasis kernel format, with mean (sidx=0) and standard deviation (sidx=-1).</p>
+<p>gulcalc is the component which calculates ground up loss. It takes the getmodel output as standard input and based on the sampling parameters specified, performs Monte Carlo sampling and numerical integration. The output is a stream of ground up loss samples in Oasis kernel format, with numerical integration mean (sidx=-1) and standard deviation (sidx=-2).</p>
 <h5 id="input-1">Input</h5>
 <p>Same as getmodel output or a binary file of the same data structure can be piped into gulcalc.</p>
 <h5 id="output-2">Output</h5>
+<h5 id="stream_id-1">stream_id 1</h5>
 <p>Stream header packet structure</p>
 <table>
 <thead>
@@ -177,7 +271,7 @@
 </tr>
 </tbody>
 </table>
-<p>Gul header packet structure</p>
+<p>gulcalc header packet structure</p>
 <table>
 <thead>
 <tr class="header">
@@ -205,7 +299,7 @@
 </tr>
 </tbody>
 </table>
-<p>Gul data packet structure</p>
+<p>gulcalc data packet structure</p>
 <table>
 <thead>
 <tr class="header">
@@ -225,7 +319,7 @@
 <td align="right">10</td>
 </tr>
 <tr class="even">
-<td align="left">gul</td>
+<td align="left">loss</td>
 <td align="left">float</td>
 <td align="left">4</td>
 <td align="left">The ground up loss for the sample</td>
@@ -253,13 +347,114 @@
 </tr>
 </tbody>
 </table>
+<h5 id="stream_id-2">stream_id 2</h5>
+<p>The main difference here is that the field in the gulcalc header packet structure is coverage_id, representing a grouping of item_id, rather than item_id. The distinction and rationale for having this as a alternative stream is explained in the Reference Model section.</p>
+<p>Stream header packet structure</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Type</th>
+<th align="left">Bytes</th>
+<th align="left">Description</th>
+<th align="right">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">stream_id</td>
+<td align="left">int</td>
+<td align="left">1/3</td>
+<td align="left">Identifier of the data stream type.</td>
+<td align="right">1/2</td>
+</tr>
+<tr class="even">
+<td align="left">no_of_samples</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Number of samples</td>
+<td align="right">100</td>
+</tr>
+</tbody>
+</table>
+<p>gulcalc header packet structure</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Type</th>
+<th align="left">Bytes</th>
+<th align="left">Description</th>
+<th align="right">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">event_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis event_id</td>
+<td align="right">4545</td>
+</tr>
+<tr class="even">
+<td align="left">coverage_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis coverage_id</td>
+<td align="right">150</td>
+</tr>
+</tbody>
+</table>
+<p>gulcalc data packet structure</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Type</th>
+<th align="left">Bytes</th>
+<th align="left">Description</th>
+<th align="right">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">sidx</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Sample index</td>
+<td align="right">10</td>
+</tr>
+<tr class="even">
+<td align="left">loss</td>
+<td align="left">float</td>
+<td align="left">4</td>
+<td align="left">The ground up loss for the sample</td>
+<td align="right">5675.675</td>
+</tr>
+</tbody>
+</table>
+<p>Only the numerical integration mean is output for stream_id 2.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">sidx</th>
+<th align="left">Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">-1</td>
+<td align="left">numerical integration mean</td>
+</tr>
+</tbody>
+</table>
 <p><a href="#specification">Return to top</a></p>
 <h2 id="fmcalc">fmcalc <a id="fmcalc"></a></h2>
-<p>fmcalc is the component which takes the gulcalc output stream as standard input and applies the policy terms and conditions to produce insured loss samples. The output is a table of insured loss samples in Oasis kernel format, including the insured loss for the mean ground up loss (sidx=-1).</p>
+<p>fmcalc is the component which takes the gulcalc output stream as standard input and applies the policy terms and conditions to produce insured loss samples. The output is a table of insured loss samples in Oasis kernel format, including the insured loss for the mean ground up loss (sidx=-1) and the maximum exposed value (sidx=-3).</p>
 <h5 id="input-2">Input</h5>
 <p>Same as gulcalc output or a binary file of the same data structure can be piped into fmcalc.</p>
 <h5 id="output-3">Output</h5>
-<p>Stream Header packet structure</p>
+<p>Stream header packet structure</p>
 <table>
 <thead>
 <tr class="header">
@@ -307,20 +502,6 @@
 <td align="right">4545</td>
 </tr>
 <tr class="even">
-<td align="left">prog_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
-<td align="left">Oasis prog_id</td>
-<td align="right">300</td>
-</tr>
-<tr class="odd">
-<td align="left">layer_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
-<td align="left">Oasis layer_id</td>
-<td align="right">300</td>
-</tr>
-<tr class="even">
 <td align="left">output_id</td>
 <td align="left">int</td>
 <td align="left">4</td>
@@ -358,16 +539,147 @@
 </tbody>
 </table>
 <p>The data packet may be a variable length and so a sidx of 0 identifies the end of the data packet.</p>
-<p>The sidx field is the same as the sidx in the gul stdout stream.</p>
+<p>There are two values of sidx with special meaning as follows;</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">sidx</th>
+<th align="left">Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">-1</td>
+<td align="left">numerical integration mean</td>
+</tr>
+<tr class="even">
+<td align="left">-3</td>
+<td align="left">maximum exposed value</td>
+</tr>
+</tbody>
+</table>
+<p>In the case of sidx = -1, this is the numerically integrated mean ground up loss passed through the financial terms from gulcalc.</p>
+<p>The maximum exposed value, sidx=-3, is generated by fmcalc and this is the TIV of the items passed through the financial terms. This represents a 100% loss scenario to all exposed items after applying the insurance terms and conditions and is used in outputs that require an exposed value.</p>
 <p><a href="#specification">Return to top</a></p>
-<h2 id="outputcalc">outputcalc <a id="outputcalc"></a></h2>
-<p>outputcalc is the component which performs results analysis such as an event loss table or EP curve on the sampled output from either the gulcalc or fmcalc program. The output is a results table in csv format.</p>
+<h2 id="summarycalc">summarycalc <a id="summarycalc"></a></h2>
+<p>summarycalc is a component which sums the sampled losses from either gulcalc or fmcalc to the users required level(s) for reporting results. This is a simple sum of the loss value by event_id, sidx and summary_id, where summary_id is a grouping of coverage_id for gulcalc or output_id for fmcalc defined in the user's input files.</p>
 <h5 id="input-3">Input</h5>
-<p>gulcalc stdout or fmcalc stdout. Binary files of the same data structures can be piped into outputcalc.</p>
+<p>Same as gulcalc coverage output (stream_id =2) or fmcalc output. A binary file of either data structure can be piped into summarycalc.</p>
 <h5 id="output-4">Output</h5>
-<p>No standard output stream. The results table is exported to a csv file. See the <a href="ReferenceModel.html">Reference model</a> for example output.</p>
+<p>Stream header packet structure</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Type</th>
+<th align="left">Bytes</th>
+<th align="left">Description</th>
+<th align="right">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">stream_id</td>
+<td align="left">int</td>
+<td align="left">1/3</td>
+<td align="left">Identifier of the data stream type.</td>
+<td align="right">3/1</td>
+</tr>
+<tr class="even">
+<td align="left">no_of_samples</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Number of samples</td>
+<td align="right">100</td>
+</tr>
+</tbody>
+</table>
+<p>summarycalc header packet structure</p>
+<table>
+<colgroup>
+<col width="18%" />
+<col width="8%" />
+<col width="8%" />
+<col width="53%" />
+<col width="12%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Type</th>
+<th align="left">Bytes</th>
+<th align="left">Description</th>
+<th align="right">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">event_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis event_id</td>
+<td align="right">4545</td>
+</tr>
+<tr class="even">
+<td align="left">summary_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Oasis summary_id</td>
+<td align="right">300</td>
+</tr>
+<tr class="odd">
+<td align="left">exposure_value</td>
+<td align="left">float</td>
+<td align="left">4</td>
+<td align="left">The TIV (from gulcalc) or maximum exposure value (fmcalc)</td>
+<td align="right">600000</td>
+</tr>
+</tbody>
+</table>
+<p>summarycalc data packet structure</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Type</th>
+<th align="left">Bytes</th>
+<th align="left">Description</th>
+<th align="right">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">sidx</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Sample index</td>
+<td align="right">10</td>
+</tr>
+<tr class="even">
+<td align="left">loss</td>
+<td align="left">float</td>
+<td align="left">4</td>
+<td align="left">The insured loss for the sample</td>
+<td align="right">5625.675</td>
+</tr>
+</tbody>
+</table>
+<p>The data packet may be a variable length and so a sidx of 0 identifies the end of the data packet.</p>
+<h2 id="outputcalc">outputcalc <a id="outputcalc"></a></h2>
+<p>Outputcalc is a general term for an end-of-pipeline component which represents one of a potentially unlimited set of output components. Four examples are provided in the Reference Model. These are;</p>
+<ul>
+<li>eltcalc</li>
+<li>leccalc</li>
+<li>aalcalc/aalsummary</li>
+<li>pltcalc.</li>
+</ul>
+<p>outputcalc performs results analysis such as an event loss table or loss exceedance curve on the sampled output from summarycalc. The output is a results table in csv format.</p>
+<h5 id="input-4">Input</h5>
+<p>summarycalc stdout. Binary files of the same data structures can be piped into the outputcalc component.</p>
+<h5 id="output-5">Output</h5>
+<p>No standard output stream. The results table is exported to a csv file.</p>
 <p><a href="#specification">Return to top</a></p>
-<p><a href="ReferenceModel.html">Go to Reference model</a></p>
+<p><a href="ReferenceModelOverview.html">Go to 4. Reference model</a></p>
 <p><a href="Contents.html">Back to Contents</a></p>
 </body>
 </html>

@@ -372,8 +372,8 @@ void gulcalc::doit()
 		bSuccess = iGetrec_(p, recsize);
 		recsize += sizeof(damagecdfrec) + sizeof(int);
 		if (d->event_id != last_event_id) {
-			last_event_id = d->event_id;
 			outputcoveragedata(last_event_id);
+			last_event_id = d->event_id;			
 			if (userandomtable_ == false) rnd_->clearvec();
 		}
 

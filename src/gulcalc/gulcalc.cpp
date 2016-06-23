@@ -109,6 +109,8 @@ void gulcalc::outputcoveragedata(int event_id)
 		for (int i = 1; i < c.second.size(); i++) {
 			gc.sidx = i - 2;
 			gc.loss = c.second[i];
+			float tiv = (*coverages_)[gc.coverage_id];
+			if (gc.loss > tiv) gc.loss = tiv;
 			if (gc.sidx) {
 				if (gc.sidx == -1) {
 					covoutputgul(gc);		// always output the mean	

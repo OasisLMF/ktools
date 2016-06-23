@@ -255,7 +255,7 @@ void summarycalc::outputsummaryset(int sample_size, int summary_set, int event_i
 			if (j != 2) {
 				sampleslevelRec s;
 				s.sidx = j - 2;
-				if (s.sidx == -2 && inputtype_ == FM_STREAM) {
+				if (s.sidx == -2) {
 					// skip
 				}
 				else {

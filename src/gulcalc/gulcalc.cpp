@@ -104,7 +104,7 @@ void gulcalc::outputcoveragedata(int event_id)
 	
 	for (auto c : cov_) {
 		gulcoverageSampleslevel gc;
-		gc.event_id = 1;
+		gc.event_id = event_id;
 		gc.coverage_id = c.first;
 		for (int i = 1; i < c.second.size(); i++) {
 			gc.sidx = i - 2;

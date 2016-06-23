@@ -52,7 +52,7 @@ private:
 	const std::map<item_map_key, std::vector<item_map_rec> > *item_map_;
 	const std::vector<float> *coverages_;
 	const std::vector<damagebindictionary> *damagebindictionary_vec_;
-	void covoutputgulx(gulcoverageSampleslevel &gc);
+	void gencovoutput(gulcoverageSampleslevel &gc);
 	std::map<int, std::vector<float>> cov_;
 	void covoutputgul(gulcoverageSampleslevel &gc);
 	void outputcoveragedata(int event_id);

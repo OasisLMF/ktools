@@ -101,7 +101,7 @@ float gulcalc::getgul(damagebindictionary &b, gulGulSamples &g)
 void gulcalc::outputcoveragedata(int event_id)
 {
 	if (coverageWriter_ == 0)  return;
-	
+
 	for (auto c : cov_) {
 		gulcoverageSampleslevel gc;
 		gc.event_id = event_id;
@@ -125,7 +125,7 @@ void gulcalc::outputcoveragedata(int event_id)
 	}
 	cov_.clear();
 }
-void gulcalc::covoutputgulx(gulcoverageSampleslevel &gg)
+void gulcalc::gencovoutput(gulcoverageSampleslevel &gg)
 {
 	if (coverageWriter_ == 0)  return;
 	auto pos = cov_.find(gg.coverage_id);
@@ -263,14 +263,14 @@ damagecdfrec *d = (damagecdfrec *)rec;
 			gc.sidx = mean_idx;
 			itemoutputgul(gx);
 			//covoutputgul(gc);
-			covoutputgulx(gc);
+			gencovoutput(gc);
 			gx.loss = std_dev;
 			gc.loss = std_dev;
 			gx.sidx = std_dev_idx;
 			gc.sidx = std_dev_idx;
 			itemoutputgul(gx);
 			//covoutputgul(gc);
-			covoutputgulx(gc);
+			gencovoutput(gc);
 			int ridx = 0; // dummy value		
             if (userandomtable_) ridx = ((iter->group_id * p1_*p3_) + (d->event_id * p2_)) % rnd_count;
             else ridx = iter->group_id * samplesize_;
@@ -318,7 +318,7 @@ damagecdfrec *d = (damagecdfrec *)rec;
 						if (gg.loss >= gul_limit_) {
 							itemoutputgul(gg);
 							//covoutputgul(ggc);
-							covoutputgulx(ggc);
+							gencovoutput(ggc);
 						}
 						break; // break the for loop
 					}
@@ -372,7 +372,7 @@ void gulcalc::doit()
 		bSuccess = iGetrec_(p, recsize);
 		recsize += sizeof(damagecdfrec) + sizeof(int);
 		if (d->event_id != last_event_id) {
-			outputcoveragedata(last_event_id);
+			if (last_event_id > 0) outputcoveragedata(last_event_id);
 			last_event_id = d->event_id;			
 			if (userandomtable_ == false) rnd_->clearvec();
 		}

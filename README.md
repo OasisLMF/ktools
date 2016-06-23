@@ -8,7 +8,7 @@ Please click [here](https://github.com/OasisLMF/ktools/releases) to download the
 
 The source code will change on a regular basis but only the releases are supported. Support enquiries should be sent to support@oasislmf.org.
 
-The instructions for the Windows build below are for 32-bit executables as the Cygwin mingw cross compiler for Windows does not support 64-bit executables. Until an automated build process for 64-bit is made available, the 64-bit Windows executables will be provided with each release.
+There are build instructions for Windows 64-bit executables. 
 
 Note that the dynamic random number option in the Windows build uses a deterministic seed due to a bug in the mingw compiler. We recommend the random number file option (gulcalc -r) should be used in Windows. 
 
@@ -69,13 +69,16 @@ Download and run the set-up program for Cygwin.
 The following Cygwin add-in packages are required;
 * gcc-g++
 * gcc-core
-* mingw64-i686-gcc-g++
-* mingw64-i686-gcc-core
 * make
 * diffutils
 * automake
 
-Search for 'gcc', 'make' and 'diffutils' to find all of the relevant packages (Only 'gcc' illustrated below).
+To build Windows 64-bit executables;
+
+* mingw64-x86_64-gcc-g++
+* mingw64-x86_64-gcc-core
+
+Search for 'mingw', gcc', 'make' and 'diffutils' to find all of the relevant packages (Only 'gcc' illustrated below).
 ![alt text](docs/img/cygwin1.jpg "Add-in packages")
 
 ### Instructions
@@ -94,9 +97,10 @@ $ tar -xvf ktools-[version].tar.gz
 ```
 
 Go into the ktools folder and configure using the following command;
+
 ``` sh
 $ cd ktools-[version]
-$ ./winconfigure
+$ ./win64configure
 ```
 
 Make using the following command;
@@ -122,12 +126,13 @@ The installation is complete. Restart the Cygwin session to refresh the path bef
 
 ## Usage
 
-There is sample data and three example scripts which demonstrate how to invoke ktools in the /examples folder. These are written in bash, python and vbscript. 
-For example, to run the python script, go into the examples folder and run the following command (you must have python installed to run this script.)
+There is sample data and five example scripts which demonstrate how to invoke ktools in the /examples folder. These are written in python. 
+
+For example, to run the eltcalc_example script, go into the examples folder and run the following command (you must have python installed):
 
 ``` sh
 $ cd examples
-$ python concurrent_example.py 
+$ python eltcalc_example.py 
 ```
 
 ### Questions/problems?

@@ -1,7 +1,7 @@
 # Planned work
 
-#### 1. Generate cdf data component
-Reference examples of components that generate the input binaries from csv have been provided.  One outstanding component to convert cdf data from csv to binary will be provided.
+#### 1. Generate cdfs in getmodel
+The cdf data is assumed to be pre-calculated and read into ktools from binaries.  This will be changed to calculate cdfs as part of getmodel from the model file inputs.
 
 #### 2. Remove chunk concept from eve and getmodel
 The input data for the reference components eve and getmodel can be split across several files, where each is identified by a chunk_id under a fixed naming convention. Eve and getmodel have 'chunk_id' as an input parameter which identifies the relevant input binary file. 
@@ -25,8 +25,9 @@ The sample index field is currently a 4 byte integer format for simplicity of de
 #### 5. Add random number limit as a parameter to gulcalc
 There is a fixed limit of 1 million random numbers per event when the dynamic random number option (no -r parameter) is used in gulcalc. This limit was imposed to improve performance.  We plan to add this limit as an optional parameter to gulcalc.
 
-#### 6. fmcalc code re-factor
-The fmcalc code will be re-factored to improve efficiency, performance and extensibility.
+#### 6. More outputs
+
+More in-memory output components to calculate EP curves and event/year loss tables at different summary levels will be added.
 
 [Go to Random numbers](RandomNumbers.md)
 

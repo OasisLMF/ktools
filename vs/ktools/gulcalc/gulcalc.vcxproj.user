@@ -3,6 +3,6 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LocalDebuggerWorkingDirectory>f:\oasisdev\posix\kfiles</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>-S100 -R 1000 -r -c gul_coverage.bin -i -  &lt; cdf11.bin &gt; gul_item.bin</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-L 0.1 -S100 -R 1000 -r -c gul_coverage.bin -i -  &lt; cdf11.bin &gt; gul_item.bin</LocalDebuggerCommandArguments>
   </PropertyGroup>
 </Project>

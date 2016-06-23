@@ -110,7 +110,14 @@ void gulcalc::outputcoveragedata(int event_id)
 			gc.sidx = i - 2;
 			gc.loss = c.second[i];
 			if (gc.sidx) {
-				covoutputgul(gc);
+				if (gc.sidx == -1) {
+					covoutputgul(gc);		// always output the mean	
+				}
+				else {
+					if (gc.loss >= gul_limit_) {
+						covoutputgul(gc);
+					}
+				}
 			}
 		}		
 	}

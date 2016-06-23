@@ -1,41 +1,41 @@
 #!/bin/sh
 
-installertest()
-{
+init()
+{	
 	if [ ! -f ../src/eve/eve ]; then
 	    echo "Please run make all before make check"
 	    exit
 	fi
 	mkdir -p testout
-
-	CTRL=ctrl
-
-	if [ -f cwbld ]; then
-		CTRL=wctrl
-	fi
-
-	if [ -f uwbld ]; then
-		echo "Windows test  not supported in Linux"
-		exit
-	fi
-
 	cd ..
 	if [ ! -d examples ]; then
 		tar -xzf examples.tar.gz
 	fi
+	mkdir -p examples/work/gul1/summary
+	mkdir -p examples/work/gul2/summary
+	mkdir -p examples/work/fm1/summary
+	mkdir -p examples/work/fm2/summary
+	mkdir -p examples/work/gul1/aal
+	mkdir -p examples/work/gul2/aal
+	mkdir -p examples/work/fm1/aal
+	mkdir -p examples/work/fm2/aal
+
+}
+
+fin()
+{
+
+	rm -rf examples/work
+}
+
+installertest()
+{
+	CTRL=ctrl
 	cd examples
-	mkdir -p work/gul1/summary
-	mkdir -p work/gul2/summary
-	mkdir -p work/fm1/summary
-	mkdir -p work/fm2/summary
-	mkdir -p work/gul1/aal
-	mkdir -p work/gul2/aal
-	mkdir -p work/fm1/aal
-	mkdir -p work/fm2/aal
+
 	# test eve
 	../src/eve/eve 1 2 > ../ktest/testout/eveout1.bin
 	../src/eve/eve 2 2 > ../ktest/testout/eveout2.bin
-
 
 	# # test getmodel
 	 ../src/eve/eve 1 1 | ../src/getmodel/getmodel > ../ktest/testout/getmodelout.bin
@@ -43,9 +43,6 @@ installertest()
 	# test gulcalc item stream and coverage stream
 	../src/eve/eve 1 1 | ../src/getmodel/getmodel | ../src/gulcalc/gulcalc -S100 -L0.1 -r -i - > ../ktest/testout/gulcalci.bin
 	../src/eve/eve 1 1 | ../src/getmodel/getmodel | ../src/gulcalc/gulcalc -S100 -L0.1 -r -c - > ../ktest/testout/gulcalcc.bin
-
-#	../src/eve/eve 2 249 | ../src/getmodel/getmodel -i 121 -d 102 | ../src/gulcalc/gulcalc -S100 -r -i - | gultocsv > ../ktest/testout/gulcalc42i.csv
-#	../src/eve/eve 2 249 | ../src/getmodel/getmodel -i 121 -d 102 | ../src/gulcalc/gulcalc -S100 -r -d -i - | gultocsv > ../ktest/testout/gulcalc42d.csv
 
 	# test fmcalc
 	 ../src/fmcalc/fmcalc > ../ktest/testout/fmcalc.bin < ../ktest/testout/gulcalci.bin
@@ -108,18 +105,17 @@ installertest()
 	../src/aalsummary/aalsummary -Kfm1/aal > ../ktest/testout/fmaalsummary1.csv
 	../src/aalsummary/aalsummary -Kfm2/aal > ../ktest/testout/fmaalsummary2.csv
 
-		# test stream conversion utilities
+	# test stream conversion components
 	# stdout to csv
 	../src/cdftocsv/cdftocsv < ../ktest/testout/getmodelout.bin > ../ktest/testout/getmodelout.csv
+	../src/gultocsv/gultocsv -f < ../ktest/testout/gulcalci.bin > ../ktest/testout/gulcalci.csv
+	../src/gultocsv/gultocsv -f < ../ktest/testout/gulcalcc.bin > ../ktest/testout/gulcalcc.csv
+	../src/fmtocsv/fmtocsv -f < ../ktest/testout/fmcalc.bin > ../ktest/testout/fmcalc.csv
 
-	../src/gultocsv/gultocsv < ../ktest/testout/gulcalci.bin > ../ktest/testout/gulcalci.csv
-	../src/gultocsv/gultocsv < ../ktest/testout/gulcalcc.bin > ../ktest/testout/gulcalcc.csv
-	../src/fmtocsv/fmtocsv < ../ktest/testout/fmcalc.bin > ../ktest/testout/fmcalc.csv
-
-	../src/summarycalctocsv/summarycalctocsv < ../ktest/testout/gulsummarycalc2.bin > ../ktest/testout/gulsummarycalc2.csv
-	../src/summarycalctocsv/summarycalctocsv < ../ktest/testout/gulsummarycalc1.bin > ../ktest/testout/gulsummarycalc1.csv
-	../src/summarycalctocsv/summarycalctocsv < ../ktest/testout/fmsummarycalc2.bin > ../ktest/testout/fmsummarycalc2.csv
-	../src/summarycalctocsv/summarycalctocsv < ../ktest/testout/fmsummarycalc1.bin > ../ktest/testout/fmsummarycalc1.csv
+	../src/summarycalctocsv/summarycalctocsv -f < ../ktest/testout/gulsummarycalc2.bin > ../ktest/testout/gulsummarycalc2.csv
+	../src/summarycalctocsv/summarycalctocsv -f < ../ktest/testout/gulsummarycalc1.bin > ../ktest/testout/gulsummarycalc1.csv
+	../src/summarycalctocsv/summarycalctocsv -f < ../ktest/testout/fmsummarycalc2.bin > ../ktest/testout/fmsummarycalc2.csv
+	../src/summarycalctocsv/summarycalctocsv -f < ../ktest/testout/fmsummarycalc1.bin > ../ktest/testout/fmsummarycalc1.csv
 
 	../src/aalcalctocsv/aalcalctocsv < ../ktest/testout/gulaalcalc1.bin > ../ktest/testout/gulaalcalc1.csv
 
@@ -147,21 +143,33 @@ installertest()
 	../src/fmsummaryxreftocsv/fmsummaryxreftocsv < ../examples/input/fmsummaryxref.bin | ../src/fmsummaryxreftobin/fmsummaryxreftobin > ../ktest/testout/fmsummaryxref.bin
 
 	../src/occurrencetocsv/occurrencetocsv < ../examples/static/occurrence.bin | ../src/occurrencetobin/occurrencetobin -P10000 > ../ktest/testout/occurrence.bin
+
+	../src/vulnerabilitytocsv/vulnerabilitytocsv < ../examples/static/vulnerability.bin | ../src/vulnerabilitytobin/vulnerabilitytobin -d 102 > ../ktest/testout/vulnerability.bin
 	
-	# cd ../ktest/testout
-
+	cp static/footprint.bin ../ktest/testout/footprint.bin
+    cp static/footprint.idx ../ktest/testout/footprint.idx
 	
-	#  md5sum -c ../$CTRL.md5
+	cd ../ktest/testout
+	../../src/footprinttocsv/footprinttocsv > footprint.csv
+	mv footprint.bin footprintin.bin
+    mv footprint.idx footprintin.idx 
+	../../src/footprinttobin/footprinttobin -i 121 < footprint.csv
 
-	#  if [ "$?" -ne "0" ]; then
-	#    echo "Sorry check failed\n"
-	#    exit 1
-	#  else
-	#    echo "All tests passed.\n"
-	#   exit 0
-	#  fi
+     # checksums		
+	 md5sum -c ../$CTRL.md5
 
-	echo "Finished.  Check sums to do."
+	 if [ "$?" -ne "0" ]; then
+	   echo "Sorry check failed\n"
+	   cd ../..
+	   return
+	 else
+	   echo "All tests passed.\n"
+	  cd ../..
+	  return
+	 fi
+	
 }
 
+init
 installertest
+fin

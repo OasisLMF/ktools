@@ -37,7 +37,7 @@ procs = []
 
 
 while (counter <= total_processes) :
-	cmd="eve %d %d | getmodel -i 121 -d 102 | gulcalc -r -S%d -i - | fmcalc | summarycalc -f -2 - | eltcalc > results/elt/fm_elt_summary2_p%d.csv " % (counter,total_processes,samplesize,counter)
+	cmd="eve %d %d | getmodel | gulcalc -r -S%d -i - | fmcalc | summarycalc -f -2 - | eltcalc > results/elt/fm_elt_summary2_p%d.csv " % (counter,total_processes,samplesize,counter)
 	p1 = subprocess.Popen(cmd,shell=True)
 	procs.append(p1)
 	print cmd

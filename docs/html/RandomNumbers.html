@@ -20,7 +20,7 @@
 <h5 id="usage">Usage</h5>
 <p>Use -R{number of random numbers} as a parameter.</p>
 <h5 id="example">Example</h5>
-<pre><code>$ gulcalc -S00 -R1000000</code></pre>
+<pre><code>$ gulcalc -S00 -R1000000 -i -</code></pre>
 <p>This will run 100 samples drawing from 1 million dynamically generated random numbers.</p>
 <h5 id="method">Method</h5>
 <p>Random numbers are sampled dynamically using the Mersenne twister psuedo random number generator (the default RNG of the C++ v11 compiler).<br />
@@ -36,7 +36,7 @@ A sparse array capable of holding R million random numbers is allocated to each 
 <h5 id="usage-1">Usage</h5>
 <p>Use -r as a parameter</p>
 <h5 id="example-1">Example</h5>
-<pre><code>$ gulcalc -S100 -r</code></pre>
+<pre><code>$ gulcalc -S100 -r -i -</code></pre>
 <p>This will run 100 samples using random numbers from file random.bin in the static sub-directory.</p>
 <h5 id="method-1">Method</h5>
 <p>The random number file(s) is read into memory at the start of the gulcalc process.</p>
@@ -48,7 +48,7 @@ A sparse array capable of holding R million random numbers is allocated to each 
 <li>P3 is the first prime number which is bigger than the number of samples, S.</li>
 </ul>
 <p>This formula pseudo-randomly assigns a starting position index to each event_id and group_id combo between 0 and R-1, and then S random numbers are drawn by incrementing the starting position by the sidx.</p>
-<p><a href="#financialmodule">Return to top</a></p>
+<p><a href="#randomnumbers">Return to top</a></p>
 <p><a href="fmprofiles.html">Go to Appendix B FM Profiles</a></p>
 <p><a href="Contents.html">Back to Contents</a></p>
 </body>

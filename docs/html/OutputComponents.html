@@ -27,6 +27,13 @@ $ eltcalc &lt; summarycalc.bin &gt; elt.csv </code></pre>
 <h5 id="output">Output</h5>
 <p>csv file with the following fields;</p>
 <table>
+<colgroup>
+<col width="17%" />
+<col width="7%" />
+<col width="7%" />
+<col width="53%" />
+<col width="12%" />
+</colgroup>
 <thead>
 <tr class="header">
 <th align="left">Name</th>
@@ -69,7 +76,7 @@ $ eltcalc &lt; summarycalc.bin &gt; elt.csv </code></pre>
 <td align="left">exposure_value</td>
 <td align="left">float</td>
 <td align="left">4</td>
-<td align="left">sum of TIV for summary_id affected by event_id</td>
+<td align="left">exposure value for summary_id affected by the event</td>
 <td align="right">70000</td>
 </tr>
 </tbody>
@@ -77,7 +84,7 @@ $ eltcalc &lt; summarycalc.bin &gt; elt.csv </code></pre>
 <p><a href="#outputcomponents">Return to top</a></p>
 <h3 id="leccalc">leccalc <a id="leccalc"></a></h3>
 <hr />
-<p>Loss exceedance curves, also known as exceedance probability curves, are computed by a rank ordering a set of losses by period and computing the probability of exceedance for each level of loss in any given period based on relative frequency. Period losses are first computed by reference to the <strong>occurrence</strong> file which contains the event occurrences against each period. Event losses are summed within each period for an aggregate loss exceedance curve, or the maximum of the event losses in each period is taken for an occurrence loss exceedance curve. From this point, there are a few variants available as follows;</p>
+<p>Loss exceedance curves, also known as exceedance probability curves, are computed by a rank ordering a set of losses by period and computing the probability of exceedance for each level of loss in any given period based on relative frequency. Losses are first assigned to periods by reference to the <strong>occurrence</strong> file which contains the event occurrences in each period. Event losses are summed within each period for an aggregate loss exceedance curve, or the maximum of the event losses in each period is taken for an occurrence loss exceedance curve. From this point, there are a few variants available as follows;</p>
 <ul>
 <li>Full uncertainty</li>
 <li>Wheatsheaf</li>
@@ -118,7 +125,7 @@ $ leccalc -Ksummary1 -F lec_full_uncertainty_agg.csv -f lec_full_uncertainty_occ
 <li>work/summaryset1/summarycalc2.bin</li>
 <li>work/summaryset1/summarycalc3.bin</li>
 </ul>
-<p>The reason for leccalc not having an input stream is that the calculation is not valid on a subset of events, i.e. within a single process when distributing events across multiple processes. It must bring together all event losses before assigning event losses to periods and ranking losses by period. The summarycalc losses for all events (all processes) must be written to the /work folder before running leccalc.</p>
+<p>The reason for leccalc not having an input stream is that the calculation is not valid on a subset of events, i.e. within a single process when the calculation has been distributed across multiple processes. It must bring together all event losses before assigning event losses to periods and ranking losses by period. The summarycalc losses for all events (all processes) must be written to the /work folder before running leccalc.</p>
 <h5 id="calculation-1">Calculation</h5>
 <p>All files with extension .bin from the specified subdirectory are read into memory, as well as the occurrence.bin. The summarycalc losses are grouped together and sampled losses are assigned to period according to which period the events occur in.</p>
 <p>If multiple events occur within a period;</p>
@@ -128,8 +135,8 @@ $ leccalc -Ksummary1 -F lec_full_uncertainty_agg.csv -f lec_full_uncertainty_occ
 </ul>
 <p>Then the calculation differs by lec type, as follows;</p>
 <ul>
-<li>Full uncertainty - all sampled losses by period are rank ordered to produce a single loss exceedance curve</li>
-<li>Wheatsheaf - losses by period are rank ordered for each sample, which produces many loss exceedance curves - one for each sample</li>
+<li>Full uncertainty - all sampled losses by period are rank ordered to produce a single loss exceedance curve. This treats each sample as if it were another period of losses in an extended timeline.</li>
+<li>Wheatsheaf - losses by period are rank ordered for each sample, which produces many loss exceedance curves - one for each sample across the same timeline.</li>
 <li>Sample mean - the losses by period are first averaged across the samples, and then a single loss exceedance curve is created from the period sample mean losses.</li>
 <li><p>Wheatsheaf mean - the loss exceedance curves from the Wheatsheaf are averaged across each return period, which produces a single loss exceedance curve.</p></li>
 <li><p>For the Sample mean and Wheatsheaf mean curves, the analytical mean loss (sidx = -1) is output as a separate exceedance probability curve. If the calculation is run with 0 samples, then leccalc will still return the analytical mean loss exceedance curve. The 'type' field in the output identifies the type of loss exceedance curve, which is 1 for analytical mean, and 2 for the mean calculated from the samples.</p></li>
@@ -256,6 +263,7 @@ $ leccalc -Ksummary1 -F lec_full_uncertainty_agg.csv -f lec_full_uncertainty_occ
 </tr>
 </tbody>
 </table>
+<p>In the next version of leccalc, users will be able to enter the return periods they wish to be returned by specifying a return period file.</p>
 <p><a href="#outputcomponents">Return to top</a></p>
 <h3 id="pltcalc">pltcalc <a id="pltcalc"></a></h3>
 <hr />
@@ -271,7 +279,7 @@ $ pltcalc &lt; summarycalc.bin &gt; plt.csv </code></pre>
 <h5 id="calculation-2">Calculation</h5>
 <p>The occurrence.bin file is read into memory. For each summary_id, event_id and period_no, the sample mean and standard deviation is calculated from the sampled losses in the summarycalc stream and output to file. The exposure_value, which is carried in the event_id, summary_id header of the stream is also output, as well as the date field(s) from the occurrence file.</p>
 <h5 id="output-2">Output</h5>
-<p>There are two output formats, depending on whether an event occurrence date is an integer offset to some base date that most external programs can interpret as a real date, or a day in a numbered scenario year. The output format will depend on the format of the date fields in the occurrence.bin file.</p>
+<p>There are two output formats, depending on whether an event occurrence date is an integer offset to some base date that most external programs can interpret as a real date, or a calendar day in a numbered scenario year. The output format will depend on the format of the date fields in the occurrence.bin file.</p>
 <p>In the former case, the output format is;</p>
 <table>
 <colgroup>
@@ -416,7 +424,7 @@ $ pltcalc &lt; summarycalc.bin &gt; plt.csv </code></pre>
 <p><a href="#outputcomponents">Return to top</a></p>
 <h3 id="aalcalc">aalcalc <a id="aalcalc"></a></h3>
 <hr />
-<p>aalcalc produces binary files which contain the sum of means, and sum of squared means across all periods for each summary_id. This is the first stage in the calculation of average annual loss and standard deviation of loss, which requires the aggregation of the sum of means and sum of squared means across all periods. Like the leccalc component, the calculation cannot be performed within a single process containing a subset of the data, in cases where the analysis has been distributed across multiple processes. Instead, the aalcalc binaries returned from all processes are read back into memory by the aalsummary component which completes the calculation of average annual loss and standard deviation.</p>
+<p>aalcalc produces binary files which contain the sum of means, and sum of squared means across all periods for each summary_id. This is the first stage in the calculation of average annual loss and standard deviation of loss, which requires the aggregation of the sum of means and sum of squared means across all periods. Like the leccalc component, the final calculation cannot be performed within a single process containing a subset of the data, in cases where the events have been distributed across multiple processes. Instead, the aalcalc binaries returned from all processes are read back into memory by the aalsummary component which completes the calculation of average annual loss and standard deviation.</p>
 <p>Two types of mean are calculated in aalcalc; analytical mean (type 1) and sample mean (type 2). If the analysis is run with zero samples, then only type 1 means are returned by aalcalc.</p>
 <h5 id="parameters-3">Parameters</h5>
 <p>None</p>
@@ -493,7 +501,7 @@ $ aalcalc &lt; summarycalc.bin &gt; aal.bin </code></pre>
 <p><a href="#outputcomponents">Return to top</a></p>
 <h3 id="aalsummary">aalsummary <a id="aalsummary"></a></h3>
 <hr />
-<p>aalsummary is the final stage calculation for average annual loss and standard deviation of loss. It reads in all aalcalc binary files which contain the sum of means, and sum of squared means across different sets of periods for each summary_id, and then computes overall average annual loss and standard deviation of loss across all periods.</p>
+<p>aalsummary is the final stage calculation for average annual loss and standard deviation of loss. It reads in all aalcalc binary files which contain the sum of means, and sum of squared means across different sets of periods for each summary_id, and then computes overall average annual loss, standard deviation of loss and maximum exposure value across all periods.</p>
 <p>Two types of aal and standard deviation of loss are calculated in aalsummary; analytical (type 1) and sample (type 2). If the analysis is run with zero samples, then only type 1 statistics are returned by aalsummary.</p>
 <h5 id="parameters-4">Parameters</h5>
 <ul>

@@ -10,7 +10,7 @@
 <body>
 <h1 id="data-conversion-components">4.3 Data conversion components <a id="dataconversioncomponents"></a></h1>
 <p>The following components convert input data in csv format to the binary format required by the calculation components in the reference model;</p>
-<p>Static data</p>
+<p><strong>Static data</strong></p>
 <ul>
 <li><strong><a href="#damagebins">damagebintobin</a></strong> converts the damage bin dictionary.</li>
 <li><strong><a href="#footprint">footprinttobin</a></strong> converts the event footprint.</li>
@@ -18,7 +18,7 @@
 <li><strong><a href="#rand">randtobin</a></strong> converts a list of random numbers.</li>
 <li><strong><a href="#vulnerability">vulnerabilitytobin</a></strong> converts the vulnerability data.</li>
 </ul>
-<p>Input data</p>
+<p><strong>Input data</strong></p>
 <ul>
 <li><strong><a href="#coverages">coveragetobin</a></strong> converts the coverages data.</li>
 <li><strong><a href="#events">evetobin</a></strong> converts a list of event_ids.</li>
@@ -32,7 +32,7 @@
 </ul>
 <p>These components are intended to allow users to generate the required input binaries from csv independently of the original data store and technical environment. All that needs to be done is first generate the csv files from the data store (SQL Server database, etc).</p>
 <p>The following components convert the binary input data required by the calculation components in the reference model into csv format;</p>
-<p>Static data</p>
+<p><strong>Static data</strong></p>
 <ul>
 <li><strong><a href="#damagebins">damagebintocsv</a></strong> converts the damage bin dictionary.</li>
 <li><strong><a href="#footprint">footprinttocsv</a></strong> converts the event footprint.</li>
@@ -40,7 +40,7 @@
 <li><strong><a href="#rand">randtocsv</a></strong> converts a list of random numbers.</li>
 <li><strong><a href="#vulnerability">vulnerabilitytocsv</a></strong> converts the vulnerability data.</li>
 </ul>
-<p>Input data</p>
+<p><strong>Input data</strong></p>
 <ul>
 <li><strong><a href="#coverages">coveragetocsv</a></strong> converts the coverages data.</li>
 <li><strong><a href="#events">evetocsv</a></strong> converts a list of event_ids.</li>
@@ -196,7 +196,7 @@
 <p><a id="occurrence"></a></p>
 <h3 id="occurrence">occurrence</h3>
 <hr />
-<p>The occurrence file is required for certain output components which, in the reference model, are leccalc, pltcalc and aalcalc. In general, some form of event occurence file is required for any output which involves the calculation of loss metrics over a period of time. The occurrence file assigns occurrences of the event_ids to numbered periods. A period can represent any length of time, such as a year or 2 years, or 18 months. The output metrics such as mean, standard deviation or loss exceedance probabilities are with respect to the chosen period length. Most commonly, the period of interest is a year.</p>
+<p>The occurrence file is required for certain output components which, in the reference model, are leccalc, pltcalc and aalcalc. In general, some form of event occurence file is required for any output which involves the calculation of loss metrics over a period of time. The occurrence file assigns occurrences of the event_ids to numbered periods. A period can represent any length of time, such as a year, or 2 years for instance. The output metrics such as mean, standard deviation or loss exceedance probabilities are with respect to the chosen period length. Most commonly in catastrophe modelling, the period of interest is a year.</p>
 <p>The occurrence file also includes date fields. There are two formats for providing the date;</p>
 <ul>
 <li>occ_year, occ_month, occ_day. These are all integers representing occurrence year, month and day.</li>
@@ -315,7 +315,7 @@ $ occurrencetobin -P10000 -D &lt; occurrence.csv &gt; occurrence.bin</code></pre
 <ul>
 <li>static/random.bin</li>
 </ul>
-<p>If the gulcalc -r parameter is not used, the random number binary is not required and random numbers are instead generated dynamically during the calculation.</p>
+<p>If the gulcalc -r parameter is not used, the random number binary is not required and random numbers are instead generated dynamically during the calculation, using the -R parameter to specify how many should be generated.</p>
 <h5 id="file-format-3">File format</h5>
 <p>The csv file should contain a simple list of random numbers. It should not contain any headers.</p>
 <table>
@@ -607,8 +607,30 @@ $ occurrencetobin -P10000 -D &lt; occurrence.csv &gt; occurrence.bin</code></pre
 </tr>
 </tbody>
 </table>
-<p>This shows, for summaryset_id=1, coverages 1-3 being grouped into summary_id = 1 and coverages 4-6 being grouped into summary_id = 2. This could be an example of a 'site' level grouping, for example.</p>
-<p>Up to 10 summary sets may be provided in this file, depending on the required summary reporting levels for the analysis. Here is an example of the 'site' summary level with summaryset_id=1, plus an 'account' summary level with summaryset_id = 2. In summary set 2, the account summary level includes both sites because all coverages are assigned a summary_id of 1.</p>
+<p>This shows, for summaryset_id=1, coverages 1-3 being grouped into summary_id = 1 and coverages 4-6 being grouped into summary_id = 2. This could be an example of a 'site' level grouping, for example. The summary_ids should be held in a dictionary which contains the description of the ids to make meaning of the output results. For instance;</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">summary_id</th>
+<th align="left">summaryset_id</th>
+<th align="right">summary_desc</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">1</td>
+<td align="left">1</td>
+<td align="right">site_435</td>
+</tr>
+<tr class="even">
+<td align="left">2</td>
+<td align="left">1</td>
+<td align="right">site_958</td>
+</tr>
+</tbody>
+</table>
+<p>This cross reference information is not required in ktools.</p>
+<p>Up to 10 summary sets may be provided in gulsummaryxref, depending on the required summary reporting levels for the analysis. Here is an example of the 'site' summary level with summaryset_id=1, plus an 'account' summary level with summaryset_id = 2. In summary set 2, the account summary level includes both sites because all coverages are assigned a summary_id of 1.</p>
 <table>
 <thead>
 <tr class="header">
@@ -934,11 +956,11 @@ $ occurrencetobin -P10000 -D &lt; occurrence.csv &gt; occurrence.bin</code></pre
 <p>The csv file should contain the following fields and include a header row.</p>
 <table>
 <colgroup>
-<col width="17%" />
+<col width="16%" />
 <col width="7%" />
 <col width="7%" />
-<col width="55%" />
-<col width="12%" />
+<col width="56%" />
+<col width="11%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -951,9 +973,25 @@ $ occurrencetobin -P10000 -D &lt; occurrence.csv &gt; occurrence.bin</code></pre
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">output _id | int | 4 | Identifier of the coverage | 3 |<br />
-| summary_id | int | 4 | Identifier of the summary level group for one or more coverages| 1 |<br />
-| summaryset_id | int | 4 | Identifier of the summary set (0 to 9 inclusive) | 1 |</td>
+<td align="left">output_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Identifier of the coverage</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">summary_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Identifier of the summary level group for one or more output losses</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">summaryset_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Identifier of the summary set (0 to 9 inclusive)</td>
+<td align="right">1</td>
 </tr>
 </tbody>
 </table>
@@ -985,7 +1023,7 @@ $ occurrencetobin -P10000 -D &lt; occurrence.csv &gt; occurrence.bin</code></pre
 </tr>
 </tbody>
 </table>
-<p>This shows, for summaryset_id=1, output_id=1 being assigned summary_id = 1 and output_id=1 being assigned summary_id = 2.</p>
+<p>This shows, for summaryset_id=1, output_id=1 being assigned summary_id = 1 and output_id=2 being assigned summary_id = 2.</p>
 <p>If the output_id represents a policy level loss output from fmcalc (the meaning of output_id is defined in the fm xref file) then no further grouping is performed by summarycalc and this is an example of a 'policy' summary level grouping.</p>
 <p>Up to 10 summary sets may be provided in this file, depending on the required summary reporting levels for the analysis. Here is an example of the 'policy' summary level with summaryset_id=1, plus an 'account' summary level with summaryset_id = 2. In summary set 2, the 'account' summary level includes both policy's because both output_id's are assigned a summary_id of 1.</p>
 <table>
@@ -1019,7 +1057,7 @@ $ occurrencetobin -P10000 -D &lt; occurrence.csv &gt; occurrence.bin</code></pre
 </tr>
 </tbody>
 </table>
-<p>If a more detailed summary level than policy is required for insured losses, then the user should specify in the fm profile file to back-allocate fmcalc losses to items. Then the output_id represents back-allocated policy losses to item, and in the fmsummaryxref file these can be grouped into any summary level, such as site, zipcode, line of business or region, for example. The user needs to define output_id in the fm xref file, and group them together into meaningful summary levels in the fm summary xref file.</p>
+<p>If a more detailed summary level than policy is required for insured losses, then the user should specify in the fm profile file to back-allocate fmcalc losses to items. Then the output_id represents back-allocated policy losses to item, and in the fmsummaryxref file these can be grouped into any summary level, such as site, zipcode, line of business or region, for example. The user needs to define output_id in the fm xref file, and group them together into meaningful summary levels in the fm summary xref file, hence these two files must be consistent with respect to the meaning of output_id.</p>
 <h5 id="fmsummaryxreftobin">fmsummaryxreftobin</h5>
 <pre><code>$ fmsummaryxreftobin &lt; fmsummaryxref.csv &gt; fmsummaryxref.bin</code></pre>
 <h5 id="fmsummaryxreftocsv">fmsummaryxreftocsv</h5>
@@ -1150,6 +1188,7 @@ $ occurrencetobin -P10000 -D &lt; occurrence.csv &gt; occurrence.bin</code></pre
 </tr>
 </tbody>
 </table>
+<p>The fm summary xref file must be consistent with respect to the meaning of output_id in the fmxref file.</p>
 <h5 id="fmxreftobin">fmxreftobin</h5>
 <pre><code>$ fmxreftobin &lt; fm_xref.csv &gt; fm_xref.bin</code></pre>
 <h5 id="fmxreftocsv">fmxreftocsv</h5>

@@ -80,7 +80,7 @@ Groups are defined within levels and they represent aggregations of losses on wh
 ### Loss values
 The initial input is the ground-up loss (GUL) table, generally coming from the main Oasis calculation of ground-up losses. Here is an example, for a two events and 1 sample (idx=1):
 
-| event_id | item_id  | idx    | gul    |
+| event_id | item_id  | sidx   | loss   |
 |:---------|----------|--------| ------:|
 |       1  | 1        |    1   | 100,000|
 |       1  | 2        |    1   | 10,000 |
@@ -123,10 +123,10 @@ In level 1, items 1, 2 and 3 all have to_agg_id =1 so losses will be summed toge
 
 Next we have the profile description table, which list the profiles representing general policy types. Our example is represented by two general profiles which specify the input fields and mathematical operations to perform. In this example, the profile for the combined coverages and time is the same (albeit with different values) and requires a limit, a deductible, and an associated calculation rule, whereas the profile for the policy requires a limit, deductible, and share, and an associated calculation rule.
 
-| Profile description                                                | profile_id| calcrule_id |
-|:-------------------------------------------------------------------|-----------|------------:|
-| Deductible and limit                                               | 1         |   1         |
-| Deductible, limit and share                                        | 6         |   2         |
+| Profile description                | profile_id| calcrule_id |
+|:-----------------------------------|-----------|------------:|
+| Deductible and limit               | 1         |   1         |
+| Deductible, limit and share        | 6         |   2         |
 
 
 There is a “profile value” table for each profile containing the applicable policy terms, each identified by a policytc_id. The table below shows the list of policy terms for profile_id 1.

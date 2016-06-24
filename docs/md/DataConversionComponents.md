@@ -2,14 +2,14 @@
 
 The following components convert input data in csv format to the binary format required by the calculation components in the reference model;
 
-Static data
+**Static data**
 * **[damagebintobin](#damagebins)** converts the damage bin dictionary. 
 * **[footprinttobin](#footprint)** converts the event footprint.
 * **[occurrencetobin](#occurrence)** converts the event occurrence data.
 * **[randtobin](#rand)** converts a list of random numbers. 
 * **[vulnerabilitytobin](#vulnerability)** converts the vulnerability data.
 
-Input data
+**Input data**
 * **[coveragetobin](#coverages)** converts the coverages data.
 * **[evetobin](#events)** converts a list of event_ids.
 * **[itemtobin](#items)** converts the items data.
@@ -24,14 +24,14 @@ These components are intended to allow users to generate the required input bina
 
 The following components convert the binary input data required by the calculation components in the reference model into csv format;
 
-Static data
+**Static data**
 * **[damagebintocsv](#damagebins)** converts the damage bin dictionary. 
 * **[footprinttocsv](#footprint)** converts the event footprint.
 * **[occurrencetocsv](#occurrence)** converts the event occurrence data.
 * **[randtocsv](#rand)** converts a list of random numbers. 
 * **[vulnerabilitytocsv](#vulnerability)** converts the vulnerability data.
 
-Input data
+**Input data**
 * **[coveragetocsv](#coverages)** converts the coverages data.
 * **[evetocsv](#events)** converts a list of event_ids.
 * **[itemtocsv](#items)** converts the items data.
@@ -121,7 +121,7 @@ footprinttocsv requires a binary file footprint.bin and an index file footprint.
 <a id="occurrence"></a>
 ### occurrence
 ***
-The occurrence file is required for certain output components which, in the reference model, are leccalc, pltcalc and aalcalc.  In general, some form of event occurence file is required for any output which involves the calculation of loss metrics over a period of time.  The occurrence file assigns occurrences of the event_ids to numbered periods. A period can represent any length of time, such as a year or 2 years, or 18 months. The output metrics such as mean, standard deviation or loss exceedance probabilities are with respect to the chosen period length.  Most commonly, the period of interest is a year.
+The occurrence file is required for certain output components which, in the reference model, are leccalc, pltcalc and aalcalc.  In general, some form of event occurence file is required for any output which involves the calculation of loss metrics over a period of time.  The occurrence file assigns occurrences of the event_ids to numbered periods. A period can represent any length of time, such as a year, or 2 years for instance. The output metrics such as mean, standard deviation or loss exceedance probabilities are with respect to the chosen period length.  Most commonly in catastrophe modelling, the period of interest is a year.
 
 The occurrence file also includes date fields.  There are two formats for providing the date;
 * occ_year, occ_month, occ_day. These are all integers representing occurrence year, month and day.
@@ -176,7 +176,7 @@ A random number file may be provided for the gulcalc component as an option (usi
 
 * static/random.bin
 
-If the gulcalc -r parameter is not used, the random number binary is not required and random numbers are instead generated dynamically during the calculation. 
+If the gulcalc -r parameter is not used, the random number binary is not required and random numbers are instead generated dynamically during the calculation, using the -R parameter to specify how many should be generated. 
 
 ##### File format
 The csv file should contain a simple list of random numbers. It should not contain any headers.
@@ -348,9 +348,16 @@ One summary set consists of a common summaryset_id and each coverage_id being as
 | 5           | 2            |    1             |
 | 6           | 2            |    1             |
 
-This shows, for summaryset_id=1, coverages 1-3 being grouped into summary_id = 1 and coverages 4-6 being grouped into summary_id = 2.  This could be an example of a 'site' level grouping, for example.
+This shows, for summaryset_id=1, coverages 1-3 being grouped into summary_id = 1 and coverages 4-6 being grouped into summary_id = 2.  This could be an example of a 'site' level grouping, for example. The summary_ids should be held in a dictionary which contains the description of the ids to make meaning of the output results.  For instance;
 
-Up to 10 summary sets may be provided in this file, depending on the required summary reporting levels for the analysis. Here is an example of the 'site' summary level with summaryset_id=1, plus an 'account' summary level with summaryset_id = 2. In summary set 2, the account summary level includes both sites because all coverages are assigned a summary_id of 1.
+| summary_id   | summaryset_id    | summary_desc|
+|:-------------|------------------|------------:|
+| 1            |    1             |  site_435   |
+| 2            |    1             |  site_958   |
+
+This cross reference information is not required in ktools.
+
+Up to 10 summary sets may be provided in gulsummaryxref, depending on the required summary reporting levels for the analysis. Here is an example of the 'site' summary level with summaryset_id=1, plus an 'account' summary level with summaryset_id = 2. In summary set 2, the account summary level includes both sites because all coverages are assigned a summary_id of 1.
 
 | coverage_id | summary_id   | summaryset_id    |
 |:------------|--------------|-----------------:|
@@ -504,11 +511,11 @@ The fm summary xref binary is a cross reference file which determines how losses
 ##### File format
 The csv file should contain the following fields and include a header row.
 
-| Name              | Type   |  Bytes | Description                                                    | Example     |
-|:------------------|--------|--------| :--------------------------------------------------------------|------------:|
-| output   _id      | int    |    4   | Identifier of the coverage                                     |   3         |
-| summary_id        | int    |    4   | Identifier of the summary level group for one or more coverages|   1         |
-| summaryset_id     | int    |    4   | Identifier of the summary set (0 to 9 inclusive)               |   1         |
+| Name              | Type   |  Bytes | Description                                                        | Example     |
+|:------------------|--------|--------| :------------------------------------------------------------------|------------:|
+| output_id         | int    |    4   | Identifier of the coverage                                         |   3         |
+| summary_id        | int    |    4   | Identifier of the summary level group for one or more output losses|   1         |
+| summaryset_id     | int    |    4   | Identifier of the summary set (0 to 9 inclusive)                   |   1         |
 
 * The data should not contain nulls and there should be at least one summary set in the file.  
 * Valid entries for summaryset_id is all integers between 0 and 9 inclusive. 
@@ -521,7 +528,7 @@ One summary set consists of a common summaryset_id and each output_id being assi
 | 1           | 1            |    1             | 
 | 2           | 2            |    1             | 
 
-This shows, for summaryset_id=1, output_id=1 being assigned summary_id = 1 and output_id=1 being assigned summary_id = 2.  
+This shows, for summaryset_id=1, output_id=1 being assigned summary_id = 1 and output_id=2 being assigned summary_id = 2.  
 
 If the output_id represents a policy level loss output from fmcalc (the meaning of output_id is defined in the fm xref file) then no further grouping is performed by summarycalc and this is an example of a 'policy' summary level grouping.
 
@@ -534,7 +541,7 @@ Up to 10 summary sets may be provided in this file, depending on the required su
 | 1           | 1            |    2             |
 | 2           | 1            |    2             |
 
-If a more detailed summary level than policy is required for insured losses, then the user should specify in the fm profile file to back-allocate fmcalc losses to items. Then the output_id represents back-allocated policy losses to item, and in the fmsummaryxref file these can be grouped into any summary level, such as site, zipcode, line of business or region, for example. The user needs to define output_id in the fm xref file, and group them together into meaningful summary levels in the fm summary xref file.
+If a more detailed summary level than policy is required for insured losses, then the user should specify in the fm profile file to back-allocate fmcalc losses to items. Then the output_id represents back-allocated policy losses to item, and in the fmsummaryxref file these can be grouped into any summary level, such as site, zipcode, line of business or region, for example. The user needs to define output_id in the fm xref file, and group them together into meaningful summary levels in the fm summary xref file, hence these two files must be consistent with respect to the meaning of output_id.
 
 ##### fmsummaryxreftobin
 ```
@@ -592,6 +599,8 @@ If the user wants to back-allocate policy losses to the items and output the los
 | 6         | 2        |    2        |
 | 7         | 3        |    2        | 
 | 8         | 4        |    2        |
+
+The fm summary xref file must be consistent with respect to the meaning of output_id in the fmxref file.
 
 ##### fmxreftobin
 ```

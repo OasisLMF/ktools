@@ -1,4 +1,4 @@
-# Workflows <a id="workflows"></a>
+# 6. Workflows <a id="workflows"></a>
 
 ktools is capable of multiple output workflows. This brings much greater flexibility, but also more complexity for users of the toolkit.  
 

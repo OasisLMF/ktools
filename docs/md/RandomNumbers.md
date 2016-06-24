@@ -21,7 +21,7 @@ Use -R{number of random numbers} as a parameter.
 
 ##### Example
 ```
-$ gulcalc -S00 -R1000000
+$ gulcalc -S00 -R1000000 -i -
 ```
 This will run 100 samples drawing from 1 million dynamically generated random numbers.
 
@@ -47,7 +47,7 @@ Use -r as a parameter
 
 ##### Example
 ```
-$ gulcalc -S100 -r
+$ gulcalc -S100 -r -i -
 ```
 This will run 100 samples using random numbers from file random.bin in the static sub-directory.
 
@@ -64,7 +64,7 @@ ridx= sidx + mod(group_id x P1 x P3 + event_id x P2, R)
 
 This formula pseudo-randomly assigns a starting position index to each event_id and group_id combo between 0 and R-1, and then S random numbers are drawn by incrementing the starting position by the sidx.
 
-[Return to top](#financialmodule)
+[Return to top](#randomnumbers)
 
 [Go to Appendix B FM Profiles](fmprofiles.md)
 

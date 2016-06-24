@@ -24,10 +24,10 @@ $ eve 1 2 > events1_2.bin
 $ eve 1 2 | getmodel | gulcalc -r -S100 -i - > gulcalc1_2.bin
 ```
 
-In this example, the events from the file **events.bin** will be read into memory and the first half (partition 1 of 2) would be streamed out to binary file, or downstream to a single process calculation workflow.
+In this example, the events from the file events.bin will be read into memory and the first half (partition 1 of 2) would be streamed out to binary file, or downstream to a single process calculation workflow.
 
 ##### Internal data
-The program requires an event binary. The file is picked up from the **input** sub-directory relative to where the program is invoked and has the following filename;
+The program requires an event binary. The file is picked up from the input sub-directory relative to where the program is invoked and has the following filename;
 * input/events.bin
 
 The data structure of events.bin is a simple list of event ids (4 byte integers).
@@ -37,9 +37,9 @@ The data structure of events.bin is a simple list of event ids (4 byte integers)
 <a id="getmodel"></a>
 ### getmodel 
 ***
-getmodel generates a stream of effective damageability distributions (cdfs) from an input list of events. Specifically, it combines the probability distributions from the model files, eventfootprint.bin and vulnerability.bin, to generate effective damageability cdfs for the subset of exposures contained in the items.bin file and converts them into a binary stream. The source input data must have been generated as binary files by a separate program.
+getmodel generates a stream of effective damageability distributions (cdfs) from an input list of events. Specifically, it combines the probability distributions from the model files, eventfootprint.bin and vulnerability.bin, to generate effective damageability cdfs for the subset of exposures contained in the items.bin file and converts them into a binary stream. 
 
-This is reference example of the class of programs which generates the damage distributions for an event set and streams them into memory. It is envisaged that model developers who wish to use the toolkit as a back-end calculator of their existing platforms can write their own version of getmodel, reading in their own source data and converting it into the standard output stream. As long as the standard input and output structures are adhered to, the program can be written in any language and read any input data.
+This is reference example of the class of programs which generates the damage distributions for an event set and streams them into memory. It is envisaged that model developers who wish to use the toolkit as a back-end calculator of their existing platforms can write their own version of getmodel, reading in their own source data and converting it into the standard output stream. As long as the standard input and output structures are adhered to, each program can be written in any language and read any input data.
 
 ##### Stream_id
 
@@ -65,10 +65,10 @@ $ getmodel < events.bin > getmodel.bin
 ```
 
 ##### Internal data
-The program requires the eventfootprint binary and index file for the model, the vulnerability binary model file, the items file representing the user's exposures. The files are picked up from sub-directories relative to where the program is invoked, as follows;
+The program requires the footprint binary and index file for the model, the vulnerability binary model file, and the items file representing the user's exposures. The files are picked up from sub-directories relative to where the program is invoked, as follows;
 
-* static/eventfootprint.bin
-* static/eventfootprint.idx
+* static/footprint.bin
+* static/footprint.idx
 * static/vulnerability.bin
 * static/damage_bin_dict.bin
 * input/items.bin
@@ -76,14 +76,14 @@ The program requires the eventfootprint binary and index file for the model, the
 The getmodel output stream is ordered by event and streamed out in blocks for each event. 
 
 ##### Calculation
-The program filters the eventfootprint binary file for all 'areaperil_id's which appear in the items file. This selects the event footprints that affect the exposures on the basis on their location, and discards the rest.  Similarly the program filters the vulnerability file for 'vulnerability_id's that appear in the items file. This removes damage distributions which are not relevant for the exposures. Then the intensity distributions from the eventfootprint file and conditional damage distributions from the vulnerability file are convolved for every combination of areaperil_id and vulnerability_id in the items file. The effective damage probabilities are calculated by a sum product of conditional damage probabilities with intensity probabilities for each event, areaperil, vulnerability combination and each damage bin.  The resulting discrete probability distributions are converted into discrete cumulative distribution functions 'cdfs'.  Finally, the damage bin mid-point from the damage bin dictionary ('interpolation' field) is read in as a new field in the cdf stream as 'bin_mean'.  This field is the conditional mean damage for the bin and it is used to facilitate the calculation of mean and standard deviation in the gulcalc component. 
+The program filters the footprint binary file for all 'areaperil_id's which appear in the items file. This selects the event footprints that affect the exposures on the basis on their location.  Similarly the program filters the vulnerability file for 'vulnerability_id's that appear in the items file. This selects damage distributions which are relevant for the exposures. Then the intensity distributions from the footprint file and conditional damage distributions from the vulnerability file are convolved for every combination of areaperil_id and vulnerability_id in the items file. The effective damage probabilities are calculated by a sum product of conditional damage probabilities with intensity probabilities for each event, areaperil, vulnerability combination and each damage bin.  The resulting discrete probability distributions are converted into discrete cumulative distribution functions 'cdfs'.  Finally, the damage bin mid-point from the damage bin dictionary ('interpolation' field) is read in as a new field in the cdf stream as 'bin_mean'.  This field is the conditional mean damage for the bin and it is used to facilitate the calculation of mean and standard deviation in the gulcalc component. 
 
 [Return to top](#corecomponents)
 
 <a id="gulcalc"></a>
 ### gulcalc
 ***
-The gulcalc program performs Monte Carlo sampling of ground up loss and calculates mean and standard deviation by numerical integration of the cdfs. The sampling methodology has been extended beyond linear interpolation to include point value sampling and quadratic interpolation. This supports damage bin intervals which represent a single discrete damage value, and damage distributions with cdfs that are described by a piecewise quadratic function. 
+The gulcalc program performs Monte Carlo sampling of ground up loss using interpolation of uniform random numbers against the effective damage cdf, and calculates mean and standard deviation by numerical integration of the cdfs. The sampling methodology has been extended beyond linear interpolation to include point value sampling and quadratic interpolation. This supports damage bin intervals which represent a single discrete damage value, and damage distributions with cdfs that are described by a piecewise quadratic function. 
 
 ##### Stream_id
 
@@ -120,7 +120,7 @@ $ gulcalc -r -S100 -c gulcalcc.bin < getmodel.bin
 ```
 
 ##### Internal data
-The program requires the damage bin dictionary for the static folder and the item and coverage files from the input folder, all binary files. The files are found in the following locations relative to the working directory with the filenames;
+The program requires the damage bin dictionary binary for the static folder and the item and coverage binaries from the input folder. The files are found in the following locations relative to the working directory with the filenames;
 
 * static/damage_bin_dictionary.bin
 * input/items.bin
@@ -147,23 +147,25 @@ An example of the three cases and methods is given below;
 |    0.1   |  0.1   |    0.1    | Sample bin value        |
 |    0.1   |  0.2   |    0.14   | Quadratic interpolation |
 
+If the -R parameter is used along with a specified number of random numbers then random numbers used for sampling are generated on the fly for each event and group of items which have a common group_id using the Mersenne twister psuedo random number generator (the default RNG of the C++ v11 compiler).  if the -r parameter is used, gulcalc reads a random number from the provided random number file. See [Random Numbers](RandomNumbers.md) for more details.
+
 Each sampled damage is multiplied by the item TIV, looked up from the coverage file.
 
-If the -i parameter is specified, then the ground up losses for the items are output to the stream (stream_id 1).
-If the -c parameter is specified, then the ground up losses for the items are grouped by coverage and capped to the coverage TIV, and the ground up losses for the coverages are output to the stream (stream_id 2).
+The mean and standard deviation of ground up loss is also calculated. For each cdf, the mean and standard deviation of damage is calculated by numerical integration of the effective damageability probability distribution and the result is multiplied by the TIV. The results are included in the output to the stdout stream as sidx=-1 (mean) and sidx=-2 (standard deviation), for each event and item (or coverage).
 
-The purpose of the coverage stream is to cap losses to the coverage TIV where items represent damage to the same coverage from different perils.
+At this stage, there are two possible output streams, as follows;
 
-A final calculation which occurs in the gulcalc program is of the mean and standard deviation of ground up loss. For each cdf, the mean and standard deviation of damage is calculated by numerical integration of the effective damageability probability distribution and the result is multiplied by the TIV. The results are included in the output to the stdout stream as sidx=-1 (mean) and sidx=-2 (standard deviation), for each event and item (or coverage).
+* stream_id=1: If the -i parameter is specified, then the ground up losses for the items are output to the stream (stream_id 1).
+* stream_id=2: If the -c parameter is specified, then the ground up losses for the items are grouped by coverage_id and capped to the coverage TIV, and the ground up losses for the coverages are output to the stream (stream_id 2).
 
-If the -R parameter is used along with a specified number of random numbers then random numbers used for sampling are generated on the fly for each event and group of items which have a common group_id using the Mersenne twister psuedo random number generator (the default RNG of the C++ v11 compiler).  if the -r parameter is used, gulcalc reads a random number from the provided random number file. See [Random Numbers](RandomNumbers.md) for more details.
+The purpose of the coverage stream is to cap losses to the coverage TIV where items represent damage to the same coverage from different perils, where overall damage cannot exceed 100% of the TIV. 
 
 [Return to top](#corecomponents)
 
 <a id="fmcalc"></a>
 ### fmcalc
 ***
-fmcalc is the in-memory implementation of the Oasis Financial Module. It applies policy terms and conditions to the ground up losses and produces insured loss sample output.  It takes in losses from gulcalc at item level only (stream_id = 1). 
+fmcalc is the reference implementation of the Oasis Financial Module. It applies policy terms and conditions to the ground up losses and produces insured loss sample output.  It reads in losses from gulcalc at item level only (stream_id = 1). 
 
 ##### Stream_id
 
@@ -172,7 +174,7 @@ fmcalc is the in-memory implementation of the Oasis Financial Module. It applies
 |    2   |     1     |  fmcalc reference example                      |
 
 ##### Parameters
-There are no parameters as all of the information is taken from the gul stdout stream and fm input data.
+There are no parameters as all of the information is taken from the gulcalc stdout stream and fm input data.
 
 ##### Usage
 ```
@@ -189,7 +191,7 @@ $ fmcalc < gulcalc.bin > fmcalc.bin
 ```
 
 ##### Internal data
-The program requires the item, coverage and fm input data, which are Oasis abstract data objects that describe an insurance programme. This data is picked up from the following files relative to the working directory;
+The program requires the item, coverage and fm input data files, which are Oasis abstract data objects that describe an insurance programme. This data is picked up from the following files relative to the working directory;
 
 * input/items.bin
 * input/coverages.bin
@@ -206,9 +208,9 @@ See [Financial Module](FinancialModule.md)
 <a id="summarycalc"></a>
 ### summarycalc 
 ***
-The purpose of summarycalc is firstly to aggregate the samples of loss to a level of interest for reporting, thereby reducing the volume of data in the stream. This is a general first step which precedes all of the downstream output calculations.  Secondly, it unifies the formats of the gulcalc and fmcalc streams, so that they are transformed into an identical stream type for downstream outputs. Finally, it can generate up to 10 summary level outputs in one go, creating multiple output streams or files.
+The purpose of summarycalc is firstly to aggregate the samples of loss to a level of interest for reporting, thereby reducing the volume of data in the stream. This is a generic first step which precedes all of the downstream output calculations.  Secondly, it unifies the formats of the gulcalc and fmcalc streams, so that they are transformed into an identical stream type for downstream outputs. Finally, it can generate up to 10 summary level outputs in one go, creating multiple output streams or files.
 
-The output is similar to the gulcalc or fmcalc input which are losses are by sample index and by event, but the coverage or policy input losses are grouped to an abstract level represented by a summary_id.  The relationship between the input identifier and the summary_id are defined in cross reference files called **gulsummaryxref** and **fmsummaryxref**.
+The output is similar to the gulcalc or fmcalc input which are losses are by sample index and by event, but the ground up or insured loss input losses are grouped to an abstract level represented by a summary_id.  The relationship between the input identifier and the summary_id are defined in cross reference files called **gulsummaryxref** and **fmsummaryxref**.
 
 ##### Stream_id
 
@@ -230,11 +232,11 @@ For each output stream, the following tuple of parameters must be specified for 
 For example the following parameter choices are valid;
 ```
 $ summarycalc -g -1 -                                       
-'outputs summaryset 1 results to standard output
+'outputs results for summaryset 1 to standard output
 $ summarycalc -g -1 summarycalc1.bin                        
-'outputs summaryset 1 results to a file (or named pipe)
+'outputs results for summaryset 1 to a file (or named pipe)
 $ summarycalc -g -1 summarycalc1.bin -2 summarycalc2.bin    
-'outputs summaryset 1 and 2 results to a file (or named pipe)
+'outputs results for summaryset 1 and 2 to a file (or named pipe)
 ```
 Note that the summaryset_id relates to a summaryset_id in the required input data file **gulsummaryxref.bin** or **fmsummaryxref.bin** for a gulcalc input stream or a fmcalc input stream, respectively, and represents a user specified summary reporting level. For example summaryset_id = 1 represents portfolio level, summaryset_id = 2 represents zipcode level and summaryset_id 3 represents site level.
 
@@ -260,9 +262,9 @@ The program requires the gulsummaryxref file for gulcalc input (-g option), or t
 * input/fmsummaryxref.bin
 
 ##### Calculation
-summarycalc takes either ground up loss (by coverage) or insured loss samples (by policy) as input and aggregates them to a user-defined summary reporting level. The output is similar to the input which are losses are by sample index and by event, but the coverage or policy input losses are grouped to an abstract level represented by a summary_id.  The relationship between the input identifier, coverage_id for gulcalc or output_id for fmcalc, and the summary_id are defined in the internal data files.
+summarycalc takes either ground up loss (by coverage) or insured loss samples (by policy) as input and aggregates them to a user-defined summary reporting level. The output is similar to the input which are losses are by sample index and by event, but the ground up or insured losses are grouped to an abstract level represented by a summary_id.  The relationship between the input identifier, coverage_id for gulcalc or output_id for fmcalc, and the summary_id are defined in the internal data files.
 
-summarycalc also calculates the maximum exposure value by summary_id and event_id. This is carried through in the stream header and output by eltcalc, aalcalc and pltcalc. For ground up losses this is the sum of TIV for all coverages which have a non-zero sampled ground up loss for a given event. For insured losses, this is the sum of the losses for sample index -3 from the fmcalc stdout stream.  Sample index -3 is the TIV of the items in the programme which have been passed through the financial module calculations to take account of the deductibles and limits.  Essentially, it is a 100% damage scenario for all items simultaneously.
+summarycalc also calculates the maximum exposure value by summary_id and event_id. This is carried through in the stream header and output by eltcalc, aalcalc and pltcalc. For ground up losses this is the sum of TIV for all coverages which have at least one non-zero sampled ground up loss for a given event. For insured losses, this is the sum of the losses for sample index -3 from the fmcalc stdout stream.  Sample index -3 is the TIV of the items in the programme which have been passed through the financial module calculations to take account of the deductibles and limits.  Essentially, it is a 100% damage scenario for all items.
 
 [Return to top](#corecomponents)
 

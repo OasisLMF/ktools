@@ -6,13 +6,14 @@ touch Makefile.in
 touch configure
 touch config.h.in
 
-rm -f ktest/cwbld
+rm -f ktest/cw32bld
+rm -f ktest/cw62bld
 rm -f ktest/uwbld
  
 if [ "$SYSNAME" = "Cygwin" ]; then
-   ./configure  --build=x86_64 --host i686-w64-mingw32 --prefix=/cygdrive/c/oasis
-   touch ktest/cwbld
-   exit 0
+	./configure  --host x86_64-w64-mingw32 --prefix=/cygdrive/c/oasis
+   	touch ktest/cw64bld
+   	exit 0
 else
    DIST_ID=`lsb_release -i -s`
    if [ "$DIST_ID" = "Ubuntu" ]; then

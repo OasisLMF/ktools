@@ -100,7 +100,7 @@ Go into the ktools folder and configure using the following command;
 
 ``` sh
 $ cd ktools-[version]
-$ ./win64configure
+$ ./winconfigure
 ```
 
 Make using the following command;

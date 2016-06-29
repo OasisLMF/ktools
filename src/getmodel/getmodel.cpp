@@ -111,13 +111,15 @@ void getmodel::getVulnerabilities()
 	fread(&_num_damage_bins, sizeof(_num_damage_bins), 1, fin);
 
     while (fread(&vulnerability, sizeof(vulnerability), 1, fin) != 0) {
-        if (vulnerability.vulnerability_id != current_vulnerability_id)
-        {
-            _vulnerabilities[vulnerability.vulnerability_id] = std::vector<float>(_num_intensity_bins * _num_damage_bins, 0.0);
-            current_vulnerability_id = vulnerability.vulnerability_id;
-        }
-        int vulnerabilityIndex = getVulnerabilityIndex(vulnerability.intensity_bin_id, vulnerability.damage_bin_id);
-        _vulnerabilities[vulnerability.vulnerability_id][vulnerabilityIndex] = vulnerability.probability;
+		if (_num_intensity_bins >= vulnerability.intensity_bin_id) {
+			if (vulnerability.vulnerability_id != current_vulnerability_id)
+			{
+				_vulnerabilities[vulnerability.vulnerability_id] = std::vector<float>(_num_intensity_bins * _num_damage_bins, 0.0);
+				current_vulnerability_id = vulnerability.vulnerability_id;
+			}
+			int vulnerabilityIndex = getVulnerabilityIndex(vulnerability.intensity_bin_id, vulnerability.damage_bin_id);
+			_vulnerabilities[vulnerability.vulnerability_id][vulnerabilityIndex] = vulnerability.probability;
+		}
     }
     fclose(fin);
 }
@@ -176,9 +178,8 @@ void getmodel::getItems()
 void getmodel::getDamageBinDictionary()
 {
     FILE *fin = fopen(DAMAGE_BIN_DICT_FILE, "rb");
-    if (fin == nullptr) {
-        std::ostringstream poss;
-        poss << "Error opening " << DAMAGE_BIN_DICT_FILE;
+    if (fin == nullptr) {       
+        std::cerr << "Error opening " << DAMAGE_BIN_DICT_FILE << "\n";
         exit(-1);
     }
     fseek(fin, 0L, SEEK_END);

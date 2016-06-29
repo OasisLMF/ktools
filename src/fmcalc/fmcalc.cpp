@@ -404,7 +404,7 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 	std::vector<std::vector<int>>  aggid_to_vectorlookups(maxLevel_ + 1);
 
 	std::vector<int> &aggid_to_vectorlookup = aggid_to_vectorlookups[level];	
-	aggid_to_vectorlookup.resize(level_to_maxagg_id[level], -2);
+	aggid_to_vectorlookup.resize(level_to_maxagg_id_[level], -2);
 
 	// std::map<fmlevelhdr, std::vector<fmlevelrec>> outmapx;
 	//fmlevelhdr fmhdr;
@@ -428,7 +428,7 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 			if (current_idx == -2) {
 				policytcvidx a;
 				a.agg_id = agg_id;
-				a.policytc_id = policy_tc_vec_vec_vec[level][agg_id][layer_id];
+				a.policytc_id = policy_tc_vec_vec_vec_[level][agg_id][layer_id];
 				avx[1].push_back(a);			// populate the first layer
 				avx[1][avx[1].size() - 1].item_idx.push_back(i);
 				aggid_to_vectorlookup[agg_id-1] = avx[1].size() - 1;
@@ -448,7 +448,7 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 
 			// std::map<int, int> &aggid_to_vectorlookup = aggid_to_vectorlookups[zzlevel]; // 
 			std::vector<int> &zzaggid_to_vectorlookup = aggid_to_vectorlookups[zzlevel]; // 
-			zzaggid_to_vectorlookup.resize(level_to_maxagg_id[zzlevel] , -2);
+			zzaggid_to_vectorlookup.resize(level_to_maxagg_id_[zzlevel] , -2);
 			int previous_layer = 1; // previous layer is always one becuase only the last layer can be greater than 1
 
 			for (unsigned int i = 0;i < prev[1].size();i++) {
@@ -459,9 +459,9 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 				if (current_idx == -2)
 				{
 					// vec_idx = aggid_to_vectorlookup[agg_id];
-					for (unsigned int layer = 1; layer < policy_tc_vec_vec_vec[zzlevel][agg_id].size() ; layer++ ){ // loop through layers
+					for (unsigned int layer = 1; layer < policy_tc_vec_vec_vec_[zzlevel][agg_id].size() ; layer++ ){ // loop through layers
 						struct policytcvidx a;
-						const int policytc_id = policy_tc_vec_vec_vec[zzlevel][agg_id][layer];
+						const int policytc_id = policy_tc_vec_vec_vec_[zzlevel][agg_id][layer];
 						//if (next[layer].size() < (agg_id + 1)) {
 							//next[layer].resize(agg_id + 1);
 						//}
@@ -478,8 +478,8 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 					}						
 				}
 				else {
-					for (unsigned int layer = 1; layer < policy_tc_vec_vec_vec[zzlevel][agg_id].size(); layer++) { // loop through layers
-						const int policytc_id = policy_tc_vec_vec_vec[zzlevel][agg_id][layer];
+					for (unsigned int layer = 1; layer < policy_tc_vec_vec_vec_[zzlevel][agg_id].size(); layer++) { // loop through layers
+						const int policytc_id = policy_tc_vec_vec_vec_[zzlevel][agg_id][layer];
 						//int current_idx = aggid_to_vectorlookup[agg_id];
 						for (int x : prev[previous_layer][i].item_idx) {
 							next[layer][current_idx].item_idx.push_back(x);	
@@ -605,17 +605,17 @@ void fmcalc::init_policytc(int maxRunLevel)
             if (f.layer_id > max_layer_) max_layer_ = f.layer_id;
 			if (f.agg_id > max_agg_id_) max_agg_id_ = f.agg_id;
 	
-            if (policy_tc_vec_vec_vec.size() < f.level_id + 1) {
-                policy_tc_vec_vec_vec.resize(f.level_id + 1);
+            if (policy_tc_vec_vec_vec_.size() < f.level_id + 1) {
+                policy_tc_vec_vec_vec_.resize(f.level_id + 1);
             }
-            if (policy_tc_vec_vec_vec[f.level_id].size() < f.agg_id + 1) {
-                policy_tc_vec_vec_vec[f.level_id].resize(f.agg_id + 1);
+            if (policy_tc_vec_vec_vec_[f.level_id].size() < f.agg_id + 1) {
+                policy_tc_vec_vec_vec_[f.level_id].resize(f.agg_id + 1);
             }
 
-            if (policy_tc_vec_vec_vec[f.level_id][f.agg_id].size() < f.layer_id + 1) {
-                policy_tc_vec_vec_vec[f.level_id][f.agg_id].resize(f.layer_id + 1);
+            if (policy_tc_vec_vec_vec_[f.level_id][f.agg_id].size() < f.layer_id + 1) {
+                policy_tc_vec_vec_vec_[f.level_id][f.agg_id].resize(f.layer_id + 1);
             }
-            policy_tc_vec_vec_vec[f.level_id][f.agg_id][f.layer_id] = f.PolicyTC_id;
+            policy_tc_vec_vec_vec_[f.level_id][f.agg_id][f.layer_id] = f.PolicyTC_id;
         }
 		i = fread(&f, sizeof(f), 1, fin);
 	}
@@ -639,9 +639,9 @@ void fmcalc::init_programme(int maxRunLevel)
         if (f.level_id <= maxRunLevel){
 			if (maxLevel_ < f.level_id) {
 				maxLevel_ = f.level_id;
-				level_to_maxagg_id.resize(maxLevel_+1, -1);
+				level_to_maxagg_id_.resize(maxLevel_+1, -1);
 			}
-			if (f.to_agg_id > level_to_maxagg_id[f.level_id])level_to_maxagg_id[f.level_id] = f.to_agg_id;
+			if (f.to_agg_id > level_to_maxagg_id_[f.level_id])level_to_maxagg_id_[f.level_id] = f.to_agg_id;
             if (pfm_vec_vec_.size() < f.level_id + 1) {
                 pfm_vec_vec_.resize(f.level_id + 1);
             }

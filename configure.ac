@@ -91,6 +91,8 @@ AC_CONFIG_FILES([
                  src/vulnerabilitytocsv/Makefile
                  src/footprinttobin/Makefile
                  src/footprinttocsv/Makefile
+		 src/returnperiodtocsv/Makefile
+		 src/returnperiodtobin/Makefile
                  ])
 AC_OUTPUT
 

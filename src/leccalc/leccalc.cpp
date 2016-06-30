@@ -71,6 +71,7 @@ FILE *fout[] = { nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr
 
 int totalperiods = -1;
 int maxsummaryid = 0;
+bool useReturnPeriodFile = false;
 
 bool isSummaryCalcStream(unsigned int stream_type)
 {
@@ -262,6 +263,7 @@ void help()
 	fprintf(stderr, "-s Occurrence sample mean\n");
 	fprintf(stderr, "-m Occurrence Wheatsheaf mean\n");
 	fprintf(stderr, "-K workspace sub folder\n");
+	fprintf(stderr, "-r use return period file\n");
 	exit(-1);
 }
 
@@ -271,7 +273,7 @@ int main(int argc, char* argv[])
 
 	std::string subfolder;
 	int opt;
-	while ((opt = getopt(argc, argv, "F:W:M:S:K:f:w:s:m:")) != -1) {
+	while ((opt = getopt(argc, argv, "rF:W:M:S:K:f:w:s:m:")) != -1) {
 		switch (opt) {
 		case 'K':
 			subfolder = optarg;
@@ -299,6 +301,9 @@ int main(int argc, char* argv[])
 			break;
 		case 'm':
 			openpipe(OCC_WHEATSHEAF_MEAN, optarg);
+			break;
+		case 'r':
+			useReturnPeriodFile = true;
 			break;
 		default:
 			fprintf(stderr, "unknown parameter\n");

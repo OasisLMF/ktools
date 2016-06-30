@@ -4869,7 +4869,7 @@ esac
 
 
 
-ac_config_files="$ac_config_files Makefile ktest/Makefile src/Makefile src/cdftocsv/Makefile src/eve/Makefile src/damagebintocsv/Makefile src/damagebintobin/Makefile src/fmcalc/Makefile src/fmprofiletocsv/Makefile src/fmprofiletobin/Makefile src/fmpolicytctocsv/Makefile src/fmpolicytctobin/Makefile src/fmprogrammetobin/Makefile src/fmprogrammetocsv/Makefile src/fmtocsv/Makefile src/randtocsv/Makefile src/randtobin/Makefile src/evetocsv/Makefile src/evetobin/Makefile src/gultobin/Makefile src/getmodel/Makefile src/gulcalc/Makefile src/gultocsv/Makefile src/itemtobin/Makefile src/itemtocsv/Makefile src/coveragetobin/Makefile src/coveragetocsv/Makefile src/summarycalc/Makefile src/fmxreftocsv/Makefile src/fmxreftobin/Makefile src/summarycalctocsv/Makefile src/eltcalc/Makefile src/pltcalc/Makefile src/gulsummaryxreftobin/Makefile src/gulsummaryxreftocsv/Makefile src/fmsummaryxreftobin/Makefile src/fmsummaryxreftocsv/Makefile src/occurrencetobin/Makefile src/occurrencetocsv/Makefile src/leccalc/Makefile src/aalcalc/Makefile src/aalcalctocsv/Makefile src/aalsummary/Makefile src/vulnerabilitytobin/Makefile src/vulnerabilitytocsv/Makefile src/footprinttobin/Makefile src/footprinttocsv/Makefile"
+ac_config_files="$ac_config_files Makefile ktest/Makefile src/Makefile src/cdftocsv/Makefile src/eve/Makefile src/damagebintocsv/Makefile src/damagebintobin/Makefile src/fmcalc/Makefile src/fmprofiletocsv/Makefile src/fmprofiletobin/Makefile src/fmpolicytctocsv/Makefile src/fmpolicytctobin/Makefile src/fmprogrammetobin/Makefile src/fmprogrammetocsv/Makefile src/fmtocsv/Makefile src/randtocsv/Makefile src/randtobin/Makefile src/evetocsv/Makefile src/evetobin/Makefile src/gultobin/Makefile src/getmodel/Makefile src/gulcalc/Makefile src/gultocsv/Makefile src/itemtobin/Makefile src/itemtocsv/Makefile src/coveragetobin/Makefile src/coveragetocsv/Makefile src/summarycalc/Makefile src/fmxreftocsv/Makefile src/fmxreftobin/Makefile src/summarycalctocsv/Makefile src/eltcalc/Makefile src/pltcalc/Makefile src/gulsummaryxreftobin/Makefile src/gulsummaryxreftocsv/Makefile src/fmsummaryxreftobin/Makefile src/fmsummaryxreftocsv/Makefile src/occurrencetobin/Makefile src/occurrencetocsv/Makefile src/leccalc/Makefile src/aalcalc/Makefile src/aalcalctocsv/Makefile src/aalsummary/Makefile src/vulnerabilitytobin/Makefile src/vulnerabilitytocsv/Makefile src/footprinttobin/Makefile src/footprinttocsv/Makefile src/returnperiodtocsv/Makefile src/returnperiodtobin/Makefile"
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -5649,6 +5649,8 @@ do
     "src/vulnerabilitytocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/vulnerabilitytocsv/Makefile" ;;
     "src/footprinttobin/Makefile") CONFIG_FILES="$CONFIG_FILES src/footprinttobin/Makefile" ;;
     "src/footprinttocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/footprinttocsv/Makefile" ;;
+    "src/returnperiodtocsv/Makefile") CONFIG_FILES="$CONFIG_FILES src/returnperiodtocsv/Makefile" ;;
+    "src/returnperiodtobin/Makefile") CONFIG_FILES="$CONFIG_FILES src/returnperiodtobin/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
   esac

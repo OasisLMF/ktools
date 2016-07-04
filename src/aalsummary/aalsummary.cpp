@@ -1,5 +1,6 @@
 #include <regex>
 #include <map>
+#include <math.h>
 
 #if defined(_MSC_VER)
 #include "../wingetopt/wingetopt.h"

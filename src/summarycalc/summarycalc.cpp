@@ -165,19 +165,16 @@ bool summarycalc::loadcoverages()
 	long long sz = fltell(fin);
 	flseek(fin, 0L, SEEK_SET);
 
-	unsigned int nrec = sz / sizeof(coverage);
+	float tiv;
+	unsigned int nrec = sz / sizeof(tiv);
 
 	coverages_.resize(nrec + 1);
-
-	coverage cov;
-	int i = fread(&cov, sizeof(cov), 1, fin);
+	int coverage_id = 0;
+	int i = fread(&tiv, sizeof(tiv), 1, fin);
 	while (i != 0) {
-		if (cov.id > nrec) {
-			fprintf(stderr, "Coverage ids not contigious in coverages.bin\n");
-			exit(-1);
-		}
-		coverages_[cov.id] = cov.tiv;
-		i = fread(&cov, sizeof(cov), 1, fin);
+		coverage_id++;
+		coverages_[coverage_id] = tiv;
+		i = fread(&tiv, sizeof(tiv), 1, fin);
 	}
 
 	fclose(fin);

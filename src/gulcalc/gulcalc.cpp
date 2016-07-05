@@ -98,11 +98,41 @@ float gulcalc::getgul(damagebindictionary &b, gulGulSamples &g)
 
 	return gul;
 }
+
 void gulcalc::outputcoveragedata(int event_id)
+{
+	for (int j = 1; j < cov_.size(); j++) {
+		if (cov_[j].size() > 0) {
+			gulcoverageSampleslevel gc;
+			gc.event_id = event_id;
+			gc.coverage_id = j;
+			for (int i = 1; i < cov_[j].size(); i++) {
+				gc.sidx = i - 2;
+				gc.loss = cov_[j][i];
+				float tiv = (*coverages_)[gc.coverage_id];
+				if (gc.loss > tiv) gc.loss = tiv;
+				if (gc.sidx) {
+					if (gc.sidx == -1) {
+						covoutputgul(gc);		// always output the mean	
+					}
+					else {
+						if (gc.loss >= gul_limit_) {
+							covoutputgul(gc);
+						}
+					}
+				}
+			}
+
+		}
+	}
+	cov_.clear();
+	cov_.resize(coverages_->size());
+}
+void gulcalc::outputcoveragedatax(int event_id)
 {
 	if (coverageWriter_ == 0)  return;
 
-	for (auto c : cov_) {
+	for (auto c : covx_) {
 		gulcoverageSampleslevel gc;
 		gc.event_id = event_id;
 		gc.coverage_id = c.first;
@@ -123,16 +153,24 @@ void gulcalc::outputcoveragedata(int event_id)
 			}
 		}		
 	}
-	cov_.clear();
+	covx_.clear();
 }
 void gulcalc::gencovoutput(gulcoverageSampleslevel &gg)
 {
 	if (coverageWriter_ == 0)  return;
-	auto pos = cov_.find(gg.coverage_id);
-	if (pos == cov_.end()) {
+	if (cov_[gg.coverage_id].size() == 0) {
 		cov_[gg.coverage_id].resize(samplesize_ + 3, 0);
 	}
-	cov_[gg.coverage_id][gg.sidx+2] += gg.loss;
+	cov_[gg.coverage_id][gg.sidx + 2] += gg.loss;
+}
+void gulcalc::gencovoutputx(gulcoverageSampleslevel &gg)
+{
+	if (coverageWriter_ == 0)  return;
+	auto pos = covx_.find(gg.coverage_id);
+	if (pos == covx_.end()) {
+		covx_[gg.coverage_id].resize(samplesize_ + 3, 0);
+	}
+	covx_[gg.coverage_id][gg.sidx+2] += gg.loss;
 
 }
 void gulcalc::covoutputgul(gulcoverageSampleslevel &gg)

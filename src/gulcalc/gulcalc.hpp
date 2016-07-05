@@ -53,9 +53,12 @@ private:
 	const std::vector<float> *coverages_;
 	const std::vector<damagebindictionary> *damagebindictionary_vec_;
 	void gencovoutput(gulcoverageSampleslevel &gc);
-	std::map<int, std::vector<float>> cov_;
+	void gencovoutputx(gulcoverageSampleslevel &gc);
+	std::vector<std::vector<float>> cov_;
+	std::map<int, std::vector<float>> covx_;
 	void covoutputgul(gulcoverageSampleslevel &gc);
 	void outputcoveragedata(int event_id);
+	void outputcoveragedatax(int event_id);
 	void itemoutputgul(gulitemSampleslevel &gg);
 	void(*itemWriter_)(const void *ibuf, int size, int count);
 	void(*coverageWriter_)(const void *ibuf, int size, int count);
@@ -90,6 +93,7 @@ public:
 		) {
 		damagebindictionary_vec_ = &damagebindictionary_vec;
 		coverages_ = &tivs;
+		cov_.resize(coverages_->size());
 		item_map_ = &item_map;
 		rnd_ = &rnd;
 		itemWriter_ = itemWriter;

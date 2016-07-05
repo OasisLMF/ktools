@@ -58,10 +58,11 @@ void doit()
       else
        {
 		   if ((last_coverage_id + 1) !=  coverage_id) {
-				printf("Expecting coverage id %d but got %d\n", (last_coverage_id + 1), coverage_id);
+				fprintf(stderr,"Expecting coverage id %d but got %d\n", (last_coverage_id + 1), coverage_id);
 				exit(-1);
 		   }
            fwrite(&tiv, sizeof(tiv), 1, stdout);
+		   last_coverage_id = coverage_id;
        }
        lineno++;
     }

@@ -80,7 +80,16 @@ void doetloutput(int samplesize)
 			if (x < 0.0000001) sd = 0;   // fix floating point precision problems caused by using large numbers
 			sd = sqrt(sd);
 		}
-		
+		else {
+			if (samplesize == 0) {
+				mean = 0;
+				sd = 0;
+			}
+			if (samplesize == 1) {
+				mean = sumloss / samplesize;
+				sd = 0;
+			}
+		}
 		printf("%d, %d, %f, %f, %f\n", sh.summary_id, sh.event_id,mean, sd, sh.expval);
 
 		if (i) i = fread(&sh, sizeof(sh), 1, stdin);

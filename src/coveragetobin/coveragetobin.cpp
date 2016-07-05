@@ -41,20 +41,27 @@
 void doit()
 {
 
-  coverage c;
+	int last_coverage_id = 0;
     char line[4096];
     int lineno=0;
   fgets(line, sizeof(line), stdin);
   lineno++;
+
     while (fgets(line, sizeof(line), stdin) != 0)
     {
-    if (sscanf(line, "%d,%f", &c.id, &c.tiv) != 2){
+		int coverage_id;
+		float tiv;
+	  if (sscanf(line, "%d,%f", &coverage_id, &tiv) != 2){
            fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
            return;
        }
       else
        {
-           fwrite(&c, sizeof(c), 1, stdout);
+		   if ((last_coverage_id + 1) !=  coverage_id) {
+				printf("Expecting coverage id %d but got %d\n", (last_coverage_id + 1), coverage_id);
+				exit(-1);
+		   }
+           fwrite(&tiv, sizeof(tiv), 1, stdout);
        }
        lineno++;
     }

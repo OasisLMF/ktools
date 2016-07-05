@@ -681,19 +681,16 @@ bool fmcalc::loadcoverages(std::vector<float> &coverages)
 	long long sz = fltell(fin);
 	flseek(fin, 0L, SEEK_SET);
 
-	unsigned int nrec = sz / sizeof(coverage);
+	float tiv;
+	unsigned int nrec = sz / sizeof(tiv);
 
 	coverages.resize(nrec + 1);
-
-	coverage cov;
-	int i = fread(&cov, sizeof(cov), 1, fin);
+	int coverage_id = 0;
+	int i = fread(&tiv, sizeof(tiv), 1, fin);
 	while (i != 0) {
-		if (cov.id > nrec) {
-			fprintf(stderr, "Coverage ids not contiguous in coverages.bin\n");
-			exit(-1);
-		}
-		coverages[cov.id] = cov.tiv;
-		i = fread(&cov, sizeof(cov), 1, fin);
+		coverage_id++;
+		coverages[coverage_id] = tiv;
+		i = fread(&tiv, sizeof(tiv), 1, fin);
 	}
 
 	fclose(fin);

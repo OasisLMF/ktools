@@ -50,7 +50,7 @@ using namespace std;
 void doit()
 {
 
-	printf("\"output_id\", \"agg_id\", \"layer_id\"\n");
+	printf("\"output_id\",\"agg_id\",\"layer_id\"\n");
     
     fmXref q;
     int i = fread(&q, sizeof(q), 1, stdin);

@@ -58,8 +58,8 @@ struct fm_policyTC {
 void doit()
 {
 
-    //printf ("\"level_id\", \"agg_id\",\"layer_id\",\"PolicyTC_id\"\n");
-    printf (" \"layer_id\", \"level_id\",\"agg_id\",\"PolicyTC_id\"\n");
+    //printf ("\"level_id\",\"agg_id\",\"layer_id\",\"PolicyTC_id\"\n");
+    printf ("\"layer_id\",\"level_id\",\"agg_id\",\"policytc_id\"\n");
 
     fm_policyTC q;
     int i = fread(&q, sizeof(q), 1, stdin);

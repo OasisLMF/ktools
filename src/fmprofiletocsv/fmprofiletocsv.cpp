@@ -57,9 +57,9 @@ using namespace std;
 void doit()
 {
 
-    printf ("\"policytc_id\", \"calcrule_id\", \"allocrule_id\",\"ccy_id\", ");
-	printf("\"deductible\", \"limits\", \"share_prop_of_lim\", \"deductible_prop_of_loss\", \"limit_prop_of_loss\", ");
-	printf ("\"deductible_prop_of_tiv\", \"limit_prop_of_tiv\", \"deductible_prop_of_limit\"\n");
+    printf ("\"policytc_id\",\"calcrule_id\",\"allocrule_id\",\"ccy_id\",");
+	printf("\"deductible\",\"limits\",\"share_prop_of_lim\",\"deductible_prop_of_loss\",\"limit_prop_of_loss\",");
+	printf ("\"deductible_prop_of_tiv\",\"limit_prop_of_tiv\",\"deductible_prop_of_limit\"\n");
 
     fm_profile q;
     int i = fread(&q, sizeof(q), 1, stdin);

@@ -244,10 +244,10 @@ The csv file should contain the following fields and include a header row.
 
 | Name              | Type   |  Bytes | Description                                                   | Example     |
 |:------------------|--------|--------| :-------------------------------------------------------------|------------:|
-| coverage_id       | int    |    4   | Identifier of the coverage                                    |     3       |
+| coverage_id       | int    |    4   | Identifier of the coverage                                    |     1       |
 | tiv               | float  |    4   | The total insured value of the coverage                       |   200000    |
 
-The data should not contain nulls.
+Coverage_id must be an ordered contiguous sequence of numbers starting at 1. 
 
 ##### coveragetobin
 ```
@@ -303,7 +303,7 @@ The csv file should contain the following fields and include a header row.
 | vulnerability_id  | int    |    4   | Identifier of the vulnerability distribution of the item      |   345456    |
 | group_id          | int    |    4   | Identifier of the correlation group of the item               |    1        |  
 
-The data should be ordered by areaperil_id, vulnerability_id ascending and not contain nulls.
+The data should be ordered by areaperil_id, vulnerability_id ascending and not contain nulls. It is best practice for item_id to be a contiguous sequence of numbers starting from 1.
 
 ##### itemtobin
 ```

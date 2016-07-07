@@ -249,4 +249,6 @@ if (loss < 0) loss = 0;
 ```
 [Return to top](#fmprofiles)
 
+[Go to Appendix C Multi-peril model support](MultiPeril.md)
+
 [Back to Contents](Contents.md)

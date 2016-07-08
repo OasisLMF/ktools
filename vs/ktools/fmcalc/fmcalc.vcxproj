@@ -147,7 +147,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\fmcalc\fmcalc.hpp" />
-    <ClInclude Include="..\..\..\src\fmcalc\fmcalc_old.hpp" />
     <ClInclude Include="..\..\..\src\fmcalc\fmstructs.hpp" />
     <ClInclude Include="..\..\..\src\include\oasis.hpp" />
   </ItemGroup>

@@ -497,8 +497,9 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 	
 
 	//agg_vec.resize(aggid_to_vectorlookup.size());
-	agg_vec.resize(total_loss_items);
+	
 	for (unsigned int idx = 0; idx < event_guls.size(); idx++) {	// loop sample + 1 times
+		agg_vec.resize(total_loss_items);
 		fmlevelhdr fmhdr;
 		fmhdr.event_id = event_id;
 		const std::vector<float> &guls = event_guls[idx];
@@ -567,7 +568,7 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
         }else {
             dofmcalc_r(aggid_to_vectorlookups, agg_vecs, level + 1, maxLevel_, outmap, fmhdr, sidx,avxs,1, items, guls);
         }
-
+		agg_vec.clear();
 	}
 	aggid_to_vectorlookups.clear();
 	// Do output

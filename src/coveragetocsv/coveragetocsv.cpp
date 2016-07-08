@@ -52,13 +52,13 @@ void doit()
 
 	printf("\"coverage_id\", \"tiv\"\n");
     
-	coverage c;
-    int i = fread(&c, sizeof(c), 1, stdin);
+	float tiv;
+	int id = 0;
+    int i = fread(&tiv, sizeof(tiv), 1, stdin);
     while (i != 0) {
-        printf("%d, %f\n",
-               c.id, c.tiv);
-
-        i = fread(&c, sizeof(c), 1, stdin);
+		id++;
+        printf("%d, %f\n", id, tiv);
+        i = fread(&tiv, sizeof(tiv), 1, stdin);
     }
 }
 

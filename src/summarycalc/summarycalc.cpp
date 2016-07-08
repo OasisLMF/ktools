@@ -38,7 +38,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
+//#include <math.h>
 
 
 #ifdef __unix
@@ -143,7 +143,10 @@ void summarycalc::alloc_sse_array()
 void summarycalc::init_c_to_s()
 {
 	for (int i = 0; i < MAX_SUMMARY_SETS; i++) {
-		if (fout[i] != nullptr) co_to_s[i] = new coverage_id_or_output_id_to_Summary_id;
+		if (fout[i] != nullptr) {
+			co_to_s[i] = new coverage_id_or_output_id_to_Summary_id;
+			co_to_s[i]->resize(coverages_.size());
+		}
 	}
 }
 void summarycalc::init_o_to_s()
@@ -200,7 +203,8 @@ void summarycalc::loadgulsummaryxref()
 		if (fout[s.summaryset_id] != nullptr) {
 			if (s.summary_id < min_summary_id_[s.summaryset_id]) min_summary_id_[s.summaryset_id] = s.summary_id;
 			if (s.summary_id > max_summary_id_[s.summaryset_id]) max_summary_id_[s.summaryset_id] = s.summary_id;
-			co_to_s[s.summaryset_id]->insert({ s.coverage_id,s.summary_id });
+			//co_to_s[s.summaryset_id]->insert({ s.coverage_id,s.summary_id });
+			(*co_to_s[s.summaryset_id])[s.coverage_id] = s.summary_id ;
 		}
 		i = fread(&s, sizeof(gulsummaryxref), 1, fin);
 	}
@@ -228,7 +232,8 @@ void summarycalc::loadfmsummaryxref()
 		if (fout[s.summaryset_id] != nullptr) {
 			if (s.summary_id < min_summary_id_[s.summaryset_id]) min_summary_id_[s.summaryset_id] = s.summary_id;
 			if (s.summary_id > max_summary_id_[s.summaryset_id]) max_summary_id_[s.summaryset_id] = s.summary_id;
-			co_to_s[s.summaryset_id]->insert({ s.output_id,s.summary_id });
+			// co_to_s[s.summaryset_id]->insert({ s.output_id,s.summary_id });
+			(*co_to_s[s.summaryset_id])[s.output_id] = s.summary_id ;
 		}
 		i = fread(&s, sizeof(fmsummaryxref), 1, fin);
 	}
@@ -364,8 +369,8 @@ void summarycalc::dosummary(int sample_size,int event_id,int coverage_or_output_
 
 void summarycalc::dogulsummary()
 {
-	loadgulsummaryxref();
 	loadcoverages();
+	loadgulsummaryxref();	
 	outputstreamtype();
 	unsigned int streamtype = 0;
 	int i = fread(&streamtype, sizeof(streamtype), 1, stdin);

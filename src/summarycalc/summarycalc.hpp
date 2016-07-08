@@ -13,7 +13,8 @@ struct loss_exp {
 
 #define MAX_SUMMARY_ID 2147483647
 
-typedef std::map<int, int> coverage_id_or_output_id_to_Summary_id;	// will turn into vectors once code is working
+typedef std::vector<int> coverage_id_or_output_id_to_Summary_id;	// will turn into vectors once code is working
+//typedef std::map<int, int> coverage_id_or_output_id_to_Summary_id;	// will turn into vectors once code is working
 //typedef std::map<int, int> output_id_to_Summary_id;		// will turn into vectors once code is working
 
 class summarycalc {

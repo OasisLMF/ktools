@@ -233,6 +233,7 @@ void summarycalc::loadfmsummaryxref()
 			if (s.summary_id < min_summary_id_[s.summaryset_id]) min_summary_id_[s.summaryset_id] = s.summary_id;
 			if (s.summary_id > max_summary_id_[s.summaryset_id]) max_summary_id_[s.summaryset_id] = s.summary_id;
 			// co_to_s[s.summaryset_id]->insert({ s.output_id,s.summary_id });
+			if ((*co_to_s[s.summaryset_id]).size() < (s.output_id + 1)) (*co_to_s[s.summaryset_id]).resize(s.output_id + 1, 0);
 			(*co_to_s[s.summaryset_id])[s.output_id] = s.summary_id ;
 		}
 		i = fread(&s, sizeof(fmsummaryxref), 1, fin);

@@ -224,10 +224,10 @@ void getmodel::doResults(
         int result_index = 0;
         auto vulnerability = vulnerabilities[vulnerability_id];
         int vulnerability_index = 0;
-        float cumulative_prob = 0;
+        double cumulative_prob = 0;		
         for (int damage_bin_index = 0; damage_bin_index < _num_damage_bins; damage_bin_index++)
         {
-            float prob = 0.0f;
+            double prob = 0.0f;
             for (int intensity_bin_index = 0;
                     intensity_bin_index < _num_intensity_bins;
                     intensity_bin_index++)
@@ -242,6 +242,7 @@ void getmodel::doResults(
             results[result_index++] =
                 Result(cumulative_prob, _mean_damage_bins[damage_bin_index]);
             //}
+			if (cumulative_prob > 0.999999940) break;		// single precision value approx 1
         }
 
         int num_results = result_index;

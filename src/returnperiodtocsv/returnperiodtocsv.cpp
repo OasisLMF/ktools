@@ -41,10 +41,10 @@
 void doit()
 {
 
-    int eventid;
+    int return_period;
 
-    while (fread(&eventid, sizeof(eventid), 1, stdin) == 1){
-        printf("%d\n",eventid);
+    while (fread(&return_period, sizeof(return_period), 1, stdin) == 1){
+        printf("%d\n",return_period);
     }
 
 }

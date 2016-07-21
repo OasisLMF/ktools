@@ -40,18 +40,18 @@
 
 void doit()
 {
-    int eventid;
+    int return_period;
     char line[4096];
     int lineno=0;
     while (fgets(line, sizeof(line), stdin) != 0)
     {
-       if (sscanf(line, "%d", &eventid) != 1){
+       if (sscanf(line, "%d", &return_period) != 1){
            fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
            return;
        }
        else
        {
-           fwrite(&eventid, sizeof(eventid), 1, stdout);
+           fwrite(&return_period, sizeof(return_period), 1, stdout);
        }
        lineno++;
     }

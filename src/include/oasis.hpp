@@ -289,6 +289,7 @@ inline void initstreams(std::string inFile="", std::string outFile="")
 #define FMXREF_FILE "input/fm_xref.bin"
 #define ITEMS_FILE "input/items.bin"
 #define EVENTS_FILE "input/events.bin"
+#define RETURNPERIODS_FILE "input/returnperiods.bin"
 
 #define DAMAGE_BIN_DICT_FILE "static/damage_bin_dict.bin"
 #define DAMAGE_CDF_BIN_FILE "static/damage_cdf.bin"

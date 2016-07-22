@@ -26,18 +26,5 @@ struct summary_id_period_key {
 
 typedef  std::vector<float> lossvec;
 
-extern FILE *fout[];
-extern int totalperiods;
-extern int maxsummaryid;
+//extern FILE *fout[];
 
-extern std::map<outkey2, float> agg_out_loss;
-extern std::map<outkey2, float> max_out_loss;
-
-void outputAggFulluncertainty();
-void outputAggWheatsheaf();
-void outputAggWheatSheafMean(int samplesize);
-void outputAggSampleMean(int samplesize);
-void outputOccFulluncertainty();
-void outputOccWheatsheaf();
-void outputOccWheatSheafMean(int samplesize);
-void outputOccSampleMean(int samplesize);

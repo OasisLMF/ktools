@@ -2,8 +2,19 @@
 #include <vector>
 #include <algorithm>    // std::sort
 
-#include "leccalc.hpp"
+#include "aggreports.hpp"
 
+
+struct line_points {
+	float from_x;
+	float from_y;
+	float to_x;
+	float to_y;
+};
+inline float linear_interpolate(line_points lp, float xpos)
+{
+	return ((xpos - lp.to_x) * (lp.from_y - lp.to_y) / (lp.from_x - lp.to_x)) + lp.to_y;
+}
 
 bool operator<(const summary_id_period_key& lhs, const summary_id_period_key& rhs)
 {
@@ -40,43 +51,71 @@ bool operator<(const wheatkey& lhs, const wheatkey& rhs)
 	}
 }
 
-
-void fulluncertainty(int handle,const std::map<outkey2, float> &out_loss)
+aggreports::aggreports(int totalperiods, int maxsummaryid, std::map<outkey2, float> &agg_out_loss, std::map<outkey2, float> &max_out_loss, FILE **fout, bool useReturnPeriodFile) :
+	totalperiods_(totalperiods), maxsummaryid_(maxsummaryid), agg_out_loss_(agg_out_loss), max_out_loss_(max_out_loss), fout_(fout), useReturnPeriodFile_(useReturnPeriodFile)
 {
-	if (fout[handle] == nullptr) return;
+	loadreturnperiods();
+};
+
+void aggreports::loadreturnperiods()
+{
+	if (useReturnPeriodFile_ == false) return;
+
+	FILE *fin = fopen(RETURNPERIODS_FILE, "rb");
+	if (fin == NULL) {
+		std::cerr << "loadreturnperiods: Unable to open " << RETURNPERIODS_FILE << "\n";
+		exit(-1);
+	}
+
+	int return_period;
+
+	while (fread(&return_period, sizeof(return_period), 1, fin) == 1) {
+		returnperiods_.push_back(return_period);
+	}
+
+	fclose(fin);
+
+	if (returnperiods_.size() == 0) {
+		useReturnPeriodFile_ = false;
+		fprintf(stderr, "No return periods loaded - running without defined return periods option\n");
+	}
+}
+
+void aggreports::fulluncertainty(int handle,const std::map<outkey2, float> &out_loss)
+{
+	if (fout_[handle] == nullptr) return;
 	std::map<int, lossvec> items;
 	for (auto x : out_loss) {
 		items[x.first.summary_id].push_back(x.second);
 	}
 
-	fprintf(fout[handle], "Summary_id, return_period, Loss\n");
+	fprintf(fout_[handle], "Summary_id, return_period, Loss\n");
 
 	for (auto s : items) {
 		lossvec &lpv = s.second;
 		std::sort(lpv.rbegin(), lpv.rend());
 		int i = 1;
-		float t = (float) totalperiods;
+		float t = (float) totalperiods_;
 		for (auto lp : lpv) {
-			fprintf(fout[handle], "%d, %f,%f\n", s.first, t / i, lp);
+			fprintf(fout_[handle], "%d, %f,%f\n", s.first, t / i, lp);
 			i++;
 		}
 	}
 }
-void outputOccFulluncertainty()
+void aggreports::outputOccFulluncertainty()
 {
-	fulluncertainty(OCC_FULL_UNCERTAINTY, max_out_loss);
+	fulluncertainty(OCC_FULL_UNCERTAINTY, max_out_loss_);
 }
 
 // Full uncertainity output
-void outputAggFulluncertainty()
+void aggreports::outputAggFulluncertainty()
 {
-	fulluncertainty(AGG_FULL_UNCERTAINTY, agg_out_loss);
-
+	fulluncertainty(AGG_FULL_UNCERTAINTY, agg_out_loss_);
 }
 
-void wheatsheaf(int handle, const std::map<outkey2, float> &out_loss)
+void aggreports::wheatsheaf(int handle, const std::map<outkey2, float> &out_loss)
 {
-	if (fout[handle] == nullptr) return;
+	if (fout_[handle] == nullptr) return;
 	std::map<wheatkey, lossvec> items;
 
 	for (auto x : out_loss) {
@@ -86,32 +125,31 @@ void wheatsheaf(int handle, const std::map<outkey2, float> &out_loss)
 		items[wk].push_back(x.second);
 	}
 
-	fprintf(fout[handle], "Summary_id, sidx, return_period, Loss\n");
+	fprintf(fout_[handle], "Summary_id, sidx, return_period, Loss\n");
 	for (auto s : items) {
 		lossvec &lpv = s.second;
 		std::sort(lpv.rbegin(), lpv.rend());
 		int i = 1;
-		float t = (float)totalperiods;
+		float t = (float)totalperiods_;
 		for (auto lp : lpv) {
-			fprintf(fout[handle], "%d,%d, %f,%f\n", s.first.summary_id, s.first.sidx, t / i, lp);
+			fprintf(fout_[handle], "%d,%d, %f,%f\n", s.first.summary_id, s.first.sidx, t / i, lp);
 			i++;
 		}
 	}
-
 }
 
-void outputOccWheatsheaf()
+void aggreports::outputOccWheatsheaf()
 {
-	wheatsheaf(OCC_WHEATSHEAF, max_out_loss);
+	wheatsheaf(OCC_WHEATSHEAF, max_out_loss_);
 }
-void outputAggWheatsheaf()
+void aggreports::outputAggWheatsheaf()
 {
-	wheatsheaf(AGG_WHEATSHEAF, agg_out_loss);
+	wheatsheaf(AGG_WHEATSHEAF, agg_out_loss_);
 }
 
-void wheatSheafMean(int samplesize, int handle, const std::map<outkey2, float> &out_loss)
+void aggreports::wheatSheafMean(int samplesize, int handle, const std::map<outkey2, float> &out_loss)
 {
-	if (fout[handle] == nullptr) return;
+	if (fout_[handle] == nullptr) return;
 	std::map<wheatkey, lossvec> items;
 	for (auto x : out_loss) {
 		wheatkey wk;;
@@ -126,12 +164,16 @@ void wheatSheafMean(int samplesize, int handle, const std::map<outkey2, float> &
 	}
 
 	std::map<int, std::vector<float>> mean_map;
-	for (int i = 1; i <= maxsummaryid; i++) {
+	for (int i = 1; i <= maxsummaryid_; i++) {
 		mean_map[i] = std::vector<float>(maxcount, 0);
 	}
-	fprintf(fout[handle], "Summary_id,type, return_period, Loss\n");
-
+	fprintf(fout_[handle], "Summary_id,type, return_period, Loss\n");
 	for (auto s : items) {
+		int nextreturnperiodindex = 0;
+		int nextreturnperiodvalue = 0;
+		if (useReturnPeriodFile_) nextreturnperiodvalue = returnperiods_[nextreturnperiodindex];
+		float last_computed_rp = 0;	
+		float last_computed_loss = 0;
 		lossvec &lpv = s.second;
 		std::sort(lpv.rbegin(), lpv.rend());
 		if (s.first.sidx != -1) {
@@ -143,10 +185,56 @@ void wheatSheafMean(int samplesize, int handle, const std::map<outkey2, float> &
 		}
 		else {
 			int i = 1;
-			float t = (float) totalperiods;
+			float t = (float) totalperiods_;
 			for (auto lp : lpv) {
-				fprintf(fout[handle], "%d, 1, %f,%f\n", s.first.summary_id, t / i, lp);
+				if (useReturnPeriodFile_) {
+					float retperiod = t / i;
+					if (retperiod == nextreturnperiodvalue) {
+						//fprintf(stderr, "%d, 1, %f,%f\n", s.first.summary_id, retperiod, lp);
+						fprintf(fout_[handle], "%d, 1, %f,%f\n", s.first.summary_id, retperiod, lp);
+						nextreturnperiodindex++;
+						nextreturnperiodvalue = returnperiods_[nextreturnperiodindex];
+					} else{
+						if (retperiod < nextreturnperiodvalue) {
+							line_points lpt;
+							lpt.from_x = last_computed_rp;
+							lpt.from_y = last_computed_loss;
+							lpt.to_x = retperiod;
+							lpt.to_y = lp;
+							float zz = linear_interpolate(lpt, nextreturnperiodvalue);
+							//fprintf(stderr, "%d, 1, %f,%f\n", s.first.summary_id, (float)nextreturnperiodvalue, zz);
+							fprintf(fout_[handle], "%d, 1, %f,%f\n", s.first.summary_id, (float)nextreturnperiodvalue, zz);
+							nextreturnperiodindex++;
+							nextreturnperiodvalue = returnperiods_[nextreturnperiodindex];
+						}
+					}
+					//fprintf(fout_[handle], "%d, 1, %f,%f\n", s.first.summary_id, t / i, lp);					
+					last_computed_rp = retperiod;
+					last_computed_loss = lp;
+				}else {
+					fprintf(fout_[handle], "%d, 1, %f,%f\n", s.first.summary_id, t / i, lp);
+				}
+				
 				i++;
+			}
+			if (useReturnPeriodFile_) {
+
+				line_points lpt;
+				lpt.from_x = last_computed_rp;
+				lpt.from_y = last_computed_loss;
+				lpt.to_x = 0;
+				lpt.to_y = 0;
+				float zz = linear_interpolate(lpt, nextreturnperiodvalue);
+				//fprintf(stderr, "%d, 1, %f,%f\n", s.first.summary_id, (float)nextreturnperiodvalue, zz);
+				fprintf(fout_[handle], "%d, 1, %f,%f\n", s.first.summary_id, (float)nextreturnperiodvalue, zz);
+				nextreturnperiodindex++;
+				while (nextreturnperiodindex < returnperiods_.size()) {
+					nextreturnperiodvalue = returnperiods_[nextreturnperiodindex];
+					zz = linear_interpolate(lpt, nextreturnperiodvalue);
+					fprintf(fout_[handle], "%d, 1, %f,%f\n", s.first.summary_id, (float)nextreturnperiodvalue, zz);
+					//fprintf(stderr, "%d, 1, %f,%f\n", s.first.summary_id, (float)nextreturnperiodvalue, zz);
+					nextreturnperiodindex++;
+				}
 			}
 		}
 	}
@@ -163,9 +251,9 @@ void wheatSheafMean(int samplesize, int handle, const std::map<outkey2, float> &
 			rit++;
 		}
 		int i = 1;
-		float t = (float)totalperiods;
+		float t = (float)totalperiods_;
 		for (auto lp : lpv) {
-			fprintf(fout[handle], "%d, 2, %f,%f\n", m.first, t / i, lp / samplesize);
+			fprintf(fout_[handle], "%d, 2, %f,%f\n", m.first, t / i, lp / samplesize);
 			i++;
 			if (i > maxindex) break;
 		}
@@ -173,19 +261,19 @@ void wheatSheafMean(int samplesize, int handle, const std::map<outkey2, float> &
 
 }
 
-void outputOccWheatSheafMean(int samplesize)
+void aggreports::outputOccWheatSheafMean(int samplesize)
 {
-	wheatSheafMean(samplesize, OCC_WHEATSHEAF_MEAN, max_out_loss);
+	wheatSheafMean(samplesize, OCC_WHEATSHEAF_MEAN, max_out_loss_);
 }
 
-void outputAggWheatSheafMean(int samplesize)
+void aggreports::outputAggWheatSheafMean(int samplesize)
 {
-	wheatSheafMean(samplesize, AGG_WHEATSHEAF_MEAN, agg_out_loss);
+	wheatSheafMean(samplesize, AGG_WHEATSHEAF_MEAN, agg_out_loss_);
 }
 
-void sampleMean(int samplesize, int handle, const std::map<outkey2, float> &out_loss)
+void aggreports::sampleMean(int samplesize, int handle, const std::map<outkey2, float> &out_loss)
 {
-	if (fout[handle] == nullptr) return;
+	if (fout_[handle] == nullptr) return;
 	std::map<summary_id_period_key, float> items;
 
 	for (auto x : out_loss) {
@@ -206,7 +294,7 @@ void sampleMean(int samplesize, int handle, const std::map<outkey2, float> &out_
 
 	std::map<summary_id_type_key, std::vector<float>> mean_map;
 
-	fprintf(fout[handle], "Summary_id,type, return_period, Loss_mean\n");
+	fprintf(fout_[handle], "Summary_id,type, return_period, Loss_mean\n");
 	for (auto s : items) {
 		summary_id_type_key st;
 		st.summary_id = s.first.summary_id;
@@ -218,19 +306,19 @@ void sampleMean(int samplesize, int handle, const std::map<outkey2, float> &out_
 		std::vector<float> &lpv = m.second;
 		std::sort(lpv.rbegin(), lpv.rend());
 		int i = 1;
-		float t = (float) totalperiods;
+		float t = (float) totalperiods_;
 		for (auto lp : lpv) {
-			fprintf(fout[handle], "%d, %d, %f,%f\n", m.first.summary_id, m.first.type, t / i, lp);
+			fprintf(fout_[handle], "%d, %d, %f,%f\n", m.first.summary_id, m.first.type, t / i, lp);
 			i++;
 		}
 	}
 }
-void outputOccSampleMean(int samplesize)
+void aggreports::outputOccSampleMean(int samplesize)
 {
-	sampleMean(samplesize, OCC_SAMPLE_MEAN, max_out_loss);
+	sampleMean(samplesize, OCC_SAMPLE_MEAN, max_out_loss_);
 }
 
-void outputAggSampleMean(int samplesize)
+void aggreports::outputAggSampleMean(int samplesize)
 {
-	sampleMean(samplesize, AGG_SAMPLE_MEAN, agg_out_loss);
+	sampleMean(samplesize, AGG_SAMPLE_MEAN, agg_out_loss_);
 }

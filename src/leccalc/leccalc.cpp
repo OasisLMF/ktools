@@ -50,6 +50,7 @@ This process will then read all the *.bin files in the subdirectory and then com
 #include <math.h>
 #include <vector>
 #include "leccalc.hpp"
+#include "aggreports.hpp"
 
 #ifdef __unix
 #include <unistd.h>
@@ -66,20 +67,11 @@ This process will then read all the *.bin files in the subdirectory and then com
 
 using namespace std;
 
-
-FILE *fout[] = { nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr };
-
-int totalperiods = -1;
-int maxsummaryid = 0;
-bool useReturnPeriodFile = false;
-
 bool isSummaryCalcStream(unsigned int stream_type)
 {
 	unsigned int stype = summarycalc_id & stream_type;
 	return (stype == summarycalc_id);
 }
-
-std::map<int, std::vector<int> > event_to_periods;
 
 bool operator<(const outkey2& lhs, const outkey2& rhs)
 {
@@ -93,10 +85,8 @@ bool operator<(const outkey2& lhs, const outkey2& rhs)
 	}
 }
 
-std::map<outkey2, float> agg_out_loss;
-std::map<outkey2, float> max_out_loss;
 
-void loadoccurence()
+void loadoccurence(std::map<int, std::vector<int> > &event_to_periods, int &totalperiods)
 {
 	FILE *fin = fopen(OCCURRENCE_FILE, "rb");
 	if (fin == NULL) {
@@ -122,7 +112,7 @@ void loadoccurence()
 //
 //
 
-inline void dolecoutputaggsummary(int summary_id, int sidx, float loss, const std::vector<int> &periods)
+inline void dolecoutputaggsummary(int summary_id, int sidx, float loss, const std::vector<int> &periods, std::map<outkey2, float> &agg_out_loss, std::map<outkey2, float> &max_out_loss)
 {
 	outkey2 key;
 	key.summary_id = summary_id;
@@ -132,21 +122,12 @@ inline void dolecoutputaggsummary(int summary_id, int sidx, float loss, const st
 		key.sidx = sidx;
 		agg_out_loss[key] += loss;
 		if (max_out_loss[key] < loss) max_out_loss[key] = loss;
-/*
-		auto iter = agg_out_loss.find(key);
-		if (iter == agg_out_loss.end()) {
-			agg_out_loss.insert(std::pair<outkey2, float>(key, loss));
-			max_out_loss.insert(std::pair<outkey2, float>(key, loss));
-		}
-		else {
-			agg_out_loss[key] += loss;
-			if (max_out_loss[key] < loss) max_out_loss[key] = loss;
-		}		
-*/
+
 	}
 }
 
-void processinputfile(unsigned int &samplesize)
+
+void processinputfile(unsigned int &samplesize,const std::map<int, std::vector<int> > &event_to_periods, int &maxsummaryid, std::map<outkey2, float> &agg_out_loss, std::map<outkey2, float> &max_out_loss)
 {
 	unsigned int stream_type = 0;
 	int i = fread(&stream_type, sizeof(stream_type), 1, stdin);
@@ -174,7 +155,7 @@ void processinputfile(unsigned int &samplesize)
 					if (sr.sidx == 0) break;
 					//				dolecoutput1(sh.summary_id, sr.loss,iter->second);					
 					if (sr.sidx != -2) {
-						if (sr.loss > 0.0) dolecoutputaggsummary(sh.summary_id, sr.sidx, sr.loss, iter->second);
+						if (sr.loss > 0.0) dolecoutputaggsummary(sh.summary_id, sr.sidx, sr.loss, iter->second,agg_out_loss,max_out_loss);
 					}
 				}
 			}
@@ -200,15 +181,22 @@ void setinputstream(const std::string &inFile)
 	}
 
 }
-void doit(const std::string &subfolder)
+void doit(const std::string &subfolder, FILE **fout, bool useReturnPeriodFile)
 {
 	std::string path = "work/" + subfolder;
 	if (path.substr(path.length() - 1, 1) != "/") {
 		path = path + "/";
 	}
+	std::map<int, std::vector<int> > event_to_periods;
+	int totalperiods;
+	loadoccurence(event_to_periods,totalperiods);
+	std::map<outkey2, float> agg_out_loss;
+	std::map<outkey2, float> max_out_loss;
+
 	unsigned int samplesize;
-	if (subfolder.size() == 0) {
-		processinputfile(samplesize);
+	int maxsummaryid = -1;
+	if (subfolder.size() == 0) {		
+		processinputfile(samplesize, event_to_periods, maxsummaryid, agg_out_loss, max_out_loss);
 	}
 	else {
 		DIR *dir;
@@ -219,26 +207,26 @@ void doit(const std::string &subfolder)
 				if (s.length() > 4 && s.substr(s.length() - 4, 4) == ".bin") {
 					s = path + ent->d_name;
 					setinputstream(s);
-					processinputfile(samplesize);
+					processinputfile(samplesize, event_to_periods, maxsummaryid, agg_out_loss, max_out_loss);
 				}
 			}
 		}
 	}
 
-	outputAggWheatsheaf();
-	outputAggFulluncertainty();
-	outputAggWheatSheafMean(samplesize);
-	outputAggSampleMean(samplesize);
-	outputOccWheatsheaf();
-	outputOccFulluncertainty();
-	outputOccWheatSheafMean(samplesize);
-	outputOccSampleMean(samplesize);
-
+	aggreports agg(totalperiods,maxsummaryid, agg_out_loss, max_out_loss, fout,useReturnPeriodFile);
+	agg.outputAggWheatsheaf();
+	agg.outputAggFulluncertainty();
+	agg.outputAggWheatSheafMean(samplesize);
+	agg.outputAggSampleMean(samplesize);
+	agg.outputOccWheatsheaf();
+	agg.outputOccFulluncertainty();
+	agg.outputOccWheatSheafMean(samplesize);
+	agg.outputOccSampleMean(samplesize);
 
 }
 
 
-void openpipe(int output_id,const std::string &pipe)
+void openpipe(int output_id,const std::string &pipe, FILE **fout)
 {
 	if (pipe == "-") fout[output_id] = stdout;
 	else {
@@ -267,9 +255,12 @@ void help()
 	exit(-1);
 }
 
+
 // 
 int main(int argc, char* argv[])
 {
+	bool useReturnPeriodFile = false;
+	FILE *fout[] = { nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr };
 
 	std::string subfolder;
 	int opt;
@@ -279,28 +270,28 @@ int main(int argc, char* argv[])
 			subfolder = optarg;
 			break;
 		case 'F':
-			openpipe(AGG_FULL_UNCERTAINTY, optarg);
+			openpipe(AGG_FULL_UNCERTAINTY, optarg, fout);
 			break;
 		case 'f':
-			openpipe(OCC_FULL_UNCERTAINTY, optarg);
+			openpipe(OCC_FULL_UNCERTAINTY, optarg, fout);
 			break;
 		case 'W':
-			openpipe(AGG_WHEATSHEAF, optarg);
+			openpipe(AGG_WHEATSHEAF, optarg, fout);
 			break;
 		case 'w':
-			openpipe(OCC_WHEATSHEAF, optarg);
+			openpipe(OCC_WHEATSHEAF, optarg, fout);
 			break;
 		case 'S':
-			openpipe(AGG_SAMPLE_MEAN, optarg);
+			openpipe(AGG_SAMPLE_MEAN, optarg, fout);
 			break;
 		case 's':
-			openpipe(OCC_SAMPLE_MEAN, optarg);
+			openpipe(OCC_SAMPLE_MEAN, optarg, fout);
 			break;
 		case 'M':
-			openpipe(AGG_WHEATSHEAF_MEAN, optarg);
+			openpipe(AGG_WHEATSHEAF_MEAN, optarg, fout);
 			break;
 		case 'm':
-			openpipe(OCC_WHEATSHEAF_MEAN, optarg);
+			openpipe(OCC_WHEATSHEAF_MEAN, optarg, fout);
 			break;
 		case 'r':
 			useReturnPeriodFile = true;
@@ -315,9 +306,8 @@ int main(int argc, char* argv[])
 		fprintf(stderr, "Invalid parameters\n");
 		help();
 	}	
-	initstreams();
-	loadoccurence();
-	doit(subfolder);
+	initstreams();	
+	doit(subfolder,fout, useReturnPeriodFile);
 	return 0;
 
 }

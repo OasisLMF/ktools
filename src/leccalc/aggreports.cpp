@@ -94,12 +94,27 @@ void aggreports::fulluncertainty(int handle,const std::map<outkey2, float> &out_
 	for (auto s : items) {
 		lossvec &lpv = s.second;
 		std::sort(lpv.rbegin(), lpv.rend());
+		int nextreturnperiodindex = 0;
+		float last_computed_rp = 0;
+		float last_computed_loss = 0;
 		int i = 1;
 		float t = (float) totalperiods_;
 		for (auto lp : lpv) {
-			fprintf(fout_[handle], "%d, %f,%f\n", s.first, t / i, lp);
+			float retperiod = t / i;
+			if (useReturnPeriodFile_) {
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, s.first, 0);
+			}else{
+				fprintf(fout_[handle], "%d, %f,%f\n", s.first, t / i, lp);
+			}
 			i++;
 		}
+		if (useReturnPeriodFile_) {
+			doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first, 0);
+			while (nextreturnperiodindex < returnperiods_.size()) {
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first, 0);
+			}
+		}
+
 	}
 }
 void aggreports::outputOccFulluncertainty()
@@ -138,7 +153,8 @@ void aggreports::doreturnperiodout(int handle, int &nextreturnperiod_index, floa
 	float nextreturnperiod_value = returnperiods_[nextreturnperiod_index];
 	if (current_return_period <= nextreturnperiod_value) {
 		float loss = getloss(nextreturnperiod_value, last_return_period, last_loss, current_return_period, current_loss);
-		fprintf(fout_[handle], "%d, %d, %f,%f\n", summary_id, type, (float)nextreturnperiod_value, loss);
+		if(type) fprintf(fout_[handle], "%d, %d, %f,%f\n", summary_id, type, (float)nextreturnperiod_value, loss);
+		else fprintf(fout_[handle], "%d, %f,%f\n", summary_id, (float)nextreturnperiod_value, loss);
 		nextreturnperiod_index++;
 	}
 	if (current_return_period > 0) {
@@ -174,7 +190,6 @@ void aggreports::wheatsheaf(int handle, const std::map<outkey2, float> &out_loss
 			float retperiod = t / i;
 			if (useReturnPeriodFile_) {
 				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, s.first.summary_id, s.first.sidx);
-				//fprintf(fout_[handle], "TODO: %d,%d, %f,%f\n", s.first.summary_id, s.first.sidx, t / i, lp);
 			}else {
 				fprintf(fout_[handle], "%d,%d, %f,%f\n", s.first.summary_id, s.first.sidx, t / i, lp);
 			}			
@@ -338,11 +353,25 @@ void aggreports::sampleMean(int samplesize, int handle, const std::map<outkey2, 
 	for (auto m : mean_map) {
 		std::vector<float> &lpv = m.second;
 		std::sort(lpv.rbegin(), lpv.rend());
+		int nextreturnperiodindex = 0;
+		float last_computed_rp = 0;
+		float last_computed_loss = 0;
 		int i = 1;
 		float t = (float) totalperiods_;
 		for (auto lp : lpv) {
-			fprintf(fout_[handle], "%d, %d, %f,%f\n", m.first.summary_id, m.first.type, t / i, lp);
+			float retperiod = t / i;
+			if (useReturnPeriodFile_) {
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, m.first.summary_id, m.first.type);
+			}else {
+				fprintf(fout_[handle], "%d, %d, %f,%f\n", m.first.summary_id, m.first.type, retperiod, lp);
+			}
 			i++;
+		}
+		if (useReturnPeriodFile_) {
+			doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first.summary_id, m.first.type);
+			while (nextreturnperiodindex < returnperiods_.size()) {
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first.summary_id, m.first.type);
+			}
 		}
 	}
 }

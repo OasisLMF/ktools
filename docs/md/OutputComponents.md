@@ -131,7 +131,7 @@ csv file with the following fields;
 | return_period     | float  |    4   | return period interval                                              |    250      |
 | loss              | float  |    4   | loss exceedance threshold for return period                         |    546577.8 |
 
-**Wheatsheaf loss exceedance curve **
+**Wheatsheaf loss exceedance curve**
 
 | Name              | Type   |  Bytes | Description                                                         | Example     |
 |:------------------|--------|--------| :-------------------------------------------------------------------|------------:|

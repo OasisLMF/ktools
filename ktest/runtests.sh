@@ -83,6 +83,42 @@ installertest()
 	../src/leccalc/leccalc -Kfm1/summary -s ../ktest/testout/fm_sample_mean_oep_1.csv
     ../src/leccalc/leccalc -Kfm1/summary -m ../ktest/testout/fm_wheatsheaf_mean_oep_1.csv
 
+	../src/leccalc/leccalc -r -Kgul1/summary -F ../ktest/testout/gul_full_uncertainty_aep_1_r.csv 
+	../src/leccalc/leccalc -r -Kgul1/summary -W ../ktest/testout/gul_wheatsheaf_aep_1_r.csv 
+	../src/leccalc/leccalc -r -Kgul1/summary -S ../ktest/testout/gul_sample_mean_aep_1_r.csv
+	../src/leccalc/leccalc -r -Kgul1/summary -M ../ktest/testout/gul_wheatsheaf_mean_aep_1_r.csv 
+    ../src/leccalc/leccalc -r -Kgul1/summary -f ../ktest/testout/gul_full_uncertainty_oep_1_r.csv
+	../src/leccalc/leccalc -r -Kgul1/summary -w ../ktest/testout/gul_wheatsheaf_oep_1_r.csv
+	../src/leccalc/leccalc -r -Kgul1/summary -s ../ktest/testout/gul_sample_mean_oep_1_r.csv 
+    ../src/leccalc/leccalc -r -Kgul1/summary -m ../ktest/testout/gul_wheatsheaf_mean_oep_1_r.csv
+
+	../src/leccalc/leccalc -r -Kfm1/summary -F ../ktest/testout/fm_full_uncertainty_aep_1_r.csv  
+	../src/leccalc/leccalc -r -Kfm1/summary -W ../ktest/testout/fm_wheatsheaf_aep_1_r.csv
+	../src/leccalc/leccalc -r -Kfm1/summary -S ../ktest/testout/fm_sample_mean_aep_1_r.csv
+	../src/leccalc/leccalc -r -Kfm1/summary -M ../ktest/testout/fm_wheatsheaf_mean_aep_1_r.csv
+    ../src/leccalc/leccalc -r -Kfm1/summary -f ../ktest/testout/fm_full_uncertainty_oep_1_r.csv
+	../src/leccalc/leccalc -r -Kfm1/summary -w ../ktest/testout/fm_wheatsheaf_oep_1_r.csv
+	../src/leccalc/leccalc -r -Kfm1/summary -s ../ktest/testout/fm_sample_mean_oep_1_r.csv
+    ../src/leccalc/leccalc -r -Kfm1/summary -m ../ktest/testout/fm_wheatsheaf_mean_oep_1_r.csv
+
+	../src/leccalc/leccalc -r -Kgul2/summary -F ../ktest/testout/gul_full_uncertainty_aep_2_r.csv 
+	../src/leccalc/leccalc -r -Kgul2/summary -W ../ktest/testout/gul_wheatsheaf_aep_2_r.csv 
+	../src/leccalc/leccalc -r -Kgul2/summary -S ../ktest/testout/gul_sample_mean_aep_2_r.csv
+	../src/leccalc/leccalc -r -Kgul2/summary -M ../ktest/testout/gul_wheatsheaf_mean_aep_2_r.csv 
+    ../src/leccalc/leccalc -r -Kgul2/summary -f ../ktest/testout/gul_full_uncertainty_oep_2_r.csv
+	../src/leccalc/leccalc -r -Kgul2/summary -w ../ktest/testout/gul_wheatsheaf_oep_2_r.csv
+	../src/leccalc/leccalc -r -Kgul2/summary -s ../ktest/testout/gul_sample_mean_oep_2_r.csv 
+    ../src/leccalc/leccalc -r -Kgul2/summary -m ../ktest/testout/gul_wheatsheaf_mean_oep_2_r.csv
+
+	../src/leccalc/leccalc -r -Kfm2/summary -F ../ktest/testout/fm_full_uncertainty_aep_2_r.csv  
+	../src/leccalc/leccalc -r -Kfm2/summary -W ../ktest/testout/fm_wheatsheaf_aep_2_r.csv
+	../src/leccalc/leccalc -r -Kfm2/summary -S ../ktest/testout/fm_sample_mean_aep_2_r.csv
+	../src/leccalc/leccalc -r -Kfm2/summary -M ../ktest/testout/fm_wheatsheaf_mean_aep_2_r.csv
+    ../src/leccalc/leccalc -r -Kfm2/summary -f ../ktest/testout/fm_full_uncertainty_oep_2_r.csv
+	../src/leccalc/leccalc -r -Kfm2/summary -w ../ktest/testout/fm_wheatsheaf_oep_2_r.csv
+	../src/leccalc/leccalc -r -Kfm2/summary -s ../ktest/testout/fm_sample_mean_oep_2_r.csv
+    ../src/leccalc/leccalc -r -Kfm2/summary -m ../ktest/testout/fm_wheatsheaf_mean_oep_2_r.csv
+
 	# test pltcalc
 	../src/pltcalc/pltcalc < ../ktest/testout/gulsummarycalc1.bin > ../ktest/testout/gulplt1.csv
 	../src/pltcalc/pltcalc < ../ktest/testout/gulsummarycalc2.bin > ../ktest/testout/gulplt2.csv
@@ -107,7 +143,7 @@ installertest()
 
 	# test stream conversion components
 	# stdout to csv
-	../src/cdftocsv/cdftocsv < ../ktest/testout/getmodelout.bin > ../ktest/testout/getmodelout.csv
+	../src/cdftocsv/cdftocsv -f < ../ktest/testout/getmodelout.bin > ../ktest/testout/getmodelout.csv
 	../src/gultocsv/gultocsv -f < ../ktest/testout/gulcalci.bin > ../ktest/testout/gulcalci.csv
 	../src/gultocsv/gultocsv -f < ../ktest/testout/gulcalcc.bin > ../ktest/testout/gulcalcc.csv
 	../src/fmtocsv/fmtocsv -f < ../ktest/testout/fmcalc.bin > ../ktest/testout/fmcalc.csv
@@ -141,6 +177,8 @@ installertest()
 	../src/gulsummaryxreftocsv/gulsummaryxreftocsv < ../examples/input/gulsummaryxref.bin | ../src/gulsummaryxreftobin/gulsummaryxreftobin > ../ktest/testout/gulsummaryxref.bin
 	
 	../src/fmsummaryxreftocsv/fmsummaryxreftocsv < ../examples/input/fmsummaryxref.bin | ../src/fmsummaryxreftobin/fmsummaryxreftobin > ../ktest/testout/fmsummaryxref.bin
+    
+    ../src/returnperiodtocsv/returnperiodtocsv < ../examples/input/returnperiods.bin | ../src/returnperiodtobin/returnperiodtobin > ../ktest/testout/returnperiods.bin
 
 	../src/occurrencetocsv/occurrencetocsv < ../examples/static/occurrence.bin | ../src/occurrencetobin/occurrencetobin -P10000 > ../ktest/testout/occurrence.bin
 

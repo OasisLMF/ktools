@@ -70,12 +70,12 @@ $ leccalc [parameters] > lec.csv
 $ eve 1 2 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - > work/summary1/summarycalc1.bin
 $ eve 2 2 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - > work/summary1/summarycalc2.bin
 'Then run leccalc, pointing to the specified sub-directory of work containing summarycalc binaries.
-$ leccalc -Ksummary1 -F lec_full_uncertainty_agg.csv -f lec_full_uncertainty_occ.csv 
+$ leccalc -r -Ksummary1 -F lec_full_uncertainty_agg.csv -f lec_full_uncertainty_occ.csv 
 ```
 
 ##### Internal data
 
-leccalc requires the occurrence.bin file 
+leccalc requires the occurrence.bin file;
 
 * static/occurrence.bin
 
@@ -92,6 +92,14 @@ The user must ensure the work subdirectory exists.  The user may also specify a 
 * work/summaryset1/summarycalc3.bin
 
 The reason for leccalc not having an input stream is that the calculation is not valid on a subset of events, i.e. within a single process when the calculation has been distributed across multiple processes.  It must bring together all event losses before assigning event losses to periods and ranking losses by period.  The summarycalc losses for all events (all processes) must be written to the /work folder before running leccalc.
+
+Finally, and optionally, if the user would like only certain return period losses in the output (-r parameter), then a returnperiods file may be provided. If provided then the following file must exist;
+
+* input/returnperiods.bin
+
+Losses for return periods in the returnperiods file that are not directly calculated by leccalc based on the model's number of periods are calculated by linear interpolation of the two bounding return period losses.
+
+If the -r option is not used, then all calculated return period losses will be returned.
 
 ##### Calculation
 

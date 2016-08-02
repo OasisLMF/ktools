@@ -19,6 +19,7 @@ The following components convert input data in csv format to the binary format r
 * **[fmprofiletobin](#fmprofile)** converts the fm profile data.
 * **[fmsummaryxreftobin](#fmsummaryxref)** converts the fm summary xref data.
 * **[fmxreftobin](#fmxref)** converts the fm xref data.
+* **[returnperiodtobin](#returnperiod)** converts a list of return periods.
 
 These components are intended to allow users to generate the required input binaries from csv independently of the original data store and technical environment. All that needs to be done is first generate the csv files from the data store (SQL Server database, etc).
 
@@ -41,6 +42,7 @@ The following components convert the binary input data required by the calculati
 * **[fmprofiletocsv](#fmprofile)** converts the fm profile data.
 * **[fmsummaryxreftocsv](#fmsummaryxref)** converts the fm summary xref data.
 * **[fmxreftocsv](#fmxref)** converts the fm xref data.
+* **[returnperiodtocsv](#returnperiod)** converts a list of return periods.
 
 These components are provided for the convenience of viewing the data and debugging.
 
@@ -610,6 +612,35 @@ $ fmxreftobin < fm_xref.csv > fm_xref.bin
 ##### fmxreftocsv
 ```
 $ fmxreftocsv < fm_xref.bin > fm_xref.csv
+``` 
+
+[Return to top](#dataconversioncomponents)
+
+<a id="returnperiod"></a>
+### return period 
+***
+The returnperiods binary file is a list of return periods that the user requires to be included in loss exceedance curve (leccalc) results.
+
+This must be in the following location with filename format;
+* input/returnperiods.bin
+
+
+##### File format
+The csv file should contain the following fields with no header.
+
+| Name                        | Type   |  Bytes | Description          | Example     |
+|:----------------------------|--------|--------| :--------------------|------------:|
+| return_period               | int    |    4   | Return period        |     250     |
+
+
+##### returnperiodtobin
+```
+$ returnperiodtobin < returnperiods.csv > returnperiods.bin
+``` 
+
+##### returnperiodtocsv
+```
+$ returnperiodtocsv < returnperiods.bin > returnperiods.csv
 ``` 
 
 [Return to top](#dataconversioncomponents)

@@ -321,13 +321,15 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 				prev_agg_vec[i].next_vec_idx = aggid_to_vectorlookup[agg_id-1];
 			}
 			int vec_idx = prev_agg_vec[i].next_vec_idx;
-			if (agg_vec[vec_idx].policytc_id == 0) { // policytc_id cannot be zero - first position in lookup vector not used
-				agg_vec[vec_idx].policytc_id = avx[layer][vec_idx].policytc_id;
-				agg_vec[vec_idx].agg_id = agg_id;
-				agg_vec[vec_idx].item_idx = &avx[layer][vec_idx].item_idx;
-			}			
-			agg_vec[vec_idx].loss += prev_agg_vec[i].loss;
-			agg_vec[vec_idx].retained_loss += prev_agg_vec[i].retained_loss;						
+			if (vec_idx < avx[layer].size()) {	// TODO check this logic!!!!
+				if (agg_vec[vec_idx].policytc_id == 0) { // policytc_id cannot be zero - first position in lookup vector not used
+					agg_vec[vec_idx].policytc_id = avx[layer][vec_idx].policytc_id;
+					agg_vec[vec_idx].agg_id = agg_id;
+					agg_vec[vec_idx].item_idx = &avx[layer][vec_idx].item_idx;
+				}
+				agg_vec[vec_idx].loss += prev_agg_vec[i].loss;
+				agg_vec[vec_idx].retained_loss += prev_agg_vec[i].retained_loss;
+			}
 		}
 		else {
 			// this is valid when full array was not populated in previous level

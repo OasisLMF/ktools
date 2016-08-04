@@ -14,7 +14,7 @@ public:
 	fmcalc(int maxRunLevel) { init(maxRunLevel); }
 	inline float gettiv(int item_id) { return item_to_tiv_[item_id]; }
 private:
-	std::vector<std::vector<std::vector<int>>> policy_tc_vec_vec_vec_;
+	std::vector<std::vector<std::vector<int>>> policy_tc_vec_vec_vec_; // policy_tc_vec_vec_vec_[level][agg_id][layer_id]
 	std::vector<int> level_to_maxagg_id_;
 	int max_layer_ = 0;		// initialized from policy_tc
 	int max_agg_id_ = 0;	// initialized from policy_tc

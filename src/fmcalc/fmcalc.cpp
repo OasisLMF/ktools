@@ -316,12 +316,13 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 
 	for (unsigned int i = 0;i < prev_agg_vec.size();i++){ // loop through previous levels of agg_vec
 		if (prev_agg_vec[i].agg_id != 0) {
-			int agg_id = pfm_vec_vec_[level][prev_agg_vec[i].agg_id];
-			if (prev_agg_vec[i].next_vec_idx == -1) {	// next_vec_idx can be zero
-				prev_agg_vec[i].next_vec_idx = aggid_to_vectorlookup[agg_id-1];
-			}
-			int vec_idx = prev_agg_vec[i].next_vec_idx;
-			if (vec_idx < avx[layer].size()) {	// TODO check this logic!!!!
+			int agg_id = pfm_vec_vec_[level][prev_agg_vec[i].agg_id];			
+			if (layer < policy_tc_vec_vec_vec_[level][agg_id].size()) {
+				if (prev_agg_vec[i].next_vec_idx == -1) {	// next_vec_idx can be zero
+					prev_agg_vec[i].next_vec_idx = aggid_to_vectorlookup[agg_id - 1];
+				}
+				int vec_idx = prev_agg_vec[i].next_vec_idx;
+
 				if (agg_vec[vec_idx].policytc_id == 0) { // policytc_id cannot be zero - first position in lookup vector not used
 					agg_vec[vec_idx].policytc_id = avx[layer][vec_idx].policytc_id;
 					agg_vec[vec_idx].agg_id = agg_id;

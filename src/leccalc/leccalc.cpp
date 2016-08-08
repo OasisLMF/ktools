@@ -213,7 +213,7 @@ void doit(const std::string &subfolder, FILE **fout, bool useReturnPeriodFile)
 		}
 	}
 
-	aggreports agg(totalperiods,maxsummaryid, agg_out_loss, max_out_loss, fout,useReturnPeriodFile);
+	aggreports agg(totalperiods,maxsummaryid, agg_out_loss, max_out_loss, fout,useReturnPeriodFile,samplesize);
 	agg.outputAggWheatsheaf();
 	agg.outputAggFulluncertainty();
 	agg.outputAggWheatSheafMean(samplesize);

@@ -51,8 +51,8 @@ bool operator<(const wheatkey& lhs, const wheatkey& rhs)
 	}
 }
 
-aggreports::aggreports(int totalperiods, int maxsummaryid, std::map<outkey2, float> &agg_out_loss, std::map<outkey2, float> &max_out_loss, FILE **fout, bool useReturnPeriodFile) :
-	totalperiods_(totalperiods), maxsummaryid_(maxsummaryid), agg_out_loss_(agg_out_loss), max_out_loss_(max_out_loss), fout_(fout), useReturnPeriodFile_(useReturnPeriodFile)
+aggreports::aggreports(int totalperiods, int maxsummaryid, std::map<outkey2, float> &agg_out_loss, std::map<outkey2, float> &max_out_loss, FILE **fout, bool useReturnPeriodFile, int samplesize) :
+	totalperiods_(totalperiods), maxsummaryid_(maxsummaryid), agg_out_loss_(agg_out_loss), max_out_loss_(max_out_loss), fout_(fout), useReturnPeriodFile_(useReturnPeriodFile), samplesize_(samplesize)
 {
 	loadreturnperiods();
 };
@@ -99,6 +99,7 @@ void aggreports::fulluncertainty(int handle,const std::map<outkey2, float> &out_
 		float last_computed_loss = 0;
 		int i = 1;
 		float t = (float) totalperiods_;
+		if (samplesize_) t = (float) (totalperiods_ * samplesize_ );
 		for (auto lp : lpv) {
 			float retperiod = t / i;
 			if (useReturnPeriodFile_) {

@@ -10,6 +10,7 @@ private:
 	std::map<outkey2, float> &agg_out_loss_;
 	std::map<outkey2, float> &max_out_loss_;
 	bool useReturnPeriodFile_;
+	int samplesize_ = 0;
 	std::vector<int> returnperiods_;
 
 //
@@ -30,5 +31,5 @@ public:
 	void outputAggWheatSheafMean(int samplesize);
 	void outputOccSampleMean(int samplesize);
 	void outputAggSampleMean(int samplesize);
-	aggreports(int totalperiods, int maxsummaryid, std::map<outkey2, float> &agg_out_loss, std::map<outkey2, float> &max_out_loss, FILE **fout, bool useReturnPeriodFile) ;
+	aggreports(int totalperiods, int maxsummaryid, std::map<outkey2, float> &agg_out_loss, std::map<outkey2, float> &max_out_loss, FILE **fout, bool useReturnPeriodFile, int samplesize) ;
 };

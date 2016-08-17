@@ -96,7 +96,7 @@ void summarycalc::reset_sssl_array(int sample_size)
 loss_exp **summarycalc::alloc_ssl_arrays(int summary_set, int sample_size)
 {
 	if (min_summary_id_[summary_set] != 1) {
-		fprintf(stderr, "Minimum summary ID is not equal to one\n");
+		fprintf(stderr, "summarycalc: Minimum summary ID is not equal to one\n");
 		exit(-1);
 	}
 	int maxsummaryids = max_summary_id_[summary_set] ;
@@ -188,7 +188,7 @@ void summarycalc::loadgulsummaryxref()
 {
 	FILE *fin = fopen(GULSUMMARYXREF_FILE, "rb");
 	if (fin == NULL) {
-		cerr << "loadgulsummaryxref: Unable to open " << GULSUMMARYXREF_FILE << "\n";
+		cerr << "summarycalc: Unable to open " << GULSUMMARYXREF_FILE << "\n";
 		::exit(-1);
 	}
 
@@ -197,7 +197,7 @@ void summarycalc::loadgulsummaryxref()
 	int i = fread(&s, sizeof(gulsummaryxref), 1, fin);
 	while (i != 0) {
 		if (s.summaryset_id > 9) {
-			std::cerr << "Invalid summerset id " << s.summaryset_id << " found in " << GULSUMMARYXREF_FILE;
+			std::cerr << "summarycalc: Invalid summerset id " << s.summaryset_id << " found in " << GULSUMMARYXREF_FILE;
 			::exit(-1);
 		}
 		if (fout[s.summaryset_id] != nullptr) {
@@ -216,7 +216,7 @@ void summarycalc::loadfmsummaryxref()
 {
 	FILE *fin = fopen(FMSUMMARYXREF_FILE, "rb");
 	if (fin == NULL) {
-		cerr << "loadfmsummaryxref: Unable to open " << FMSUMMARYXREF_FILE << "\n";
+		cerr << "summarycalc: Unable to open " << FMSUMMARYXREF_FILE << "\n";
 		::exit(-1);
 	}
 
@@ -286,7 +286,7 @@ void summarycalc::openpipe(int summary_id, const std::string &pipe)
 		FILE *f = fopen(pipe.c_str(), "wb");
 		if (f != nullptr) fout[summary_id] = f;
 		else {
-			std::cerr << "Cannot open pipe " << pipe << " for output\n";
+			std::cerr << "summarycalc: Cannot open pipe " << pipe << " for output\n";
 			::exit(-1);
 		}
 	}
@@ -401,12 +401,12 @@ void summarycalc::dogulsummary()
 			return;
 		}
 
-		std::cerr << "Gul stream type " << stream_type << " not supported\n";
+		std::cerr << "summarycalc: Gul stream type " << stream_type << " not supported\n";
 		::exit(-1);
 	}
 	else {
-		std::cerr << "Not a gul stream\n";
-		std::cerr << "invalid stream type: " << streamtype << "\n";
+		std::cerr << "summarycalc: Not a gul stream\n";
+		std::cerr << "summarycalc: invalid stream type: " << streamtype << "\n";
 	}
 	
 	::exit(-1);
@@ -446,8 +446,8 @@ void summarycalc::dofmsummary()
 		outputsummary(samplesize, fh.event_id);
 		return;
 	}else {
-		std::cerr << "Not a fm stream\n";
-		std::cerr << "invalid stream type: " << streamtype << "\n";
+		std::cerr << "summarycalc: Not a fm stream\n";
+		std::cerr << "summarycalc: invalid stream type: " << streamtype << "\n";
 	}	
 	::exit(-1);
 
@@ -455,7 +455,7 @@ void summarycalc::dofmsummary()
 void summarycalc::doit()
 {
 	if (inputtype_ == UNKNOWN) {
-		fprintf(stderr,"stream type unknown\n");
+		fprintf(stderr,"summarycalc: tream type unknown\n");
 		return;
 	}
 	

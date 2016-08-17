@@ -132,6 +132,7 @@ void aggreports::outputAggFulluncertainty()
 // the nextreturnperiod must be between last_return_period and current_return_period
 float aggreports::getloss(float nextreturnperiod, float last_return_period, float last_loss, float current_return_period, float current_loss) const
 {
+	if (current_return_period == 0.0) return 0.0;
 	if (current_return_period == nextreturnperiod) {
 		return current_loss;
 	}

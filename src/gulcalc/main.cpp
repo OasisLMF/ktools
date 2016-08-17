@@ -166,7 +166,7 @@ void doit()
 	int stream_type = 0;
 	bool bSuccess = getrec((char *)&stream_type, stdin, sizeof(stream_type));
 	if (bSuccess == false) {
-		cerr << "Error: no stream type returned\n";
+		cerr << "gulcalc: Error no stream type returned\n";
 		return; // exit thread if failed
 	}
 
@@ -256,7 +256,7 @@ int main(int argc, char *argv[])
 	}
 
 	if (itemLevelOutput == false && coverageLevelOutput == false) {
-		fprintf(stderr, "No output option selected\n");
+		fprintf(stderr, "gulcalc: No output option selected\n");
 		exit(EXIT_FAILURE);
 	}	
 	initstreams(infile, outfile);

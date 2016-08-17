@@ -5,4 +5,9 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommandArguments>-M AGG_WHEATSHEAF_MEAN111.csv -K set111 -r</LocalDebuggerCommandArguments>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LocalDebuggerCommandArguments>-r -F AGG_FULL_UNCERTAINTY11ar.csv -K set111</LocalDebuggerCommandArguments>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerWorkingDirectory>F:\oasisdev\posix\kfiles</LocalDebuggerWorkingDirectory>
+  </PropertyGroup>
 </Project>

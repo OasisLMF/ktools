@@ -8,6 +8,8 @@ int no_of_periods_ = 0;
 std::map<int, aal_rec> map_analytical_aal_;
 std::map<int, aal_rec> map_sample_aal_;
 
+
+
 void loadoccurrence()
 {
 	
@@ -118,7 +120,7 @@ void do_sample_calc(const summarySampleslevelHeader &sh, const std::vector<sampl
 void doaalcalc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec, float mean_loss,int samplesize)
 {
 	do_analytical_calc(sh, mean_loss);
-	do_sample_calc(sh, vrec, samplesize);
+	if (samplesize) do_sample_calc(sh, vrec, samplesize);
 }
 
 void doit()
@@ -134,9 +136,9 @@ void doit()
 	}
 	stream_type = streamno_mask & summarycalcstream_type;
 	
-	if (stream_type == 1) {
-		int samplesize;
+	if (stream_type == 1) {		
 		int summary_set = 0;
+		int samplesize = 0;
 		i = fread(&samplesize, sizeof(samplesize), 1, stdin);
 		if (i != 0) i = fread(&summary_set, sizeof(summary_set), 1, stdin);
 		std::vector<sampleslevelRec> vrec;

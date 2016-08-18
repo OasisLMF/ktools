@@ -53,15 +53,36 @@ bool isSummaryCalcStream(unsigned int stream_type)
 	return (stype == summarycalc_id);
 }
 
-void doetloutput(int samplesize)
+void doetloutputnosample()
 {
+	printf("Summary_id, type, event_id, mean, standard_deviation, exposure_value\n");
 	summarySampleslevelHeader sh;
-	int i = fread(&sh, sizeof(sh), 1, stdin);
-	float sumloss = 0.0;
 	float mean = 0.0;
 	float sd = 0;
+	int i = fread(&sh, sizeof(sh), 1, stdin);
+	while (i != 0) {
+		sampleslevelRec sr;
+		i = fread(&sr, sizeof(sr), 1, stdin);
+		while (i != 0) {			
+			if (sr.sidx == -1) mean = sr.loss;
+			if (sr.sidx == 0) break;
+			i = fread(&sr, sizeof(sr), 1, stdin);
+		}
+		printf("%d, 1, %d, %f, %f, %f\n", sh.summary_id, sh.event_id, mean, sd, sh.expval);
+		if (i) i = fread(&sh, sizeof(sh), 1, stdin);
+	}
+
+}
+void doetloutput(int samplesize)
+{
+	float sumloss = 0.0;
+	float sample_mean = 0.0;
+	float analytical_mean = 0.0;
+	float sd = 0;
 	float sumlosssqr = 0.0;
-	printf("Summary_id, event_id, mean, standard_deviation, exposure_value\n");
+	printf("Summary_id, type, event_id, mean, standard_deviation, exposure_value\n");
+	summarySampleslevelHeader sh;
+	int i = fread(&sh, sizeof(sh), 1, stdin);
 	while (i != 0) {
 		sampleslevelRec sr;
 		i = fread(&sr, sizeof(sr), 1, stdin);
@@ -70,11 +91,12 @@ void doetloutput(int samplesize)
 				sumloss += sr.loss;
 				sumlosssqr += (sr.loss * sr.loss);
 			}
+			if (sr.sidx == -1) analytical_mean = sr.loss;
 			i = fread(&sr, sizeof(sr), 1, stdin);
 			if (sr.sidx == 0) break;
 		}		
 		if (samplesize > 1) {
-			mean = sumloss / samplesize;
+			sample_mean = sumloss / samplesize;
 			sd = (sumlosssqr - ((sumloss*sumloss) / samplesize)) / (samplesize - 1);
 			float x = sd / sumlosssqr;
 			if (x < 0.0000001) sd = 0;   // fix floating point precision problems caused by using large numbers
@@ -82,15 +104,16 @@ void doetloutput(int samplesize)
 		}
 		else {
 			if (samplesize == 0) {
-				mean = 0;
 				sd = 0;
+				sample_mean = 0;
 			}
 			if (samplesize == 1) {
-				mean = sumloss / samplesize;
+				sample_mean = sumloss / samplesize;
 				sd = 0;
 			}
 		}
-		printf("%d, %d, %f, %f, %f\n", sh.summary_id, sh.event_id,mean, sd, sh.expval);
+		printf("%d, 1, %d, %f, %f, %f\n", sh.summary_id, sh.event_id, analytical_mean, sd, sh.expval);
+		if (samplesize) printf("%d, 2, %d, %f, %f, %f\n", sh.summary_id, sh.event_id,sample_mean, sd, sh.expval);
 
 		if (i) i = fread(&sh, sizeof(sh), 1, stdin);
 		sumloss = 0.0;

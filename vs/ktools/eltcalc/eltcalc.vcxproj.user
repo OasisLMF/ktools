@@ -5,4 +5,9 @@
     <LocalDebuggerWorkingDirectory>f:\oasisdev\posix\OasisApi/ara_tests</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LocalDebuggerWorkingDirectory>F:\oasisdev\posix\kfiles</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArguments>&lt; summary.bin</LocalDebuggerCommandArguments>
+  </PropertyGroup>
 </Project>

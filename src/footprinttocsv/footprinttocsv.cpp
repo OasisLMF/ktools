@@ -32,7 +32,7 @@
 * DAMAGE.
 */
 /*
-Convert cdfdata to csv
+Convert footprint to csv
 Author: Joh Carter  email: johanna.carter@oasislmf.org
 */
 #include <iostream>
@@ -52,15 +52,6 @@ Author: Joh Carter  email: johanna.carter@oasislmf.org
 #include "../include/oasis.hpp"
 
 using namespace std;
-bool skipheader = false;
-
-struct cdfdata {
-	int event_id;
-	int areaperil_id;
-	int vulnerability_id;
-	int bin_index;
-	float prob_to;
-};
 
 void printrows(int event_id, FILE *finx, long long size )
 {
@@ -74,19 +65,25 @@ void printrows(int event_id, FILE *finx, long long size )
 		i += sizeof(row);
 	}
 }
+
+
+
 void doit()
 {
-	if (skipheader == false) printf("\"event_id\", \"areaperil_id\", \"intensity_bin_id\", \"probability\"\n");
+	printf("\"event_id\", \"areaperil_id\", \"intensity_bin_id\", \"probability\"\n");
 	FILE *finx = fopen("footprint.bin", "rb");
 	FILE *finy = fopen("footprint.idx", "rb");
 
 	EventIndex idx;
-	int intensity_bins;
-	int hasIntensityUncertainty;
 
+	if (finy == nullptr) {
+		fprintf(stderr, "Footprint idx open failed\n");
+		exit(3);
+	}
 	int i = fread(&idx, sizeof(idx), 1, finy);
 	while (i != 0) {		
-		fseek(finx, idx.offset, SEEK_SET);
+		flseek(finx, idx.offset, SEEK_SET);
+		//printf("%lld\n", idx.offset);
 		printrows(idx.event_id, finx, idx.size);
 		i = fread(&idx, sizeof(idx), 1, finy);
 	}
@@ -95,38 +92,10 @@ void doit()
 	fclose(finy);
 }
 
-void help()
-{
 
-    cerr << "-I inputfilename\n"
-        << "-O outputfielname\n"
-        ;
-}
 
 int main(int argc, char* argv[])
 {
-
-	int opt;
-	std::string inFile;
-	std::string outFile;
-
-	while ((opt = getopt(argc, argv, "fshI:O:")) != -1) {
-		switch (opt) {
-		case 'I':
-			inFile = optarg;
-			break;
-		case 'O':
-			outFile = optarg;
-			break;
-		case 's':
-			skipheader = true;
-			break;
-		case 'h':
-			help();
-			exit(EXIT_FAILURE);
-		}
-	}
-
 
     initstreams();
 	doit();

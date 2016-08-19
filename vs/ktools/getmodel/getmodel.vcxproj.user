@@ -5,4 +5,14 @@
     <LocalDebuggerWorkingDirectory>f:\junk\example2</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LocalDebuggerCommandArguments>&lt; input\events.bin &gt; aaaa.bin</LocalDebuggerCommandArguments>
+    <LocalDebuggerWorkingDirectory>f:\willis\csv_to_JC</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LocalDebuggerWorkingDirectory>f:\willis\csv_to_JC</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArguments>&lt; static\events.bin &gt; aaaa.bin</LocalDebuggerCommandArguments>
+  </PropertyGroup>
 </Project>

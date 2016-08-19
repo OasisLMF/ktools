@@ -182,9 +182,9 @@ void getmodel::getDamageBinDictionary()
         std::cerr << "Error opening " << DAMAGE_BIN_DICT_FILE << "\n";
         exit(-1);
     }
-    fseek(fin, 0L, SEEK_END);
+    flseek(fin, 0L, SEEK_END);
     long long sz = fltell(fin);
-    fseek(fin, 0L, SEEK_SET);
+    flseek(fin, 0L, SEEK_SET);
     int nrec = sz / sizeof(damagebindictionary);
     
     damagebindictionary *damage_bins = new damagebindictionary[nrec];
@@ -350,7 +350,7 @@ void getmodel::doCdfInner(
         intensity = std::vector<float>(_num_intensity_bins, 0.0f);
 
         if (event_index_by_event_id.count(event_id) == 0) continue;
-        fseek(fin, event_index_by_event_id[event_id].offset, 0);
+        flseek(fin, event_index_by_event_id[event_id].offset, 0);
         EventRow event_key;
         int number_of_event_records = event_index_by_event_id[event_id].size / sizeof_EventKey;
         for (int i = 0; i < number_of_event_records; i++)
@@ -403,7 +403,7 @@ void getmodel::doCdfInnerNoIntensityUncertainty(
     for (int event_id : event_ids)
     {
         if (event_index_by_event_id.count(event_id) == 0) continue;
-        fseek(fin, event_index_by_event_id[event_id].offset, 0);
+        flseek(fin, event_index_by_event_id[event_id].offset, 0);
 
         int number_of_event_records = event_index_by_event_id[event_id].size / sizeof_EventKey;
         for (int i = 0; i < number_of_event_records; i++)

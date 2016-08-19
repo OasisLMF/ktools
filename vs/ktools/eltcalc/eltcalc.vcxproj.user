@@ -6,8 +6,8 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerWorkingDirectory>F:\oasisdev\posix\kfiles</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>F:\oasisdev\posix\ktools\ktest\testout</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>&lt; summary.bin</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>&lt; fmsummarycalc1.bin</LocalDebuggerCommandArguments>
   </PropertyGroup>
 </Project>

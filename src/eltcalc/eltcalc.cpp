@@ -112,7 +112,7 @@ void doetloutput(int samplesize)
 				sd = 0;
 			}
 		}
-		printf("%d, 1, %d, %f, %f, %f\n", sh.summary_id, sh.event_id, analytical_mean, sd, sh.expval);
+		printf("%d, 1, %d, %f, %f, %f\n", sh.summary_id, sh.event_id, analytical_mean, 0, sh.expval);
 		if (samplesize) printf("%d, 2, %d, %f, %f, %f\n", sh.summary_id, sh.event_id,sample_mean, sd, sh.expval);
 
 		if (i) i = fread(&sh, sizeof(sh), 1, stdin);

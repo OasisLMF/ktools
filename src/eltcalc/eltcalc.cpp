@@ -53,26 +53,6 @@ bool isSummaryCalcStream(unsigned int stream_type)
 	return (stype == summarycalc_id);
 }
 
-void doetloutputnosample()
-{
-	printf("Summary_id, type, event_id, mean, standard_deviation, exposure_value\n");
-	summarySampleslevelHeader sh;
-	float mean = 0.0;
-	float sd = 0;
-	int i = fread(&sh, sizeof(sh), 1, stdin);
-	while (i != 0) {
-		sampleslevelRec sr;
-		i = fread(&sr, sizeof(sr), 1, stdin);
-		while (i != 0) {			
-			if (sr.sidx == -1) mean = sr.loss;
-			if (sr.sidx == 0) break;
-			i = fread(&sr, sizeof(sr), 1, stdin);
-		}
-		printf("%d, 1, %d, %f, %f, %f\n", sh.summary_id, sh.event_id, mean, sd, sh.expval);
-		if (i) i = fread(&sh, sizeof(sh), 1, stdin);
-	}
-
-}
 void doetloutput(int samplesize)
 {
 	float sumloss = 0.0;

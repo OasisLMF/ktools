@@ -12,7 +12,7 @@ public:
 
     getmodel();
     ~getmodel();
-    void init();
+    void init(bool has_secondary_unceratainty);
 	void doCdf(std::list<int> event_ids);
 
 private:

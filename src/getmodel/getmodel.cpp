@@ -256,6 +256,7 @@ void getmodel::doResults(
     }
 }
 
+
 void getmodel::doResultsNoIntensityUncertainty(
     int &event_id,
     int &areaperil_id,
@@ -292,8 +293,10 @@ int getmodel::getVulnerabilityIndex(int intensity_bin_index, int damage_bin_inde
     return (intensity_bin_index - 1) + ((damage_bin_index - 1) * _num_intensity_bins);
 }
 
-void getmodel::init()
+void getmodel::init(bool has_secondary_unceratainty)
 {
+    _has_intensity_uncertainty = has_secondary_unceratainty;
+
 	getIntensityInfo();
 
     getItems();
@@ -416,7 +419,6 @@ void getmodel::doCdfInnerNoIntensityUncertainty(
             {
                 // Generate and write the results
                 doResultsNoIntensityUncertainty(
-
                     event_id,
                     event_key.areaperil_id,
                     _vulnerability_ids_by_area_peril,

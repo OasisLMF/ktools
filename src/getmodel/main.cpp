@@ -49,15 +49,16 @@ void help()
 	std::cerr
 		<< "-I input filename\n"
 		<< "-O output filename\n"
-		<< "-d number of damage bins\n"
+		<< "-n no secondary uncertainty\n"
 		;
 }
 
-void doIt()
+void doIt(bool hasSecondaryUncertainty)
 {
 
 	getmodel cdf_generator;
-	cdf_generator.init();
+
+	cdf_generator.init(hasSecondaryUncertainty);
 
 	int event_id = -1;
 	std::list<int> event_ids;
@@ -75,14 +76,18 @@ int main(int argc, char** argv)
 	std::string inFile;
 	std::string outFile;
 	int opt;
-	while ((opt = getopt(argc, argv, "hI:O:")) != -1) {
+	bool hasSecondaryUncertainty = false;
+	while ((opt = getopt(argc, argv, "hI:O:n")) != -1) {
 		switch (opt) {
 		case 'I':
 			inFile = optarg;
 			break;
 		case 'O':
 			outFile = optarg;
-			break;		
+			break;
+		case 'n':
+			hasSecondaryUncertainty = true;
+			break;
 		case 'h':
 			help();
 			exit(EXIT_FAILURE);
@@ -93,6 +98,6 @@ int main(int argc, char** argv)
 	}
 	
 	initstreams(inFile, outFile);
-	doIt();
+	doIt(hasSecondaryUncertainty);
 	return 0;
 }

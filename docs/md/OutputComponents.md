@@ -26,7 +26,11 @@ No additional data is required, all the information is contained within the inpu
 
 ##### Calculation
 
-For each summary_id and event_id, the sample mean and standard deviation is calculated from the sampled losses in the summarycalc stream and output to file.  The exposure_value, which is carried in the event_id, summary_id header of the stream is also output.
+For each summary_id and event_id, the sample mean and standard deviation is calculated from the sampled losses from the summarycalc stream and output to file.  The exposure_value, which is carried in the event_id, summary_id header of the stream is also output. The type field, with value = 2 means that the loss statistics come from the samples.
+
+A type 1 record is also included in the output, which gives the analytical (numerically integrated) mean loss. The analytical standard deviation is not calculated and is set to zero. 
+
+When zero samples are run, only type 1 losses are output, and both type 1 and 2 are output when more than one sample is run.  
 
 ##### Output
 csv file with the following fields;
@@ -34,9 +38,10 @@ csv file with the following fields;
 | Name              | Type   |  Bytes | Description                                                 | Example     |
 |:------------------|--------|--------| :-----------------------------------------------------------|------------:|
 | summary_id        | int    |    4   | summary_id representing a grouping of losses                |   10        |
+| type              | int    |    4   | 1 for analytical mean, 2 for sample mean                    |   2         |
 | event_id          | int    |    4   | Oasis event_id                                              |  45567      |
-| mean              | float  |    4   | sample mean                                                 |   1345.678  |
-| standard_deviation| float  |    4   | sample standard deviation                                   |    945.89   | 
+| mean              | float  |    4   | mean                                                        |   1345.678  |
+| standard_deviation| float  |    4   | sample standard deviation,  or 0 for type 1                 |    945.89   | 
 | exposure_value    | float  |    4   | exposure value for summary_id affected by the event         |   70000     |
 
 [Return to top](#outputcomponents)
@@ -97,7 +102,7 @@ Finally, and optionally, if the user would like only certain return period losse
 
 * input/returnperiods.bin
 
-Losses for return periods in the returnperiods file that are not directly calculated by leccalc based on the model's number of periods are calculated by linear interpolation of the two bounding return period losses.
+Losses for return periods in the returnperiods file that are not directly calculated by leccalc based on the model's total number of periods are calculated by linear interpolation of the two bounding return period losses. If the requested return period is below the range of the calculated set of return periods, then the loss is set to zero.
 
 If the -r option is not used, then all calculated return period losses will be returned.
 
@@ -149,7 +154,7 @@ csv file with the following fields;
 | return_period     | float  |    4   | return period interval                                              |    250      |
 | loss              | float  |    4   | loss exceedance threshold for return period                         |    546577.8 |
 
-In the next version of leccalc, users will be able to enter the return periods they wish to be returned by specifying a return period file.
+Users are able to enter the return periods they wish to be returned by specifying a return period file.
 
 [Return to top](#outputcomponents)
 

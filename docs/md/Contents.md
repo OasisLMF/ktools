@@ -12,3 +12,4 @@
 ##### 6. [Workflows](Workflows.md)
 ##### Appendix A [Random numbers](RandomNumbers.md)
 ##### Appendix B [FM profiles](fmprofiles.md)
+##### Appendix C [Multi-peril support](MultiPeril.md)

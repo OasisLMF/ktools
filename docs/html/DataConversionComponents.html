@@ -29,6 +29,7 @@
 <li><strong><a href="#fmprofile">fmprofiletobin</a></strong> converts the fm profile data.</li>
 <li><strong><a href="#fmsummaryxref">fmsummaryxreftobin</a></strong> converts the fm summary xref data.</li>
 <li><strong><a href="#fmxref">fmxreftobin</a></strong> converts the fm xref data.</li>
+<li><strong><a href="#returnperiod">returnperiodtobin</a></strong> converts a list of return periods.</li>
 </ul>
 <p>These components are intended to allow users to generate the required input binaries from csv independently of the original data store and technical environment. All that needs to be done is first generate the csv files from the data store (SQL Server database, etc).</p>
 <p>The following components convert the binary input data required by the calculation components in the reference model into csv format;</p>
@@ -51,6 +52,7 @@
 <li><strong><a href="#fmprofile">fmprofiletocsv</a></strong> converts the fm profile data.</li>
 <li><strong><a href="#fmsummaryxref">fmsummaryxreftocsv</a></strong> converts the fm summary xref data.</li>
 <li><strong><a href="#fmxref">fmxreftocsv</a></strong> converts the fm xref data.</li>
+<li><strong><a href="#returnperiod">returnperiodtocsv</a></strong> converts a list of return periods.</li>
 </ul>
 <p>These components are provided for the convenience of viewing the data and debugging.</p>
 <h2 id="static-data">Static data</h2>
@@ -426,7 +428,7 @@ $ occurrencetobin -P10000 -D &lt; occurrence.csv &gt; occurrence.bin</code></pre
 <td align="left">int</td>
 <td align="left">4</td>
 <td align="left">Identifier of the coverage</td>
-<td align="right">3</td>
+<td align="right">1</td>
 </tr>
 <tr class="even">
 <td align="left">tiv</td>
@@ -437,7 +439,7 @@ $ occurrencetobin -P10000 -D &lt; occurrence.csv &gt; occurrence.bin</code></pre
 </tr>
 </tbody>
 </table>
-<p>The data should not contain nulls.</p>
+<p>Coverage_id must be an ordered contiguous sequence of numbers starting at 1.</p>
 <h5 id="coveragetobin">coveragetobin</h5>
 <pre><code>$ coveragetobin &lt; coverages.csv &gt; coverages.bin</code></pre>
 <h5 id="coveragetocsv">coveragetocsv</h5>
@@ -519,7 +521,7 @@ $ occurrencetobin -P10000 -D &lt; occurrence.csv &gt; occurrence.bin</code></pre
 </tr>
 </tbody>
 </table>
-<p>The data should be ordered by areaperil_id, vulnerability_id ascending and not contain nulls.</p>
+<p>The data should be ordered by areaperil_id, vulnerability_id ascending and not contain nulls. It is best practice for item_id to be a contiguous sequence of numbers starting from 1.</p>
 <h5 id="itemtobin">itemtobin</h5>
 <pre><code>$ itemtobin &lt; items.csv &gt; items.bin</code></pre>
 <h5 id="itemtocsv">itemtocsv</h5>
@@ -1193,6 +1195,41 @@ $ occurrencetobin -P10000 -D &lt; occurrence.csv &gt; occurrence.bin</code></pre
 <pre><code>$ fmxreftobin &lt; fm_xref.csv &gt; fm_xref.bin</code></pre>
 <h5 id="fmxreftocsv">fmxreftocsv</h5>
 <pre><code>$ fmxreftocsv &lt; fm_xref.bin &gt; fm_xref.csv</code></pre>
+<p><a href="#dataconversioncomponents">Return to top</a></p>
+<p><a id="returnperiod"></a></p>
+<h3 id="return-period">return period</h3>
+<hr />
+<p>The returnperiods binary file is a list of return periods that the user requires to be included in loss exceedance curve (leccalc) results.</p>
+<p>This must be in the following location with filename format;</p>
+<ul>
+<li>input/returnperiods.bin</li>
+</ul>
+<h5 id="file-format-14">File format</h5>
+<p>The csv file should contain the following fields with no header.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Type</th>
+<th align="left">Bytes</th>
+<th align="left">Description</th>
+<th align="right">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">return_period</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Return period</td>
+<td align="right">250</td>
+</tr>
+</tbody>
+</table>
+<h5 id="returnperiodtobin">returnperiodtobin</h5>
+<pre><code>$ returnperiodtobin &lt; returnperiods.csv &gt; returnperiods.bin</code></pre>
+<h5 id="returnperiodtocsv">returnperiodtocsv</h5>
+<pre><code>$ returnperiodtocsv &lt; returnperiods.bin &gt; returnperiods.csv</code></pre>
 <p><a href="#dataconversioncomponents">Return to top</a></p>
 <p><a href="StreamConversionComponents.html">Go to 4.4 Stream conversion components section</a></p>
 <p><a href="Contents.html">Back to Contents</a></p>

@@ -250,8 +250,8 @@ $ summarycalc [parameters] < [stdin].bin
 ##### Example
 
 ```
-$ eve 1 1 | getmodel | gulcalc -S100 -c - | summarycalc -g -1 - | eltcalc > eltcalc.csv
-$ eve 1 1 | getmodel | gulcalc -S100 -c - | summarycalc -g -1 gulsummarycalc.bin 
+$ eve 1 1 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - | eltcalc > eltcalc.csv
+$ eve 1 1 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 gulsummarycalc.bin 
 $ summarycalc -f -1 fmsummarycalc.bin < fmcalc.bin
 ```
 

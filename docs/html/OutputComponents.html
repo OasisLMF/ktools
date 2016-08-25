@@ -23,7 +23,9 @@ $ eltcalc &lt; summarycalc.bin &gt; elt.csv </code></pre>
 <h5 id="internal-data">Internal data</h5>
 <p>No additional data is required, all the information is contained within the input stream.</p>
 <h5 id="calculation">Calculation</h5>
-<p>For each summary_id and event_id, the sample mean and standard deviation is calculated from the sampled losses in the summarycalc stream and output to file. The exposure_value, which is carried in the event_id, summary_id header of the stream is also output.</p>
+<p>For each summary_id and event_id, the sample mean and standard deviation is calculated from the sampled losses from the summarycalc stream and output to file. The exposure_value, which is carried in the event_id, summary_id header of the stream is also output. The type field, with value = 2 means that the loss statistics come from the samples.</p>
+<p>A type 1 record is also included in the output, which gives the analytical (numerically integrated) mean loss. The analytical standard deviation is not calculated and is set to zero.</p>
+<p>When zero samples are run, only type 1 losses are output, and both type 1 and 2 are output when more than one sample is run.</p>
 <h5 id="output">Output</h5>
 <p>csv file with the following fields;</p>
 <table>
@@ -52,27 +54,34 @@ $ eltcalc &lt; summarycalc.bin &gt; elt.csv </code></pre>
 <td align="right">10</td>
 </tr>
 <tr class="even">
+<td align="left">type</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">1 for analytical mean, 2 for sample mean</td>
+<td align="right">2</td>
+</tr>
+<tr class="odd">
 <td align="left">event_id</td>
 <td align="left">int</td>
 <td align="left">4</td>
 <td align="left">Oasis event_id</td>
 <td align="right">45567</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">mean</td>
 <td align="left">float</td>
 <td align="left">4</td>
-<td align="left">sample mean</td>
+<td align="left">mean</td>
 <td align="right">1345.678</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">standard_deviation</td>
 <td align="left">float</td>
 <td align="left">4</td>
-<td align="left">sample standard deviation</td>
+<td align="left">sample standard deviation, or 0 for type 1</td>
 <td align="right">945.89</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">exposure_value</td>
 <td align="left">float</td>
 <td align="left">4</td>
@@ -107,9 +116,9 @@ Then the following tuple of parameters must be specified for at least one analys
 $ eve 1 2 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - &gt; work/summary1/summarycalc1.bin
 $ eve 2 2 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - &gt; work/summary1/summarycalc2.bin
 &#39;Then run leccalc, pointing to the specified sub-directory of work containing summarycalc binaries.
-$ leccalc -Ksummary1 -F lec_full_uncertainty_agg.csv -f lec_full_uncertainty_occ.csv </code></pre>
+$ leccalc -r -Ksummary1 -F lec_full_uncertainty_agg.csv -f lec_full_uncertainty_occ.csv </code></pre>
 <h5 id="internal-data-1">Internal data</h5>
-<p>leccalc requires the occurrence.bin file</p>
+<p>leccalc requires the occurrence.bin file;</p>
 <ul>
 <li>static/occurrence.bin</li>
 </ul>
@@ -126,6 +135,12 @@ $ leccalc -Ksummary1 -F lec_full_uncertainty_agg.csv -f lec_full_uncertainty_occ
 <li>work/summaryset1/summarycalc3.bin</li>
 </ul>
 <p>The reason for leccalc not having an input stream is that the calculation is not valid on a subset of events, i.e. within a single process when the calculation has been distributed across multiple processes. It must bring together all event losses before assigning event losses to periods and ranking losses by period. The summarycalc losses for all events (all processes) must be written to the /work folder before running leccalc.</p>
+<p>Finally, and optionally, if the user would like only certain return period losses in the output (-r parameter), then a returnperiods file may be provided. If provided then the following file must exist;</p>
+<ul>
+<li>input/returnperiods.bin</li>
+</ul>
+<p>Losses for return periods in the returnperiods file that are not directly calculated by leccalc based on the model's total number of periods are calculated by linear interpolation of the two bounding return period losses. If the requested return period is below the range of the calculated set of return periods, then the loss is set to zero.</p>
+<p>If the -r option is not used, then all calculated return period losses will be returned.</p>
 <h5 id="calculation-1">Calculation</h5>
 <p>All files with extension .bin from the specified subdirectory are read into memory, as well as the occurrence.bin. The summarycalc losses are grouped together and sampled losses are assigned to period according to which period the events occur in.</p>
 <p>If multiple events occur within a period;</p>
@@ -179,7 +194,7 @@ $ leccalc -Ksummary1 -F lec_full_uncertainty_agg.csv -f lec_full_uncertainty_occ
 </tr>
 </tbody>
 </table>
-<p><strong>Wheatsheaf loss exceedance curve </strong></p>
+<p><strong>Wheatsheaf loss exceedance curve</strong></p>
 <table>
 <thead>
 <tr class="header">
@@ -263,7 +278,7 @@ $ leccalc -Ksummary1 -F lec_full_uncertainty_agg.csv -f lec_full_uncertainty_occ
 </tr>
 </tbody>
 </table>
-<p>In the next version of leccalc, users will be able to enter the return periods they wish to be returned by specifying a return period file.</p>
+<p>Users are able to enter the return periods they wish to be returned by specifying a return period file.</p>
 <p><a href="#outputcomponents">Return to top</a></p>
 <h3 id="pltcalc">pltcalc <a id="pltcalc"></a></h3>
 <hr />

@@ -271,8 +271,8 @@ $ summarycalc -g -1 summarycalc1.bin -2 summarycalc2.bin
 $ [stdin component] | summarycalc [parameters]
 $ summarycalc [parameters] &lt; [stdin].bin</code></pre>
 <h5 id="example-4">Example</h5>
-<pre><code>$ eve 1 1 | getmodel | gulcalc -S100 -c - | summarycalc -g -1 - | eltcalc &gt; eltcalc.csv
-$ eve 1 1 | getmodel | gulcalc -S100 -c - | summarycalc -g -1 gulsummarycalc.bin 
+<pre><code>$ eve 1 1 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - | eltcalc &gt; eltcalc.csv
+$ eve 1 1 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 gulsummarycalc.bin 
 $ summarycalc -f -1 fmsummarycalc.bin &lt; fmcalc.bin</code></pre>
 <h5 id="internal-data-4">Internal data</h5>
 <p>The program requires the gulsummaryxref file for gulcalc input (-g option), or the fmsummaryxref file for fmcalc input (-f option). This data is picked up from the following files relative to the working directory;</p>

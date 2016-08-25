@@ -93,6 +93,7 @@ AC_CONFIG_FILES([
                  src/footprinttocsv/Makefile
 		 src/returnperiodtocsv/Makefile
 		 src/returnperiodtobin/Makefile
+		 src/kat/Makefile
                  ])
 AC_OUTPUT
 

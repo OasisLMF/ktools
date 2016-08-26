@@ -38,6 +38,11 @@ Author: Joh Carter  email: johanna.carter@oasislmf.org
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
+#if defined(_MSC_VER)
+#include "../wingetopt/wingetopt.h"
+#else
+#include <getopt.h>
+#endif
 
 #ifdef __unix
 #include <unistd.h>
@@ -45,10 +50,12 @@ Author: Joh Carter  email: johanna.carter@oasislmf.org
 
 #include "../include/oasis.hpp"
 
+bool skipheader = false;
+
 void doit()
 {
 
-	printf("\"summary_id\", \"type\", \"mean\", \"mean_squared\", \"max_exposure_value\"\n");
+	if (skipheader == false) printf("\"summary_id\", \"type\", \"mean\", \"mean_squared\", \"max_exposure_value\"\n");
 
 	aal_rec q;
 	int i = fread(&q, sizeof(q), 1, stdin);
@@ -58,11 +65,31 @@ void doit()
 		i = fread(&q, sizeof(q), 1, stdin);
 	}
 }
-
+void help()
+{
+	std::cerr 	
+		<< "-s skip header\n"		
+		<< "-h help\n"
+		;
+}
 
 int main(int argc, char* argv[])
 {
 	
+	int opt;
+	std::string inFile;
+	std::string outFile;
+
+	while ((opt = getopt(argc, argv, "s")) != -1) {
+		switch (opt) {
+		case 's':
+			skipheader = true;
+			break;		
+		case 'h':
+			help();
+			exit(EXIT_FAILURE);
+		}
+	}
 	initstreams();
 
 	doit();

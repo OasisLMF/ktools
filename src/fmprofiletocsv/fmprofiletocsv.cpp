@@ -52,14 +52,15 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include "../include/oasis.hpp"
 
 using namespace std;
-
+bool skipheader = false;
 
 void doit()
 {
-
-    printf ("\"policytc_id\",\"calcrule_id\",\"allocrule_id\",\"ccy_id\",");
-	printf("\"deductible\",\"limits\",\"share_prop_of_lim\",\"deductible_prop_of_loss\",\"limit_prop_of_loss\",");
-	printf ("\"deductible_prop_of_tiv\",\"limit_prop_of_tiv\",\"deductible_prop_of_limit\"\n");
+	if (skipheader == false) {
+		printf("\"policytc_id\",\"calcrule_id\",\"allocrule_id\",\"ccy_id\",");
+		printf("\"deductible\",\"limits\",\"share_prop_of_lim\",\"deductible_prop_of_loss\",\"limit_prop_of_loss\",");
+		printf("\"deductible_prop_of_tiv\",\"limit_prop_of_tiv\",\"deductible_prop_of_limit\"\n");
+	}
 
     fm_profile q;
     int i = fread(&q, sizeof(q), 1, stdin);
@@ -88,7 +89,7 @@ int main(int argc, char* argv[])
      std::string inFile;
      std::string outFile;
 
-     while ((opt = getopt(argc, argv, "hI:O:")) != -1) {
+     while ((opt = getopt(argc, argv, "hsI:O:")) != -1) {
          switch (opt) {
          case 'I':
              inFile = optarg;
@@ -96,6 +97,9 @@ int main(int argc, char* argv[])
           case 'O':
              outFile = optarg;
              break;
+		  case 's':
+			  skipheader = true;
+			  break;
          case 'h':
             help();
             exit(EXIT_FAILURE);

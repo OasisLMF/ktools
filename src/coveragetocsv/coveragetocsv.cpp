@@ -39,6 +39,12 @@ Author: Joh Carter  email: johanna.carter@oasislmf.org
 #include <stdio.h>
 #include <stdlib.h>
 
+#if defined(_MSC_VER)
+#include "../wingetopt/wingetopt.h"
+#else
+#include <getopt.h>
+#endif
+
 #ifdef __unix
     #include <unistd.h>
 #endif
@@ -46,11 +52,12 @@ Author: Joh Carter  email: johanna.carter@oasislmf.org
 #include "../include/oasis.hpp"
 
 using namespace std;
+bool skipheader = false;
 
 void doit()
 {
 
-	printf("\"coverage_id\", \"tiv\"\n");
+	if(skipheader == false) printf("\"coverage_id\", \"tiv\"\n");
     
 	float tiv;
 	int id = 0;
@@ -67,6 +74,8 @@ void help()
 
     cerr << "-I inputfilename\n"
         << "-O outputfielname\n"
+		<< "-s skip header\n"
+		<< "-h help"
         ;
 }
 
@@ -75,9 +84,8 @@ int main(int argc, char* argv[])
      std::string inFile;
      std::string outFile;
 
- #ifdef __unix
 	 int opt;
-     while ((opt = getopt(argc, argv, "hI:O:")) != -1) {
+     while ((opt = getopt(argc, argv, "shI:O:")) != -1) {
          switch (opt) {
          case 'I':
              inFile = optarg;
@@ -85,12 +93,15 @@ int main(int argc, char* argv[])
           case 'O':
              outFile = optarg;
              break;
+		  case 's':
+			  skipheader = true;
+			  break;
          case 'h':
             help();
             exit(EXIT_FAILURE);
          }
      }
- #endif
+
 
     initstreams(inFile, outFile);
 

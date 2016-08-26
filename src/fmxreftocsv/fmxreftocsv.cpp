@@ -39,18 +39,26 @@ Author: Joh Carter  email: johanna.carter@oasislmf.org
 #include <stdio.h>
 #include <stdlib.h>
 
+#if defined(_MSC_VER)
+#include "../wingetopt/wingetopt.h"
+#else
+#include <getopt.h>
+#endif
+
 #ifdef __unix
     #include <unistd.h>
 #endif
 
 #include "../include/oasis.hpp"
 
+bool skipheader = false;
+
 using namespace std;
 
 void doit()
 {
 
-	printf("\"output_id\",\"agg_id\",\"layer_id\"\n");
+	if (skipheader == false) printf("\"output_id\",\"agg_id\",\"layer_id\"\n");
     
     fmXref q;
     int i = fread(&q, sizeof(q), 1, stdin);
@@ -73,9 +81,8 @@ int main(int argc, char* argv[])
      std::string inFile;
      std::string outFile;
 
- #ifdef __unix
 	 int opt;
-     while ((opt = getopt(argc, argv, "hI:O:")) != -1) {
+     while ((opt = getopt(argc, argv, "hsI:O:")) != -1) {
          switch (opt) {
          case 'I':
              inFile = optarg;
@@ -83,12 +90,15 @@ int main(int argc, char* argv[])
           case 'O':
              outFile = optarg;
              break;
+		  case 's':
+			  skipheader = true;
+			  break;
          case 'h':
             help();
             exit(EXIT_FAILURE);
          }
      }
- #endif
+
 
     initstreams(inFile, outFile);
 

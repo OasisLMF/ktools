@@ -39,6 +39,12 @@ Author: Joh Carter  email: johanna.carter@oasislmf.org
 #include <stdio.h>
 #include <stdlib.h>
 
+#if defined(_MSC_VER)
+#include "../wingetopt/wingetopt.h"
+#else
+#include <getopt.h>
+#endif
+
 #ifdef __unix
     #include <unistd.h>
 #endif
@@ -51,6 +57,7 @@ Author: Joh Carter  email: johanna.carter@oasislmf.org
 
 #include "../include/oasis.hpp"
 
+bool skipheader = false;
 using namespace std;
 
 void printrows(int event_id, FILE *finx, long long size )
@@ -70,7 +77,7 @@ void printrows(int event_id, FILE *finx, long long size )
 
 void doit()
 {
-	printf("\"event_id\", \"areaperil_id\", \"intensity_bin_id\", \"probability\"\n");
+	if (skipheader == false)  printf("\"event_id\", \"areaperil_id\", \"intensity_bin_id\", \"probability\"\n");
 	FILE *finx = fopen("footprint.bin", "rb");
 	FILE *finy = fopen("footprint.idx", "rb");
 
@@ -92,10 +99,27 @@ void doit()
 	fclose(finy);
 }
 
+void help()
+{
 
+	cerr << "-s skip header\n"
+		<< "-h help"
+		;
+}
 
 int main(int argc, char* argv[])
 {
+	int opt;
+	while ((opt = getopt(argc, argv, "sh")) != -1) {
+		switch (opt) {
+		case 's':
+			skipheader = true;
+			break;
+		case 'h':
+			help();
+			exit(EXIT_FAILURE);
+		}
+	}
 
     initstreams();
 	doit();

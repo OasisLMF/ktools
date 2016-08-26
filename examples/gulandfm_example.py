@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# Warning: This uses Unix specific command os.mkfifo so this sript should only be run in a Linux or Cygwin terminal. 
+# Warning: This uses Unix specific command os.mkfifo so this sript should only be run in a Linux or Cygwin 64bit terminal. 
 
 import multiprocessing
 import os, re, errno

@@ -55,7 +55,7 @@ for file in os.listdir("results/elt"):
         filenames.append(file)
 
 with open('results/elt/fm_elt_summary2.csv', 'w') as outfile:
-    outfile.write("Summary_id, event_id, mean, standard_deviation, exposure_value\n")
+    outfile.write("Summary_id, type, event_id, mean, standard_deviation, exposure_value\n")
     for fname in filenames:
         with open(fname) as infile:
             lineno=1

@@ -2,8 +2,8 @@
 #include <vector>
 
 struct LossRec {
-	float loss;
-	float retained_loss;
+	float loss = 0;
+	float retained_loss = 0;
 	int agg_id;
 	int policytc_id;
 	int allocrule_id;

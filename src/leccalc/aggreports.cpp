@@ -152,6 +152,9 @@ float aggreports::getloss(float nextreturnperiod, float last_return_period, floa
 
 void aggreports::doreturnperiodout(int handle, int &nextreturnperiod_index, float &last_return_period, float &last_loss, float current_return_period, float current_loss, int summary_id, int type)
 {
+	if (nextreturnperiod_index >= returnperiods_.size()) {
+		return;
+	}
 	float nextreturnperiod_value = returnperiods_[nextreturnperiod_index];
 	if (current_return_period <= nextreturnperiod_value) {
 		float loss = getloss(nextreturnperiod_value, last_return_period, last_loss, current_return_period, current_loss);
@@ -191,6 +194,7 @@ void aggreports::wheatsheaf(int handle, const std::map<outkey2, float> &out_loss
 		for (auto lp : lpv) {
 			float retperiod = t / i;
 			if (useReturnPeriodFile_) {
+				if (nextreturnperiodindex == returnperiods_.size()) break;
 				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, s.first.summary_id, s.first.sidx);
 			}else {
 				fprintf(fout_[handle], "%d,%d, %f,%f\n", s.first.summary_id, s.first.sidx, t / i, lp);

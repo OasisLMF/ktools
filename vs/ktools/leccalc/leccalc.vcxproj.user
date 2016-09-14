@@ -6,8 +6,13 @@
     <LocalDebuggerCommandArguments>-M AGG_WHEATSHEAF_MEAN111.csv -K set111 -r</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>-r -F AGG_FULL_UNCERTAINTY11ar.csv -K set111</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-K gulsummary1 -r -w -</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerWorkingDirectory>F:\oasisdev\posix\kfiles</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>F:\junk\efe47693-c32c-456f-9db9-6cd0eb80d01f</LocalDebuggerWorkingDirectory>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LocalDebuggerCommandArguments>-K gulsummary1 -r -w -</LocalDebuggerCommandArguments>
+    <LocalDebuggerWorkingDirectory>F:\junk\efe47693-c32c-456f-9db9-6cd0eb80d01f</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

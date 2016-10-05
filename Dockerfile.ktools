@@ -1,12 +1,8 @@
-FROM ubuntu:16.04
+FROM coreoasis/oasis_base:R_0_0_0_1
 
-RUN apt-get update 
-RUN apt-get install -y apt-utils python-dev python-pip gcc g++ make automake
+RUN apt-get install -y gcc g++ make automake
 
 WORKDIR /var/oasis/ktools
 COPY ./ ./
-RUN autoreconf
-RUN sh ./configure 
-RUN make 
-RUN make check 
-RUN make install
+RUN autoreconf; sh ./configure 
+RUN make; make check; make install

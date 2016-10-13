@@ -5,4 +5,9 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
     <LocalDebuggerCommandArguments>-f -1 -  &lt;  f:\oasisdev\posix\ktools\ktest\testout\fmcalc.bin &gt; shit.bin</LocalDebuggerCommandArguments>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LocalDebuggerCommandArguments>&lt; gul.out -g -1 fred.bin</LocalDebuggerCommandArguments>
+    <LocalDebuggerWorkingDirectory>f:\ktool_example</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
 </Project>

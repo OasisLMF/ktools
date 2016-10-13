@@ -35,6 +35,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
+#include <set>
 
 #if defined(_MSC_VER)
 #include "../wingetopt/wingetopt.h"
@@ -57,6 +58,7 @@ void doit()
 	fgets(line, sizeof(line), stdin); // skip header line
 	lineno++;
 	int last_event_id = 0;
+	int last_areaperil_id = 0;
 	EventRow r;
 	EventIndex idx;
 	idx.event_id = 0;
@@ -64,29 +66,50 @@ void doit()
 	idx.size = 0;
 	int event_id = 0;
 	int count = 0; // 11616 / 968*12
-
+	std::set<int> events;
+	std::set<int> areaperils;
 	fwrite(&intensity_bins_, sizeof(intensity_bins_), 1, foutx);
 	idx.offset += sizeof(intensity_bins_);
 	fwrite(&hasIntensityUncertainty_, sizeof(hasIntensityUncertainty_), 1, foutx);
 	idx.offset += sizeof(hasIntensityUncertainty_);
 	while (fgets(line, sizeof(line), stdin) != 0)
 	{
+		lineno++;
 		if (sscanf(line, "%d,%d,%d,%f", &event_id, &r.areaperil_id, &r.intensity_bin_id, &r.probability) != 4) {
 			fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
 			return;
 		}
 		if (event_id != last_event_id) {
+			if (events.find(event_id) == events.end()) {
+				events.insert(event_id);
+				areaperils.clear();
+				last_areaperil_id = r.areaperil_id;
+				areaperils.insert(r.areaperil_id);
+			}else{
+				fprintf(stderr, "Error (%d):Event_id %d has already been converted - all event data should be contiguous \n", lineno,event_id);
+				exit(-1);
+			}
 			if (last_event_id) {
 				idx.event_id = last_event_id;
 				idx.size = count * 12;
 				fwrite(&idx, sizeof(idx), 1, fouty);
 				idx.offset += idx.size;
-			}
+			}			
 			last_event_id = event_id;
 			count = 0;
 		}
+		if (last_areaperil_id != r.areaperil_id) {
+			last_areaperil_id = r.areaperil_id;
+			if (areaperils.find(r.areaperil_id) == areaperils.end()) {
+				areaperils.insert(r.areaperil_id);
+			}
+			else {
+				fprintf(stderr, "Error (%d): areaperil_id %d data is not contiguous for event_id %d \n", lineno,r.areaperil_id, event_id);
+				exit(-1);
+			}
+
+		}
 		fwrite(&r, sizeof(r), 1, foutx);
-		lineno++;
 		count++;
 	}
 	idx.event_id = last_event_id;
@@ -101,6 +124,7 @@ void help()
 
 	std::cerr << "-i Intensitybins\n"
 		<< "-n No intenisty uncertainty\n"
+		<< "-s skip header\n"
 		;
 }
 

@@ -35,8 +35,24 @@
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
+#include <vector>
+#include <algorithm>
 
 #include "../include/oasis.hpp"
+
+std::vector<int> return_periods;
+int lastreturnperiod = -1;
+void writereturnperiods()
+{
+	std::sort(return_periods.rbegin(), return_periods.rend());
+
+	for (int return_period : return_periods) {
+		if (lastreturnperiod != return_period) {
+			fwrite(&return_period, sizeof(return_period), 1, stdout);
+			lastreturnperiod = return_period;
+		}
+	}
+}
 
 void doit()
 {
@@ -50,12 +66,12 @@ void doit()
            return;
        }
        else
-       {
-           fwrite(&return_period, sizeof(return_period), 1, stdout);
+       {           
+		   return_periods.push_back(return_period);
        }
        lineno++;
     }
-
+	writereturnperiods();
 }
 
 

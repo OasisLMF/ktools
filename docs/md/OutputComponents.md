@@ -193,7 +193,7 @@ In the former case, the output format is;
 | mean              | float  |    4   | sample mean                                                         |   1345.678  |
 | standard_deviation| float  |    4   | sample standard deviation                                           |    945.89   | 
 | exposure_value    | float  |    4   | exposure value for summary_id affected by the event                 |   70000     |
-| date_id           | int    |    4   | the date_id of the event occurrence                                 |   28616     |
+| occ_date_id       | int    |    4   | the date_id of the event occurrence                                 |   28616     |
 
 Using a base date of 1/1/1900 the integer 28616 is interpreted as 16/5/1978.
 
@@ -208,7 +208,7 @@ In the latter case, the output format is;
 | exposure_value    | float  |    4   | exposure value for summary_id affected by the event                 |   70000     |
 | occ_year          | int    |    4   | the year number of the event occurrence                             |   56876     |
 | occ_month         | int    |    4   | the month of the event occurrence                                   |   5         |
-| occ_year          | int    |    4   | the day of the event occurrence                                     |   16        |
+| occ_day           | int    |    4   | the day of the event occurrence                                     |   16        |
 
 [Return to top](#outputcomponents)
 

@@ -99,10 +99,10 @@ void dopltcalc(const summarySampleslevelHeader &sh, const std::vector<sampleslev
 			if (date_algorithm_) {
 				int occ_year, occ_month, occ_day;
 				d(o.occ_date_id, occ_year, occ_month, occ_day);
-				printf("%d, %d ,%d, %0.2f, %0.2f, %0.2f, %d, %d, %d\n", o.summary_id, o.period_no, o.event_id, o.mean, o.standard_deviation, o.exp_value, occ_year, occ_month,occ_day);
+				printf("%d,%d,%d,%0.2f,%0.2f,%0.2f,%d,%d,%d\n", o.summary_id, o.period_no, o.event_id, o.mean, o.standard_deviation, o.exp_value, occ_year, occ_month,occ_day);
 			}
 			else {
-				printf("%d, %d ,%d, %0.2f, %0.2f, %0.2f, %d \n", o.summary_id, o.period_no, o.event_id, o.mean, o.standard_deviation, o.exp_value, o.occ_date_id);
+				printf("%d,%d,%d,%0.2f,%0.2f,%0.2f,%d\n", o.summary_id, o.period_no, o.event_id, o.mean, o.standard_deviation, o.exp_value, o.occ_date_id);
 			}
 			j++;
 		}
@@ -123,9 +123,9 @@ void doit()
 	}
 	stream_type = streamno_mask & summarycalcstream_type;
 	if (date_algorithm_) {
-		printf("summary_id,  period_no, event_id, mean, standard_deviation, exposure_value, occ_year, occ_month, occ_day\n");
+		printf("summary_id,period_no,event_id,mean,standard_deviation,exposure_value,occ_year,occ_month,occ_day\n");
 	}else {
-		printf("summary_id,  period_no, event_id, mean, standard_deviation, exposure_value, occ_date_id\n");
+		printf("summary_id,period_no,event_id,mean,standard_deviation,exposure_value,occ_date_id\n");
 	}
 	if (stream_type == 1) {
 		int summary_set = 0;

@@ -66,7 +66,7 @@ void doit()
 	stream_type = streamno_mask & summarycalcstream_type;
 
 	if (stream_type == 1 ){
-		if (skipheader == false && stream_type==1) printf ("\"event_id\", \"summary_id\", \"sidx\", \"loss\"\n");
+		if (skipheader == false && stream_type==1) printf ("event_id,summary_id,sidx,loss\n");
 		int samplesize=0;
 		int summary_set = 0;
 		i=fread(&samplesize, sizeof(samplesize), 1, stdin);
@@ -79,8 +79,8 @@ void doit()
 				i = fread(&sr, sizeof(sr), 1, stdin);
 				if (i == 0) break;
 				if (sr.sidx == 0) break;
-				if (fullprecision) printf("%d, %d, %d, %f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
-				else printf("%d, %d, %d, %.2f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);				
+				if (fullprecision) printf("%d,%d,%d,%f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
+				else printf("%d,%d,%d,%.2f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);				
 			}
 		}
 		return;

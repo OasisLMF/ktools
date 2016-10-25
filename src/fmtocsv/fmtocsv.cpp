@@ -79,7 +79,7 @@ void doit()
 	int sample_size = 0;
 	i = fread(&sample_size, sizeof(sample_size), 1, stdin);
 
-	if (skipheader == false) 	printf ("\"event_id\", \"output_id\", \"sidx\", \"loss\"\n");
+	if (skipheader == false) 	printf ("event_id,output_id,sidx,loss\n");
 
 	fmlevelhdr p;
 	i = fread(&p, sizeof(fmlevelhdr), 1, stdin);
@@ -90,8 +90,8 @@ void doit()
 		while (i != 0) {
 			count++;
 			if (q.sidx == 0) break;
-			if (fullprecision) printf("%d, %d, %d, %f\n", p.event_id, p.output_id, q.sidx, q.loss);
-			else printf("%d, %d, %d, %.2f\n", p.event_id, p.output_id, q.sidx, q.loss);
+			if (fullprecision) printf("%d,%d,%d,%f\n", p.event_id, p.output_id, q.sidx, q.loss);
+			else printf("%d,%d,%d,%.2f\n", p.event_id, p.output_id, q.sidx, q.loss);
 			i = fread(&q, sizeof(fmlevelrec), 1, stdin);
 		}
 		if (i) i = fread(&p, sizeof(fmlevelhdr), 1, stdin);

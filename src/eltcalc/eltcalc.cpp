@@ -60,7 +60,7 @@ void doetloutput(int samplesize)
 	float analytical_mean = 0.0;
 	float sd = 0;
 	float sumlosssqr = 0.0;
-	printf("Summary_id, type, event_id, mean, standard_deviation, exposure_value\n");
+	printf("summary_id,type,event_id,mean,standard_deviation,exposure_value\n");
 	summarySampleslevelHeader sh;
 	int i = fread(&sh, sizeof(sh), 1, stdin);
 	while (i != 0) {
@@ -92,8 +92,8 @@ void doetloutput(int samplesize)
 				sd = 0;
 			}
 		}
-		printf("%d, 1, %d, %f, 0, %f\n", sh.summary_id, sh.event_id, analytical_mean, sh.expval);
-		if (samplesize) printf("%d, 2, %d, %f, %f, %f\n", sh.summary_id, sh.event_id,sample_mean, sd, sh.expval);
+		printf("%d,1,%d,%f,0,%f\n", sh.summary_id, sh.event_id, analytical_mean, sh.expval);
+		if (samplesize) printf("%d,2,%d,%f,%f,%f\n", sh.summary_id, sh.event_id,sample_mean, sd, sh.expval);
 
 		if (i) i = fread(&sh, sizeof(sh), 1, stdin);
 		sumloss = 0.0;

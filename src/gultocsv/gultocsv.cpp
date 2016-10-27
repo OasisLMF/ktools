@@ -67,8 +67,8 @@ void doit()
 	stream_type = streamno_mask &gulstream_type;
 
 	if (stream_type == 1 || stream_type == 2){
-		if (skipheader == false && stream_type==1) printf ("\"event_id\", \"item_id\", \"sidx\", \"loss\"\n");
-		if (skipheader == false && stream_type==2) printf ("\"event_id\", \"coverage_id\", \"sidx\", \"loss\"\n");
+		if (skipheader == false && stream_type==1) printf ("event_id,item_id,sidx,loss\n");
+		if (skipheader == false && stream_type==2) printf ("event_id,coverage_id,sidx,loss\n");
 		int samplesize=0;
 		fread(&samplesize, sizeof(samplesize), 1, stdin);
 		while (i != 0){
@@ -79,8 +79,8 @@ void doit()
 				i = fread(&gr, sizeof(gr), 1, stdin);
 				if (i == 0) break;
 				if (gr.sidx == 0) break;
-				if(fullprecision) printf("%d, %d, %d, %f\n", gh.event_id, gh.item_id, gr.sidx, gr.loss);
-				else printf("%d, %d, %d, %.2f\n", gh.event_id, gh.item_id, gr.sidx, gr.loss);
+				if(fullprecision) printf("%d,%d,%d,%f\n", gh.event_id, gh.item_id, gr.sidx, gr.loss);
+				else printf("%d,%d,%d,%.2f\n", gh.event_id, gh.item_id, gr.sidx, gr.loss);
 			}
 		}
 		return;

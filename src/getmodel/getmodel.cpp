@@ -124,25 +124,7 @@ void getmodel::getVulnerabilities()
     fclose(fin);
 }
 
-void getmodel::getExposures()
-{
-    // Read the exposures and generate a set of vulnerabilities by area peril
-    Exposure exposure_key;
 
-    FILE* fin = fopen(EXPOSURE_FILENAME.c_str(), "rb");
-    if (fin == nullptr) {
-        std::cerr << "Error opening " << EXPOSURE_FILENAME << "\n";
-        exit(EXIT_FAILURE);
-    }
-
-    while (fread(&exposure_key, sizeof(exposure_key), 1, fin) != 0) {
-        if (_vulnerability_ids_by_area_peril.count(exposure_key.areaperil_id) == 0)
-            _vulnerability_ids_by_area_peril[exposure_key.areaperil_id] = std::set<int>();
-        _vulnerability_ids_by_area_peril[exposure_key.areaperil_id].insert(exposure_key.vulnerability_id);
-        _area_perils.insert(exposure_key.areaperil_id);
-    }
-    fclose(fin);   
-}
 void getmodel::getIntensityInfo()
 {
 	FILE* fin = fopen(FOOTPRINT_FILE, "rb");
@@ -299,8 +281,7 @@ void getmodel::init(bool has_secondary_unceratainty)
 
 	getIntensityInfo();
 
-    getItems();
-    //getExposures();
+    getItems();    
     getVulnerabilities();
     getDamageBinDictionary();
 

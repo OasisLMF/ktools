@@ -387,8 +387,10 @@ void summarycalc::dogulsummary()
 			reset_sse_array();
 			outputsamplesize(samplesize);
 			gulSampleslevelHeader gh;
+			bool havedata = false;
 			while (i == 1) {
 				i = fread(&gh, sizeof(gh), 1, stdin);
+				if (i > 0 && havedata == false) havedata = true;
 				while (i != 0) {
 					gulSampleslevelRec gr;
 					i = fread(&gr, sizeof(gr), 1, stdin);
@@ -397,7 +399,7 @@ void summarycalc::dogulsummary()
 					dosummary(samplesize, gh.event_id, gh.item_id, gr.sidx, gr.loss, coverages_[gh.item_id]);
 				}
 			}
-			outputsummary(samplesize, gh.event_id);
+			if (havedata) outputsummary(samplesize, gh.event_id);
 			return;
 		}
 
@@ -429,8 +431,10 @@ void summarycalc::dofmsummary()
 		outputsamplesize(samplesize);
 		fmlevelhdr fh;
 		float expure_val = 0;
+		bool havedata = false;
 		while (i == 1) {
 			i = fread(&fh, sizeof(fh), 1, stdin);
+			if (i > 0 && havedata == false) havedata = true;
 			while (i != 0) {
 				sampleslevelRec sr;
 				i = fread(&sr, sizeof(sr), 1, stdin);
@@ -443,7 +447,7 @@ void summarycalc::dofmsummary()
 				}				
 			}			
 		}
-		outputsummary(samplesize, fh.event_id);
+		if (havedata) outputsummary(samplesize, fh.event_id);
 		return;
 	}else {
 		std::cerr << "summarycalc: Not a fm stream\n";

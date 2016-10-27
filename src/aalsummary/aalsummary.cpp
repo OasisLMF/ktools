@@ -19,20 +19,20 @@ std::map<int, aal_rec> map_sample_aal_;
 
 void outputresultscsv()
 {
-	printf("summary_id, type, mean, standard_deviation, exposure_value\n");
+	printf("summary_id,type,mean,standard_deviation,exposure_value\n");
 
 	for (auto x : map_analytical_aal_) {
 		double mean = x.second.mean;
 		double sd_dev = sqrt((x.second.mean_squared - (x.second.mean * x.second.mean / no_of_periods_)) / (no_of_periods_ - 1));
 		mean = mean / no_of_periods_;
-		printf("%d,%d, %f, %f, %f \n", x.first, x.second.type, mean, sd_dev, x.second.max_exposure_value);
+		printf("%d,%d,%f,%f,%f\n", x.first, x.second.type, mean, sd_dev, x.second.max_exposure_value);
 	}
 
 	for (auto x : map_sample_aal_) {
 		double mean = x.second.mean;
 		double sd_dev = sqrt((x.second.mean_squared - (x.second.mean * x.second.mean / no_of_periods_)) / (no_of_periods_ - 1));
 		mean = mean / no_of_periods_;
-		printf("%d,%d, %f, %f, %f \n", x.first, x.second.type, mean, sd_dev, x.second.max_exposure_value);
+		printf("%d,%d,%f,%f,%f\n", x.first, x.second.type, mean, sd_dev, x.second.max_exposure_value);
 	}
 
 }

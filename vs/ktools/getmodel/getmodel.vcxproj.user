@@ -11,8 +11,8 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerWorkingDirectory>f:\willis\csv_to_JC</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>f:\johbug</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>&lt; static\events.bin &gt; aaaa.bin</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>&lt; input\events.bin &gt; aaaa.bin</LocalDebuggerCommandArguments>
   </PropertyGroup>
 </Project>

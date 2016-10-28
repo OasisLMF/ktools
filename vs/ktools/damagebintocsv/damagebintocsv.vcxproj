@@ -19,8 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{D7C09D61-FD64-465C-B232-13884B6D9668}</ProjectGuid>
-    <RootNamespace>returnperiodtobin</RootNamespace>
+    <ProjectGuid>{1D73AFB1-976B-4E57-AE33-D5E5273B6B81}</ProjectGuid>
+    <RootNamespace>damagebintocsv</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -111,7 +111,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\src\returnperiodtobin\returnperiodtobin.cpp" />
+    <ClCompile Include="..\..\..\src\damagebintocsv\damagebintocsv.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -19,8 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{D7C09D61-FD64-465C-B232-13884B6D9668}</ProjectGuid>
-    <RootNamespace>returnperiodtobin</RootNamespace>
+    <ProjectGuid>{A6506A01-9A20-44F8-9F96-772A485F88F8}</ProjectGuid>
+    <RootNamespace>fmpolicytctocsv</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -111,7 +111,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\src\returnperiodtobin\returnperiodtobin.cpp" />
+    <ClCompile Include="..\..\..\src\fmpolicytctocsv\fmpolicytctocsv.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

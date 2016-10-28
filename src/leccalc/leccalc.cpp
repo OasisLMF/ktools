@@ -112,7 +112,8 @@ void loadoccurence(std::map<int, std::vector<int> > &event_to_periods, int &tota
 //
 //
 
-inline void dolecoutputaggsummary(int summary_id, int sidx, float loss, const std::vector<int> &periods, std::map<outkey2, float> &agg_out_loss, std::map<outkey2, float> &max_out_loss)
+inline void dolecoutputaggsummary(int summary_id, int sidx, float loss, const std::vector<int> &periods, 
+	std::map<outkey2, float> &agg_out_loss, std::map<outkey2, float> &max_out_loss)
 {
 	outkey2 key;
 	key.summary_id = summary_id;
@@ -127,7 +128,8 @@ inline void dolecoutputaggsummary(int summary_id, int sidx, float loss, const st
 }
 
 
-void processinputfile(unsigned int &samplesize,const std::map<int, std::vector<int> > &event_to_periods, int &maxsummaryid, std::map<outkey2, float> &agg_out_loss, std::map<outkey2, float> &max_out_loss)
+void processinputfile(unsigned int &samplesize,const std::map<int, std::vector<int> > &event_to_periods, 
+		int &maxsummaryid, std::map<outkey2, float> &agg_out_loss, std::map<outkey2, float> &max_out_loss)
 {
 	unsigned int stream_type = 0;
 	int i = fread(&stream_type, sizeof(stream_type), 1, stdin);

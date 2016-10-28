@@ -1,18 +1,4 @@
 x64
 Debug
 Release
-gultocsv/Debug
-itemtobin/Debug
-itemtocsv/Debug
-coveragetobin/Debug
-coveragetocsv/Debug
-randtobin/Debug
-randtocsv/Debug
-eve/Debug
-getmodel/Debug
-cdfdatatobin/Debug
-gulsummaryxreftocsv/Debug
-fmsummaryxreftocsv/Debug
-returnperiodtobin/Debug
-returnperiodtocsv/Debug
 

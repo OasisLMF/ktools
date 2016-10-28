@@ -51,8 +51,10 @@ bool operator<(const wheatkey& lhs, const wheatkey& rhs)
 	}
 }
 
-aggreports::aggreports(int totalperiods, int maxsummaryid, std::map<outkey2, float> &agg_out_loss, std::map<outkey2, float> &max_out_loss, FILE **fout, bool useReturnPeriodFile, int samplesize) :
-	totalperiods_(totalperiods), maxsummaryid_(maxsummaryid), agg_out_loss_(agg_out_loss), max_out_loss_(max_out_loss), fout_(fout), useReturnPeriodFile_(useReturnPeriodFile), samplesize_(samplesize)
+aggreports::aggreports(int totalperiods, int maxsummaryid, std::map<outkey2, float> &agg_out_loss, 
+	std::map<outkey2, float> &max_out_loss, FILE **fout, bool useReturnPeriodFile, int samplesize) :
+	totalperiods_(totalperiods), maxsummaryid_(maxsummaryid), agg_out_loss_(agg_out_loss), max_out_loss_(max_out_loss),
+	fout_(fout), useReturnPeriodFile_(useReturnPeriodFile), samplesize_(samplesize)
 {
 	loadreturnperiods();
 };
@@ -63,7 +65,7 @@ void aggreports::loadreturnperiods()
 
 	FILE *fin = fopen(RETURNPERIODS_FILE, "rb");
 	if (fin == NULL) {
-		std::cerr << "loadreturnperiods: Unable to open " << RETURNPERIODS_FILE << "\n";
+		std::cerr << __func__ << ": Unable to open " << RETURNPERIODS_FILE << "\n";
 		exit(-1);
 	}
 
@@ -77,7 +79,7 @@ void aggreports::loadreturnperiods()
 
 	if (returnperiods_.size() == 0) {
 		useReturnPeriodFile_ = false;
-		fprintf(stderr, "No return periods loaded - running without defined return periods option\n");
+		std::cerr << __func__ << ": No return periods loaded - running without defined return periods option\n";
 	}
 }
 
@@ -123,34 +125,35 @@ void aggreports::outputOccFulluncertainty()
 	fulluncertainty(OCC_FULL_UNCERTAINTY, max_out_loss_);
 }
 
-// Full uncertainity output
+// Full uncertainty output
 void aggreports::outputAggFulluncertainty()
 {
 	fulluncertainty(AGG_FULL_UNCERTAINTY, agg_out_loss_);
 }
 
-// the nextreturnperiod must be between last_return_period and current_return_period
-float aggreports::getloss(float nextreturnperiod, float last_return_period, float last_loss, float current_return_period, float current_loss) const
+// the next_return_period must be between last_return_period and current_return_period
+float aggreports::getloss(float next_return_period, float last_return_period, float last_loss, float current_return_period, float current_loss) const
 {
 	if (current_return_period == 0.0) return 0.0;
-	if (current_return_period == nextreturnperiod) {
+	if (current_return_period == next_return_period) {
 		return current_loss;
 	}
 	else {
-		if (current_return_period < nextreturnperiod) {
+		if (current_return_period < next_return_period) {
 			line_points lpt;
 			lpt.from_x = last_return_period;
 			lpt.from_y = last_loss;
 			lpt.to_x = current_return_period;
 			lpt.to_y = current_loss;
-			float zz = linear_interpolate(lpt, nextreturnperiod);
+			float zz = linear_interpolate(lpt, next_return_period);
 			return zz;
 		}
 	}
 	return -1;		// we should NOT get HERE hence the !!!
 }
 
-void aggreports::doreturnperiodout(int handle, int &nextreturnperiod_index, float &last_return_period, float &last_loss, float current_return_period, float current_loss, int summary_id, int type)
+void aggreports::doreturnperiodout(int handle, int &nextreturnperiod_index, float &last_return_period, float &last_loss,
+			float current_return_period, float current_loss, int summary_id, int type)
 {
 	if (nextreturnperiod_index >= returnperiods_.size()) {
 		return;

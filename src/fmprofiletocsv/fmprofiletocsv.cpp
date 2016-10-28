@@ -52,9 +52,8 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include "../include/oasis.hpp"
 
 using namespace std;
-bool skipheader = false;
 
-void doit()
+void doit(bool skipheader)
 {
 	if (skipheader == false) {
 		printf("\"policytc_id\",\"calcrule_id\",\"allocrule_id\",\"ccy_id\",");
@@ -63,7 +62,7 @@ void doit()
 	}
 
     fm_profile q;
-    int i = fread(&q, sizeof(q), 1, stdin);
+    size_t i = fread(&q, sizeof(q), 1, stdin);
     while (i != 0) {
         printf("%d, %d, %d, %d, %f, %f, %f, %f, %f, %f, %f, %f\n",
                q.policytc_id, q.calcrule_id, q.allocrule_id, 
@@ -80,6 +79,7 @@ void help()
 
     cerr << "-I inputfilename\n"
         << "-O outputfielname\n"
+		<< "-s Skip Header\n"
         ;
 }
 
@@ -88,6 +88,7 @@ int main(int argc, char* argv[])
     int opt;
      std::string inFile;
      std::string outFile;
+	 bool skipheader = false;
 
      while ((opt = getopt(argc, argv, "hsI:O:")) != -1) {
          switch (opt) {
@@ -108,6 +109,6 @@ int main(int argc, char* argv[])
 
     initstreams(inFile, outFile);
 
-	doit();
+	doit(skipheader);
 	return 0;
 }

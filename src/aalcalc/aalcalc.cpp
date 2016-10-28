@@ -3,24 +3,35 @@
 #include <vector>
 #include <math.h>
 
-std::map<int, int> event_count_;	// count of events in occurence table used to create cartisian effect on event_id
-int no_of_periods_ = 0;
-std::map<int, aal_rec> map_analytical_aal_;
-std::map<int, aal_rec> map_sample_aal_;
+class aalcalc {
+private:
+	std::map<int, int> event_count_;	// count of events in occurence table used to create cartisian effect on event_id
+	int no_of_periods_ = 0;
+	std::map<int, aal_rec> map_analytical_aal_;
+	std::map<int, aal_rec> map_sample_aal_;
+// functions
+	void loadoccurrence();
+	void outputresultscsv();
+	void outputsummarybin();
+	void do_analytical_calc(const summarySampleslevelHeader &sh, float mean_loss);
+	void do_sample_calc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec, int samplesize);
+	void doaalcalc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec, float mean_loss, int samplesize);
+public:
+	void doit();
+};
 
 
-
-void loadoccurrence()
+void aalcalc::loadoccurrence()
 {
 	
 	int date_algorithm_ = 0;
 	FILE *fin = fopen(OCCURRENCE_FILE, "rb");
 	if (fin == NULL) {
-		std::cerr << "loadoccurrence: Unable to open " << OCCURRENCE_FILE << "\n";
+		std::cerr << __func__ <<  ": Unable to open " << OCCURRENCE_FILE << "\n";
 		exit(-1);
 	}
 
-	int i = fread(&date_algorithm_, sizeof(date_algorithm_), 1, fin);
+	size_t i = fread(&date_algorithm_, sizeof(date_algorithm_), 1, fin);
 	i = fread(&no_of_periods_, sizeof(no_of_periods_), 1, fin);
 	occurrence occ;
 	i = fread(&occ, sizeof(occ), 1, fin);
@@ -33,27 +44,26 @@ void loadoccurrence()
 }
 
 
-void outputresultscsv()
+void aalcalc::outputresultscsv()
 {
 	printf("summary_id,type,mean, mean_squared\n");
 
 	for (auto x : map_analytical_aal_) {
-		float mean = x.second.mean;
-		float sd_dev = sqrt((x.second.mean_squared - (x.second.mean * x.second.mean / no_of_periods_)) / (no_of_periods_ - 1));
+		float mean = static_cast<float>(x.second.mean);
+		float sd_dev = static_cast<float>(static_cast<float>(sqrt((x.second.mean_squared - (x.second.mean * x.second.mean / no_of_periods_)) / (no_of_periods_ - 1))));
 		printf("%d,%d, %f, %f, %f \n", x.first, x.second.type,mean, sd_dev, x.second.max_exposure_value);
 	}
 
 	for (auto x : map_sample_aal_) {
-		float mean = x.second.mean;
-		float sd_dev = sqrt((x.second.mean_squared - (x.second.mean * x.second.mean / no_of_periods_)) / (no_of_periods_ - 1));
+		float mean = static_cast<float>(x.second.mean);
+		float sd_dev = static_cast<float>(sqrt((x.second.mean_squared - (x.second.mean * x.second.mean / no_of_periods_)) / (no_of_periods_ - 1)));
 		printf("%d,%d, %f, %f, %f \n", x.first,x.second.type, mean, sd_dev, x.second.max_exposure_value);
 	}
 
 }
 
-void outputsummarybin()
+void aalcalc::outputsummarybin()
 {
-	//fwrite(&no_of_periods_, sizeof(no_of_periods_), 1, stdout);
 
 	for (auto x : map_analytical_aal_) {
 		fwrite(&x.second, sizeof(aal_rec), 1, stdout);
@@ -64,7 +74,7 @@ void outputsummarybin()
 	}
 }
 
-void do_analytical_calc(const summarySampleslevelHeader &sh,  float mean_loss)
+void aalcalc::do_analytical_calc(const summarySampleslevelHeader &sh,  float mean_loss)
 {	
 	float mean_squared = mean_loss*mean_loss;
 	int count = event_count_[sh.event_id];		// do the cartesian
@@ -87,7 +97,8 @@ void do_analytical_calc(const summarySampleslevelHeader &sh,  float mean_loss)
 		map_analytical_aal_[sh.summary_id] = a;
 	}
 }
-void do_sample_calc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec, int samplesize)
+
+void aalcalc::do_sample_calc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec, int samplesize)
 {
 	float mean_loss=0;
 	for (auto x : vrec) {
@@ -117,21 +128,21 @@ void do_sample_calc(const summarySampleslevelHeader &sh, const std::vector<sampl
 	
 }
 
-void doaalcalc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec, float mean_loss,int samplesize)
+void aalcalc::doaalcalc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec, float mean_loss,int samplesize)
 {
 	do_analytical_calc(sh, mean_loss);
 	if (samplesize) do_sample_calc(sh, vrec, samplesize);
 }
 
-void doit()
+void aalcalc::doit()
 {
 	loadoccurrence();
 	int summarycalcstream_type = 0;
-	int i = fread(&summarycalcstream_type, sizeof(summarycalcstream_type), 1, stdin);
+	size_t i = fread(&summarycalcstream_type, sizeof(summarycalcstream_type), 1, stdin);
 	int stream_type = summarycalcstream_type & summarycalc_id;
 
 	if (stream_type != summarycalc_id) {
-		std::cerr << "Not a summarycalc stream type\n";
+		std::cerr << __func__ << ": Not a summarycalc stream type\n";
 		exit(-1);
 	}
 	stream_type = streamno_mask & summarycalcstream_type;
@@ -171,8 +182,9 @@ int main(int argc, char* argv[])
 {
 
 	initstreams();
-	doit();
-	fprintf(stderr, "\n");
+	aalcalc a;
+	a.doit();
+
 	return 0;
 
 }

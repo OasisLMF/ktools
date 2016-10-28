@@ -87,7 +87,7 @@ void doit()
 		fprintf(stderr, "Footprint idx open failed\n");
 		exit(3);
 	}
-	int i = fread(&idx, sizeof(idx), 1, finy);
+	size_t i = fread(&idx, sizeof(idx), 1, finy);
 	while (i != 0) {		
 		flseek(finx, idx.offset, SEEK_SET);
 		//printf("%lld\n", idx.offset);

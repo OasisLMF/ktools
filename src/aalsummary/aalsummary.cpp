@@ -48,7 +48,7 @@ void getnumberofperiods()
 		exit(-1);
 	}
 
-	int i = fread(&date_algorithm_, sizeof(date_algorithm_), 1, fin);
+	size_t i = fread(&date_algorithm_, sizeof(date_algorithm_), 1, fin);
 	i = fread(&no_of_periods_, sizeof(no_of_periods_), 1, fin);
 	
 	fclose(fin);
@@ -73,7 +73,7 @@ void process_file(const std::string &s)
 
 	FILE *fin = fopen(s.c_str(), "rb");
 	aal_rec aalrec;
-	int i = fread(&aalrec, sizeof(aal_rec), 1, fin);
+	size_t i = fread(&aalrec, sizeof(aal_rec), 1, fin);
 	while (i != 0) {
 		if (aalrec.type == 1) processrec(aalrec, map_analytical_aal_);
 		if (aalrec.type == 2) processrec(aalrec, map_sample_aal_);

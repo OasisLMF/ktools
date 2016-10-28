@@ -61,7 +61,7 @@ void doit()
     
 	float tiv;
 	int id = 0;
-    int i = fread(&tiv, sizeof(tiv), 1, stdin);
+    size_t i = fread(&tiv, sizeof(tiv), 1, stdin);
     while (i != 0) {
 		id++;
         printf("%d, %f\n", id, tiv);

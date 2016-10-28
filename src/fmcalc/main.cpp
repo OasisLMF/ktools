@@ -84,7 +84,7 @@ void doit(int &maxLevel)
 	fwrite(&fmstream_type, sizeof(fmstream_type), 1, stdout);
 
 	int gulstream_type = 0;
-	int i = fread(&gulstream_type, sizeof(gulstream_type), 1, stdin);
+	size_t i = fread(&gulstream_type, sizeof(gulstream_type), 1, stdin);
 
 	int stream_type = gulstream_type & gulstream_id;
 
@@ -142,7 +142,7 @@ void doit(int &maxLevel)
 					if (gr.sidx == mean_idx) {
 						items.push_back(gh.item_id);
 						for (unsigned int i = 0; i < event_guls.size(); i++) event_guls[i].resize(items.size());
-						current_item_index = items.size() - 1;
+						current_item_index = static_cast<int> (items.size() - 1);
 					}
 					int sidx = gs.sidx + 1;
 					if (gs.sidx == mean_idx) sidx = 1;

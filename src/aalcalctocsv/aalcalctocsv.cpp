@@ -58,7 +58,7 @@ void doit()
 	if (skipheader == false) printf("\"summary_id\", \"type\", \"mean\", \"mean_squared\", \"max_exposure_value\"\n");
 
 	aal_rec q;
-	int i = fread(&q, sizeof(q), 1, stdin);
+	size_t i = fread(&q, sizeof(q), 1, stdin);
 	while (i != 0) {
 		printf("%d, %d, %f, %f, %f\n",q.summary_id,q.type,q.mean,q.mean_squared,q.max_exposure_value);
 

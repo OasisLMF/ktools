@@ -167,7 +167,7 @@ void getmodel::getDamageBinDictionary()
     flseek(fin, 0L, SEEK_END);
     long long sz = fltell(fin);
     flseek(fin, 0L, SEEK_SET);
-    int nrec = sz / sizeof(damagebindictionary);
+    int nrec = static_cast<int>(sz / sizeof(damagebindictionary));
     
     damagebindictionary *damage_bins = new damagebindictionary[nrec];
     
@@ -222,7 +222,7 @@ void getmodel::doResults(
             //{
             cumulative_prob += prob;
             results[result_index++] =
-                Result(cumulative_prob, _mean_damage_bins[damage_bin_index]);
+                Result(static_cast<float>(cumulative_prob), _mean_damage_bins[damage_bin_index]);
             //}
 			if (cumulative_prob > 0.999999940) break;		// single precision value approx 1
         }
@@ -336,7 +336,7 @@ void getmodel::doCdfInner(
         if (event_index_by_event_id.count(event_id) == 0) continue;
         flseek(fin, event_index_by_event_id[event_id].offset, 0);
         EventRow event_key;
-        int number_of_event_records = event_index_by_event_id[event_id].size / sizeof_EventKey;
+        int number_of_event_records = static_cast<int>(event_index_by_event_id[event_id].size / sizeof_EventKey);
         for (int i = 0; i < number_of_event_records; i++)
         {
             fread(&event_key, sizeof(event_key), 1, fin);
@@ -389,7 +389,7 @@ void getmodel::doCdfInnerNoIntensityUncertainty(
         if (event_index_by_event_id.count(event_id) == 0) continue;
         flseek(fin, event_index_by_event_id[event_id].offset, 0);
 
-        int number_of_event_records = event_index_by_event_id[event_id].size / sizeof_EventKey;
+        int number_of_event_records = static_cast<int>(event_index_by_event_id[event_id].size / sizeof_EventKey);
         for (int i = 0; i < number_of_event_records; i++)
         {
             EventRow event_key;

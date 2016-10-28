@@ -58,49 +58,20 @@ struct fm_policyTC {
 void doit()
 {
 
-    //printf ("\"level_id\",\"agg_id\",\"layer_id\",\"PolicyTC_id\"\n");
     printf ("\"layer_id\",\"level_id\",\"agg_id\",\"policytc_id\"\n");
 
     fm_policyTC q;
-    int i = fread(&q, sizeof(q), 1, stdin);
+    size_t i = fread(&q, sizeof(q), 1, stdin);
     while (i != 0) {
         printf(" %d, %d, %d, %d\n",  q.layer_id,q.level_id,q.agg_id, q.PolicyTC_id );
         i = fread(&q, sizeof(q), 1, stdin);
     }
 }
 
-void help()
-{
-
-    cerr << "-I inputfilename\n"
-        << "-O outputfielname\n"
-        ;
-}
 
 int main(int argc, char* argv[])
 {
-    int opt;
-     std::string inFile;
-     std::string outFile;
-
- #ifdef __unix
-     while ((opt = getopt(argc, argv, "hI:O:")) != -1) {
-         switch (opt) {
-         case 'I':
-             inFile = optarg;
-             break;
-          case 'O':
-             outFile = optarg;
-             break;
-         case 'h':
-            help();
-            exit(EXIT_FAILURE);
-         }
-     }
- #endif
-
-    initstreams(inFile, outFile);
-
+    initstreams("", "");
 	doit();
 	return 0;
 }

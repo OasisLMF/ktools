@@ -59,7 +59,7 @@ bool getdamagebindictionary(std::vector<damagebindictionary> &damagebindictionar
     flseek(fin, 0L, SEEK_END);
     long long sz = fltell(fin);
     flseek(fin, 0L, SEEK_SET);
-    unsigned int nrec = sz / sizeof(damagebindictionary);
+    unsigned int nrec = static_cast<unsigned int> (sz / sizeof(damagebindictionary));
     damagebindictionary *s1 = new damagebindictionary[nrec];
     if (fread(s1, sizeof(damagebindictionary), nrec, fin) != nrec) {
         std::cerr << "Error reading file\n";
@@ -119,7 +119,7 @@ void doit()
 
 std::vector<damagebindictionary> damagebindictionary_vec;
 getdamagebindictionary(damagebindictionary_vec);
-int total_bins = damagebindictionary_vec.size();
+size_t total_bins = damagebindictionary_vec.size();
 if (total_bins == 0 ) total_bins = 10000;
 int max_recsize = (int)(total_bins * sizeof(prob_mean)) + sizeof(damagecdfrec)+sizeof(int);
 

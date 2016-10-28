@@ -61,7 +61,7 @@ void doit()
 	if (skipheader == false) printf("\"output_id\",\"agg_id\",\"layer_id\"\n");
     
     fmXref q;
-    int i = fread(&q, sizeof(q), 1, stdin);
+    size_t i = fread(&q, sizeof(q), 1, stdin);
     while (i != 0) {
         printf("%d, %d, %d\n",q.output_id, q.agg_id, q.layer_id);
         i = fread(&q, sizeof(q), 1, stdin);

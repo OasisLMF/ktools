@@ -62,7 +62,7 @@ void doit()
 
 	int fmstream_type;
 
-	int i = fread(&fmstream_type, sizeof(fmstream_type), 1, stdin);
+	size_t i = fread(&fmstream_type, sizeof(fmstream_type), 1, stdin);
 
 	int stream_type = fmstream_type & fmstream_id ;
 

@@ -41,7 +41,7 @@ bool getdamagebindictionary(std::vector<damagebindictionary> &damagebindictionar
 	long long sz = fltell(fin);
 
 	flseek(fin, 0L, SEEK_SET);
-	unsigned int nrec = sz / sizeof(damagebindictionary);
+	unsigned int nrec = static_cast<unsigned int>(sz / sizeof(damagebindictionary));
 	damagebindictionary *s1 = new damagebindictionary[nrec];
 	if (fread(s1, sizeof(damagebindictionary), nrec, fin) != nrec) {
 		cerr << "Error reading file\n";
@@ -72,12 +72,12 @@ bool getitems(std::map<item_map_key, std::vector<item_map_rec> > &item_map)
 	long long sz = fltell(fin);
 	flseek(fin, 0L, SEEK_SET);
 
-	unsigned int nrec = sz / sizeof(item);
+	unsigned int nrec = static_cast<unsigned int>(sz / sizeof(item));
 
 	item_map.clear();
 
 	item itm;
-	int i = fread(&itm, sizeof(itm), 1, fin);
+	size_t i = fread(&itm, sizeof(itm), 1, fin);
 	while (i != 0) {
 		item_map_key imk;
 		imk.areaperil_id = itm.areaperil_id;
@@ -109,11 +109,11 @@ bool getcoverages(std::vector<float> &coverages)
 	flseek(fin, 0L, SEEK_SET);
 
 	float tiv;
-	unsigned int nrec = sz / sizeof(tiv);
+	unsigned int nrec = static_cast<unsigned int>(sz / sizeof(tiv));
 
 	coverages.resize(nrec + 1);
 	int coverage_id = 0;
-	int i = fread(&tiv, sizeof(tiv), 1, fin);
+	size_t i = fread(&tiv, sizeof(tiv), 1, fin);
 	while (i != 0) {
 		coverage_id++;
 		coverages[coverage_id] = tiv;
@@ -159,7 +159,7 @@ void doit()
 	std::vector<float> coverages;
 	getcoverages(coverages);
 
-	int total_bins = damagebindictionary_vec.size();
+	size_t total_bins = damagebindictionary_vec.size();
 	int max_recsize = (int)(total_bins * sizeof(prob_mean)) + sizeof(damagecdfrec) + sizeof(int);
 	
 	int last_event_id = -1;

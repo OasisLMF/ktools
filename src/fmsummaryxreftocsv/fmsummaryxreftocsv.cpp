@@ -53,7 +53,7 @@ void doit()
 	printf("\"output_id\", \"summary_id\", \"summaryset_id\"\n");
 
 	fmsummaryxref q;
-	int i = fread(&q, sizeof(q), 1, stdin);
+	size_t i = fread(&q, sizeof(q), 1, stdin);
 	while (i != 0) {
 		printf("%d, %d, %d\n", q.output_id, q.summary_id, q.summaryset_id);
 		i = fread(&q, sizeof(q), 1, stdin);

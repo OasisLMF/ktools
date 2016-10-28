@@ -45,13 +45,13 @@ void emitevents(int pno_,int total_)
 {
     FILE *fin = fopen(EVENTS_FILE, "rb");
     if (fin == NULL){
-                cerr << "emitevents: cannot open " << EVENTS_FILE << "\n";
+                cerr << __func__ << ": cannot open " << EVENTS_FILE << "\n";
                 exit(-1);
     }
     fseek(fin, 0L, SEEK_END);
     long long  endpos = fltell(fin);
 
-    int total_events =  endpos / 4;
+    int total_events = static_cast<int>(endpos / 4);
     int chunksize = (int) ceil((float)total_events / total_);
     int end_pos = chunksize * pno_*4;
     pno_--;

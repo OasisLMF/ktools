@@ -65,7 +65,7 @@ void doit()
 
 int main()
 {
-	initstreams("", "");
+  initstreams("", "");
   doit();
   return 0;
 }

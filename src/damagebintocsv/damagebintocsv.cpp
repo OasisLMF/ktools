@@ -43,7 +43,7 @@ void doit()
 	printf("\"bin_index\", \"bin_from\", \"bin_to\", \"interpolation\", \"interval_type\"\n");
 	
 	damagebindictionary q;
-	int i = fread(&q, sizeof(q), 1, stdin);
+	size_t i = fread(&q, sizeof(q), 1, stdin);
 	while (i != 0) {
 		printf("%d, %f, %f, %f, %d\n",
 			q.bin_index, q.bin_from, q.bin_to, q.interpolation, q.interval_type);

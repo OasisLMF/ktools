@@ -1,23 +1,17 @@
+#include "aalsummary.hpp"
+
 #include <regex>
-#include <map>
 #include <math.h>
 
 #if defined(_MSC_VER)
-#include "../wingetopt/wingetopt.h"
 #include "../include/dirent.h"
 #else
 #include <dirent.h>
-#include <getopt.h>
 #endif
 
-#include "../include/oasis.hpp"
 
 
-int no_of_periods_ = 0;
-std::map<int, aal_rec> map_analytical_aal_;
-std::map<int, aal_rec> map_sample_aal_;
-
-void outputresultscsv()
+void aalsummary::outputresultscsv()
 {
 	printf("summary_id,type,mean,standard_deviation,exposure_value\n");
 
@@ -37,14 +31,13 @@ void outputresultscsv()
 
 }
 
-
-void getnumberofperiods()
+void aalsummary::getnumberofperiods()
 {
 
 	int date_algorithm_ = 0;
 	FILE *fin = fopen(OCCURRENCE_FILE, "rb");
 	if (fin == NULL) {
-		std::cerr << "loadoccurrence: Unable to open " << OCCURRENCE_FILE << "\n";
+		std::cerr << "getnumberofperiods: Unable to open " << OCCURRENCE_FILE << "\n";
 		exit(-1);
 	}
 
@@ -54,7 +47,7 @@ void getnumberofperiods()
 	fclose(fin);
 }
 
-void processrec(const aal_rec &aalrec, std::map<int, aal_rec> &map_aal)
+void aalsummary::processrec(const aal_rec &aalrec, std::map<int, aal_rec> &map_aal)
 {
 	auto iter = map_aal.find(aalrec.summary_id);
 	if (iter != map_aal.end()) {
@@ -68,7 +61,7 @@ void processrec(const aal_rec &aalrec, std::map<int, aal_rec> &map_aal)
 	}
 
 }
-void process_file(const std::string &s)
+void aalsummary::process_file(const std::string &s)
 {
 
 	FILE *fin = fopen(s.c_str(), "rb");
@@ -82,7 +75,7 @@ void process_file(const std::string &s)
 	fclose(fin);
 }
 
-void doit(const std::string &subfolder)
+void aalsummary::doit(const std::string &subfolder)
 {
 	std::string path = "work/" + subfolder;
 	if (path.substr(path.length() - 1, 1) != "/") {
@@ -101,38 +94,4 @@ void doit(const std::string &subfolder)
 	}
 	getnumberofperiods();
 	outputresultscsv();
-}
-void help()
-{
-	fprintf(stderr, "-K workspace sub folder\n");
-	exit(-1);
-}
-int main(int argc, char* argv[])
-{
-
-	std::string subfolder;
-	int opt;
-	while ((opt = getopt(argc, argv, "K:")) != -1) {
-		switch (opt) {
-		case 'K':
-			subfolder = optarg;
-			break;		
-		default:
-			fprintf(stderr, "unknown parameter\n");
-			::exit(EXIT_FAILURE);
-		}
-	}
-
-	if (argc == 1) {
-		fprintf(stderr, "Invalid parameters\n");
-		help();
-	}
-
-
-
-
-	initstreams();
-	doit(subfolder);
-	return 0;
-
 }

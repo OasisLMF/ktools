@@ -113,11 +113,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\aalsummary\aalsummary.cpp" />
+    <ClCompile Include="..\..\..\src\aalsummary\main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\wingetopt\wingetopt.vcxproj">
       <Project>{b5960b46-527b-4833-918b-ec5735c03635}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\src\aalsummary\aalsummary.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

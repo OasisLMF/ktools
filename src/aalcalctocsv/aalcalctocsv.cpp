@@ -1,5 +1,5 @@
 /*
-* Copyright (c)2015 Oasis LMF Limited
+* Copyright (c)2016 Oasis LMF Limited
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
@@ -32,12 +32,16 @@
 * DAMAGE.
 */
 /*
-Convert item output to csv
+
+Convert aalcalctocsv output to csv
 Author: Joh Carter  email: johanna.carter@oasislmf.org
+
 */
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
+#include "../../config.h"
+
 #if defined(_MSC_VER)
 #include "../wingetopt/wingetopt.h"
 #else
@@ -65,27 +69,27 @@ void doit()
 		i = fread(&q, sizeof(q), 1, stdin);
 	}
 }
+
 void help()
 {
-	std::cerr 	
-		<< "-s skip header\n"		
-		<< "-h help\n"
-		;
+	fprintf(stderr,"-s skip header\n-h help\n-v version\n")	;
 }
 
 int main(int argc, char* argv[])
 {
-	
 	int opt;
-	std::string inFile;
-	std::string outFile;
 
-	while ((opt = getopt(argc, argv, "s")) != -1) {
+	while ((opt = getopt(argc, argv, "svh")) != -1) {
 		switch (opt) {
 		case 's':
 			skipheader = true;
-			break;		
+			break;
+		case 'v':
+			fprintf(stderr, "%s : version: %s\n",argv[0],VERSION);
+			exit(EXIT_FAILURE);
+			break;	
 		case 'h':
+		default:
 			help();
 			exit(EXIT_FAILURE);
 		}
@@ -93,5 +97,5 @@ int main(int argc, char* argv[])
 	initstreams();
 
 	doit();
-	return 0;
+	return EXIT_SUCCESS;
 }

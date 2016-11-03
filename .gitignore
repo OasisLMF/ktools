@@ -1,0 +1,9 @@
+autom4te.cache/*
+Makefile
+*.o
+.deps/*
+.deps
+stamp-h1
+config.h
+config.log
+config.status

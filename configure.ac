@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.69])
-AC_INIT([ktools], [0.4.2], [support@oasislmf.org])
+AC_INIT([ktools],  m4_esyscmd([tr -d '\n' < VERSION]), [support@oasislmf.org])
 AM_INIT_AUTOMAKE
 
 AC_MSG_CHECKING([Check for /usr/bin/diff ])

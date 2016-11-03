@@ -31,6 +31,11 @@
 * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 * DAMAGE.
 */
+/*
+
+Author: Mark Pinkerton  email: mark.pinkerton@oasislmf.org
+
+*/
 
 #include <iostream>
 #include <stdio.h>

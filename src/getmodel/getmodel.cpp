@@ -71,13 +71,7 @@ Result::Result(float prob, float damage):
     //
 }
 
-const std::string EXPOSURE_FILENAME = "exposures.bin";
-/*
-const std::string VULNERABILITY_FILENAME = "vulnerability.bin";
-const std::string EVENT_FILENAME = "eventfootprint.bin";
-const std::string EVENT_INDEX_FILENAME = "eventfootprint.idx";
-const std::string DAMAGE_BIN_DICT_FILENAME = "damage_bin_dict.bin";
-*/
+
 // Is this the number of damage bins?
 const int MAX_RESULTS = 100;
 

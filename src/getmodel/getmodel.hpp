@@ -27,7 +27,6 @@ private:
     Result* _temp_results;
 
     void getVulnerabilities();
-    void getExposures();
     void getDamageBinDictionary();
     void getItems();
 	void getIntensityInfo();

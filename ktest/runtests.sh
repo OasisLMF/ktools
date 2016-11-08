@@ -158,7 +158,7 @@ installertest()
 	# input data to csv and bin
 	../src/evetocsv/evetocsv < ../examples/input/events.bin | ../src/evetobin/evetobin > ../ktest/testout/events.bin
 	
-	../src/randtocsv/randtocsv < ../examples/static/random.bin | ../src/randtobin/randtobin > ../ktest/testout/random.bin
+	../src/randtocsv/randtocsv -r < ../examples/static/random.bin | ../src/randtobin/randtobin > ../ktest/testout/random.bin
 
 	 ../src/itemtocsv/itemtocsv < ../examples/input/items.bin | ../src/itemtobin/itemtobin > ../ktest/testout/items.bin
 

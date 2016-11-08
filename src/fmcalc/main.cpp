@@ -89,13 +89,13 @@ void doit(int &maxLevel)
 	int stream_type = gulstream_type & gulstream_id;
 
 	if (stream_type != gulstream_id) {
-		std::cerr << "Not a gul stream type\n";
+		fprintf(stderr, "%s: Not a gul stream type\n",__func__);
 		exit(-1);
 	}
 
 	stream_type = streamno_mask &gulstream_type;
 	if (stream_type != 1) {
-		std::cerr << "Unsupported gul stream type\n";
+		fprintf(stderr, "%s: Unsupported gul stream type %d\n", __func__, stream_type);
 		exit(-1);
 	}
 
@@ -162,10 +162,11 @@ void doit(int &maxLevel)
 void help()
 {
 
-    std::cerr << "-I inputfilename\n"
-        << "-O outputfielname\n"
-        << "-M maxlevel (optional)\n"
-        ;
+    fprintf(stderr,
+		"-I inputfilename\n"
+        "-O outputfielname\n"
+        "-M maxlevel (optional)\n"
+	);
 }
 
 

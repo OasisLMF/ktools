@@ -70,10 +70,10 @@ void doit()
 
 void help()
 {
-
-    cerr << "-I inputfilename\n"
-        << "-O outputfielname\n"
-        ;
+	fprintf(stderr,
+    "-I inputfilename\n"
+     "-O outputfielname\n"
+	)   ;
 }
 
 int main(int argc, char* argv[])

@@ -67,12 +67,12 @@ void doit()
 	int stream_type = fmstream_type & fmstream_id ;
 
 	if (stream_type != fmstream_id) {
-		std::cerr << "Not a fm stream type\n";
+		fprintf(stderr, "%s: Not a fm stream type\n",__func__);
 		exit(-1);
 	}
 	stream_type = streamno_mask & fmstream_type;
 	if (stream_type != 1 ) {
-		std::cerr << "Unsupported fm stream type: " << stream_type << "\n";
+		fprintf(stderr, "%s: Unsupported fm stream type: %s\n", __func__, stream_type);
 		exit(-1);
 	}
 
@@ -101,13 +101,12 @@ void doit()
 
 void help()
 {
-
-	cerr << "-I inputfilename\n"
-	     << "-O outputfielname\n"
-	     << "-s skip header\n"
-		<< "-f full precision\n"
-		<< "-h help\n"
-	     ;
+	fprintf(stderr,"-I inputfilename\n"
+	     "-O outputfielname\n"
+	     "-s skip header\n"
+		"-f full precision\n"
+		"-h help\n"
+	) ;
 }
 
 int main(int argc, char* argv[])

@@ -171,7 +171,7 @@ void aalcalc::doit()
 	int stream_type = summarycalcstream_type & summarycalc_id;
 
 	if (stream_type != summarycalc_id) {
-		std::cerr << __func__ << ": Not a summarycalc stream type\n";
+		fprintf(stderr, "%s: Not a summarycalc stream type\n", __func__);
 		exit(-1);
 	}
 	stream_type = streamno_mask & summarycalcstream_type;

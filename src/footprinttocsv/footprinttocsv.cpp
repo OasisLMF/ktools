@@ -101,10 +101,10 @@ void doit()
 
 void help()
 {
-
-	cerr << "-s skip header\n"
-		<< "-h help"
-		;
+	fprintf(stderr,
+		"-s skip header\n"
+		"-h help"
+		);
 }
 
 int main(int argc, char* argv[])

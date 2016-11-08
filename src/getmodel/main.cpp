@@ -51,11 +51,11 @@ Author: Mark Pinkerton  email: mark.pinkerton@oasislmf.org
 
 void help()
 {
-	std::cerr
-		<< "-I input filename\n"
-		<< "-O output filename\n"
-		<< "-n no secondary uncertainty\n"
-		;
+	fprintf(stderr,
+		"-I input filename\n"
+		"-O output filename\n"
+		"-n no secondary uncertainty\n"
+	);
 }
 
 void doIt(bool hasSecondaryUncertainty)

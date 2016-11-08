@@ -76,11 +76,11 @@ void doit(bool skipheader)
 
 void help()
 {
-
-    cerr << "-I inputfilename\n"
-        << "-O outputfielname\n"
-		<< "-s Skip Header\n"
-        ;
+	fprintf(stderr,
+		"-I inputfilename\n"
+        "-O outputfielname\n"
+		"-s Skip Header\n"
+	);
 }
 
 int main(int argc, char* argv[])

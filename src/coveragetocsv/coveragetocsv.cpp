@@ -71,12 +71,12 @@ void doit()
 
 void help()
 {
-
-    cerr << "-I inputfilename\n"
-        << "-O outputfielname\n"
-		<< "-s skip header\n"
-		<< "-h help"
-        ;
+	fprintf(stderr, 
+		"-I inputfilename\n"
+		"-O outputfielname\n"
+		"-s skip header\n"
+		"-h help"
+	) ;
 }
 
 int main(int argc, char* argv[])

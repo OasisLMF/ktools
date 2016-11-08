@@ -121,11 +121,11 @@ void doit()
 
 void help()
 {
-
-	std::cerr << "-i Intensitybins\n"
-		<< "-n No intenisty uncertainty\n"
-		<< "-s skip header\n"
-		;
+	fprintf(stderr,
+		"-i Intensitybins\n"
+		"-n No intenisty uncertainty\n"
+		"-s skip header\n"
+	);
 }
 
 
@@ -150,7 +150,7 @@ int main(int argc, char *argv[])
 		}
 	}
 	if (intensity_bins_ == -1) {
-		cerr << "Intensity bin paramter not supplied\n";
+		fprintf(stderr,"%s: Intensity bin parameter not supplied\n",__func__);
 		help();
 		exit(EXIT_FAILURE);
 	}

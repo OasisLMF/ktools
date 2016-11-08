@@ -116,23 +116,23 @@ void doit()
 			doetloutput( samplesize);
 		}
 		else {
-			std::cerr << "Stream read error\n";
+			fprintf(stderr, "Stream read error\n");
 		}
 		return;
 	}
 
-    std::cerr << "Not a gul stream\n";
-    std::cerr << "invalid stream type: " << stream_type << "\n";
+	fprintf(stderr, "%s: Not a gul stream\n",__func__);
+	fprintf(stderr, "%s: invalid stream type %d\n", __func__, stream_type);
     exit(-1);
 
 }
 
 void help()
 {
-
-    cerr << "-I inputfilename\n"
-        << "-O outputfielname\n"
-        ;
+	fprintf(stderr,
+     "-I inputfilename\n"
+     "-O outputfielname\n"
+	) ;
 }
 
 

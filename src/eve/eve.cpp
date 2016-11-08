@@ -46,12 +46,13 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <string.h>
 #include "../include/oasis.hpp"
 
+char *progname;
 
 void emitevents(int pno_,int total_)
 {
     FILE *fin = fopen(EVENTS_FILE, "rb");
     if (fin == NULL){
-		fprintf(stderr, "%s: cannot open %s\n", __func__, EVENTS_FILE);
+		fprintf(stderr, "%s - %s: cannot open %s\n", progname, __func__, EVENTS_FILE);
                 exit(EXIT_FAILURE);
     }
     fseek(fin, 0L, SEEK_END);
@@ -77,6 +78,8 @@ void emitevents(int pno_,int total_)
 
 int main(int argc, char *argv[])
 {
+	progname = argv[0];
+
 	if (argc == 2) {
 		if (!strcmp(argv[1], "-v")) {
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);

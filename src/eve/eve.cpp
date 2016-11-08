@@ -52,7 +52,7 @@ void emitevents(int pno_,int total_)
 {
     FILE *fin = fopen(EVENTS_FILE, "rb");
     if (fin == NULL){
-		fprintf(stderr, "%s - %s: cannot open %s\n", progname, __func__, EVENTS_FILE);
+		fprintf(stderr, "%s: %s: cannot open %s\n", progname, __func__, EVENTS_FILE);
                 exit(EXIT_FAILURE);
     }
     fseek(fin, 0L, SEEK_END);

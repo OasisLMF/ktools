@@ -84,11 +84,8 @@ void help()
 	fprintf(stderr, "-S seed value\n");	
 	fprintf(stderr, "-h help\n");
 }
-/*
-Normal usage just pipe the random number binary file
-with one argument of a integer - generate x number of random numbers
-with two argument of a integer - generate x number of random numbers with y as the seed
-*/
+
+
 int main(int argc, char *argv[])
 {
 	bool skipheader = false;
@@ -97,7 +94,7 @@ int main(int argc, char *argv[])
 	int totalrandno = 0;
 	int seedval = 0;
 	int opt;
-	while ((opt = getopt(argc, argv, "vsrg:S:")) != -1) {
+	while ((opt = getopt(argc, argv, "hvsrg:S:")) != -1) {
 		switch (opt) {
 		case 's':
 			skipheader = true;
@@ -108,6 +105,9 @@ int main(int argc, char *argv[])
 		case 'g':
 			generaterandno = true;
 			totalrandno = atoi(optarg);
+			break;
+		case 'S':
+			seedval = atoi(optarg);
 			break;
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);

@@ -61,7 +61,7 @@ void doit()
 	int stream_type = gulstream_type & gulstream_id ;
 
 	if (stream_type != gulstream_id) {
-		std::cerr << "Not a gul stream type\n";
+		fprintf(stderr, "%s: Not a gul stream type\n", __func__);
 		exit(-1);
 	}
 	stream_type = streamno_mask &gulstream_type;

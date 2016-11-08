@@ -44,7 +44,7 @@ bool getdamagebindictionary(std::vector<damagebindictionary> &damagebindictionar
 	unsigned int nrec = static_cast<unsigned int>(sz / sizeof(damagebindictionary));
 	damagebindictionary *s1 = new damagebindictionary[nrec];
 	if (fread(s1, sizeof(damagebindictionary), nrec, fin) != nrec) {
-		cerr << "Error reading file\n";
+		fprintf(stderr, "%s: Error reading file %s\n", __func__, DAMAGE_BIN_DICT_FILE);
 		exit(-1);
 	}
 	damagebindictionary_vec_.clear();
@@ -53,7 +53,6 @@ bool getdamagebindictionary(std::vector<damagebindictionary> &damagebindictionar
 		damagebindictionary_vec_.push_back(s1[i]);
 	}
 	delete[] s1;
-	if (verbose) cerr << "damagebindictionary_vec row count " << damagebindictionary_vec_.size() << endl;
 
 	fclose(fin);
 	return true;
@@ -64,7 +63,7 @@ bool getitems(std::map<item_map_key, std::vector<item_map_rec> > &item_map)
 
 	FILE *fin = fopen(ITEMS_FILE, "rb");
 	if (fin == NULL) {
-		cerr << "getitems: Unable to open " << ITEMS_FILE << "\n";
+		fprintf(stderr, "%s: cannot open %s\n", __func__, ITEMS_FILE);
 		exit(-1);
 	}
 

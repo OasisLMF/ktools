@@ -42,7 +42,7 @@ void doit()
 {
 
     int return_period;
-
+	printf("return_period\n");
     while (fread(&return_period, sizeof(return_period), 1, stdin) == 1){
         printf("%d\n",return_period);
     }

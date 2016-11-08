@@ -40,7 +40,6 @@ Author: Joh Carter  email: johanna.carter@oasislmf.org
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
-#include "../../config.h"
 
 #if defined(_MSC_VER)
 #include "../wingetopt/wingetopt.h"
@@ -54,9 +53,7 @@ Author: Joh Carter  email: johanna.carter@oasislmf.org
 
 #include "../include/oasis.hpp"
 
-bool skipheader = false;
-
-void doit()
+void doit(bool skipheader)
 {
 
 	if (skipheader == false) printf("\"summary_id\", \"type\", \"mean\", \"mean_squared\", \"max_exposure_value\"\n");
@@ -78,7 +75,7 @@ void help()
 int main(int argc, char* argv[])
 {
 	int opt;
-
+	bool skipheader = false;
 	while ((opt = getopt(argc, argv, "svh")) != -1) {
 		switch (opt) {
 		case 's':
@@ -96,6 +93,6 @@ int main(int argc, char* argv[])
 	}
 	initstreams();
 
-	doit();
+	doit(skipheader);
 	return EXIT_SUCCESS;
 }

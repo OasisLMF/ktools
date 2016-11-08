@@ -31,6 +31,11 @@
 * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 * DAMAGE.
 */
+/*
+
+Author: Ben Matharu  email: ben.matharu@oasislmf.org
+
+*/
 
 #include <iostream>
 #include <stdio.h>
@@ -39,28 +44,45 @@
 
 #include "../include/oasis.hpp"
 
+#if defined(_MSC_VER)
+#include "../wingetopt/wingetopt.h"
+#else
+#include <getopt.h>
+#endif
 
 
-void genrandomnumbers(int total, int seed)
+void genrandomnumbers(bool skipheader, int total, int seed)
 {
 	std::random_device rd;
 	std::uniform_real_distribution<> dis(0, 1);
 	std::mt19937 mt;
 	if (seed > 0) mt.seed(seed);
 	else mt.seed(rd());
+	if (skipheader == false) printf("\"random_no\"\n");
 	for (int i = 0; i < total; i++) {
 		float f = (float)dis(mt);
 		printf("%f\n", f);
 	}
 }
-void doit()
+void doit(bool skipheader)
 {
 
     float rand;
+	if (skipheader == false) printf("\"random_no\"\n");
     while (fread(&rand, sizeof(rand), 1, stdin) == 1){
         printf("%f\n",rand);
     }
 
+}
+
+void help()
+{
+	fprintf(stderr, "-r Convert binary float input to csv\n");
+	fprintf(stderr, "-v version\n");
+	fprintf(stderr, "-s skip header\n");
+	fprintf(stderr, "-g generate random numbers\n");
+	fprintf(stderr, "-S seed value\n");	
+	fprintf(stderr, "-h help\n");
 }
 /*
 Normal usage just pipe the random number binary file
@@ -69,21 +91,45 @@ with two argument of a integer - generate x number of random numbers with y as t
 */
 int main(int argc, char *argv[])
 {
+	bool skipheader = false;
+	bool bintorand = false;
+	bool generaterandno = false;
+	int totalrandno = 0;
+	int seedval = 0;
+	int opt;
+	while ((opt = getopt(argc, argv, "vsrg:S:")) != -1) {
+		switch (opt) {
+		case 's':
+			skipheader = true;
+			break;
+		case 'r':
+			bintorand = true;
+			break;
+		case 'g':
+			generaterandno = true;
+			totalrandno = atoi(optarg);
+			break;
+		case 'v':
+			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+			::exit(EXIT_FAILURE);
+			break;
+		case 'h':
+		default:
+			help();
+			::exit(EXIT_FAILURE);
+		}
+	}
+
+
 	initstreams("", "");
-	if (argc == 1) {
-		doit();
+	if (bintorand == true) {
+		doit(skipheader);
 		return 0;
 	}
-	if (argc == 2) {
-		int total = atoi(argv[1]);
-		genrandomnumbers(total,0);
-		return 0;
+
+	if (generaterandno == true) {
+		genrandomnumbers(skipheader,totalrandno,seedval);
+		return EXIT_SUCCESS;
 	}
     
-	if (argc == 3) {
-		int total = atoi(argv[1]);
-		int seedval = atoi(argv[2]);
-		genrandomnumbers(total,seedval);
-		return 0;
-	}
 }

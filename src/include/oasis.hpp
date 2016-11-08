@@ -32,13 +32,16 @@
 * DAMAGE.
 */
 
-#pragma once
+#ifndef OASIS_H_
+#define OASIS_H_
 
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <string>
 #include <stdlib.h>
+
+#include "../../config.h"
 
 #if defined(_MSC_VER) || defined(__MINGW32__)
 #include <fcntl.h>
@@ -299,3 +302,5 @@ inline void initstreams(std::string inFile="", std::string outFile="")
 #define VULNERABILITY_FILE  "static/vulnerability.bin"
 #define FOOTPRINT_FILE  "static/footprint.bin"
 #define FOOTPRINT_IDX_FILE  "static/footprint.idx"
+
+#endif  // OASIS_H_

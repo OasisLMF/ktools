@@ -594,7 +594,7 @@ void fmcalc::init_policytc(int maxRunLevel)
 
 	FILE *fin = fopen(FMPOLICYTC_FILE, "rb");
 	if (fin == NULL) {
-		cerr << "Error opening " << FMPOLICYTC_FILE << "\n";
+		fprintf(stderr, "%s: cannot open %s\n", __func__, FMPOLICYTC_FILE);
 		exit(EXIT_FAILURE);
 	}
 
@@ -631,7 +631,7 @@ void fmcalc::init_programme(int maxRunLevel)
 {
 	FILE *fin = fopen(FMPROGRAMME_FILE, "rb");
 	if (fin == NULL){
-		cerr << "Error opening " << FMPROGRAMME_FILE << "\n";
+		fprintf(stderr, "%s: cannot open %s\n", __func__, FMPROGRAMME_FILE);
 		exit(EXIT_FAILURE);
 	}
 
@@ -677,7 +677,7 @@ bool fmcalc::loadcoverages(std::vector<float> &coverages)
 {
 	FILE *fin = fopen(COVERAGES_FILE, "rb");
 	if (fin == NULL) {
-		cerr << "getcoverages: Unable to open " << COVERAGES_FILE << "\n";
+		fprintf(stderr, "%s: cannot open %s\n", __func__, COVERAGES_FILE);
 		exit(-1);
 	}
 
@@ -708,7 +708,7 @@ void fmcalc::init_itemtotiv()
 
 	FILE *fin = fopen(ITEMS_FILE, "rb");
 	if (fin == NULL) {
-		cerr << "getitems: Unable to open " << ITEMS_FILE << "\n";
+		fprintf(stderr, "%s: cannot open %s\n", __func__, ITEMS_FILE);
 		exit(-1);
 	}
 
@@ -732,7 +732,7 @@ void fmcalc::init_profile()
 {
 	FILE *fin = fopen(FMPROFILE_FILE, "rb");
 	if (fin == NULL) {
-		cerr << "Error opening " << FMPROFILE_FILE << "\n";
+		fprintf(stderr, "%s: cannot open %s\n", __func__, FMPROFILE_FILE);
 		exit(EXIT_FAILURE);
 	}
 
@@ -767,7 +767,7 @@ void fmcalc::init_fmxref()
 {
 	FILE *fin = fopen(FMXREF_FILE, "rb");
 	if (fin == NULL) {
-		cerr << "Error opening " << FMXREF_FILE << "\n";
+		fprintf(stderr, "%s: cannot open %s\n", __func__, FMXREF_FILE);
 		exit(EXIT_FAILURE);
 	}
 	fmXref f;

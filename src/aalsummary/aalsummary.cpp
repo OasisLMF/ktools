@@ -9,8 +9,6 @@
 #include <dirent.h>
 #endif
 
-
-
 void aalsummary::outputresultscsv()
 {
 	printf("summary_id,type,mean,standard_deviation,exposure_value\n");
@@ -37,7 +35,7 @@ void aalsummary::getnumberofperiods()
 	int date_algorithm_ = 0;
 	FILE *fin = fopen(OCCURRENCE_FILE, "rb");
 	if (fin == NULL) {
-		std::cerr << "getnumberofperiods: Unable to open " << OCCURRENCE_FILE << "\n";
+		fprintf(stderr, "%s: cannot open %s\n", __func__, OCCURRENCE_FILE);
 		exit(-1);
 	}
 

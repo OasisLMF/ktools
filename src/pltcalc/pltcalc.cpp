@@ -69,7 +69,7 @@ void dopltcalc(const summarySampleslevelHeader &sh, const std::vector<sampleslev
 	static int j = 0;
 	std::vector<period_occ> &vp = m_occ[sh.event_id];	
 	bool hasrec = false;
-	
+	bool firsttime = true;
 	outrec o;
 	o.event_id = sh.event_id;
 	o.summary_id = sh.summary_id;
@@ -82,12 +82,15 @@ void dopltcalc(const summarySampleslevelHeader &sh, const std::vector<sampleslev
 	for (auto p : vp) {
 		o.period_no = p.period_no;
 		o.occ_date_id = p.occ_date_id;
-		for (auto v : vrec) {
-			if (v.sidx > 0) {
-				hasrec = true;
-				loss_sum += v.loss;
-				squared_loss_sum += (v.loss*v.loss);
+		if (firsttime == true) { // only do this once
+			for (auto v : vrec) {
+				if (v.sidx > 0) {
+					hasrec = true;
+					loss_sum += v.loss;
+					squared_loss_sum += (v.loss*v.loss);
+				}
 			}
+			firsttime = false;
 		}
 		if (hasrec) {
 			o.mean = loss_sum / samplesize_;

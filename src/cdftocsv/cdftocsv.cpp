@@ -31,7 +31,11 @@
 * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 * DAMAGE.
 */
+/*
 
+Author: Ben Matharu  email: ben.matharu@oasislmf.org
+
+*/
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -42,9 +46,6 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-
-
-bool verbose = false;
 
 using namespace std;
 
@@ -62,7 +63,7 @@ bool getdamagebindictionary(std::vector<damagebindictionary> &damagebindictionar
     unsigned int nrec = static_cast<unsigned int> (sz / sizeof(damagebindictionary));
     damagebindictionary *s1 = new damagebindictionary[nrec];
     if (fread(s1, sizeof(damagebindictionary), nrec, fin) != nrec) {
-        std::cerr << "Error reading file\n";
+        fprintf(stderr, "Error reading file\n");
         exit(-1);
     }
 
@@ -93,8 +94,6 @@ bool getrec(char *rec_, FILE *stream, int recsize_)
 }
 
 
-
-
 struct prob_mean {
         float prob_to;
         float bin_mean;
@@ -106,7 +105,6 @@ void processrec(char *rec, int recsize,
     damagecdfrec *d = (damagecdfrec *)rec;
     char *b = rec + sizeof(damagecdfrec);
     int *bin_count = (int *)b;
-    // fprintf(stderr,"Bin count %d\n",*bin_count);
     b = b + sizeof(int);
     prob_mean *pp = (prob_mean *)b;
     for (int bin_index = 0; bin_index < *bin_count; bin_index++){
@@ -128,8 +126,6 @@ int stream_type = 0;
 
 bool bSuccess = getrec((char *)&stream_type, stdin, sizeof(stream_type));
 
-    if (verbose) fprintf(stderr,"Stream type: %d", stream_type);
-
     if (stream_type != 1) {
         fprintf(stderr,"Invalid stream type %d expect stream type 1\n", stream_type);
         exit(-1);
@@ -149,18 +145,15 @@ bool bSuccess = getrec((char *)&stream_type, stdin, sizeof(stream_type));
 
         processrec(rec, recsize, damagebindictionary_vec);
     }
-
-
 }
+
 
 int main(int argc, char *argv[])
 {
     std::string inFile = "";
     std::string outFile = "";
-    if (argc == 3 ){
-        inFile = argv[1];
-        outFile = argv[2];
-    }
+    
+
 
     initstreams(inFile,outFile);
     doit();

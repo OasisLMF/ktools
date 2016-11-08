@@ -56,7 +56,7 @@ void aalcalc::loadoccurrence()
 	int date_algorithm_ = 0;
 	FILE *fin = fopen(OCCURRENCE_FILE, "rb");
 	if (fin == NULL) {
-		std::cerr << __func__ <<  ": Unable to open " << OCCURRENCE_FILE << "\n";
+		fprintf(stderr, "%s: cannot open %s\n", __func__, OCCURRENCE_FILE);
 		exit(-1);
 	}
 

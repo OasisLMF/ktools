@@ -1,5 +1,5 @@
 /*
-* Copyright (c)2015 Oasis LMF Limited 
+* Copyright (c)2016 Oasis LMF Limited
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
@@ -32,26 +32,67 @@
 * DAMAGE.
 */
 
+/*
+evetocsv: Convert binary event stream to csv stream
+Author: Ben Matharu  email: ben.matharu@oasislmf.org
+
+*/
+
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "../include/oasis.hpp"
+#if defined(_MSC_VER)
+#include "../wingetopt/wingetopt.h"
+#else
+#include <getopt.h>
+#endif
 
-void doit()
+#ifdef __unix
+#include <unistd.h>
+#endif
+
+
+void doit(bool skipheader)
 {
-
-    int eventid;
-
+	if (skipheader == false) printf("\"event_id\"\n");
+	int eventid;
     while (fread(&eventid, sizeof(eventid), 1, stdin) == 1){
         printf("%d\n",eventid);
     }
 
 }
 
-int main()
+
+void help()
 {
-	initstreams("", "");
-    doit();
-    return 0;
+	fprintf(stderr, "-s skip header\n-h help\n-v version\n");
 }
+
+int main(int argc, char* argv[])
+{
+	int opt;
+	bool skipheader = false;
+	while ((opt = getopt(argc, argv, "svh")) != -1) {
+		switch (opt) {
+		case 's':
+			skipheader = true;
+			break;
+		case 'v':
+			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+			exit(EXIT_FAILURE);
+			break;
+		case 'h':
+		default:
+			help();
+			exit(EXIT_FAILURE);
+		}
+	}
+	initstreams();
+
+	doit(skipheader);
+	return EXIT_SUCCESS;
+}
+
+

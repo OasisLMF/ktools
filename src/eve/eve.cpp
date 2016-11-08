@@ -32,21 +32,27 @@
 * DAMAGE.
 */
 
+/*
+eve: Event emitter for partioning work between multiple processes
+Author: Ben Matharu  email: ben.matharu@oasislmf.org
+
+*/
+
 #include <iostream>
 #include <stdlib.h>
 #include <fstream>
 #include <sstream>
 #include <math.h>
+#include <string.h>
 #include "../include/oasis.hpp"
 
-using namespace std;
 
 void emitevents(int pno_,int total_)
 {
     FILE *fin = fopen(EVENTS_FILE, "rb");
     if (fin == NULL){
-                cerr << __func__ << ": cannot open " << EVENTS_FILE << "\n";
-                exit(-1);
+		fprintf(stderr, "%s: cannot open %s\n", __func__, EVENTS_FILE);
+                exit(EXIT_FAILURE);
     }
     fseek(fin, 0L, SEEK_END);
     long long  endpos = fltell(fin);
@@ -71,10 +77,20 @@ void emitevents(int pno_,int total_)
 
 int main(int argc, char *argv[])
 {
+	if (argc == 2) {
+		if (!strcmp(argv[1], "-v")) {
+			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+			return EXIT_FAILURE;
+		}
+		if (!strcmp(argv[1], "-h")) {
+			fprintf(stderr, "usage: processno totalprocesses\n");
+			return EXIT_FAILURE;
+		}
+	}
+
     if (argc != 3) {
-        cerr << "usage: processno totalprocesses\n"
-        ;
-        return -1;
+        fprintf(stderr,"usage: processno totalprocesses\n");
+		return EXIT_FAILURE;
     }
 
     int pno = atoi(argv[1]);
@@ -83,5 +99,5 @@ int main(int argc, char *argv[])
     initstreams("","");
     emitevents(pno,total);
 
-    return 0;
+	return EXIT_SUCCESS;
 }

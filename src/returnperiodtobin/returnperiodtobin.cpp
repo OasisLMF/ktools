@@ -59,6 +59,7 @@ void doit()
     int return_period;
     char line[4096];
     int lineno=0;
+	fgets(line, sizeof(line), stdin);	// skip first line
     while (fgets(line, sizeof(line), stdin) != 0)
     {
        if (sscanf(line, "%d", &return_period) != 1){

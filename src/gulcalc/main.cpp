@@ -33,7 +33,7 @@ bool getdamagebindictionary(std::vector<damagebindictionary> &damagebindictionar
 
 	FILE *fin = fopen(DAMAGE_BIN_DICT_FILE, "rb");
 	if (fin == NULL) {
-		cerr << "getdamagebindictionary: Unable to open " << DAMAGE_BIN_DICT_FILE << "\n";
+		fprintf(stderr, "%s: cannot open %s\n", __func__, DAMAGE_BIN_DICT_FILE);
 		exit(-1);
 	}
 

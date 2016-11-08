@@ -98,7 +98,7 @@ void getmodel::getVulnerabilities()
 
     FILE *fin = fopen(VULNERABILITY_FILE, "rb");
     if (fin == nullptr) {
-        std::cerr << "Error opening " << VULNERABILITY_FILE << "\n";
+		fprintf(stderr, "%s: cannot open %s\n", __func__, VULNERABILITY_FILE);
         exit(EXIT_FAILURE);
     }
     int current_vulnerability_id = -1;
@@ -123,7 +123,7 @@ void getmodel::getIntensityInfo()
 {
 	FILE* fin = fopen(FOOTPRINT_FILE, "rb");
 	if (fin == nullptr) {
-		std::cerr << "Error opening " << FOOTPRINT_FILE << "\n";
+		fprintf(stderr, "%s: cannot open %s\n", __func__, FOOTPRINT_FILE);
 		exit(EXIT_FAILURE);
 	}
 	fread(&_num_intensity_bins, sizeof(_num_intensity_bins), 1, fin);	
@@ -138,7 +138,7 @@ void getmodel::getItems()
 
     FILE* fin = fopen(ITEMS_FILE, "rb");
     if (fin == nullptr) {
-        std::cerr << "Error opening " << ITEMS_FILE << "\n";
+		fprintf(stderr, "%s: cannot open %s\n", __func__, ITEMS_FILE);
         exit(EXIT_FAILURE);
     }
 
@@ -155,7 +155,7 @@ void getmodel::getDamageBinDictionary()
 {
     FILE *fin = fopen(DAMAGE_BIN_DICT_FILE, "rb");
     if (fin == nullptr) {       
-        std::cerr << "Error opening " << DAMAGE_BIN_DICT_FILE << "\n";
+		fprintf(stderr, "%s: cannot open %s\n", __func__, DAMAGE_BIN_DICT_FILE);
         exit(-1);
     }
     flseek(fin, 0L, SEEK_END);
@@ -290,7 +290,7 @@ void getmodel::doCdf(std::list<int> event_ids)
 {
     FILE* fin = fopen(FOOTPRINT_IDX_FILE, "rb");
     if (fin == nullptr) {
-        std::cerr << "Error opening " << FOOTPRINT_IDX_FILE << "\n";
+		fprintf(stderr, "%s: cannot open %s\n", __func__, FOOTPRINT_IDX_FILE);
         exit(EXIT_FAILURE);
     }
 

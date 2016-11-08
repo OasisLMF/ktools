@@ -180,8 +180,10 @@ A random number file may be provided for the gulcalc component as an option (usi
 
 If the gulcalc -r parameter is not used, the random number binary is not required and random numbers are instead generated dynamically during the calculation, using the -R parameter to specify how many should be generated. 
 
+The random numbers can be imported from a csv file using the component randtobin.
+
 ##### File format
-The csv file should contain a simple list of random numbers. It should not contain any headers.
+The csv file should contain a simple list of random numbers and include a header row.
 
 | Name              | Type   |  Bytes | Description                    | Example     |
 |:------------------|--------|--------| :------------------------------|------------:|
@@ -194,9 +196,19 @@ $ randtobin < random.csv > random.bin
 ```
 
 ##### randtocsv
+
+There are a few parameters available which allow the generation of a random number csv file as follows;
+
+* -r convert binary float input to csv
+* -g generate random numbers {number of random numbers}
+* -S seed value {seed value}
+
 ```
-$ randtocsv < random.bin > random.csv
+$ randtocsv -r < random.bin > random.csv
+$ randtocsv -g 1000000 > random.csv
+$ randtocsv -g 1000000 -S 1234 > random.csv
 ```
+The -S {seed value} option produces repeatable random numbers, whereas usage of -g alone will generate a different set every time.
 
 [Return to top](#dataconversioncomponents)
 
@@ -270,7 +282,7 @@ One or more event binaries are required by eve. It must have the following locat
 * input/events.bin
 
 ##### File format
-The csv file should contain a list of event_ids (integers) and no header.
+The csv file should contain a list of event_ids (integers) and include a header.
 
 | Name              | Type   |  Bytes | Description         | Example     |
 |:------------------|--------|--------| :-------------------|------------:|
@@ -626,7 +638,7 @@ This must be in the following location with filename format;
 
 
 ##### File format
-The csv file should contain the following fields with no header.
+The csv file should contain the following field and include a header.
 
 | Name                        | Type   |  Bytes | Description          | Example     |
 |:----------------------------|--------|--------| :--------------------|------------:|

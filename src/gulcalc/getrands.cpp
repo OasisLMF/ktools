@@ -52,7 +52,7 @@ getRands::getRands(bool fromFile, int rand_vec_size,int rand_seed) : gen_(rd()),
 	if (fromFile_) {
 		fin = fopen(RANDOM_FILE, "rb");
 		if (fin == NULL){
-			cerr << "getRands: cannot open " << RANDOM_FILE << "\n";
+			fprintf(stderr, "%s: Error opening file %s\n", __func__, RANDOM_FILE);
 			exit(-1);
 		}
 		flseek(fin, 0L, SEEK_END);
@@ -63,7 +63,7 @@ getRands::getRands(bool fromFile, int rand_vec_size,int rand_seed) : gen_(rd()),
 
 		buf_ = new float[buffersize_];
 		if (fread(buf_, sizeof(float), buffersize_, fin) != buffersize_) {
-			cerr << "Error reading random number file\n";
+			fprintf(stderr,"%s: Error reading random number file\n", __func__);
 			exit(-1);
 		}
 		fclose(fin);

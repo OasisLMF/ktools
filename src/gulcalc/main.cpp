@@ -99,7 +99,7 @@ bool getcoverages(std::vector<float> &coverages)
 {
 	FILE *fin = fopen(COVERAGES_FILE, "rb");
 	if (fin == NULL) {
-		cerr << "getcoverages: Unable to open " << COVERAGES_FILE << "\n";
+		fprintf(stderr, "%s: Error reading file %s\n", __func__, COVERAGES_FILE);
 		exit(-1);
 	}
 

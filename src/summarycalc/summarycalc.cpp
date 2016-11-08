@@ -160,7 +160,7 @@ bool summarycalc::loadcoverages()
 
 	FILE *fin = fopen(COVERAGES_FILE, "rb");
 	if (fin == NULL) {
-		cerr << "getcoverages: Unable to open " << COVERAGES_FILE << "\n";
+		fprintf(stderr, "%s: Error opening file %s\n", __func__, COVERAGES_FILE);
 		exit(-1);
 	}
 
@@ -188,7 +188,7 @@ void summarycalc::loadgulsummaryxref()
 {
 	FILE *fin = fopen(GULSUMMARYXREF_FILE, "rb");
 	if (fin == NULL) {
-		cerr << "summarycalc: Unable to open " << GULSUMMARYXREF_FILE << "\n";
+		fprintf(stderr, "%s: Error opening file %s\n", __func__, GULSUMMARYXREF_FILE);
 		::exit(-1);
 	}
 
@@ -197,7 +197,7 @@ void summarycalc::loadgulsummaryxref()
 	int i = fread(&s, sizeof(gulsummaryxref), 1, fin);
 	while (i != 0) {
 		if (s.summaryset_id > 9) {
-			std::cerr << "summarycalc: Invalid summerset id " << s.summaryset_id << " found in " << GULSUMMARYXREF_FILE;
+			fprintf(stderr, "%s: Invalid summaryset id  %d found in %s\n", __func__, s.summaryset_id, GULSUMMARYXREF_FILE);
 			::exit(-1);
 		}
 		if (fout[s.summaryset_id] != nullptr) {
@@ -216,7 +216,7 @@ void summarycalc::loadfmsummaryxref()
 {
 	FILE *fin = fopen(FMSUMMARYXREF_FILE, "rb");
 	if (fin == NULL) {
-		cerr << "summarycalc: Unable to open " << FMSUMMARYXREF_FILE << "\n";
+		fprintf(stderr, "%s: Error opening file %s\n", __func__, FMSUMMARYXREF_FILE);
 		::exit(-1);
 	}
 
@@ -226,7 +226,7 @@ void summarycalc::loadfmsummaryxref()
 	int i = fread(&s, sizeof(fmsummaryxref), 1, fin);
 	while (i != 0) {
 		if (s.summaryset_id > 9) {
-			std::cerr << "Invalid summerset id " << s.summaryset_id << " found in " << FMSUMMARYXREF_FILE;
+			fprintf(stderr, "%s: Invalid summaryset id  %d found in %s\n", __func__, s.summaryset_id, FMSUMMARYXREF_FILE);
 			::exit(-1);
 		}
 		if (fout[s.summaryset_id] != nullptr) {
@@ -286,7 +286,7 @@ void summarycalc::openpipe(int summary_id, const std::string &pipe)
 		FILE *f = fopen(pipe.c_str(), "wb");
 		if (f != nullptr) fout[summary_id] = f;
 		else {
-			std::cerr << "summarycalc: Cannot open pipe " << pipe << " for output\n";
+			fprintf(stderr, "%s: Cannot open %s for output\n", __func__, pipe.c_str());
 			::exit(-1);
 		}
 	}

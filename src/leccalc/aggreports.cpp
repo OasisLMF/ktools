@@ -65,7 +65,7 @@ void aggreports::loadreturnperiods()
 
 	FILE *fin = fopen(RETURNPERIODS_FILE, "rb");
 	if (fin == NULL) {
-		std::cerr << __func__ << ": Unable to open " << RETURNPERIODS_FILE << "\n";
+		fprintf(stderr, "%s: Error opening file %s\n", __func__, RETURNPERIODS_FILE);
 		exit(-1);
 	}
 

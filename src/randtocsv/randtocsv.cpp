@@ -68,7 +68,7 @@ void doit(bool skipheader)
 {
 
     float rand;
-	if (skipheader == false) printf("\"random_no\"\n");
+	if (skipheader == false) printf("random_no\n");
     while (fread(&rand, sizeof(rand), 1, stdin) == 1){
         printf("%f\n",rand);
     }

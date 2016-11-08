@@ -32,7 +32,7 @@ void loadoccurrence()
 {
 	FILE *fin = fopen(OCCURRENCE_FILE, "rb");
 	if (fin == NULL) {
-		cerr << "loadoccurrence: Unable to open " << OCCURRENCE_FILE << "\n";
+		fprintf(stderr, "%s: Error opening file %s\n", __func__, OCCURRENCE_FILE);
 		exit(-1);
 	}
 	

@@ -90,7 +90,7 @@ void loadoccurence(std::map<int, std::vector<int> > &event_to_periods, int &tota
 {
 	FILE *fin = fopen(OCCURRENCE_FILE, "rb");
 	if (fin == NULL) {
-		cerr << "loadoccurence: Unable to open " << OCCURRENCE_FILE << "\n";
+		fprintf(stderr, "%s: Error reading file %s\n", __func__, OCCURRENCE_FILE);
 		exit(-1);
 	}
 	int date_algorithm;
@@ -178,7 +178,7 @@ void processinputfile(unsigned int &samplesize,const std::map<int, std::vector<i
 void setinputstream(const std::string &inFile)
 {
 	if (freopen(inFile.c_str(), "rb", stdin) == NULL) {
-		std::cerr << "Error opening " << inFile << "\n";
+		fprintf(stderr, "%s: Error opening  %s\n", __func__, inFile.c_str());
 		exit(-1);
 	}
 
@@ -235,7 +235,7 @@ void openpipe(int output_id,const std::string &pipe, FILE **fout)
 		FILE *f = fopen(pipe.c_str(), "wb");
 		if (f != nullptr) fout[output_id] = f;
 		else {
-			std::cerr << "Cannot open pipe " << pipe << " for output\n";
+			fprintf(stderr, "%s: Cannot open %s for output\n", __func__, pipe.c_str());
 			::exit(-1);
 		}
 	}

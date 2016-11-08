@@ -259,14 +259,14 @@ inline void initstreams(std::string inFile="", std::string outFile="")
 
    if (inFile.length() > 0){
         if (freopen(inFile.c_str(), "rb", stdin) == NULL) {
-            std::cerr << "Error opening " << inFile << "\n";
+			fprintf(stderr, "%s: Error opening file %s\n", __func__, inFile.c_str());
             exit(-1);
          }
    }
 
    if (outFile.length() > 0){
        if (freopen(outFile.c_str(), "wb", stdout) == NULL) {
-           std::cerr << "Error opening " << outFile << "\n";
+		   fprintf(stderr, "%s: Error opening file %s\n", __func__, outFile.c_str());
            exit(-1);
         }
    }

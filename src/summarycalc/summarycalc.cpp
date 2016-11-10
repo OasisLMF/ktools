@@ -31,6 +31,9 @@
 * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 * DAMAGE.
 */
+/*
+Author: Ben Matharu  email: ben.matharu@oasislmf.org
+*/
 
 #include <iostream>
 #include <fstream>

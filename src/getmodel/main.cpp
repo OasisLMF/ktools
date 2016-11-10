@@ -55,6 +55,8 @@ void help()
 		"-I input filename\n"
 		"-O output filename\n"
 		"-n no secondary uncertainty\n"
+		"-v version\n"
+		"-h help\n"
 	);
 }
 
@@ -82,7 +84,7 @@ int main(int argc, char** argv)
 	std::string outFile;
 	int opt;
 	bool hasSecondaryUncertainty = false;
-	while ((opt = getopt(argc, argv, "hI:O:n")) != -1) {
+	while ((opt = getopt(argc, argv, "vhI:O:n")) != -1) {
 		switch (opt) {
 		case 'I':
 			inFile = optarg;
@@ -92,6 +94,10 @@ int main(int argc, char** argv)
 			break;
 		case 'n':
 			hasSecondaryUncertainty = true;
+			break;
+		case 'v':
+			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+			exit(EXIT_FAILURE);
 			break;
 		case 'h':
 			help();

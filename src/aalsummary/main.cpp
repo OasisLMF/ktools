@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
 		::exit(EXIT_FAILURE);
 	}
 
-	while ((opt = getopt(argc, argv, "hvK:")) != -1) {
+	while ((opt = getopt(argc, argv, "vhK:")) != -1) {
 		switch (opt) {
 		case 'K':
 			subfolder = optarg;

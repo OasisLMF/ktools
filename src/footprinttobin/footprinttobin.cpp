@@ -91,7 +91,7 @@ void doit()
 			}
 			if (last_event_id) {
 				idx.event_id = last_event_id;
-				idx.size = count * 12;
+				idx.size = count * sizeof(EventRow);
 				fwrite(&idx, sizeof(idx), 1, fouty);
 				idx.offset += idx.size;
 			}			
@@ -113,7 +113,7 @@ void doit()
 		count++;
 	}
 	idx.event_id = last_event_id;
-	idx.size = count * 12;
+	idx.size = count * sizeof(EventRow);
 	fwrite(&idx, sizeof(idx), 1, fouty);	
 	fclose(foutx);
 	fclose(fouty);
@@ -122,9 +122,10 @@ void doit()
 void help()
 {
 	fprintf(stderr,
-		"-i Intensitybins\n"
-		"-n No intenisty uncertainty\n"
-		"-s skip header\n"
+		"-i intensity bins\n"
+		"-n No intensity uncertainty\n"
+		"-s skip header\n",
+		"-v version\n"
 	);
 }
 
@@ -133,8 +134,12 @@ int main(int argc, char *argv[])
 {
 	int opt;
 	
-	while ((opt = getopt(argc, argv, "hni:")) != -1) {
+	while ((opt = getopt(argc, argv, "vhni:")) != -1) {
 		switch (opt) {
+		case 'v':
+			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+			exit(EXIT_FAILURE);
+			break;
 		case 'i':
 			intensity_bins_ = atoi(optarg);
 			break;		

@@ -39,7 +39,9 @@ Author: Joh Carter  email: johanna.carter@oasislmf.org
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef __unix
+#if defined(_MSC_VER)
+#include "../wingetopt/wingetopt.h"
+#else
 #include <unistd.h>
 #endif
 
@@ -64,10 +66,12 @@ void doit()
 
 void help()
 {
-
-	cerr << "-I inputfilename\n"
-		<< "-O outputfielname\n"
-		;
+	fprintf(stderr,
+		"-I input filename\n"
+		"-O output filename\n"
+		"-v version\n"
+		"-h help\n"
+	);
 }
 
 int main(int argc, char* argv[])
@@ -75,9 +79,8 @@ int main(int argc, char* argv[])
 	std::string inFile;
 	std::string outFile;
 
-#ifdef __unix
 	int opt;
-	while ((opt = getopt(argc, argv, "hI:O:")) != -1) {
+	while ((opt = getopt(argc, argv, "vhI:O:")) != -1) {
 		switch (opt) {
 		case 'I':
 			inFile = optarg;
@@ -85,12 +88,15 @@ int main(int argc, char* argv[])
 		case 'O':
 			outFile = optarg;
 			break;
+		case 'v':
+			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+			exit(EXIT_FAILURE);
+			break;
 		case 'h':
 			help();
 			exit(EXIT_FAILURE);
 		}
 	}
-#endif
 
 	initstreams(inFile, outFile);
 

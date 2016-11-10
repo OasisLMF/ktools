@@ -75,6 +75,7 @@ void help()
 		"-I inputfilename\n"
 		"-O outputfielname\n"
 		"-s skip header\n"
+		"-v version\n"
 		"-h help"
 	) ;
 }
@@ -85,7 +86,7 @@ int main(int argc, char* argv[])
      std::string outFile;
 
 	 int opt;
-     while ((opt = getopt(argc, argv, "shI:O:")) != -1) {
+     while ((opt = getopt(argc, argv, "vhsI:O:")) != -1) {
          switch (opt) {
          case 'I':
              inFile = optarg;
@@ -95,6 +96,10 @@ int main(int argc, char* argv[])
              break;
 		  case 's':
 			  skipheader = true;
+			  break;
+		  case 'v':
+			  fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+			  exit(EXIT_FAILURE);
 			  break;
          case 'h':
             help();

@@ -101,10 +101,11 @@ void doit()
 
 void help()
 {
-	fprintf(stderr,"-I inputfilename\n"
-	     "-O outputfielname\n"
+	fprintf(stderr,"-I input filename\n"
+	     "-O output filename\n"
 	     "-s skip header\n"
 		"-f full precision\n"
+		"-v version\n"
 		"-h help\n"
 	) ;
 }
@@ -116,7 +117,7 @@ int main(int argc, char* argv[])
 	std::string inFile;
 	std::string outFile;
 	
-	while ((opt = getopt(argc, argv, "fshI:O:")) != -1) {
+	while ((opt = getopt(argc, argv, "vhfsI:O:")) != -1) {
 		switch (opt) {
 		case 'I':
 			inFile = optarg;
@@ -129,6 +130,10 @@ int main(int argc, char* argv[])
 			break;
 		case 'f':
 			fullprecision = true;
+			break;
+		case 'v':
+			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+			exit(EXIT_FAILURE);
 			break;
 		case 'h':
 			help();

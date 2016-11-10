@@ -32,13 +32,17 @@
 * DAMAGE.
 */
 
-// Loss exceedence curve
+/*
+Loss exceedance curve
+Author: Ben Matharu  email : ben.matharu@oasislmf.org
+*/
+
 
 /*
 
-Because we are summarising over all the events we cannot split this into seperate processes and must do the summary in a single process
+Because we are summarizing over all the events we cannot split this into separate processes and must do the summary in a single process
 To achieve this we first output the results from summary calc to a set of files in a sub directory.
-This process will then read all the *.bin files in the subdirectory and then compute the loss excedence curve in a single process
+This process will then read all the *.bin files in the subdirectory and then compute the loss exceedance curve in a single process
 
 */
 
@@ -52,15 +56,12 @@ This process will then read all the *.bin files in the subdirectory and then com
 #include "leccalc.hpp"
 #include "aggreports.hpp"
 
-#ifdef __unix
-#include <unistd.h>
-#endif
 
 #if defined(_MSC_VER)
 #include "../wingetopt/wingetopt.h"
 #include "../include/dirent.h"
 #else
-#include <getopt.h>
+#include <unistd.h>
 #include <dirent.h>
 #endif
 
@@ -254,7 +255,6 @@ void help()
 	fprintf(stderr, "-m Occurrence Wheatsheaf mean\n");
 	fprintf(stderr, "-K workspace sub folder\n");
 	fprintf(stderr, "-r use return period file\n");
-	exit(-1);
 }
 
 
@@ -266,7 +266,7 @@ int main(int argc, char* argv[])
 
 	std::string subfolder;
 	int opt;
-	while ((opt = getopt(argc, argv, "rF:W:M:S:K:f:w:s:m:")) != -1) {
+	while ((opt = getopt(argc, argv, "vhrF:W:M:S:K:f:w:s:m:")) != -1) {
 		switch (opt) {
 		case 'K':
 			subfolder = optarg;
@@ -298,8 +298,16 @@ int main(int argc, char* argv[])
 		case 'r':
 			useReturnPeriodFile = true;
 			break;
+		case 'v':
+			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+			exit(EXIT_FAILURE);
+			break;
+		case 'h':
+			help();
+			::exit(EXIT_FAILURE);
+			break;
 		default:
-			fprintf(stderr, "unknown parameter\n");
+			help();
 			::exit(EXIT_FAILURE);
 		}
 	}

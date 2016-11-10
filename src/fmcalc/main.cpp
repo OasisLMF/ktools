@@ -166,6 +166,7 @@ void help()
 		"-I inputfilename\n"
         "-O outputfielname\n"
         "-M maxlevel (optional)\n"
+		"-v version\n"
 	);
 }
 
@@ -178,7 +179,7 @@ int main(int argc, char* argv[])
     int new_max = -1;
 
 	int opt;
-    while ((opt = getopt(argc, argv, "ohI:O:M:")) != -1) {
+    while ((opt = getopt(argc, argv, "vhoI:O:M:")) != -1) {
         switch (opt) {
         case 'I':
             inFile = optarg;
@@ -189,6 +190,10 @@ int main(int argc, char* argv[])
          case 'M':
             new_max = atoi(optarg);
             break;	
+		 case 'v':
+			 fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+			 exit(EXIT_FAILURE);
+			 break;
         case 'h':
            help();
            exit(EXIT_FAILURE);

@@ -31,6 +31,11 @@
 * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 * DAMAGE.
 */
+/*
+Convert occurrence csv file to binary
+Author: Ben Matharu  email: ben.matharu@oasislmf.org
+
+*/
 
 #include <iostream>
 #include <stdio.h>
@@ -143,12 +148,14 @@ void doit()
 
 void help()
 {
-
-	std::cerr << "normal input file is id, event_id, period_no,date_id\n" 
-		<< "otherwise format is id, event_id, period_no,occ_year, occ_month, occ_day\n"
-		<< "-D use date id\n"
-		<< "-P number of periods\n"
-		;
+	fprintf(stderr,
+		"normal input file is id, event_id, period_no,date_id\n" 
+		"otherwise format is id, event_id, period_no,occ_year, occ_month, occ_day\n"
+		"-D use date id\n"
+		"-P number of periods\n"
+		"-v version\n"
+		"-h help\n"
+	);
 }
 
 int main(int argc, char* argv[])
@@ -156,7 +163,7 @@ int main(int argc, char* argv[])
 	int opt;
 	date_algorithm_ = 1;
 
-	while ((opt = getopt(argc, argv, "DP:")) != -1) {
+	while ((opt = getopt(argc, argv, "vhDP:")) != -1) {
 		switch (opt) {
 		case 'D':
 		{			
@@ -165,6 +172,10 @@ int main(int argc, char* argv[])
 		break;
 		case 'P':
 			number_of_periods_ = atoi(optarg);
+			break;
+		case 'v':
+			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+			exit(EXIT_FAILURE);
 			break;
 		case 'h':
 			help();

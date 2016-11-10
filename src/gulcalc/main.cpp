@@ -1,4 +1,40 @@
-
+/*
+* Copyright (c)2015 Oasis LMF Limited
+* All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions
+* are met:
+*
+*   * Redistributions of source code must retain the above copyright
+*     notice, this list of conditions and the following disclaimer.
+*
+*   * Redistributions in binary form must reproduce the above copyright
+*     notice, this list of conditions and the following disclaimer in
+*     the documentation and/or other materials provided with the
+*     distribution.
+*
+*   * Neither the original author of this software nor the names of its
+*     contributors may be used to endorse or promote products derived
+*     from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+* "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+* LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+* FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+* COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+* INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+* BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+* OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
+* AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+* OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
+* THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+* DAMAGE.
+*/
+/*
+Calculate the GUL
+Author: Ben Matharu  email: ben.matharu@oasislmf.org
+*/
 #include <iostream>
 
 #if defined(_MSC_VER)
@@ -188,15 +224,18 @@ void doit()
 
 void help()
 {
-	cerr << "-S Samplesize (default 0) \n"
-		<< "-r use random numer file\n"
-		<< "-R [max random numbers] (used to allocate array for random numbers default 1,000,000)"
-		<< "-c [outputpipe] - coverage output\n"
-		<< "-i [outputpipe] - item output\n"
-		<< "-d debug (dump random numbers instead of gul)\n"
-		<< "-I [filename] input file (optional)\n"
-		<< "-s seed for random number generation (used for debugging)"
-		;
+	fprintf(stderr,
+		"-S Sample size (default 0) \n"
+		"-r use random numer file\n"
+		"-R [max random numbers] (used to allocate array for random numbers default 1,000,000)"
+		"-c [output pipe] - coverage output\n"
+		"-i [output pipe] - item output\n"
+		"-d debug (dump random numbers instead of gul)\n"
+		"-I [filename] input file (optional)\n"
+		 "-s seed for random number generation (used for debugging)\n"
+		"-v version\n"
+		"-h help\n"
+		);
 }
 
 int main(int argc, char *argv[])
@@ -208,7 +247,7 @@ int main(int argc, char *argv[])
 	rand_vector_size = 1000000;
 	samplesize = 0;
 	rand_seed = -1;
-	while ((opt = getopt(argc, argv, "drL:S:I:c:i:R:")) != -1) {
+	while ((opt = getopt(argc, argv, "vhdrL:S:I:c:i:R:")) != -1) {
 		switch (opt) {
 		case 'S':
 			samplesize = atoi(optarg);
@@ -239,6 +278,11 @@ int main(int argc, char *argv[])
 		case 's':
 			rand_seed = atoi(optarg);
 			break;
+		case 'v':
+			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+			exit(EXIT_FAILURE);
+			break;
+		case 'h':
 		default: /* '?' */
 			help();
 			exit(EXIT_FAILURE);

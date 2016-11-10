@@ -43,6 +43,13 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
     #include <unistd.h>
 #endif
 
+#if defined(_MSC_VER)
+#include "../wingetopt/wingetopt.h"
+#else
+#include <getopt.h>
+#endif
+
+
 #include "../include/oasis.hpp"
 
 using namespace std;
@@ -75,10 +82,9 @@ int main(int argc, char* argv[])
      std::string inFile;
      std::string outFile;
 
- #ifdef __unix
 	 int opt;
 
-     while ((opt = getopt(argc, argv, "hI:O:")) != -1) {
+     while ((opt = getopt(argc, argv, "vhI:O:")) != -1) {
          switch (opt) {
          case 'I':
              inFile = optarg;
@@ -86,12 +92,15 @@ int main(int argc, char* argv[])
           case 'O':
              outFile = optarg;
              break;
+		  case 'v':
+			  fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+			  exit(EXIT_FAILURE);
+			  break;
          case 'h':
             help();
             exit(EXIT_FAILURE);
          }
      }
- #endif
 
     initstreams(inFile, outFile);
 

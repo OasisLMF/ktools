@@ -42,17 +42,7 @@ Author: Joh Carter  email: johanna.carter@oasislmf.org
 #if defined(_MSC_VER)
 #include "../wingetopt/wingetopt.h"
 #else
-#include <getopt.h>
-#endif
-
-#ifdef __unix
-    #include <unistd.h>
-#endif
-
-#if defined(_MSC_VER)
-#include "../wingetopt/wingetopt.h"
-#else
-#include <getopt.h>
+#include <unistd.h>
 #endif
 
 #include "../include/oasis.hpp"
@@ -90,7 +80,6 @@ void doit()
 	size_t i = fread(&idx, sizeof(idx), 1, finy);
 	while (i != 0) {		
 		flseek(finx, idx.offset, SEEK_SET);
-		//printf("%lld\n", idx.offset);
 		printrows(idx.event_id, finx, idx.size);
 		i = fread(&idx, sizeof(idx), 1, finy);
 	}
@@ -103,18 +92,23 @@ void help()
 {
 	fprintf(stderr,
 		"-s skip header\n"
-		"-h help"
+		"-v version\n"
+		"-h help\n"
 		);
 }
 
 int main(int argc, char* argv[])
 {
 	int opt;
-	while ((opt = getopt(argc, argv, "sh")) != -1) {
+	while ((opt = getopt(argc, argv, "vhs")) != -1) {
 		switch (opt) {
+		case 'v':
+			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+			exit(EXIT_FAILURE);
+			break;
 		case 's':
 			skipheader = true;
-			break;
+			break;		
 		case 'h':
 			help();
 			exit(EXIT_FAILURE);

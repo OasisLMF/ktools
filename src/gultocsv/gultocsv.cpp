@@ -31,7 +31,9 @@
 * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 * DAMAGE.
 */
-
+/*
+Author: Ben Matharu  email : ben.matharu@oasislmf.org
+*/
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,11 +41,6 @@
 #if defined(_MSC_VER)
 #include "../wingetopt/wingetopt.h"
 #else
-#include <getopt.h>
-#endif
-
-
-#ifdef __unix
 #include <unistd.h>
 #endif
 
@@ -91,12 +88,14 @@ void doit()
 
 void help()
 {
-
-	cerr << "-I inputfilename\n"
-	     << "-O outputfielname\n"
-	     << "-s skip header\n"
-		<< "-f full precision\n"
-	     ;
+	fprintf(stderr,
+		"-I inputfilename\n"
+	    "-O outputfielname\n"
+	    "-s skip header\n"
+		"-f full precision\n"
+		"-v version\n"
+		"-h help\n"
+	) ;
 }
 
 int main(int argc, char* argv[])
@@ -106,7 +105,7 @@ int main(int argc, char* argv[])
 	std::string inFile;
 	std::string outFile;
 
-	while ((opt = getopt(argc, argv, "hfsI:O:")) != -1) {
+	while ((opt = getopt(argc, argv, "vhfsI:O:")) != -1) {
 		switch (opt) {
 		case 'I':
 			inFile = optarg;
@@ -120,7 +119,12 @@ int main(int argc, char* argv[])
 		case 'f':
 			fullprecision = true;
 			break;
+		case 'v':
+			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+			exit(EXIT_FAILURE);
+			break;
 		case 'h':
+		default:
 			help();
 			exit(EXIT_FAILURE);
 		}

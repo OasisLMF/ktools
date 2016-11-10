@@ -32,6 +32,10 @@
 * DAMAGE.
 */
 
+/*
+Author: Ben Matharu  email: ben.matharu@oasislmf.org
+*/
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -49,11 +53,15 @@
 void help()
 {
 
-	std::cerr << "Usage: \n"
-		<< "-f input stream = fm\n"
-		<< "-g input stream = gul\n"
-		<< "-[summarysetid] outfilepipe\n"
-		<< "where summarysetid range is 0 to 9\n"
+	fprintf(stderr,
+		"Usage: \n"
+		"-v version\n"
+		"-h help\n"
+		"-f input stream = fm\n"
+		"-g input stream = gul\n"
+		"-[summarysetid] outfilepipe\n"
+		"where summarysetid range is 0 to 9\n"
+	);
 		;
 }
 
@@ -70,7 +78,7 @@ int main(int argc, char* argv[])
 	bool noneTrue = true;
 	bool inputtypegul = false;
 	bool inputtypefm = false;
-	while ((opt = getopt(argc, argv, "hfg0:1:2:3:4:5:6:7:8:9:")) != -1) {
+	while ((opt = getopt(argc, argv, "vhfg0:1:2:3:4:5:6:7:8:9:")) != -1) {
 		switch (opt) {
 		case 'g':
 			inputtypegul = true;
@@ -93,7 +101,12 @@ int main(int argc, char* argv[])
 			f.openpipe(opt - '0', optarg);
 			noneTrue = false;
 			break;
+		case 'v':
+			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+			exit(EXIT_FAILURE);
+			break;
 		case 'h':
+		default:
 			help();
 			::exit(EXIT_FAILURE);
 		}

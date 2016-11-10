@@ -41,7 +41,9 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef __unix
+#if defined(_MSC_VER)
+#include "../wingetopt/wingetopt.h"
+#else
 #include <unistd.h>
 #endif
 
@@ -106,24 +108,16 @@ void doit()
 	if (date_algorithm_) occ_doit();
 	else no_occ_doit();
 
-
-/*
-	printf("\"id\", \"event_id\", \"period_no\", \"occ_year\", \"occ_month\", \"occ_day\"\n");
-
-	occurrence q;
-	int i = fread(&q, sizeof(q), 1, stdin);
-	while (i != 0) {
-		printf("%d, %d, %d, %d, %d, %d\n", q.id, q.event_id, q.period_no, q.occ_year, q.occ_month, q.occ_day);
-		i = fread(&q, sizeof(q), 1, stdin);
-	}
-*/
 }
 
 void help()
 {
-
-	cerr << "-I inputfilename\n"
-		<< "-O outputfielname\n"
+	fprintf(stderr,
+		"-I input filename\n"
+		"-O output filename\n"
+		"-v version\n"
+		"-h help\n"
+	);
 		;
 }
 
@@ -132,9 +126,8 @@ int main(int argc, char* argv[])
 	std::string inFile;
 	std::string outFile;
 
-#ifdef __unix
 	int opt;
-	while ((opt = getopt(argc, argv, "hI:O:")) != -1) {
+	while ((opt = getopt(argc, argv, "vhI:O:")) != -1) {
 		switch (opt) {
 		case 'I':
 			inFile = optarg;
@@ -142,12 +135,16 @@ int main(int argc, char* argv[])
 		case 'O':
 			outFile = optarg;
 			break;
+		case 'v':
+			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+			exit(EXIT_FAILURE);
+			break;
 		case 'h':
+		default:
 			help();
 			exit(EXIT_FAILURE);
 		}
 	}
-#endif
 
 	initstreams(inFile, outFile);
 

@@ -32,9 +32,7 @@
 * DAMAGE.
 */
 /*
-
 Author: Ben Matharu  email: ben.matharu@oasislmf.org
-
 */
 
 #include <iostream>
@@ -94,7 +92,7 @@ int main(int argc, char *argv[])
 	int totalrandno = 0;
 	int seedval = 0;
 	int opt;
-	while ((opt = getopt(argc, argv, "hvsrg:S:")) != -1) {
+	while ((opt = getopt(argc, argv, "vhsrg:S:")) != -1) {
 		switch (opt) {
 		case 's':
 			skipheader = true;

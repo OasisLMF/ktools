@@ -42,12 +42,9 @@ Author: Joh Carter  email: johanna.carter@oasislmf.org
 #if defined(_MSC_VER)
 #include "../wingetopt/wingetopt.h"
 #else
-#include <getopt.h>
+#include <unistd.h>
 #endif
 
-#ifdef __unix
-    #include <unistd.h>
-#endif
 
 #include "../include/oasis.hpp"
 
@@ -71,9 +68,11 @@ void doit()
 void help()
 {
 	fprintf(stderr,
-    "-I inputfilename\n"
-     "-O outputfielname\n"
-	)   ;
+    "-I input filename\n"
+     "-O output filename\n"
+	"-v version\n"
+	"-h help\n"
+	) ;
 }
 
 int main(int argc, char* argv[])
@@ -82,7 +81,7 @@ int main(int argc, char* argv[])
      std::string outFile;
 
 	 int opt;
-     while ((opt = getopt(argc, argv, "hsI:O:")) != -1) {
+     while ((opt = getopt(argc, argv, "vhsI:O:")) != -1) {
          switch (opt) {
          case 'I':
              inFile = optarg;
@@ -92,6 +91,10 @@ int main(int argc, char* argv[])
              break;
 		  case 's':
 			  skipheader = true;
+			  break;
+		  case 'v':
+			  fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+			  exit(EXIT_FAILURE);
 			  break;
          case 'h':
             help();

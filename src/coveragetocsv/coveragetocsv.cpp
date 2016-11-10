@@ -72,8 +72,6 @@ void doit()
 void help()
 {
 	fprintf(stderr, 
-		"-I inputfilename\n"
-		"-O outputfielname\n"
 		"-s skip header\n"
 		"-v version\n"
 		"-h help"
@@ -82,18 +80,9 @@ void help()
 
 int main(int argc, char* argv[])
 {    
-     std::string inFile;
-     std::string outFile;
-
 	 int opt;
-     while ((opt = getopt(argc, argv, "vhsI:O:")) != -1) {
+     while ((opt = getopt(argc, argv, "vhs")) != -1) {
          switch (opt) {
-         case 'I':
-             inFile = optarg;
-             break;
-          case 'O':
-             outFile = optarg;
-             break;
 		  case 's':
 			  skipheader = true;
 			  break;
@@ -107,8 +96,7 @@ int main(int argc, char* argv[])
          }
      }
 
-
-    initstreams(inFile, outFile);
+    initstreams("", "");
 
 	doit();
 	return 0;

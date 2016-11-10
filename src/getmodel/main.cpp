@@ -52,8 +52,6 @@ Author: Mark Pinkerton  email: mark.pinkerton@oasislmf.org
 void help()
 {
 	fprintf(stderr,
-		"-I input filename\n"
-		"-O output filename\n"
 		"-n no secondary uncertainty\n"
 		"-v version\n"
 		"-h help\n"
@@ -80,18 +78,10 @@ void doIt(bool hasSecondaryUncertainty)
 
 int main(int argc, char** argv)
 {
-	std::string inFile;
-	std::string outFile;
 	int opt;
 	bool hasSecondaryUncertainty = false;
-	while ((opt = getopt(argc, argv, "vhI:O:n")) != -1) {
+	while ((opt = getopt(argc, argv, "vhn")) != -1) {
 		switch (opt) {
-		case 'I':
-			inFile = optarg;
-			break;
-		case 'O':
-			outFile = optarg;
-			break;
 		case 'n':
 			hasSecondaryUncertainty = true;
 			break;
@@ -108,7 +98,7 @@ int main(int argc, char** argv)
 		}
 	}
 	
-	initstreams(inFile, outFile);
+	initstreams("", "");
 	doIt(hasSecondaryUncertainty);
 	return 0;
 }

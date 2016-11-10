@@ -241,8 +241,6 @@ void help()
 int main(int argc, char *argv[])
 {
 	int opt;
-	std::string infile;
-	std::string outfile;
 	// default values
 	rand_vector_size = 1000000;
 	samplesize = 0;
@@ -261,9 +259,6 @@ int main(int argc, char *argv[])
 		case 'R':
 			rand_vector_size = atoi(optarg);
 			break;
-		case 'I':
-			infile = optarg;
-			break;		
 		case 'i':
 			item_output = optarg;
 			itemLevelOutput = true;
@@ -299,10 +294,10 @@ int main(int argc, char *argv[])
 	}
 
 	if (itemLevelOutput == false && coverageLevelOutput == false) {
-		fprintf(stderr, "gulcalc: No output option selected\n");
+		fprintf(stderr, "%s: No output option selected\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}	
-	initstreams(infile, outfile);
+	initstreams("", "");
 	doit();
 
 }

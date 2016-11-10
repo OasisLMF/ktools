@@ -32,10 +32,7 @@
 * DAMAGE.
 */
 /*
-Example implmentation for FM with back allocation
-
 Author: Ben Matharu  email: ben.matharu@oasislmf.org
-
 */
 #include <iostream>
 #include <fstream>
@@ -163,9 +160,7 @@ void help()
 {
 
     fprintf(stderr,
-		"-I inputfilename\n"
-        "-O outputfielname\n"
-        "-M maxlevel (optional)\n"
+        "-M max level (optional)\n"
 		"-v version\n"
 	);
 }
@@ -173,20 +168,11 @@ void help()
 
 int main(int argc, char* argv[])
 {
-
-    std::string inFile;
-    std::string outFile;
     int new_max = -1;
 
 	int opt;
-    while ((opt = getopt(argc, argv, "vhoI:O:M:")) != -1) {
+    while ((opt = getopt(argc, argv, "vhoM:")) != -1) {
         switch (opt) {
-        case 'I':
-            inFile = optarg;
-            break;
-         case 'O':
-            outFile = optarg;
-            break;
          case 'M':
             new_max = atoi(optarg);
             break;	
@@ -203,9 +189,7 @@ int main(int argc, char* argv[])
         }
     }
 
-
-   initstreams(inFile, outFile);
-   
+   initstreams("", "");   
 	doit(new_max);
    
 	return 0;

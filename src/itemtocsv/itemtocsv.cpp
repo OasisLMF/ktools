@@ -76,18 +76,9 @@ void help()
 
 int main(int argc, char* argv[])
 {
-	std::string inFile;
-	std::string outFile;
-
 	int opt;
-	while ((opt = getopt(argc, argv, "vhI:O:")) != -1) {
+	while ((opt = getopt(argc, argv, "vh")) != -1) {
 		switch (opt) {
-		case 'I':
-			inFile = optarg;
-			break;
-		case 'O':
-			outFile = optarg;
-			break;
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
 			exit(EXIT_FAILURE);
@@ -98,8 +89,7 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	initstreams(inFile, outFile);
-
+	initstreams("", "");
 	doit();
 	return 0;
 }

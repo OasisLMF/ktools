@@ -102,17 +102,9 @@ int main(int argc, char* argv[])
 {
 
 	int opt;
-	std::string inFile;
-	std::string outFile;
 
-	while ((opt = getopt(argc, argv, "vhfsI:O:")) != -1) {
+	while ((opt = getopt(argc, argv, "vhfs")) != -1) {
 		switch (opt) {
-		case 'I':
-			inFile = optarg;
-			break;
-		case 'O':
-			outFile = optarg;
-			break;
 		case 's':
 			skipheader = true;
 			break;
@@ -130,7 +122,7 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	initstreams(inFile, outFile);
+	initstreams("", "");
 	doit();
 	return 0;
 }

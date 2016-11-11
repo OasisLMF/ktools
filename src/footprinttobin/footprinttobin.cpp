@@ -31,7 +31,10 @@
 * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 * DAMAGE.
 */
-
+/*
+Convert footprint csv to binary
+Author: Ben Matharu  email: ben.matharu@oasislmf.org
+*/
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,7 +43,7 @@
 #if defined(_MSC_VER)
 #include "../wingetopt/wingetopt.h"
 #else
-#include <getopt.h>
+#include <unistd.h>
 #endif
 using namespace std;
 

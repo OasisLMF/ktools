@@ -32,9 +32,7 @@
 * DAMAGE.
 */
 /*
-
 Author: Ben Matharu  email: ben.matharu@oasislmf.org
-
 */
 #include <iostream>
 #include <stdio.h>
@@ -47,8 +45,13 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <fstream>
 #include <sstream>
 
-using namespace std;
+#if defined(_MSC_VER)
+#include "../wingetopt/wingetopt.h"
+#else
+#include <unistd.h>
+#endif
 
+using namespace std;
 
 bool getdamagebindictionary(std::vector<damagebindictionary> &damagebindictionary_vec_)
 {
@@ -147,15 +150,29 @@ bool bSuccess = getrec((char *)&stream_type, stdin, sizeof(stream_type));
     }
 }
 
+void help()
+{
+	fprintf(stderr, "-h help\n-v version\n");
+}
+
 
 int main(int argc, char *argv[])
 {
-    std::string inFile = "";
-    std::string outFile = "";
+	int opt;
+	while ((opt = getopt(argc, argv, "vh")) != -1) {
+		switch (opt) {
+		case 'v':
+			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+			::exit(EXIT_FAILURE);
+			break;
+		case 'h':
+		default:
+			help();
+			::exit(EXIT_FAILURE);
+		}
+	}
     
-
-
-    initstreams(inFile,outFile);
+    initstreams();
     doit();
     return 0;
 }

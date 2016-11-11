@@ -33,9 +33,7 @@
 */
 
 /*
-
 Author: Ben Matharu  email: ben.matharu@oasislmf.org
-
 */
 
 #include "aalsummary.hpp"
@@ -45,7 +43,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include "../include/dirent.h"
 #else
 #include <dirent.h>
-#include <getopt.h>
+#include <unistd.h>
 #endif
 
 #include "../../config.h"

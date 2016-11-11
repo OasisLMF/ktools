@@ -1,5 +1,5 @@
 /*
-* Copyright (c)2016 Oasis LMF Limited 
+* Copyright (c)2015 Oasis LMF Limited
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,9 @@
 * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 * DAMAGE.
 */
-
+/*
+Author: Ben Matharu  email: ben.matharu@oasislmf.org
+*/
 #ifndef OASIS_H_
 #define OASIS_H_
 

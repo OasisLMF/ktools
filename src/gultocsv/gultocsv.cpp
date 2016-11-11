@@ -89,8 +89,6 @@ void doit()
 void help()
 {
 	fprintf(stderr,
-		"-I inputfilename\n"
-	    "-O outputfielname\n"
 	    "-s skip header\n"
 		"-f full precision\n"
 		"-v version\n"

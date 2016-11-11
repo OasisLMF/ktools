@@ -45,7 +45,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #if defined(_MSC_VER)
 #include "../wingetopt/wingetopt.h"
 #else
-#include <getopt.h>
+#include <unistd.h>
 #endif
 
 

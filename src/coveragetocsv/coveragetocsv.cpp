@@ -42,11 +42,7 @@ Author: Joh Carter  email: johanna.carter@oasislmf.org
 #if defined(_MSC_VER)
 #include "../wingetopt/wingetopt.h"
 #else
-#include <getopt.h>
-#endif
-
-#ifdef __unix
-    #include <unistd.h>
+#include <unistd.h>
 #endif
 
 #include "../include/oasis.hpp"

@@ -229,6 +229,6 @@ int main(int argc, char* argv[])
 	aalcalc a;
 	a.doit();
 
-	return 0;
+	return EXIT_SUCCESS;
 
 }

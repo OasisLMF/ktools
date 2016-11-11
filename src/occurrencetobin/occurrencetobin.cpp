@@ -185,7 +185,7 @@ int main(int argc, char* argv[])
 			exit(EXIT_FAILURE);
 		}
 	}	
-	initstreams("", "");
+	initstreams();
 	if (number_of_periods_ == 0) {
 		fprintf(stderr, "Number of periods not supplied\n");
 		exit(-1);

@@ -122,7 +122,7 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	initstreams("", "");
+	initstreams();
 	doit();
 	return 0;
 }

@@ -62,7 +62,7 @@ Follow the rest of the process as described above.
 ## Windows Installation
 
 ### Pre-requisites
-Cygwin is required for the Windows native build.  Cygwin is a Linux environment running in Windows.
+Cygwin 64-bit is required for the Windows native build.  Cygwin is a Linux environment running in Windows.
 http://www.cygwin.com/
 
 Download and run the set-up program for Cygwin. 
@@ -73,7 +73,7 @@ The following Cygwin add-in packages are required;
 * diffutils
 * automake
 
-To build Windows 64-bit executables;
+To build native Windows 64-bit executables;
 
 * mingw64-x86_64-gcc-g++
 * mingw64-x86_64-gcc-core
@@ -126,7 +126,7 @@ The installation is complete. Restart the Cygwin session to refresh the path bef
 
 ## Usage
 
-There is sample data and five example scripts which demonstrate how to invoke ktools in the /examples folder. These are written in python. 
+There is sample data and six example scripts which demonstrate how to invoke ktools in the /examples folder. These are written in python v2. 
 
 For example, to run the eltcalc_example script, go into the examples folder and run the following command (you must have python v2.X installed):
 

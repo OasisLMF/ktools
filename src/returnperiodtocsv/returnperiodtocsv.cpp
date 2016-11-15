@@ -46,11 +46,11 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 #include "../include/oasis.hpp"
 
-void doit()
+void doit(bool skipheader)
 {
 
     int return_period;
-	printf("return_period\n");
+	if (skipheader==false) printf("return_period\n");
     while (fread(&return_period, sizeof(return_period), 1, stdin) == 1){
         printf("%d\n",return_period);
     }
@@ -59,14 +59,22 @@ void doit()
 
 void help()
 {
-	fprintf(stderr, "-h help\n-v version\n");
+	fprintf(stderr, 
+		"-s skip header\n"
+		"-h help\n"
+		"-v version\n"
+	);
 }
 
 int main(int argc, char *argv[])
 {
 	int opt;
-	while ((opt = getopt(argc, argv, "vh")) != -1) {
+	bool skipheader = false;
+	while ((opt = getopt(argc, argv, "vhs")) != -1) {
 		switch (opt) {
+		case 's':
+			skipheader = true;
+			break;
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
 			::exit(EXIT_FAILURE);
@@ -79,7 +87,7 @@ int main(int argc, char *argv[])
 	}
 
 	initstreams();
-	doit();
+	doit(skipheader);
 	return EXIT_SUCCESS;
 }
 

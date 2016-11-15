@@ -81,7 +81,7 @@ void doit(bool skipheader, bool fullprecision)
 		}
 		return;
 	}
-	std::cerr << "Unsupported summarycalc stream type\n";
+	fprintf(stderr,"Unsupported summarycalc stream type\n");
 
 }
 

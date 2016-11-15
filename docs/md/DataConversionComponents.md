@@ -60,6 +60,7 @@ The damage bin dictionary is a reference table in Oasis which defines how the ef
 
 The csv file should contain the following fields and include a header row.
 
+
 | Name              | Type   |  Bytes | Description                                                   | Example     |
 |:------------------|--------|--------| :-------------------------------------------------------------|------------:|
 | bin_index         | int    |    4   | Identifier of the damage bin                                  |     1       |

@@ -8,23 +8,24 @@
   <style type="text/css">code{white-space: pre;}</style>
 </head>
 <body>
+<p><img src="../img/banner.jpg" title="banner" alt="alt text" /></p>
 <h1 id="appendix-a-random-numbers">Appendix A: Random numbers <a id="randomnumbers"></a></h1>
 <p>Simple uniform random numbers are assigned to each event, group and sample number to sample ground up loss in the gulcalc process. A group is a collection of items which share the same group_id, and is the method of supporting spatial correlation in ground up loss sampling in Oasis and ktools.</p>
 <h4 id="correlation">Correlation</h4>
 <p>Items (typically representing, in insurance terms, the underlying risk coverages) that are assigned the same group_id will use the same random number to sample damage for a given event and sample number. Items with different group_ids will be assigned independent random numbers. Therefore sampled damage is fully correlated within groups and fully independent between groups, where group is an abstract collection of items defined by the user.</p>
 <p>The item_id, group_id data is provided by the user in the items input file (items.bin).</p>
 <h3 id="methodology">Methodology</h3>
-<p>The method of assigning random numbers in gulcalc uses an random number index (ridx) which is used as a position reference into a list of random numbers. S random numbers corresponding to the runtime number of samples are drawn from the list starting at the first ridx position.</p>
+<p>The method of assigning random numbers in gulcalc uses an random number index (ridx), an integer which is used as a position reference into a list of random numbers. S random numbers corresponding to the runtime number of samples are drawn from the list starting at the ridx position.</p>
 <p>There are two options in ktools for choosing random numbers to apply in the sampling process.</p>
 <h4 id="generate-dynamically-during-the-calculation">1. Generate dynamically during the calculation</h4>
 <h5 id="usage">Usage</h5>
 <p>Use -R{number of random numbers} as a parameter.</p>
 <h5 id="example">Example</h5>
 <pre><code>$ gulcalc -S00 -R1000000 -i -</code></pre>
-<p>This will run 100 samples drawing from 1 million dynamically generated random numbers.</p>
+<p>This will run 100 samples drawing from 1 million dynamically generated random numbers. They are simple uniform random numbers.</p>
 <h5 id="method">Method</h5>
 <p>Random numbers are sampled dynamically using the Mersenne twister psuedo random number generator (the default RNG of the C++ v11 compiler).<br />
-A sparse array capable of holding R million random numbers is allocated to each event. The ridx is generated from the group_id and number of samples S using the following modulus function;</p>
+A sparse array capable of holding R random numbers is allocated to each event. The ridx is generated from the group_id and number of samples S using the following modulus function;</p>
 <p>ridx= mod(group_id x P1, R)</p>
 <ul>
 <li>P1 is the first prime number which is bigger than the number of samples, S.</li>

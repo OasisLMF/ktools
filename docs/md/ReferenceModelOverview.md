@@ -46,6 +46,13 @@ The **[data conversion components](DataConversionComponents.md)** section covers
 
 Finally, the **[stream conversion components](StreamConversionComponents.md)** section explains how to convert the binary data stream output to csv, plus how to convert gulcalc data in csv format into binary format. These components are useful when working with individual components at a more detailed level.
 
+The version of the installed components can be found by using the command line parameter -v. For example;
+
+```
+$ gulcalc -v
+```
+The components have additional command line parameters depending on their particular function.  These are described in detail in the following pages.
+
 [Return to top](#referencemodel)
 
 [Go to 4.1 Core Components section](CoreComponents.md)

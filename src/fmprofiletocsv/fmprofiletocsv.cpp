@@ -84,7 +84,7 @@ int main(int argc, char* argv[])
     int opt;
 	 bool skipheader = false;
 
-     while ((opt = getopt(argc, argv, "vhsI:O:")) != -1) {
+     while ((opt = getopt(argc, argv, "vhs")) != -1) {
          switch (opt) {
 		  case 's':
 			  skipheader = true;

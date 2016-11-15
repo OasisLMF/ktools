@@ -125,7 +125,7 @@ void doit()
 void help()
 {
 	fprintf(stderr,
-		"-i intensity bins\n"
+		"-i max intensity bins\n"
 		"-n No intensity uncertainty\n"
 		"-s skip header\n",
 		"-v version\n"

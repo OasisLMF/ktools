@@ -115,52 +115,61 @@ void processrec(char *rec, int recsize,
         pp++;
     }
 }
-void doit()
+void doit(bool skipheader)
 {
 
-std::vector<damagebindictionary> damagebindictionary_vec;
-getdamagebindictionary(damagebindictionary_vec);
-size_t total_bins = damagebindictionary_vec.size();
-if (total_bins == 0 ) total_bins = 10000;
-int max_recsize = (int)(total_bins * sizeof(prob_mean)) + sizeof(damagecdfrec)+sizeof(int);
+	if (skipheader == false) fprintf(stdout, "event_id,areaperil_id,vulnerabilty_id,bin_index,prob_to,>bin_mean");
+	std::vector<damagebindictionary> damagebindictionary_vec;
+	getdamagebindictionary(damagebindictionary_vec);
+	size_t total_bins = damagebindictionary_vec.size();
+	if (total_bins == 0 ) total_bins = 10000;
+	int max_recsize = (int)(total_bins * sizeof(prob_mean)) + sizeof(damagecdfrec)+sizeof(int);
 
-char *rec = new char[max_recsize];
-int stream_type = 0;
+	char *rec = new char[max_recsize];
+	int stream_type = 0;
 
-bool bSuccess = getrec((char *)&stream_type, stdin, sizeof(stream_type));
+	bool bSuccess = getrec((char *)&stream_type, stdin, sizeof(stream_type));
 
-    if (stream_type != 1) {
-        fprintf(stderr,"Invalid stream type %d expect stream type 1\n", stream_type);
-        exit(-1);
-    }
-    for(;;){
-        char *p = rec;
-        bSuccess = getrec(p, stdin, sizeof(damagecdfrec));
-        if (bSuccess == false) break;
-         p = p + sizeof(damagecdfrec);
-        bSuccess = getrec(p, stdin, sizeof(int)); // we now have bin count
-        int *q = (int *)p;
-        p = p + sizeof(int);
-        int recsize = (*q) * sizeof(prob_mean);
-                // we should now have damagecdfrec in memory
-        bSuccess = getrec(p, stdin, recsize);
-        recsize += sizeof(damagecdfrec)+sizeof(int);
+	if (stream_type != 1) {
+		fprintf(stderr,"Invalid stream type %d expect stream type 1\n", stream_type);
+		exit(-1);
+	}
+	for(;;){
+		char *p = rec;
+		bSuccess = getrec(p, stdin, sizeof(damagecdfrec));
+		if (bSuccess == false) break;
+			p = p + sizeof(damagecdfrec);
+		bSuccess = getrec(p, stdin, sizeof(int)); // we now have bin count
+		int *q = (int *)p;
+		p = p + sizeof(int);
+		int recsize = (*q) * sizeof(prob_mean);
+				// we should now have damagecdfrec in memory
+		bSuccess = getrec(p, stdin, recsize);
+		recsize += sizeof(damagecdfrec)+sizeof(int);
 
-        processrec(rec, recsize, damagebindictionary_vec);
-    }
+		processrec(rec, recsize, damagebindictionary_vec);
+	}
 }
 
 void help()
 {
-	fprintf(stderr, "-h help\n-v version\n");
+	fprintf(stderr, 
+		"-s skip header\n"
+		"-h help\n"
+		"-v version\n"
+	);
 }
 
 
 int main(int argc, char *argv[])
 {
 	int opt;
-	while ((opt = getopt(argc, argv, "vh")) != -1) {
+	bool skipheader = false;
+	while ((opt = getopt(argc, argv, "vhs")) != -1) {
 		switch (opt) {
+		case 's':
+			skipheader = true;
+			break;
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
 			::exit(EXIT_FAILURE);
@@ -173,6 +182,6 @@ int main(int argc, char *argv[])
 	}
     
     initstreams();
-    doit();
+    doit(skipheader);
     return EXIT_SUCCESS;
 }

@@ -158,6 +158,7 @@ void help()
     fprintf(stderr,
         "-M max level (optional)\n"
 		"-v version\n"
+		"-h help\n"
 	);
 }
 

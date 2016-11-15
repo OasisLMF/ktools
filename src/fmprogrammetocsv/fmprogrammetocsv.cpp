@@ -49,9 +49,9 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 using namespace std;
 
-void doit()
+void doit(bool skipheader)
 {
-    printf ("\"from_agg_id\",\"level_id\",\"to_agg_id\"\n");
+	if (skipheader == false)  printf ("\"from_agg_id\",\"level_id\",\"to_agg_id\"\n");
     
     fm_programme q;
     size_t i = fread(&q, sizeof(q), 1, stdin);
@@ -64,6 +64,7 @@ void doit()
 void help()
 {
     fprintf(stderr,
+		"-s skip header\n"
 		"-v version\n"
         "-h help\n"
 	);
@@ -72,9 +73,12 @@ void help()
 int main(int argc, char* argv[])
 {
 	 int opt;
-
-     while ((opt = getopt(argc, argv, "vh")) != -1) {
+	 bool skipheader = false;
+     while ((opt = getopt(argc, argv, "vhs")) != -1) {
          switch (opt) {
+		 case 's':
+			 skipheader = true;
+			break;
 		  case 'v':
 			  fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
 			  exit(EXIT_FAILURE);
@@ -87,6 +91,6 @@ int main(int argc, char* argv[])
 
     initstreams();
 
-	doit();
+	doit(skipheader);
 	return 0;
 }

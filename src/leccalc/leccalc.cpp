@@ -255,6 +255,8 @@ void help()
 	fprintf(stderr, "-m Occurrence Wheatsheaf mean\n");
 	fprintf(stderr, "-K workspace sub folder\n");
 	fprintf(stderr, "-r use return period file\n");
+	fprintf(stderr, "-h help\n");
+	fprintf(stderr, "-v version\n");
 }
 
 

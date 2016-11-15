@@ -65,6 +65,7 @@ void doit()
 void help()
 {
 	fprintf(stderr,
+		"-s skip header\n"
 	"-v version\n"
 	 "-h help\n"
 	)
@@ -75,7 +76,7 @@ int main(int argc, char* argv[])
 {
 
 	int opt;
-	while ((opt = getopt(argc, argv, "vh")) != -1) {
+	while ((opt = getopt(argc, argv, "vhs")) != -1) {
 		switch (opt) {
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);

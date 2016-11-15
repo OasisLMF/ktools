@@ -59,10 +59,10 @@ struct fm_policyTC {
 };
 
 
-void doit()
+void doit(bool skipheader)
 {
 
-    printf ("\"layer_id\",\"level_id\",\"agg_id\",\"policytc_id\"\n");
+	if (skipheader == false)  printf ("\"layer_id\",\"level_id\",\"agg_id\",\"policytc_id\"\n");
 
     fm_policyTC q;
     size_t i = fread(&q, sizeof(q), 1, stdin);
@@ -75,15 +75,23 @@ void doit()
 
 void help()
 {
-	fprintf(stderr, "-h help\n-v version\n");
+	fprintf(stderr, 
+		"-s skip header\n"
+		"-h help\n"
+		"-v version\n"
+	);
 }
 
 int main(int argc, char *argv[])
 {
 
+	bool skipheader = false;
 	int opt;
-	while ((opt = getopt(argc, argv, "vh")) != -1) {
+	while ((opt = getopt(argc, argv, "vhs")) != -1) {
 		switch (opt) {
+		case 's':
+			skipheader = true;
+		break;
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
 			::exit(EXIT_FAILURE);
@@ -96,6 +104,6 @@ int main(int argc, char *argv[])
 	}
 
 	initstreams();
-	doit();
+	doit(skipheader);
 	return 0;
 }

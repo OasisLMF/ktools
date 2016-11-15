@@ -48,10 +48,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 using namespace std;
 #include "../include/oasis.hpp"
 
-bool skipheader = false;
-bool fullprecision = false;
-
-void doit()
+void doit(bool skipheader, bool fullprecision)
 {
 
 	int summarycalcstream_type = 0;
@@ -90,20 +87,20 @@ void doit()
 
 void help()
 {
-
-	cerr << "-I inputfilename\n"
-	     << "-O outputfielname\n"
-	     << "-s skip header\n"
-		<< "-f full precision\n"
-		<< "-h help\n"
-	     ;
+	fprintf(stderr,
+		"-s skip header\n"
+		"-f full precision\n"
+		"-v version\n"
+		"-h help\n"
+	);
 }
 
 int main(int argc, char* argv[])
 {
 
 	int opt;
-
+	bool skipheader = false;
+	bool fullprecision = false;
 	while ((opt = getopt(argc, argv, "vhfs")) != -1) {
 		switch (opt) {
 		case 's':
@@ -123,6 +120,6 @@ int main(int argc, char* argv[])
 	}
 
 	initstreams();
-	doit();
+	doit(skipheader, fullprecision);
 	return 0;
 }

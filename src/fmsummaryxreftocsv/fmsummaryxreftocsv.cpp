@@ -51,10 +51,10 @@ Author: Joh Carter  email: johanna.carter@oasislmf.org
 
 using namespace std;
 
-void doit()
+void doit(bool skipheader)
 {
 
-	printf("\"output_id\", \"summary_id\", \"summaryset_id\"\n");
+	if (skipheader == false)  printf("\"output_id\", \"summary_id\", \"summaryset_id\"\n");
 
 	fmsummaryxref q;
 	size_t i = fread(&q, sizeof(q), 1, stdin);
@@ -67,6 +67,7 @@ void doit()
 void help()
 {
 	fprintf(stderr,
+		"-s skip header\n"
 		"-v version\n"
 		"-h help\n"
 	);
@@ -74,10 +75,13 @@ void help()
 
 int main(int argc, char* argv[])
 {
-
+	bool skipheader = false;
 	int opt;
-	while ((opt = getopt(argc, argv, "vh")) != -1) {
+	while ((opt = getopt(argc, argv, "vhs")) != -1) {
 		switch (opt) {
+		case 's':
+			skipheader = true;
+			break;
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
 			exit(EXIT_FAILURE);
@@ -90,6 +94,6 @@ int main(int argc, char* argv[])
 
 	initstreams("", "");
 
-	doit();
+	doit(skipheader);
 	return 0;
 }

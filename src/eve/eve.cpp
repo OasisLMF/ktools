@@ -76,6 +76,14 @@ void emitevents(int pno_,int total_)
 
 }
 
+void help()
+{
+	fprintf(stderr, 
+		"usage: processno totalprocesses\n"
+		"-h help\n"
+		"-v version\n"
+	);
+}
 int main(int argc, char *argv[])
 {
 	progname = argv[0];
@@ -86,7 +94,7 @@ int main(int argc, char *argv[])
 			return EXIT_FAILURE;
 		}
 		if (!strcmp(argv[1], "-h")) {
-			fprintf(stderr, "usage: processno totalprocesses\n");
+			help();
 			return EXIT_FAILURE;
 		}
 	}

@@ -21,7 +21,6 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\src\leccalc\aggreports.cpp" />
     <ClCompile Include="..\..\..\src\leccalc\leccalc.cpp" />
-    <ClCompile Include="..\..\..\src\wingetopt\wingetopt.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\wingetopt\wingetopt.vcxproj">

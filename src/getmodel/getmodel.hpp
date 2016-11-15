@@ -1,7 +1,7 @@
 #pragma once
 
 /*
-* Copyright (c)2015 Oasis LMF Limited
+* Copyright (c)2015 - 2016 Oasis LMF Limited
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without

@@ -47,7 +47,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <unistd.h>
 #endif
 
-void doit()
+void doit(int maxsampleindex)
 {
 
   gulitemSampleslevel q;
@@ -57,8 +57,7 @@ void doit()
   lineno++;
   int gulstream_type = gulstream_id | 1;
   fwrite(&gulstream_type, sizeof(int), 1, stdout);
-  int samplesize = 1;
-  fwrite(&samplesize, sizeof(int), 1, stdout);
+  fwrite(&maxsampleindex, sizeof(int), 1, stdout);
   gulSampleslevelHeader gh;
   gh.event_id = -1;
     while (fgets(line, sizeof(line), stdin) != 0)
@@ -99,16 +98,22 @@ void doit()
 
 void help()
 {
-	fprintf(stderr, "-h help\n-v version\n");
+	fprintf(stderr, 
+		"-S maximum sample index\n"
+		"-h help\n"
+		"-v version\n");
 }
 
 int main(int argc, char* argv[])
 {
 
 	int opt;
-
-	while ((opt = getopt(argc, argv, "vh")) != -1) {
+	int maxsampleindex = -1;
+	while ((opt = getopt(argc, argv, "vhS:")) != -1) {
 		switch (opt) {
+		case 'S':
+			maxsampleindex = atoi(optarg);
+			break;
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
 			exit(EXIT_FAILURE);
@@ -120,7 +125,7 @@ int main(int argc, char* argv[])
 		}
 	}
 	initstreams();
-	doit();
+	doit(maxsampleindex);
 
 	return EXIT_SUCCESS;
 

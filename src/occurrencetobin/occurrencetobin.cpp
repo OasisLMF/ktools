@@ -149,9 +149,9 @@ void doit()
 void help()
 {
 	fprintf(stderr,
-		"normal input file is id, event_id, period_no,date_id\n" 
-		"otherwise format is id, event_id, period_no,occ_year, occ_month, occ_day\n"
-		"-D use date id\n"
+		"option 1: format is event_id, period_no,occ_year, occ_month, occ_day\n"
+		"option 2: format is event_id, period_no, occ_date_id\n" 		
+		"-D use occ_date_id\n"
 		"-P number of periods\n"
 		"-v version\n"
 		"-h help\n"

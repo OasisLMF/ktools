@@ -227,10 +227,10 @@ void help()
 	fprintf(stderr,
 		"-S Sample size (default 0) \n"
 		"-r use random number file\n"
-		"-R [max random numbers] (used to allocate array for random numbers default 1,000,000)"
+		"-R [max random numbers] used to allocate array for random numbers default 1,000,000\n"
 		"-c [output pipe] - coverage output\n"
 		"-i [output pipe] - item output\n"
-		"-d debug (dump random numbers instead of gul)\n"
+		"-d debug (output random numbers instead of gul)\n"
 		 "-s seed for random number generation (used for debugging)\n"
 		"-v version\n"
 		"-h help\n"
@@ -241,9 +241,9 @@ int main(int argc, char *argv[])
 {
 	int opt;
 	// default values
-	rand_vector_size = 1000000;
-	samplesize = 0;
-	rand_seed = -1;
+	//rand_vector_size = 1000000;
+	//samplesize = 0;
+	//rand_seed = -1;
 	while ((opt = getopt(argc, argv, "vhdrL:S:c:i:R:")) != -1) {
 		switch (opt) {
 		case 'S':
@@ -296,7 +296,7 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "%s: No output option selected\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}	
-	initstreams("", "");
+	initstreams();
 	doit();
 
 }

@@ -269,10 +269,8 @@ int getmodel::getVulnerabilityIndex(int intensity_bin_index, int damage_bin_inde
     return (intensity_bin_index - 1) + ((damage_bin_index - 1) * _num_intensity_bins);
 }
 
-void getmodel::init(bool has_secondary_unceratainty)
+void getmodel::init()
 {
-    _has_intensity_uncertainty = has_secondary_unceratainty;
-
 	getIntensityInfo();
 
     getItems();    

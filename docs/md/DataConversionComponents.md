@@ -222,12 +222,12 @@ The vulnerability file is  required for the getmodel component. It contains the 
 ##### File format
 The csv file should contain the following fields and include a header row.
 
-| Name               | Type   |  Bytes | Description                                                   | Example     |
-|:-------------------|--------|--------| :-------------------------------------------------------------|------------:|
-| vulnerability_id   | int    |    4   | Oasis vulnerability_id                                        |   45        |
-| intensity_bin_index| int    |    4   | Identifier of the hazard intensity bin                        |     10      |
-| damage_bin_index   | int    |    4   | Identifier of the damage bin                                  |     20      |
-| prob               | float  |    4   | The probability mass for the damage bin                       |    0.186    | 
+| Name               | Type   |  Bytes | Description                                   | Example   |
+|:-------------------|--------|--------| :---------------------------------------------|----------:|
+| vulnerability_id   | int    |    4   | Oasis vulnerability_id                        |     45    |
+| intensity_bin_index| int    |    4   | Identifier of the hazard intensity bin        |     10    |
+| damage_bin_index   | int    |    4   | Identifier of the damage bin                  |     20    |
+| prob               | float  |    4   | The probability mass for the damage bin       |    0.186  | 
 
 The data should be ordered by vulnerability_id, intensity_bin_index and not contain nulls. 
 
@@ -256,10 +256,10 @@ The coverages binary contains the list of coverages and the coverage TIVs. The d
 #### File format
 The csv file should contain the following fields and include a header row.
 
-| Name              | Type   |  Bytes | Description                                                   | Example     |
-|:------------------|--------|--------| :-------------------------------------------------------------|------------:|
-| coverage_id       | int    |    4   | Identifier of the coverage                                    |     1       |
-| tiv               | float  |    4   | The total insured value of the coverage                       |   200000    |
+| Name              | Type   |  Bytes | Description                                   | Example     |
+|:------------------|--------|--------| :---------------------------------------------|------------:|
+| coverage_id       | int    |    4   | Identifier of the coverage                    |     1       |
+| tiv               | float  |    4   | The total insured value of the coverage       |   200000    |
 
 Coverage_id must be an ordered contiguous sequence of numbers starting at 1. 
 
@@ -309,13 +309,13 @@ The items binary contains the list of exposure items for which ground up loss wi
 ##### File format
 The csv file should contain the following fields and include a header row.
 
-| Name              | Type   |  Bytes | Description                                                   | Example     |
-|:------------------|--------|--------| :-------------------------------------------------------------|------------:|
-| item_id           | int    |    4   | Identifier of the exposure item                               |     1       |
-| coverage _id      | int    |    4   | Identifier of the coverage                                    |   3         |
-| areaperil_id      | int    |    4   | Identifier of the locator and peril of the item               |   4545      |
-| vulnerability_id  | int    |    4   | Identifier of the vulnerability distribution of the item      |   345456    |
-| group_id          | int    |    4   | Identifier of the correlation group of the item               |    1        |  
+| Name             | Type   |  Bytes | Description                                              | Example  |
+|:-----------------|--------|--------| :--------------------------------------------------------|---------:|
+| item_id          | int    |    4   | Identifier of the exposure item                          |     1    |
+| coverage _id     | int    |    4   | Identifier of the coverage                               |   3      |
+| areaperil_id     | int    |    4   | Identifier of the locator and peril of the item          |   4545   |
+| vulnerability_id | int    |    4   | Identifier of the vulnerability distribution of the item |   345456 |
+| group_id         | int    |    4   | Identifier of the correlation group of the item          |    1     |  
 
 The data should be ordered by areaperil_id, vulnerability_id ascending and not contain nulls. It is best practice for item_id to be a contiguous sequence of numbers starting from 1.
 
@@ -341,11 +341,11 @@ The gulsummaryxref binary is a cross reference file which determines how coverag
 ##### File format
 The csv file should contain the following fields and include a header row.
 
-| Name              | Type   |  Bytes | Description                                                    | Example     |
-|:------------------|--------|--------| :--------------------------------------------------------------|------------:|
-| coverage _id      | int    |    4   | Identifier of the coverage                                     |   3         |
-| summary_id        | int    |    4   | Identifier of the summary level group for one or more coverages|   1         |
-| summaryset_id     | int    |    4   | Identifier of the summary set (0 to 9 inclusive)               |   1         |
+| Name          | Type   |  Bytes | Description                                               | Example  |
+|:--------------|--------|--------| :---------------------------------------------------------|---------:|
+| coverage _id  | int    |    4   | Identifier of the coverage                                |   3      |
+| summary_id    | int    |    4   | Identifier of the summary level for one or more coverages |   1      |
+| summaryset_id | int    |    4   | Identifier of the summary set (0 to 9 inclusive)          |   1      |
 
 * The data should not contain nulls and there should be at least one summary set in the file.  
 * Valid entries for summaryset_id is all integers between 0 and 9 inclusive. 

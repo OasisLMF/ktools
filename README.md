@@ -128,7 +128,7 @@ The installation is complete. Restart the Cygwin session to refresh the path bef
 
 There is sample data and five example scripts which demonstrate how to invoke ktools in the /examples folder. These are written in python. 
 
-For example, to run the eltcalc_example script, go into the examples folder and run the following command (you must have python installed):
+For example, to run the eltcalc_example script, go into the examples folder and run the following command (you must have python v2.X installed):
 
 ``` sh
 $ cd examples

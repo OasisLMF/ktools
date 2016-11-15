@@ -143,7 +143,7 @@ installertest()
 
 	# test stream conversion components
 	# stdout to csv
-	../src/cdftocsv/cdftocsv < ../ktest/testout/getmodelout.bin > ../ktest/testout/getmodelout.csv
+	../src/cdftocsv/cdftocsv -s < ../ktest/testout/getmodelout.bin > ../ktest/testout/getmodelout.csv
 	../src/gultocsv/gultocsv -f < ../ktest/testout/gulcalci.bin > ../ktest/testout/gulcalci.csv
 	../src/gultocsv/gultocsv -f < ../ktest/testout/gulcalcc.bin > ../ktest/testout/gulcalcc.csv
 	../src/fmtocsv/fmtocsv -f < ../ktest/testout/fmcalc.bin > ../ktest/testout/fmcalc.csv

@@ -67,8 +67,14 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "occurrencetocsv", "occurrencetocsv\occurrencetocsv.vcxproj", "{BE0F1CC3-0D67-4F02-81DD-50A33C493B3D}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pltcalc", "pltcalc\pltcalc.vcxproj", "{6B8452F1-3F6D-4B58-A464-B4EE4819BA88}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B5960B46-527B-4833-918B-EC5735C03635} = {B5960B46-527B-4833-918B-EC5735C03635}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "aalcalc", "aalcalc\aalcalc.vcxproj", "{72AD63C6-8844-4DBF-875B-72F3168B894C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B5960B46-527B-4833-918B-EC5735C03635} = {B5960B46-527B-4833-918B-EC5735C03635}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "aalsummary", "aalsummary\aalsummary.vcxproj", "{604B5F75-44DD-41BC-9DFF-0D5844AD2727}"
 EndProject
@@ -77,6 +83,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vulnerabilitytobin", "vulnerabilitytobin\vulnerabilitytobin.vcxproj", "{1730B808-F39B-4ECB-9B1A-8A9568FEAF45}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vulnerabilitytocsv", "vulnerabilitytocsv\vulnerabilitytocsv.vcxproj", "{8960F2B6-E0EF-4AB6-8B3F-27A76B4D3B98}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B5960B46-527B-4833-918B-EC5735C03635} = {B5960B46-527B-4833-918B-EC5735C03635}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "footprinttobin", "footprinttobin\footprinttobin.vcxproj", "{938B82D6-27EC-4959-8CA9-E3A6A6366E9A}"
 EndProject
@@ -87,12 +96,18 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "returnperiodtobin", "returnperiodtobin\returnperiodtobin.vcxproj", "{D7C09D61-FD64-465C-B232-13884B6D9668}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "returnperiodtocsv", "returnperiodtocsv\returnperiodtocsv.vcxproj", "{6CCEF608-D887-42BB-8E8D-3E8535BD9C5E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B5960B46-527B-4833-918B-EC5735C03635} = {B5960B46-527B-4833-918B-EC5735C03635}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "damagebintobin", "damagebintobin\damagebintobin.vcxproj", "{90C65677-B65D-4750-8F89-BA02F86DC9A5}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "damagebintocsv", "damagebintocsv\damagebintocsv.vcxproj", "{1D73AFB1-976B-4E57-AE33-D5E5273B6B81}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "evetobin", "evetobin\evetobin.vcxproj", "{A6352134-99ED-486F-98B8-2D6FC6C9246B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B5960B46-527B-4833-918B-EC5735C03635} = {B5960B46-527B-4833-918B-EC5735C03635}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "evetocsv", "evetocsv\evetocsv.vcxproj", "{57852863-1C25-41EC-8566-018520A3C860}"
 EndProject

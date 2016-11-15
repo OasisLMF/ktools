@@ -1,3 +1,4 @@
+![alt text](../img/banner.jpg "banner")
 # 3. Specification <a id="specification"></a>
 
 ### Introduction

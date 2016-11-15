@@ -1,3 +1,4 @@
+![alt text](../img/banner.jpg "banner")
 # Appendix A: Random numbers <a id="randomnumbers"></a>
 
 Simple uniform random numbers are assigned to each event, group and sample number to sample ground up loss in the gulcalc process. A group is a collection of items which share the same group_id, and is the method of supporting spatial correlation in ground up loss sampling in Oasis and ktools.

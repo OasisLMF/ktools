@@ -1,3 +1,4 @@
+![alt text](../img/banner.jpg "banner")
 # 4.4 Stream conversion components <a id="streamconversioncomponents"></a>
 
 The following components convert the binary output of each calculation component to csv format;

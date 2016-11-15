@@ -1,3 +1,4 @@
+![alt text](../img/banner.jpg "banner")
 # 5. Financial Module  <a id="financialmodule"></a>
 
 The Oasis Financial Module is a data-driven process design for calculating the losses on (re)insurance contracts. It has an abstract design in order to cater for the many variations in contract structures and terms. The way Oasis works is to be fed data in order to execute calculations, so for the insurance calculations it needs to know the structure, parameters and calculation rules to be used. This data must be provided in the files used by the Oasis Financial Module:

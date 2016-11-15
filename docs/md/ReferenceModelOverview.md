@@ -1,3 +1,4 @@
+![alt text](../img/banner.jpg "banner")
 # 4. Reference Model Overview <a id="referencemodel"></a>
 
 This section provides an overview of the reference model, which is an implementation of each of the components in the framework. 

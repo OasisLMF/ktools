@@ -1,3 +1,4 @@
+![alt text](../img/banner.jpg "banner")
 # 1. Introduction
 The in-memory solution for the Oasis Kernel is called the kernel tools or “ktools”. ktools is an independent “specification” of a set of processes which means that it defines the processing architecture and data structures. The framework is implemented as a set of components called the “reference model” which can then be adapted for particular model or business needs. 
 

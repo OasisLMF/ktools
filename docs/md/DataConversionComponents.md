@@ -1,3 +1,4 @@
+![alt text](../img/banner.jpg "banner")
 # 4.3 Data conversion components <a id="dataconversioncomponents"></a>
 
 The following components convert input data in csv format to the binary format required by the calculation components in the reference model;
@@ -309,13 +310,13 @@ The items binary contains the list of exposure items for which ground up loss wi
 ##### File format
 The csv file should contain the following fields and include a header row.
 
-| Name             | Type   |  Bytes | Description                                              | Example  |
-|:-----------------|--------|--------| :--------------------------------------------------------|---------:|
-| item_id          | int    |    4   | Identifier of the exposure item                          |     1    |
-| coverage _id     | int    |    4   | Identifier of the coverage                               |   3      |
-| areaperil_id     | int    |    4   | Identifier of the locator and peril of the item          |   4545   |
-| vulnerability_id | int    |    4   | Identifier of the vulnerability distribution of the item |   345456 |
-| group_id         | int    |    4   | Identifier of the correlation group of the item          |    1     |  
+| Name              | Type   |  Bytes | Description                                   | Example  |
+|:------------------|--------|--------| :---------------------------------------------|---------:|
+| item_id           | int    |    4   | Identifier of the exposure item               |     1    |
+| coverage _id      | int    |    4   | Identifier of the coverage                    |   3      |
+| areaperil_id      | int    |    4   | Identifier of the locator and peril           |   4545   |
+| vulnerability_id  | int    |    4   | Identifier of the vulnerability distribution  |  345456  |
+| group_id          | int    |    4   | Identifier of the correlation group           |    1     |  
 
 The data should be ordered by areaperil_id, vulnerability_id ascending and not contain nulls. It is best practice for item_id to be a contiguous sequence of numbers starting from 1.
 
@@ -341,11 +342,11 @@ The gulsummaryxref binary is a cross reference file which determines how coverag
 ##### File format
 The csv file should contain the following fields and include a header row.
 
-| Name          | Type   |  Bytes | Description                                               | Example  |
-|:--------------|--------|--------| :---------------------------------------------------------|---------:|
-| coverage _id  | int    |    4   | Identifier of the coverage                                |   3      |
-| summary_id    | int    |    4   | Identifier of the summary level for one or more coverages |   1      |
-| summaryset_id | int    |    4   | Identifier of the summary set (0 to 9 inclusive)          |   1      |
+| Name           | Type   |  Bytes | Description                                               | Example  |
+|:---------------|--------|--------| :---------------------------------------------------------|---------:|
+| coverage _id   | int    |    4   | Identifier of the coverage                                |   3      |
+| summary_id     | int    |    4   | Identifier of the summary level for one or more coverages |   1      |
+| summaryset_id  | int    |    4   | Identifier of the summary set (0 to 9 inclusive)          |   1      |
 
 * The data should not contain nulls and there should be at least one summary set in the file.  
 * Valid entries for summaryset_id is all integers between 0 and 9 inclusive. 

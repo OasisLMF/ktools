@@ -1,3 +1,4 @@
+![alt text](../img/banner.jpg "banner")
 # Appendix A: Random numbers <a id="randomnumbers"></a>
 
 Simple uniform random numbers are assigned to each event, group and sample number to sample ground up loss in the gulcalc process. A group is a collection of items which share the same group_id, and is the method of supporting spatial correlation in ground up loss sampling in Oasis and ktools.
@@ -10,7 +11,7 @@ The item_id, group_id data is provided by the user in the items input file (item
 
 ### Methodology
 
-The method of assigning random numbers in gulcalc uses an random number index (ridx) which is used as a position reference into a list of random numbers.  S random numbers corresponding to the runtime number of samples are drawn from the list starting at the first ridx position.
+The method of assigning random numbers in gulcalc uses an random number index (ridx), an integer which is used as a position reference into a list of random numbers.  S random numbers corresponding to the runtime number of samples are drawn from the list starting at the ridx position.
 
 There are two options in ktools for choosing random numbers to apply in the sampling process.
 
@@ -23,12 +24,12 @@ Use -R{number of random numbers} as a parameter.
 ```
 $ gulcalc -S00 -R1000000 -i -
 ```
-This will run 100 samples drawing from 1 million dynamically generated random numbers.
+This will run 100 samples drawing from 1 million dynamically generated random numbers. They are simple uniform random numbers.
 
 ##### Method
 
 Random numbers are sampled dynamically using the Mersenne twister psuedo random number generator (the default RNG of the C++ v11 compiler). 
-A sparse array capable of holding R million random numbers is allocated to each event. The ridx is generated from the group_id and number of samples S using the following modulus function;
+A sparse array capable of holding R random numbers is allocated to each event. The ridx is generated from the group_id and number of samples S using the following modulus function;
 
 ridx= mod(group_id x P1, R)
 

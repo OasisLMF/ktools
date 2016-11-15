@@ -1,3 +1,4 @@
+![alt text](../img/banner.jpg "banner")
 # 4. Reference Model Overview <a id="referencemodel"></a>
 
 This section provides an overview of the reference model, which is an implementation of each of the components in the framework. 
@@ -44,6 +45,13 @@ The files required for the output components are shown in Figure 2.
 The **[data conversion components](DataConversionComponents.md)** section covers the formats of all of the required data files and explains how to convert data in csv format into binary format, and vice versa.
 
 Finally, the **[stream conversion components](StreamConversionComponents.md)** section explains how to convert the binary data stream output to csv, plus how to convert gulcalc data in csv format into binary format. These components are useful when working with individual components at a more detailed level.
+
+The version of the installed components can be found by using the command line parameter -v. For example;
+
+```
+$ gulcalc -v
+```
+The components have additional command line parameters depending on their particular function.  These are described in detail in the following pages.
 
 [Return to top](#referencemodel)
 

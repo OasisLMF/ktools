@@ -1,5 +1,5 @@
 /*
-* Copyright (c)2015 Oasis LMF Limited
+* Copyright (c)2015 - 2016 Oasis LMF Limited
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
@@ -255,6 +255,8 @@ void help()
 	fprintf(stderr, "-m Occurrence Wheatsheaf mean\n");
 	fprintf(stderr, "-K workspace sub folder\n");
 	fprintf(stderr, "-r use return period file\n");
+	fprintf(stderr, "-h help\n");
+	fprintf(stderr, "-v version\n");
 }
 
 

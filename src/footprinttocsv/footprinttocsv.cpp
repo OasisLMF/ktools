@@ -1,5 +1,5 @@
 /*
-* Copyright (c)2015 Oasis LMF Limited
+* Copyright (c)2015 - 2016 Oasis LMF Limited
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
@@ -47,7 +47,7 @@ Author: Joh Carter  email: johanna.carter@oasislmf.org
 
 #include "../include/oasis.hpp"
 
-bool skipheader = false;
+
 using namespace std;
 
 void printrows(int event_id, FILE *finx, long long size )
@@ -64,8 +64,7 @@ void printrows(int event_id, FILE *finx, long long size )
 }
 
 
-
-void doit()
+void doit(bool skipheader)
 {
 	if (skipheader == false)  printf("\"event_id\", \"areaperil_id\", \"intensity_bin_id\", \"probability\"\n");
 	FILE *finx = fopen("footprint.bin", "rb");
@@ -100,6 +99,7 @@ void help()
 int main(int argc, char* argv[])
 {
 	int opt;
+	bool skipheader = false;
 	while ((opt = getopt(argc, argv, "vhs")) != -1) {
 		switch (opt) {
 		case 'v':
@@ -116,6 +116,6 @@ int main(int argc, char* argv[])
 	}
 
     initstreams();
-	doit();
+	doit(skipheader);
 	return 0;
 }

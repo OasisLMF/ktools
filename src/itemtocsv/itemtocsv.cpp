@@ -1,5 +1,5 @@
 /*
-* Copyright (c)2015 Oasis LMF Limited
+* Copyright (c)2015 - 2016 Oasis LMF Limited
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
@@ -49,10 +49,10 @@ Author: Joh Carter  email: johanna.carter@oasislmf.org
 
 using namespace std;
 
-void doit()
+void doit(bool skipheader)
 {
 
-	printf("\"item_id\", \"coverage_id\", \"areaperil_id\", \"vulnerability_id\", \"group_id\"\n");
+	if (skipheader == false) printf("item_id,coverage_id,areaperil_id,vulnerability_id,group_id\n");
 
 	item q;
 	int i = fread(&q, sizeof(q), 1, stdin);
@@ -67,8 +67,7 @@ void doit()
 void help()
 {
 	fprintf(stderr,
-		"-I input filename\n"
-		"-O output filename\n"
+		"-s skip header\n"
 		"-v version\n"
 		"-h help\n"
 	);
@@ -77,8 +76,12 @@ void help()
 int main(int argc, char* argv[])
 {
 	int opt;
-	while ((opt = getopt(argc, argv, "vh")) != -1) {
+	bool skipheader = false;
+	while ((opt = getopt(argc, argv, "vhs")) != -1) {
 		switch (opt) {
+		case 's':
+			skipheader = true;
+			break;
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
 			exit(EXIT_FAILURE);
@@ -89,7 +92,7 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	initstreams("", "");
-	doit();
-	return 0;
+	initstreams();
+	doit(skipheader);
+	return EXIT_SUCCESS;
 }

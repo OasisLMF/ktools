@@ -1,3 +1,4 @@
+![alt text](../img/banner.jpg "banner")
 # 4.3 Data conversion components <a id="dataconversioncomponents"></a>
 
 The following components convert input data in csv format to the binary format required by the calculation components in the reference model;
@@ -56,7 +57,9 @@ The damage bin dictionary is a reference table in Oasis which defines how the ef
 * static/damage_bin_dict.bin
 
 ##### File format
+
 The csv file should contain the following fields and include a header row.
+
 
 | Name              | Type   |  Bytes | Description                                                   | Example     |
 |:------------------|--------|--------| :-------------------------------------------------------------|------------:|
@@ -222,12 +225,12 @@ The vulnerability file is  required for the getmodel component. It contains the 
 ##### File format
 The csv file should contain the following fields and include a header row.
 
-| Name               | Type   |  Bytes | Description                                                   | Example     |
-|:-------------------|--------|--------| :-------------------------------------------------------------|------------:|
-| vulnerability_id   | int    |    4   | Oasis vulnerability_id                                        |   45        |
-| intensity_bin_index| int    |    4   | Identifier of the hazard intensity bin                        |     10      |
-| damage_bin_index   | int    |    4   | Identifier of the damage bin                                  |     20      |
-| prob               | float  |    4   | The probability mass for the damage bin                       |    0.186    | 
+| Name                 | Type   |  Bytes | Description                                   | Example   |
+|:---------------------|--------|--------| :---------------------------------------------|----------:|
+| vulnerability_id     | int    |    4   | Oasis vulnerability_id                        |     45    |
+| intensity_bin_index  | int    |    4   | Identifier of the hazard intensity bin        |     10    |
+| damage_bin_index     | int    |    4   | Identifier of the damage bin                  |     20    |
+| prob                 | float  |    4   | The probability mass for the damage bin       |    0.186  | 
 
 The data should be ordered by vulnerability_id, intensity_bin_index and not contain nulls. 
 
@@ -256,10 +259,10 @@ The coverages binary contains the list of coverages and the coverage TIVs. The d
 #### File format
 The csv file should contain the following fields and include a header row.
 
-| Name              | Type   |  Bytes | Description                                                   | Example     |
-|:------------------|--------|--------| :-------------------------------------------------------------|------------:|
-| coverage_id       | int    |    4   | Identifier of the coverage                                    |     1       |
-| tiv               | float  |    4   | The total insured value of the coverage                       |   200000    |
+| Name              | Type   |  Bytes | Description                                   | Example     |
+|:------------------|--------|--------| :---------------------------------------------|------------:|
+| coverage_id       | int    |    4   | Identifier of the coverage                    |     1       |
+| tiv               | float  |    4   | The total insured value of the coverage       |   200000    |
 
 Coverage_id must be an ordered contiguous sequence of numbers starting at 1. 
 
@@ -309,13 +312,14 @@ The items binary contains the list of exposure items for which ground up loss wi
 ##### File format
 The csv file should contain the following fields and include a header row.
 
-| Name              | Type   |  Bytes | Description                                                   | Example     |
-|:------------------|--------|--------| :-------------------------------------------------------------|------------:|
-| item_id           | int    |    4   | Identifier of the exposure item                               |     1       |
-| coverage _id      | int    |    4   | Identifier of the coverage                                    |   3         |
-| areaperil_id      | int    |    4   | Identifier of the locator and peril of the item               |   4545      |
-| vulnerability_id  | int    |    4   | Identifier of the vulnerability distribution of the item      |   345456    |
-| group_id          | int    |    4   | Identifier of the correlation group of the item               |    1        |  
+| Name              | Type   | Bytes | Description                                    | Example   |
+|:------------------|--------|-------|:-----------------------------------------------|----------:|
+| item_id           | int    |   4   | Identifier of the exposure item                |    1      |
+| coverage_id       | int    |   4   | Identifier of the coverage                     |    3      |
+| areaperil_id      | int    |   4   | Identifier of the locator and peril            |   4545    |
+| vulnerability_id  | int    |   4   | Identifier of the vulnerability distribution   |   645     |
+| group_id			| int    |   4   | Identifier of the correlaton group             |    3      |
+
 
 The data should be ordered by areaperil_id, vulnerability_id ascending and not contain nulls. It is best practice for item_id to be a contiguous sequence of numbers starting from 1.
 
@@ -341,11 +345,12 @@ The gulsummaryxref binary is a cross reference file which determines how coverag
 ##### File format
 The csv file should contain the following fields and include a header row.
 
-| Name              | Type   |  Bytes | Description                                                    | Example     |
-|:------------------|--------|--------| :--------------------------------------------------------------|------------:|
-| coverage _id      | int    |    4   | Identifier of the coverage                                     |   3         |
-| summary_id        | int    |    4   | Identifier of the summary level group for one or more coverages|   1         |
-| summaryset_id     | int    |    4   | Identifier of the summary set (0 to 9 inclusive)               |   1         |
+| Name             | Type   |  Bytes | Description                                   | Example  |
+|:-----------------|--------|--------|:----------------------------------------------|---------:|
+| coverage_id      | int    |    4   | Identifier of the coverage                    |   3      |
+| summary_id       | int    |    4   | Identifier of the summary level grouping      |   3      |
+| summaryset_id    | int    |    4   | Identifier of the summary set                 |   1      |
+
 
 * The data should not contain nulls and there should be at least one summary set in the file.  
 * Valid entries for summaryset_id is all integers between 0 and 9 inclusive. 
@@ -353,40 +358,40 @@ The csv file should contain the following fields and include a header row.
 
 One summary set consists of a common summaryset_id and each coverage_id being assigned a summary_id. An example is as follows.
 
-| coverage_id | summary_id   | summaryset_id    |
-|:------------|--------------|-----------------:|
-| 1           | 1            |    1             | 
-| 2           | 1            |    1             | 
-| 3           | 1            |    1             |
-| 4           | 2            |    1             |
-| 5           | 2            |    1             |
-| 6           | 2            |    1             |
+| coverage_id   | summary_id     | summaryset_id    |
+|:--------------|----------------|-----------------:|
+| 1             | 1              |    1             | 
+| 2             | 1              |    1             | 
+| 3             | 1              |    1             |
+| 4             | 2              |    1             |
+| 5             | 2              |    1             |
+| 6             | 2              |    1             |
 
 This shows, for summaryset_id=1, coverages 1-3 being grouped into summary_id = 1 and coverages 4-6 being grouped into summary_id = 2.  This could be an example of a 'site' level grouping, for example. The summary_ids should be held in a dictionary which contains the description of the ids to make meaning of the output results.  For instance;
 
-| summary_id   | summaryset_id    | summary_desc|
-|:-------------|------------------|------------:|
-| 1            |    1             |  site_435   |
-| 2            |    1             |  site_958   |
+| summary_id   | summaryset_id    | summary_desc    |
+|:-------------|------------------|----------------:|
+| 1            |    1             |  site_435       |
+| 2            |    1             |  site_958       |
 
 This cross reference information is not required in ktools.
 
 Up to 10 summary sets may be provided in gulsummaryxref, depending on the required summary reporting levels for the analysis. Here is an example of the 'site' summary level with summaryset_id=1, plus an 'account' summary level with summaryset_id = 2. In summary set 2, the account summary level includes both sites because all coverages are assigned a summary_id of 1.
 
-| coverage_id | summary_id   | summaryset_id    |
-|:------------|--------------|-----------------:|
-| 1           | 1            |    1             | 
-| 2           | 1            |    1             | 
-| 3           | 1            |    1             |
-| 4           | 2            |    1             |
-| 5           | 2            |    1             |
-| 6           | 2            |    1             |
-| 1           | 1            |    2             | 
-| 2           | 1            |    2             | 
-| 3           | 1            |    2             |
-| 4           | 1            |    2             |
-| 5           | 1            |    2             |
-| 6           | 1            |    2             |
+| coverage_id   | summary_id   | summaryset_id     |
+|:--------------|--------------|------------------:|
+| 1             | 1            |    1              | 
+| 2             | 1            |    1              | 
+| 3             | 1            |    1              |
+| 4             | 2            |    1              |
+| 5             | 2            |    1              |
+| 6             | 2            |    1              |
+| 1             | 1            |    2              | 
+| 2             | 1            |    2              | 
+| 3             | 1            |    2              |
+| 4             | 1            |    2              |
+| 5             | 1            |    2              |
+| 6             | 1            |    2              |
 
 
 ##### gulsummaryxreftobin

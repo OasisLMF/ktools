@@ -8,9 +8,10 @@
   <style type="text/css">code{white-space: pre;}</style>
 </head>
 <body>
+<p><img src="../img/banner.jpg" title="banner" alt="alt text" /></p>
 <h1 id="introduction">1. Introduction</h1>
 <p>The in-memory solution for the Oasis Kernel is called the kernel tools or “ktools”. ktools is an independent “specification” of a set of processes which means that it defines the processing architecture and data structures. The framework is implemented as a set of components called the “reference model” which can then be adapted for particular model or business needs.</p>
-<p>The code can be compiled in Linux, POSIX-compliant Windows and native Windows.</p>
+<p>The code can be compiled in Linux, POSIX-compliant Windows and native Windows. The installation instructions can be found in <a href="../../README.html">README.html</a>.</p>
 <h3 id="background">Background</h3>
 <p>The Kernel performs the core Oasis calculations of computing effective damageability distributions, Monte-Carlo sampling of ground up loss, the financial module calculations, which apply insurance policy terms and conditions to the sampled losses, and finally some common catastrophe model outputs.</p>
 <p>The early releases of Oasis used a SQL-compliant database to perform all calculations. Release 1.3 included the first “in-memory” version of the Oasis Kernel written in C++ and C to provide streamed calculation at high computational performance, as an alternative to the database calculation. The scope of the in-memory calculation was for the most intensive Kernel calculations of ground up loss sampling and the financial module. This in-memory variant was first delivered as a stand-alone toolkit &quot;ktools&quot; with R1.4.</p>

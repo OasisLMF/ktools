@@ -1,3 +1,4 @@
+![alt text](../img/banner.jpg "banner")
 # Appendix C: Multi-peril model support <a id="multiperil"></a>
 
 ktools now supports multi-peril models through the introduction of the coverage_id in the data structures.  

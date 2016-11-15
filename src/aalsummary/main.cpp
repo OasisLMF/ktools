@@ -1,5 +1,5 @@
 /*
-* Copyright (c)2016 Oasis LMF Limited
+* Copyright (c)2015 - 2016 Oasis LMF Limited
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
@@ -50,7 +50,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 void help()
 {
-	fprintf(stderr, "-K workspace sub folder-h help\n-v version\n");
+	fprintf(stderr, "-K workspace sub folder\n-h help\n-v version\n");
 }
 
 int main(int argc, char* argv[])

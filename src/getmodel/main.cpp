@@ -1,5 +1,5 @@
 /*
-* Copyright (c)2016 Oasis LMF Limited
+* Copyright (c)2015 - 2016 Oasis LMF Limited
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
@@ -52,18 +52,17 @@ Author: Mark Pinkerton  email: mark.pinkerton@oasislmf.org
 void help()
 {
 	fprintf(stderr,
-		"-n no secondary uncertainty\n"
 		"-v version\n"
 		"-h help\n"
 	);
 }
 
-void doIt(bool hasSecondaryUncertainty)
+void doIt()
 {
 
 	getmodel cdf_generator;
 
-	cdf_generator.init(hasSecondaryUncertainty);
+	cdf_generator.init();
 
 	int event_id = -1;
 	std::list<int> event_ids;
@@ -79,12 +78,8 @@ void doIt(bool hasSecondaryUncertainty)
 int main(int argc, char** argv)
 {
 	int opt;
-	bool hasSecondaryUncertainty = false;
-	while ((opt = getopt(argc, argv, "vhn")) != -1) {
-		switch (opt) {
-		case 'n':
-			hasSecondaryUncertainty = true;
-			break;
+	while ((opt = getopt(argc, argv, "vh")) != -1) {
+		switch (opt) {		
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
 			exit(EXIT_FAILURE);
@@ -98,7 +93,7 @@ int main(int argc, char** argv)
 		}
 	}
 	
-	initstreams("", "");
-	doIt(hasSecondaryUncertainty);
-	return 0;
+	initstreams();
+	doIt();
+	return EXIT_SUCCESS;
 }

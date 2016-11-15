@@ -8,6 +8,7 @@
   <style type="text/css">code{white-space: pre;}</style>
 </head>
 <body>
+<p><img src="../img/banner.jpg" title="banner" alt="alt text" /></p>
 <h1 id="data-conversion-components">4.3 Data conversion components <a id="dataconversioncomponents"></a></h1>
 <p>The following components convert input data in csv format to the binary format required by the calculation components in the reference model;</p>
 <p><strong>Static data</strong></p>
@@ -318,8 +319,9 @@ $ occurrencetobin -P10000 -D &lt; occurrence.csv &gt; occurrence.bin</code></pre
 <li>static/random.bin</li>
 </ul>
 <p>If the gulcalc -r parameter is not used, the random number binary is not required and random numbers are instead generated dynamically during the calculation, using the -R parameter to specify how many should be generated.</p>
+<p>The random numbers can be imported from a csv file using the component randtobin.</p>
 <h5 id="file-format-3">File format</h5>
-<p>The csv file should contain a simple list of random numbers. It should not contain any headers.</p>
+<p>The csv file should contain a simple list of random numbers and include a header row.</p>
 <table>
 <thead>
 <tr class="header">
@@ -343,7 +345,16 @@ $ occurrencetobin -P10000 -D &lt; occurrence.csv &gt; occurrence.bin</code></pre
 <h5 id="randtobin">randtobin</h5>
 <pre><code>$ randtobin &lt; random.csv &gt; random.bin</code></pre>
 <h5 id="randtocsv">randtocsv</h5>
-<pre><code>$ randtocsv &lt; random.bin &gt; random.csv</code></pre>
+<p>There are a few parameters available which allow the generation of a random number csv file as follows;</p>
+<ul>
+<li>-r convert binary float input to csv</li>
+<li>-g generate random numbers {number of random numbers}</li>
+<li>-S seed value {seed value}</li>
+</ul>
+<pre><code>$ randtocsv -r &lt; random.bin &gt; random.csv
+$ randtocsv -g 1000000 &gt; random.csv
+$ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
+<p>The -S {seed value} option produces repeatable random numbers, whereas usage of -g alone will generate a different set every time.</p>
 <p><a href="#dataconversioncomponents">Return to top</a></p>
 <p><a id="vulnerability"></a></p>
 <h3 id="vulnerability">vulnerability</h3>
@@ -453,7 +464,7 @@ $ occurrencetobin -P10000 -D &lt; occurrence.csv &gt; occurrence.bin</code></pre
 <li>input/events.bin</li>
 </ul>
 <h5 id="file-format-6">File format</h5>
-<p>The csv file should contain a list of event_ids (integers) and no header.</p>
+<p>The csv file should contain a list of event_ids (integers) and include a header.</p>
 <table>
 <thead>
 <tr class="header">
@@ -489,13 +500,6 @@ $ occurrencetobin -P10000 -D &lt; occurrence.csv &gt; occurrence.bin</code></pre
 <h5 id="file-format-7">File format</h5>
 <p>The csv file should contain the following fields and include a header row.</p>
 <table>
-<colgroup>
-<col width="17%" />
-<col width="7%" />
-<col width="7%" />
-<col width="54%" />
-<col width="12%" />
-</colgroup>
 <thead>
 <tr class="header">
 <th align="left">Name</th>
@@ -514,10 +518,32 @@ $ occurrencetobin -P10000 -D &lt; occurrence.csv &gt; occurrence.bin</code></pre
 <td align="right">1</td>
 </tr>
 <tr class="even">
-<td align="left">coverage _id | int | 4 | Identifier of the coverage | 3 |<br />
-| areaperil_id | int | 4 | Identifier of the locator and peril of the item | 4545 |<br />
-| vulnerability_id | int | 4 | Identifier of the vulnerability distribution of the item | 345456 |<br />
-| group_id | int | 4 | Identifier of the correlation group of the item | 1 |</td>
+<td align="left">coverage_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Identifier of the coverage</td>
+<td align="right">3</td>
+</tr>
+<tr class="odd">
+<td align="left">areaperil_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Identifier of the locator and peril</td>
+<td align="right">4545</td>
+</tr>
+<tr class="even">
+<td align="left">vulnerability_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Identifier of the vulnerability distribution</td>
+<td align="right">645</td>
+</tr>
+<tr class="odd">
+<td align="left">group_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Identifier of the correlaton group</td>
+<td align="right">3</td>
 </tr>
 </tbody>
 </table>
@@ -537,13 +563,6 @@ $ occurrencetobin -P10000 -D &lt; occurrence.csv &gt; occurrence.bin</code></pre
 <h5 id="file-format-8">File format</h5>
 <p>The csv file should contain the following fields and include a header row.</p>
 <table>
-<colgroup>
-<col width="17%" />
-<col width="7%" />
-<col width="7%" />
-<col width="55%" />
-<col width="12%" />
-</colgroup>
 <thead>
 <tr class="header">
 <th align="left">Name</th>
@@ -555,9 +574,25 @@ $ occurrencetobin -P10000 -D &lt; occurrence.csv &gt; occurrence.bin</code></pre
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">coverage _id | int | 4 | Identifier of the coverage | 3 |<br />
-| summary_id | int | 4 | Identifier of the summary level group for one or more coverages| 1 |<br />
-| summaryset_id | int | 4 | Identifier of the summary set (0 to 9 inclusive) | 1 |</td>
+<td align="left">coverage_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Identifier of the coverage</td>
+<td align="right">3</td>
+</tr>
+<tr class="even">
+<td align="left">summary_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Identifier of the summary level grouping</td>
+<td align="right">3</td>
+</tr>
+<tr class="odd">
+<td align="left">summaryset_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">Identifier of the summary set</td>
+<td align="right">1</td>
 </tr>
 </tbody>
 </table>
@@ -1205,7 +1240,7 @@ $ occurrencetobin -P10000 -D &lt; occurrence.csv &gt; occurrence.bin</code></pre
 <li>input/returnperiods.bin</li>
 </ul>
 <h5 id="file-format-14">File format</h5>
-<p>The csv file should contain the following fields with no header.</p>
+<p>The csv file should contain the following field and include a header.</p>
 <table>
 <thead>
 <tr class="header">

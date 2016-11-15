@@ -8,6 +8,7 @@
   <style type="text/css">code{white-space: pre;}</style>
 </head>
 <body>
+<p><img src="../img/banner.jpg" title="banner" alt="alt text" /></p>
 <h1 id="appendix-c-multi-peril-model-support">Appendix C: Multi-peril model support <a id="multiperil"></a></h1>
 <p>ktools now supports multi-peril models through the introduction of the coverage_id in the data structures.</p>
 <p>Ground up losses apply at the “Item” level in the Kernel which corresponds to “interest coverage” in business terms, which is the element of financial loss that can be associated with a particular asset. In ktools 2.0, item_id represents the element of financial loss and coverage_id represents the asset with its associated total insured value. If there is more than one item per coverage (as defined in the items data) then each item represents an element of financial loss from a particular peril contributing to the total loss for the asset. For each item, the identification of the peril is held in the areaperil_id, which is a unique key representing a combination of the location (area) and peril.</p>

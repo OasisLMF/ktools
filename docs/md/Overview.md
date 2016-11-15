@@ -1,3 +1,4 @@
+![alt text](../img/banner.jpg "banner")
 # 2. Data Streaming Framework Overview
 
 This is the general data streaming framework showing the core components of the toolkit.

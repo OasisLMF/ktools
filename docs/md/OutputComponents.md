@@ -1,3 +1,4 @@
+![alt text](../img/banner.jpg "banner")
 # 4.2 Output Components <a id="outputcomponents"></a>
 
 ### eltcalc <a id="eltcalc"></a>

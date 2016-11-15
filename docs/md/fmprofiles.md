@@ -1,3 +1,4 @@
+![alt text](../img/banner.jpg "banner")
 # Appendix B: FM Profiles <a id="fmprofiles"></a>
 
 This section specifies the attributes and rules for the following list of profiles.

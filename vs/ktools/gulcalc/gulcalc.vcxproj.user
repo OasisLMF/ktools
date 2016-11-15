@@ -1,8 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <LocalDebuggerWorkingDirectory>f:\oasisdev\posix\kfiles</LocalDebuggerWorkingDirectory>
-    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>-L 0.1 -S100 -R 1000 -r -c gul_coveragex.bin -i -  &lt; cdf11.bin &gt; gul_item.bin</LocalDebuggerCommandArguments>
-  </PropertyGroup>
-</Project>

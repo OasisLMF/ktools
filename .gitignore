@@ -1,5 +1,5 @@
+/Makefile
 autom4te.cache/*
-Makefile
 *.o
 .deps/*
 .deps

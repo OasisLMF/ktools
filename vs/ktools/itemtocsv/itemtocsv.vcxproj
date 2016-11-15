@@ -21,6 +21,11 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\src\itemtocsv\itemtocsv.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\wingetopt\wingetopt.vcxproj">
+      <Project>{b5960b46-527b-4833-918b-ec5735c03635}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{996A8E85-1FF8-469C-ACB7-3DED11CD216E}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>

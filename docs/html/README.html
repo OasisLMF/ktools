@@ -44,7 +44,7 @@ $ ./kconfigure</code></pre>
 <p>Follow the rest of the process as described above.</p>
 <h2 id="windows-installation">Windows Installation</h2>
 <h3 id="pre-requisites-1">Pre-requisites</h3>
-<p>Cygwin is required for the Windows native build. Cygwin is a Linux environment running in Windows.<br />
+<p>Cygwin 64-bit is required for the Windows native build. Cygwin is a Linux environment running in Windows.<br />
 <a href="http://www.cygwin.com/" class="uri">http://www.cygwin.com/</a></p>
 <p>Download and run the set-up program for Cygwin.<br />
 The following Cygwin add-in packages are required;</p>
@@ -55,7 +55,7 @@ The following Cygwin add-in packages are required;</p>
 <li>diffutils</li>
 <li>automake</li>
 </ul>
-<p>To build Windows 64-bit executables;</p>
+<p>To build native Windows 64-bit executables;</p>
 <ul>
 <li>mingw64-x86_64-gcc-g++</li>
 <li>mingw64-x86_64-gcc-core</li>
@@ -71,7 +71,7 @@ The following Cygwin add-in packages are required;</p>
 <pre class="sh"><code>$ tar -xvf ktools-[version].tar.gz</code></pre>
 <p>Go into the ktools folder and configure using the following command;</p>
 <pre class="sh"><code>$ cd ktools-[version]
-$ ./win64configure</code></pre>
+$ ./winconfigure</code></pre>
 <p>Make using the following command;</p>
 <pre class="sh"><code>$ make</code></pre>
 <p>Next run the automated test to check the build and numerical results;</p>
@@ -82,8 +82,8 @@ $ ./win64configure</code></pre>
 <p><img src="docs/img/windowspath.jpg" title="Adding the path in system environment variables" alt="alt text" /></p>
 <p>The installation is complete. Restart the Cygwin session to refresh the path before usage.</p>
 <h2 id="usage">Usage</h2>
-<p>There is sample data and five example scripts which demonstrate how to invoke ktools in the /examples folder. These are written in python.</p>
-<p>For example, to run the eltcalc_example script, go into the examples folder and run the following command (you must have python installed):</p>
+<p>There is sample data and six example scripts which demonstrate how to invoke ktools in the /examples folder. These are written in python v2.</p>
+<p>For example, to run the eltcalc_example script, go into the examples folder and run the following command (you must have python v2.X installed):</p>
 <pre class="sh"><code>$ cd examples
 $ python eltcalc_example.py </code></pre>
 <h3 id="questionsproblems">Questions/problems?</h3>

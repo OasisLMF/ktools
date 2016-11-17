@@ -321,7 +321,7 @@ The csv file should contain the following fields and include a header row.
 | group_id			| int    |   4   | Identifier of the correlaton group             |    3      |
 
 
-The data should be ordered by areaperil_id, vulnerability_id ascending and not contain nulls. It is best practice for item_id to be a contiguous sequence of numbers starting from 1.
+The data should be ordered by areaperil_id, vulnerability_id ascending and not contain nulls. item_id must be a contiguous sequence of numbers starting from 1.
 
 ##### itemtobin
 ```

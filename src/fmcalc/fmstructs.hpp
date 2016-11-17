@@ -1,4 +1,3 @@
-#pragma once
 /*
 * Copyright (c)2015 - 2016 Oasis LMF Limited
 * All rights reserved.
@@ -35,6 +34,9 @@
 /*
 Author: Ben Matharu  email: ben.matharu@oasislmf.org
 */
+#ifndef FMSTUCTS_H_
+#define FMSTUCTS_H_
+
 
 #include <vector>
 
@@ -67,3 +69,5 @@ struct profile_rec {
 	std::vector<tc_rec> tc_vec;
 
 };
+
+#endif  // FMSTUCTS_H_

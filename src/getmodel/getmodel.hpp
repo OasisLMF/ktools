@@ -1,5 +1,3 @@
-#pragma once
-
 /*
 * Copyright (c)2015 - 2016 Oasis LMF Limited
 * All rights reserved.
@@ -34,8 +32,13 @@
 * DAMAGE.
 */
 /*
-Author: Ben Matharu  email: ben.matharu@oasislmf.org
+
+Author: Mark Pinkerton  email: mark.pinkerton@oasislmf.org
+
 */
+
+#ifndef GETMODEL_H_
+#define GETMODEL_H__
 
 #include <map>
 #include <set>
@@ -89,3 +92,5 @@ private:
 	static void initOutputStream();
     int getVulnerabilityIndex(int intensity_bin_index, int damage_bin_index) const;
 };
+
+#endif // GETMODEL_H_

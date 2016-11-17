@@ -1,4 +1,3 @@
-#pragma once
 /*
 * Copyright (c)2015 - 2016 Oasis LMF Limited
 * All rights reserved.
@@ -36,6 +35,10 @@
 Author: Ben Matharu  email: ben.matharu@oasislmf.org
 */
 
+#ifndef AGGREPORTS_H_
+#define AGGREPORTS_H_
+
+#include<vector>
 #include "leccalc.hpp"
 
 class aggreports {
@@ -72,3 +75,4 @@ public:
 	aggreports(int totalperiods, int maxsummaryid, std::map<outkey2, float> &agg_out_loss, std::map<outkey2, float> &max_out_loss,
 		FILE **fout, bool useReturnPeriodFile, int samplesize) ;
 };
+#endif // AGGREPORTS_H_

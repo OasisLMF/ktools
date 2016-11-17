@@ -1,4 +1,3 @@
-#pragma once
 /*
 
 http://note.sonots.com/Comp/CompLang/cpp/getopt.html
@@ -9,6 +8,9 @@ AT&T Public License
 
 Code given out at the 1985 UNIFORUM conference in Dallas.
 */
+
+#ifndef WINGETOPT_H_
+#define WINGETOPT_H_
 
 #ifdef __GNUC__
 #include <getopt.h>
@@ -34,3 +36,5 @@ extern "C" {
 
 #endif  /* _GETOPT_H_ */
 #endif  /* __GNUC__ */
+
+#endif // WINGETOPT_H_

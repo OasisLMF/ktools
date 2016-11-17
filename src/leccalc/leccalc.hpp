@@ -1,5 +1,3 @@
-#pragma once
-
 /*
 * Copyright (c)2015 - 2016 Oasis LMF Limited
 * All rights reserved.
@@ -37,6 +35,8 @@
 Author: Ben Matharu  email: ben.matharu@oasislmf.org
 */
 
+#ifndef LECCALC_H_
+#define LECCALC_H_
 
 #include <map>
 #include "../include/oasis.hpp"
@@ -66,3 +66,4 @@ typedef  std::vector<float> lossvec;
 
 //extern FILE *fout[];
 
+#endif

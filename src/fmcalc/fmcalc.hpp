@@ -1,4 +1,3 @@
-#pragma once
 /*
 * Copyright (c)2015 - 2016 Oasis LMF Limited
 * All rights reserved.
@@ -36,6 +35,8 @@
 Author: Ben Matharu  email: ben.matharu@oasislmf.org
 */
 
+#ifndef FMCALC_H_
+#define FMCALC_H_
 
 #include "../include/oasis.hpp"
 #include "fmstructs.hpp"
@@ -72,3 +73,5 @@ private:
 		const std::vector<int> &items_, const std::vector<float> &guls_);
 	inline void dofmcalc(std::vector <LossRec> &agg_vec_);	
 };
+
+#endif  // FMCALC_H_

@@ -32,7 +32,9 @@
 * DAMAGE.
 */
 
-#pragma once
+#ifndef GETRANDS_H_
+#define GETRANDS_H_
+
 #include <stdio.h>
 #include <random>
 #include <unordered_map>
@@ -89,3 +91,5 @@ public:
 	int count() { return buffersize_; }
 	inline int rdxmax() const { return buffersize_; }
 };
+
+#endif // GETRANDS_H_

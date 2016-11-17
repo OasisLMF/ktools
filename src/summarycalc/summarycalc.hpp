@@ -1,4 +1,3 @@
-#pragma once
 /*
 * Copyright (c)2015 - 2016 Oasis LMF Limited
 * All rights reserved.
@@ -35,6 +34,9 @@
 /*
 Author: Ben Matharu  email: ben.matharu@oasislmf.org
 */
+#ifndef SUMMARYCALC_H_
+#define SUMMARYCALC_H_
+
 
 #include <map>
 #include <vector>
@@ -100,3 +102,5 @@ public:
 	void setfmmode() { inputtype_ = FM_STREAM; };
 
 };
+
+#endif // SUMMARYCALC_H_

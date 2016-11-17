@@ -1,5 +1,3 @@
-#pragma once
-
 /*
 * Copyright (c)2015 - 2016 Oasis LMF Limited
 * All rights reserved.
@@ -37,6 +35,9 @@
 Calculate the GUL
 Author: Ben Matharu  email: ben.matharu@oasislmf.org
 */
+#ifndef GULCALC_H_
+#define GULCALC_H_
+
 #include "../include/oasis.hpp"
 
 #include <vector>
@@ -154,3 +155,5 @@ public:
 	}
 	void doit();
 };
+
+#endif // GULCALC_H_

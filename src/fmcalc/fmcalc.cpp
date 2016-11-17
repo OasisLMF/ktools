@@ -701,6 +701,7 @@ bool fmcalc::loadcoverages(std::vector<float> &coverages)
 	return true;
 
 }
+
 void fmcalc::init_itemtotiv()
 {
 	std::vector<float> coverages;
@@ -715,13 +716,19 @@ void fmcalc::init_itemtotiv()
 	flseek(fin, 0L, SEEK_END);
 	long long sz = fltell(fin);
 	flseek(fin, 0L, SEEK_SET);
-
+	int last_item_id = 0;
 	unsigned int nrec = sz / sizeof(item);
 	item_to_tiv_.resize(nrec+1,0.0);
 
 	item itm;
 	int i = fread(&itm, sizeof(itm), 1, fin);
 	while (i != 0) {
+		last_item_id++;
+		if (itm.id != last_item_id) {
+			fprintf(stderr, "Item ids are not contiguous or do not start from one");
+			exit(-1);
+		}
+		last_item_id = itm.id;
 		item_to_tiv_[itm.id] = coverages[itm.coverage_id];
 		i = fread(&itm, sizeof(itm), 1, fin);
 	}

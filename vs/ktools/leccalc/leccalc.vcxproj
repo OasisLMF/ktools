@@ -28,8 +28,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\src\leccalc\aggreports.hpp" />
-    <ClInclude Include="..\..\..\src\leccalc\leccalc.hpp" />
+    <ClInclude Include="..\..\..\src\leccalc\aggreports.h" />
+    <ClInclude Include="..\..\..\src\leccalc\leccalc.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{0941449F-9C96-486B-8D5A-8A6361190A0B}</ProjectGuid>

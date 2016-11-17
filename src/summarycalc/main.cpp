@@ -47,7 +47,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #endif
 
 #include "../include/oasis.hpp"
-#include "summarycalc.hpp"
+#include "summarycalc.h"
 #include <string>
 
 void help()

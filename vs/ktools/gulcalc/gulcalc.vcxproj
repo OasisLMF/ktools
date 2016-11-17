@@ -155,8 +155,8 @@
     <ClCompile Include="..\..\..\src\gulcalc\primetest.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\src\gulcalc\getrands.hpp" />
-    <ClInclude Include="..\..\..\src\gulcalc\gulcalc.hpp" />
+    <ClInclude Include="..\..\..\src\gulcalc\getrands.h" />
+    <ClInclude Include="..\..\..\src\gulcalc\gulcalc.h" />
     <ClInclude Include="..\..\..\src\wingetopt\wingetopt.h" />
   </ItemGroup>
   <ItemGroup>

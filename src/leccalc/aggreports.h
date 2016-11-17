@@ -39,7 +39,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #define AGGREPORTS_H_
 
 #include<vector>
-#include "leccalc.hpp"
+#include "leccalc.h"
 
 class aggreports {
 private:

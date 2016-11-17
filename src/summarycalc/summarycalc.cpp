@@ -50,7 +50,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 using namespace std;
 #include "../include/oasis.hpp"
-#include "summarycalc.hpp"
+#include "summarycalc.h"
 
 
 

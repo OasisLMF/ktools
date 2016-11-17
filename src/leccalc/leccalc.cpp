@@ -53,8 +53,8 @@ This process will then read all the *.bin files in the subdirectory and then com
 #include <stdlib.h>
 #include <math.h>
 #include <vector>
-#include "leccalc.hpp"
-#include "aggreports.hpp"
+#include "leccalc.h"
+#include "aggreports.h"
 
 
 #if defined(_MSC_VER)

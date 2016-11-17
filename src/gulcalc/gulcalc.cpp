@@ -36,7 +36,7 @@
 	Author: Ben Matharu  email: ben.matharu@oasislmf.org
 */
 
-#include "gulcalc.hpp"
+#include "gulcalc.h"
 
 #include <fcntl.h>
 #include <stdio.h>

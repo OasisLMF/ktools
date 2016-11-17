@@ -38,7 +38,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <vector>
 #include <algorithm>    // std::sort
 
-#include "aggreports.hpp"
+#include "aggreports.h"
 
 
 struct line_points {

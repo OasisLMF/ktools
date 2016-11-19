@@ -43,7 +43,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <unistd.h>
 #endif
 
-#include "gulcalc.hpp"
+#include "gulcalc.h"
 
 using namespace std;
 

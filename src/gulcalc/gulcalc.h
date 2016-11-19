@@ -42,7 +42,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 #include <vector>
 #include <map>
-#include "getrands.hpp"
+#include "getrands.h"
 
 struct exposure_rec {
 	int item_id;

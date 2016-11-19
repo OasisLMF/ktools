@@ -118,7 +118,7 @@ void processrec(char *rec, int recsize,
 void doit(bool skipheader)
 {
 
-	if (skipheader == false) fprintf(stdout, "event_id,areaperil_id,vulnerabilty_id,bin_index,prob_to,>bin_mean");
+	if (skipheader == false) fprintf(stdout, "event_id,areaperil_id,vulnerabilty_id,bin_index,prob_to,bin_mean\n");
 	std::vector<damagebindictionary> damagebindictionary_vec;
 	getdamagebindictionary(damagebindictionary_vec);
 	size_t total_bins = damagebindictionary_vec.size();

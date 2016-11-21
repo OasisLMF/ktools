@@ -316,21 +316,22 @@ damagecdfrec *d = (damagecdfrec *)rec;
 				float  rval;
 				rval = rnd_->rnd(ridx + i);
                 float last_prob_to = 0;
-				pp = (prob_mean *)b;
+				pp = (prob_mean *)b;				
 				for (int bin_index = 0; bin_index < *bin_count; bin_index++){
 					if ((char *)pp > endofRec) {
 						cerr << "Reached end of record"
 							; // this is an error condition
 						pp--;
 					}
-
+					bool is_last_bin = false;
+					if (bin_index+1 == *bin_count) is_last_bin = true;
 					probrec p;
 					if (bin_index == 0) p.prob_from = 0;
 					else p.prob_from = last_prob_to;
 					p.prob_to = pp->prob_to;
 					p.bin_mean = pp->bin_mean;
 					last_prob_to = pp->prob_to;
-					if (rval < p.prob_to){
+					if (rval < p.prob_to || is_last_bin){
 						gulGulSamples g;
 						g.event_id = d->event_id;
 						g.item_id = iter->item_id;
@@ -359,10 +360,10 @@ damagecdfrec *d = (damagecdfrec *)rec;
 							gencovoutput(ggc);
 						}
 						break; // break the for loop
-					}
-
+					}					
 					pp++;
 				}
+
 			}
 			iter++;
 		}

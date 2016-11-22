@@ -45,7 +45,7 @@ Author: Joh Carter  email: johanna.carter@oasislmf.org
 #include <unistd.h>
 #endif
 
-#include "../include/oasis.hpp"
+#include "../include/oasis.h"
 
 using namespace std;
 

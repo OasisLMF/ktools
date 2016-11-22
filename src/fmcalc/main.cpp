@@ -42,8 +42,8 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <algorithm>
 #include <fcntl.h>
 #include <assert.h>
-#include "fmcalc.hpp"
-#include "../include/oasis.hpp"
+#include "fmcalc.h"
+#include "../include/oasis.h"
 
 #if defined(_MSC_VER)
 #include "../wingetopt/wingetopt.h"

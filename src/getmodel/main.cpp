@@ -39,8 +39,8 @@ Author: Mark Pinkerton  email: mark.pinkerton@oasislmf.org
 
 #include <iostream>
 #include <stdio.h>
-#include "getmodel.hpp"
-#include "../include/oasis.hpp"
+#include "getmodel.h"
+#include "../include/oasis.h"
 
 #if defined(_WIN32) || defined(_WIN64)
 #include "../wingetopt/wingetopt.h"

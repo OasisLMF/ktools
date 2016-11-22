@@ -44,7 +44,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <sstream>
 #include <math.h>
 #include <string.h>
-#include "../include/oasis.hpp"
+#include "../include/oasis.h"
 
 char *progname;
 

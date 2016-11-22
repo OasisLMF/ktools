@@ -37,7 +37,7 @@
 #include <fstream>
 #include <sstream>
 #include <stdlib.h>
-#include "../include/oasis.hpp"
+#include "../include/oasis.h"
 
 std::random_device rd;
 using namespace std;

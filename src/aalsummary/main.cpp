@@ -36,7 +36,7 @@
 Author: Ben Matharu  email: ben.matharu@oasislmf.org
 */
 
-#include "aalsummary.hpp"
+#include "aalsummary.h"
 
 #if defined(_MSC_VER)
 #include "../wingetopt/wingetopt.h"

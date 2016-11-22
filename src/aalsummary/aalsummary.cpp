@@ -35,7 +35,7 @@
 Author: Ben Matharu  email: ben.matharu@oasislmf.org
 */
 
-#include "aalsummary.hpp"
+#include "aalsummary.h"
 
 #include <regex>
 #include <math.h>

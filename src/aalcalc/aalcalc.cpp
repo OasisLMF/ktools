@@ -37,7 +37,7 @@
 Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 */
-#include "aalcalc.hpp"
+#include "aalcalc.h"
 #include "../../config.h"
 #if defined(_MSC_VER)
 #include "../wingetopt/wingetopt.h"

@@ -42,7 +42,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../include/oasis.hpp"
+#include "../include/oasis.h"
 #if defined(_MSC_VER)
 #include "../wingetopt/wingetopt.h"
 #else

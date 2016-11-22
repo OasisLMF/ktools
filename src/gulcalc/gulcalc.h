@@ -38,7 +38,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #ifndef GULCALC_H_
 #define GULCALC_H_
 
-#include "../include/oasis.hpp"
+#include "../include/oasis.h"
 
 #include <vector>
 #include <map>

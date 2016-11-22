@@ -47,7 +47,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #endif
 using namespace std;
 
-#include "../include/oasis.hpp"
+#include "../include/oasis.h"
 int intensity_bins_ = -1;
 int hasIntensityUncertainty_ = true;
 
@@ -127,7 +127,7 @@ void help()
 	fprintf(stderr,
 		"-i max intensity bins\n"
 		"-n No intensity uncertainty\n"
-		"-s skip header\n",
+		"-s skip header\n"
 		"-v version\n"
 	);
 }

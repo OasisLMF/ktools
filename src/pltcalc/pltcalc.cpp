@@ -35,7 +35,7 @@
 Author: Ben Matharu  email: ben.matharu@oasislmf.org
 */
 
-#include "../include/oasis.hpp"
+#include "../include/oasis.h"
 #include <iostream>
 #include <vector>
 #include <map>

@@ -46,7 +46,7 @@ Author: Joh Carter  email: johanna.carter@oasislmf.org
 #endif
 
 
-#include "../include/oasis.hpp"
+#include "../include/oasis.h"
 
 bool skipheader = false;
 

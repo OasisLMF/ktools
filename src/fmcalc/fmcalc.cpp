@@ -38,7 +38,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 */
 
-#include "fmcalc.hpp"
+#include "fmcalc.h"
 
 #include <iostream>
 #include <fstream>

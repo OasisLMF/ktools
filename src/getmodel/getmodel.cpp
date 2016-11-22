@@ -40,8 +40,8 @@
 #include <list>
 #include <set>
 #include <map>
-#include "getmodel.hpp"
-#include "../include/oasis.hpp"
+#include "getmodel.h"
+#include "../include/oasis.h"
 
 struct Exposure 
 {

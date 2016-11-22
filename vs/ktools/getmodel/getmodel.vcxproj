@@ -151,7 +151,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\src\getmodel\getmodel.hpp" />
+    <ClInclude Include="..\..\..\src\getmodel\getmodel.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

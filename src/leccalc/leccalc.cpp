@@ -96,7 +96,7 @@ void loadoccurence(std::map<int, std::vector<int> > &event_to_periods, int &tota
 	}
 	int date_algorithm;
 	occurrence occ;
-	int i = fread(&date_algorithm, sizeof(date_algorithm), 1, fin);
+	size_t i = fread(&date_algorithm, sizeof(date_algorithm), 1, fin);
 	i = fread(&totalperiods, sizeof(totalperiods), 1, fin);
 	i = fread(&occ, sizeof(occ), 1, fin);
 	while (i != 0) {		
@@ -133,7 +133,7 @@ void processinputfile(unsigned int &samplesize,const std::map<int, std::vector<i
 		int &maxsummaryid, std::map<outkey2, float> &agg_out_loss, std::map<outkey2, float> &max_out_loss)
 {
 	unsigned int stream_type = 0;
-	int i = fread(&stream_type, sizeof(stream_type), 1, stdin);
+	size_t i = fread(&stream_type, sizeof(stream_type), 1, stdin);
 	if (isSummaryCalcStream(stream_type) == true) {
 		unsigned int summaryset_id;
 		i = fread(&samplesize, sizeof(samplesize), 1, stdin);

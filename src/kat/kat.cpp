@@ -35,7 +35,7 @@
 Used to multiples pipes functionality of simple cat command with multiple inputs
 Author: Ben Matharu  email: ben.matharu@oasislmf.org
 */
-#include "../include/oasis.hpp"
+#include "../include/oasis.h"
 #include <vector>
 
 #if defined(_MSC_VER)

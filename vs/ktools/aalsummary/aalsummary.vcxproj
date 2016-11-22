@@ -121,7 +121,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\src\aalsummary\aalsummary.hpp" />
+    <ClInclude Include="..\..\..\src\aalsummary\aalsummary.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

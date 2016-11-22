@@ -48,7 +48,7 @@
 
 #include <memory.h>
 
-#include "../include/oasis.hpp"
+#include "../include/oasis.h"
 
 using namespace std;
 
@@ -312,9 +312,13 @@ damagecdfrec *d = (damagecdfrec *)rec;
 			int ridx = 0; // dummy value		
             if (userandomtable_) ridx = ((iter->group_id * p1_*p3_) + (d->event_id * p2_)) % rnd_count;
             else ridx = iter->group_id * samplesize_;
+			prob_mean *pp_max = pp + (*bin_count) -1;
 			for (int i = 0; i < samplesize_; i++){
 				float  rval;
 				rval = rnd_->rnd(ridx + i);
+				if (rval >= pp_max->prob_to) {
+					rval = pp_max->prob_to - 0.00000003;	// set value to just under max value (which should be 1)
+				}
                 float last_prob_to = 0;
 				pp = (prob_mean *)b;
 				for (int bin_index = 0; bin_index < *bin_count; bin_index++){

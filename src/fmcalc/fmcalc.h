@@ -38,8 +38,8 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #ifndef FMCALC_H_
 #define FMCALC_H_
 
-#include "../include/oasis.hpp"
-#include "fmstructs.hpp"
+#include "../include/oasis.h"
+#include "fmstructs.h"
 
 #include <vector>
 #include <map>

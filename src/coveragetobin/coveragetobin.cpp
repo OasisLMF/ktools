@@ -44,7 +44,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <unistd.h>
 #endif
 
-#include "../include/oasis.hpp"
+#include "../include/oasis.h"
 
 void doit()
 {

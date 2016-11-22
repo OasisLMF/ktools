@@ -115,7 +115,7 @@
     <ClCompile Include="..\..\..\src\aalcalc\aalcalc.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\src\aalcalc\aalcalc.hpp" />
+    <ClInclude Include="..\..\..\src\aalcalc\aalcalc.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\wingetopt\wingetopt.vcxproj">

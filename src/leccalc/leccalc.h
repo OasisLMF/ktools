@@ -39,7 +39,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #define LECCALC_H_
 
 #include <map>
-#include "../include/oasis.hpp"
+#include "../include/oasis.h"
 
 enum { AGG_FULL_UNCERTAINTY = 0, AGG_WHEATSHEAF, AGG_SAMPLE_MEAN, AGG_WHEATSHEAF_MEAN, OCC_FULL_UNCERTAINTY, OCC_WHEATSHEAF, OCC_SAMPLE_MEAN, OCC_WHEATSHEAF_MEAN };
 

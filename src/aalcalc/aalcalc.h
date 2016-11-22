@@ -39,7 +39,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #ifndef AALCALC_H_
 #define AALCALC_H_
 
-#include "../include/oasis.hpp"
+#include "../include/oasis.h"
 
 #include <map>
 #include <vector>

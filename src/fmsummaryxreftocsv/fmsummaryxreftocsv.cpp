@@ -32,7 +32,7 @@
 * DAMAGE.
 */
 /*
-Convert fmxref output to csv
+Convert fmsummaryxref output to csv
 Author: Joh Carter  email: johanna.carter@oasislmf.org
 */
 #include <iostream>
@@ -47,7 +47,7 @@ Author: Joh Carter  email: johanna.carter@oasislmf.org
 #endif
 
 
-#include "../include/oasis.hpp"
+#include "../include/oasis.h"
 
 using namespace std;
 

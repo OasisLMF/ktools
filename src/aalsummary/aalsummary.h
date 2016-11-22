@@ -43,7 +43,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 #include <map>
 
-#include "../include/oasis.hpp"
+#include "../include/oasis.h"
 
 class aalsummary {
 private:

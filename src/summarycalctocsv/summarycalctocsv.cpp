@@ -46,7 +46,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #endif
 
 using namespace std;
-#include "../include/oasis.hpp"
+#include "../include/oasis.h"
 
 void doit(bool skipheader, bool fullprecision)
 {

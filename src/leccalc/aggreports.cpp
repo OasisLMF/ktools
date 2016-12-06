@@ -195,11 +195,16 @@ void aggreports::doreturnperiodout(int handle, int &nextreturnperiod_index, floa
 		return;
 	}
 	float nextreturnperiod_value = returnperiods_[nextreturnperiod_index];
-	if (current_return_period <= nextreturnperiod_value) {
+	while (current_return_period <= nextreturnperiod_value) {
 		float loss = getloss(nextreturnperiod_value, last_return_period, last_loss, current_return_period, current_loss);
 		if(type) fprintf(fout_[handle],"%d,%d,%f,%f\n", summary_id, type, (float)nextreturnperiod_value, loss);
 		else fprintf(fout_[handle],"%d,%f,%f\n", summary_id, (float)nextreturnperiod_value, loss);
 		nextreturnperiod_index++;
+		if (nextreturnperiod_index < returnperiods_.size()) {
+			nextreturnperiod_value = returnperiods_[nextreturnperiod_index];
+		}else{
+			break;
+		}
 	}
 	if (current_return_period > 0) {
 		last_return_period = current_return_period;

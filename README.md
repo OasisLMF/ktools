@@ -18,7 +18,7 @@ This issue will be handled in future releases by implementing the rdrand random 
 
 ### Pre-requisites
 
-The g++ compiler needs to be installed in Linux.
+The g++ compiler and build-essential on debian distros or 'Development Tools' on red hat  needs to be installed in Linux.
 
 ### Instructions
 
@@ -27,9 +27,14 @@ Copy ktools-[version].tar.gz onto your machine and untar.
 $ tar -xvf ktools-[version].tar.gz
 ```
 
-Go into the ktools folder and configure using the following command;
+Go into the ktools folder and  autogen using the following command;
 ``` sh
 $ cd ktools-[version]
+$ ./autogen.sh
+```
+
+Configure using the following command;
+``` sh
 $ ./configure
 ```
 
@@ -52,11 +57,13 @@ The installation is complete. The executables are located in ~/usr/local/bin.
 
 If installing the latest code from the git repository, clone the ktools repository onto your machine.
 
-Go into the ktools folder and configure using the following command;
+Go into the ktools folder and  autogen using the following command;
 ``` sh
 $ cd ktools
-$ ./kconfigure
+$ ./autogen.sh
 ```
+
+
 Follow the rest of the process as described above.
 
 ## Windows Installation
@@ -72,6 +79,8 @@ The following Cygwin add-in packages are required;
 * make
 * diffutils
 * automake
+* libtools
+
 
 To build native Windows 64-bit executables;
 
@@ -96,10 +105,15 @@ Extract the files using the following command
 $ tar -xvf ktools-[version].tar.gz
 ```
 
-Go into the ktools folder and configure using the following command;
+Go into the ktools folder and autgen using the following command;
 
 ``` sh
 $ cd ktools-[version]
+$ ./autogen.sh
+```
+
+Configure using the following command;
+``` sh
 $ ./winconfigure
 ```
 

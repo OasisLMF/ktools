@@ -4,6 +4,7 @@
 AC_PREREQ([2.69])
 AC_INIT([ktools],  m4_esyscmd([tr -d '\n' < VERSION]), [support@oasislmf.org])
 AM_INIT_AUTOMAKE([gnu])
+AC_CONFIG_MACRO_DIR([m4])
 
 AC_MSG_CHECKING([Check for /usr/bin/diff ])
 if [[ -f /usr/bin/diff ]];

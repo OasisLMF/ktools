@@ -8,3 +8,5 @@ config.h
 config.log
 config.status
 config.h.in~
+Makefile.in
+

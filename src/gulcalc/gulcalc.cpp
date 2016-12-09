@@ -316,11 +316,11 @@ damagecdfrec *d = (damagecdfrec *)rec;
 			for (int i = 0; i < samplesize_; i++){
 				float  rval;
 				rval = rnd_->rnd(ridx + i);
-				/* Add when Joh is  back
+				// Add when Joh is  back
 				if (rval >= pp_max->prob_to) {
 					rval = pp_max->prob_to - 0.00000003;	// set value to just under max value (which should be 1)
 				}
-				*/
+				
                 float last_prob_to = 0;
 				pp = (prob_mean *)b;
 				for (int bin_index = 0; bin_index < *bin_count; bin_index++){

@@ -4,5 +4,5 @@ RUN apt-get install -y gcc g++ make automake autoconf
 
 WORKDIR /var/oasis/ktools
 COPY ./ ./
-RUN autoreconf; sh ./configure 
+RUN sh ./autogen.sh; sh ./configure 
 RUN make; make check; make install

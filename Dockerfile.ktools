@@ -1,6 +1,6 @@
 FROM coreoasis/oasis_base:R_0_0_0_3
 
-RUN apt-get install -y gcc g++ make automake autoconf
+RUN apt-get install -y gcc g++ make libtool automake autoconf
 
 WORKDIR /var/oasis/ktools
 COPY ./ ./

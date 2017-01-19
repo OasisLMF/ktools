@@ -295,11 +295,11 @@ inline void initstreams(std::string inFile="", std::string outFile="")
 #define ITEMS_FILE "input/items.bin"
 #define EVENTS_FILE "input/events.bin"
 #define RETURNPERIODS_FILE "input/returnperiods.bin"
+#define OCCURRENCE_FILE "input/occurrence.bin"
 
 #define DAMAGE_BIN_DICT_FILE "static/damage_bin_dict.bin"
 #define DAMAGE_CDF_BIN_FILE "static/damage_cdf.bin"
 #define DAMAGE_CDF_IDX_FILE "static/damage_cdf.idx"
-#define OCCURRENCE_FILE "static/occurrence.bin"
 #define RANDOM_FILE "static/random.bin"
 #define VULNERABILITY_FILE  "static/vulnerability.bin"
 #define FOOTPRINT_FILE  "static/footprint.bin"

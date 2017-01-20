@@ -37,12 +37,13 @@
 #include <fstream>
 #include <sstream>
 #include <stdlib.h>
+#include <time.h>
 #include "../include/oasis.h"
 
 std::random_device rd;
 using namespace std;
 
-getRands::getRands(bool fromFile, int rand_vec_size,int rand_seed) : gen_(rd()), dis_(0, 1), rand_vec_size_(rand_vec_size), rand_seed_(rand_seed)
+getRands::getRands(bool fromFile, int rand_vec_size,int rand_seed) : gen_(time(0)), dis_(0, 1), rand_vec_size_(rand_vec_size), rand_seed_(rand_seed)
 {
 	if (rand_seed_ > 0) gen_.seed(rand_seed_);
 

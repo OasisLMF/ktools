@@ -231,7 +231,7 @@ void help()
 		"-c [output pipe] - coverage output\n"
 		"-i [output pipe] - item output\n"
 		"-d debug (output random numbers instead of gul)\n"
-		 "-s seed for random number generation (used for debugging)\n"
+		"-s seed for random number generation (used for debugging)\n"
 		"-v version\n"
 		"-h help\n"
 		);
@@ -244,7 +244,7 @@ int main(int argc, char *argv[])
 	//rand_vector_size = 1000000;
 	//samplesize = 0;
 	//rand_seed = -1;
-	while ((opt = getopt(argc, argv, "vhdrL:S:c:i:R:")) != -1) {
+	while ((opt = getopt(argc, argv, "vhdrL:S:c:i:R:s:")) != -1) {
 		switch (opt) {
 		case 'S':
 			samplesize = atoi(optarg);

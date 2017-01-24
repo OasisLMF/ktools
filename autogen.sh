@@ -1552,6 +1552,7 @@ if [ "x$config" = "x" ] ; then
     $VERBOSE_ECHO "Could not locate the configure template (from `pwd`)"
 fi
 
+chmod +x configure
 # summarize
 $ECHO "done"
 $ECHO

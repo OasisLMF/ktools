@@ -11,7 +11,8 @@ rm -f ktest/cw62bld
 rm -f ktest/uwbld
  
 if [ "$SYSNAME" = "Cygwin" ]; then
-	./configure  --host  i686-w64-mingw32 --prefix=/cygdrive/c/oasis
+	# ./configure  --host  i686-w64-mingw32 --prefix=/cygdrive/c/oasis   # do not use 32 bit variant!!!
+	./configure  --build=x86_64 --host x86_64-w64-mingw32 --prefix=/cygdrive/c/oasis
    	touch ktest/cw64bld
    	exit 0
 else

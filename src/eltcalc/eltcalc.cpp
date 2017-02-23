@@ -137,16 +137,32 @@ void help()
      "-h help\n"
 	) ;
 }
-
+void touch(const std::string &filepath)
+{
+	FILE *fout = fopen(filepath.c_str(), "wb");
+	fclose(fout);
+}
+void setinitdone(int processid)
+{
+	if (processid) {
+		std::ostringstream s;
+		s << SEMA_DIR_PREFIX << "_elt/" << processid << ".id";
+		touch(s.str());
+	}
+}
 int main(int argc, char* argv[])
 {
 
 	int opt;
-	while ((opt = getopt(argc, argv, "vh")) != -1) {
+	int processid = 0;
+	while ((opt = getopt(argc, argv, "vhP:")) != -1) {
 		switch (opt) {
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
 			exit(EXIT_FAILURE);
+			break;
+		case 'P':
+			processid = atoi(optarg);
 			break;
 		case 'h':
 		default:
@@ -155,6 +171,7 @@ int main(int argc, char* argv[])
 		}
 	}
    initstreams();
+   setinitdone(processid);
    doit();
    return 0;
 

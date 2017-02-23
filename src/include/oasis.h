@@ -305,4 +305,5 @@ inline void initstreams(std::string inFile="", std::string outFile="")
 #define FOOTPRINT_FILE  "static/footprint.bin"
 #define FOOTPRINT_IDX_FILE  "static/footprint.idx"
 
+#define SEMA_DIR_PREFIX "work/sema"
 #endif  // OASIS_H_

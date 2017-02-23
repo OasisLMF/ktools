@@ -57,9 +57,27 @@ void doit(std::vector <FILE *> &infiles)
 	}
 }
 
+void touch(const std::string &filepath)
+{
+	FILE *fout = fopen(filepath.c_str(), "wb");
+	fclose(fout);
+}
+void setinitdone(int processid)
+{
+	if (processid) {
+		std::ostringstream s;
+		s << SEMA_DIR_PREFIX << "_kat/" << processid << ".id";
+		touch(s.str());
+	}
+}
+
 void help()
 {
-	fprintf(stderr, "-h help\n-v version\n");
+	fprintf(stderr,
+		"-P process_id\n"
+		"-h help\n"
+		"-v version\n"
+	);
 }
 
 
@@ -68,8 +86,12 @@ int main(int argc, char* argv[])
 
 
 	int opt;
-	while ((opt = getopt(argc, argv, "vh")) != -1) {
+	int processid = 0;
+	while ((opt = getopt(argc, argv, "P:vh")) != -1) {
 		switch (opt) {
+		case 'P':
+			processid = atoi(optarg);
+			break;
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
 			::exit(EXIT_FAILURE);
@@ -81,6 +103,8 @@ int main(int argc, char* argv[])
 		}
 	}
 
+	argc -= optind;
+	argv += optind;
 
 	std::vector <FILE *> infiles;
 
@@ -94,5 +118,6 @@ int main(int argc, char* argv[])
 	}
 
 	initstreams();
+	setinitdone(processid);
 	doit(infiles);
 }

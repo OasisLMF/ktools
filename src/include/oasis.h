@@ -44,6 +44,9 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <stdlib.h>
 
 #include "../../config.h"
+#ifdef __unix 
+#include <unistd.h>
+#endif
 
 #if defined(_MSC_VER) || defined(__MINGW32__)
 #include <fcntl.h>
@@ -256,15 +259,19 @@ struct EventIndex
 
 // -- UTILITY inline functions 
 
+inline void zzSleep(int sleep_millisecs)
+{
+#if defined(_MSC_VER)
+        Sleep(sleep_millisecs);                 // windows sleep in milliseconds
+#else
+        usleep(sleep_millisecs * 1000);   // usleep in millionth of a second
+#endif
+}
+
+
+
 inline void initstreams(std::string inFile="", std::string outFile="")
 {
-
-   if (inFile.length() > 0){
-        if (freopen(inFile.c_str(), "rb", stdin) == NULL) {
-			fprintf(stderr, "%s: Error opening file %s\n", __func__, inFile.c_str());
-            exit(-1);
-         }
-   }
 
    if (outFile.length() > 0){
        if (freopen(outFile.c_str(), "wb", stdout) == NULL) {
@@ -273,16 +280,24 @@ inline void initstreams(std::string inFile="", std::string outFile="")
         }
    }
 
+   if (inFile.length() > 0){
+        if (freopen(inFile.c_str(), "rb", stdin) == NULL) {
+			fprintf(stderr, "%s: Error opening file %s\n", __func__, inFile.c_str());
+            exit(-1);
+         }
+   }
+
 #if defined(_MSC_VER) || defined(__MINGW32__)
 	_setmode(_fileno(stdout), O_BINARY);
 	_setmode(_fileno(stdin), O_BINARY);
 #else
-	freopen(NULL, "rb", stdin);
 	freopen(NULL, "wb", stdout);
+	freopen(NULL, "rb", stdin);
 #endif
 
 }
 
+#define PIPE_DELAY	1000
 
 // Relative paths for file names
 #define COVERAGES_FILE "input/coverages.bin"

@@ -95,7 +95,6 @@ AC_CONFIG_FILES([
 		 src/returnperiodtocsv/Makefile
 		 src/returnperiodtobin/Makefile
 		 src/kat/Makefile
-		 src/kwait/Makefile
                  ])
 AC_OUTPUT
 

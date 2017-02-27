@@ -45,6 +45,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <unistd.h>
 #endif
 
+bool firstOutput = true;
 
 void aalcalc::loadoccurrence()
 {
@@ -77,12 +78,20 @@ void aalcalc::outputresultscsv()
 		float mean = static_cast<float>(x.second.mean);
 		float sd_dev = static_cast<float>(static_cast<float>(sqrt((x.second.mean_squared - (x.second.mean * x.second.mean / no_of_periods_)) / (no_of_periods_ - 1))));
 		printf("%d,%d, %f, %f, %f \n", x.first, x.second.type,mean, sd_dev, x.second.max_exposure_value);
+		 if (firstOutput==true){
+                        zzSleep(PIPE_DELAY);  // used to stop possible race condition with kat
+                        firstOutput=false;
+                }
 	}
 
 	for (auto x : map_sample_aal_) {
 		float mean = static_cast<float>(x.second.mean);
 		float sd_dev = static_cast<float>(sqrt((x.second.mean_squared - (x.second.mean * x.second.mean / no_of_periods_)) / (no_of_periods_ - 1)));
 		printf("%d,%d, %f, %f, %f \n", x.first,x.second.type, mean, sd_dev, x.second.max_exposure_value);
+		if (firstOutput==true){
+                        zzSleep(PIPE_DELAY);  // used to stop possible race condition with kat
+                        firstOutput=false;
+                }
 	}
 
 }

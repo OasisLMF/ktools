@@ -51,6 +51,8 @@ Author: Ben Matharu  email : ben.matharu@oasislmf.org
 using namespace std;
 #include "../include/oasis.h"
 
+bool firstOutput = true;
+
 bool isSummaryCalcStream(unsigned int stream_type)
 {
 	unsigned int stype = summarycalc_id & stream_type;
@@ -96,7 +98,11 @@ void doetloutput(int samplesize)
 				sd = 0;
 			}
 		}
-		printf("%d,1,%d,%f,0,%f\n", sh.summary_id, sh.event_id, analytical_mean, sh.expval);
+		printf("%d,1,%d,%f,0,%f\n", sh.summary_id, sh.event_id, analytical_mean, sh.expval) ;
+		if (firstOutput==true){
+			zzSleep(PIPE_DELAY);  // used to stop possible race condition with kat
+			firstOutput=false;
+		} 
 		if (samplesize) printf("%d,2,%d,%f,%f,%f\n", sh.summary_id, sh.event_id,sample_mean, sd, sh.expval);
 
 		if (i) i = fread(&sh, sizeof(sh), 1, stdin);

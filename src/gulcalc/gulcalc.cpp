@@ -50,7 +50,10 @@
 
 #include "../include/oasis.h"
 
+
+
 using namespace std;
+
 
 bool operator<(const item_map_key& lhs, const item_map_key& rhs)
 {
@@ -390,6 +393,7 @@ void gulcalc::init()
 		coverageWriter_(&gulstream_type, sizeof(gulstream_type), 1);
 		coverageWriter_(&samplesize_, sizeof(samplesize_), 1);
 	}
+	zzSleep(PIPE_DELAY);
 }
 void gulcalc::doit()
 {

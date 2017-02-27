@@ -73,11 +73,11 @@ void help()
 */
 int main(int argc, char* argv[])
 {
-	summarycalc f;
 	int opt;
 	bool noneTrue = true;
 	bool inputtypegul = false;
 	bool inputtypefm = false;
+	summarycalc f;
 	while ((opt = getopt(argc, argv, "vhfg0:1:2:3:4:5:6:7:8:9:")) != -1) {
 		switch (opt) {
 		case 'g':

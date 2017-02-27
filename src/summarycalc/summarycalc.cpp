@@ -41,8 +41,6 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 #include <stdio.h>
 #include <stdlib.h>
-//#include <math.h>
-
 
 #ifdef __unix
 #include <unistd.h>
@@ -300,6 +298,7 @@ void summarycalc::outputstreamtype(int summary_set)
 {
 	int streamtype = summarycalc_id | 1;
 	fwrite(&streamtype, sizeof(streamtype), 1, fout[summary_set]);
+	zzSleep(PIPE_DELAY);
 }
 
 void summarycalc::outputstreamtype()

@@ -41,6 +41,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #if defined(_MSC_VER)
 #include "../wingetopt/wingetopt.h"
 #else
+#include <fcntl.h>
 #include <unistd.h>
 #endif
 
@@ -102,13 +103,12 @@ int main(int argc, char* argv[])
 			::exit(EXIT_FAILURE);
 		}
 	}
-
+	
 	argc -= optind;
 	argv += optind;
 
 	std::vector <FILE *> infiles;
-
-	for (int i = 1; i < argc; i++) {
+	for (int i = 0; i < argc; i++) {
 		FILE *fin = fopen(argv[i], "rb");
 		if (fin == nullptr) {
 			fprintf(stderr, "kat: Cannot open %s\n", argv[i]);

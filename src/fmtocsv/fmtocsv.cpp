@@ -67,7 +67,7 @@ void doit()
 	}
 	stream_type = streamno_mask & fmstream_type;
 	if (stream_type != 1 ) {
-		fprintf(stderr, "%s: Unsupported fm stream type: %s\n", __func__, stream_type);
+		fprintf(stderr, "%s: Unsupported fm stream type: %d\n", __func__, stream_type);
 		exit(-1);
 	}
 

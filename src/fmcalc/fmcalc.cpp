@@ -85,7 +85,6 @@ enum tc {			// tc = terms and conditions
 bool operator<(const fmlevelhdr& lhs, const fmlevelhdr& rhs)
 {
 	if (lhs.event_id != rhs.event_id)  return lhs.event_id < rhs.event_id;
-//	if (lhs.layer_id != rhs.layer_id)  return lhs.layer_id < rhs.layer_id;	
 	return lhs.output_id < rhs.output_id;		// should never reach here since these two are always equal 
 }
 
@@ -338,17 +337,7 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 
 		}
 	}
-
-	/*
-	// resize array remove trailing empty elements in array - investigae why not needed for A MAP FIRST
-	if (agg_vec.size() > 1) {
-		int x = agg_vec.size() - 1;
-		while ()
-		if (agg_vec[agg_vec.size() - 1].agg_id == 0) {
-			printf("Ouch");
-		}
-	}
-	*/
+	
 	if (sidx == 3) {
 		//fprintf(stderr, "We're here");
 	}
@@ -359,7 +348,6 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 		fmlevelrec rec;
         rec.loss = 0;
 		rec.sidx = sidx;		
-		//fmhdr.layer_id = layer;
 		for (auto x : agg_vec) {
 			if (x.allocrule_id == -1 || x.allocrule_id == 0 ) { // no back allocation
 				fmxref_key k;
@@ -409,11 +397,6 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 	std::vector<int> &aggid_to_vectorlookup = aggid_to_vectorlookups[level];	
 	aggid_to_vectorlookup.resize(level_to_maxagg_id_[level], -2);
 
-	// std::map<fmlevelhdr, std::vector<fmlevelrec>> outmapx;
-	//fmlevelhdr fmhdr;
-	//fmhdr.event_id = event_id;
-	//fmhdr.layer_id = 1;
-
 	const int layer_id = 1;
 	std::vector<std::vector<std::vector<policytcvidx>>> avxs;
 	int total_loss_items = 0;
@@ -425,8 +408,7 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 		avx.resize(max_layer_+1);
 		for (unsigned int i = 0;i < guls.size();i++) {
 			int agg_id = pfm_vec_vec_[level][items[i]];
-			//auto iter = aggid_to_vectorlookup.find(agg_id);
-			//if (iter == aggid_to_vectorlookup.end()) {
+
 			int current_idx = aggid_to_vectorlookup[agg_id-1];
 			if (current_idx == -2) {
 				policytcvidx a;
@@ -438,7 +420,6 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 				total_loss_items++;
 			}
 			else {
-				// avx[1][iter->second].item_idx.push_back(i);
 				avx[1][current_idx].item_idx.push_back(i);
 			}
 			
@@ -449,28 +430,23 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 			std::vector<std::vector<policytcvidx>>  &next = avxs[zzlevel];
 			next.resize(max_layer_ + 1);
 
-			// std::map<int, int> &aggid_to_vectorlookup = aggid_to_vectorlookups[zzlevel]; // 
 			std::vector<int> &zzaggid_to_vectorlookup = aggid_to_vectorlookups[zzlevel]; // 
 			zzaggid_to_vectorlookup.resize(level_to_maxagg_id_[zzlevel] , -2);
 			int previous_layer = 1; // previous layer is always one becuase only the last layer can be greater than 1
 
 			for (unsigned int i = 0;i < prev[1].size();i++) {
 				int agg_id = pfm_vec_vec_[zzlevel][prev[previous_layer][i].agg_id];
-				//auto iter = aggid_to_vectorlookup.find(agg_id);
 				int current_idx = zzaggid_to_vectorlookup[agg_id-1];
-				//if (iter == aggid_to_vectorlookup.end())
 				if (current_idx == -2)
 				{
-					// vec_idx = aggid_to_vectorlookup[agg_id];
+
 					for (unsigned int layer = 1; layer < policy_tc_vec_vec_vec_[zzlevel][agg_id].size() ; layer++ ){ // loop through layers
 						struct policytcvidx a;
 						const int policytc_id = policy_tc_vec_vec_vec_[zzlevel][agg_id][layer];
-						//if (next[layer].size() < (agg_id + 1)) {
-							//next[layer].resize(agg_id + 1);
-						//}
+
 						a.agg_id = agg_id;
 						a.policytc_id = policytc_id;
-						//a.vidx = vec_idx;
+
 						next[layer].push_back(a);
 						
 						int current_idx = next[layer].size() - 1;
@@ -483,7 +459,6 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 				else {
 					for (unsigned int layer = 1; layer < policy_tc_vec_vec_vec_[zzlevel][agg_id].size(); layer++) { // loop through layers
 						const int policytc_id = policy_tc_vec_vec_vec_[zzlevel][agg_id][layer];
-						//int current_idx = aggid_to_vectorlookup[agg_id];
 						for (int x : prev[previous_layer][i].item_idx) {
 							next[layer][current_idx].item_idx.push_back(x);	
 						}
@@ -498,8 +473,6 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 	vector <LossRec> &agg_vec = agg_vecs[level];
 	std::map<fmlevelhdr, std::vector<fmlevelrec>> outmap;
 	
-
-	//agg_vec.resize(aggid_to_vectorlookup.size());
 	
 	for (unsigned int idx = 0; idx < event_guls.size(); idx++) {	// loop sample + 1 times
 		agg_vec.resize(total_loss_items);

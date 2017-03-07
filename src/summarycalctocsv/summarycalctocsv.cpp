@@ -48,6 +48,8 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 using namespace std;
 #include "../include/oasis.h"
 
+bool firstOutput = true;
+
 void doit(bool skipheader, bool fullprecision)
 {
 
@@ -76,7 +78,11 @@ void doit(bool skipheader, bool fullprecision)
 				if (i == 0) break;
 				if (sr.sidx == 0) break;
 				if (fullprecision) printf("%d,%d,%d,%f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
-				else printf("%d,%d,%d,%.2f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);				
+				else printf("%d,%d,%d,%.2f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
+				if (firstOutput==true){
+					zzSleep(PIPE_DELAY);  // used to stop possible race condition with kat
+					firstOutput=false;
+				} 				
 			}
 		}
 		return;

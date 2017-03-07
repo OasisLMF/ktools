@@ -140,16 +140,20 @@ void processinputfile(unsigned int &samplesize,const std::map<int, std::vector<i
 		if (i == 1) i = fread(&summaryset_id, sizeof(summaryset_id), 1, stdin);
 		if (i == 1) {
 			while (i != 0) {
+				bool processEvent = true;
 				summarySampleslevelHeader sh;
 				i = fread(&sh, sizeof(sh), 1, stdin);
 				std::map<int, std::vector<int> >::const_iterator iter;
 				if (i) {
 					iter = event_to_periods.find(sh.event_id);
 					if (iter == event_to_periods.end()) {
-						fprintf(stderr, "Event id %d not found in occurrence.bin\n", sh.event_id);
-						exit(-1);
+						// Event not found so don't process it
+						processEvent = false;
+						//fprintf(stderr, "Event id %d not found in occurrence.bin\n", sh.event_id);
+						//exit(-1);
+					}else {
+						if (maxsummaryid < sh.summary_id) maxsummaryid = sh.summary_id;
 					}
-					if (maxsummaryid < sh.summary_id) maxsummaryid = sh.summary_id;
 				}
 				while (i != 0) {
 					sampleslevelRec sr;
@@ -158,7 +162,7 @@ void processinputfile(unsigned int &samplesize,const std::map<int, std::vector<i
 					if (sr.sidx == 0) break;
 					//				dolecoutput1(sh.summary_id, sr.loss,iter->second);					
 					if (sr.sidx != -2) {
-						if (sr.loss > 0.0) dolecoutputaggsummary(sh.summary_id, sr.sidx, sr.loss, iter->second,agg_out_loss,max_out_loss);
+						if (sr.loss > 0.0 && processEvent == true) dolecoutputaggsummary(sh.summary_id, sr.sidx, sr.loss, iter->second,agg_out_loss,max_out_loss);
 					}
 				}
 			}

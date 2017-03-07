@@ -47,6 +47,8 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <unistd.h>
 #endif
 
+bool firstOutput = true;
+
 using namespace std;
 struct period_occ {
 	int period_no;
@@ -174,6 +176,11 @@ void doit()
 	}else {
 		printf("summary_id,period_no,event_id,mean,standard_deviation,exposure_value,occ_date_id\n");
 	}
+	
+	if (firstOutput==true){
+		zzSleep(PIPE_DELAY);  // used to stop possible race condition with kat
+		firstOutput=false;
+	} 
 	if (stream_type == 1) {
 		int summary_set = 0;
 		int j=0;

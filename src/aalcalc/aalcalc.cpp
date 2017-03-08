@@ -37,6 +37,9 @@
 Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 */
+#include <chrono>
+#include <thread>
+
 #include "aalcalc.h"
 #include "../../config.h"
 #if defined(_MSC_VER)
@@ -79,9 +82,9 @@ void aalcalc::outputresultscsv()
 		float sd_dev = static_cast<float>(static_cast<float>(sqrt((x.second.mean_squared - (x.second.mean * x.second.mean / no_of_periods_)) / (no_of_periods_ - 1))));
 		printf("%d,%d, %f, %f, %f \n", x.first, x.second.type,mean, sd_dev, x.second.max_exposure_value);
 		 if (firstOutput==true){
-                        zzSleep(PIPE_DELAY);  // used to stop possible race condition with kat
-                        firstOutput=false;
-                }
+			std::this_thread::sleep_for(std::chrono::milliseconds(PIPE_DELAY)); // used to stop possible race condition with kat
+            firstOutput=false;
+         }
 	}
 
 	for (auto x : map_sample_aal_) {
@@ -89,9 +92,9 @@ void aalcalc::outputresultscsv()
 		float sd_dev = static_cast<float>(sqrt((x.second.mean_squared - (x.second.mean * x.second.mean / no_of_periods_)) / (no_of_periods_ - 1)));
 		printf("%d,%d, %f, %f, %f \n", x.first,x.second.type, mean, sd_dev, x.second.max_exposure_value);
 		if (firstOutput==true){
-                        zzSleep(PIPE_DELAY);  // used to stop possible race condition with kat
-                        firstOutput=false;
-                }
+			std::this_thread::sleep_for(std::chrono::milliseconds(PIPE_DELAY)); // used to stop possible race condition with kat
+            firstOutput=false;
+        }
 	}
 
 }

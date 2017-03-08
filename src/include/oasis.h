@@ -58,6 +58,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #define fltell ftell
 #endif 
 
+
 const int mean_idx = -1;
 const int std_dev_idx = -2;
 const int tiv_idx = -3;
@@ -258,16 +259,6 @@ struct EventIndex
 
 
 // -- UTILITY inline functions 
-
-inline void zzSleep(int sleep_millisecs)
-{
-#if defined(_MSC_VER)
-        Sleep(sleep_millisecs);                 // windows sleep in milliseconds
-#else
-        usleep(sleep_millisecs * 1000);   // usleep in millionth of a second
-#endif
-}
-
 
 
 inline void initstreams(std::string inFile="", std::string outFile="")

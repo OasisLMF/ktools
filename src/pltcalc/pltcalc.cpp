@@ -40,6 +40,8 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <vector>
 #include <map>
 #include <math.h>
+#include <chrono>
+#include <thread>
 
 #if defined(_MSC_VER)
 #include "../wingetopt/wingetopt.h"
@@ -178,7 +180,7 @@ void doit()
 	}
 	
 	if (firstOutput==true){
-		zzSleep(PIPE_DELAY);  // used to stop possible race condition with kat
+		std::this_thread::sleep_for(std::chrono::milliseconds(PIPE_DELAY)); // used to stop possible race condition with kat
 		firstOutput=false;
 	} 
 	if (stream_type == 1) {

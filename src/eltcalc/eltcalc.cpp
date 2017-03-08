@@ -42,6 +42,9 @@ Author: Ben Matharu  email : ben.matharu@oasislmf.org
 #include <stdlib.h>
 #include <math.h>
 
+#include <chrono>
+#include <thread>
+
 #if defined(_MSC_VER)
 #include "../wingetopt/wingetopt.h"
 #else
@@ -100,7 +103,7 @@ void doetloutput(int samplesize)
 		}
 		printf("%d,1,%d,%f,0,%f\n", sh.summary_id, sh.event_id, analytical_mean, sh.expval) ;
 		if (firstOutput==true){
-			zzSleep(PIPE_DELAY);  // used to stop possible race condition with kat
+			std::this_thread::sleep_for(std::chrono::milliseconds(PIPE_DELAY)); // used to stop possible race condition with kat
 			firstOutput=false;
 		} 
 		if (samplesize) printf("%d,2,%d,%f,%f,%f\n", sh.summary_id, sh.event_id,sample_mean, sd, sh.expval);

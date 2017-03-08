@@ -38,6 +38,8 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
+#include <chrono>
+#include <thread>
 
 #if defined(_MSC_VER)
 #include "../wingetopt/wingetopt.h"
@@ -80,7 +82,7 @@ void doit(bool skipheader, bool fullprecision)
 				if (fullprecision) printf("%d,%d,%d,%f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
 				else printf("%d,%d,%d,%.2f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
 				if (firstOutput==true){
-					zzSleep(PIPE_DELAY);  // used to stop possible race condition with kat
+					std::this_thread::sleep_for(std::chrono::milliseconds(PIPE_DELAY));  // used to stop possible race condition with kat
 					firstOutput=false;
 				} 				
 			}

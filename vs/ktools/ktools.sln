@@ -117,8 +117,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fmpolicytctocsv", "fmpolicy
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cdftocsv", "cdftocsv\cdftocsv.vcxproj", "{99CBE4AF-9516-42F7-B435-026E7BF1FC05}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kwait", "kwait\kwait.vcxproj", "{0DC43ABD-CD9A-476D-B2B8-70C69E5BCD79}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -609,16 +607,6 @@ Global
 		{99CBE4AF-9516-42F7-B435-026E7BF1FC05}.Release|x64.Build.0 = Release|x64
 		{99CBE4AF-9516-42F7-B435-026E7BF1FC05}.Release|x86.ActiveCfg = Release|Win32
 		{99CBE4AF-9516-42F7-B435-026E7BF1FC05}.Release|x86.Build.0 = Release|Win32
-		{0DC43ABD-CD9A-476D-B2B8-70C69E5BCD79}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{0DC43ABD-CD9A-476D-B2B8-70C69E5BCD79}.Debug|x64.ActiveCfg = Debug|x64
-		{0DC43ABD-CD9A-476D-B2B8-70C69E5BCD79}.Debug|x64.Build.0 = Debug|x64
-		{0DC43ABD-CD9A-476D-B2B8-70C69E5BCD79}.Debug|x86.ActiveCfg = Debug|Win32
-		{0DC43ABD-CD9A-476D-B2B8-70C69E5BCD79}.Debug|x86.Build.0 = Debug|Win32
-		{0DC43ABD-CD9A-476D-B2B8-70C69E5BCD79}.Release|Any CPU.ActiveCfg = Release|Win32
-		{0DC43ABD-CD9A-476D-B2B8-70C69E5BCD79}.Release|x64.ActiveCfg = Release|x64
-		{0DC43ABD-CD9A-476D-B2B8-70C69E5BCD79}.Release|x64.Build.0 = Release|x64
-		{0DC43ABD-CD9A-476D-B2B8-70C69E5BCD79}.Release|x86.ActiveCfg = Release|Win32
-		{0DC43ABD-CD9A-476D-B2B8-70C69E5BCD79}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

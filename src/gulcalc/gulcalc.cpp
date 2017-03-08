@@ -47,6 +47,8 @@
 #include <sstream>
 
 #include <memory.h>
+#include <chrono>
+#include <thread>
 
 #include "../include/oasis.h"
 
@@ -393,7 +395,7 @@ void gulcalc::init()
 		coverageWriter_(&gulstream_type, sizeof(gulstream_type), 1);
 		coverageWriter_(&samplesize_, sizeof(samplesize_), 1);
 	}
-	zzSleep(PIPE_DELAY);
+	std::this_thread::sleep_for(std::chrono::milliseconds(PIPE_DELAY));
 }
 void gulcalc::doit()
 {

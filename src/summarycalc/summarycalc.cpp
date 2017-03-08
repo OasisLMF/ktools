@@ -42,6 +42,9 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <chrono>
+#include <thread>
+
 #ifdef __unix
 #include <unistd.h>
 #endif
@@ -298,7 +301,7 @@ void summarycalc::outputstreamtype(int summary_set)
 {
 	int streamtype = summarycalc_id | 1;
 	fwrite(&streamtype, sizeof(streamtype), 1, fout[summary_set]);
-	zzSleep(PIPE_DELAY);
+	std::this_thread::sleep_for(std::chrono::milliseconds(PIPE_DELAY));
 }
 
 void summarycalc::outputstreamtype()

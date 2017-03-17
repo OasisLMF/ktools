@@ -61,6 +61,10 @@ void doit()
        }
        else
        {
+		   if (eventid < 1) {
+			   fprintf(stderr, "Invalid event ID: %d\n", eventid);
+			   fprintf(stderr, "Event ID's must be integers greater than zero\n");
+		   }
            fwrite(&eventid, sizeof(eventid), 1, stdout);
        }
        lineno++;

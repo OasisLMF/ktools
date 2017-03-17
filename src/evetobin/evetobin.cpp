@@ -51,8 +51,9 @@ void doit()
 {
     int eventid;
     char line[4096];
-    int lineno=0;
-	fgets(line, sizeof(line), stdin);	// skip first line
+    int lineno=1;
+	fgets(line, sizeof(line), stdin);	// skip first line header line
+	lineno++;
     while (fgets(line, sizeof(line), stdin) != 0)
     {
        if (sscanf(line, "%d", &eventid) != 1){
@@ -62,7 +63,7 @@ void doit()
        else
        {
 		   if (eventid < 1) {
-			   fprintf(stderr, "Invalid event ID: %d\n", eventid);
+			   fprintf(stderr, "Invalid event ID: %d on line %d\n", eventid, lineno);
 			   fprintf(stderr, "Event ID's must be integers greater than zero\n");
 		   }
            fwrite(&eventid, sizeof(eventid), 1, stdout);

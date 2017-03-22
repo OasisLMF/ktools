@@ -356,7 +356,7 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 				fmhdr.output_id = fm_xrefmap[k];
 				rec.loss = x.loss;
 				outmap[fmhdr].push_back(rec);			// neglible cost
-			}
+			}			
 			if (x.allocrule_id == 1) {	// back allocate as a proportion of the total of the original guls	
 				float gultotal = 0;
 				int vec_idx = aggid_to_vectorlookup[x.agg_id-1];		// Same index applies to avx as to agg_vec
@@ -374,8 +374,24 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 					rec.loss = x.loss * prop;
 					outmap[fmhdr].push_back(rec);			// neglible cost
 				}				
-
 			}
+			if (x.allocrule_id == 2) {		// back allocate as a proportion of the total of the previous guls
+				float prev_gul_total = 0;
+				int vec_idx = aggid_to_vectorlookup[x.agg_id - 1];		// Same index applies to avx as to agg_vec
+				for (int idx : avx[layer][vec_idx].item_idx) {
+					prev_gul_total += prev_agg_vec[idx].loss;
+				}
+				for (int idx : avx[layer][vec_idx].item_idx) {
+					float prop = 0;
+					if (prev_gul_total > 0) prop = prev_agg_vec[idx].loss / prev_gul_total;
+					fmxref_key k;
+					k.layer_id = layer;
+					k.agg_id = items[idx];
+					fmhdr.output_id = fm_xrefmap[k];
+					rec.loss = x.loss * prop;
+					outmap[fmhdr].push_back(rec);			// neglible cost
+				}
+			}			
 		}
 		if (layer < max_layer_) {
 			layer++;
@@ -535,7 +551,7 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
                         outmap[fmhdr].push_back(rec);			// neglible cost
                     }
 
-                }
+                }				
             }
             if (layer < max_layer_) {
                 layer++;

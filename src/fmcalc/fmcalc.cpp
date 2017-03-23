@@ -375,7 +375,7 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 					outmap[fmhdr].push_back(rec);			// neglible cost
 				}				
 			}
-			if (x.allocrule_id == 2) {		// back allocate as a proportion of the total of the previous guls
+			if (x.allocrule_id == 2) {		// back allocate as a proportion of the total of the previous losses
 				float prev_gul_total = 0;
 				int vec_idx = aggid_to_vectorlookup[x.agg_id - 1];		// Same index applies to avx as to agg_vec
 				for (int idx : avx[layer][vec_idx].item_idx) {
@@ -534,7 +534,7 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
                     rec.loss = x.loss;
                     outmap[fmhdr].push_back(rec);			// neglible cost
                 }
-                if (x.allocrule_id == 1) {	// back allocate as a proportion of the total of the original guls
+                if (x.allocrule_id == 1 || x.allocrule_id == 2) {	// back allocate as a proportion of the total of the original guls
                     float gultotal = 0;
                     int vec_idx = aggid_to_vectorlookup[x.agg_id];		// Same index applies to avx as to agg_vec
                     for (int idx : avx[layer][vec_idx].item_idx) {

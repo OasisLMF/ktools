@@ -83,7 +83,7 @@ $ leccalc -r -Ksummary1 -F lec_full_uncertainty_agg.csv -f lec_full_uncertainty_
 
 leccalc requires the occurrence.bin file;
 
-* static/occurrence.bin
+* input/occurrence.bin
 
 leccalc does not have a standard input that can be streamed in. Instead, it reads in summarycalc binary data from a file in a fixed location.  The format of the binaries must match summarycalc standard output. The location is in the 'work' subdirectory of the present working directory. For example;
 
@@ -249,7 +249,7 @@ binary file containing the following fields;
 ##### Internal data
 The program requires the occurrence file;
 
-* static/occurrence.bin
+* input/occurrence.bin
 
 ##### Calculation
 The occurrence file is read into memory. From the summarycalc stream data, the event sample means and sample means squared are computed for each summary_id.  The sample means and squared sampled means are summed by period and summary_id, according to which events are assigned to periods in the occurrence data.  Then the means and squared means are summed across the periods, for each summary_id.  The exposure_value, which is held at an event_id, summary_id in the summarycalc header is also accumulated by summary_id and period, and then across periods. In this case however, it is the maximum exposure value which is carried through the accumulations, not the sum.
@@ -294,7 +294,7 @@ csv file containing the following fields;
 ##### Internal data
 The program requires the occurrence file;
 
-* static/occurrence.bin
+* input/occurrence.bin
 
 aalsummary does not have a standard input that can be streamed in. Instead, it reads in aalcalc binary data from a file in a fixed location. The location is in the 'work' subdirectory of the present working directory. For example;
 

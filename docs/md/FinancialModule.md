@@ -147,8 +147,7 @@ In practice, all profile values are stored in a single flattened format which co
 
 For any given profile we have two standard rules:
 * **calcrule_id**, being the Function used to calculate the losses from the given Profile’s fields. More information about the functions can be found in [FM Profiles](fmprofiles.md).
-* **allocrule_id**, being the rule for allocating back to ITEM level. There are really only two meaningful values here – don’t allocate (0) used typically for the final level to avoid maintaining lots of detailed losses, or allocate back to ITEMs (1) used in all other cases which is in proportion to the input ground up losses.
-(Allocation does not need to be on this basis, by the way, there could be other rules such as allocate back always on TIV or in proportion to the input losses from the previous level, but we have implemented a ground up loss back-allocation rule.
+* **allocrule_id**, being the rule for allocating losses back to ITEM level. There are three meaningful values here – don’t allocate (0) used typically for all levels where a breakdown of losses is not required in output, allocate back to ITEMs (1) in proportion to the input ground up losses, or allocate back to ITEMS (2) in proportion to the losses from the previous level calculation. If a breakdown of the policy losses is required in output, it is not necessary to back-allocate at every intermediate level. i.e. only the allocrule_id for final level calculations may be set to 1 or 2 and the prior levels can be set to allocrule_id 0.  This will result in the most efficient execution path.
 
 ### Policytc
 The **policytc** table specifies the insurance policies (a policy in Oasis FM is a combination of prog_id and layer_id) and the separate terms and conditions which will be applied to each layer_id/agg_id for a given level. In our example, we have a limit and deductible with the same value applicable to the combination of the first three items, a limit and deductible for the fourth item (time) in level 1, and then a limit, deductible, and line applicable at level 2 covering all items. We’d represent this in terms of the distinct agg_ids as follows:
@@ -203,9 +202,10 @@ The output_id is specified by the user in the **xref** table, and is a unique co
 | 1         | 1        |    1        | 
 | 2         | 1        |    2        |
 
-There are two options, depending on whether the losses are allocated back to the items at the final level or not. 
+There are three options, depending on whether the losses are allocated back to the items at the final level or not. 
 * If allocrule_id = 0 for all policytc_ids at the final level then agg_id = to_agg_id of the final level in the **programme** table
 * If allocrule_id = 1 for all policytc_ids at the final level then output_id = from_agg_id of the first level in the **programme** table
+* If allocrule_id = 2 for all policytc_ids at the final level then output_id = from_agg_id of the first level in the **programme** table
 
 In other words, losses are either output at the contract level or back-allocated to the lowest level, which is item_id. To avoid unnecessary computation, it is recommended not to back-allocate unless losses are required to be reported at a more detailed level than the contract level (site or zip code, for example). In this case, losses are re-aggregated up from item level (represented by output_id in fmcalc output) in summarycalc, using the fmsummaryxref table.
 

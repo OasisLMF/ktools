@@ -536,11 +536,12 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
                 }
                 if (x.allocrule_id == 1 || x.allocrule_id == 2) {	// back allocate as a proportion of the total of the original guls
                     float gultotal = 0;
-                    int vec_idx = aggid_to_vectorlookup[x.agg_id];		// Same index applies to avx as to agg_vec
-                    for (int idx : avx[layer][vec_idx].item_idx) {
+					const std::vector<float> &guls = event_guls[event_guls.size()-1];	
+                    // int vec_idx = aggid_to_vectorlookup[x.agg_id];		// Same index applies to avx as to agg_vec
+					for (int idx = 0; idx < guls.size(); idx++) {
                         gultotal += guls[idx];
                     }
-                    for (int idx : avx[layer][vec_idx].item_idx) {
+					for (int idx = 0; idx < guls.size(); idx++) {
                         float prop = 0;
                         if (gultotal > 0) prop = guls[idx] / gultotal;
                         fmhdr.output_id = items[idx];

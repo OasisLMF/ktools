@@ -54,6 +54,7 @@ Author: Ben Matharu  email : ben.matharu@oasislmf.org
 using namespace std;
 #include "../include/oasis.h"
 
+bool skipHeader = false;
 bool firstOutput = true;
 
 bool isSummaryCalcStream(unsigned int stream_type)
@@ -69,7 +70,7 @@ void doetloutput(int samplesize)
 	float analytical_mean = 0.0;
 	float sd = 0;
 	float sumlosssqr = 0.0;
-	printf("summary_id,type,event_id,mean,standard_deviation,exposure_value\n");
+	if (skipHeader == false) printf("summary_id,type,event_id,mean,standard_deviation,exposure_value\n");
 	summarySampleslevelHeader sh;
 	int i = fread(&sh, sizeof(sh), 1, stdin);
 	while (i != 0) {
@@ -164,7 +165,7 @@ int main(int argc, char* argv[])
 
 	int opt;
 	int processid = 0;
-	while ((opt = getopt(argc, argv, "vhP:")) != -1) {
+	while ((opt = getopt(argc, argv, "vshP:")) != -1) {
 		switch (opt) {
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
@@ -172,6 +173,9 @@ int main(int argc, char* argv[])
 			break;
 		case 'P':
 			processid = atoi(optarg);
+			break;
+		case 's':
+			skipHeader = true;
 			break;
 		case 'h':
 		default:

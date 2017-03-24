@@ -49,6 +49,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <unistd.h>
 #endif
 
+bool skipHeader = false;
 bool firstOutput = true;
 
 using namespace std;
@@ -174,9 +175,9 @@ void doit()
 	}
 	stream_type = streamno_mask & summarycalcstream_type;
 	if (date_algorithm_) {
-		printf("summary_id,period_no,event_id,mean,standard_deviation,exposure_value,occ_year,occ_month,occ_day\n");
+		if (skipHeader == false) printf("summary_id,period_no,event_id,mean,standard_deviation,exposure_value,occ_year,occ_month,occ_day\n");
 	}else {
-		printf("summary_id,period_no,event_id,mean,standard_deviation,exposure_value,occ_date_id\n");
+		if (skipHeader == false) printf("summary_id,period_no,event_id,mean,standard_deviation,exposure_value,occ_date_id\n");
 	}
 	
 	if (firstOutput==true){
@@ -219,11 +220,14 @@ void help()
 int main(int argc, char *argv[])
 {
 	int opt;
-	while ((opt = getopt(argc, argv, "vh")) != -1) {
+	while ((opt = getopt(argc, argv, "svh")) != -1) {
 		switch (opt) {
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
 			::exit(EXIT_FAILURE);
+			break;
+		case 's':
+			skipHeader = true;
 			break;
 		case 'h':
 		default:

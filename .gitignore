@@ -16,4 +16,4 @@ configure
 depcomp
 install-sh
 missing
-
+VERSION

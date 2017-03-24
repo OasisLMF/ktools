@@ -8,8 +8,8 @@ This section specifies the attributes and rules for the following list of profil
 | Deductible and limit                                               | 1         |   1         |
 | Franchise deductible and limit                                     | 2         |   3         |
 | Deductible only                                                    | 3         |  12         |
-| Deductible as a cap on the retention of input losses               | 4         |  10         |
-| Deductible as a floor on the retention of input losses             | 5         |  11         |
+| Maximum Deductible                                                 | 4         |  10         |
+| Minimum Deductible                                                 | 5         |  11         |
 | Deductible, limit and share                                        | 6         |   2         |
 | Deductible and limit as a proportion of loss                       | 10        |   5         |
 | Limit with deductible as a proportion of limit                     | 11        |   9         |
@@ -17,6 +17,15 @@ This section specifies the attributes and rules for the following list of profil
 | Limit as a proportion of loss                                      | 13        |   15        |
 | Deductible as a proportion of loss                                 | 14        |   16        |
 
+An allocation rule can be assigned to any profile at any stage in the calculation, which determines whether calculated losses should be back-allocated to the contributing items, and if so how. This is specified via an allocrule_id in the fm_profile data. 
+
+The choices are as follows;
+
+| Allocrule description                                              | allocrule_id|
+|:-------------------------------------------------------------------|------------:|
+| Don't back-allocate losses                                         | 0           |
+| Back allocate losses to items in proportion to ground up loss      | 1           |
+| Back-allocate losses to items in proportion to previous level loss | 2           |
 
 In the following notation;
 * x.loss is the input loss to the calculation
@@ -83,7 +92,9 @@ loss = x.loss - ded;
 if (loss < 0) loss = 0;
 ```
 
-### 4. Deductible as a cap on the retention of input losses
+### 4. Maximum deductible
+
+If the accumulated deductibles from the previous level exceed the maximum deductible, the deductible is capped at the maximum deductible value
 
 | Attributes                        | Example |
 |:----------------------------------|--------:|
@@ -107,7 +118,9 @@ else {
      }
 ```
 
-### 5. Deductible as a floor on the retention of input losses
+### 5. Minimum deductible
+
+If the accumulated deductibles from the previous level are less than the minimum deductible, the deductible is increased to the total loss or the minimum deductible value, whichever is greater.
 
 | Attributes                        | Example |
 |:----------------------------------|--------:|

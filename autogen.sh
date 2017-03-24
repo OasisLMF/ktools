@@ -77,6 +77,8 @@
 #
 ######################################################################
 
+(cat VERSION.in  && git log -1 --pretty=format:%cdt) |  tr '\n' 'A' | sed 's/A/ - git update: /g' > VERSION
+
 # set to minimum acceptable version of autoconf
 if [ "x$AUTOCONF_VERSION" = "x" ] ; then
     AUTOCONF_VERSION=2.52

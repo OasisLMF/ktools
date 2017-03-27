@@ -213,7 +213,11 @@ void doit()
 
 void help()
 {
-	fprintf(stderr, "-h help\n-v version\n");
+	fprintf(stderr, 
+	"-h help\n"
+	"-v version\n"
+	"-s skip header\n"
+	);
 }
 
 

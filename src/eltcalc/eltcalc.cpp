@@ -144,6 +144,7 @@ void help()
 {
 	fprintf(stderr,
      "-v version\n"
+	 "-s skip header\n"
      "-h help\n"
 	) ;
 }

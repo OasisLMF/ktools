@@ -183,7 +183,7 @@ void aalcalc::doit()
 		exit(-1);
 	}
 	stream_type = streamno_mask & summarycalcstream_type;
-	
+	bool haveData = false;
 	if (stream_type == 1) {		
 		int summary_set = 0;
 		int samplesize = 0;
@@ -196,6 +196,7 @@ void aalcalc::doit()
 		while (i != 0) {
 			i = fread(&sh, sizeof(sh), 1, stdin);
 			while (i != 0) {
+				haveData = true;
 				sampleslevelRec sr;
 				i = fread(&sr, sizeof(sr), 1, stdin);
 				if (i == 0 || sr.sidx == 0) {
@@ -209,7 +210,7 @@ void aalcalc::doit()
 
 			j++;
 		}
-		doaalcalc(sh, vrec,mean_loss, samplesize);
+		if (haveData == true) doaalcalc(sh, vrec,mean_loss, samplesize);
 	}
 
 	outputsummarybin();

@@ -305,14 +305,12 @@ damagecdfrec *d = (damagecdfrec *)rec;
 			gx.sidx = mean_idx;
 			gc.sidx = mean_idx;
 			itemoutputgul(gx);
-			//covoutputgul(gc);
 			gencovoutput(gc);
 			gx.loss = std_dev;
 			gc.loss = std_dev;
 			gx.sidx = std_dev_idx;
 			gc.sidx = std_dev_idx;
 			itemoutputgul(gx);
-			//covoutputgul(gc);
 			gencovoutput(gc);
 			int ridx = 0; // dummy value		
             if (userandomtable_) ridx = ((iter->group_id * p1_*p3_) + (d->event_id * p2_)) % rnd_count;
@@ -321,7 +319,6 @@ damagecdfrec *d = (damagecdfrec *)rec;
 			for (int i = 0; i < samplesize_; i++){
 				float  rval;
 				rval = rnd_->rnd(ridx + i);
-				// Add when Joh is  back
 				if (rval >= pp_max->prob_to) {
 					rval = pp_max->prob_to - 0.00000003;	// set value to just under max value (which should be 1)
 				}

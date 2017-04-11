@@ -71,7 +71,7 @@ getRands::getRands(rd_option rndopt, int rand_vec_size,int rand_seed) : gen_(tim
 
 	base_offset_ = 0;
 	switch (rndopt_) {
-		case rd_option::userandomnumberfile2:
+		case rd_option::userandomnumberfile:
 			userandfile();
 		break;
 		case rd_option::usecachedvector:

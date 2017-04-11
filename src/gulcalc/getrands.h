@@ -42,7 +42,7 @@
 bool isPrime(int number);
 
 enum rd_option {
-	userandomnumberfile2,		// user supplied random number file
+	userandomnumberfile,		// user supplied random number file
 	usehashedseed,				// use hashed seed to get random numbers so no need for random number vector
 	usecachedvector				// uses cached vector for random numbers gets simular if not faster performance to file based random numbers
 };
@@ -76,18 +76,29 @@ public:
 	inline float nextrnd() { return (float) dis_(gen_); }	// used after seeding via group id and event_id
 
 	inline float rnd(unsigned int ridx)  {
-		if (rndopt_ == rd_option::userandomnumberfile2) {
-			if (ridx >= buffersize_) ridx = ridx - buffersize_;
-			return buf_[ridx];
-		}
-		else {
-			float f = rnd_ [ridx % rand_vec_size_] ;
-			if ( f < 0 ) {
-				f = (float) dis_(gen_);
-				rnd_ [ridx % rand_vec_size_] = f;
+		switch (rndopt_) {
+			case rd_option::userandomnumberfile:
+			{
+				if (ridx >= buffersize_) ridx = ridx - buffersize_;
+				return buf_[ridx];
 			}
-			return f;
-		}
+			break;
+			case rd_option::usecachedvector:
+			{
+				float f = rnd_[ridx % rand_vec_size_];
+				if (f < 0) {
+					f = (float)dis_(gen_);
+					rnd_[ridx % rand_vec_size_] = f;
+				}
+				return f;
+			}
+			break;
+			case rd_option::usehashedseed: 
+			{
+				return (float)dis_(gen_);
+			}
+			break;
+		}		
 	}
 
 	inline unsigned int getp1() const {  return getp2(buffersize_ / 2); }

@@ -314,7 +314,7 @@ damagecdfrec *d = (damagecdfrec *)rec;
 			gencovoutput(gc);
 			int ridx = 0; // dummy value		
 			switch (rndopt_) {
-			case rd_option::userandomnumberfile2:
+			case rd_option::userandomnumberfile:
 				ridx = ((iter->group_id * p1_*p3_) + (d->event_id * p2_)) % rnd_count;
 				break;
 			case rd_option::usecachedvector:

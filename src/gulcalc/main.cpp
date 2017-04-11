@@ -57,7 +57,8 @@ bool coverageLevelOutput = false;
 int rand_vector_size = 1000000;
 int rand_seed = -1;
 
-rd_option rndopt = rd_option::usecachedvector;
+rd_option rndopt = rd_option::usehashedseed;
+
 
 FILE *itemout = stdout;
 FILE *covout = stdout;
@@ -233,7 +234,8 @@ void help()
 		"-i [output pipe] - item output\n"
 		"-d debug (output random numbers instead of gul)\n"
 		"-s seed for random number generation (used for debugging)\n"
-		"-a automatically hashed seed driven random number generation"
+		"-a automatically hashed seed driven random number generation (default)"
+		"-l legacy mechanism driven by random numbers generated dynamically per group - will be removed in future"
 		"-L gul limit (default 0)"
 		"-v version\n"
 		"-h help\n"
@@ -247,16 +249,19 @@ int main(int argc, char *argv[])
 	//rand_vector_size = 1000000;
 	//samplesize = 0;
 	//rand_seed = -1;
-	while ((opt = getopt(argc, argv, "avhdrL:S:c:i:R:s:")) != -1) {
+	while ((opt = getopt(argc, argv, "alvhdrL:S:c:i:R:s:")) != -1) {
 		switch (opt) {
 		case 'S':
 			samplesize = atoi(optarg);
+			break;
+		case 'l':
+			rndopt = rd_option::usecachedvector;
 			break;
 		case 'a':
 			rndopt = rd_option::usehashedseed;
 			break;
 		case 'r':
-			rndopt = rd_option::userandomnumberfile2;
+			rndopt = rd_option::userandomnumberfile;
 			break;
 		case 'L':
 			gul_limit = atof(optarg);

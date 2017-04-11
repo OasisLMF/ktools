@@ -78,7 +78,7 @@ getRands::getRands(rd_option rndopt, int rand_vec_size,int rand_seed) : gen_(tim
 			rnd_.resize(rand_vec_size, -1);
 		break;
 		case rd_option::usehashedseed:
-			fprintf(stderr, "%s: TODO: usehashedseed\n", __func__);
+			// nothing to do
 			break;
 		default:
 			fprintf(stderr, "%s: Unknow random number option\n", __func__);

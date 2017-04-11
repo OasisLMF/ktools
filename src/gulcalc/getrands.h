@@ -41,9 +41,16 @@
 
 bool isPrime(int number);
 
+enum rd_option {
+	userandomnumberfile2,		// user supplied random number file
+	usehashedseed,				// use hashed seed to get random numbers so no need for random number vector
+	usecachedvector				// uses cached vector for random numbers gets simular if not faster performance to file based random numbers
+};
+
+
 class getRands {
 private:
-	bool fromFile_;
+	rd_option rndopt_;
 	int rand_vec_size_;
 	float *buf_;
 	int base_offset_;
@@ -53,8 +60,10 @@ private:
     //int _randsamplesize;
     std::vector<float> rnd_;
 	int rand_seed_;
+	void userandfile();
 public:
-	getRands(bool fromFile,int rand_vec_size, int rand_seed);
+	getRands(rd_option rndopt,int rand_vec_size, int rand_seed);
+	void seedRands(int rand_seed) { gen_.seed(rand_seed); }	// used for seeding via group_id and event_id
 	void clearbuff() {
 		delete[]buf_;
 	}
@@ -64,8 +73,10 @@ public:
         rnd_.resize(rand_vec_size_,-1);
     }
 
+	inline float nextrnd() { return (float) dis_(gen_); }	// used after seeding via group id and event_id
+
 	inline float rnd(unsigned int ridx)  {
-		if (fromFile_) {
+		if (rndopt_ == rd_option::userandomnumberfile2) {
 			if (ridx >= buffersize_) ridx = ridx - buffersize_;
 			return buf_[ridx];
 		}
@@ -76,7 +87,6 @@ public:
 				rnd_ [ridx % rand_vec_size_] = f;
 			}
 			return f;
-
 		}
 	}
 

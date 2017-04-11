@@ -313,12 +313,31 @@ damagecdfrec *d = (damagecdfrec *)rec;
 			itemoutputgul(gx);
 			gencovoutput(gc);
 			int ridx = 0; // dummy value		
-            if (userandomtable_) ridx = ((iter->group_id * p1_*p3_) + (d->event_id * p2_)) % rnd_count;
-            else ridx = iter->group_id * samplesize_;
+			switch (rndopt_) {
+			case rd_option::userandomnumberfile2:
+				ridx = ((iter->group_id * p1_*p3_) + (d->event_id * p2_)) % rnd_count;
+				break;
+			case rd_option::usecachedvector:
+				ridx = iter->group_id * samplesize_;
+				break;
+			case rd_option::usehashedseed:
+				{
+					long s1 = (iter->group_id * 1543270363L) % 2147483648L;		// hash group_id and event_id to seed random number
+					long s2 = (d->event_id * 1943272559L) % 2147483648L;
+					s1 = (s1 + s2) % 2147483648L;
+					rnd_->seedRands(s1);
+				}
+				break;
+			default:
+				fprintf(stderr, "%s: Unknow random number option\n", __func__);
+				exit(-1);
+			}
+
 			prob_mean *pp_max = pp + (*bin_count) -1;
 			for (int i = 0; i < samplesize_; i++){
 				float  rval;
-				rval = rnd_->rnd(ridx + i);
+				if (rndopt_ == rd_option::usehashedseed) rval = rnd_->nextrnd();
+				else rval = rnd_->rnd(ridx + i);
 				if (rval >= pp_max->prob_to) {
 					rval = pp_max->prob_to - 0.00000003;	// set value to just under max value (which should be 1)
 				}
@@ -420,8 +439,8 @@ void gulcalc::doit()
 		recsize += sizeof(damagecdfrec) + sizeof(int);
 		if (d->event_id != last_event_id) {
 			if (last_event_id > 0) outputcoveragedata(last_event_id);
-			last_event_id = d->event_id;			
-			if (userandomtable_ == false) rnd_->clearvec();
+			last_event_id = d->event_id;						
+			if (rndopt_ == rd_option::usecachedvector) rnd_->clearvec();
 		}
 
 		processrec(rec, recsize);

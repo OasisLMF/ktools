@@ -51,12 +51,13 @@ using namespace std;
 bool verbose = false;
 int samplesize = -1;
 double gul_limit = 0.0;
-bool userandomnumberfile = false;
 bool debug = false;
 bool itemLevelOutput = false;
 bool coverageLevelOutput = false;
 int rand_vector_size = 1000000;
 int rand_seed = -1;
+
+rd_option rndopt = rd_option::usecachedvector;
 
 FILE *itemout = stdout;
 FILE *covout = stdout;
@@ -210,12 +211,12 @@ void doit()
 	itmWriter = 0;
 	covWriter = 0;
 
-	getRands rnd(userandomnumberfile, rand_vector_size,rand_seed);
+	getRands rnd(rndopt, rand_vector_size,rand_seed);
 
 	if (itemLevelOutput == true) itmWriter = itemWriter;
 	if (coverageLevelOutput == true) covWriter = coverageWriter;
 
-	gulcalc g(damagebindictionary_vec,coverages,item_map,rnd, gul_limit, userandomnumberfile,debug, samplesize, itmWriter, covWriter, iGetrec);
+	gulcalc g(damagebindictionary_vec,coverages,item_map,rnd, gul_limit, rndopt,debug, samplesize, itmWriter, covWriter, iGetrec);
 	g.doit();
 
 	return;
@@ -232,6 +233,8 @@ void help()
 		"-i [output pipe] - item output\n"
 		"-d debug (output random numbers instead of gul)\n"
 		"-s seed for random number generation (used for debugging)\n"
+		"-a automatically hashed seed driven random number generation"
+		"-L gul limit (default 0)"
 		"-v version\n"
 		"-h help\n"
 		);
@@ -244,13 +247,16 @@ int main(int argc, char *argv[])
 	//rand_vector_size = 1000000;
 	//samplesize = 0;
 	//rand_seed = -1;
-	while ((opt = getopt(argc, argv, "vhdrL:S:c:i:R:s:")) != -1) {
+	while ((opt = getopt(argc, argv, "avhdrL:S:c:i:R:s:")) != -1) {
 		switch (opt) {
 		case 'S':
 			samplesize = atoi(optarg);
-			break;	
+			break;
+		case 'a':
+			rndopt = rd_option::usehashedseed;
+			break;
 		case 'r':
-			userandomnumberfile = true;
+			rndopt = rd_option::userandomnumberfile2;
 			break;
 		case 'L':
 			gul_limit = atof(optarg);

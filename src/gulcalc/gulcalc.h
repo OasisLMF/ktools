@@ -109,7 +109,7 @@ private:
 	int itembufoffset_ = 0;
 	int covbufoffset_ = 0;
 	double gul_limit_;
-	bool userandomtable_;
+	rd_option rndopt_;
 	bool debug_;
 	int samplesize_;
 	bool isFirstItemEvent_;
@@ -122,7 +122,8 @@ public:
 	gulcalc(const std::vector<damagebindictionary> &damagebindictionary_vec,const std::vector<float> &tivs,
 		const std::map<item_map_key, std::vector<item_map_rec> > &item_map, getRands &rnd, 
 		double gul_limit,
-		bool userandomtable,
+		//bool userandomtable,
+		rd_option rndopt,
 		bool debug,
 		int samplesize,
 		void (*itemWriter)(const void *ibuf,int size, int count),
@@ -140,7 +141,7 @@ public:
 		ibuf_ = new unsigned char[bufsize + sizeof(gulitemSampleslevel)]; // make the allocation bigger by 1 record to avoid overrunning
 		cbuf_ = new unsigned char[bufsize + sizeof(gulitemSampleslevel)]; // make the allocation bigger by 1 record to avoid overrunning
 		gul_limit_ = gul_limit;
-		userandomtable_ = userandomtable;
+		rndopt_ = rndopt;				
 		debug_ = debug;
 		samplesize_ = samplesize;
 		isFirstItemEvent_ = true;

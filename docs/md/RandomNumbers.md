@@ -13,18 +13,23 @@ The item_id, group_id data is provided by the user in the items input file (item
 
 The method of assigning random numbers in gulcalc uses an random number index (ridx), an integer which is used as a position reference into a list of random numbers.  S random numbers corresponding to the runtime number of samples are drawn from the list starting at the ridx position.
 
-There are two options in ktools for choosing random numbers to apply in the sampling process.
+There are three options in ktools for choosing random numbers to apply in the sampling process.
 
 #### 1. Generate dynamically during the calculation
 
 ##### Usage
-Use -R{number of random numbers} as a parameter.
+Use -R{number of random numbers} as a parameter. Optionally you may use -s{seed} to make the random numbers repeatable.
 
 ##### Example
 ```
 $ gulcalc -S00 -R1000000 -i -
 ```
 This will run 100 samples drawing from 1 million dynamically generated random numbers. They are simple uniform random numbers.
+
+```
+$ gulcalc -S00 -s123 -R1000000 -i -
+```
+This will run 100 samples drawing from 1 million seeded random numbers (repeatable)
 
 ##### Method
 
@@ -64,6 +69,25 @@ ridx= sidx + mod(group_id x P1 x P3 + event_id x P2, R)
 * P3 is the first prime number which is bigger than the number of samples, S.
 
 This formula pseudo-randomly assigns a starting position index to each event_id and group_id combo between 0 and R-1, and then S random numbers are drawn by incrementing the starting position by the sidx.
+
+#### 3. Generate automatically seeded random numbers (no buffer)
+
+##### Usage
+Default option
+
+##### Example
+```
+$ gulcalc -S100 -i -
+```
+This option will produce repeatable random numbers seeded from a combination of the event_id and group_id. The difference between this option and method 1 with the fixed seed is that there is no limit on the number of random numbers generated, and you do not need to make a decision on the buffer size. This will impact performance for large analyses.
+
+##### Method
+
+For each event_id and group_id, the seed is calculated as follows;
+
+s1 = mod(group_id * 1543270363, 2147483648);        
+s2 = mod(event_id * 1943272559, 2147483648);
+seed = mod(s1 + s2 , 2147483648)
 
 [Return to top](#randomnumbers)
 

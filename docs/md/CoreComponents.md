@@ -94,13 +94,14 @@ The gulcalc program performs Monte Carlo sampling of ground up loss using interp
 
 ##### Parameters
 Required parameters are;
-* -R{number} or -r.  Number of random numbers to generate or read random numbers from file
 * -S{number}. Number of samples
 * -c or -i {destination}. There are two alternative streams, 'coverage' or 'item'. 
 The destination is either a filename or named pipe, or use - for standard output.
 
 Optional parameters are;
-
+* -R{number} Number of random numbers to generate dynamically 
+* -s{number} Manual seed for random numbers (to make them repeatable)
+* -r Read random numbers from random.bin file
 * -L{number} loss threshold (optional) excludes losses below the threshold from the output stream
 * -d debug mode - output random numbers rather than losses (optional)
 
@@ -148,7 +149,11 @@ An example of the three cases and methods is given below;
 |    0.1   |  0.1   |    0.1    | Sample bin value        |
 |    0.1   |  0.2   |    0.14   | Quadratic interpolation |
 
-If the -R parameter is used along with a specified number of random numbers then random numbers used for sampling are generated on the fly for each event and group of items which have a common group_id using the Mersenne twister psuedo random number generator (the default RNG of the C++ v11 compiler).  if the -r parameter is used, gulcalc reads a random number from the provided random number file. See [Random Numbers](RandomNumbers.md) for more details.
+If the -R parameter is used along with a specified number of random numbers then random numbers used for sampling are generated on the fly for each event and group of items which have a common group_id using the Mersenne twister psuedo random number generator (the default RNG of the C++ v11 compiler).  These random numbers are not repeatable, unless a seed is also specified (-s{number}).
+
+If the -r parameter is used, gulcalc reads a random number from the provided random number file, which produces repeatable results. 
+
+The default random number behaviour (no additional parameters) is to generate random numbers from a seed determined by a combination of the event_id and group_id, which produces repeatable results. See [Random Numbers](RandomNumbers.md) for more details.
 
 Each sampled damage is multiplied by the item TIV, looked up from the coverage file.
 

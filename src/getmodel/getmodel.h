@@ -68,9 +68,9 @@ private:
     int _has_intensity_uncertainty = false;
     Result* _temp_results;
 
-    void getVulnerabilities();
+    void getVulnerabilities(const std::set<int> &v);
     void getDamageBinDictionary();
-    void getItems();
+    void getItems(std::set<int> &v);
 	void getIntensityInfo();
     void doCdfInner(std::list<int> &event_ids, std::map<int, EventIndex> &event_index_by_event_id);
     void doCdfInnerNoIntensityUncertainty(std::list<int> &event_ids, std::map<int, EventIndex> &event_index_by_event_id);

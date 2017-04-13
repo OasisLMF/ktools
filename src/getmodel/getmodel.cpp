@@ -91,7 +91,8 @@ getmodel::~getmodel()
     if (_temp_results != nullptr) delete _temp_results;
 }
 
-void getmodel::getVulnerabilities()
+// only get those vulnerabilities that exist in the items file - so reduce memory footprint
+void getmodel::getVulnerabilities(const std::set<int> &v)
 {
     // Read the vulnerabilities
     Vulnerability vulnerability;
@@ -105,14 +106,16 @@ void getmodel::getVulnerabilities()
 	fread(&_num_damage_bins, sizeof(_num_damage_bins), 1, fin);
 
     while (fread(&vulnerability, sizeof(vulnerability), 1, fin) != 0) {
-		if (_num_intensity_bins >= vulnerability.intensity_bin_id) {
-			if (vulnerability.vulnerability_id != current_vulnerability_id)
-			{
-				_vulnerabilities[vulnerability.vulnerability_id] = std::vector<float>(_num_intensity_bins * _num_damage_bins, 0.0);
-				current_vulnerability_id = vulnerability.vulnerability_id;
+		if (v.find(vulnerability.vulnerability_id) != v.end()) {	// only process those vulnerabilities that are in the item file
+			if (_num_intensity_bins >= vulnerability.intensity_bin_id) {
+				if (vulnerability.vulnerability_id != current_vulnerability_id)
+				{
+					_vulnerabilities[vulnerability.vulnerability_id] = std::vector<float>(_num_intensity_bins * _num_damage_bins, 0.0);
+					current_vulnerability_id = vulnerability.vulnerability_id;
+				}
+				int vulnerabilityIndex = getVulnerabilityIndex(vulnerability.intensity_bin_id, vulnerability.damage_bin_id);
+				_vulnerabilities[vulnerability.vulnerability_id][vulnerabilityIndex] = vulnerability.probability;
 			}
-			int vulnerabilityIndex = getVulnerabilityIndex(vulnerability.intensity_bin_id, vulnerability.damage_bin_id);
-			_vulnerabilities[vulnerability.vulnerability_id][vulnerabilityIndex] = vulnerability.probability;
 		}
     }
     fclose(fin);
@@ -131,7 +134,7 @@ void getmodel::getIntensityInfo()
 	fclose(fin);
 }
 
-void getmodel::getItems()
+void getmodel::getItems(std::set<int> &v)
 {
     // Read the exposures and generate a set of vulnerabilities by area peril
     item item_rec;
@@ -273,8 +276,10 @@ void getmodel::init()
 {
 	getIntensityInfo();
 
-    getItems();    
-    getVulnerabilities();
+	std::set<int> v;  // set of vulnerabilities;
+    getItems(v);    
+    getVulnerabilities(v);
+	v.clear();	// set no longer required release memory
     getDamageBinDictionary();
 
     _temp_results = new Result[_num_damage_bins];

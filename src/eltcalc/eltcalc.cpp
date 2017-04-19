@@ -102,12 +102,15 @@ void doetloutput(int samplesize)
 				sd = 0;
 			}
 		}
-		printf("%d,1,%d,%f,0,%f\n", sh.summary_id, sh.event_id, analytical_mean, sh.expval) ;
-		if (firstOutput==true){
-			std::this_thread::sleep_for(std::chrono::milliseconds(PIPE_DELAY)); // used to stop possible race condition with kat
-			firstOutput=false;
-		} 
-		if (samplesize) printf("%d,2,%d,%f,%f,%f\n", sh.summary_id, sh.event_id,sample_mean, sd, sh.expval);
+		if (sh.expval > 0) {	// only output rows with a none zero exposure value
+			printf("%d,1,%d,%f,0,%f\n", sh.summary_id, sh.event_id, analytical_mean, sh.expval);
+			if (firstOutput == true) {
+				std::this_thread::sleep_for(std::chrono::milliseconds(PIPE_DELAY)); // used to stop possible race condition with kat
+				firstOutput = false;
+			}
+			if (samplesize) printf("%d,2,%d,%f,%f,%f\n", sh.summary_id, sh.event_id, sample_mean, sd, sh.expval);
+		}
+		
 
 		if (i) i = fread(&sh, sizeof(sh), 1, stdin);
 		sumloss = 0.0;

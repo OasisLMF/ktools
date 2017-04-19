@@ -150,6 +150,7 @@ void getmodel::getItems(std::set<int> &v)
             _vulnerability_ids_by_area_peril[item_rec.areaperil_id] = std::set<int>();
         _vulnerability_ids_by_area_peril[item_rec.areaperil_id].insert(item_rec.vulnerability_id);
         _area_perils.insert(item_rec.areaperil_id);
+		v.insert(item_rec.vulnerability_id);
     }
     fclose(fin);
 }

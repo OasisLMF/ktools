@@ -46,7 +46,8 @@ Author: Joh Carter  email: johanna.carter@oasislmf.org
 #endif
 
 #include "../include/oasis.h"
-
+#include <vector>
+#include <zlib.h>
 
 using namespace std;
 
@@ -63,6 +64,64 @@ void printrows(int event_id, FILE *finx, long long size )
 	}
 }
 
+void printrowsz(int event_id, FILE *finx, long long size )
+{
+	long long i=0;
+	std::vector<unsigned char > compressed_buf;
+	compressed_buf.resize(size+1);
+	
+	std::vector<unsigned char > uncompressed_buf;
+	uncompressed_buf.resize(size*20);
+	fread(&compressed_buf[0],size,1,finx);
+	uLong dest_length = uncompressed_buf.size();
+	int ret = uncompress(&uncompressed_buf[0],&dest_length, &compressed_buf[0], size );
+	if (ret != Z_OK) {
+		fprintf(stderr,"Got bad return code from uncompress %d\n", ret);
+		exit(-1);
+	}	
+
+	EventRow *row = (EventRow *)&uncompressed_buf[0];
+	while (i < dest_length) {		
+		printf("%d, %d, %d, %.10e\n", event_id,row->areaperil_id,row->intensity_bin_id, row->probability);
+		row++;
+		i += sizeof(EventRow);
+	}
+}
+
+
+
+void doitz(bool skipheader)
+{
+	if (skipheader == false)  printf("\"event_id\", \"areaperil_id\", \"intensity_bin_id\", \"probability\"\n");
+	FILE *finx = fopen("footprint.bin.z", "rb");
+	FILE *finy = fopen("footprint.idx.z", "rb");
+	EventIndex current_idx;
+	EventIndex next_idx;
+
+	if (finy == nullptr) {
+		fprintf(stderr, "Footprint idx open failed\n");
+		exit(3);
+	}
+	
+	size_t i = fread(&current_idx, sizeof(current_idx), 1, finy);
+	int compressed_length = 0;
+	while (i != 0) {
+		i = fread(&next_idx, sizeof(next_idx), 1, finy);
+		if (i !=0) {
+			compressed_length = next_idx.offset - current_idx.offset;
+		}else {
+			flseek(finx, 0L, SEEK_END);
+			long long pos = fltell(finx);
+			compressed_length = pos -  current_idx.offset;
+		}
+		flseek(finx, current_idx.offset, SEEK_SET);
+		printrowsz(current_idx.event_id, finx, compressed_length);
+		if ( i != 0) current_idx = next_idx;
+	}
+
+	fclose(finx);
+	fclose(finy);
+}
 
 void doit(bool skipheader)
 {
@@ -92,6 +151,7 @@ void help()
 	fprintf(stderr,
 		"-s skip header\n"
 		"-v version\n"
+		"-z zip input\n"
 		"-h help\n"
 		);
 }
@@ -100,11 +160,15 @@ int main(int argc, char* argv[])
 {
 	int opt;
 	bool skipheader = false;
-	while ((opt = getopt(argc, argv, "vhs")) != -1) {
+	bool zip = false;
+	while ((opt = getopt(argc, argv, "zvhs")) != -1) {
 		switch (opt) {
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
 			exit(EXIT_FAILURE);
+			break;
+		case 'z':
+      		zip = true;
 			break;
 		case 's':
 			skipheader = true;
@@ -116,6 +180,11 @@ int main(int argc, char* argv[])
 	}
 
     initstreams();
-	doit(skipheader);
+	if (zip) {
+		fprintf(stderr,"processing zip file\n");
+		doitz(skipheader);
+	}else {
+		doit(skipheader);
+	}	
 	return 0;
 }

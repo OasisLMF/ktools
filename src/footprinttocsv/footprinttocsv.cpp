@@ -181,7 +181,6 @@ int main(int argc, char* argv[])
 
     initstreams();
 	if (zip) {
-		fprintf(stderr,"processing zip file\n");
 		doitz(skipheader);
 	}else {
 		doit(skipheader);

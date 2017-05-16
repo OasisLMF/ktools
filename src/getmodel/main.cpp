@@ -57,12 +57,12 @@ void help()
 	);
 }
 
-void doIt()
+void doIt(bool zip)
 {
 
 	getmodel cdf_generator;
 
-	cdf_generator.init();
+	cdf_generator.init(zip);
 
 	int event_id = -1;
 	std::list<int> event_ids;
@@ -78,8 +78,12 @@ void doIt()
 int main(int argc, char** argv)
 {
 	int opt;
-	while ((opt = getopt(argc, argv, "vh")) != -1) {
-		switch (opt) {		
+	bool zip = false;
+	while ((opt = getopt(argc, argv, "zvh")) != -1) {
+		switch (opt) {
+		case 'z':
+			zip = true;
+			break;	
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
 			exit(EXIT_FAILURE);
@@ -94,6 +98,6 @@ int main(int argc, char** argv)
 	}
 	
 	initstreams();
-	doIt();
+	doIt(zip);
 	return EXIT_SUCCESS;
 }

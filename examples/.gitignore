@@ -1,2 +1,7 @@
 work
 results
+*.z
+*.hex
+*.out
+temp
+

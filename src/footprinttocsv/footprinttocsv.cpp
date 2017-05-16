@@ -136,7 +136,7 @@ void doit(bool skipheader)
 		exit(3);
 	}
 	size_t i = fread(&idx, sizeof(idx), 1, finy);
-	while (i != 0) {		
+	while (i != 0) {
 		flseek(finx, idx.offset, SEEK_SET);
 		printrows(idx.event_id, finx, idx.size);
 		i = fread(&idx, sizeof(idx), 1, finy);

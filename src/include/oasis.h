@@ -310,6 +310,9 @@ inline void initstreams(std::string inFile="", std::string outFile="")
 #define VULNERABILITY_FILE  "static/vulnerability.bin"
 #define FOOTPRINT_FILE  "static/footprint.bin"
 #define FOOTPRINT_IDX_FILE  "static/footprint.idx"
+// compressed variant of footprint
+#define ZFOOTPRINT_FILE  "static/footprint.bin.z"	
+#define ZFOOTPRINT_IDX_FILE  "static/footprint.idx.z"
 
 #define SEMA_DIR_PREFIX "work/sema"
 #endif  // OASIS_H_

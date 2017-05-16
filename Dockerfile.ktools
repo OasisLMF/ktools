@@ -1,8 +1,8 @@
-FROM coreoasis/oasis_base:R_0_0_0_7
+FROM coreoasis/oasis_base:R_0_0_0_10
 
 RUN apt-get update && \
     apt-get upgrade -y && \
-    apt-get install -y gcc g++ make libtool automake autoconf
+    apt-get install -y gcc g++ make libtool automake autoconf zlib1g-dev
 
 WORKDIR /var/oasis/ktools
 COPY ./ ./

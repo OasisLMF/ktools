@@ -77,13 +77,9 @@ void doIt(bool zip)
 
 int main(int argc, char** argv)
 {
-	int opt;
-	bool zip = false;
-	while ((opt = getopt(argc, argv, "zvh")) != -1) {
+	int opt;	
+	while ((opt = getopt(argc, argv, "vh")) != -1) {
 		switch (opt) {
-		case 'z':
-			zip = true;
-			break;	
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
 			exit(EXIT_FAILURE);
@@ -96,7 +92,11 @@ int main(int argc, char** argv)
 			exit(EXIT_FAILURE);
 		}
 	}
-	
+
+	bool zip = false;
+	FILE *fin = fopen(ZFOOTPRINT_FILE, "rb");
+	if (fin != nullptr) zip=true;
+
 	initstreams();
 	doIt(zip);
 	return EXIT_SUCCESS;

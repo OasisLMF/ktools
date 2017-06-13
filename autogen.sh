@@ -77,7 +77,13 @@
 #
 ######################################################################
 
-(cat VERSION.in  && git log -1 --pretty=format:%cdt) |  tr '\n' 'A' | sed 's/A/ - git update: /g' > VERSION
+if [ -d ".git" ]; then
+	(cat VERSION.in  && git log -1 --pretty=format:%cdt) |  tr '\n' 'A' | sed 's/A/ - git update: /g' > VERSION
+else
+    cat VERSION.in  > VERSION
+fi
+
+uname -a
 
 # set to minimum acceptable version of autoconf
 if [ "x$AUTOCONF_VERSION" = "x" ] ; then

@@ -150,6 +150,13 @@ $ cd examples
 $ python eltcalc_example.py 
 ```
 
+To build linux docker image do following command
+
+```
+docker build --file Dockerfile.ktools.alpine -t alpine-ktools .
+```
+
+
 ### Questions/problems?
 
 Email support@oasislmf.org

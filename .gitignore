@@ -17,3 +17,4 @@ depcomp
 install-sh
 missing
 VERSION
+build

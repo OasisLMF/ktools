@@ -15,13 +15,25 @@ else
 	AC_MSG_NOTICE([ /usr/bin/diff not found - cannot do make check])
 fi
 
+AC_ARG_ENABLE(debug,
+AS_HELP_STRING([--enable-debug],
+               [enable debugging, default: no]),
+[case "${enableval}" in
+             yes) debug=true ;;
+             no)  debug=false ;;
+             *)   AC_MSG_ERROR([bad value ${enableval} for --enable-debug]) ;;
+esac],
+[debug=false])
+
+# :${CXXFLAGS="-std=c++11 -Wno-unused-result -g -O3"}
+
+AM_CONDITIONAL(DEBUG, test x"$debug" = x"true")
 
 
 
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADERS([config.h])
 
-: ${CXXFLAGS="-std=c++11 -Wno-unused-result -g -O3"}
 
 LDFLAGS=-static
 
@@ -39,7 +51,6 @@ AX_CXX_COMPILE_STDCXX_11
 AC_CHECK_HEADERS([fcntl.h inttypes.h memory.h stdlib.h unistd.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
-AC_CHECK_HEADER_STDBOOL
 AC_C_INLINE
 AC_TYPE_INT64_T
 

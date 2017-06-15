@@ -6,7 +6,7 @@ RUN apk --no-cache add autoconf
 RUN apk --no-cache add git
 RUN apk --no-cache add automake
 RUN apk --no-cache add libtool
-RUN apk --no-cache add gcc
+#RUN apk --no-cache add gcc
 RUN apk --no-cache add g++
 RUN apk --no-cache add make
 RUN apk --no-cache add diffutils

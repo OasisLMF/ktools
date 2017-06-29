@@ -117,6 +117,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fmpolicytctocsv", "fmpolicy
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cdftocsv", "cdftocsv\cdftocsv.vcxproj", "{99CBE4AF-9516-42F7-B435-026E7BF1FC05}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "periodstobin", "periodstobin\periodstobin.vcxproj", "{30380255-EBFE-401A-B444-4BB1F4D44D15}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "periodstocsv", "periodstocsv\periodstocsv.vcxproj", "{6C9870B8-86E1-4C66-B189-133431432570}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -607,6 +611,26 @@ Global
 		{99CBE4AF-9516-42F7-B435-026E7BF1FC05}.Release|x64.Build.0 = Release|x64
 		{99CBE4AF-9516-42F7-B435-026E7BF1FC05}.Release|x86.ActiveCfg = Release|Win32
 		{99CBE4AF-9516-42F7-B435-026E7BF1FC05}.Release|x86.Build.0 = Release|Win32
+		{30380255-EBFE-401A-B444-4BB1F4D44D15}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{30380255-EBFE-401A-B444-4BB1F4D44D15}.Debug|x64.ActiveCfg = Debug|x64
+		{30380255-EBFE-401A-B444-4BB1F4D44D15}.Debug|x64.Build.0 = Debug|x64
+		{30380255-EBFE-401A-B444-4BB1F4D44D15}.Debug|x86.ActiveCfg = Debug|Win32
+		{30380255-EBFE-401A-B444-4BB1F4D44D15}.Debug|x86.Build.0 = Debug|Win32
+		{30380255-EBFE-401A-B444-4BB1F4D44D15}.Release|Any CPU.ActiveCfg = Release|Win32
+		{30380255-EBFE-401A-B444-4BB1F4D44D15}.Release|x64.ActiveCfg = Release|x64
+		{30380255-EBFE-401A-B444-4BB1F4D44D15}.Release|x64.Build.0 = Release|x64
+		{30380255-EBFE-401A-B444-4BB1F4D44D15}.Release|x86.ActiveCfg = Release|Win32
+		{30380255-EBFE-401A-B444-4BB1F4D44D15}.Release|x86.Build.0 = Release|Win32
+		{6C9870B8-86E1-4C66-B189-133431432570}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{6C9870B8-86E1-4C66-B189-133431432570}.Debug|x64.ActiveCfg = Debug|x64
+		{6C9870B8-86E1-4C66-B189-133431432570}.Debug|x64.Build.0 = Debug|x64
+		{6C9870B8-86E1-4C66-B189-133431432570}.Debug|x86.ActiveCfg = Debug|Win32
+		{6C9870B8-86E1-4C66-B189-133431432570}.Debug|x86.Build.0 = Debug|Win32
+		{6C9870B8-86E1-4C66-B189-133431432570}.Release|Any CPU.ActiveCfg = Release|Win32
+		{6C9870B8-86E1-4C66-B189-133431432570}.Release|x64.ActiveCfg = Release|x64
+		{6C9870B8-86E1-4C66-B189-133431432570}.Release|x64.Build.0 = Release|x64
+		{6C9870B8-86E1-4C66-B189-133431432570}.Release|x86.ActiveCfg = Release|Win32
+		{6C9870B8-86E1-4C66-B189-133431432570}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

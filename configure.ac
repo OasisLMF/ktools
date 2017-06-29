@@ -103,8 +103,10 @@ AC_CONFIG_FILES([
                  src/vulnerabilitytocsv/Makefile
                  src/footprinttobin/Makefile
                  src/footprinttocsv/Makefile
-		 src/returnperiodtocsv/Makefile
+                 src/periodstobin/Makefile
+                 src/periodstocsv/Makefile
 		 src/returnperiodtobin/Makefile
+		 src/returnperiodtocsv/Makefile
 		 src/kat/Makefile
 		 src/footprintconv/Makefile
                  ])

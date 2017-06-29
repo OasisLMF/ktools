@@ -3,5 +3,6 @@ results
 *.z
 *.hex
 *.out
+*.csv
 temp
 

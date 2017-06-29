@@ -60,7 +60,7 @@ void aalcalc::loadoccurrence()
 		exit(-1);
 	}
 
-	size_t i = fread(&date_algorithm_, sizeof(date_algorithm_), 1, fin);
+	size_t i = fread(&date_algorithm_, sizeof(date_algorithm_), 1, fin);	// discard date algorithm
 	i = fread(&no_of_periods_, sizeof(no_of_periods_), 1, fin);
 	occurrence occ;
 	i = fread(&occ, sizeof(occ), 1, fin);

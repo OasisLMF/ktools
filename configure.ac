@@ -6,6 +6,9 @@ AC_INIT([ktools],  m4_esyscmd([tr -d '\n' < VERSION]), [support@oasislmf.org])
 AM_INIT_AUTOMAKE([gnu])
 AC_CONFIG_MACRO_DIR([m4])
 
+AC_LANG([C])
+AC_LANG([C++])
+
 AC_MSG_CHECKING([Check for /usr/bin/diff ])
 if [[ -f /usr/bin/diff ]];
 then
@@ -45,6 +48,7 @@ AC_PROG_MAKE_SET
 
 AX_CXX_COMPILE_STDCXX_11
 
+AX_CHECK_ZLIB()
 # Checks for libraries.
 
 # Checks for header files.

@@ -1,7 +1,6 @@
 # Our binary is produced here
 bin_PROGRAMS = footprinttobin 
 footprinttobin_SOURCES = footprinttobin.cpp 
-LDADD = -lz
 
 if DEBUG
 AM_CXXFLAGS = -std=c++11 -Wno-unused-result -g -O3

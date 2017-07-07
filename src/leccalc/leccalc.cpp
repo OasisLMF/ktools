@@ -53,9 +53,9 @@ This process will then read all the *.bin files in the subdirectory and then com
 #include <stdlib.h>
 #include <math.h>
 #include <vector>
+#include <map>
 #include "leccalc.h"
 #include "aggreports.h"
-
 
 #if defined(_MSC_VER)
 #include "../wingetopt/wingetopt.h"
@@ -107,7 +107,6 @@ void loadoccurence(std::map<int, std::vector<int> > &event_to_periods, int &tota
 	fclose(fin);
 
 }
-
 
 //
 //
@@ -188,6 +187,7 @@ void setinputstream(const std::string &inFile)
 	}
 
 }
+
 void doit(const std::string &subfolder, FILE **fout, bool useReturnPeriodFile)
 {
 	std::string path = "work/" + subfolder;
@@ -200,6 +200,7 @@ void doit(const std::string &subfolder, FILE **fout, bool useReturnPeriodFile)
 	std::map<outkey2, float> agg_out_loss;
 	std::map<outkey2, float> max_out_loss;
 
+	
 	unsigned int samplesize;
 	int maxsummaryid = -1;
 	if (subfolder.size() == 0) {		
@@ -218,9 +219,14 @@ void doit(const std::string &subfolder, FILE **fout, bool useReturnPeriodFile)
 				}
 			}
 		}
+		else {
+			fprintf(stderr, "Unable to open directory %s\n", path.c_str());
+			exit(-1);
+		}
 	}
 
 	aggreports agg(totalperiods,maxsummaryid, agg_out_loss, max_out_loss, fout,useReturnPeriodFile,samplesize);
+	agg.loadperiodtoweigthing();
 	agg.outputAggWheatsheaf();
 	agg.outputAggFulluncertainty();
 	agg.outputAggWheatSheafMean(samplesize);

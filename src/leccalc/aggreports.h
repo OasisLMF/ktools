@@ -51,9 +51,11 @@ private:
 	bool useReturnPeriodFile_;
 	int samplesize_ = 0;
 	std::vector<int> returnperiods_;
+	std::map <int, float> periodstowighting_;	
 
 //
 	void fulluncertainty(int handle, const std::map<outkey2, float> &out_loss);	
+	void fulluncertaintywithweighting(int handle, const std::map<outkey2, float> &out_loss);
 	void wheatsheaf(int handle, const std::map<outkey2, float> &out_loss);	
 	void wheatSheafMean(int samplesize, int handle, const std::map<outkey2, float> &out_loss);	
 	void sampleMean(int samplesize, int handle, const std::map<outkey2, float> &out_loss);	
@@ -63,7 +65,7 @@ private:
 	void doreturnperiodout(int handle, int &nextreturnperiod_index, float &last_return_period, float &last_loss,
 		float current_return_period, float current_loss, int summary_id, int type);
 public:
-
+	void loadperiodtoweigthing();
 	void outputOccFulluncertainty();
 	void outputAggFulluncertainty();
 	void outputOccWheatsheaf();

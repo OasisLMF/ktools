@@ -37,7 +37,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 #include <vector>
 #include <algorithm>    // std::sort
-
+#include <assert.h>
 #include "aggreports.h"
 
 
@@ -65,6 +65,10 @@ bool operator<(const summary_id_period_key& lhs, const summary_id_period_key& rh
 	}
 }
 
+bool operator<(const lossval& lhs, const lossval& rhs)
+{
+	return lhs.value < rhs.value;
+}
 
 bool operator<(const summary_id_type_key& lhs, const summary_id_type_key& rhs)
 {
@@ -95,6 +99,35 @@ aggreports::aggreports(int totalperiods, int maxsummaryid, std::map<outkey2, flo
 	loadreturnperiods();
 };
 
+// Load and normalize weigthting table 
+// we must have entry for every return period!!!
+// otherwise no way to pad missing ones
+void aggreports::loadperiodtoweigthing()
+{
+	FILE *fin = fopen(PERIODS_FILE, "rb");
+	if (fin == NULL) return;
+	Periods p;
+	float total_weighting = 0;
+	size_t i = fread(&p, sizeof(Periods), 1, fin);
+	while (i != 0) {
+		total_weighting += p.weighting;
+		periodstowighting_[p.period_no] = p.weighting;
+		i = fread(&p, sizeof(Periods), 1, fin);
+	}
+	// If we are going to have weightings we should have them for all periods
+	if (periodstowighting_.size() != totalperiods_) {
+		fprintf(stderr, "Total number of periods in %s does not match the number of periods in %s\n", PERIODS_FILE, OCCURRENCE_FILE);
+		exit(-1);
+	}
+	// Now normalize the weigthing ...
+	auto iter = periodstowighting_.begin();
+	while (iter != periodstowighting_.end()) {
+		iter->second = iter->second / total_weighting;
+		if (samplesize_) iter->second = iter->second / samplesize_;
+		iter++;
+	}
+}
+
 void aggreports::loadreturnperiods()
 {
 	if (useReturnPeriodFile_ == false) return;
@@ -116,6 +149,34 @@ void aggreports::loadreturnperiods()
 	if (returnperiods_.size() == 0) {
 		useReturnPeriodFile_ = false;
 		std::cerr << __func__ << ": No return periods loaded - running without defined return periods option\n";
+	}
+}
+
+// this one should run using period table 
+void aggreports::fulluncertaintywithweighting(int handle, const std::map<outkey2, float> &out_loss)
+{
+	if (fout_[handle] == nullptr) return;
+	std::map<int, lossvec2> items;
+	for (auto x : out_loss) {
+		lossval lv;
+		lv.value = x.second;
+		lv.period_weigthing = periodstowighting_[x.first.period_no];
+		items[x.first.summary_id].push_back(lv);
+	}
+
+	fprintf(fout_[handle], "summary_id,return_period,loss\n");	
+
+	for (auto s : items) {
+		float cummulative_weigthing = 0;
+		lossvec2 &lpv = s.second;
+		std::sort(lpv.rbegin(), lpv.rend());
+		int i = 1;
+		for (auto lp : lpv) {
+			cummulative_weigthing += lp.period_weigthing;				
+			float f = 1 / cummulative_weigthing;
+			fprintf(fout_[handle], "%d,%f,%f\n", s.first, f, lp.value);
+		}
+		i++;
 	}
 }
 
@@ -158,13 +219,24 @@ void aggreports::fulluncertainty(int handle,const std::map<outkey2, float> &out_
 }
 void aggreports::outputOccFulluncertainty()
 {
-	fulluncertainty(OCC_FULL_UNCERTAINTY, max_out_loss_);
+	if (periodstowighting_.size() == 0) {
+		fulluncertainty(OCC_FULL_UNCERTAINTY, max_out_loss_);
+	}
+	else {
+		fulluncertaintywithweighting(OCC_FULL_UNCERTAINTY, max_out_loss_);;
+	}
+	
 }
 
 // Full uncertainty output
 void aggreports::outputAggFulluncertainty()
 {
-	fulluncertainty(AGG_FULL_UNCERTAINTY, agg_out_loss_);
+	if (periodstowighting_.size() == 0) {
+		fulluncertainty(AGG_FULL_UNCERTAINTY, agg_out_loss_);
+	}
+	else {
+		fulluncertaintywithweighting(AGG_FULL_UNCERTAINTY, agg_out_loss_);;
+	}	
 }
 
 // the next_return_period must be between last_return_period and current_return_period
@@ -225,7 +297,6 @@ void aggreports::wheatsheaf(int handle, const std::map<outkey2, float> &out_loss
 		items[wk].push_back(x.second);
 	}
 
-	
 	fprintf(fout_[handle], "summary_id,sidx,return_period,loss\n");
 	for (auto s : items) {
 		lossvec &lpv = s.second;

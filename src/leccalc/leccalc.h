@@ -61,8 +61,13 @@ struct summary_id_period_key {
 	int type;
 };
 
-
+struct lossval {
+	float period_weigthing;
+	float value;
+};
 typedef  std::vector<float> lossvec;
+
+typedef  std::vector<lossval> lossvec2;
 
 //extern FILE *fout[];
 

@@ -3,8 +3,10 @@
 init()
 {	
 	if [ ! -f ../src/eve/eve ]; then
-	    echo "Please run make all before make check"
-	    exit
+		if [ ! -f ../src/eve/eve.exe ]; then
+	    		echo "Please run make all before make check"
+	    		exit
+		fi
 	fi
 	mkdir -p testout
 	cd ..

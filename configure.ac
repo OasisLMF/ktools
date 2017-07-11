@@ -3,7 +3,8 @@
 
 AC_PREREQ([2.68])
 AC_INIT([ktools],  m4_esyscmd([tr -d '\n' < VERSION]), [support@oasislmf.org])
-AM_INIT_AUTOMAKE([gnu])
+#AM_INIT_AUTOMAKE([gnu])
+AM_INIT_AUTOMAKE([foreign subdir-objects])
 AC_CONFIG_MACRO_DIR([m4])
 
 AC_LANG([C])

@@ -192,7 +192,7 @@ loss = x.loss * (lim - ded);
 | policytc_id                       | 1       |
 | ccy_id                            | 1       |
 | deductible_prop_of_loss           | 0.05    |
-| limit_prop_of_loss                | 100000  |
+| limit                             | 100000  |
 
 | Rules                             | Value   |
 |:----------------------------------|--------:|

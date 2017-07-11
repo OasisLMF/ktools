@@ -121,7 +121,7 @@ $ leccalc -r -Ksummary1 -F lec_full_uncertainty_agg.csv -f lec_full_uncertainty_
 <h5 id="internal-data-1">Internal data</h5>
 <p>leccalc requires the occurrence.bin file;</p>
 <ul>
-<li>static/occurrence.bin</li>
+<li>input/occurrence.bin</li>
 </ul>
 <p>leccalc does not have a standard input that can be streamed in. Instead, it reads in summarycalc binary data from a file in a fixed location. The format of the binaries must match summarycalc standard output. The location is in the 'work' subdirectory of the present working directory. For example;</p>
 <ul>
@@ -510,7 +510,7 @@ $ aalcalc &lt; summarycalc.bin &gt; aal.bin </code></pre>
 <h5 id="internal-data-2">Internal data</h5>
 <p>The program requires the occurrence file;</p>
 <ul>
-<li>static/occurrence.bin</li>
+<li>input/occurrence.bin</li>
 </ul>
 <h5 id="calculation-3">Calculation</h5>
 <p>The occurrence file is read into memory. From the summarycalc stream data, the event sample means and sample means squared are computed for each summary_id. The sample means and squared sampled means are summed by period and summary_id, according to which events are assigned to periods in the occurrence data. Then the means and squared means are summed across the periods, for each summary_id. The exposure_value, which is held at an event_id, summary_id in the summarycalc header is also accumulated by summary_id and period, and then across periods. In this case however, it is the maximum exposure value which is carried through the accumulations, not the sum.</p>
@@ -584,7 +584,7 @@ $ aalsummary -Ksummary1/aal &gt; aal.csv </code></pre>
 <h5 id="internal-data-3">Internal data</h5>
 <p>The program requires the occurrence file;</p>
 <ul>
-<li>static/occurrence.bin</li>
+<li>input/occurrence.bin</li>
 </ul>
 <p>aalsummary does not have a standard input that can be streamed in. Instead, it reads in aalcalc binary data from a file in a fixed location. The location is in the 'work' subdirectory of the present working directory. For example;</p>
 <ul>

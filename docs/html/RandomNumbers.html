@@ -16,13 +16,15 @@
 <p>The item_id, group_id data is provided by the user in the items input file (items.bin).</p>
 <h3 id="methodology">Methodology</h3>
 <p>The method of assigning random numbers in gulcalc uses an random number index (ridx), an integer which is used as a position reference into a list of random numbers. S random numbers corresponding to the runtime number of samples are drawn from the list starting at the ridx position.</p>
-<p>There are two options in ktools for choosing random numbers to apply in the sampling process.</p>
+<p>There are three options in ktools for choosing random numbers to apply in the sampling process.</p>
 <h4 id="generate-dynamically-during-the-calculation">1. Generate dynamically during the calculation</h4>
 <h5 id="usage">Usage</h5>
-<p>Use -R{number of random numbers} as a parameter.</p>
+<p>Use -R{number of random numbers} as a parameter. Optionally you may use -s{seed} to make the random numbers repeatable.</p>
 <h5 id="example">Example</h5>
 <pre><code>$ gulcalc -S00 -R1000000 -i -</code></pre>
 <p>This will run 100 samples drawing from 1 million dynamically generated random numbers. They are simple uniform random numbers.</p>
+<pre><code>$ gulcalc -S00 -s123 -R1000000 -i -</code></pre>
+<p>This will run 100 samples drawing from 1 million seeded random numbers (repeatable)</p>
 <h5 id="method">Method</h5>
 <p>Random numbers are sampled dynamically using the Mersenne twister psuedo random number generator (the default RNG of the C++ v11 compiler).<br />
 A sparse array capable of holding R random numbers is allocated to each event. The ridx is generated from the group_id and number of samples S using the following modulus function;</p>
@@ -49,6 +51,17 @@ A sparse array capable of holding R random numbers is allocated to each event. T
 <li>P3 is the first prime number which is bigger than the number of samples, S.</li>
 </ul>
 <p>This formula pseudo-randomly assigns a starting position index to each event_id and group_id combo between 0 and R-1, and then S random numbers are drawn by incrementing the starting position by the sidx.</p>
+<h4 id="generate-automatically-seeded-random-numbers-no-buffer">3. Generate automatically seeded random numbers (no buffer)</h4>
+<h5 id="usage-2">Usage</h5>
+<p>Default option</p>
+<h5 id="example-2">Example</h5>
+<pre><code>$ gulcalc -S100 -i -</code></pre>
+<p>This option will produce repeatable random numbers seeded from a combination of the event_id and group_id. The difference between this option and method 1 with the fixed seed is that there is no limit on the number of random numbers generated, and you do not need to make a decision on the buffer size. This will impact performance for large analyses.</p>
+<h5 id="method-2">Method</h5>
+<p>For each event_id and group_id, the seed is calculated as follows;</p>
+<p>s1 = mod(group_id * 1543270363, 2147483648);<br />
+s2 = mod(event_id * 1943272559, 2147483648);<br />
+seed = mod(s1 + s2 , 2147483648)</p>
 <p><a href="#randomnumbers">Return to top</a></p>
 <p><a href="fmprofiles.html">Go to Appendix B FM Profiles</a></p>
 <p><a href="Contents.html">Back to Contents</a></p>

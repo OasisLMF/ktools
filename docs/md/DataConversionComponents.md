@@ -21,6 +21,7 @@ The following components convert input data in csv format to the binary format r
 * **[fmxreftobin](#fmxref)** converts the fm xref data.
 * **[occurrencetobin](#occurrence)** converts the event occurrence data.
 * **[returnperiodtobin](#returnperiod)** converts a list of return periods.
+* **[periodstobin](#returnperiod)** converts a list of weighted periods (optional).
 
 These components are intended to allow users to generate the required input binaries from csv independently of the original data store and technical environment. All that needs to be done is first generate the csv files from the data store (SQL Server database, etc).
 
@@ -44,6 +45,7 @@ The following components convert the binary input data required by the calculati
 * **[fmxreftocsv](#fmxref)** converts the fm xref data.
 * **[occurrencetocsv](#occurrence)** converts the event occurrence data.
 * **[returnperiodtocsv](#returnperiod)** converts a list of return periods.
+* **[periodstocsv](#returnperiod)** converts a list of weighted periods (optional).
 
 These components are provided for the convenience of viewing the data and debugging.
 
@@ -658,6 +660,36 @@ $ returnperiodtobin < returnperiods.csv > returnperiods.bin
 ##### returnperiodtocsv
 ```
 $ returnperiodtocsv < returnperiods.bin > returnperiods.csv
+``` 
+
+[Return to top](#dataconversioncomponents)
+
+<a id="periods"></a>
+### periods
+***
+The periods binary file is a list of all the periods that are in the model and is optional for weigthing the periods in the calculation. The file is used in the calculation of the loss exceedance curve (leccalc) results.
+
+This must be in the following location with filename format;
+* input/periods.bin
+
+
+##### File format
+The csv file should contain the following field and include a header.
+
+| Name               | Type   |  Bytes | Description                                  | Example     |
+|:----------------------------|--------|--------| :-----------------------------------|------------:|
+| period_no          | int    |    4   | A numbered period in which the event occurs  |   4545      |
+| weigth             | int    |    4   | relative weight to other periods             |   3         |
+
+
+##### periodstobin
+```
+$ periodstobin < periods.csv > periods.bin
+``` 
+
+##### periodstocsv
+```
+$ periodstocsv < periods.bin > periods.csv
 ``` 
 
 [Return to top](#dataconversioncomponents)

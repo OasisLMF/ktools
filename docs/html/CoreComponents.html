@@ -104,13 +104,15 @@ $ getmodel &lt; events.bin &gt; getmodel.bin </code></pre>
 <h5 id="parameters-2">Parameters</h5>
 <p>Required parameters are;</p>
 <ul>
-<li>-R{number} or -r. Number of random numbers to generate or read random numbers from file</li>
 <li>-S{number}. Number of samples</li>
 <li>-c or -i {destination}. There are two alternative streams, 'coverage' or 'item'.<br />
 The destination is either a filename or named pipe, or use - for standard output.</li>
 </ul>
 <p>Optional parameters are;</p>
 <ul>
+<li>-R{number} Number of random numbers to generate dynamically</li>
+<li>-s{number} Manual seed for random numbers (to make them repeatable)</li>
+<li>-r Read random numbers from random.bin file</li>
 <li>-L{number} loss threshold (optional) excludes losses below the threshold from the output stream</li>
 <li>-d debug mode - output random numbers rather than losses (optional)</li>
 </ul>
@@ -175,7 +177,9 @@ $ gulcalc -r -S100 -c gulcalcc.bin &lt; getmodel.bin </code></pre>
 </tr>
 </tbody>
 </table>
-<p>If the -R parameter is used along with a specified number of random numbers then random numbers used for sampling are generated on the fly for each event and group of items which have a common group_id using the Mersenne twister psuedo random number generator (the default RNG of the C++ v11 compiler). if the -r parameter is used, gulcalc reads a random number from the provided random number file. See <a href="RandomNumbers.html">Random Numbers</a> for more details.</p>
+<p>If the -R parameter is used along with a specified number of random numbers then random numbers used for sampling are generated on the fly for each event and group of items which have a common group_id using the Mersenne twister psuedo random number generator (the default RNG of the C++ v11 compiler). These random numbers are not repeatable, unless a seed is also specified (-s{number}).</p>
+<p>If the -r parameter is used, gulcalc reads a random number from the provided random number file, which produces repeatable results.</p>
+<p>The default random number behaviour (no additional parameters) is to generate random numbers from a seed determined by a combination of the event_id and group_id, which produces repeatable results. See <a href="RandomNumbers.html">Random Numbers</a> for more details.</p>
 <p>Each sampled damage is multiplied by the item TIV, looked up from the coverage file.</p>
 <p>The mean and standard deviation of ground up loss is also calculated. For each cdf, the mean and standard deviation of damage is calculated by numerical integration of the effective damageability probability distribution and the result is multiplied by the TIV. The results are included in the output to the stdout stream as sidx=-1 (mean) and sidx=-2 (standard deviation), for each event and item (or coverage).</p>
 <p>At this stage, there are two possible output streams, as follows;</p>

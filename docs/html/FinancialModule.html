@@ -321,8 +321,7 @@ The linkage between account and programme can be provided by a user defined <str
 <p>For any given profile we have two standard rules:</p>
 <ul>
 <li><strong>calcrule_id</strong>, being the Function used to calculate the losses from the given Profile’s fields. More information about the functions can be found in <a href="fmprofiles.html">FM Profiles</a>.</li>
-<li><strong>allocrule_id</strong>, being the rule for allocating back to ITEM level. There are really only two meaningful values here – don’t allocate (0) used typically for the final level to avoid maintaining lots of detailed losses, or allocate back to ITEMs (1) used in all other cases which is in proportion to the input ground up losses.<br />
-(Allocation does not need to be on this basis, by the way, there could be other rules such as allocate back always on TIV or in proportion to the input losses from the previous level, but we have implemented a ground up loss back-allocation rule.</li>
+<li><strong>allocrule_id</strong>, being the rule for allocating losses back to ITEM level. There are three meaningful values here – don’t allocate (0) used typically for all levels where a breakdown of losses is not required in output, allocate back to ITEMs (1) in proportion to the input ground up losses, or allocate back to ITEMS (2) in proportion to the losses from the previous level calculation. If a breakdown of the policy losses is required in output, it is not necessary to back-allocate at every intermediate level. i.e. only the allocrule_id for final level calculations may be set to 1 or 2 and the prior levels can be set to allocrule_id 0. This will result in the most efficient execution path.</li>
 </ul>
 <h3 id="policytc">Policytc</h3>
 <p>The <strong>policytc</strong> table specifies the insurance policies (a policy in Oasis FM is a combination of prog_id and layer_id) and the separate terms and conditions which will be applied to each layer_id/agg_id for a given level. In our example, we have a limit and deductible with the same value applicable to the combination of the first three items, a limit and deductible for the fourth item (time) in level 1, and then a limit, deductible, and line applicable at level 2 covering all items. We’d represent this in terms of the distinct agg_ids as follows:</p>
@@ -440,10 +439,11 @@ The linkage between account and programme can be provided by a user defined <str
 </tr>
 </tbody>
 </table>
-<p>There are two options, depending on whether the losses are allocated back to the items at the final level or not.</p>
+<p>There are three options, depending on whether the losses are allocated back to the items at the final level or not.</p>
 <ul>
 <li>If allocrule_id = 0 for all policytc_ids at the final level then agg_id = to_agg_id of the final level in the <strong>programme</strong> table</li>
 <li>If allocrule_id = 1 for all policytc_ids at the final level then output_id = from_agg_id of the first level in the <strong>programme</strong> table</li>
+<li>If allocrule_id = 2 for all policytc_ids at the final level then output_id = from_agg_id of the first level in the <strong>programme</strong> table</li>
 </ul>
 <p>In other words, losses are either output at the contract level or back-allocated to the lowest level, which is item_id. To avoid unnecessary computation, it is recommended not to back-allocate unless losses are required to be reported at a more detailed level than the contract level (site or zip code, for example). In this case, losses are re-aggregated up from item level (represented by output_id in fmcalc output) in summarycalc, using the fmsummaryxref table.</p>
 <p>In R1.1 of Oasis we took the view that it was simpler throughout to refer back to the base items rather than use a hierarchy of aggregated loss calculations. So, for example, we could have calculated a loss at the site level and then used this calculated loss directly at the policy conditions level but instead we allocated back to item level and then re-aggregated to the next level. The reason for this was that intermediate conditions may only apply to certain items so if we didn’t go back to the base item “ground-up” level then any higher level could have a complicated grouping of a level.</p>

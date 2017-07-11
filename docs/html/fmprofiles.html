@@ -36,12 +36,12 @@
 <td align="right">12</td>
 </tr>
 <tr class="even">
-<td align="left">Deductible as a cap on the retention of input losses</td>
+<td align="left">Maximum Deductible</td>
 <td align="left">4</td>
 <td align="right">10</td>
 </tr>
 <tr class="odd">
-<td align="left">Deductible as a floor on the retention of input losses</td>
+<td align="left">Minimum Deductible</td>
 <td align="left">5</td>
 <td align="right">11</td>
 </tr>
@@ -74,6 +74,30 @@
 <td align="left">Deductible as a proportion of loss</td>
 <td align="left">14</td>
 <td align="right">16</td>
+</tr>
+</tbody>
+</table>
+<p>An allocation rule can be assigned to any profile at any stage in the calculation, which determines whether calculated losses should be back-allocated to the contributing items, and if so how. This is specified via an allocrule_id in the fm_profile data.</p>
+<p>The choices are as follows;</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Allocrule description</th>
+<th align="right">allocrule_id</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Don't back-allocate losses</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Back allocate losses to items in proportion to ground up loss</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">Back-allocate losses to items in proportion to previous level loss</td>
+<td align="right">2</td>
 </tr>
 </tbody>
 </table>
@@ -214,7 +238,8 @@ if (loss &gt; lim) loss = lim;</code></pre>
 <h5 id="calculation-logic-2">Calculation logic</h5>
 <pre class="sh"><code>loss = x.loss - ded;
 if (loss &lt; 0) loss = 0;</code></pre>
-<h3 id="deductible-as-a-cap-on-the-retention-of-input-losses">4. Deductible as a cap on the retention of input losses</h3>
+<h3 id="maximum-deductible">4. Maximum deductible</h3>
+<p>If the accumulated deductibles from the previous level exceed the maximum deductible, the deductible is capped at the maximum deductible value</p>
 <table>
 <thead>
 <tr class="header">
@@ -259,7 +284,8 @@ if (loss &lt; 0) loss = 0;</code></pre>
 else {
     loss = x.loss;
      }</code></pre>
-<h3 id="deductible-as-a-floor-on-the-retention-of-input-losses">5. Deductible as a floor on the retention of input losses</h3>
+<h3 id="minimum-deductible">5. Minimum deductible</h3>
+<p>If the accumulated deductibles from the previous level are less than the minimum deductible, the deductible is increased to the total loss or the minimum deductible value, whichever is greater.</p>
 <table>
 <thead>
 <tr class="header">
@@ -415,7 +441,7 @@ loss = loss * share;</code></pre>
 <td align="right">0.05</td>
 </tr>
 <tr class="even">
-<td align="left">limit_prop_of_loss</td>
+<td align="left">limit</td>
 <td align="right">100000</td>
 </tr>
 </tbody>

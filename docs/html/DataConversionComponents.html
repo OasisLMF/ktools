@@ -15,7 +15,6 @@
 <ul>
 <li><strong><a href="#damagebins">damagebintobin</a></strong> converts the damage bin dictionary.</li>
 <li><strong><a href="#footprint">footprinttobin</a></strong> converts the event footprint.</li>
-<li><strong><a href="#occurrence">occurrencetobin</a></strong> converts the event occurrence data.</li>
 <li><strong><a href="#rand">randtobin</a></strong> converts a list of random numbers.</li>
 <li><strong><a href="#vulnerability">vulnerabilitytobin</a></strong> converts the vulnerability data.</li>
 </ul>
@@ -30,7 +29,9 @@
 <li><strong><a href="#fmprofile">fmprofiletobin</a></strong> converts the fm profile data.</li>
 <li><strong><a href="#fmsummaryxref">fmsummaryxreftobin</a></strong> converts the fm summary xref data.</li>
 <li><strong><a href="#fmxref">fmxreftobin</a></strong> converts the fm xref data.</li>
+<li><strong><a href="#occurrence">occurrencetobin</a></strong> converts the event occurrence data.</li>
 <li><strong><a href="#returnperiod">returnperiodtobin</a></strong> converts a list of return periods.</li>
+<li><strong><a href="#returnperiod">periodstobin</a></strong> converts a list of weighted periods (optional).</li>
 </ul>
 <p>These components are intended to allow users to generate the required input binaries from csv independently of the original data store and technical environment. All that needs to be done is first generate the csv files from the data store (SQL Server database, etc).</p>
 <p>The following components convert the binary input data required by the calculation components in the reference model into csv format;</p>
@@ -38,7 +39,6 @@
 <ul>
 <li><strong><a href="#damagebins">damagebintocsv</a></strong> converts the damage bin dictionary.</li>
 <li><strong><a href="#footprint">footprinttocsv</a></strong> converts the event footprint.</li>
-<li><strong><a href="#occurrence">occurrencetocsv</a></strong> converts the event occurrence data.</li>
 <li><strong><a href="#rand">randtocsv</a></strong> converts a list of random numbers.</li>
 <li><strong><a href="#vulnerability">vulnerabilitytocsv</a></strong> converts the vulnerability data.</li>
 </ul>
@@ -53,7 +53,9 @@
 <li><strong><a href="#fmprofile">fmprofiletocsv</a></strong> converts the fm profile data.</li>
 <li><strong><a href="#fmsummaryxref">fmsummaryxreftocsv</a></strong> converts the fm summary xref data.</li>
 <li><strong><a href="#fmxref">fmxreftocsv</a></strong> converts the fm xref data.</li>
+<li><strong><a href="#occurrence">occurrencetocsv</a></strong> converts the event occurrence data.</li>
 <li><strong><a href="#returnperiod">returnperiodtocsv</a></strong> converts a list of return periods.</li>
+<li><strong><a href="#returnperiod">periodstocsv</a></strong> converts a list of weighted periods (optional).</li>
 </ul>
 <p>These components are provided for the convenience of viewing the data and debugging.</p>
 <h2 id="static-data">Static data</h2>
@@ -196,121 +198,6 @@
 <pre><code>$ footprinttocsv &gt; footprint.csv</code></pre>
 <p>footprinttocsv requires a binary file footprint.bin and an index file footprint.idx to be present in the working directory.</p>
 <p><a href="#dataconversioncomponents">Return to top</a></p>
-<p><a id="occurrence"></a></p>
-<h3 id="occurrence">occurrence</h3>
-<hr />
-<p>The occurrence file is required for certain output components which, in the reference model, are leccalc, pltcalc and aalcalc. In general, some form of event occurence file is required for any output which involves the calculation of loss metrics over a period of time. The occurrence file assigns occurrences of the event_ids to numbered periods. A period can represent any length of time, such as a year, or 2 years for instance. The output metrics such as mean, standard deviation or loss exceedance probabilities are with respect to the chosen period length. Most commonly in catastrophe modelling, the period of interest is a year.</p>
-<p>The occurrence file also includes date fields. There are two formats for providing the date;</p>
-<ul>
-<li>occ_year, occ_month, occ_day. These are all integers representing occurrence year, month and day.</li>
-<li>occ_date_id: An integer representing an offset number of days relative to some arbitrary base date.</li>
-</ul>
-<h5 id="file-format-2">File format</h5>
-<p>The csv file should contain the following fields and include a header row.</p>
-<p>Option 1. occ_year, occ_month, occ_day</p>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">event_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
-<td align="left">The occurrence event_id</td>
-<td align="right">45567</td>
-</tr>
-<tr class="even">
-<td align="left">period_no</td>
-<td align="left">int</td>
-<td align="left">4</td>
-<td align="left">A numbered period in which the event occurs</td>
-<td align="right">56876</td>
-</tr>
-<tr class="odd">
-<td align="left">occ_year</td>
-<td align="left">int</td>
-<td align="left">4</td>
-<td align="left">the year number of the event occurrence</td>
-<td align="right">56876</td>
-</tr>
-<tr class="even">
-<td align="left">occ_month</td>
-<td align="left">int</td>
-<td align="left">4</td>
-<td align="left">the month of the event occurrence</td>
-<td align="right">5</td>
-</tr>
-<tr class="odd">
-<td align="left">occ_day</td>
-<td align="left">int</td>
-<td align="left">4</td>
-<td align="left">the day of the event occurrence</td>
-<td align="right">16</td>
-</tr>
-</tbody>
-</table>
-<p>The occurrence year in this example is a scenario numbered year, which cannot be expressed as a real date in a standard calendar.</p>
-<p>Option 2. occ_date_id</p>
-<table>
-<colgroup>
-<col width="17%" />
-<col width="7%" />
-<col width="7%" />
-<col width="55%" />
-<col width="11%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">event_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
-<td align="left">The occurrence event_id</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="left">period_no</td>
-<td align="left">int</td>
-<td align="left">4</td>
-<td align="left">A numbered period in which the event occurs</td>
-<td align="right">4545</td>
-</tr>
-<tr class="odd">
-<td align="left">occ_date_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
-<td align="left">An integer representing an offset number of days to a base date</td>
-<td align="right">28626</td>
-</tr>
-</tbody>
-</table>
-<p>For example, 28626 days relative to a base date of 0/1/1900 is 16/5/1978.</p>
-<h5 id="occurrencetobin">occurrencetobin</h5>
-<p>A required parameter is -P, the total number of periods of event occurrences. The total number of periods is held in the header of the binary file and used in output calculations.</p>
-<p>Option 2 format should be indicated by using the parameter -D</p>
-<pre><code>&#39;Option 1 (occurrence files with an occ_year, occ_month, occ_day)
-$ occurrencetobin -P10000 &lt; occurrence.csv &gt; occurrence.bin
-
-&#39;Option 2 (occurrence files with an occ_date_id)
-$ occurrencetobin -P10000 -D &lt; occurrence.csv &gt; occurrence.bin</code></pre>
-<h5 id="occurrencetocsv">occurrencetocsv</h5>
-<pre><code>$ occurrencetocsv &lt; occurrence.bin &gt; occurrence.csv</code></pre>
-<p><a href="#dataconversioncomponents">Return to top</a></p>
 <p><a id="rand"></a></p>
 <h3 id="random-numbers">Random numbers</h3>
 <hr />
@@ -320,7 +207,7 @@ $ occurrencetobin -P10000 -D &lt; occurrence.csv &gt; occurrence.bin</code></pre
 </ul>
 <p>If the gulcalc -r parameter is not used, the random number binary is not required and random numbers are instead generated dynamically during the calculation, using the -R parameter to specify how many should be generated.</p>
 <p>The random numbers can be imported from a csv file using the component randtobin.</p>
-<h5 id="file-format-3">File format</h5>
+<h5 id="file-format-2">File format</h5>
 <p>The csv file should contain a simple list of random numbers and include a header row.</p>
 <table>
 <thead>
@@ -363,7 +250,7 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <ul>
 <li>static/vulnerability.bin</li>
 </ul>
-<h5 id="file-format-4">File format</h5>
+<h5 id="file-format-3">File format</h5>
 <p>The csv file should contain the following fields and include a header row.</p>
 <table>
 <thead>
@@ -421,7 +308,7 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <ul>
 <li>input/coverages.bin</li>
 </ul>
-<h4 id="file-format-5">File format</h4>
+<h4 id="file-format-4">File format</h4>
 <p>The csv file should contain the following fields and include a header row.</p>
 <table>
 <thead>
@@ -463,7 +350,7 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <ul>
 <li>input/events.bin</li>
 </ul>
-<h5 id="file-format-6">File format</h5>
+<h5 id="file-format-5">File format</h5>
 <p>The csv file should contain a list of event_ids (integers) and include a header.</p>
 <table>
 <thead>
@@ -497,7 +384,7 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <ul>
 <li>input/items.bin</li>
 </ul>
-<h5 id="file-format-7">File format</h5>
+<h5 id="file-format-6">File format</h5>
 <p>The csv file should contain the following fields and include a header row.</p>
 <table>
 <thead>
@@ -560,7 +447,7 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <ul>
 <li>input/gulsummaryxref.bin</li>
 </ul>
-<h5 id="file-format-8">File format</h5>
+<h5 id="file-format-7">File format</h5>
 <p>The csv file should contain the following fields and include a header row.</p>
 <table>
 <thead>
@@ -752,7 +639,7 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <ul>
 <li>input/fm_programme.bin</li>
 </ul>
-<h5 id="file-format-9">File format</h5>
+<h5 id="file-format-8">File format</h5>
 <p>The csv file should contain the following fields and include a header row.</p>
 <table>
 <thead>
@@ -808,7 +695,7 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <ul>
 <li>input/fm_profile.bin</li>
 </ul>
-<h5 id="file-format-10">File format</h5>
+<h5 id="file-format-9">File format</h5>
 <p>The csv file should contain the following fields and include a header row.</p>
 <table>
 <thead>
@@ -927,7 +814,7 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <ul>
 <li>input/fm_policytc.bin</li>
 </ul>
-<h5 id="file-format-11">File format</h5>
+<h5 id="file-format-10">File format</h5>
 <p>The csv file should contain the following fields and include a header row.</p>
 <table>
 <thead>
@@ -989,7 +876,7 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <ul>
 <li>input/fmsummaryxref.bin</li>
 </ul>
-<h5 id="file-format-12">File format</h5>
+<h5 id="file-format-11">File format</h5>
 <p>The csv file should contain the following fields and include a header row.</p>
 <table>
 <colgroup>
@@ -1108,7 +995,7 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <ul>
 <li>input/fm_xref.bin</li>
 </ul>
-<h5 id="file-format-13">File format</h5>
+<h5 id="file-format-12">File format</h5>
 <p>The csv file should contain the following fields and include a header row.</p>
 <table>
 <thead>
@@ -1231,6 +1118,121 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <h5 id="fmxreftocsv">fmxreftocsv</h5>
 <pre><code>$ fmxreftocsv &lt; fm_xref.bin &gt; fm_xref.csv</code></pre>
 <p><a href="#dataconversioncomponents">Return to top</a></p>
+<p><a id="occurrence"></a></p>
+<h3 id="occurrence">occurrence</h3>
+<hr />
+<p>The occurrence file is required for certain output components which, in the reference model, are leccalc, pltcalc and aalcalc. In general, some form of event occurence file is required for any output which involves the calculation of loss metrics over a period of time. The occurrence file assigns occurrences of the event_ids to numbered periods. A period can represent any length of time, such as a year, or 2 years for instance. The output metrics such as mean, standard deviation or loss exceedance probabilities are with respect to the chosen period length. Most commonly in catastrophe modelling, the period of interest is a year.</p>
+<p>The occurrence file also includes date fields. There are two formats for providing the date;</p>
+<ul>
+<li>occ_year, occ_month, occ_day. These are all integers representing occurrence year, month and day.</li>
+<li>occ_date_id: An integer representing an offset number of days relative to some arbitrary base date.</li>
+</ul>
+<h5 id="file-format-13">File format</h5>
+<p>The csv file should contain the following fields and include a header row.</p>
+<p>Option 1. occ_year, occ_month, occ_day</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Type</th>
+<th align="left">Bytes</th>
+<th align="left">Description</th>
+<th align="right">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">event_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">The occurrence event_id</td>
+<td align="right">45567</td>
+</tr>
+<tr class="even">
+<td align="left">period_no</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">A numbered period in which the event occurs</td>
+<td align="right">56876</td>
+</tr>
+<tr class="odd">
+<td align="left">occ_year</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">the year number of the event occurrence</td>
+<td align="right">56876</td>
+</tr>
+<tr class="even">
+<td align="left">occ_month</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">the month of the event occurrence</td>
+<td align="right">5</td>
+</tr>
+<tr class="odd">
+<td align="left">occ_day</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">the day of the event occurrence</td>
+<td align="right">16</td>
+</tr>
+</tbody>
+</table>
+<p>The occurrence year in this example is a scenario numbered year, which cannot be expressed as a real date in a standard calendar.</p>
+<p>Option 2. occ_date_id</p>
+<table>
+<colgroup>
+<col width="17%" />
+<col width="7%" />
+<col width="7%" />
+<col width="55%" />
+<col width="11%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Type</th>
+<th align="left">Bytes</th>
+<th align="left">Description</th>
+<th align="right">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">event_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">The occurrence event_id</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">period_no</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">A numbered period in which the event occurs</td>
+<td align="right">4545</td>
+</tr>
+<tr class="odd">
+<td align="left">occ_date_id</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">An integer representing an offset number of days to a base date</td>
+<td align="right">28626</td>
+</tr>
+</tbody>
+</table>
+<p>For example, 28626 days relative to a base date of 0/1/1900 is 16/5/1978.</p>
+<h5 id="occurrencetobin">occurrencetobin</h5>
+<p>A required parameter is -P, the total number of periods of event occurrences. The total number of periods is held in the header of the binary file and used in output calculations.</p>
+<p>Option 2 format should be indicated by using the parameter -D</p>
+<pre><code>&#39;Option 1 (occurrence files with an occ_year, occ_month, occ_day)
+$ occurrencetobin -P10000 &lt; occurrence.csv &gt; occurrence.bin
+
+&#39;Option 2 (occurrence files with an occ_date_id)
+$ occurrencetobin -P10000 -D &lt; occurrence.csv &gt; occurrence.bin</code></pre>
+<h5 id="occurrencetocsv">occurrencetocsv</h5>
+<pre><code>$ occurrencetocsv &lt; occurrence.bin &gt; occurrence.csv</code></pre>
+<p><a href="#dataconversioncomponents">Return to top</a></p>
 <p><a id="returnperiod"></a></p>
 <h3 id="return-period">return period</h3>
 <hr />
@@ -1265,6 +1267,48 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <pre><code>$ returnperiodtobin &lt; returnperiods.csv &gt; returnperiods.bin</code></pre>
 <h5 id="returnperiodtocsv">returnperiodtocsv</h5>
 <pre><code>$ returnperiodtocsv &lt; returnperiods.bin &gt; returnperiods.csv</code></pre>
+<p><a href="#dataconversioncomponents">Return to top</a></p>
+<p><a id="periods"></a></p>
+<h3 id="periods">periods</h3>
+<hr />
+<p>The periods binary file is a list of all the periods that are in the model and is optional for weigthing the periods in the calculation. The file is used in the calculation of the loss exceedance curve (leccalc) results.</p>
+<p>This must be in the following location with filename format;</p>
+<ul>
+<li>input/periods.bin</li>
+</ul>
+<h5 id="file-format-15">File format</h5>
+<p>The csv file should contain the following field and include a header.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th align="left">Type</th>
+<th align="left">Bytes</th>
+<th align="left">Description</th>
+<th align="right">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">period_no</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">A numbered period in which the event occurs</td>
+<td align="right">4545</td>
+</tr>
+<tr class="even">
+<td align="left">weigth</td>
+<td align="left">int</td>
+<td align="left">4</td>
+<td align="left">relative weight to other periods</td>
+<td align="right">3</td>
+</tr>
+</tbody>
+</table>
+<h5 id="periodstobin">periodstobin</h5>
+<pre><code>$ periodstobin &lt; periods.csv &gt; periods.bin</code></pre>
+<h5 id="periodstocsv">periodstocsv</h5>
+<pre><code>$ periodstocsv &lt; periods.bin &gt; periods.csv</code></pre>
 <p><a href="#dataconversioncomponents">Return to top</a></p>
 <p><a href="StreamConversionComponents.html">Go to 4.4 Stream conversion components section</a></p>
 <p><a href="Contents.html">Back to Contents</a></p>

@@ -23,13 +23,15 @@ document.write('<a h'+'ref'+'="ma'+'ilto'+':'+e+'" clas'+'s="em' + 'ail">'+e+'<\
 <p>This issue will be handled in future releases by implementing the rdrand random number generator in all environments.</p>
 <h2 id="linux-installation">Linux Installation</h2>
 <h3 id="pre-requisites">Pre-requisites</h3>
-<p>The g++ compiler needs to be installed in Linux.</p>
+<p>The g++ compiler build-essential, libtool, zlibg1-dev on debian distros or 'Development Tools' and zlib-devel on red hat needs to be installed in Linux.</p>
 <h3 id="instructions">Instructions</h3>
 <p>Copy ktools-[version].tar.gz onto your machine and untar.</p>
 <pre class="sh"><code>$ tar -xvf ktools-[version].tar.gz</code></pre>
-<p>Go into the ktools folder and configure using the following command;</p>
+<p>Go into the ktools folder and autogen using the following command;</p>
 <pre class="sh"><code>$ cd ktools-[version]
-$ ./configure</code></pre>
+$ ./autogen.sh</code></pre>
+<p>Configure using the following command;</p>
+<pre class="sh"><code>$ ./configure</code></pre>
 <p>Make using the following command;</p>
 <pre class="sh"><code>$ make</code></pre>
 <p>Next run the automated test to check the build and numerical results;</p>
@@ -38,9 +40,9 @@ $ ./configure</code></pre>
 <pre class="sh"><code>$ make install</code></pre>
 <p>The installation is complete. The executables are located in ~/usr/local/bin.</p>
 <p>If installing the latest code from the git repository, clone the ktools repository onto your machine.</p>
-<p>Go into the ktools folder and configure using the following command;</p>
+<p>Go into the ktools folder and autogen using the following command;</p>
 <pre class="sh"><code>$ cd ktools
-$ ./kconfigure</code></pre>
+$ ./autogen.sh</code></pre>
 <p>Follow the rest of the process as described above.</p>
 <h2 id="windows-installation">Windows Installation</h2>
 <h3 id="pre-requisites-1">Pre-requisites</h3>
@@ -54,6 +56,8 @@ The following Cygwin add-in packages are required;</p>
 <li>make</li>
 <li>diffutils</li>
 <li>automake</li>
+<li>libtools</li>
+<li>zlib-devel</li>
 </ul>
 <p>To build native Windows 64-bit executables;</p>
 <ul>
@@ -69,9 +73,11 @@ The following Cygwin add-in packages are required;</p>
 <p>Change directory to the location of the tar.gz.</p>
 <p>Extract the files using the following command</p>
 <pre class="sh"><code>$ tar -xvf ktools-[version].tar.gz</code></pre>
-<p>Go into the ktools folder and configure using the following command;</p>
+<p>Go into the ktools folder and autgen using the following command;</p>
 <pre class="sh"><code>$ cd ktools-[version]
-$ ./winconfigure</code></pre>
+$ ./autogen.sh</code></pre>
+<p>Configure using the following command;</p>
+<pre class="sh"><code>$ ./winconfigure</code></pre>
 <p>Make using the following command;</p>
 <pre class="sh"><code>$ make</code></pre>
 <p>Next run the automated test to check the build and numerical results;</p>
@@ -86,6 +92,8 @@ $ ./winconfigure</code></pre>
 <p>For example, to run the eltcalc_example script, go into the examples folder and run the following command (you must have python v2.X installed):</p>
 <pre class="sh"><code>$ cd examples
 $ python eltcalc_example.py </code></pre>
+<p>To build linux docker image do following command</p>
+<pre><code>docker build --file Dockerfile.ktools.alpine -t alpine-ktools .</code></pre>
 <h3 id="questionsproblems">Questions/problems?</h3>
 <p>Email <script type="text/javascript">
 <!--

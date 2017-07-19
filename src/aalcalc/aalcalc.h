@@ -49,15 +49,20 @@ class aalcalc {
 private:
 	std::map<int, int> event_count_;	// count of events in occurrence table used to create cartesian effect on event_id
 	int no_of_periods_ = 0;
+	int samplesize_ = 0;
 	std::map<int, aal_rec> map_analytical_aal_;
 	std::map<int, aal_rec> map_sample_aal_;
+	std::map <int, float> periodstowighting_;	
 	// functions
+	void loadperiodtoweigthing();
 	void loadoccurrence();
 	void outputresultscsv();
 	void outputsummarybin();
 	void do_analytical_calc(const summarySampleslevelHeader &sh, float mean_loss);
-	void do_sample_calc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec, int samplesize);
-	void doaalcalc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec, float mean_loss, int samplesize);
+	void do_sample_calc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec);
+	void doaalcalc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec, float mean_loss);
+	void applyweightingstomap(std::map<int, aal_rec> &m, int i);
+	void applyweightingstomaps();
 public:
 	void doit();
 };

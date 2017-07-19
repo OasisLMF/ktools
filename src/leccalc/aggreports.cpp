@@ -161,6 +161,7 @@ void aggreports::fulluncertaintywithweighting(int handle, const std::map<outkey2
 		lossval lv;
 		lv.value = x.second;
 		lv.period_weigthing = periodstowighting_[x.first.period_no];
+		lv.period_no = x.first.period_no;		// for debugging
 		items[x.first.summary_id].push_back(lv);
 	}
 

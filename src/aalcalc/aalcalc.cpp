@@ -50,6 +50,36 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 bool firstOutput = true;
 
+// Load and normalize weigthting table 
+// we must have entry for every return period!!!
+// otherwise no way to pad missing ones
+void aalcalc::loadperiodtoweigthing()
+{
+	FILE *fin = fopen(PERIODS_FILE, "rb");
+	if (fin == NULL) return;
+	Periods p;
+	float total_weighting = 0;
+	size_t i = fread(&p, sizeof(Periods), 1, fin);
+	while (i != 0) {
+		total_weighting += p.weighting;
+		periodstowighting_[p.period_no] = (float) p.weighting;
+		i = fread(&p, sizeof(Periods), 1, fin);
+	}
+	// If we are going to have weightings we should have them for all periods
+	if (periodstowighting_.size() != no_of_periods_) {
+		fprintf(stderr, "Total number of periods in %s does not match the number of periods in %s\n", PERIODS_FILE, OCCURRENCE_FILE);
+		exit(-1);
+	}
+	// Now normalize the weigthing ...
+	auto iter = periodstowighting_.begin();
+	while (iter != periodstowighting_.end()) {
+		iter->second = iter->second / total_weighting;
+		if (samplesize_) iter->second = iter->second / samplesize_;
+		iter++;
+	}
+}
+
+
 void aalcalc::loadoccurrence()
 {
 	
@@ -113,6 +143,10 @@ void aalcalc::outputsummarybin()
 
 void aalcalc::do_analytical_calc(const summarySampleslevelHeader &sh,  float mean_loss)
 {	
+	if (periodstowighting_.size() > 0) {
+		auto iter = periodstowighting_.find(sh.event_id);
+		mean_loss = mean_loss * iter->second;
+	}
 	float mean_squared = mean_loss*mean_loss;
 	int count = event_count_[sh.event_id];		// do the cartesian
 	mean_loss = mean_loss * count;
@@ -135,13 +169,13 @@ void aalcalc::do_analytical_calc(const summarySampleslevelHeader &sh,  float mea
 	}
 }
 
-void aalcalc::do_sample_calc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec, int samplesize)
+void aalcalc::do_sample_calc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec)
 {
 	float mean_loss=0;
 	for (auto x : vrec) {
 		mean_loss += x.loss;
 	}
-	mean_loss = mean_loss / samplesize;	
+	mean_loss = mean_loss / samplesize_;	
 	float mean_squared = mean_loss*mean_loss;
 	int count = event_count_[sh.event_id];		// do the cartesian
 	mean_loss = mean_loss * count;
@@ -165,15 +199,44 @@ void aalcalc::do_sample_calc(const summarySampleslevelHeader &sh, const std::vec
 	
 }
 
-void aalcalc::doaalcalc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec, float mean_loss,int samplesize)
+void aalcalc::doaalcalc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec, float mean_loss)
 {
 	do_analytical_calc(sh, mean_loss);
-	if (samplesize) do_sample_calc(sh, vrec, samplesize);
+	if (samplesize_) do_sample_calc(sh, vrec);
 }
 
+void applyweightings(int event_id, const std::map <int, float> &periodstowighting,std::vector<sampleslevelRec> &vrec)
+{
+	if (periodstowighting.size() == 0) return;
+	auto iter = periodstowighting.find(event_id);
+	if (iter != periodstowighting.end()) {
+		for (int i = 0;i < vrec.size(); i++) vrec[i].loss = vrec[i].loss * iter->second;
+	}else {
+		fprintf(stderr, "Event %d not found in periods.bin\n", event_id);
+		exit(-1);
+	}
+}
+
+void aalcalc::applyweightingstomap(std::map<int, aal_rec> &m, int i)
+{
+	auto iter = m.begin();
+	while (iter != m.end()) {
+		iter->second.mean = iter->second.mean * i;
+		iter->second.mean_squared = iter->second.mean_squared * i * i;
+		iter++;
+	}
+}
+void aalcalc::applyweightingstomaps()
+{
+	int i = periodstowighting_.size();
+	if ( i == 0) return;
+	applyweightingstomap(map_analytical_aal_, i);
+	applyweightingstomap(map_sample_aal_, i);
+}
 void aalcalc::doit()
 {
 	loadoccurrence();
+	loadperiodtoweigthing();
 	int summarycalcstream_type = 0;
 	size_t i = fread(&summarycalcstream_type, sizeof(summarycalcstream_type), 1, stdin);
 	int stream_type = summarycalcstream_type & summarycalc_id;
@@ -185,9 +248,8 @@ void aalcalc::doit()
 	stream_type = streamno_mask & summarycalcstream_type;
 	bool haveData = false;
 	if (stream_type == 1) {		
-		int summary_set = 0;
-		int samplesize = 0;
-		i = fread(&samplesize, sizeof(samplesize), 1, stdin);
+		int summary_set = 0;		
+		i = fread(&samplesize_, sizeof(samplesize_), 1, stdin);
 		if (i != 0) i = fread(&summary_set, sizeof(summary_set), 1, stdin);
 		std::vector<sampleslevelRec> vrec;
 		summarySampleslevelHeader sh;
@@ -200,7 +262,8 @@ void aalcalc::doit()
 				sampleslevelRec sr;
 				i = fread(&sr, sizeof(sr), 1, stdin);
 				if (i == 0 || sr.sidx == 0) {
-					doaalcalc(sh, vrec, mean_loss, samplesize);
+					applyweightings(sh.event_id, periodstowighting_, vrec);
+					doaalcalc(sh, vrec, mean_loss);
 					vrec.clear();
 					break;
 				}
@@ -210,9 +273,13 @@ void aalcalc::doit()
 
 			j++;
 		}
-		if (haveData == true) doaalcalc(sh, vrec,mean_loss, samplesize);
+		if (haveData == true) {
+			applyweightings(sh.event_id, periodstowighting_, vrec);
+			doaalcalc(sh, vrec, mean_loss);
+		}
 	}
 
+	applyweightingstomaps();
 	outputsummarybin();
 }
 

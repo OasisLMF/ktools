@@ -87,6 +87,7 @@ To build native Windows 64-bit executables;
 
 * mingw64-x86_64-gcc-g++
 * mingw64-x86_64-gcc-core
+* mingw64-x86_64-zlib
 
 Search for 'mingw', gcc', 'make' and 'diffutils' to find all of the relevant packages (Only 'gcc' illustrated below).
 ![alt text](docs/img/cygwin1.jpg "Add-in packages")

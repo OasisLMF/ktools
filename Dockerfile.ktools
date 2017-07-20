@@ -1,4 +1,4 @@
-FROM coreoasis/oasis_base:R_0_0_0_14
+FROM coreoasis/oasis_base:R_0_0_0_17
 
 RUN apt-get update && \
     apt-get upgrade -y && \

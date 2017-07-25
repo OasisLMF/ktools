@@ -50,10 +50,10 @@ $ make check
 
 Finally, install the executables using the following command;
 ``` sh
-$ make install
+$ [sudo] make install
 ```
 
-The installation is complete. The executables are located in ~/usr/local/bin. 
+The installation is complete. The executables are located in /usr/local/bin. 
 
 If installing the latest code from the git repository, clone the ktools repository onto your machine.
 

@@ -29,6 +29,15 @@ AS_HELP_STRING([--enable-debug],
 esac],
 [debug=false])
 
+dnl Enable static linking
+AC_ARG_ENABLE([static],
+    AS_HELP_STRING([--enable-static], [Enable static link]))
+
+AS_IF([test "x$enable_static" = "xyes"], [
+	LDFLAGS=-static
+])
+
+
 # :${CXXFLAGS="-std=c++11 -Wno-unused-result -g -O3"}
 
 AM_CONDITIONAL(DEBUG, test x"$debug" = x"true")

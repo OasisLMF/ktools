@@ -279,7 +279,7 @@ damagecdfrec *d = (damagecdfrec *)rec;
 
 	item_map_key k;
 	k.areaperil_id = d->areaperil_id;
-	k.vulnerability_id = d->vulnerabilty_id;
+	k.vulnerability_id = d->vulnerability_id;
 
 	auto pos = item_map_->find(k);
 	if (pos != item_map_->end()){

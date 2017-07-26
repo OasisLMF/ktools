@@ -78,7 +78,7 @@ const unsigned int streamno_mask = 0x00FFFFFF;
 struct damagecdfrec {
         int event_id;
         int areaperil_id;
-        int vulnerabilty_id;
+        int vulnerability_id;
 };
 
 struct damagebindictionary {

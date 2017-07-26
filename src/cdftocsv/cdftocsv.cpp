@@ -111,14 +111,14 @@ void processrec(char *rec, int recsize,
     b = b + sizeof(int);
     prob_mean *pp = (prob_mean *)b;
     for (int bin_index = 0; bin_index < *bin_count; bin_index++){
-        fprintf(stdout,"%d,%d,%d,%d,%f,%f\n",d->event_id, d->areaperil_id, d->vulnerabilty_id,bin_index+1,pp->prob_to,pp->bin_mean );
+        fprintf(stdout,"%d,%d,%d,%d,%f,%f\n",d->event_id, d->areaperil_id, d->vulnerability_id,bin_index+1,pp->prob_to,pp->bin_mean );
         pp++;
     }
 }
 void doit(bool skipheader)
 {
 
-	if (skipheader == false) fprintf(stdout, "event_id,areaperil_id,vulnerabilty_id,bin_index,prob_to,bin_mean\n");
+	if (skipheader == false) fprintf(stdout, "event_id,areaperil_id,vulnerability_id,bin_index,prob_to,bin_mean\n");
 	std::vector<damagebindictionary> damagebindictionary_vec;
 	getdamagebindictionary(damagebindictionary_vec);
 	size_t total_bins = damagebindictionary_vec.size();

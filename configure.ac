@@ -48,7 +48,7 @@ AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADERS([config.h])
 
 
-LDFLAGS=-static
+# LDFLAGS=-static
 
 # Checks for programs.
 AC_PROG_CXX

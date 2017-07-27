@@ -51,8 +51,8 @@ AC_CONFIG_HEADERS([config.h])
 # LDFLAGS=-static
 
 # Checks for programs.
-AC_PROG_CXX
-AC_PROG_CC
+AC_PROG_CXX([c++ g++])
+AC_PROG_CC([cc gcc])
 AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 

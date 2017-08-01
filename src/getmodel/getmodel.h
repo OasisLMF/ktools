@@ -38,7 +38,7 @@ Author: Mark Pinkerton  email: mark.pinkerton@oasislmf.org
 */
 
 #ifndef GETMODEL_H_
-#define GETMODEL_H__
+#define GETMODEL_H_
 
 #include <map>
 #include <set>

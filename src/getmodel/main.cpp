@@ -47,6 +47,7 @@ Author: Mark Pinkerton  email: mark.pinkerton@oasislmf.org
 #endif
 #ifdef __unix
 #include <unistd.h>
+#include <getopt.h>
 #endif
 
 void help()

@@ -10,13 +10,13 @@ AC_CONFIG_MACRO_DIR([m4])
 AC_LANG([C])
 AC_LANG([C++])
 
-AC_MSG_CHECKING([Check for /usr/bin/diff ])
-if [[ -f /usr/bin/diff ]];
+AC_MSG_CHECKING([Check for /usr/bin/md5sum ])
+if [[ -f /usr/bin/md5sum ]];
 then
 	AC_MSG_RESULT([yes])
 else
 	AC_MSG_RESULT([no])
-	AC_MSG_NOTICE([ /usr/bin/diff not found - cannot do make check])
+	AC_MSG_NOTICE([ /usr/bin/md5sum not found - cannot do make check])
 fi
 
 AC_ARG_ENABLE(debug,
@@ -38,9 +38,38 @@ AS_IF([test "x$enable_static" = "xyes"], [
 ])
 
 
+dnl Enable static linking
+AC_ARG_ENABLE([osx],
+    AS_HELP_STRING([--enable-osx], [Enable OSX build]))
+
+AS_IF([test "x$enable_osx" = "xyes"], [
+	:${CXXFLAGS="-std=c++11 -Wno-unused-result -g -O3"}	
+],
+[
+	:${CXXFLAGS="-std=c++11 -Wno-unused-result -ffunction-sections -fdata-sections -O3"}
+	:${LDFLAGS="-Wl,--gc-sections -Wl,--strip-all"}
+]
+)
+
+
 # :${CXXFLAGS="-std=c++11 -Wno-unused-result -g -O3"}
 
 AM_CONDITIONAL(DEBUG, test x"$debug" = x"true")
+
+# For debug
+# AC_SUBST([AM_CXXFLAGS], [-std=c++11 -Wno-unused-result -g -O3])
+
+#AC_SUBST([AM_CXXFLAGS], [-std=c++11 -Wno-unused-result -ffunction-sections -fdata-sections -O3])
+#AC_SUBST([AM_LDFLAGS], [-Wl,--gc-sections -Wl,--strip-all])
+
+
+#if [[ -f ./fred ]];
+#then
+#	:${CXXFLAGS="-std=c++11 -Wno-unused-result -ffunction-sections -fdata-sections -O3"}
+#	:${LDFLAGS="-Wl,--gc-sections -Wl,--strip-all"}
+#else
+#	:${CXXFLAGS="-std=c++11 -Wno-unused-result -g -O3"}	
+#fi
 
 
 

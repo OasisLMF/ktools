@@ -17,11 +17,11 @@ if [ "$SYSNAME" = "Cygwin" ]; then
    	touch ktest/cw64bld
    	exit 0
 else
-   DIST_ID=`lsb_release -i -s`
-   if [ "$DIST_ID" = "Ubuntu" ]; then
-	./configure  --host x86_64-w64-mingw32 --prefix=/cygdrive/c/oasis
-   	touch ktest/uwbld
-	exit 0
-   fi
-   echo "Must run this under cygwin"
+	SYSNAME=`uname -r`
+	if echo "$SYSNAME" | grep -q "Microsoft"; then
+		echo "This is not yet supported due to lack of thread support"
+		# ./configure  --host x86_64-w64-mingw32 --prefix=/mnt/c/oasis --with-zlib=/usr/x86_64-w64-mingw32
+	else
+   		echo "Must run this on a windows machine either under cygwin or under the Linux Subsystem for Windows"
+	fi
 fi

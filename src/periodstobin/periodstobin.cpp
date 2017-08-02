@@ -51,7 +51,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 void doit()
 {
 
-	Periodsx p;
+	Periods p;
     char line[4096];
     int lineno=0;
 

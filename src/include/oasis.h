@@ -244,7 +244,7 @@ struct Vulnerability
 struct Periods
 {
 	int period_no;
-	int weighting;
+	double weighting;
 };
 struct EventRow
 {

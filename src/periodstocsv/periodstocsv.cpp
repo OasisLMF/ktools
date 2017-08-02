@@ -50,10 +50,10 @@ void doit()
 {
 	printf("\"period_no\", \"weighting\"\n");
 	
-	Periods p;
+	Periodsx p;
 	size_t i = fread(&p, sizeof(p), 1, stdin);
 	while (i != 0) {
-		printf("%d, %d\n",	p.period_no, p.weighting);
+		printf("%d, %lf\n",	p.period_no, p.weighting);
 
 		i = fread(&p, sizeof(p), 1, stdin);
     }

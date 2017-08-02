@@ -43,11 +43,11 @@ AC_ARG_ENABLE([osx],
     AS_HELP_STRING([--enable-osx], [Enable OSX build]))
 
 AS_IF([test "x$enable_osx" = "xyes"], [
-	:${CXXFLAGS="-std=c++11 -D__unix  -Wno-unused-result -g -O3"}	
+	CXXFLAGS="-std=c++11 -D__unix  -Wno-unused-result -g -O3"
 ],
 [
-	:${CXXFLAGS="-std=c++11 -Wno-unused-result -ffunction-sections -fdata-sections -O3"}
-	:${LDFLAGS="-Wl,--gc-sections -Wl,--strip-all"}
+	CXXFLAGS="-std=c++11 -Wno-unused-result -ffunction-sections -fdata-sections -O3"
+	LDFLAGS="-Wl,--gc-sections -Wl,--strip-all"
 ]
 )
 

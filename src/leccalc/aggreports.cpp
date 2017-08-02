@@ -102,6 +102,7 @@ aggreports::aggreports(int totalperiods, int maxsummaryid, std::map<outkey2, flo
 // Load and normalize weigthting table 
 // we must have entry for every return period!!!
 // otherwise no way to pad missing ones
+// The weighting should already be normalized - i.e range within 0 and 1 and they should total upto one.
 void aggreports::loadperiodtoweigthing()
 {
 	FILE *fin = fopen(PERIODS_FILE, "rb");
@@ -111,19 +112,19 @@ void aggreports::loadperiodtoweigthing()
 	size_t i = fread(&p, sizeof(Periods), 1, fin);
 	while (i != 0) {
 		total_weighting += p.weighting;
-		periodstowighting_[p.period_no] = p.weighting;
+		periodstoweighting_[p.period_no] = p.weighting;
 		i = fread(&p, sizeof(Periods), 1, fin);
 	}
 	// If we are going to have weightings we should have them for all periods
-	if (periodstowighting_.size() != totalperiods_) {
-		fprintf(stderr, "Total number of periods in %s does not match the number of periods in %s\n", PERIODS_FILE, OCCURRENCE_FILE);
-		exit(-1);
-	}
+	//if (periodstowighting_.size() != totalperiods_) {
+	//	fprintf(stderr, "Total number of periods in %s does not match the number of periods in %s\n", PERIODS_FILE, OCCURRENCE_FILE);
+	//	exit(-1);
+	//}
 	// Now normalize the weigthing ...
-	auto iter = periodstowighting_.begin();
-	while (iter != periodstowighting_.end()) {
-		iter->second = iter->second / total_weighting;
-		if (samplesize_) iter->second = iter->second / samplesize_;
+	auto iter = periodstoweighting_.begin();
+	while (iter != periodstoweighting_.end()) {   // weightings already normalized so just split between samples
+	//	iter->second = iter->second / total_weighting;		
+		if (samplesize_) iter->second = iter->second / samplesize_;		// now split them between the samples
 		iter++;
 	}
 }
@@ -160,7 +161,7 @@ void aggreports::fulluncertaintywithweighting(int handle, const std::map<outkey2
 	for (auto x : out_loss) {
 		lossval lv;
 		lv.value = x.second;
-		lv.period_weigthing = periodstowighting_[x.first.period_no];
+		lv.period_weigthing = periodstoweighting_[x.first.period_no];
 		lv.period_no = x.first.period_no;		// for debugging
 		items[x.first.summary_id].push_back(lv);
 	}
@@ -220,7 +221,7 @@ void aggreports::fulluncertainty(int handle,const std::map<outkey2, float> &out_
 }
 void aggreports::outputOccFulluncertainty()
 {
-	if (periodstowighting_.size() == 0) {
+	if (periodstoweighting_.size() == 0) {
 		fulluncertainty(OCC_FULL_UNCERTAINTY, max_out_loss_);
 	}
 	else {
@@ -232,7 +233,7 @@ void aggreports::outputOccFulluncertainty()
 // Full uncertainty output
 void aggreports::outputAggFulluncertainty()
 {
-	if (periodstowighting_.size() == 0) {
+	if (periodstoweighting_.size() == 0) {
 		fulluncertainty(AGG_FULL_UNCERTAINTY, agg_out_loss_);
 	}
 	else {

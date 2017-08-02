@@ -51,7 +51,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 void doit()
 {
 
-	Periods p;
+	Periodsx p;
     char line[4096];
     int lineno=0;
 
@@ -59,7 +59,7 @@ void doit()
 	lineno++;
     while (fgets(line, sizeof(line), stdin) != 0)
     {
-		if (sscanf(line, "%d,%d", &p.period_no, &p.weighting) != 2){
+		if (sscanf(line, "%d,%lf", &p.period_no, &p.weighting) != 2){
            fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
            return;
        }

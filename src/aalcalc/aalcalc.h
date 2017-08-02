@@ -52,7 +52,7 @@ private:
 	int samplesize_ = 0;
 	std::map<int, aal_rec> map_analytical_aal_;
 	std::map<int, aal_rec> map_sample_aal_;
-	std::map <int, float> periodstowighting_;	
+	std::map <int, float> periodstoweighting_;	
 	// functions
 	void loadperiodtoweigthing();
 	void loadoccurrence();

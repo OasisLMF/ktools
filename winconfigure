@@ -3,8 +3,8 @@ SYSNAME=`uname -o`
 
 touch aclocal.m4
 touch Makefile.in
-touch configure
 touch config.h.in
+
 
 rm -f ktest/cw32bld
 rm -f ktest/cw62bld
@@ -12,7 +12,8 @@ rm -f ktest/uwbld
  
 if [ "$SYSNAME" = "Cygwin" ]; then
 	# ./configure  --host  i686-w64-mingw32 --prefix=/cygdrive/c/oasis   # do not use 32 bit variant!!!
-	./configure  --build=x86_64 --host x86_64-w64-mingw32 --prefix=/cygdrive/c/oasis
+	#./configure  --build=x86_64 --host x86_64-w64-mingw32 --prefix=/cygdrive/c/oasis   --without-zlib
+	./configure  --build=x86_64 --host x86_64-w64-mingw32 --prefix=/cygdrive/c/oasis   --with-zlib=/usr/x86_64-w64-mingw32/sys-root/mingw/
    	touch ktest/cw64bld
    	exit 0
 else

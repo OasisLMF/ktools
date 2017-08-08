@@ -78,7 +78,7 @@
 ######################################################################
 
 if [ -d ".git" ]; then
-	(cat VERSION.in  && git log -1 --pretty=format:%cdt) |  tr '\n' 'A' | sed 's/A/ - git update: /g' > VERSION
+	(cat VERSION.in  && git log -1 --pretty=format:%cdt) |  tr '\n' 'A' | sed 's/A/ - git update: /' > VERSION
 else
     cat VERSION.in  > VERSION
 fi

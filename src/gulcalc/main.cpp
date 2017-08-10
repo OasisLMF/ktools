@@ -55,7 +55,7 @@ bool debug = false;
 bool itemLevelOutput = false;
 bool coverageLevelOutput = false;
 int rand_vector_size = 1000000;
-int rand_seed = -1;
+int rand_seed = 0;
 
 rd_option rndopt = rd_option::usehashedseed;
 

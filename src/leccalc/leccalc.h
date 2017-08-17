@@ -63,7 +63,7 @@ struct summary_id_period_key {
 
 struct lossval {
 	int period_no;	// for debugging
-	float period_weigthing;
+	double period_weighting;
 	float value;
 };
 typedef  std::vector<float> lossvec;

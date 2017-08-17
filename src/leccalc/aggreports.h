@@ -51,7 +51,7 @@ private:
 	bool useReturnPeriodFile_;
 	int samplesize_ = 0;
 	std::vector<int> returnperiods_;
-	std::map <int, float> periodstoweighting_;
+	std::map <int, double> periodstoweighting_;
 
 //
 	void fulluncertainty(int handle, const std::map<outkey2, float> &out_loss);	

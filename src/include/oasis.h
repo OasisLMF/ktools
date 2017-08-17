@@ -58,6 +58,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #define fltell ftell
 #endif 
 
+#define OAFLOAT float
 
 const int mean_idx = -1;
 const int std_dev_idx = -2;

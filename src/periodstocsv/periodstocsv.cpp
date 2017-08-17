@@ -53,7 +53,7 @@ void doit()
 	Periods p;
 	size_t i = fread(&p, sizeof(p), 1, stdin);
 	while (i != 0) {
-		printf("%d, %lf\n",	p.period_no, p.weighting);
+		printf("%d, %0.9lf\n",	p.period_no, p.weighting);
 
 		i = fread(&p, sizeof(p), 1, stdin);
     }

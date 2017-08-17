@@ -111,6 +111,7 @@ void aggreports::loadperiodtoweigthing()
 	float total_weighting = 0;
 	size_t i = fread(&p, sizeof(Periods), 1, fin);
 	while (i != 0) {
+		//printf("%d, %lf\n", p.period_no, p.weighting);
 		total_weighting += p.weighting;
 		periodstoweighting_[p.period_no] = p.weighting;
 		i = fread(&p, sizeof(Periods), 1, fin);
@@ -161,9 +162,12 @@ void aggreports::fulluncertaintywithweighting(int handle, const std::map<outkey2
 	for (auto x : out_loss) {
 		lossval lv;
 		lv.value = x.second;
-		lv.period_weigthing = periodstoweighting_[x.first.period_no];
-		lv.period_no = x.first.period_no;		// for debugging
-		items[x.first.summary_id].push_back(lv);
+		auto iter = periodstoweighting_.find(x.first.period_no);	// assume weighting is zero if not supplied
+		if (iter != periodstoweighting_.end()) {
+			lv.period_weighting = iter->second;
+			lv.period_no = x.first.period_no;		// for debugging
+			items[x.first.summary_id].push_back(lv);
+		}
 	}
 
 	fprintf(fout_[handle], "summary_id,return_period,loss\n");	
@@ -173,10 +177,24 @@ void aggreports::fulluncertaintywithweighting(int handle, const std::map<outkey2
 		lossvec2 &lpv = s.second;
 		std::sort(lpv.rbegin(), lpv.rend());
 		int i = 1;
+		int nextreturnperiodindex = 0;
+		float last_computed_rp = 0;
+		float last_computed_loss = 0;
+
 		for (auto lp : lpv) {
-			cummulative_weigthing += lp.period_weigthing;				
-			float f = 1 / cummulative_weigthing;
-			fprintf(fout_[handle], "%d,%f,%f\n", s.first, f, lp.value);
+			cummulative_weigthing += lp.period_weighting;
+			if (cummulative_weigthing) {
+				float retperiod = 1 / cummulative_weigthing;
+				//if (samplesize_) retperiod = retperiod * samplesize_;
+				//retperiod = retperiod / i;
+				if (useReturnPeriodFile_) {
+					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, s.first, 0);
+				}
+				else {
+					fprintf(fout_[handle], "%d,%f,%f\n", s.first, retperiod, lp.value);
+				}
+				//fprintf(fout_[handle], "%d,%f,%f\n", s.first, f, lp.value);
+			}
 		}
 		i++;
 	}
@@ -206,7 +224,7 @@ void aggreports::fulluncertainty(int handle,const std::map<outkey2, float> &out_
 			if (useReturnPeriodFile_) {
 				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, s.first, 0);
 			}else{
-				fprintf(fout_[handle],"%d,%f,%f\n", s.first, t / i, lp);
+				fprintf(fout_[handle],"%d,%f,%f\n", s.first, retperiod, lp);
 			}
 			i++;
 		}
@@ -237,6 +255,7 @@ void aggreports::outputAggFulluncertainty()
 		fulluncertainty(AGG_FULL_UNCERTAINTY, agg_out_loss_);
 	}
 	else {
+		//fulluncertainty(AGG_FULL_UNCERTAINTY, agg_out_loss_);
 		fulluncertaintywithweighting(AGG_FULL_UNCERTAINTY, agg_out_loss_);;
 	}	
 }
@@ -259,7 +278,7 @@ float aggreports::getloss(float next_return_period, float last_return_period, fl
 			return zz;
 		}
 	}
-	return -1;		// we should NOT get HERE hence the !!!
+	return -1;		// we should NOT get HERE hence the -1 !!!
 }
 
 void aggreports::doreturnperiodout(int handle, int &nextreturnperiod_index, float &last_return_period, float &last_loss,

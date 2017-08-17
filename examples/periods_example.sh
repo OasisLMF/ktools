@@ -13,13 +13,10 @@
 
 dorun()
 {
-	echo "input/periods.csv  row count "
-	wc input/periods.csv 
-
-	echo "Checksum"
-	cat input/periods.csv | awk '{ sum+=$2 } ; END {print sum }'
-
-
+	echo "row count $(wc -l input/periods.csv)"
+	 
+	echo "Checksum (should equal 1) : $(cat input/periods.csv | awk '{ sum+=$2 } ; END {print sum }')"
+	
 	../src/periodstobin/periodstobin < input/periods.csv > input/periods.bin
 	./leccalc_example.py
 
@@ -27,17 +24,14 @@ dorun()
 	# keep this in until microsft fixes it
 
 	sleep 1
-	mv "results/lec/fm_lec_full_uncertainty_agg.csv" "results/lec/fm_lec_full_uncertainty_agg$1.csv"
-	mv "results/lec/fm_lec_full_uncertainty_occ.csv" "results/lec/fm_lec_full_uncertainty_occ$1.csv"
+
+	mv "results/lec/fm_lec_full_uncertainty_agg.csv" "results/lec/periods/fm_lec_full_uncertainty_agg$1.csv"
+	mv "results/lec/fm_lec_full_uncertainty_occ.csv" "results/lec/periods/fm_lec_full_uncertainty_occ$1.csv"
 	sleep 1
-
-	diff "results/lec/test$1/fm_lec_full_uncertainty_agg.csv" "results/lec/fm_lec_full_uncertainty_agg$1.csv"
-	diff "results/lec/test$1/fm_lec_full_uncertainty_occ.csv" "results/lec/fm_lec_full_uncertainty_occ$1.csv"
-
 
 }
 
-
+mkdir -p results/lec/periods
 
 seq 1 10000 | awk 'BEGIN{ print "period_no, weighting" };{print $1",", 0.0001}'  > input/periods.csv 
 
@@ -51,6 +45,8 @@ seq 1 10000 | sed '/^24$/d' | sed '/^23$/d'  | awk 'BEGIN{ print "period_no, wei
 
 dorun 3
 
+
+sha1sum -c ctrl.sha1
 
 # cleanup
 rm input/periods.bin

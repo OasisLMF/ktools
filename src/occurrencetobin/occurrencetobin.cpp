@@ -122,6 +122,10 @@ void occ_doit()
            return;
        }else
        {
+       		if (number_of_periods_ < p.period_no) {
+       			fprintf(stderr,"Period number exceeds maximum supplied\n");
+       			exit(EXIT_FAILURE);
+       		}
 		   switch (date_algorithm_) {
 			case 1:
 				p.occ_date_id = g(occ_year, occ_month, occ_day);

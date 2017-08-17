@@ -196,7 +196,7 @@ installertest()
 	../../src/footprinttobin/footprinttobin -i 121 < footprint.csv
 
      # checksums		
-	 md5sum -c ../$CTRL.md5
+	 sha1sum -c ../$CTRL.sha1
 
 	 if [ "$?" -ne "0" ]; then
 	   echo "Sorry check failed\n"

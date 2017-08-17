@@ -55,7 +55,7 @@
 
 
 using namespace std;
-
+extern int rand_seed;
 
 bool operator<(const item_map_key& lhs, const item_map_key& rhs)
 {
@@ -324,7 +324,7 @@ damagecdfrec *d = (damagecdfrec *)rec;
 				{
 					long s1 = (iter->group_id * 1543270363L) % 2147483648L;		// hash group_id and event_id to seed random number
 					long s2 = (d->event_id * 1943272559L) % 2147483648L;
-					s1 = (s1 + s2) % 2147483648L;
+					s1 = (s1 + s2 + rand_seed) % 2147483648L;
 					rnd_->seedRands(s1);
 				}
 				break;

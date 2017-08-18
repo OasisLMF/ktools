@@ -3,11 +3,11 @@
 
 # Following example performancs the following tests
 # test 1 - this tests a run using periods but with each period having equal weight - the results of this should very close to not using any periods.bin file at all.
-# test 2 = In this test period 24 is deleted and period 25 is set to 0.0002 i.e has the accumulated total of period 24 and 25
-# test 3 = In this test period 23 and 24 is deleted and period 25 is set to 0.0003 i.e has the accumulated total of period 23, 24 and 25
+# test 2 = In this test period 1 is deleted and period 25 is set to 0.0002 i.e has the accumulated weighting of period 1 and 25
+# test 3 = In this test period 1 and 2 are deleted and period 25 is set to 0.0003 i.e has the accumulated weighting of period 1, 2  and 25
 # 
-# 
-# 
+# The effects of these weighting changes can be seen for instance on lines 746 onwards in the fm_lec_full_uncertainty_occx.csv files 
+# Similary the effects of weighting on fm_lec_uncertainty_aggx.csv can be seen from line 759 onwards  
 # 
 
 
@@ -34,18 +34,16 @@ dorun()
 mkdir -p results/lec/periods
 
 seq 1 10000 | awk 'BEGIN{ print "period_no, weighting" };{print $1",", 0.0001}'  > input/periods.csv 
-
 dorun 1
 
-seq 1 10000 | sed '/^24$/d' | awk 'BEGIN{ print "period_no, weighting" };{print $1",", 0.0001}'  | sed "/^25, 0.0001/c25, 0.0002"  > input/periods.csv 
-
+seq 2 10000 | awk 'BEGIN{ print "period_no, weighting" };{print $1",", 0.0001}'  | sed "/^25, 0.0001/c25, 0.0002"  > input/periods.csv 
 dorun 2
 
-seq 1 10000 | sed '/^24$/d' | sed '/^23$/d'  | awk 'BEGIN{ print "period_no, weighting" };{print $1",", 0.0001}'  | sed "/^25, 0.0001/c25, 0.0003"  > input/periods.csv 
-
+seq 3 10000 | awk 'BEGIN{ print "period_no, weighting" };{print $1",", 0.0001}'  | sed "/^25, 0.0001/c25, 0.0003"  > input/periods.csv 
 dorun 3
-
-
+  
+seq 24 10000 | awk 'BEGIN{ print "period_no, weighting" };{print $1",", 0.0001}'  | sed "/^25, 0.0001/c25, 0.0024"  > input/periods.csv 
+dorun 4 
 sha1sum -c ctrl.sha1
 
 # cleanup

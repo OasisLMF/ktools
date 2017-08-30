@@ -7,3 +7,8 @@ results
 temp
 *.bin.save
 g
+input/periods.bin
+aal_p1.bin
+aal_periods_example.sh
+*.save
+

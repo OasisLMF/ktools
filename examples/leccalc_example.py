@@ -48,7 +48,9 @@ for p in procs:
 counter=1
 
 # After all processes are finished, the final step is to run leccalc on the work folder containing the summarycalc samples. Multiple lec outputs can be run in a single process.
-cmd="leccalc -Ksummary2 -F results/lec/fm_lec_full_uncertainty_agg.csv -f results/lec/fm_lec_full_uncertainty_occ.csv"
+cmd="leccalc -Ksummary2 -F results/lec/fm_lec_full_uncertainty_agg.csv -f results/lec/fm_lec_full_uncertainty_occ.csv -S results/lec/fm_lec_sample_mean_agg.csv -s results/lec/fm_lec_sample_mean_occ.csv"
+#cmd="leccalc -Ksummary2 -W results/lec/fm_lec_wheatsheaf_agg.csv -s results/lec/fm_lec_wheatsheaf_occ.csv"
+
 print cmd
 p1 = subprocess.Popen(cmd,shell=True)
 print "Finished. View outputs in results/lec"

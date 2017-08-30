@@ -27,11 +27,20 @@ dorun()
 
 	mv "results/lec/fm_lec_full_uncertainty_agg.csv" "results/lec/periods/fm_lec_full_uncertainty_agg$1.csv"
 	mv "results/lec/fm_lec_full_uncertainty_occ.csv" "results/lec/periods/fm_lec_full_uncertainty_occ$1.csv"
+	mv "results/lec/fm_lec_sample_mean_agg.csv" "results/lec/periods/fm_lec_sample_mean_agg$1.csv"
+	mv "results/lec/fm_lec_sample_mean_occ.csv" "results/lec/periods/fm_lec_sample_mean_occ$1.csv"
+
 	sleep 1
 
 }
 
 mkdir -p results/lec/periods
+
+rm -f input/periods.bin
+rm -f input/periods.csv
+
+dorun 0
+
 
 seq 1 10000 | awk 'BEGIN{ print "period_no, weighting" };{print $1",", 0.0001}'  > input/periods.csv 
 dorun 1
@@ -47,5 +56,5 @@ dorun 4
 sha1sum -c ctrl.sha1
 
 # cleanup
-rm input/periods.bin
-rm input/periods.csv
+rm -f input/periods.bin
+rm -f input/periods.csv

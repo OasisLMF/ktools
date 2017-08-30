@@ -59,6 +59,7 @@ private:
 	void wheatsheaf(int handle, const std::map<outkey2, float> &out_loss);	
 	void wheatSheafMean(int samplesize, int handle, const std::map<outkey2, float> &out_loss);	
 	void sampleMean(int samplesize, int handle, const std::map<outkey2, float> &out_loss);	
+	void sampleMeanwithweighting(int samplesize, int handle, const std::map<outkey2, float> &out_loss);
 	void loadreturnperiods();
 	float getloss(float nextreturnperiod, float last_return_period, float last_loss, 
 		float current_return_period, float current_loss) const;

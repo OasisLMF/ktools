@@ -461,6 +461,74 @@ void aggreports::outputAggWheatSheafMean(int samplesize)
 	wheatSheafMean(samplesize, AGG_WHEATSHEAF_MEAN, agg_out_loss_);
 }
 
+void aggreports::sampleMeanwithweighting(int samplesize, int handle, const std::map<outkey2, float> &out_loss)
+{
+	if (fout_[handle] == nullptr) return;
+	std::map<summary_id_period_key,lossval> items;
+
+	for (auto x : out_loss) {
+		summary_id_period_key sk;
+		lossval lv;
+		lv.value = x.second;
+		auto iter = periodstoweighting_.find(x.first.period_no);	// assume weighting is zero if not supplied
+		sk.period_no = x.first.period_no;
+		sk.summary_id = x.first.summary_id;
+		if (iter != periodstoweighting_.end()) {
+			if (x.first.sidx == -1) {
+				sk.type = 1;
+				items[sk].period_weighting = iter->second;
+				items[sk].period_no = x.first.period_no;		// for debugging
+				items[sk].value += x.second;
+			}
+			else {
+				if (samplesize > 0) {
+					sk.type = 2;
+					items[sk].period_no = x.first.period_no;		// for debugging
+					items[sk].period_weighting = iter->second;
+					items[sk].value += (x.second / samplesize);
+				}
+			}
+		}
+	}
+
+	std::map<summary_id_type_key, std::vector<lossval>> mean_map;
+
+	fprintf(fout_[handle], "summary_id,type,return_period,loss\n");
+	for (auto s : items) {
+		summary_id_type_key st;
+		st.summary_id = s.first.summary_id;
+		st.type = s.first.type;
+		mean_map[st].push_back(s.second);
+	}
+
+	for (auto m : mean_map) {
+		std::vector<lossval> &lpv = m.second;
+		std::sort(lpv.rbegin(), lpv.rend());
+		int nextreturnperiodindex = 0;
+		float last_computed_rp = 0;
+		float last_computed_loss = 0;
+		float cummulative_weigthing = 0;
+		for (auto lp : lpv) {
+			cummulative_weigthing += (lp.period_weighting * samplesize_);
+			if (cummulative_weigthing) {
+				float retperiod = 1 / cummulative_weigthing;
+				if (useReturnPeriodFile_) {
+					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, m.first.summary_id, m.first.type);
+				}
+				else {
+					fprintf(fout_[handle], "%d,%d,%f,%f\n", m.first.summary_id, m.first.type, retperiod, lp.value);
+				}
+			}
+		}
+		if (useReturnPeriodFile_) {
+			doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first.summary_id, m.first.type);
+			while (nextreturnperiodindex < returnperiods_.size()) {
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first.summary_id, m.first.type);
+			}
+		}
+	}
+}
+
 void aggreports::sampleMean(int samplesize, int handle, const std::map<outkey2, float> &out_loss)
 {
 	if (fout_[handle] == nullptr) return;
@@ -519,10 +587,20 @@ void aggreports::sampleMean(int samplesize, int handle, const std::map<outkey2, 
 }
 void aggreports::outputOccSampleMean(int samplesize)
 {
-	sampleMean(samplesize, OCC_SAMPLE_MEAN, max_out_loss_);
+	if (periodstoweighting_.size() == 0) {
+		sampleMean(samplesize, OCC_SAMPLE_MEAN, max_out_loss_);
+	}
+	else {
+		sampleMeanwithweighting(samplesize, OCC_SAMPLE_MEAN, max_out_loss_);
+	}	
 }
 
 void aggreports::outputAggSampleMean(int samplesize)
 {
-	sampleMean(samplesize, AGG_SAMPLE_MEAN, agg_out_loss_);
+	if (periodstoweighting_.size() == 0) {
+		sampleMean(samplesize, AGG_SAMPLE_MEAN, agg_out_loss_);
+	}
+	else {
+		sampleMeanwithweighting(samplesize, AGG_SAMPLE_MEAN, agg_out_loss_);
+	}
 }

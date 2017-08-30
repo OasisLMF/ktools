@@ -211,7 +211,7 @@ void aalcalc::doaalcalc(const summarySampleslevelHeader &sh, const std::vector<s
 	if (samplesize_) do_sample_calc(sh, vrec);
 }
 
-void applyweightings(int event_id, const std::map <int, float> &periodstoweighting,std::vector<sampleslevelRec> &vrec)
+void aalcalc::applyweightings(int event_id, const std::map <int, float> &periodstoweighting,std::vector<sampleslevelRec> &vrec)
 {
 	if (periodstoweighting.size() == 0) return;
 	auto iter = periodstoweighting.find(event_id);

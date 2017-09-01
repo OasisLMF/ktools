@@ -70,6 +70,7 @@ bool operator<(const lossval& lhs, const lossval& rhs)
 	return lhs.value < rhs.value;
 }
 
+
 bool operator<(const summary_id_type_key& lhs, const summary_id_type_key& rhs)
 {
 	if (lhs.summary_id != rhs.summary_id) {
@@ -176,11 +177,9 @@ void aggreports::fulluncertaintywithweighting(int handle, const std::map<outkey2
 		float cummulative_weigthing = 0;
 		lossvec2 &lpv = s.second;
 		std::sort(lpv.rbegin(), lpv.rend());
-		int i = 1;
 		int nextreturnperiodindex = 0;
 		float last_computed_rp = 0;
 		float last_computed_loss = 0;
-
 		for (auto lp : lpv) {
 			cummulative_weigthing += lp.period_weighting;
 			if (cummulative_weigthing) {
@@ -196,7 +195,6 @@ void aggreports::fulluncertaintywithweighting(int handle, const std::map<outkey2
 				//fprintf(fout_[handle], "%d,%f,%f\n", s.first, f, lp.value);
 			}
 		}
-		i++;
 	}
 }
 
@@ -255,7 +253,6 @@ void aggreports::outputAggFulluncertainty()
 		fulluncertainty(AGG_FULL_UNCERTAINTY, agg_out_loss_);
 	}
 	else {
-		//fulluncertainty(AGG_FULL_UNCERTAINTY, agg_out_loss_);
 		fulluncertaintywithweighting(AGG_FULL_UNCERTAINTY, agg_out_loss_);;
 	}	
 }
@@ -346,16 +343,145 @@ void aggreports::wheatsheaf(int handle, const std::map<outkey2, float> &out_loss
 
 	}
 }
+void aggreports::wheatsheafwithweighting(int handle, const std::map<outkey2, float> &out_loss)
+{
+	fprintf(stderr, "TODO:: wheatsheafwithweighting\n");
+}
 
 void aggreports::outputOccWheatsheaf()
 {
-	wheatsheaf(OCC_WHEATSHEAF, max_out_loss_);
+	if (periodstoweighting_.size() == 0) {
+		wheatsheaf(OCC_WHEATSHEAF, max_out_loss_);
+	}
+	else {
+		wheatsheafwithweighting(OCC_FULL_UNCERTAINTY, max_out_loss_);
+	}
+	
 }
 void aggreports::outputAggWheatsheaf()
 {
-	wheatsheaf(AGG_WHEATSHEAF, agg_out_loss_);
+	if (periodstoweighting_.size() == 0) {
+		wheatsheaf(AGG_WHEATSHEAF, agg_out_loss_);
+	}
+	else {
+		wheatsheafwithweighting(AGG_WHEATSHEAF, agg_out_loss_);
+	}
 }
 
+void aggreports::wheatSheafMeanwithweighting(int samplesize, int handle, const std::map<outkey2, float> &out_loss)
+{
+	if (fout_[handle] == nullptr) return;
+	std::map<wheatkey, lossvec2> items;
+	for (auto x : out_loss) {
+		wheatkey wk;;
+		wk.sidx = x.first.sidx;
+		wk.summary_id = x.first.summary_id;
+		lossval lv;
+		lv.value = x.second;
+		auto iter = periodstoweighting_.find(x.first.period_no);	// assume weighting is zero if not supplied
+		if (iter != periodstoweighting_.end()) {
+			lv.period_weighting = iter->second;
+			lv.period_no = x.first.period_no;		// for debugging
+			items[wk].push_back(lv);
+		}		
+	}
+
+	int maxcount = 0;
+	for (auto x : items) {
+		if (x.second.size() > maxcount) maxcount = x.second.size();
+	}
+
+	std::map<int, std::vector<lossval>> mean_map;
+	for (int i = 1; i <= maxsummaryid_; i++) {		
+		mean_map[i] = std::vector<lossval>(maxcount, lossval());
+	}
+	fprintf(fout_[handle], "summary_id,type,return_period,loss\n");
+
+	for (auto s : items) {
+		int nextreturnperiodindex = 0;
+		float last_computed_rp = 0;
+		float last_computed_loss = 0;
+		lossvec2 &lpv = s.second;
+		std::sort(lpv.rbegin(), lpv.rend());
+		float cummulative_weigthing = 0;
+		if (s.first.sidx != -1) {
+			int i = 0;
+			for (auto lp : lpv) {
+				lossval &l = mean_map[s.first.summary_id][i];
+				l.period_no = lp.period_no;
+				l.period_weighting = lp.period_weighting;
+				l.value += lp.value;
+				i++;
+			}
+		}
+		else {			
+			int i = 1;
+			float t = (float)totalperiods_;
+			for (auto lp : lpv) {
+				cummulative_weigthing += lp.period_weighting;
+				if (cummulative_weigthing) {
+					float retperiod = 1 / cummulative_weigthing;
+					if (useReturnPeriodFile_) {
+						doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, s.first.summary_id, 1);
+					}
+					else {
+						fprintf(fout_[handle], "%d,1,%f,%f\n", s.first.summary_id, retperiod, lp);
+					}
+				}
+
+				i++;
+			}
+			if (useReturnPeriodFile_) {
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, 1);
+				while (nextreturnperiodindex < returnperiods_.size()) {
+					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, 1);
+				}
+			}
+		}
+	}
+	
+	if (samplesize == 0) return; // avoid divide by zero error
+
+	for (auto m : mean_map) {
+		std::vector<lossval> &lpv = m.second;
+		std::vector<lossval>::reverse_iterator rit = lpv.rbegin();
+		int maxindex = lpv.size();
+		while (rit != lpv.rend()) {
+			if (rit->value != 0.0) break;
+			maxindex--;
+			rit++;
+		}
+		int nextreturnperiodindex = 0;
+		int nextreturnperiodvalue = 0;
+		if (useReturnPeriodFile_) nextreturnperiodvalue = returnperiods_[nextreturnperiodindex];
+		float last_computed_rp = 0;
+		float last_computed_loss = 0;
+		int i = 1;
+		float t = (float)totalperiods_;
+		float cummulative_weigthing = 0;
+		for (auto lp : lpv) {
+			cummulative_weigthing += lp.period_weighting;
+			if (cummulative_weigthing) {
+				float retperiod = 1 / cummulative_weigthing;
+				if (useReturnPeriodFile_) {
+					float loss = lp.value / samplesize;
+					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, loss, m.first, 2);
+				}
+				else {
+					fprintf(fout_[handle], "%d,2,%f,%f\n", m.first, retperiod, lp.value / samplesize);
+				}
+			}
+			i++;
+			if (i > maxindex) break;
+		}
+		if (useReturnPeriodFile_) {
+			doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first, 2);
+			while (nextreturnperiodindex < returnperiods_.size()) {
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first, 2);
+			}
+		}
+	}
+}
 
 void aggreports::wheatSheafMean(int samplesize, int handle, const std::map<outkey2, float> &out_loss)
 {
@@ -451,15 +577,31 @@ void aggreports::wheatSheafMean(int samplesize, int handle, const std::map<outke
 	}
 }
 
+//void aggreports::wheatSheafMeanwithweighting(int samplesize, int handle, const std::map<outkey2, float> &out_loss)
+//{
+//	fprintf(stderr, "TODO!!! wheatsheafwithweighting \n");
+//	wheatSheafMean(samplesize, handle, out_loss);
+//}
+
 void aggreports::outputOccWheatSheafMean(int samplesize)
 {
-	wheatSheafMean(samplesize, OCC_WHEATSHEAF_MEAN, max_out_loss_);
+	if (periodstoweighting_.size() == 0) {
+		wheatSheafMean(samplesize, OCC_WHEATSHEAF_MEAN, max_out_loss_);
+	}else {
+		wheatSheafMeanwithweighting(samplesize, OCC_WHEATSHEAF_MEAN, max_out_loss_);
+	}
 }
 
 void aggreports::outputAggWheatSheafMean(int samplesize)
 {
-	wheatSheafMean(samplesize, AGG_WHEATSHEAF_MEAN, agg_out_loss_);
+	if (periodstoweighting_.size() == 0) {
+		wheatSheafMean(samplesize, AGG_WHEATSHEAF_MEAN, agg_out_loss_);
+	}
+	else {
+		wheatSheafMeanwithweighting(samplesize, AGG_WHEATSHEAF_MEAN, agg_out_loss_);
+	}
 }
+
 
 void aggreports::sampleMeanwithweighting(int samplesize, int handle, const std::map<outkey2, float> &out_loss)
 {
@@ -587,16 +729,18 @@ void aggreports::sampleMean(int samplesize, int handle, const std::map<outkey2, 
 }
 void aggreports::outputOccSampleMean(int samplesize)
 {
+	
 	if (periodstoweighting_.size() == 0) {
 		sampleMean(samplesize, OCC_SAMPLE_MEAN, max_out_loss_);
 	}
 	else {
 		sampleMeanwithweighting(samplesize, OCC_SAMPLE_MEAN, max_out_loss_);
-	}	
+	}
 }
 
 void aggreports::outputAggSampleMean(int samplesize)
 {
+	
 	if (periodstoweighting_.size() == 0) {
 		sampleMean(samplesize, AGG_SAMPLE_MEAN, agg_out_loss_);
 	}

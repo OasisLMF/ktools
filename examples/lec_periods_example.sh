@@ -13,13 +13,11 @@
 
 dorun()
 {
-	echo "row count $(wc -l input/periods.csv)"
-
-	echo "Checksum (should equal 1) : $(cat input/periods.csv | awk '{ sum+=$2 } ; END {print sum }')"
-
-    if [ -f /tmp/foo.txt ]; then
-	    ../src/periodstobin/periodstobin < input/periods.csv > input/periods.bin
-    fi
+    	if [ -f input/periods.csv ]; then
+		echo "row count $(wc -l input/periods.csv)"
+		echo "Checksum (should equal 1) : $(cat input/periods.csv | awk '{ sum+=$2 } ; END {print sum }')"
+	    	../src/periodstobin/periodstobin < input/periods.csv > input/periods.bin
+    	fi
 
 	./leccalc_example.py
 
@@ -28,10 +26,19 @@ dorun()
 
 	sleep 1
 
-	mv "results/lec/fm_lec_full_uncertainty_agg.csv" "results/lec/periods/fm_lec_full_uncertainty_agg$1.csv"
-	mv "results/lec/fm_lec_full_uncertainty_occ.csv" "results/lec/periods/fm_lec_full_uncertainty_occ$1.csv"
-	mv "results/lec/fm_lec_sample_mean_agg.csv" "results/lec/periods/fm_lec_sample_mean_agg$1.csv"
-	mv "results/lec/fm_lec_sample_mean_occ.csv" "results/lec/periods/fm_lec_sample_mean_occ$1.csv"
+	# mv "results/lec/fm_lec_full_uncertainty_agg.csv" "results/lec/periods/fm_lec_full_uncertainty_agg$1.csv"
+	# mv "results/lec/fm_lec_full_uncertainty_occ.csv" "results/lec/periods/fm_lec_full_uncertainty_occ$1.csv"
+	# mv "results/lec/fm_lec_sample_mean_agg.csv" "results/lec/periods/fm_lec_sample_mean_agg$1.csv"
+	# mv "results/lec/fm_lec_sample_mean_occ.csv" "results/lec/periods/fm_lec_sample_mean_occ$1.csv"
+
+	rm 	"results/lec/fm_lec_full_uncertainty_agg.csv"
+	rm 	"results/lec/fm_lec_full_uncertainty_occ.csv"
+	rm 	"results/lec/fm_lec_sample_mean_agg.csv"
+	rm 	"results/lec/fm_lec_sample_mean_occ.csv"
+
+
+	mv "results/lec/fm_lec_wheatsheaf_agg.csv" "results/lec/periods/fm_lec_wheatsheaf_agg$1.csv"
+	mv "results/lec/fm_lec_wheatsheaf_occ.csv" "results/lec/periods/fm_lec_wheatsheaf_occ$1.csv"
 
 	sleep 1
 
@@ -59,5 +66,5 @@ dorun 4
 #sha1sum -c ctrl.sha1
 
 # cleanup
-rm -f input/periods.bin
-rm -f input/periods.csv
+#rm -f input/periods.bin
+#rm -f input/periods.csv

@@ -48,7 +48,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 char *progname;
 
-void emitevents(int pno_,int total_)
+void emitevents(OASIS_INT pno_,OASIS_INT total_)
 {
     FILE *fin = fopen(EVENTS_FILE, "rb");
     if (fin == NULL){
@@ -58,11 +58,11 @@ void emitevents(int pno_,int total_)
     fseek(fin, 0L, SEEK_END);
     long long  endpos = fltell(fin);
 
-    int total_events = static_cast<int>(endpos / 4);
+    int total_events = static_cast<OASIS_INT>(endpos / sizeof(OASIS_INT));
     int chunksize = (int) ceil((float)total_events / total_);
-    int end_pos = chunksize * pno_*4;
+    int end_pos = chunksize * pno_*sizeof(OASIS_INT);
     pno_--;
-    int start_pos = chunksize * pno_*4;
+    int start_pos = chunksize * pno_*sizeof(OASIS_INT);
     fseek(fin, start_pos, SEEK_SET);
     while(start_pos < end_pos) {
         int c = fgetc(fin);
@@ -104,8 +104,8 @@ int main(int argc, char *argv[])
 		return EXIT_FAILURE;
     }
 
-    int pno = atoi(argv[1]);
-    int total = atoi(argv[2]);
+    OASIS_INT pno = atoi(argv[1]);
+    OASIS_INT total = atoi(argv[2]);
 
     initstreams("","");
     emitevents(pno,total);

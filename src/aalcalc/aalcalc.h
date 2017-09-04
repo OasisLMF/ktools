@@ -53,18 +53,18 @@ private:
 	int samplesize_ = 0;
 	std::map<int, aal_rec> map_analytical_aal_;
 	std::map<int, aal_rec> map_sample_aal_;
-	std::map <int, float> periodstoweighting_;	
+	std::map <int, OASIS_FLOAT> periodstoweighting_;	
 	// functions
 	void loadperiodtoweigthing();
 	void loadoccurrence();
 	void outputresultscsv();
 	void outputsummarybin();
-	void do_analytical_calc(const summarySampleslevelHeader &sh, float mean_loss);
+	void do_analytical_calc(const summarySampleslevelHeader &sh, OASIS_FLOAT mean_loss);
 	void do_sample_calc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec);
-	void doaalcalc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec, float mean_loss);
+	void doaalcalc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec, OASIS_FLOAT mean_loss);
 	void applyweightingstomap(std::map<int, aal_rec> &m, int i);
 	void applyweightingstomaps();
-	void applyweightings(int event_id, const std::map <int, float> &periodstoweighting, std::vector<sampleslevelRec> &vrec);
+	void applyweightings(int event_id, const std::map <int, OASIS_FLOAT> &periodstoweighting, std::vector<sampleslevelRec> &vrec);
 public:
 	void doit();
 };

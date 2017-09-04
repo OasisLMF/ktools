@@ -59,7 +59,7 @@ void emitevents(OASIS_INT pno_,OASIS_INT total_)
     long long  endpos = fltell(fin);
 
     int total_events = static_cast<OASIS_INT>(endpos / sizeof(OASIS_INT));
-    int chunksize = (int) ceil((float)total_events / total_);
+    int chunksize = (int) ceil((OASIS_FLOAT)total_events / total_);
     int end_pos = chunksize * pno_*sizeof(OASIS_INT);
     pno_--;
     int start_pos = chunksize * pno_*sizeof(OASIS_INT);

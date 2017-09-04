@@ -55,7 +55,7 @@ void doit()
 
 	if(skipheader == false) printf("\"coverage_id\", \"tiv\"\n");
     
-	float tiv;
+	OASIS_FLOAT tiv;
 	int id = 0;
     size_t i = fread(&tiv, sizeof(tiv), 1, stdin);
     while (i != 0) {

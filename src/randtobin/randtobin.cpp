@@ -49,7 +49,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 void doit()
 {
-    float randno;
+    OASIS_FLOAT randno;
     char line[4096];
     int lineno=0;
 	

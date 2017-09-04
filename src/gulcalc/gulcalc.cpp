@@ -68,17 +68,17 @@ bool operator<(const item_map_key& lhs, const item_map_key& rhs)
 }
 
 struct probrec {
-	float prob_from;
-	float prob_to;
-	float bin_mean;
+	OASIS_FLOAT prob_from;
+	OASIS_FLOAT prob_to;
+	OASIS_FLOAT bin_mean;
 };
 
 gulSampleslevelHeader lastitemheader;
 gulSampleslevelHeader lastcoverageheader;
 
-float gulcalc::getgul(damagebindictionary &b, gulGulSamples &g)
+OASIS_FLOAT gulcalc::getgul(damagebindictionary &b, gulGulSamples &g)
 {
-	float gul = 0;
+	OASIS_FLOAT gul = 0;
 	if (b.bin_from == b.bin_to) {
 		gul = b.bin_to * g.tiv;
 		return gul;
@@ -114,7 +114,7 @@ void gulcalc::outputcoveragedata(int event_id)
 			for (int i = 1; i < cov_[j].size(); i++) {
 				gc.sidx = i - 2;
 				gc.loss = cov_[j][i];
-				float tiv = (*coverages_)[gc.coverage_id];
+				OASIS_FLOAT tiv = (*coverages_)[gc.coverage_id];
 				if (gc.loss > tiv) gc.loss = tiv;
 				if (gc.sidx) {
 					if (gc.sidx == -1) {
@@ -144,7 +144,7 @@ void gulcalc::outputcoveragedatax(int event_id)
 		for (int i = 1; i < c.second.size(); i++) {
 			gc.sidx = i - 2;
 			gc.loss = c.second[i];
-			float tiv = (*coverages_)[gc.coverage_id];
+			OASIS_FLOAT tiv = (*coverages_)[gc.coverage_id];
 			if (gc.loss > tiv) gc.loss = tiv;
 			if (gc.sidx) {
 				if (gc.sidx == -1) {
@@ -244,12 +244,12 @@ void gulcalc::itemoutputgul(gulitemSampleslevel &gg)
 
 }
 
-void gulcalc::output_mean(const item_map_rec &er, float tiv, prob_mean *pp, int bin_count, float &gul_mean,  float &std_dev)
+void gulcalc::output_mean(const item_map_rec &er, OASIS_FLOAT tiv, prob_mean *pp, int bin_count, OASIS_FLOAT &gul_mean,  OASIS_FLOAT &std_dev)
 {
-	float last_prob_to = 0;
+	OASIS_FLOAT last_prob_to = 0;
 	gul_mean = 0;
 	std_dev = 0;
-	float ctr_var = 0;
+	OASIS_FLOAT ctr_var = 0;
 
 	for (int bin_index = 0; bin_index < bin_count; bin_index++){
 		probrec p;
@@ -262,7 +262,7 @@ void gulcalc::output_mean(const item_map_rec &er, float tiv, prob_mean *pp, int 
 		ctr_var = ctr_var + ((p.prob_to - p.prob_from) *p.bin_mean*p.bin_mean * tiv * tiv);
 		pp++;
 	}
-	float g2 = gul_mean * gul_mean;
+	OASIS_FLOAT g2 = gul_mean * gul_mean;
 	std_dev = ctr_var - g2;
     if (std_dev < 0) std_dev  = 0;
 	std_dev = sqrt(std_dev);
@@ -295,10 +295,10 @@ damagecdfrec *d = (damagecdfrec *)rec;
 			int *bin_count = (int *)b;
 			b = b + sizeof(int);
 			prob_mean *pp = (prob_mean *)b;
-			float std_dev;
-			float gul_mean;
+			OASIS_FLOAT std_dev;
+			OASIS_FLOAT gul_mean;
 //			coveragerec cr=	(*coverages_)[iter->coverage_id];
-			float tiv = (*coverages_)[iter->coverage_id];
+			OASIS_FLOAT tiv = (*coverages_)[iter->coverage_id];
 			output_mean(*iter, tiv, pp, *bin_count, gul_mean, std_dev);			
 			gx.loss = gul_mean;
 			gc.loss = gul_mean;
@@ -335,14 +335,14 @@ damagecdfrec *d = (damagecdfrec *)rec;
 
 			prob_mean *pp_max = pp + (*bin_count) -1;
 			for (int i = 0; i < samplesize_; i++){
-				float  rval;
+				OASIS_FLOAT  rval;
 				if (rndopt_ == rd_option::usehashedseed) rval = rnd_->nextrnd();
 				else rval = rnd_->rnd(ridx + i);
 				if (rval >= pp_max->prob_to) {
 					rval = pp_max->prob_to - 0.00000003;	// set value to just under max value (which should be 1)
 				}
 				
-                float last_prob_to = 0;
+                OASIS_FLOAT last_prob_to = 0;
 				pp = (prob_mean *)b;
 				for (int bin_index = 0; bin_index < *bin_count; bin_index++){
 					if ((char *)pp > endofRec) {

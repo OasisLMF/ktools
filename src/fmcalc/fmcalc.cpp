@@ -110,14 +110,14 @@ inline void fmcalc::dofmcalc(vector <LossRec> &agg_vec)
 			switch (profile.calcrule_id) {
 				case 1:
 				{
-					float ded = 0;
-					float lim = 0;
+					OASIS_FLOAT ded = 0;
+					OASIS_FLOAT lim = 0;
 					for (auto y : profile.tc_vec) {
 						if (y.tc_id == deductible) ded = y.tc_val;
 						if (y.tc_id == limit) lim = y.tc_val;
 					}
 					//Function1 = IIf(Loss < Ded, 0, IIf(Loss > Ded + Lim, Lim, Loss - Ded))
-					float loss = x.loss - ded;
+					OASIS_FLOAT loss = x.loss - ded;
 					if (loss < 0) loss = 0;
 					if (loss > lim) loss = lim;
 					x.retained_loss = x.retained_loss + (x.loss - loss);
@@ -126,16 +126,16 @@ inline void fmcalc::dofmcalc(vector <LossRec> &agg_vec)
 				break;
 				case 2:
 				{
-					float ded = 0;
-					float lim = 0;
-					float share = 0;
+					OASIS_FLOAT ded = 0;
+					OASIS_FLOAT lim = 0;
+					OASIS_FLOAT share = 0;
 					for (auto y : profile.tc_vec) {
 						if (y.tc_id == deductible) ded = y.tc_val;
 						if (y.tc_id == limit) lim = y.tc_val;
 						if (y.tc_id == share_prop_of_limit) share = y.tc_val;
 					}
 					//Function2 = IIf(Loss < Ded, 0, IIf(Loss > Ded + Lim, Lim, Loss - Ded)) * Share	
-					float loss = 0;
+					OASIS_FLOAT loss = 0;
 					if (x.loss > (ded + lim)) loss = lim;
 					else loss = x.loss - ded;
 					if (loss < 0) loss = 0;
@@ -146,14 +146,14 @@ inline void fmcalc::dofmcalc(vector <LossRec> &agg_vec)
 				break;
 				case 3:
 				{
-					float ded = 0;
-					float lim = 0;
+					OASIS_FLOAT ded = 0;
+					OASIS_FLOAT lim = 0;
 					for (auto y : profile.tc_vec) {
 						if (y.tc_id == deductible) ded = y.tc_val;
 						if (y.tc_id == limit) lim = y.tc_val;
 					}
 					//Function3 = IIf(Loss < Ded, 0, IIf(Loss > Ded, Lim, Loss))
-					float loss = x.loss;
+					OASIS_FLOAT loss = x.loss;
 					if (loss < ded) loss = 0;
 					else loss = loss;
 					if (loss > lim) loss = lim;
@@ -163,28 +163,28 @@ inline void fmcalc::dofmcalc(vector <LossRec> &agg_vec)
 				break;
 				case 5:
 				{
-					float ded = 0;
-					float lim = 0;
+					OASIS_FLOAT ded = 0;
+					OASIS_FLOAT lim = 0;
 					for (auto y : profile.tc_vec) {
 						if (y.tc_id == deductible_prop_of_loss) ded = y.tc_val;
 						if (y.tc_id == limit_prop_of_loss) lim = y.tc_val;
 					}
 					//Function5 = Loss * (Lim - Ded)
-					float loss = x.loss * (lim - ded);
+					OASIS_FLOAT loss = x.loss * (lim - ded);
 					x.retained_loss = x.retained_loss + (x.loss - loss);
 					x.loss = loss;
 				}
 				break;
 				case 9:
 				{
-					float ded = 0;
-					float lim = 0;
+					OASIS_FLOAT ded = 0;
+					OASIS_FLOAT lim = 0;
 					for (auto y : profile.tc_vec) {
 						if (y.tc_id == deductible_prop_of_limit) ded = y.tc_val;
 						if (y.tc_id == limit) lim = y.tc_val;
 					}
 					//Function9 = IIf(Loss < (Ded * lim), 0, IIf(Loss > (ded* lim) + Lim, Lim, Loss - (Ded * lim))
-					float loss = x.loss - (ded * lim);
+					OASIS_FLOAT loss = x.loss - (ded * lim);
 					if (loss < 0) loss = 0;
 					if (loss > lim) loss = lim;
 					x.retained_loss = x.retained_loss + (x.loss - loss);
@@ -193,12 +193,12 @@ inline void fmcalc::dofmcalc(vector <LossRec> &agg_vec)
 				break;
 				case 10:
 				{
-					float ded = 0;
+					OASIS_FLOAT ded = 0;
 					for (auto y : profile.tc_vec) {
 						if (y.tc_id == deductible) ded = y.tc_val;
 					}
 					// Function 10: Applies a cap on retained loss (maximum deductible)
-					float loss = 0;
+					OASIS_FLOAT loss = 0;
 					if (x.retained_loss > ded) {
 						loss = x.loss + x.retained_loss - ded;
 						if (loss < 0) loss = 0;
@@ -214,12 +214,12 @@ inline void fmcalc::dofmcalc(vector <LossRec> &agg_vec)
 				break;
 				case 11:
 				{
-					float ded = 0;
+					OASIS_FLOAT ded = 0;
 					for (auto y : profile.tc_vec) {
 						if (y.tc_id == deductible) ded = y.tc_val;
 					}
 					// Function 11: Applies a floor on retained loss (minimum deductible)
-					float loss = 0;
+					OASIS_FLOAT loss = 0;
 					if (x.retained_loss < ded) {
 						loss = x.loss + x.retained_loss - ded;
 						if (loss < 0) loss = 0;
@@ -237,7 +237,7 @@ inline void fmcalc::dofmcalc(vector <LossRec> &agg_vec)
 				{
 					for (auto &z : profile.tc_vec) {
 						if (z.tc_id == deductible) {
-							float loss = x.loss - z.tc_val;
+							OASIS_FLOAT loss = x.loss - z.tc_val;
 							if (loss < 0) loss = 0;
 							x.retained_loss = x.retained_loss + (x.loss - loss);
 							x.loss = loss;
@@ -248,12 +248,12 @@ inline void fmcalc::dofmcalc(vector <LossRec> &agg_vec)
 				break;
 				case 14:
 				{
-					float lim = 0;
+					OASIS_FLOAT lim = 0;
 					for (auto y : profile.tc_vec) {
 						if (y.tc_id == limit) lim = y.tc_val;
 					}
 					//Function14 =  IIf(Loss > lim, Lim, Loss)
-					float loss = x.loss;
+					OASIS_FLOAT loss = x.loss;
 					if (loss > lim) loss = lim;
 					x.retained_loss = x.retained_loss + (x.loss - loss);
 					x.loss = loss;
@@ -261,12 +261,12 @@ inline void fmcalc::dofmcalc(vector <LossRec> &agg_vec)
 				break;
 				case 15:
 				{
-					float lim = 0;
+					OASIS_FLOAT lim = 0;
 					for (auto y : profile.tc_vec) {
 						if (y.tc_id == limit_prop_of_loss) lim = y.tc_val;
 					}
 					//Function15 =  Loss * lim
-					float loss = x.loss;
+					OASIS_FLOAT loss = x.loss;
 					loss = loss * lim;
 					x.retained_loss = x.retained_loss + (x.loss - loss);
 					x.loss = loss;
@@ -274,12 +274,12 @@ inline void fmcalc::dofmcalc(vector <LossRec> &agg_vec)
 				break;
 				case 16:
 				{
-					float ded = 0;
+					OASIS_FLOAT ded = 0;
 					for (auto y : profile.tc_vec) {
 						if (y.tc_id == deductible_prop_of_loss) ded = y.tc_val;
 					}
 					//Function16 =  Loss - (loss * ded)
-					float loss = x.loss;
+					OASIS_FLOAT loss = x.loss;
 					loss = loss - (loss * ded);
 					if (loss < 0) loss = 0;
 					x.retained_loss = x.retained_loss + (x.loss - loss);
@@ -297,7 +297,7 @@ inline void fmcalc::dofmcalc(vector <LossRec> &agg_vec)
 
 inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlookups, vector<vector <LossRec>> &agg_vecs, int level, int max_level,
 	std::map<fmlevelhdr, std::vector<fmlevelrec> > &outmap, fmlevelhdr &fmhdr, int sidx, const std::vector<std::vector<std::vector<policytcvidx>>> &avxs, int layer, 
-	const std::vector<int> &items, const std::vector<float> &guls)
+	const std::vector<int> &items, const std::vector<OASIS_FLOAT> &guls)
 {
 	vector <LossRec> &prev_agg_vec = agg_vecs[level - 1];
 	vector <LossRec> &agg_vec = agg_vecs[level];
@@ -358,13 +358,13 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 				outmap[fmhdr].push_back(rec);			// neglible cost
 			}			
 			if (x.allocrule_id == 1) {	// back allocate as a proportion of the total of the original guls	
-				float gultotal = 0;
+				OASIS_FLOAT gultotal = 0;
 				int vec_idx = aggid_to_vectorlookup[x.agg_id-1];		// Same index applies to avx as to agg_vec
 				for (int idx : avx[layer][vec_idx].item_idx) {
 					gultotal += guls[idx];
 				}
 				for (int idx : avx[layer][vec_idx].item_idx) {
-                    float prop = 0;
+                    OASIS_FLOAT prop = 0;
                     if (gultotal > 0) prop = guls[idx] / gultotal;
 					//fmhdr.output_id = items[idx];
 					fmxref_key k;
@@ -376,13 +376,13 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 				}				
 			}
 			if (x.allocrule_id == 2) {		// back allocate as a proportion of the total of the previous losses
-				float prev_gul_total = 0;
+				OASIS_FLOAT prev_gul_total = 0;
 				int vec_idx = aggid_to_vectorlookup[x.agg_id - 1];		// Same index applies to avx as to agg_vec
 				for (int idx : avx[layer][vec_idx].item_idx) {
 					prev_gul_total += prev_agg_vec[idx].loss;
 				}
 				for (int idx : avx[layer][vec_idx].item_idx) {
-					float prop = 0;
+					OASIS_FLOAT prop = 0;
 					if (prev_gul_total > 0) prop = prev_agg_vec[idx].loss / prev_gul_total;
 					fmxref_key k;
 					k.layer_id = layer;
@@ -404,7 +404,7 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 	}
 }
 
-void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vector<float>> &event_guls)
+void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vector<OASIS_FLOAT>> &event_guls)
 {
 	
 	const int level = 1;
@@ -494,7 +494,7 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 		agg_vec.resize(total_loss_items);
 		fmlevelhdr fmhdr;
 		fmhdr.event_id = event_id;
-		const std::vector<float> &guls = event_guls[idx];
+		const std::vector<OASIS_FLOAT> &guls = event_guls[idx];
 		const std::vector<std::vector<policytcvidx>> &avx = avxs[1];
 		for (unsigned int i = 0;i < agg_vec.size(); i++) agg_vec[i].loss = 0;
 		int last_agg_id = -1;
@@ -535,14 +535,14 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
                     outmap[fmhdr].push_back(rec);			// neglible cost
                 }
                 if (x.allocrule_id == 1 || x.allocrule_id == 2) {	// back allocate as a proportion of the total of the original guls
-                    float gultotal = 0;
-					const std::vector<float> &guls = event_guls[event_guls.size()-1];	
+                    OASIS_FLOAT gultotal = 0;
+					const std::vector<OASIS_FLOAT> &guls = event_guls[event_guls.size()-1];	
                     // int vec_idx = aggid_to_vectorlookup[x.agg_id];		// Same index applies to avx as to agg_vec
 					for (int idx = 0; idx < guls.size(); idx++) {
                         gultotal += guls[idx];
                     }
 					for (int idx = 0; idx < guls.size(); idx++) {
-                        float prop = 0;
+                        OASIS_FLOAT prop = 0;
                         if (gultotal > 0) prop = guls[idx] / gultotal;
                         fmhdr.output_id = items[idx];
                         rec.loss = x.loss * prop;
@@ -653,7 +653,7 @@ void fmcalc::init_programme(int maxRunLevel)
 
 }
 
-inline void add_tc(unsigned char tc_id, float &tc_val, std::vector<tc_rec> &tc_vec)
+inline void add_tc(unsigned char tc_id, OASIS_FLOAT &tc_val, std::vector<tc_rec> &tc_vec)
 {
 	if (tc_val > -1) {
 		tc_rec t;
@@ -663,7 +663,7 @@ inline void add_tc(unsigned char tc_id, float &tc_val, std::vector<tc_rec> &tc_v
 	}
 }
 
-bool fmcalc::loadcoverages(std::vector<float> &coverages)
+bool fmcalc::loadcoverages(std::vector<OASIS_FLOAT> &coverages)
 {
 	FILE *fin = fopen(COVERAGES_FILE, "rb");
 	if (fin == NULL) {
@@ -675,7 +675,7 @@ bool fmcalc::loadcoverages(std::vector<float> &coverages)
 	long long sz = fltell(fin);
 	flseek(fin, 0L, SEEK_SET);
 
-	float tiv;
+	OASIS_FLOAT tiv;
 	unsigned int nrec = sz / sizeof(tiv);
 
 	coverages.resize(nrec + 1);
@@ -694,7 +694,7 @@ bool fmcalc::loadcoverages(std::vector<float> &coverages)
 
 void fmcalc::init_itemtotiv()
 {
-	std::vector<float> coverages;
+	std::vector<OASIS_FLOAT> coverages;
 	loadcoverages(coverages);
 
 	FILE *fin = fopen(ITEMS_FILE, "rb");

@@ -65,11 +65,11 @@ bool isSummaryCalcStream(unsigned int stream_type)
 
 void doetloutput(int samplesize)
 {
-	float sumloss = 0.0;
-	float sample_mean = 0.0;
-	float analytical_mean = 0.0;
-	float sd = 0;
-	float sumlosssqr = 0.0;
+	OASIS_FLOAT sumloss = 0.0;
+	OASIS_FLOAT sample_mean = 0.0;
+	OASIS_FLOAT analytical_mean = 0.0;
+	OASIS_FLOAT sd = 0;
+	OASIS_FLOAT sumlosssqr = 0.0;
 	if (skipHeader == false) printf("summary_id,type,event_id,mean,standard_deviation,exposure_value\n");
 	summarySampleslevelHeader sh;
 	int i = fread(&sh, sizeof(sh), 1, stdin);
@@ -88,8 +88,8 @@ void doetloutput(int samplesize)
 		if (samplesize > 1) {
 			sample_mean = sumloss / samplesize;
 			sd = (sumlosssqr - ((sumloss*sumloss) / samplesize)) / (samplesize - 1);
-			float x = sd / sumlosssqr;
-			if (x < 0.0000001) sd = 0;   // fix floating point precision problems caused by using large numbers
+			OASIS_FLOAT x = sd / sumlosssqr;
+			if (x < 0.0000001) sd = 0;   // fix OASIS_FLOATing point precision problems caused by using large numbers
 			sd = sqrt(sd);
 		}
 		else {

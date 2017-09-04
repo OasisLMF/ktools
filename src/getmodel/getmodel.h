@@ -44,6 +44,7 @@ Author: Mark Pinkerton  email: mark.pinkerton@oasislmf.org
 #include <set>
 #include <list>
 #include <vector>
+#include "../include/oasis.h"
 
 struct Result;
 struct EventIndex;
@@ -59,10 +60,10 @@ public:
 
 private:
 	
-	std::map<int, std::vector<float> > _vulnerabilities;	
+	std::map<int, std::vector<OASIS_FLOAT> > _vulnerabilities;	
 	std::map<int, std::set<int> > _vulnerability_ids_by_area_peril;
 	std::set<int> _area_perils;
-	std::vector<float> _mean_damage_bins;
+	std::vector<OASIS_FLOAT> _mean_damage_bins;
     std::vector<unsigned char > _compressed_buf;
     std::vector<unsigned char > _uncompressed_buf;
     
@@ -84,14 +85,14 @@ private:
         int &event_id,
         int &areaperil_id,
         std::map<int, std::set<int> > &vulnerabilities_by_area_peril,
-        std::map<int, std::vector<float> > &vulnerabilities,
-        std::vector<float> intensity) const;
+        std::map<int, std::vector<OASIS_FLOAT> > &vulnerabilities,
+        std::vector<OASIS_FLOAT> intensity) const;
 
 	void  doResultsNoIntensityUncertainty(
 		int &event_id,
 		int &areaperil_id,
 		std::map<int, std::set<int> > &vulnerabilities_by_area_peril,
-		std::map<int, std::vector<float> > &vulnerabilities,
+		std::map<int, std::vector<OASIS_FLOAT> > &vulnerabilities,
 		int intensity_bin_index) const;
 	
 	static void initOutputStream();

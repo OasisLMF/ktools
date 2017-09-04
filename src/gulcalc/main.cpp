@@ -133,7 +133,7 @@ bool getitems(std::map<item_map_key, std::vector<item_map_rec> > &item_map)
 }
 
 
-bool getcoverages(std::vector<float> &coverages)
+bool getcoverages(std::vector<OASIS_FLOAT> &coverages)
 {
 	FILE *fin = fopen(COVERAGES_FILE, "rb");
 	if (fin == NULL) {
@@ -145,7 +145,7 @@ bool getcoverages(std::vector<float> &coverages)
 	long long sz = fltell(fin);
 	flseek(fin, 0L, SEEK_SET);
 
-	float tiv;
+	OASIS_FLOAT tiv;
 	unsigned int nrec = static_cast<unsigned int>(sz / sizeof(tiv));
 
 	coverages.resize(nrec + 1);
@@ -193,7 +193,7 @@ void doit()
 	std::map<item_map_key, std::vector<item_map_rec> > item_map;
 	getitems(item_map);
 
-	std::vector<float> coverages;
+	std::vector<OASIS_FLOAT> coverages;
 	getcoverages(coverages);
 
 	size_t total_bins = damagebindictionary_vec.size();

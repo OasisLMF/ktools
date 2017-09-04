@@ -98,8 +98,8 @@ bool getrec(char *rec_, FILE *stream, int recsize_)
 
 
 struct prob_mean {
-        float prob_to;
-        float bin_mean;
+        OASIS_FLOAT prob_to;
+        OASIS_FLOAT bin_mean;
 };
 
 void processrec(char *rec, int recsize,

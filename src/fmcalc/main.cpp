@@ -97,7 +97,7 @@ void doit(int &maxLevel)
 		int samplesize = 0;
 		i = fread(&samplesize, sizeof(samplesize), 1, stdin);
 		fwrite(&samplesize, sizeof(samplesize), 1, stdout);
-		std::vector<std::vector<float>> event_guls(samplesize + 2);	// one additional for mean and tiv
+		std::vector<std::vector<OASIS_FLOAT>> event_guls(samplesize + 2);	// one additional for mean and tiv
 		std::vector<int> items;
 		int max_no_of_items = getmaxnoofitems();
 		int current_item_index = 0;

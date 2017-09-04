@@ -49,7 +49,7 @@ struct Exposure {
   int areaperil_id;
   int vulnerability_id;
   int group_id;
-  float tiv;
+  OASIS_FLOAT tiv;
 };
 
 struct Result {
@@ -58,13 +58,13 @@ struct Result {
     //
   }
 
-  Result(float damage, float prob);
+  Result(OASIS_FLOAT damage, OASIS_FLOAT prob);
 
-  float prob;
-  float damage;
+  OASIS_FLOAT prob;
+  OASIS_FLOAT damage;
 };
 
-Result::Result(float prob, float damage) : prob(prob), damage(damage) {
+Result::Result(OASIS_FLOAT prob, OASIS_FLOAT damage) : prob(prob), damage(damage) {
   //
 }
 
@@ -72,7 +72,7 @@ Result::Result(float prob, float damage) : prob(prob), damage(damage) {
 const int MAX_RESULTS = 100;
 
 const size_t SIZE_OF_INT = sizeof(int);
-const size_t SIZE_OF_FLOAT = sizeof(float);
+const size_t SIZE_OF_OASIS_FLOAT = sizeof(OASIS_FLOAT);
 const size_t SIZE_OF_RESULT = sizeof(Result);
 
 const unsigned int OUTPUT_STREAM_TYPE = 1;
@@ -107,7 +107,7 @@ void getmodel::getVulnerabilities(const std::set<int> &v) {
       if (_num_intensity_bins >= vulnerability.intensity_bin_id) {
         if (vulnerability.vulnerability_id != current_vulnerability_id) {
           _vulnerabilities[vulnerability.vulnerability_id] =
-              std::vector<float>(_num_intensity_bins * _num_damage_bins, 0.0);
+              std::vector<OASIS_FLOAT>(_num_intensity_bins * _num_damage_bins, 0.0);
           current_vulnerability_id = vulnerability.vulnerability_id;
         }
         int vulnerabilityIndex = getVulnerabilityIndex(
@@ -175,7 +175,7 @@ void getmodel::getDamageBinDictionary() {
 
   fclose(fin);
 
-  _mean_damage_bins = std::vector<float>(nrec);
+  _mean_damage_bins = std::vector<OASIS_FLOAT>(nrec);
   for (int i = 0; i < nrec; i++) {
     _mean_damage_bins[i] = damage_bins[i].interpolation;
   }
@@ -190,8 +190,8 @@ void getmodel::initOutputStream() {
 void getmodel::doResults(
     int &event_id, int &areaperil_id,
     std::map<int, std::set<int>> &vulnerabilities_by_area_peril,
-    std::map<int, std::vector<float>> &vulnerabilities,
-    std::vector<float> intensity) const {
+    std::map<int, std::vector<OASIS_FLOAT>> &vulnerabilities,
+    std::vector<OASIS_FLOAT> intensity) const {
   for (int vulnerability_id : vulnerabilities_by_area_peril[areaperil_id]) {
     Result *results = new Result[_num_damage_bins];
     int result_index = 0;
@@ -210,7 +210,7 @@ void getmodel::doResults(
       // if (prob > 0 || damage_bin_index == 0)
       //{
       cumulative_prob += prob;
-      results[result_index++] = Result(static_cast<float>(cumulative_prob),
+      results[result_index++] = Result(static_cast<OASIS_FLOAT>(cumulative_prob),
                                        _mean_damage_bins[damage_bin_index]);
       //}
       if (cumulative_prob > 0.999999940)
@@ -231,14 +231,14 @@ void getmodel::doResults(
 void getmodel::doResultsNoIntensityUncertainty(
     int &event_id, int &areaperil_id,
     std::map<int, std::set<int>> &vulnerabilities_by_area_peril,
-    std::map<int, std::vector<float>> &vulnerabilities,
+    std::map<int, std::vector<OASIS_FLOAT>> &vulnerabilities,
     int intensity_bin_index) const {
   for (int vulnerability_id : vulnerabilities_by_area_peril[areaperil_id]) {
     int result_index = 0;
-    float cumulative_prob = 0;
+    OASIS_FLOAT cumulative_prob = 0;
     for (int damage_bin_index = 1; damage_bin_index <= _num_damage_bins;
          damage_bin_index++) {
-      float prob = vulnerabilities[vulnerability_id][getVulnerabilityIndex(
+      OASIS_FLOAT prob = vulnerabilities[vulnerability_id][getVulnerabilityIndex(
           intensity_bin_index, damage_bin_index)];
 
       // if (prob > 0 || damage_bin_index == 0)
@@ -321,10 +321,10 @@ void getmodel::doCdfInnerz(std::list<int> &event_ids,
                            ) {
   auto sizeof_EventKey = sizeof(EventRow);
   auto fin = fopen(ZFOOTPRINT_FILE, "rb");
-  auto intensity = std::vector<float>(_num_intensity_bins, 0.0f);
+  auto intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);
   for (int event_id : event_ids) {        
     bool do_cdf_for_area_peril = false;
-    intensity = std::vector<float>(_num_intensity_bins, 0.0f);
+    intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);
     if (event_index_by_event_id.count(event_id) == 0)
       continue;
     flseek(fin, event_index_by_event_id[event_id].offset, 0);
@@ -356,7 +356,7 @@ void getmodel::doCdfInnerz(std::list<int> &event_ids,
           doResults(event_id, current_areaperil_id,
                     _vulnerability_ids_by_area_peril, _vulnerabilities,
                     intensity);
-          intensity = std::vector<float>(_num_intensity_bins, 0.0f);
+          intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);
         }
         current_areaperil_id = event_key->areaperil_id;
         do_cdf_for_area_peril = (_area_perils.count(current_areaperil_id) == 1);
@@ -381,12 +381,12 @@ void getmodel::doCdfInner(std::list<int> &event_ids,
                           std::map<int, EventIndex> &event_index_by_event_id) {
   auto sizeof_EventKey = sizeof(EventRow);
   auto fin = fopen(FOOTPRINT_FILE, "rb");
-  auto intensity = std::vector<float>(_num_intensity_bins, 0.0f);
+  auto intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);
 
   for (int event_id : event_ids) {
     int current_areaperil_id = -1;
     bool do_cdf_for_area_peril = false;
-    intensity = std::vector<float>(_num_intensity_bins, 0.0f);
+    intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);
 
     if (event_index_by_event_id.count(event_id) == 0)
       continue;
@@ -402,7 +402,7 @@ void getmodel::doCdfInner(std::list<int> &event_ids,
           doResults(event_id, current_areaperil_id,
                     _vulnerability_ids_by_area_peril, _vulnerabilities,
                     intensity);
-          intensity = std::vector<float>(_num_intensity_bins, 0.0f);
+          intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);
         }
         current_areaperil_id = event_key.areaperil_id;
         do_cdf_for_area_peril = (_area_perils.count(current_areaperil_id) == 1);

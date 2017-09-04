@@ -92,7 +92,7 @@ void summarycalc::reset_sssl_array(int sample_size)
 {
 	for (int i = 0; i < MAX_SUMMARY_SETS; i++) {		
 		if (fout[i] != nullptr) {
-			loss_exp **ssl = sssl[i];		// float **ssl two dimensional array of ssl[summary_id][sidx] to loss
+			loss_exp **ssl = sssl[i];		// OASIS_FLOAT **ssl two dimensional array of ssl[summary_id][sidx] to loss
 			reset_ssl_array(i, sample_size, ssl);
 		}
 	}
@@ -122,7 +122,7 @@ void summarycalc::reset_sse_array()
 {
 	for (int i = 0; i < MAX_SUMMARY_SETS; i++) {
 		if (fout[i] != nullptr) {
-			float *se = sse[i];		// f array of se[summary_id] to exposure
+			OASIS_FLOAT *se = sse[i];		// f array of se[summary_id] to exposure
 			int maxsummaryids = max_summary_id_[i] - min_summary_id_[i] + 1;
 			for (int j = 0; j <= maxsummaryids; j++) {
 				se[j] = 0;
@@ -130,10 +130,10 @@ void summarycalc::reset_sse_array()
 		}
 	}
 }
-float *summarycalc::alloc_sse_arrays(int summary_set)
+OASIS_FLOAT *summarycalc::alloc_sse_arrays(int summary_set)
 {
 	int maxsummaryids = max_summary_id_[summary_set] - min_summary_id_[summary_set] + 1;
-	float *se = new float [maxsummaryids + 1];
+	OASIS_FLOAT *se = new OASIS_FLOAT [maxsummaryids + 1];
 	return se;
 }
 
@@ -172,7 +172,7 @@ bool summarycalc::loadcoverages()
 	long long sz = fltell(fin);
 	flseek(fin, 0L, SEEK_SET);
 
-	float tiv;
+	OASIS_FLOAT tiv;
 	unsigned int nrec = sz / sizeof(tiv);
 
 	coverages_.resize(nrec + 1);
@@ -248,8 +248,8 @@ void summarycalc::loadfmsummaryxref()
 
 void summarycalc::outputsummaryset(int sample_size, int summary_set, int event_id)
 {
-	loss_exp **ssl = sssl[summary_set]; // float **ssl two dimensional array of ssl[summary_id][sidx] to loss
-	float *se = sse[summary_set];
+	loss_exp **ssl = sssl[summary_set]; // OASIS_FLOAT **ssl two dimensional array of ssl[summary_id][sidx] to loss
+	OASIS_FLOAT *se = sse[summary_set];
 	int maxsummaryids = max_summary_id_[summary_set];
 	int minsummaryids = min_summary_id_[summary_set];
 	for (int i = minsummaryids ; i <= maxsummaryids; i++) {
@@ -334,7 +334,7 @@ void summarycalc::outputsummary(int sample_size,int event_id)
 		}
 	}
 }
-void summarycalc::processsummeryset(int summaryset, int event_id, int coverage_id, int sidx, float gul)
+void summarycalc::processsummeryset(int summaryset, int event_id, int coverage_id, int sidx, OASIS_FLOAT gul)
 {
 	loss_exp **ssl = sssl[summaryset];
 	coverage_id_or_output_id_to_Summary_id &p = *co_to_s[summaryset];
@@ -343,7 +343,7 @@ void summarycalc::processsummeryset(int summaryset, int event_id, int coverage_i
 }
 
 
-void summarycalc::dosummary(int sample_size,int event_id,int coverage_or_output_id,int sidx, float gul, float expval)
+void summarycalc::dosummary(int sample_size,int event_id,int coverage_or_output_id,int sidx, OASIS_FLOAT gul, OASIS_FLOAT expval)
 {
 	static int last_event_id = -1;
 	static int last_coverage_or_output_id = -1;
@@ -362,7 +362,7 @@ void summarycalc::dosummary(int sample_size,int event_id,int coverage_or_output_
 			if (fout[i] != nullptr) {
 				coverage_id_or_output_id_to_Summary_id &p = *co_to_s[i];
 				int summary_id = p[coverage_or_output_id];
-				float *se = sse[i];
+				OASIS_FLOAT *se = sse[i];
 				se[summary_id] += expval;
 			}
 		}
@@ -435,7 +435,7 @@ void summarycalc::dofmsummary()
 		reset_sse_array();
 		outputsamplesize(samplesize);
 		fmlevelhdr fh;
-		float expure_val = 0;
+		OASIS_FLOAT expure_val = 0;
 		bool havedata = false;
 		while (i == 1) {
 			i = fread(&fh, sizeof(fh), 1, stdin);

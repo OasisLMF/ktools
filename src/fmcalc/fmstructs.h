@@ -41,8 +41,8 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <vector>
 
 struct LossRec {
-	float loss = 0;
-	float retained_loss = 0;
+	OASIS_FLOAT loss = 0;
+	OASIS_FLOAT retained_loss = 0;
 	int agg_id;
 	int policytc_id;
 	int allocrule_id;
@@ -58,7 +58,7 @@ struct policytcvidx {
 };
 
 struct tc_rec {
-	float tc_val;
+	OASIS_FLOAT tc_val;
 	unsigned char tc_id;
 };
 

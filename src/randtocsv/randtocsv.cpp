@@ -58,14 +58,14 @@ void genrandomnumbers(bool skipheader, int total, int seed)
 	else mt.seed(rd());
 	if (skipheader == false) printf("\"random_no\"\n");
 	for (int i = 0; i < total; i++) {
-		float f = (float)dis(mt);
+		OASIS_FLOAT f = (OASIS_FLOAT)dis(mt);
 		printf("%f\n", f);
 	}
 }
 void doit(bool skipheader)
 {
 
-    float rand;
+    OASIS_FLOAT rand;
 	if (skipheader == false) printf("random_no\n");
     while (fread(&rand, sizeof(rand), 1, stdin) == 1){
         printf("%f\n",rand);
@@ -75,7 +75,7 @@ void doit(bool skipheader)
 
 void help()
 {
-	fprintf(stderr, "-r Convert binary float input to csv\n");
+	fprintf(stderr, "-r Convert binary OASIS_FLOAT input to csv\n");
 	fprintf(stderr, "-v version\n");
 	fprintf(stderr, "-s skip header\n");
 	fprintf(stderr, "-g generate random numbers\n");

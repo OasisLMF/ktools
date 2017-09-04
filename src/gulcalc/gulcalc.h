@@ -47,7 +47,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 struct exposure_rec {
 	int item_id;
 	int group_id;
-	float tiv;
+	OASIS_FLOAT tiv;
 };
 
 struct item_map_key {
@@ -65,18 +65,18 @@ struct item_map_rec {
 
 
 struct prob_mean {
-	float prob_to;
-	float bin_mean;
+	OASIS_FLOAT prob_to;
+	OASIS_FLOAT bin_mean;
 };
 
 struct gulGulSamples {
 	int event_id;
 	int item_id;
-	float tiv;
+	OASIS_FLOAT tiv;
 	int bin_index;
-	float prob_from;
-	float prob_to;
-	float bin_mean;
+	OASIS_FLOAT prob_from;
+	OASIS_FLOAT prob_to;
+	OASIS_FLOAT bin_mean;
 	int sidx;
 	double rval;
 };
@@ -88,12 +88,12 @@ class gulcalc  {
 private:
 	getRands *rnd_;
 	const std::map<item_map_key, std::vector<item_map_rec> > *item_map_;
-	const std::vector<float> *coverages_;
+	const std::vector<OASIS_FLOAT> *coverages_;
 	const std::vector<damagebindictionary> *damagebindictionary_vec_;
 	void gencovoutput(gulcoverageSampleslevel &gc);
 	void gencovoutputx(gulcoverageSampleslevel &gc);
-	std::vector<std::vector<float>> cov_;
-	std::map<int, std::vector<float>> covx_;
+	std::vector<std::vector<OASIS_FLOAT>> cov_;
+	std::map<int, std::vector<OASIS_FLOAT>> covx_;
 	void covoutputgul(gulcoverageSampleslevel &gc);
 	void outputcoveragedata(int event_id);
 	void outputcoveragedatax(int event_id);
@@ -101,8 +101,8 @@ private:
 	void(*itemWriter_)(const void *ibuf, int size, int count);
 	void(*coverageWriter_)(const void *ibuf, int size, int count);
 	bool(*iGetrec_)(char *rec, int recsize);
-	float getgul(damagebindictionary &b, gulGulSamples &g);
-	void output_mean(const item_map_rec &er, float tiv, prob_mean *pp, int bin_count, float &gul_mean, float &std_dev);
+	OASIS_FLOAT getgul(damagebindictionary &b, gulGulSamples &g);
+	void output_mean(const item_map_rec &er, OASIS_FLOAT tiv, prob_mean *pp, int bin_count, OASIS_FLOAT &gul_mean, OASIS_FLOAT &std_dev);
 	void init();
 	unsigned char *ibuf_;	// item level buffer
 	unsigned char *cbuf_;	// coverage level buffer
@@ -119,7 +119,7 @@ private:
 	long long p3_;
 public:	
 	void processrec(char *rec, int recsize);
-	gulcalc(const std::vector<damagebindictionary> &damagebindictionary_vec,const std::vector<float> &tivs,
+	gulcalc(const std::vector<damagebindictionary> &damagebindictionary_vec,const std::vector<OASIS_FLOAT> &tivs,
 		const std::map<item_map_key, std::vector<item_map_rec> > &item_map, getRands &rnd, 
 		double gul_limit,
 		//bool userandomtable,
@@ -140,6 +140,8 @@ public:
 		iGetrec_ = iGetrec;
 		ibuf_ = new unsigned char[bufsize + sizeof(gulitemSampleslevel)]; // make the allocation bigger by 1 record to avoid overrunning
 		cbuf_ = new unsigned char[bufsize + sizeof(gulitemSampleslevel)]; // make the allocation bigger by 1 record to avoid overrunning
+		//TODO: when using double precision, these buffers above are overflowing,
+		//the hack fix is to replace sizeof(gulitemSampleslevel) with 2*sizeof(gulitemSampleslevel)
 		gul_limit_ = gul_limit;
 		rndopt_ = rndopt;				
 		debug_ = debug;

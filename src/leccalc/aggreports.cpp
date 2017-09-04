@@ -425,7 +425,7 @@ void aggreports::wheatSheafMeanwithweighting(int samplesize, int handle, const s
 						doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, s.first.summary_id, 1);
 					}
 					else {
-						fprintf(fout_[handle], "%d,1,%f,%f\n", s.first.summary_id, retperiod, lp);
+						fprintf(fout_[handle], "%d,1,%f,%f\n", s.first.summary_id, retperiod, lp.value);
 					}
 				}
 

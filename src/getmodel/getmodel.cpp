@@ -78,7 +78,7 @@ const size_t SIZE_OF_RESULT = sizeof(Result);
 
 const unsigned int OUTPUT_STREAM_TYPE = 1;
 
-explicit getmodel::getmodel(bool zip = false) : _zip(zip) {
+getmodel::getmodel(bool zip) : _zip(zip) {
   //
 }
 
@@ -133,7 +133,7 @@ void getmodel::getIntensityInfo() {
   fclose(fin);
 }
 
-void getmodel::getItems(std::set<int> &v) {
+auto getmodel::getItems() -> std::unique_ptr<std::set<int>> {
   // Read the exposures and generate a set of vulnerabilities by area peril
   item item_rec;
 
@@ -143,15 +143,21 @@ void getmodel::getItems(std::set<int> &v) {
     exit(EXIT_FAILURE);
   }
 
+  // C++14:
+  //auto v = std::make_unique<std::set<int>>();
+  auto v = std::unique_ptr<std::set<int>>{ new std::set<int> };
+
   while (fread(&item_rec, sizeof(item_rec), 1, fin) != 0) {
     if (_vulnerability_ids_by_area_peril.count(item_rec.areaperil_id) == 0)
       _vulnerability_ids_by_area_peril[item_rec.areaperil_id] = std::set<int>();
     _vulnerability_ids_by_area_peril[item_rec.areaperil_id].insert(
         item_rec.vulnerability_id);
     _area_perils.insert(item_rec.areaperil_id);
-    v.insert(item_rec.vulnerability_id);
+    v->insert(item_rec.vulnerability_id);
   }
   fclose(fin);
+
+  return v;
 }
 
 void getmodel::getDamageBinDictionary() {
@@ -264,14 +270,14 @@ int getmodel::getVulnerabilityIndex(int intensity_bin_index,
          ((damage_bin_index - 1) * _num_intensity_bins);
 }
 
+void getmodel::getVulnerabilities() {
+    auto v = getItems();
+    getVulnerabilities(*v);
+}
+
 void getmodel::init() {
   getIntensityInfo();
-
-
-  std::set<int> v; // set of vulnerabilities;
-  getItems(v);
-  getVulnerabilities(v);
-  v.clear(); // set no longer required release memory
+  getVulnerabilities();
   getDamageBinDictionary();
 
   _temp_results = new Result[_num_damage_bins];

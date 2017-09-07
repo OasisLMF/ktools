@@ -75,7 +75,7 @@ private:
     void getVulnerabilities(const std::set<int> &v);
     void getVulnerabilities();
     void getDamageBinDictionary();
-    auto getItems() -> std::unique_ptr<std::set<int>>;
+    auto getItems() -> std::set<int>;
 	void getIntensityInfo();
     void doCdfInner(std::list<int> &event_ids, std::map<int, EventIndex> &event_index_by_event_id);
     void doCdfInnerNoIntensityUncertainty(std::list<int> &event_ids, std::map<int, EventIndex> &event_index_by_event_id);

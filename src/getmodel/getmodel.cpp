@@ -133,7 +133,7 @@ void getmodel::getIntensityInfo() {
   fclose(fin);
 }
 
-auto getmodel::getItems() -> std::unique_ptr<std::set<int>> {
+auto getmodel::getItems() -> std::set<int> {
   // Read the exposures and generate a set of vulnerabilities by area peril
   item item_rec;
 
@@ -143,9 +143,7 @@ auto getmodel::getItems() -> std::unique_ptr<std::set<int>> {
     exit(EXIT_FAILURE);
   }
 
-  // C++14:
-  //auto v = std::make_unique<std::set<int>>();
-  auto v = std::unique_ptr<std::set<int>>{ new std::set<int> };
+  auto v = std::set<int>();
 
   while (fread(&item_rec, sizeof(item_rec), 1, fin) != 0) {
     if (_vulnerability_ids_by_area_peril.count(item_rec.areaperil_id) == 0)
@@ -153,11 +151,11 @@ auto getmodel::getItems() -> std::unique_ptr<std::set<int>> {
     _vulnerability_ids_by_area_peril[item_rec.areaperil_id].insert(
         item_rec.vulnerability_id);
     _area_perils.insert(item_rec.areaperil_id);
-    v->insert(item_rec.vulnerability_id);
+    v.insert(item_rec.vulnerability_id);
   }
   fclose(fin);
 
-  return v;
+  return v; // RVO or move
 }
 
 void getmodel::getDamageBinDictionary() {
@@ -272,7 +270,7 @@ int getmodel::getVulnerabilityIndex(int intensity_bin_index,
 
 void getmodel::getVulnerabilities() {
     auto v = getItems();
-    getVulnerabilities(*v);
+    getVulnerabilities(v);
 }
 
 void getmodel::init() {

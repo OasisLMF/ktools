@@ -81,6 +81,7 @@ The following Cygwin add-in packages are required;
 * automake
 * libtools
 * zlib-devel
+* git
 
 
 To build native Windows 64-bit executables;

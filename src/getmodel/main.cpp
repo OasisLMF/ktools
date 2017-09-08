@@ -61,9 +61,9 @@ void help()
 void doIt(bool zip)
 {
 
-	getmodel cdf_generator;
+	getmodel cdf_generator{ zip };
 
-	cdf_generator.init(zip);
+	cdf_generator.init();
 
 	int event_id = -1;
 	std::list<int> event_ids;
@@ -78,7 +78,7 @@ void doIt(bool zip)
 
 int main(int argc, char** argv)
 {
-	int opt;	
+	int opt;
 	while ((opt = getopt(argc, argv, "vh")) != -1) {
 		switch (opt) {
 		case 'v':

@@ -40,6 +40,7 @@
 #include <list>
 #include <set>
 #include <map>
+#include <memory>
 #include "getmodel.h"
 #include "../include/oasis.h"
 #include <zlib.h>
@@ -77,7 +78,7 @@ const size_t SIZE_OF_RESULT = sizeof(Result);
 
 const unsigned int OUTPUT_STREAM_TYPE = 1;
 
-getmodel::getmodel() {
+getmodel::getmodel(bool zip) : _zip(zip) {
   //
 }
 
@@ -132,7 +133,7 @@ void getmodel::getIntensityInfo() {
   fclose(fin);
 }
 
-void getmodel::getItems(std::set<int> &v) {
+auto getmodel::getItems() -> std::set<int> {
   // Read the exposures and generate a set of vulnerabilities by area peril
   item item_rec;
 
@@ -141,6 +142,8 @@ void getmodel::getItems(std::set<int> &v) {
     fprintf(stderr, "%s: cannot open %s\n", __func__, ITEMS_FILE);
     exit(EXIT_FAILURE);
   }
+
+  auto v = std::set<int>();
 
   while (fread(&item_rec, sizeof(item_rec), 1, fin) != 0) {
     if (_vulnerability_ids_by_area_peril.count(item_rec.areaperil_id) == 0)
@@ -151,6 +154,8 @@ void getmodel::getItems(std::set<int> &v) {
     v.insert(item_rec.vulnerability_id);
   }
   fclose(fin);
+
+  return v; // RVO or move
 }
 
 void getmodel::getDamageBinDictionary() {
@@ -263,15 +268,14 @@ int getmodel::getVulnerabilityIndex(int intensity_bin_index,
          ((damage_bin_index - 1) * _num_intensity_bins);
 }
 
-void getmodel::init(bool zip) {
-  _zip = zip;
+void getmodel::getVulnerabilities() {
+    auto v = getItems();
+    getVulnerabilities(v);
+}
 
+void getmodel::init() {
   getIntensityInfo();
-
-  std::set<int> v; // set of vulnerabilities;
-  getItems(v);
-  getVulnerabilities(v);
-  v.clear(); // set no longer required release memory
+  getVulnerabilities();
   getDamageBinDictionary();
 
   _temp_results = new Result[_num_damage_bins];
@@ -322,7 +326,7 @@ void getmodel::doCdfInnerz(std::list<int> &event_ids,
   auto sizeof_EventKey = sizeof(EventRow);
   auto fin = fopen(ZFOOTPRINT_FILE, "rb");
   auto intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);
-  for (int event_id : event_ids) {        
+  for (int event_id : event_ids) {
     bool do_cdf_for_area_peril = false;
     intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);
     if (event_index_by_event_id.count(event_id) == 0)
@@ -349,7 +353,7 @@ void getmodel::doCdfInnerz(std::list<int> &event_ids,
         static_cast<int>(dest_length / sizeof_EventKey);
     EventRow *event_key = (EventRow *)&_uncompressed_buf[0];
     int current_areaperil_id = -1;
-    for (int i = 0; i < number_of_event_records; i++) {      
+    for (int i = 0; i < number_of_event_records; i++) {
       if (event_key->areaperil_id != current_areaperil_id) {
         if (do_cdf_for_area_peril) {
           // Generate and write the results
@@ -363,7 +367,7 @@ void getmodel::doCdfInnerz(std::list<int> &event_ids,
       }
       if (do_cdf_for_area_peril) {
         intensity[event_key->intensity_bin_id - 1] = event_key->probability;
-      }      
+      }
       event_key++;
     }
     // Write out results for last event record
@@ -422,7 +426,7 @@ void getmodel::doCdfInner(std::list<int> &event_ids,
   fclose(fin);
 }
 
-void getmodel::doCdfInnerNoIntensityUncertaintyz(  
+void getmodel::doCdfInnerNoIntensityUncertaintyz(
     std::list<int> &event_ids,
     std::map<int, EventIndex> &event_index_by_event_id) {
   auto sizeof_EventKey = sizeof(EventRow);
@@ -441,7 +445,7 @@ void getmodel::doCdfInnerNoIntensityUncertaintyz(
     if (ret != Z_OK) {
       fprintf(stderr, "Got bad return code from uncompress %d\n", ret);
       exit(-1);
-    }    
+    }
     // we now have the data length
     int number_of_event_records =
         static_cast<int>(dest_length / sizeof_EventKey);

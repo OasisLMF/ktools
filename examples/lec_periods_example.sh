@@ -21,20 +21,20 @@ dorun()
 
 	./leccalc_example.py
 
-	# avoid race condition which occurs in Linux under windows
-	# keep this in until microsft fixes it
+	# sleep to avoid race condition which occurs in Linux subsystem under windows
+	# keep this in until microsoft fixes it
 
 	sleep 1
 
-	# mv "results/lec/fm_lec_full_uncertainty_agg.csv" "results/lec/periods/fm_lec_full_uncertainty_agg$1.csv"
-	# mv "results/lec/fm_lec_full_uncertainty_occ.csv" "results/lec/periods/fm_lec_full_uncertainty_occ$1.csv"
-	# mv "results/lec/fm_lec_sample_mean_agg.csv" "results/lec/periods/fm_lec_sample_mean_agg$1.csv"
-	# mv "results/lec/fm_lec_sample_mean_occ.csv" "results/lec/periods/fm_lec_sample_mean_occ$1.csv"
+	mv "results/lec/fm_lec_full_uncertainty_agg.csv" "results/lec/periods/fm_lec_full_uncertainty_agg$1.csv"
+	mv "results/lec/fm_lec_full_uncertainty_occ.csv" "results/lec/periods/fm_lec_full_uncertainty_occ$1.csv"
+	mv "results/lec/fm_lec_sample_mean_agg.csv" "results/lec/periods/fm_lec_sample_mean_agg$1.csv"
+	mv "results/lec/fm_lec_sample_mean_occ.csv" "results/lec/periods/fm_lec_sample_mean_occ$1.csv"
 
-	rm 	"results/lec/fm_lec_full_uncertainty_agg.csv"
-	rm 	"results/lec/fm_lec_full_uncertainty_occ.csv"
-	rm 	"results/lec/fm_lec_sample_mean_agg.csv"
-	rm 	"results/lec/fm_lec_sample_mean_occ.csv"
+	#rm 	"results/lec/fm_lec_full_uncertainty_agg.csv"
+	#rm 	"results/lec/fm_lec_full_uncertainty_occ.csv"
+	#rm 	"results/lec/fm_lec_sample_mean_agg.csv"
+	#rm 	"results/lec/fm_lec_sample_mean_occ.csv"
 
 
 	mv "results/lec/fm_lec_wheatsheaf_agg.csv" "results/lec/periods/fm_lec_wheatsheaf_agg$1.csv"

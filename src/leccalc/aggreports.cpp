@@ -344,7 +344,7 @@ void aggreports::wheatsheaf(int handle, const std::map<outkey2, OASIS_FLOAT> &ou
 
 	}
 }
-void aggreports::wheatsheafwithweighting(int handle, const std::map<outkey2, float> &out_loss)
+void aggreports::wheatsheafwithweighting(int handle, const std::map<outkey2, OASIS_FLOAT> &out_loss)
 {
 	if (fout_[handle] == nullptr) return;
 	std::map<wheatkey, lossvec2> items;
@@ -365,18 +365,18 @@ void aggreports::wheatsheafwithweighting(int handle, const std::map<outkey2, flo
 	fprintf(fout_[handle], "summary_id,sidx,return_period,loss\n");
 
 	for (auto s : items) {
-		float cummulative_weigthing = 0;
+		OASIS_FLOAT cummulative_weigthing = 0;
 		lossvec2 &lpv = s.second;
 
 		std::sort(lpv.rbegin(), lpv.rend());
 		int nextreturnperiodindex = 0;
-		float last_computed_rp = 0;
-		float last_computed_loss = 0;
+		OASIS_FLOAT last_computed_rp = 0;
+		OASIS_FLOAT last_computed_loss = 0;
 		int i = 1;
-		float t = (float)totalperiods_;
+		OASIS_FLOAT t = (float)totalperiods_;
 		for (auto lp : lpv) {
-			cummulative_weigthing += (float) lp.period_weighting;
-			float retperiod = 1 / cummulative_weigthing;
+			cummulative_weigthing += (OASIS_FLOAT) lp.period_weighting;
+			OASIS_FLOAT retperiod = 1 / cummulative_weigthing;
 			if (useReturnPeriodFile_) {
 				if (nextreturnperiodindex == returnperiods_.size()) break;
 				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, s.first.summary_id, s.first.sidx);

@@ -24,6 +24,7 @@ purge("work/aal2","")
 purge("results/aal","fm_aal*")
 
 total_processes = multiprocessing.cpu_count()
+total_processes = 1 
 counter=1
 samplesize=100
 randomnumbers=1000000

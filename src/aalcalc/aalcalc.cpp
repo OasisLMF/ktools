@@ -59,7 +59,7 @@ void aalcalc::loadperiodtoweigthing()
 	FILE *fin = fopen(PERIODS_FILE, "rb");
 	if (fin == NULL) return;
 	Periods p;
-	OASIS_FLOAT total_weighting = 0;
+	double total_weighting = 0;
 	size_t i = fread(&p, sizeof(Periods), 1, fin);
 	while (i != 0) {
 		total_weighting += p.weighting;
@@ -97,6 +97,7 @@ void aalcalc::loadoccurrence()
 	i = fread(&occ, sizeof(occ), 1, fin);
 	while (i != 0) {
 		event_count_[occ.event_id] = event_count_[occ.event_id] + 1;
+		event_to_period_[occ.event_id] = occ.period_no;
 		i = fread(&occ, sizeof(occ), 1, fin);
 	}
 
@@ -142,18 +143,24 @@ void aalcalc::outputsummarybin()
 	}
 }
 
-void aalcalc::do_analytical_calc(const summarySampleslevelHeader &sh,  OASIS_FLOAT mean_loss)
-{		
+void aalcalc::do_analytical_calc(const summarySampleslevelHeader &sh,  double mean_loss)
+{	
+	
 	if (periodstoweighting_.size() > 0) {
-		auto iter = periodstoweighting_.find(sh.event_id);
-		if (iter != periodstoweighting_.end()){
-			mean_loss = mean_loss * iter->second;
-		}else{
-			// no weighting so assume its zero
-			mean_loss = 0;
+		double factor = (double) periodstoweighting_.size();
+		auto it = event_to_period_.find(sh.event_id);
+		if (it != event_to_period_.end()) {
+			auto iter = periodstoweighting_.find(it->second);
+			if (iter != periodstoweighting_.end()) {
+				mean_loss = mean_loss * iter->second * factor;
+			}
+			else {
+				// no weighting so assume its zero
+				mean_loss = 0;
+			}
 		}
 	}
-	OASIS_FLOAT mean_squared = mean_loss*mean_loss;
+	double mean_squared = mean_loss*mean_loss;
 	int count = event_count_[sh.event_id];		// do the cartesian
 	mean_loss = mean_loss * count;
 	mean_squared = mean_squared * count;
@@ -211,17 +218,27 @@ void aalcalc::doaalcalc(const summarySampleslevelHeader &sh, const std::vector<s
 	if (samplesize_) do_sample_calc(sh, vrec);
 }
 
-void aalcalc::applyweightings(int event_id, const std::map <int, OASIS_FLOAT> &periodstoweighting,std::vector<sampleslevelRec> &vrec)
+void aalcalc::applyweightings(int event_id, const std::map <int, double> &periodstoweighting,std::vector<sampleslevelRec> &vrec)
 {
 	if (periodstoweighting.size() == 0) return;
-	auto iter = periodstoweighting.find(event_id);
-	if (iter != periodstoweighting.end()) {
-		for (int i = 0;i < vrec.size(); i++) vrec[i].loss = vrec[i].loss * iter->second;
-	}else {
-	// Event not found in periods.bin so no weighting i.e zero 
-		for (int i = 0;i < vrec.size(); i++) vrec[i].loss = 0; 
-	//	fprintf(stderr, "Event %d not found in periods.bin\n", event_id);
-//		exit(-1);
+	double factor = periodstoweighting.size();
+	auto it = event_to_period_.find(event_id);
+	if (it != event_to_period_.end()) {
+		auto iter = periodstoweighting.find(it->second);
+		if (iter != periodstoweighting.end()) {
+			for (int i = 0;i < vrec.size(); i++) {
+				vrec[i].loss = vrec[i].loss * iter->second * factor;
+			}
+		}
+		else {
+			// Event not found in periods.bin so no weighting i.e zero 
+			for (int i = 0;i < vrec.size(); i++) vrec[i].loss = 0;
+			//	fprintf(stderr, "Event %d not found in periods.bin\n", event_id);
+		//		exit(-1);
+		}
+	}
+	else {
+		fprintf(stderr, "Event ID %d not found\n", event_id);
 	}
 }
 
@@ -229,8 +246,8 @@ void aalcalc::applyweightingstomap(std::map<int, aal_rec> &m, int i)
 {
 	auto iter = m.begin();
 	while (iter != m.end()) {
-		iter->second.mean = iter->second.mean * i;
-		iter->second.mean_squared = iter->second.mean_squared * i * i;
+		//iter->second.mean = iter->second.mean * i;
+		//iter->second.mean_squared = iter->second.mean_squared * i * i;
 		iter++;
 	}
 }

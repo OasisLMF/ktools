@@ -183,6 +183,26 @@ void getmodel::getDamageBinDictionary() {
   delete[] damage_bins;
 }
 
+void getmodel::getFootPrints(){
+  FILE *fin;
+  if (_zip) {
+    fin = fopen(ZFOOTPRINT_IDX_FILE, "rb");
+  } else {
+    fin = fopen(FOOTPRINT_IDX_FILE, "rb");
+  }
+  if (fin == nullptr) {
+    fprintf(stderr, "%s: cannot open %s\n", __func__, FOOTPRINT_IDX_FILE);
+    exit(EXIT_FAILURE);
+  }
+
+  EventIndex event_index;
+  while (fread(&event_index, sizeof(event_index), 1, fin) != 0) {
+    _event_index_by_event_id[event_index.event_id] = event_index;
+  }
+
+  fclose(fin);
+}
+
 void getmodel::initOutputStream() {
   fwrite(&OUTPUT_STREAM_TYPE, sizeof(OUTPUT_STREAM_TYPE), 1, stdout);
 }
@@ -223,7 +243,6 @@ void getmodel::doResults(
     fwrite(&vulnerability_id, SIZE_OF_INT, 1, stdout);
     fwrite(&num_results, SIZE_OF_INT, 1, stdout);
     fwrite(results, SIZE_OF_RESULT, num_results, stdout);
-
     delete[] results;
   }
 }
@@ -273,220 +292,178 @@ void getmodel::init(bool zip) {
   getVulnerabilities(v);
   v.clear(); // set no longer required release memory
   getDamageBinDictionary();
+  getFootPrints();
+  initOutputStream();
 
   _temp_results = new Result[_num_damage_bins];
-  for (int damage_bin_index = 1; damage_bin_index <= _num_damage_bins;
-       damage_bin_index++) {
+  for (int damage_bin_index = 1; damage_bin_index <= _num_damage_bins; damage_bin_index++) {
     _temp_results[damage_bin_index - 1] =
         Result(0.0, _mean_damage_bins[damage_bin_index - 1]);
   }
 }
 
-void getmodel::doCdf(std::list<int> event_ids) {
-  FILE *fin;
-  if (_zip) {
-    fin = fopen(ZFOOTPRINT_IDX_FILE, "rb");
-  } else {
-    fin = fopen(FOOTPRINT_IDX_FILE, "rb");
-  }
-  if (fin == nullptr) {
-    fprintf(stderr, "%s: cannot open %s\n", __func__, FOOTPRINT_IDX_FILE);
-    exit(EXIT_FAILURE);
-  }
-
-  EventIndex event_index;
-  std::map<int, EventIndex> event_index_by_event_id;
-  while (fread(&event_index, sizeof(event_index), 1, fin) != 0) {
-    event_index_by_event_id[event_index.event_id] = event_index;
-  }
-
-  fclose(fin);
-  initOutputStream();
-
+void getmodel::doCdf(int event_id) {
+  
   if (_has_intensity_uncertainty) {
     if (_zip)
-      doCdfInnerz(event_ids, event_index_by_event_id);
+      doCdfInnerz(event_id);
     else
-      doCdfInner(event_ids, event_index_by_event_id);
+      doCdfInner(event_id);
   } else {
     if (_zip)
-      doCdfInnerNoIntensityUncertaintyz(event_ids, event_index_by_event_id);
+      doCdfInnerNoIntensityUncertaintyz(event_id);
     else
-      doCdfInnerNoIntensityUncertainty(event_ids, event_index_by_event_id);
+      doCdfInnerNoIntensityUncertainty(event_id);
   }
 }
 
-void getmodel::doCdfInnerz(std::list<int> &event_ids,
-                           std::map<int, EventIndex> &event_index_by_event_id
-                           ) {
+void getmodel::doCdfInnerz(int event_id) {
   auto sizeof_EventKey = sizeof(EventRow);
   auto fin = fopen(ZFOOTPRINT_FILE, "rb");
-  auto intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);
-  for (int event_id : event_ids) {        
-    bool do_cdf_for_area_peril = false;
-    intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);
-    if (event_index_by_event_id.count(event_id) == 0)
-      continue;
-    flseek(fin, event_index_by_event_id[event_id].offset, 0);
-    // Cannot do below because record is compressed
-    // int number_of_event_records =
-    // static_cast<int>(event_index_by_event_id[event_id].size /
-    // sizeof_EventKey);
-    // Need to now uncompress the record here
-    int size = event_index_by_event_id[event_id].size;
-    _compressed_buf.resize(size + 1);
-    _uncompressed_buf.resize(size * 20);
-    fread(&_compressed_buf[0], size, 1, fin);
-    uLong dest_length = _uncompressed_buf.size();
-    int ret = uncompress(&_uncompressed_buf[0], &dest_length,
-                         &_compressed_buf[0], size);
-    if (ret != Z_OK) {
-      fprintf(stderr, "Got bad return code from uncompress %d\n", ret);
-      exit(-1);
-    }
-    // we now have the data length
-    int number_of_event_records =
-        static_cast<int>(dest_length / sizeof_EventKey);
-    EventRow *event_key = (EventRow *)&_uncompressed_buf[0];
-    int current_areaperil_id = -1;
-    for (int i = 0; i < number_of_event_records; i++) {      
-      if (event_key->areaperil_id != current_areaperil_id) {
-        if (do_cdf_for_area_peril) {
-          // Generate and write the results
-          doResults(event_id, current_areaperil_id,
-                    _vulnerability_ids_by_area_peril, _vulnerabilities,
-                    intensity);
-          intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);
-        }
-        current_areaperil_id = event_key->areaperil_id;
-        do_cdf_for_area_peril = (_area_perils.count(current_areaperil_id) == 1);
-      }
-      if (do_cdf_for_area_peril) {
-        intensity[event_key->intensity_bin_id - 1] = event_key->probability;
-      }      
-      event_key++;
-    }
-    // Write out results for last event record
-      if (do_cdf_for_area_peril) {
-      // Generate and write the results
-        doResults(event_id, current_areaperil_id,_vulnerability_ids_by_area_peril, _vulnerabilities, intensity);
-      }
+  auto intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);   
+  bool do_cdf_for_area_peril = false;
+  intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);
+  if (_event_index_by_event_id.count(event_id) == 0)
+    return;
+  flseek(fin, _event_index_by_event_id[event_id].offset, 0);
+
+  int size = _event_index_by_event_id[event_id].size;
+  _compressed_buf.resize(size + 1);
+  _uncompressed_buf.resize(size * 20);
+  fread(&_compressed_buf[0], size, 1, fin);
+  uLong dest_length = _uncompressed_buf.size();
+  int ret = uncompress(&_uncompressed_buf[0], &dest_length, &_compressed_buf[0], size);
+  if (ret != Z_OK) {
+    fprintf(stderr, "Got bad return code from uncompress %d\n", ret);
+    exit(-1);
   }
+  // we now have the data length
+  int number_of_event_records = static_cast<int>(dest_length / sizeof_EventKey);
+  EventRow *event_key = (EventRow *)&_uncompressed_buf[0];
+  int current_areaperil_id = -1;
+  for (int i = 0; i < number_of_event_records; i++) {      
+    if (event_key->areaperil_id != current_areaperil_id) {
+      if (do_cdf_for_area_peril) {
+        // Generate and write the results
+        doResults(event_id, current_areaperil_id,
+                  _vulnerability_ids_by_area_peril, _vulnerabilities,
+                  intensity);
+        intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);
+      }
+      current_areaperil_id = event_key->areaperil_id;
+      do_cdf_for_area_peril = (_area_perils.count(current_areaperil_id) == 1);
+    }
+    if (do_cdf_for_area_peril) {
+      intensity[event_key->intensity_bin_id - 1] = event_key->probability;
+    }      
+    event_key++;
+  }
+  // Write out results for last event record
+    if (do_cdf_for_area_peril) {
+    // Generate and write the results
+      doResults(event_id, current_areaperil_id,_vulnerability_ids_by_area_peril, _vulnerabilities, intensity);
+    }
   _compressed_buf.clear();
   _uncompressed_buf.clear();
   fclose(fin);
 }
 
-void getmodel::doCdfInner(std::list<int> &event_ids,
-                          std::map<int, EventIndex> &event_index_by_event_id) {
+void getmodel::doCdfInner(int event_id) {
   auto sizeof_EventKey = sizeof(EventRow);
   auto fin = fopen(FOOTPRINT_FILE, "rb");
   auto intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);
 
-  for (int event_id : event_ids) {
-    int current_areaperil_id = -1;
-    bool do_cdf_for_area_peril = false;
-    intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);
+  int current_areaperil_id = -1;
+  bool do_cdf_for_area_peril = false;
+  intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);
 
-    if (event_index_by_event_id.count(event_id) == 0)
-      continue;
-    flseek(fin, event_index_by_event_id[event_id].offset, 0);
-    EventRow event_key;
-    int number_of_event_records = static_cast<int>(
-        event_index_by_event_id[event_id].size / sizeof_EventKey);
-    for (int i = 0; i < number_of_event_records; i++) {
-      fread(&event_key, sizeof(event_key), 1, fin);
-      if (event_key.areaperil_id != current_areaperil_id) {
-        if (do_cdf_for_area_peril) {
-          // Generate and write the results
-          doResults(event_id, current_areaperil_id,
-                    _vulnerability_ids_by_area_peril, _vulnerabilities,
-                    intensity);
-          intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);
-        }
-        current_areaperil_id = event_key.areaperil_id;
-        do_cdf_for_area_peril = (_area_perils.count(current_areaperil_id) == 1);
-      }
-      if (do_cdf_for_area_peril) {
-        intensity[event_key.intensity_bin_id - 1] = event_key.probability;
-      }
-    }
-    // Write out results for last event record
-    if (do_cdf_for_area_peril) {
-      // Generate and write the results
-      doResults(event_id, current_areaperil_id,
-                _vulnerability_ids_by_area_peril, _vulnerabilities, intensity);
-    }
-  }
-
-  fclose(fin);
-}
-
-void getmodel::doCdfInnerNoIntensityUncertaintyz(  
-    std::list<int> &event_ids,
-    std::map<int, EventIndex> &event_index_by_event_id) {
-  auto sizeof_EventKey = sizeof(EventRow);
-  FILE *fin = fopen(ZFOOTPRINT_FILE, "rb");
-  for (int event_id : event_ids) {
-    if (event_index_by_event_id.count(event_id) == 0)
-      continue;
-    flseek(fin, event_index_by_event_id[event_id].offset, 0);
-    int size = event_index_by_event_id[event_id].size;
-    _compressed_buf.resize(size + 1);
-    _uncompressed_buf.resize(size * 20);
-    fread(&_compressed_buf[0], size, 1, fin);
-    uLong dest_length = _uncompressed_buf.size();
-    int ret = uncompress(&_uncompressed_buf[0], &dest_length,
-                         &_compressed_buf[0], size);
-    if (ret != Z_OK) {
-      fprintf(stderr, "Got bad return code from uncompress %d\n", ret);
-      exit(-1);
-    }    
-    // we now have the data length
-    int number_of_event_records =
-        static_cast<int>(dest_length / sizeof_EventKey);
-    EventRow *event_key = (EventRow *)&_uncompressed_buf[0];
-    for (int i = 0; i < number_of_event_records; i++) {
-      bool do_cdf_for_area_peril =
-          (_area_perils.count(event_key->areaperil_id) == 1);
+  if (_event_index_by_event_id.count(event_id) == 0)
+    return;
+  flseek(fin, _event_index_by_event_id[event_id].offset, 0);
+  EventRow event_key;
+  int number_of_event_records = static_cast<int>(
+      _event_index_by_event_id[event_id].size / sizeof_EventKey);
+  for (int i = 0; i < number_of_event_records; i++) {
+    fread(&event_key, sizeof(event_key), 1, fin);
+    if (event_key.areaperil_id != current_areaperil_id) {
       if (do_cdf_for_area_peril) {
         // Generate and write the results
-        doResultsNoIntensityUncertainty(
-            event_id, event_key->areaperil_id, _vulnerability_ids_by_area_peril,
-            _vulnerabilities, event_key->intensity_bin_id);
+        doResults(event_id, current_areaperil_id, _vulnerability_ids_by_area_peril, _vulnerabilities, intensity);
+        intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);
       }
-      event_key++;
+      current_areaperil_id = event_key.areaperil_id;
+      do_cdf_for_area_peril = (_area_perils.count(current_areaperil_id) == 1);
     }
+    if (do_cdf_for_area_peril) {
+      intensity[event_key.intensity_bin_id - 1] = event_key.probability;
+    }
+  }
+  // Write out results for last event record
+  if (do_cdf_for_area_peril) {
+    // Generate and write the results
+    doResults(event_id, current_areaperil_id, _vulnerability_ids_by_area_peril, _vulnerabilities, intensity);
   }
 
   fclose(fin);
 }
 
-void getmodel::doCdfInnerNoIntensityUncertainty(
-    std::list<int> &event_ids,
-    std::map<int, EventIndex> &event_index_by_event_id) {
+void getmodel::doCdfInnerNoIntensityUncertaintyz(int event_id) {
+  auto sizeof_EventKey = sizeof(EventRow);
+  FILE *fin = fopen(ZFOOTPRINT_FILE, "rb");
+  if (_event_index_by_event_id.count(event_id) == 0)
+    return;
+  flseek(fin, _event_index_by_event_id[event_id].offset, 0);
+  int size = _event_index_by_event_id[event_id].size;
+  _compressed_buf.resize(size + 1);
+  _uncompressed_buf.resize(size * 20);
+  fread(&_compressed_buf[0], size, 1, fin);
+  uLong dest_length = _uncompressed_buf.size();
+  int ret = uncompress(&_uncompressed_buf[0], &dest_length,
+                        &_compressed_buf[0], size);
+  if (ret != Z_OK) {
+    fprintf(stderr, "Got bad return code from uncompress %d\n", ret);
+    exit(-1);
+  }    
+  // we now have the data length
+  int number_of_event_records =
+      static_cast<int>(dest_length / sizeof_EventKey);
+  EventRow *event_key = (EventRow *)&_uncompressed_buf[0];
+  for (int i = 0; i < number_of_event_records; i++) {
+    bool do_cdf_for_area_peril =
+        (_area_perils.count(event_key->areaperil_id) == 1);
+    if (do_cdf_for_area_peril) {
+      // Generate and write the results
+      doResultsNoIntensityUncertainty(
+          event_id, event_key->areaperil_id, _vulnerability_ids_by_area_peril,
+          _vulnerabilities, event_key->intensity_bin_id);
+    }
+    event_key++;
+  }
+
+  fclose(fin);
+}
+
+void getmodel::doCdfInnerNoIntensityUncertainty(int event_id) {
   auto sizeof_EventKey = sizeof(EventRow);
   auto fin = fopen(FOOTPRINT_FILE, "rb");
 
-  for (int event_id : event_ids) {
-    if (event_index_by_event_id.count(event_id) == 0)
-      continue;
-    flseek(fin, event_index_by_event_id[event_id].offset, 0);
+  if (_event_index_by_event_id.count(event_id) == 0)
+    return;
+  flseek(fin, _event_index_by_event_id[event_id].offset, 0);
 
-    int number_of_event_records = static_cast<int>(
-        event_index_by_event_id[event_id].size / sizeof_EventKey);
-    for (int i = 0; i < number_of_event_records; i++) {
-      EventRow event_key;
-      fread(&event_key, sizeof(event_key), 1, fin);
+  int number_of_event_records = static_cast<int>(
+      _event_index_by_event_id[event_id].size / sizeof_EventKey);
+  for (int i = 0; i < number_of_event_records; i++) {
+    EventRow event_key;
+    fread(&event_key, sizeof(event_key), 1, fin);
 
-      bool do_cdf_for_area_peril =
-          (_area_perils.count(event_key.areaperil_id) == 1);
-      if (do_cdf_for_area_peril) {
-        // Generate and write the results
-        doResultsNoIntensityUncertainty(
-            event_id, event_key.areaperil_id, _vulnerability_ids_by_area_peril,
-            _vulnerabilities, event_key.intensity_bin_id);
-      }
+    bool do_cdf_for_area_peril =
+        (_area_perils.count(event_key.areaperil_id) == 1);
+    if (do_cdf_for_area_peril) {
+      // Generate and write the results
+      doResultsNoIntensityUncertainty(
+          event_id, event_key.areaperil_id, _vulnerability_ids_by_area_peril,
+          _vulnerabilities, event_key.intensity_bin_id);
     }
   }
 

@@ -56,12 +56,13 @@ public:
     getmodel();
     ~getmodel();
     void init(bool zip);
-	void doCdf(std::list<int> event_ids);
+	void doCdf(int event_id);
 
 private:
 	
 	std::map<int, std::vector<OASIS_FLOAT> > _vulnerabilities;	
-	std::map<int, std::set<int> > _vulnerability_ids_by_area_peril;
+    std::map<int, std::set<int> > _vulnerability_ids_by_area_peril;
+    std::map<int, EventIndex> _event_index_by_event_id;
 	std::set<int> _area_perils;
 	std::vector<OASIS_FLOAT> _mean_damage_bins;
     std::vector<unsigned char > _compressed_buf;
@@ -74,13 +75,13 @@ private:
     bool _zip = false;
     void getVulnerabilities(const std::set<int> &v);
     void getDamageBinDictionary();
+    void getFootPrints();
     void getItems(std::set<int> &v);
 	void getIntensityInfo();
-    void doCdfInner(std::list<int> &event_ids, std::map<int, EventIndex> &event_index_by_event_id);
-    void doCdfInnerNoIntensityUncertainty(std::list<int> &event_ids, std::map<int, EventIndex> &event_index_by_event_id);
-    void doCdfInnerz(std::list<int> &event_ids, std::map<int, EventIndex> &event_index_by_event_id);
-    void doCdfInnerNoIntensityUncertaintyz(std::list<int> &event_ids, 
-    std::map<int, EventIndex> &event_index_by_event_id);
+    void doCdfInner(int event_id);
+    void doCdfInnerNoIntensityUncertainty(int event_id);
+    void doCdfInnerz(int event_id);
+    void doCdfInnerNoIntensityUncertaintyz(int event_id);
     void  doResults(
         int &event_id,
         int &areaperil_id,

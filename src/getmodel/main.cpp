@@ -66,14 +66,10 @@ void doIt(bool zip)
 	cdf_generator.init(zip);
 
 	int event_id = -1;
-	std::list<int> event_ids;
 	while (fread(&event_id, sizeof(event_id), 1, stdin) != 0)
 	{
-		event_ids.push_back(event_id);
+		cdf_generator.doCdf(event_id);
 	}
-
-	//! Send the events through in smaller batches.
-	cdf_generator.doCdf(event_ids);
 }
 
 int main(int argc, char** argv)

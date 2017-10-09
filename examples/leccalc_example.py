@@ -24,6 +24,7 @@ purge("work/summary2","")
 purge("results/lec","fm_lec*")
 
 total_processes = multiprocessing.cpu_count()
+#total_processes = 1 
 counter=1
 samplesize=100
 randomnumbers=1000000
@@ -48,7 +49,7 @@ for p in procs:
 counter=1
 
 # After all processes are finished, the final step is to run leccalc on the work folder containing the summarycalc samples. Multiple lec outputs can be run in a single process.
-cmd="leccalc -Ksummary2 -F results/lec/fm_lec_full_uncertainty_agg.csv -f results/lec/fm_lec_full_uncertainty_occ.csv -S results/lec/fm_lec_sample_mean_agg.csv -s results/lec/fm_lec_sample_mean_occ.csv -M results/lec/fm_lec_wheatsheaf_agg.csv -m results/lec/fm_lec_wheatsheaf_occ.csv "
+cmd="leccalc -r -Ksummary2 -F results/lec/fm_lec_full_uncertainty_agg.csv -f results/lec/fm_lec_full_uncertainty_occ.csv -S results/lec/fm_lec_sample_mean_agg.csv -s results/lec/fm_lec_sample_mean_occ.csv -M results/lec/fm_lec_wheatsheaf_agg.csv -m results/lec/fm_lec_wheatsheaf_occ.csv "
 #cmd="leccalc -Ksummary2 -W results/lec/fm_lec_wheatsheaf_agg.csv -s results/lec/fm_lec_wheatsheaf_occ.csv"
 
 print cmd

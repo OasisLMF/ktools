@@ -24,7 +24,7 @@ purge("work/aal2","")
 purge("results/aal","fm_aal*")
 
 total_processes = multiprocessing.cpu_count()
-total_processes = 1 
+#total_processes = 1 
 counter=1
 samplesize=100
 randomnumbers=1000000
@@ -41,6 +41,7 @@ procs = []
 
 while (counter <= total_processes) :
 	cmd="eve %d %d | getmodel | gulcalc -r -S%d -i - | fmcalc | summarycalc -f -2 - | aalcalc > work/aal2/p%d.bin " % (counter,total_processes,samplesize,counter)
+	print cmd	
 	p1 = subprocess.Popen(cmd,shell=True)
 	procs.append(p1)
 	print cmd

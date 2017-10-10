@@ -405,7 +405,7 @@ void aggreports::outputOccWheatsheaf()
 		wheatsheaf(OCC_WHEATSHEAF, max_out_loss_);
 	}
 	else {
-		wheatsheafwithweighting(OCC_FULL_UNCERTAINTY, max_out_loss_);
+		wheatsheafwithweighting(OCC_WHEATSHEAF, max_out_loss_);
 	}
 	
 }

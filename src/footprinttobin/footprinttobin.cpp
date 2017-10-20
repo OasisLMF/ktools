@@ -87,6 +87,10 @@ void doitz() {
       fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
       return;
     }
+    if (r.intensity_bin_id > intensity_bins_){
+    	fprintf(stderr, "Intensity bin id %d is greater than the max supplied (%d) in line %d:\n%s",r.intensity_bin_id, intensity_bins_, lineno, line);
+    	return;
+    }
     if (event_id != last_event_id) {
       if (events.find(event_id) == events.end()) {
         events.insert(event_id);
@@ -175,6 +179,10 @@ void doit() {
                &r.intensity_bin_id, &r.probability) != 4) {
       fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
       return;
+    }
+    if (r.intensity_bin_id > intensity_bins_){
+    	fprintf(stderr, "Intensity bin id %d is greater than the max supplied (%d) in line %d:\n%s",r.intensity_bin_id, intensity_bins_, lineno, line);
+    	return;
     }
     if (event_id != last_event_id) {
       if (events.find(event_id) == events.end()) {

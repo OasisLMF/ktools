@@ -107,6 +107,7 @@ AC_CONFIG_FILES([
 		 src/damagebintocsv/Makefile
 		 src/damagebintobin/Makefile
                  src/fmcalc/Makefile
+                 src/xfmcalc/Makefile
                  src/fmprofiletocsv/Makefile
                  src/fmprofiletobin/Makefile
                  src/fmpolicytctocsv/Makefile

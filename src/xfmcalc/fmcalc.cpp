@@ -372,6 +372,9 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 					k.agg_id = items[idx];
 					fmhdr.output_id = fm_xrefmap[k];
 					rec.loss = x.loss * prop;
+					if (netvalue_) { // get net gul value							
+						rec.loss = guls[idx] - rec.loss;
+					}
 					outmap[fmhdr].push_back(rec);			// neglible cost
 				}				
 			}
@@ -525,13 +528,18 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
             rec.loss = 0;
             rec.sidx = sidx;
             //fmhdr.layer_id = layer;
-            for (auto x : agg_vec) {
+			const std::vector<OASIS_FLOAT> &guls = event_guls[event_guls.size() - 1];
+            for (auto x : agg_vec) {				
                 if (x.allocrule_id == -1 || x.allocrule_id == 0 ) { // no back allocation
 					fmxref_key k;
 					k.layer_id = layer;
 					k.agg_id = x.agg_id;
 					fmhdr.output_id = fm_xrefmap[k];
                     rec.loss = x.loss;
+					// do the flip here
+					if (netvalue_) { // get net gul value		
+						rec.loss = guls[idx] - rec.loss;
+					}
                     outmap[fmhdr].push_back(rec);			// neglible cost
                 }
                 if (x.allocrule_id == 1 || x.allocrule_id == 2) {	// back allocate as a proportion of the total of the original guls
@@ -546,6 +554,9 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
                         if (gultotal > 0) prop = guls[idx] / gultotal;
                         fmhdr.output_id = items[idx];
                         rec.loss = x.loss * prop;
+						if (netvalue_) { // get net gul value							
+							rec.loss = guls[idx] - rec.loss;
+						}						
 						fmxref_key k;
 						k.layer_id = layer;
 						k.agg_id = items[idx];

@@ -18,18 +18,18 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h">
+    <ClInclude Include="..\..\..\src\xfmcalc\fmcalc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="targetver.h">
+    <ClInclude Include="..\..\..\src\xfmcalc\fmstructs.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="stdafx.cpp">
+    <ClCompile Include="..\..\..\src\xfmcalc\fmcalc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="xfmcalc.cpp">
+    <ClCompile Include="..\..\..\src\xfmcalc\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

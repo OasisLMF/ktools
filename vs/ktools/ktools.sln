@@ -121,6 +121,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "periodstobin", "periodstobi
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "periodstocsv", "periodstocsv\periodstocsv.vcxproj", "{6C9870B8-86E1-4C66-B189-133431432570}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xfmcalc", "xfmcalc\xfmcalc.vcxproj", "{3614B08E-9308-4059-A452-1CF2CE4FD007}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B5960B46-527B-4833-918B-EC5735C03635} = {B5960B46-527B-4833-918B-EC5735C03635}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -631,6 +636,16 @@ Global
 		{6C9870B8-86E1-4C66-B189-133431432570}.Release|x64.Build.0 = Release|x64
 		{6C9870B8-86E1-4C66-B189-133431432570}.Release|x86.ActiveCfg = Release|Win32
 		{6C9870B8-86E1-4C66-B189-133431432570}.Release|x86.Build.0 = Release|Win32
+		{3614B08E-9308-4059-A452-1CF2CE4FD007}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{3614B08E-9308-4059-A452-1CF2CE4FD007}.Debug|x64.ActiveCfg = Debug|x64
+		{3614B08E-9308-4059-A452-1CF2CE4FD007}.Debug|x64.Build.0 = Debug|x64
+		{3614B08E-9308-4059-A452-1CF2CE4FD007}.Debug|x86.ActiveCfg = Debug|Win32
+		{3614B08E-9308-4059-A452-1CF2CE4FD007}.Debug|x86.Build.0 = Debug|Win32
+		{3614B08E-9308-4059-A452-1CF2CE4FD007}.Release|Any CPU.ActiveCfg = Release|Win32
+		{3614B08E-9308-4059-A452-1CF2CE4FD007}.Release|x64.ActiveCfg = Release|x64
+		{3614B08E-9308-4059-A452-1CF2CE4FD007}.Release|x64.Build.0 = Release|x64
+		{3614B08E-9308-4059-A452-1CF2CE4FD007}.Release|x86.ActiveCfg = Release|Win32
+		{3614B08E-9308-4059-A452-1CF2CE4FD007}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

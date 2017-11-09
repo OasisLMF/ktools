@@ -105,7 +105,6 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalOptions>"E:\dev\ktools\vs\ktools\x64\Debug\wingetopt.lib" %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -152,6 +151,11 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\src\xfmcalc\fmcalc.cpp" />
     <ClCompile Include="..\..\..\src\xfmcalc\main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\wingetopt\wingetopt.vcxproj">
+      <Project>{b5960b46-527b-4833-918b-ec5735c03635}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

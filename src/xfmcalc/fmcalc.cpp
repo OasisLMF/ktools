@@ -353,8 +353,13 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 				fmxref_key k;
 				k.layer_id = layer;
 				k.agg_id = x.agg_id;
-				fmhdr.output_id = fm_xrefmap[k];
-				rec.loss = x.loss;
+				fmhdr.output_id = fm_xrefmap[k];				
+				if (netvalue_) { // get net gul value							
+					rec.loss = x.retained_loss;
+					//rec.loss = guls[idx] - rec.loss;
+				}else {
+					rec.loss = x.loss;
+				}
 				outmap[fmhdr].push_back(rec);			// neglible cost
 			}			
 			if (x.allocrule_id == 1) {	// back allocate as a proportion of the total of the original guls	
@@ -370,10 +375,13 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 					fmxref_key k;
 					k.layer_id = layer;
 					k.agg_id = items[idx];
-					fmhdr.output_id = fm_xrefmap[k];
-					rec.loss = x.loss * prop;
+					fmhdr.output_id = fm_xrefmap[k];					
 					if (netvalue_) { // get net gul value							
-						rec.loss = guls[idx] - rec.loss;
+						rec.loss = x.retained_loss;
+						//rec.loss = guls[idx] - rec.loss;
+					}
+					else {
+						rec.loss = x.loss * prop;
 					}
 					outmap[fmhdr].push_back(rec);			// neglible cost
 				}				
@@ -391,7 +399,13 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 					k.layer_id = layer;
 					k.agg_id = items[idx];
 					fmhdr.output_id = fm_xrefmap[k];
-					rec.loss = x.loss * prop;
+					if (netvalue_) { // get net gul value							
+						rec.loss = x.retained_loss;
+						//rec.loss = guls[idx] - rec.loss;
+					}
+					else {
+						rec.loss = x.loss * prop;
+					}					
 					outmap[fmhdr].push_back(rec);			// neglible cost
 				}
 			}			

@@ -606,10 +606,15 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 void fmcalc::init_policytc(int maxRunLevel)
 {
     if (maxRunLevel == -1) maxRunLevel = 10000;
+	FILE *fin = NULL;
+	std::string file = FMPOLICYTC_FILE;
+	if (inputpath_.length() > 0) {
+		file = inputpath_ + file.substr(5);
+	}
+	fin = fopen(file.c_str(), "rb");
 
-	FILE *fin = fopen(FMPOLICYTC_FILE, "rb");
 	if (fin == NULL) {
-		fprintf(stderr, "%s: cannot open %s\n", __func__, FMPOLICYTC_FILE);
+		fprintf(stderr, "%s: cannot open %s\n", __func__, file.c_str());
 		exit(EXIT_FAILURE);
 	}
 
@@ -644,9 +649,15 @@ void fmcalc::init_policytc(int maxRunLevel)
 
 void fmcalc::init_programme(int maxRunLevel)
 {
-	FILE *fin = fopen(FMPROGRAMME_FILE, "rb");
+
+	FILE *fin = NULL;
+	std::string file = FMPROGRAMME_FILE;
+	if (inputpath_.length() > 0) {
+		file = inputpath_ + file.substr(5);
+	}
+	fin = fopen(file.c_str(), "rb");
 	if (fin == NULL){
-		fprintf(stderr, "%s: cannot open %s\n", __func__, FMPROGRAMME_FILE);
+		fprintf(stderr, "%s: cannot open %s\n", __func__, file.c_str());
 		exit(EXIT_FAILURE);
 	}
 
@@ -690,12 +701,18 @@ inline void add_tc(unsigned char tc_id, OASIS_FLOAT &tc_val, std::vector<tc_rec>
 
 bool fmcalc::loadcoverages(std::vector<OASIS_FLOAT> &coverages)
 {
-	FILE *fin = fopen(COVERAGES_FILE, "rb");
-	if (fin == NULL) {
-		fprintf(stderr, "%s: cannot open %s\n", __func__, COVERAGES_FILE);
-		exit(-1);
-	}
 
+	FILE *fin = NULL;
+	std::string file = COVERAGES_FILE;
+	if (inputpath_.length() > 0) {
+		file = inputpath_ + file.substr(5);
+	}
+	fin = fopen(file.c_str(), "rb");
+	if (fin == NULL) {
+		fprintf(stderr, "%s: cannot open %s\n", __func__, file.c_str());
+		exit(EXIT_FAILURE);
+	}
+	
 	flseek(fin, 0L, SEEK_END);
 	long long sz = fltell(fin);
 	flseek(fin, 0L, SEEK_SET);
@@ -716,16 +733,42 @@ bool fmcalc::loadcoverages(std::vector<OASIS_FLOAT> &coverages)
 	return true;
 
 }
+int fmcalc::getmaxnoofitems()
+{
+
+	FILE *fin = NULL;
+	std::string file = ITEMS_FILE;
+	if (inputpath_.length() > 0) {
+		file = inputpath_ + file.substr(5);
+	}
+	fin = fopen(file.c_str(), "rb");
+	if (fin == NULL) {
+		fprintf(stderr, "%s: cannot open %s\n", __func__, file.c_str());
+		exit(EXIT_FAILURE);
+	}
+
+	flseek(fin, 0L, SEEK_END);
+	long long p = fltell(fin);
+	p = p / sizeof(item);
+	fclose(fin);
+	return int(p);
+
+}
 
 void fmcalc::init_itemtotiv()
 {
 	std::vector<OASIS_FLOAT> coverages;
 	loadcoverages(coverages);
 
-	FILE *fin = fopen(ITEMS_FILE, "rb");
+	FILE *fin = NULL;
+	std::string file = ITEMS_FILE;
+	if (inputpath_.length() > 0) {
+		file = inputpath_ + file.substr(5);
+	}
+	fin = fopen(file.c_str(), "rb");
 	if (fin == NULL) {
-		fprintf(stderr, "%s: cannot open %s\n", __func__, ITEMS_FILE);
-		exit(-1);
+		fprintf(stderr, "%s: cannot open %s\n", __func__, file.c_str());
+		exit(EXIT_FAILURE);
 	}
 
 	flseek(fin, 0L, SEEK_END);
@@ -752,9 +795,15 @@ void fmcalc::init_itemtotiv()
 }
 void fmcalc::init_profile()
 {
-	FILE *fin = fopen(FMPROFILE_FILE, "rb");
+
+	FILE *fin = NULL;
+	std::string file = FMPROFILE_FILE;
+	if (inputpath_.length() > 0) {
+		file = inputpath_ + file.substr(5);
+	}
+	fin = fopen(file.c_str(), "rb");
 	if (fin == NULL) {
-		fprintf(stderr, "%s: cannot open %s\n", __func__, FMPROFILE_FILE);
+		fprintf(stderr, "%s: cannot open %s\n", __func__, file.c_str());
 		exit(EXIT_FAILURE);
 	}
 
@@ -787,11 +836,17 @@ void fmcalc::init_profile()
 
 void fmcalc::init_fmxref()
 {
-	FILE *fin = fopen(FMXREF_FILE, "rb");
+	FILE *fin = NULL;
+	std::string file = FMXREF_FILE;
+	if (inputpath_.length() > 0) {
+		file = inputpath_ + file.substr(5);
+	}
+	fin = fopen(file.c_str(), "rb");
 	if (fin == NULL) {
-		fprintf(stderr, "%s: cannot open %s\n", __func__, FMXREF_FILE);
+		fprintf(stderr, "%s: cannot open %s\n", __func__, file.c_str());
 		exit(EXIT_FAILURE);
 	}
+
 	fmXref f;
 	int i = fread(&f, sizeof(f), 1, fin);
 	while (i != 0) {

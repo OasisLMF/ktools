@@ -51,21 +51,6 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <unistd.h>
 #endif
 
-int getmaxnoofitems()
-{
-	FILE *fin = fopen(ITEMS_FILE, "rb");
-	if (fin == NULL) {
-		fprintf(stderr,"Error cannot open items.bin");
-		exit(-1);
-	}
-
-	flseek(fin, 0L, SEEK_END);
-	long long p = fltell(fin);
-	p = p / sizeof(item);
-	fclose(fin);
-	return int(p);
-
-}
 
 void doit(int &maxLevel,const std::string &inputpath, bool netvalue)
 {
@@ -103,7 +88,7 @@ void doit(int &maxLevel,const std::string &inputpath, bool netvalue)
 		fwrite(&samplesize, sizeof(samplesize), 1, stdout);
 		std::vector<std::vector<OASIS_FLOAT>> event_guls(samplesize + 2);	// one additional for mean and tiv
 		std::vector<int> items;
-		int max_no_of_items = getmaxnoofitems();
+		int max_no_of_items = fc.getmaxnoofitems();
 		int current_item_index = 0;
 		
 		while (i != 0) {

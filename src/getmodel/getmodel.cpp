@@ -371,14 +371,20 @@ void getmodel::doCdfInnerz(int event_id) {
 void getmodel::doCdfInner(int event_id) {
   auto sizeof_EventKey = sizeof(EventRow);
   auto fin = fopen(FOOTPRINT_FILE, "rb");
+  if (fin == NULL){
+      fprintf(stderr,"Error opening footprint file\n");
+      exit(-1);
+  }
   auto intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);
 
   int current_areaperil_id = -1;
   bool do_cdf_for_area_peril = false;
   intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);
 
-  if (_event_index_by_event_id.count(event_id) == 0)
+  if (_event_index_by_event_id.count(event_id) == 0){
+      fclose(fin);
     return;
+  }
   flseek(fin, _event_index_by_event_id[event_id].offset, 0);
   EventRow event_key;
   int number_of_event_records = static_cast<int>(

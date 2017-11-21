@@ -47,7 +47,7 @@ AS_IF([test "x$enable_osx" = "xyes"], [
 ],
 [
 	CXXFLAGS="-std=c++11 -Wno-unused-result -ffunction-sections -fdata-sections -O3"
-	LDFLAGS="-Wl,--gc-sections -Wl,--strip-all"
+#	LDFLAGS="-Wl,--gc-sections -Wl,--strip-all"
 ]
 )
 
@@ -77,7 +77,7 @@ AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADERS([config.h])
 
 
-# LDFLAGS=-static
+#LDFLAGS=-static
 
 # Checks for programs.
 AC_PROG_CXX([c++ g++])
@@ -107,6 +107,7 @@ AC_CONFIG_FILES([
 		 src/damagebintocsv/Makefile
 		 src/damagebintobin/Makefile
                  src/fmcalc/Makefile
+                 src/xfmcalc/Makefile
                  src/fmprofiletocsv/Makefile
                  src/fmprofiletobin/Makefile
                  src/fmpolicytctocsv/Makefile

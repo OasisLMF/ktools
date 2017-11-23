@@ -1,11 +1,13 @@
 """
 Test wrapper on FMCals with friendlier data structures.
 """
+import argparse
 import os
 import itertools
 import pandas as pd
 import subprocess
 import json
+import shutil
 from collections import namedtuple
 from tabulate import tabulate
 
@@ -181,75 +183,88 @@ class Treaty(object):
             self):
         pass
 
-class LocationPerRiskTreaty(Treaty):
-    def __init__(
-            self,
-            treaty_id, attachment, limit, share):
-        self.treaty_id = treaty_id
-        self.attachment = attachment
-        self.limit = limit
-        self.share = share
+# TODO
+#
+# class LocationPerRiskTreaty(Treaty):
+#     def __init__(
+#             self,
+#             treaty_id, location_ids, per_risk_attachment, per_risk_limit, occurrence_limit,  share):
+#         self.treaty_id = treaty_id
+#         self.location_ids = location_ids
+#         self.per_risk_attachment = per_risk_attachment
+#         self.per_risk_limit = per_risk_limit
+#         self.occurrence_limit = occurrence_limit
+#         self.share = share
 
 
-class PolicyPerRiskTreaty(Treaty):
+# class PolicyPerRiskTreaty(Treaty):
+#     def __init__(
+#             self,
+#             treaty_id, policy_ids, per_risk_attachment, per_risk_limit, occurrence_limit,  share):
+#         self.treaty_id = treaty_id
+#         self.policy_ids = policy_ids
+#         self.per_risk_attachment = per_risk_attachment
+#         self.per_risk_limit = per_risk_limit
+#         self.occurrence_limit = occurrence_limit
+#         self.share = share
+
+
+# class PolicyFacTreaty(Treaty):
+#     def __init__(
+#             self,
+#             treaty_id, policy_id, attachment, limit, share):
+#         self.treaty_id = treaty_id
+#         self.policy_id = policy_id
+#         self.attachment = attachment
+#         self.limit = limitmapping = {frozenset(('House_Number', 
+#                       'Street_Number', 
+#                       'State')): AddressClass,
+#            frozenset(('Name', 
+#                       'Address')): EmployeeClass}
+
+# class SurplusShareTreaty(Treaty):
+#     def __init__(
+#             self,
+#             treaty_id, line_size, number_of_lines, occurrence_limit, share):
+#         self.treaty_id = treaty_id
+#         self.line_size = line_size
+#         self.number_of_lines = number_of_lines
+#         self.occurrence_limit = occurrence_limit
+#         self.share = share
+
+class CatXlTreaty(Treaty):
     def __init__(
             self,
-            treaty_id, attachment, limit, share):
+            treaty_id, attachment, occurrence_limit, share):
         self.treaty_id = treaty_id
         self.attachment = attachment
-        self.limit = limit
+        self.occurrence_limit = occurrence_limit
         self.share = share
 
 
 class PolicyFacTreaty(Treaty):
     def __init__(
             self,
-            treaty_id, attachment, limit, share):
+            treaty_id, policy_id, attachment, limit, share):
         self.treaty_id = treaty_id
+        self.policy_id = policy_id
         self.attachment = attachment
         self.limit = limit
         self.share = share
 
-class SurplusShareTreaty(Treaty):
+
+class LocationFacTreaty(Treaty):
     def __init__(
             self,
-            treaty_id, attachment, limit, share):
+            treaty_id, location_id, attachment, limit, share):
         self.treaty_id = treaty_id
-        self.attachment = attachment
-        self.limit = limit
-        self.share = share
-
-class CatXlTreaty:
-    def __init__(
-            self,
-            treaty_id, attachment, limit, share):
-        self.treaty_id = treaty_id
+        self.location_id = location_id
         self.attachment = attachment
         self.limit = limit
         self.share = share
 
 
-class PolicyFacTreaty:
-    def __init__(
-            self,
-            treaty_id, attachment, limit, share):
-        self.treaty_id = treaty_id
-        self.attachment = attachment
-        self.limit = limit
-        self.share = share
-
-
-class LocationFacTreaty:
-    def __init__(
-            self,
-            treaty_id, attachment, limit, share):
-        self.treaty_id = treaty_id
-        self.attachment = attachment
-        self.limit = limit
-        self.share = share
-
-
-class DirectLayer:
+class DirectLayer(object):
 
     def __init__(self, policies):
         self.policies = policies
@@ -387,6 +402,7 @@ class DirectLayer:
         self.xref_descriptions = pd.DataFrame(xref_descriptions_list)
 
     def write_oasis_files(self):
+        
         self.coverages.to_csv("coverages.csv", index=False)
         self.items.to_csv("items.csv", index=False)
         self.fmprogrammes.to_csv("fm_programme.csv", index=False)
@@ -395,6 +411,9 @@ class DirectLayer:
         self.fm_xrefs.to_csv("fm_xref.csv", index=False)
 
         directory = "direct"
+        if os.path.exists(directory):
+            shutil.rmtree(directory)
+        os.mkdir(directory)
         input_files = GUL_INPUTS_FILES + IL_INPUTS_FILES
 
         for input_file in input_files:
@@ -449,9 +468,10 @@ class DirectLayer:
         return losses_df
 
 
-class ReinsuranceLayer:
+class ReinsuranceLayer(object):
 
-    def __init__(self, treaties, items, coverages, xref_descriptions):
+    def __init__(self, name, treaties, items, coverages, xref_descriptions):
+        self.name = name
         self.treaties = treaties
         self.coverages = items
         self.items = coverages
@@ -482,7 +502,7 @@ class ReinsuranceLayer:
                 ccy_id=-1,
                 allocrule_id=ALLOCATE_TO_ITEMS_BY_GUL_ALLOC_ID,
                 deductible=treaty.attachment,
-                limit=treaty.limit,
+                limit=treaty.occurrence_limit,
                 share_prop_of_lim=treaty.share,
                 deductible_prop_of_loss=0.0,    # Not used
                 limit_prop_of_loss=0.0,         # Not used
@@ -517,12 +537,17 @@ class ReinsuranceLayer:
         self.fm_xrefs = pd.DataFrame(fm_xrefs_list)
 
     def write_oasis_files(self):
+
         self.fmprogrammes.to_csv("fm_programme.csv", index=False)
         self.fmprofiles.to_csv("fm_profile.csv", index=False)
         self.fm_policytcs.to_csv("fm_policytc.csv", index=False)
         self.fm_xrefs.to_csv("fm_xref.csv", index=False)
 
-        directory = "reinsurance"
+        directory = self.name
+        if os.path.exists(directory):
+            shutil.rmtree(directory)
+        os.mkdir(directory)
+
         input_files = GUL_INPUTS_FILES + IL_INPUTS_FILES
 
         for input_file in input_files:
@@ -540,14 +565,15 @@ class ReinsuranceLayer:
                 raise Exception(
                     "Failed to convert {}: {}".format(input_file_path, command))
 
-    def apply_fm(self):
-
-        command = "xfmcalc -p reinsurance < ils.bin | fmtocsv > ris.csv"
+    def apply_fm(self, input):
+        command = \
+            "xfmcalc -p {0} < {1}.bin | tee {0}.bin | fmtocsv > {0}.csv".format(
+                self.name, input)
         proc = subprocess.Popen(command, shell=True)
         proc.wait()
         if proc.returncode != 0:
             raise Exception("Failed to run fm")
-        losses_df = pd.read_csv("ris.csv")
+        losses_df = pd.read_csv("{}.csv".format(self.name))
         losses_df.drop(losses_df[losses_df.sidx != 1].index, inplace=True)
         losses_df = pd.merge(self.xref_descriptions,
                              losses_df, left_on='xref_id', right_on='output_id')
@@ -561,80 +587,141 @@ class CustomJsonEncoder(json.JSONEncoder):
     def default(self, o):
         # Here you can serialize your object depending of its type
         # or you can define a method in your class which serializes the object           
-        if isinstance(o, (Policy, Location)):
+        if isinstance(o, (
+            Policy, Location, )):
             return o.__dict__  # Or another method to serialize it
         else:
             return json.JSONEncoder.encode(self, o)
 
+mapping = {
+    frozenset((
+        'policy_id',
+        'site_limit',
+        'blanket_deductible',
+        'blanket_limit',
+        'locations')): Policy,
+    frozenset((
+        'location_id',
+        'area_peril_id',
+        'vulnerability_id',
+        'buildings_value',
+        'contents_value',
+        'time_value')): Location,
+    frozenset((
+        'treaty_id',
+        'attachment',
+        'occurrence_limit',
+        'share')): CatXlTreaty,        
+    frozenset((
+        'treaty_id',
+        'policy_id',
+        'attachment',
+        'limit',
+        'share')): PolicyFacTreaty,        
+    frozenset((
+        'treaty_id',
+        'attachment',
+        'limit',
+        'share')): CatXlTreaty
+        }
 
-def run_example():
-    policies = [
-        Policy(
-            policy_id=1,
-            site_limit=10,
-            blanket_deductible=0,
-            blanket_limit=10000,
-            locations=[
-                Location(
-                    location_id=1,
-                    area_peril_id=1,
-                    vulnerability_id=1,
-                    buildings_value=1000, contents_value=500, time_value=500
-                ),
-                Location(
-                    location_id=2,
-                    area_peril_id=1,
-                    vulnerability_id=1,
-                    buildings_value=1000, contents_value=500, time_value=500
-                )
-            ]),
-        Policy(
-            policy_id=2,
-            site_limit=1000,
-            blanket_deductible=0,
-            blanket_limit=1000000,
-            locations=[
-                Location(
-                    location_id=3,
-                    area_peril_id=1,
-                    vulnerability_id=1,
-                    buildings_value=10000, contents_value=5000, time_value=5000
-                ),
-                Location(
-                    location_id=4,
-                    area_peril_id=1,
-                    vulnerability_id=1,
-                    buildings_value=10000, contents_value=5000, time_value=5000
-                )
-            ])
-    ]
+def class_mapper(d):
+    return mapping[frozenset(d.keys())](**d)
 
-    print json.dumps(policies, cls=CustomJsonEncoder, indent=4)
+parser = argparse.ArgumentParser(description='Run Oasis FM examples with reinsurance.')
+parser.add_argument(
+    '-n', '--name', metavar='N', type=str, required=True,
+    help='The analysis name. All intermediate files will be "+ \
+            "saved in a labelled directory.')
+parser.add_argument(
+    '-p', '--policy_json', metavar='N', type=str, required=True,
+    help='The JSON file containing the direct policies.')
+parser.add_argument(
+    '-r1', '--ri_1_json', metavar='N', type=str, required=False,
+    help='The JSON file containing the first reinsurance inuring layer.')
+parser.add_argument(
+    '-r2', '--ri_2_json', metavar='N', type=str, required=False,
+    help='The JSON file containing the second reinsurance inuring layer.')
+
+args = parser.parse_args()
+
+run_name = args.name
+policy_json_file = args.policy_json
+ri_1_json_file = args.ri_1_json
+ri_2_json_file = args.ri_2_json
+
+for filepath in [policy_json_file, ri_1_json_file, ri_2_json_file]:
+    if filepath is None: 
+        continue
+    if not os.path.exists(policy_json_file):
+        print "Path does not exist: {}".format(policy_json_file)
+        exit(1)
+
+if os.path.exists(run_name):
+    shutil.rmtree(run_name)
+os.mkdir(run_name)
+
+do_ri_1 = ri_1_json_file is not None
+do_ri_2 = ri_2_json_file is not None
+
+with open(policy_json_file) as json_data:
+    policies = json.load(json_data, object_hook=class_mapper)
+
+if do_ri_1:
+    with open(ri_1_json_file) as json_data:
+        treaties1 = json.load(json_data, object_hook=class_mapper)
+
+if do_ri_2:
+    with open(ri_2_json_file) as json_data:
+        treaties2 = json.load(json_data, object_hook=class_mapper)
+
+cwd = os.getcwd()
+try:
+    os.chdir(run_name)
 
     direct_layer = DirectLayer(policies=policies)
     direct_layer.generate_oasis_structures()
     direct_layer.write_oasis_files()
     losses_df = direct_layer.apply_fm(loss_percentage_of_tiv=0.1, net=True)
+    print "Direct layer loss"
     print tabulate(losses_df, headers='keys', tablefmt='psql', floatfmt=".2f")
+    print ""
+    print ""
 
-    treaties = [
-        CatXlTreaty(
-            treaty_id=1, 
-            attachment=0, 
-            limit=1000, 
-            share=1.0)
-    ]
+    if do_ri_1:
+        reinsurance_layer = ReinsuranceLayer(
+            name = "ri1",
+            treaties=treaties1,
+            items=direct_layer.items,
+            coverages=direct_layer.coverages,
+            xref_descriptions=direct_layer.xref_descriptions
+        )
 
-    reinsurance_layer = ReinsuranceLayer(
-        treaties=treaties,
-        items=direct_layer.items,
-        coverages=direct_layer.coverages,
-        xref_descriptions=direct_layer.xref_descriptions
-    )
+        reinsurance_layer.generate_oasis_structures()
+        reinsurance_layer.write_oasis_files()
+        treaty_losses_df = reinsurance_layer.apply_fm("ils")
+        print "Reinsurance - first inuring layer"
+        print tabulate(treaty_losses_df, headers='keys', tablefmt='psql', floatfmt=".2f")
+        print ""
+        print ""
 
-    reinsurance_layer.generate_oasis_structures()
-    reinsurance_layer.write_oasis_files()
-    treaty_losses_df = reinsurance_layer.apply_fm()
-    print tabulate(treaty_losses_df, headers='keys', tablefmt='psql', floatfmt=".2f")
+    if do_ri_2:
 
-run_example()
+        reinsurance_layer = ReinsuranceLayer(
+            name="ri2",
+            treaties=treaties2,
+            items=direct_layer.items,
+            coverages=direct_layer.coverages,
+            xref_descriptions=direct_layer.xref_descriptions
+        )
+
+        reinsurance_layer.generate_oasis_structures()
+        reinsurance_layer.write_oasis_files()
+        treaty_losses_df = reinsurance_layer.apply_fm("ri1")
+        print "Reinsurance - second inuring layer"
+        print tabulate(treaty_losses_df, headers='keys', tablefmt='psql', floatfmt=".2f")
+        print ""
+        print ""
+        
+finally:
+    os.chdir(cwd)

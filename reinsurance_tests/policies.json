@@ -1,0 +1,26 @@
+[
+    {
+        "blanket_deductible": 0,
+        "site_limit": 10,
+        "blanket_limit": 10000,
+        "locations": [
+            {
+                "area_peril_id": 1,
+                "contents_value": 500,
+                "time_value": 500,
+                "vulnerability_id": 1,
+                "location_id": 1,
+                "buildings_value": 1000
+            },
+            {
+                "area_peril_id": 1,
+                "contents_value": 500,
+                "time_value": 500,
+                "vulnerability_id": 1,
+                "location_id": 2,
+                "buildings_value": 1000
+            }
+        ],
+        "policy_id": 1
+    }
+]

@@ -369,15 +369,15 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 					gultotal += guls[idx];
 				}
 				for (int idx : avx[layer][vec_idx].item_idx) {
-                    OASIS_FLOAT prop = 0;
-                    if (gultotal > 0) prop = guls[idx] / gultotal;
+                    			OASIS_FLOAT prop = 0;
+                    			if (gultotal > 0) prop = guls[idx] / gultotal;
 					//fmhdr.output_id = items[idx];
 					fmxref_key k;
 					k.layer_id = layer;
 					k.agg_id = items[idx];
 					fmhdr.output_id = fm_xrefmap[k];					
 					if (netvalue_) { // get net gul value							
-						rec.loss = x.retained_loss;
+						rec.loss = x.retained_loss * prop;
 						//rec.loss = guls[idx] - rec.loss;
 					}
 					else {
@@ -400,7 +400,7 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 					k.agg_id = items[idx];
 					fmhdr.output_id = fm_xrefmap[k];
 					if (netvalue_) { // get net gul value							
-						rec.loss = x.retained_loss;
+						rec.loss = x.retained_loss * prop;
 						//rec.loss = guls[idx] - rec.loss;
 					}
 					else {

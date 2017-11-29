@@ -143,6 +143,7 @@ void aalcalc::outputsummarybin()
 	}
 }
 
+int analytic_count = 0;
 void aalcalc::do_analytical_calc(const summarySampleslevelHeader &sh,  double mean_loss)
 {	
 	
@@ -170,6 +171,13 @@ void aalcalc::do_analytical_calc(const summarySampleslevelHeader &sh,  double me
 		if (a.max_exposure_value < sh.expval) a.max_exposure_value = sh.expval;
 		a.mean += mean_loss;
 		a.mean_squared += mean_squared;
+		//if (mean_loss > 0) {
+		//	analytic_count++;
+		//	//if (analytic_count == 14461) {
+		//	//	fprintf(stderr, "Got here\n");
+		//	//}
+		//	//printf("%d: %d,%d, %f, %f, %f \n", analytic_count, a.summary_id, a.type, a.mean, a.mean_squared, a.max_exposure_value);
+		//}
 	}
 	else {
 		aal_rec a;
@@ -179,6 +187,10 @@ void aalcalc::do_analytical_calc(const summarySampleslevelHeader &sh,  double me
 		a.mean = mean_loss;
 		a.mean_squared = mean_squared;
 		map_analytical_aal_[sh.summary_id] = a;
+		//if (mean_loss > 0) {
+		//	analytic_count++;
+		//	//printf("%d: %d,%d, %f, %f, %f \n", analytic_count, a.summary_id, a.type, a.mean, a.mean_squared, a.max_exposure_value);
+		//}
 	}
 }
 
@@ -260,6 +272,14 @@ void aalcalc::applyweightingstomaps()
 }
 void aalcalc::doit()
 {
+	aal_rec b;
+	b.summary_id = 1;
+	b.type = 1;
+	b.max_exposure_value = 0;
+	b.mean = 1717297166584;
+	b.mean_squared = 0;
+	//map_analytical_aal_[1] = b;
+
 	loadoccurrence();
 	loadperiodtoweigthing();
 	int summarycalcstream_type = 0;
@@ -295,7 +315,7 @@ void aalcalc::doit()
 				if (sr.sidx == -1) mean_loss = sr.loss;
 				if (sr.sidx >=0) vrec.push_back(sr);
 			}
-
+			haveData = false;
 			j++;
 		}
 		if (haveData == true) {

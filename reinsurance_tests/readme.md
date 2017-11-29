@@ -1,5 +1,5 @@
 Test wrapper on FMCalcs with friendlier data structures and illustrative
-reinsurance functaionality.
+reinsurance functionality.
 
 To run the example, use the following command. This assumes that the latest version of ktools is installed.
 

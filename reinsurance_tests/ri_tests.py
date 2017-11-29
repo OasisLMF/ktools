@@ -1,15 +1,16 @@
 """
-Test wrapper on FMCals with friendlier data structures.
+Test wrapper on FMCalcs with friendlier data structures and illustrative
+reinsurance functaionality.
 """
 import argparse
-import os
 import itertools
-import pandas as pd
-import subprocess
 import json
+import os
 import shutil
+import subprocess
 from collections import namedtuple
 from tabulate import tabulate
+import pandas as pd
 
 DEDUCTIBLE_AND_LIMIT_CALCRULE_ID = 1
 FRANCHISE_DEDUCTIBLE_AND_LIMIT_CALCRULE_ID = 3
@@ -178,61 +179,18 @@ class Policy(object):
         self.blanket_limit = blanket_limit
         self.locations = locations
 
+
 class Treaty(object):
     def __init__(
             self):
         pass
 
-# TODO
-#
-# class LocationPerRiskTreaty(Treaty):
-#     def __init__(
-#             self,
-#             treaty_id, location_ids, per_risk_attachment, per_risk_limit, occurrence_limit,  share):
-#         self.treaty_id = treaty_id
-#         self.location_ids = location_ids
-#         self.per_risk_attachment = per_risk_attachment
-#         self.per_risk_limit = per_risk_limit
-#         self.occurrence_limit = occurrence_limit
-#         self.share = share
-
-
-# class PolicyPerRiskTreaty(Treaty):
-#     def __init__(
-#             self,
-#             treaty_id, policy_ids, per_risk_attachment, per_risk_limit, occurrence_limit,  share):
-#         self.treaty_id = treaty_id
-#         self.policy_ids = policy_ids
-#         self.per_risk_attachment = per_risk_attachment
-#         self.per_risk_limit = per_risk_limit
-#         self.occurrence_limit = occurrence_limit
-#         self.share = share
-
-
-# class PolicyFacTreaty(Treaty):
-#     def __init__(
-#             self,
-#             treaty_id, policy_id, attachment, limit, share):
-#         self.treaty_id = treaty_id
-#         self.policy_id = policy_id
-#         self.attachment = attachment
-#         self.limit = limitmapping = {frozenset(('House_Number', 
-#                       'Street_Number', 
-#                       'State')): AddressClass,
-#            frozenset(('Name', 
-#                       'Address')): EmployeeClass}
-
-# class SurplusShareTreaty(Treaty):
-#     def __init__(
-#             self,
-#             treaty_id, line_size, number_of_lines, occurrence_limit, share):
-#         self.treaty_id = treaty_id
-#         self.line_size = line_size
-#         self.number_of_lines = number_of_lines
-#         self.occurrence_limit = occurrence_limit
-#         self.share = share
 
 class CatXlTreaty(Treaty):
+    """
+    Layer that applies to entire portfolio.
+    """
+
     def __init__(
             self,
             treaty_id, attachment, occurrence_limit, share):
@@ -242,18 +200,11 @@ class CatXlTreaty(Treaty):
         self.share = share
 
 
-class PolicyFacTreaty(Treaty):
-    def __init__(
-            self,
-            treaty_id, policy_id, attachment, limit, share):
-        self.treaty_id = treaty_id
-        self.policy_id = policy_id
-        self.attachment = attachment
-        self.limit = limit
-        self.share = share
-
-
 class LocationFacTreaty(Treaty):
+    """
+    Layer that applies to a specific location.
+    """
+
     def __init__(
             self,
             treaty_id, location_id, attachment, limit, share):
@@ -265,7 +216,9 @@ class LocationFacTreaty(Treaty):
 
 
 class DirectLayer(object):
-
+    """
+    Set of direct policiies.
+    """
     def __init__(self, policies):
         self.policies = policies
         self.item_ids = list()
@@ -402,7 +355,7 @@ class DirectLayer(object):
         self.xref_descriptions = pd.DataFrame(xref_descriptions_list)
 
     def write_oasis_files(self):
-        
+
         self.coverages.to_csv("coverages.csv", index=False)
         self.items.to_csv("items.csv", index=False)
         self.fmprogrammes.to_csv("fm_programme.csv", index=False)
@@ -456,10 +409,13 @@ class DirectLayer(object):
         guls_df.drop(guls_df[guls_df.sidx != 1].index, inplace=True)
         del guls_df['event_id']
         del guls_df['sidx']
-        guls_df = pd.merge(self.xref_descriptions,
-                           guls_df, left_on=['xref_id'], right_on=['item_id'])
-        losses_df = pd.merge(guls_df,
-                             losses_df, left_on='xref_id', right_on='output_id', suffixes=["_gul", "_net"])
+        guls_df = pd.merge(
+            self.xref_descriptions,
+            guls_df, left_on=['xref_id'], right_on=['item_id'])
+        losses_df = pd.merge(
+            guls_df,
+            losses_df, left_on='xref_id', right_on='output_id', 
+            suffixes=["_gul", "_il"])
         del losses_df['event_id']
         del losses_df['output_id']
         del losses_df['xref_id']
@@ -485,51 +441,152 @@ class ReinsuranceLayer(object):
         self.fm_xrefs = pd.DataFrame()
 
     def generate_oasis_structures(self):
-        treaty_agg_id = 0
+
+        level_1_agg_id = 0
+        level_2_agg_id = 0
+        level_3_agg_id = 0
         treatytc_id = 0
+        treaty_layer_id = 0
 
         fmprogrammes_list = list()
         fmprofiles_list = list()
         fm_policytcs_list = list()
         fm_xrefs_list = list()
 
-        for treaty in self.treaties:
-            treaty_agg_id = treaty_agg_id + 1
-            treatytc_id = treatytc_id + 1
-            fmprofiles_list.append(FmProfile(
-                policytc_id=treatytc_id,
-                calcrule_id=DEDUCTIBLE_LIMIT_AND_SHARE_CALCRULE_ID,
-                ccy_id=-1,
-                allocrule_id=ALLOCATE_TO_ITEMS_BY_GUL_ALLOC_ID,
-                deductible=treaty.attachment,
-                limit=treaty.occurrence_limit,
-                share_prop_of_lim=treaty.share,
-                deductible_prop_of_loss=0.0,    # Not used
-                limit_prop_of_loss=0.0,         # Not used
-                deductible_prop_of_tiv=0.0,     # Not used
-                limit_prop_of_tiv=0.0,          # Not used
-                deductible_prop_of_limit=0.0    # Not used
-            ))
+        treatytc_id = treatytc_id + 1
+        passthroughtc_id = treatytc_id
+        fmprofiles_list.append(FmProfile(
+            policytc_id=passthroughtc_id,
+            calcrule_id=DEDUCTIBLE_ONLY_CALCRULE_ID,
+            ccy_id=-1,
+            allocrule_id=ALLOCATE_TO_ITEMS_BY_PREVIOUS_LEVEL_ALLOC_ID,
+            deductible=0.0,
+            limit=0.0,                      # Not used
+            share_prop_of_lim=0.0,          # Not used
+            deductible_prop_of_loss=0.0,    # Not used
+            limit_prop_of_loss=0.0,         # Not used
+            deductible_prop_of_tiv=0.0,     # Not used
+            limit_prop_of_tiv=0.0,          # Not used
+            deductible_prop_of_limit=0.0    # Not used
+        ))
+
+        treatytc_id = treatytc_id + 1
+        nolosstc_id = treatytc_id
+        fmprofiles_list.append(FmProfile(
+            policytc_id=nolosstc_id,
+            calcrule_id=LIMIT_ONLY_CALCRULE_ID,
+            ccy_id=-1,
+            allocrule_id=ALLOCATE_TO_ITEMS_BY_PREVIOUS_LEVEL_ALLOC_ID,
+            deductible=0.0,                 # Not used
+            limit=0.0,
+            share_prop_of_lim=0.0,          # Not used
+            deductible_prop_of_loss=0.0,    # Not used
+            limit_prop_of_loss=0.0,         # Not used
+            deductible_prop_of_tiv=0.0,     # Not used
+            limit_prop_of_tiv=0.0,          # Not used
+            deductible_prop_of_limit=0.0    # Not used
+        ))
+
+        for __, xref_description in self.xref_descriptions.iterrows():
+            fm_xrefs_list.append(
+                FmXref(
+                    output_id=xref_description.xref_id,
+                    agg_id=xref_description.xref_id,
+                    layer_id=1
+                ))
+            level_2_agg_id = level_2_agg_id + 1
+            fmprogrammes_list.append(
+                FmProgramme(
+                    from_agg_id=xref_description.xref_id,
+                    level_id=1,
+                    to_agg_id=level_2_agg_id
+                ))
             fm_policytcs_list.append(FmPolicyTc(
                 layer_id=1,
                 level_id=1,
-                agg_id=treaty_agg_id,
+                agg_id=level_2_agg_id,
+                policytc_id=passthroughtc_id
+            ))
+
+        level_3_agg_id = level_3_agg_id + 1
+        noloss_level_3_agg_id = level_3_agg_id
+        fm_policytcs_list.append(FmPolicyTc(
+            layer_id=1,
+            level_id=2,
+            agg_id=noloss_level_3_agg_id,
+            policytc_id=nolosstc_id
+        ))
+
+        for treaty in self.treaties:
+            level_3_agg_id = level_3_agg_id + 1
+            treatytc_id = treatytc_id + 1
+            treaty_layer_id = treaty_layer_id + 1
+            
+            if type(treaty) == CatXlTreaty:
+                fmprofiles_list.append(FmProfile(
+                    policytc_id=treatytc_id,
+                    calcrule_id=DEDUCTIBLE_LIMIT_AND_SHARE_CALCRULE_ID,
+                    ccy_id=-1,
+                    allocrule_id=ALLOCATE_TO_ITEMS_BY_PREVIOUS_LEVEL_ALLOC_ID,
+                    deductible=treaty.attachment,
+                    limit=treaty.occurrence_limit,
+                    share_prop_of_lim=treaty.share,
+                    deductible_prop_of_loss=0.0,    # Not used
+                    limit_prop_of_loss=0.0,         # Not used
+                    deductible_prop_of_tiv=0.0,     # Not used
+                    limit_prop_of_tiv=0.0,          # Not used
+                    deductible_prop_of_limit=0.0    # Not used
+                ))
+            elif type(treaty) == LocationFacTreaty:
+                fmprofiles_list.append(FmProfile(
+                    policytc_id=treatytc_id,
+                    calcrule_id=DEDUCTIBLE_LIMIT_AND_SHARE_CALCRULE_ID,
+                    ccy_id=-1,
+                    allocrule_id=ALLOCATE_TO_ITEMS_BY_PREVIOUS_LEVEL_ALLOC_ID,
+                    deductible=treaty.attachment,
+                    limit=treaty.limit,
+                    share_prop_of_lim=treaty.share,
+                    deductible_prop_of_loss=0.0,    # Not used
+                    limit_prop_of_loss=0.0,         # Not used
+                    deductible_prop_of_tiv=0.0,     # Not used
+                    limit_prop_of_tiv=0.0,          # Not used
+                    deductible_prop_of_limit=0.0    # Not used
+                ))
+
+            fm_policytcs_list.append(FmPolicyTc(
+                layer_id=treaty_layer_id,
+                level_id=2,
+                agg_id=level_3_agg_id,
                 policytc_id=treatytc_id
             ))
-            for __, xref_description in self.xref_descriptions.iterrows():
-                fmprogrammes_list.append(
-                    FmProgramme(
-                        from_agg_id=xref_description.xref_id,
-                        level_id=1,
-                        to_agg_id=treaty_agg_id
+
+            if type(treaty) == CatXlTreaty:
+                for __, xref_description in self.xref_descriptions.iterrows():
+                    fmprogrammes_list.append(
+                        FmProgramme(
+                            from_agg_id=xref_description.xref_id,
+                            level_id=2,
+                            to_agg_id=level_3_agg_id
+                        )
                     )
-                )
-                fm_xrefs_list.append(
-                    FmXref(
-                        output_id=xref_description.xref_id,
-                        agg_id=xref_description.xref_id,
-                        layer_id=1
-                    ))
+            elif type(treaty) == LocationFacTreaty:
+                for __, xref_description in self.xref_descriptions.iterrows():
+                    if xref_description.location_id == treaty.location_id:
+                        fmprogrammes_list.append(
+                            FmProgramme(
+                                from_agg_id=xref_description.xref_id,
+                                level_id=2,
+                                to_agg_id=level_3_agg_id
+                            )
+                        )
+                    else:
+                        fmprogrammes_list.append(
+                            FmProgramme(
+                                from_agg_id=xref_description.xref_id,
+                                level_id=2,
+                                to_agg_id=noloss_level_3_agg_id
+                            )
+                        )
 
         self.fmprogrammes = pd.DataFrame(fmprogrammes_list)
         self.fmprofiles = pd.DataFrame(fmprofiles_list)
@@ -567,31 +624,43 @@ class ReinsuranceLayer(object):
 
     def apply_fm(self, input):
         command = \
-            "xfmcalc -p {0} < {1}.bin | tee {0}.bin | fmtocsv > {0}.csv".format(
+            "xfmcalc -p {0} -n < {1}.bin | tee {0}.bin | fmtocsv > {0}.csv".format(
                 self.name, input)
+
         proc = subprocess.Popen(command, shell=True)
         proc.wait()
         if proc.returncode != 0:
             raise Exception("Failed to run fm")
         losses_df = pd.read_csv("{}.csv".format(self.name))
+        inputs_df = pd.read_csv("{}.csv".format(input))
         losses_df.drop(losses_df[losses_df.sidx != 1].index, inplace=True)
-        losses_df = pd.merge(self.xref_descriptions,
-                             losses_df, left_on='xref_id', right_on='output_id')
-        del losses_df['event_id']
-        del losses_df['sidx']
+        inputs_df.drop(inputs_df[inputs_df.sidx != 1].index, inplace=True)
+        losses_df = pd.merge(
+            inputs_df,
+            losses_df, left_on='output_id', right_on='output_id',
+            suffixes=('_pre', '_net'))
+        losses_df = pd.merge(
+            self.xref_descriptions,
+            losses_df, left_on='xref_id', right_on='output_id')
+        del losses_df['event_id_pre']
+        del losses_df['sidx_pre']
+        del losses_df['event_id_net']
+        del losses_df['sidx_net']
         del losses_df['output_id']
         del losses_df['xref_id']
         return losses_df
 
+
 class CustomJsonEncoder(json.JSONEncoder):
     def default(self, o):
         # Here you can serialize your object depending of its type
-        # or you can define a method in your class which serializes the object           
+        # or you can define a method in your class which serializes the object
         if isinstance(o, (
-            Policy, Location, )):
+                Policy, Location, )):
             return o.__dict__  # Or another method to serialize it
         else:
             return json.JSONEncoder.encode(self, o)
+
 
 mapping = {
     frozenset((
@@ -609,26 +678,24 @@ mapping = {
         'time_value')): Location,
     frozenset((
         'treaty_id',
+        'location_id',
+        'attachment',
+        'limit',
+        'share')): LocationFacTreaty,
+    frozenset((
+        'treaty_id',
         'attachment',
         'occurrence_limit',
-        'share')): CatXlTreaty,        
-    frozenset((
-        'treaty_id',
-        'policy_id',
-        'attachment',
-        'limit',
-        'share')): PolicyFacTreaty,        
-    frozenset((
-        'treaty_id',
-        'attachment',
-        'limit',
         'share')): CatXlTreaty
-        }
+}
+
 
 def class_mapper(d):
     return mapping[frozenset(d.keys())](**d)
 
-parser = argparse.ArgumentParser(description='Run Oasis FM examples with reinsurance.')
+
+parser = argparse.ArgumentParser(
+    description='Run Oasis FM examples with reinsurance.')
 parser.add_argument(
     '-n', '--name', metavar='N', type=str, required=True,
     help='The analysis name. All intermediate files will be "+ \
@@ -651,7 +718,7 @@ ri_1_json_file = args.ri_1_json
 ri_2_json_file = args.ri_2_json
 
 for filepath in [policy_json_file, ri_1_json_file, ri_2_json_file]:
-    if filepath is None: 
+    if filepath is None:
         continue
     if not os.path.exists(policy_json_file):
         print "Path does not exist: {}".format(policy_json_file)
@@ -682,7 +749,7 @@ try:
     direct_layer = DirectLayer(policies=policies)
     direct_layer.generate_oasis_structures()
     direct_layer.write_oasis_files()
-    losses_df = direct_layer.apply_fm(loss_percentage_of_tiv=0.1, net=True)
+    losses_df = direct_layer.apply_fm(loss_percentage_of_tiv=0.1, net=False)
     print "Direct layer loss"
     print tabulate(losses_df, headers='keys', tablefmt='psql', floatfmt=".2f")
     print ""
@@ -690,7 +757,7 @@ try:
 
     if do_ri_1:
         reinsurance_layer = ReinsuranceLayer(
-            name = "ri1",
+            name="ri1",
             treaties=treaties1,
             items=direct_layer.items,
             coverages=direct_layer.coverages,
@@ -722,6 +789,6 @@ try:
         print tabulate(treaty_losses_df, headers='keys', tablefmt='psql', floatfmt=".2f")
         print ""
         print ""
-        
+
 finally:
     os.chdir(cwd)

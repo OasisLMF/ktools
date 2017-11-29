@@ -1,7 +1,7 @@
 [
     {
         "blanket_deductible": 0,
-        "site_limit": 10,
+        "site_limit": 100,
         "blanket_limit": 10000,
         "locations": [
             {
@@ -22,5 +22,29 @@
             }
         ],
         "policy_id": 1
+    },
+    {
+        "blanket_deductible": 0,
+        "site_limit": 100,
+        "blanket_limit": 10000,
+        "locations": [
+            {
+                "area_peril_id": 3,
+                "contents_value": 500,
+                "time_value": 500,
+                "vulnerability_id": 1,
+                "location_id": 3,
+                "buildings_value": 1000
+            },
+            {
+                "area_peril_id": 4,
+                "contents_value": 500,
+                "time_value": 500,
+                "vulnerability_id": 1,
+                "location_id": 4,
+                "buildings_value": 1000
+            }
+        ],
+        "policy_id": 2
     }
 ]

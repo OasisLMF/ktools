@@ -451,11 +451,13 @@ void getmodel::doCdfInnerNoIntensityUncertaintyz(int event_id) {
 
 void getmodel::doCdfInnerNoIntensityUncertainty(int event_id) {
   auto sizeof_EventKey = sizeof(EventRow);
-  auto fin = fopen(FOOTPRINT_FILE, "rb");
-
+  
   if (_event_index_by_event_id.count(event_id) == 0)
     return;
-  flseek(fin, _event_index_by_event_id[event_id].offset, 0);
+
+  auto fin = fopen(FOOTPRINT_FILE, "rb");
+
+  flseek(fin, _event_index_by_event_id[event_id].offset, SEEK_SET);
 
   int number_of_event_records = static_cast<int>(
       _event_index_by_event_id[event_id].size / sizeof_EventKey);

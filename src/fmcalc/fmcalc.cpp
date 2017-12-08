@@ -549,7 +549,9 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 						fmxref_key k;
 						k.layer_id = layer;
 						k.agg_id = items[gidx];
-                        outmap[fmhdr].push_back(rec);			// neglible cost
+						if (rec.loss > 0.0) {
+							outmap[fmhdr].push_back(rec);			// neglible cost
+						}
                     }
 
                 }				

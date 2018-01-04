@@ -19,3 +19,5 @@ missing
 VERSION
 build
 examples2
+.gdbinit*
+

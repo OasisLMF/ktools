@@ -1,2 +1,7 @@
 fmcalc
 fmcalc.exe
+gmon*
+*save
+*png
+analysis.txt
+

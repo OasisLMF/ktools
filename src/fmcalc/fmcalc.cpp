@@ -353,7 +353,12 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 				fmxref_key k;
 				k.layer_id = layer;
 				k.agg_id = x.agg_id;
-				fmhdr.output_id = fm_xrefmap[k];
+				auto it = fm_xrefmap.find(k);
+				if (it == fm_xrefmap.end()) {
+					fmhdr.output_id = k.agg_id;
+				}else {
+					fmhdr.output_id = it->second;
+				}				
 				rec.loss = x.loss;
 				outmap[fmhdr].push_back(rec);			// neglible cost
 			}			
@@ -369,8 +374,14 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 					//fmhdr.output_id = items[idx];
 					fmxref_key k;
 					k.layer_id = layer;
-					k.agg_id = items[idx];
-					fmhdr.output_id = fm_xrefmap[k];
+					k.agg_id = items[idx];					
+					auto it = fm_xrefmap.find(k);
+					if (it == fm_xrefmap.end()) {
+						fmhdr.output_id = k.agg_id;
+					}
+					else {
+						fmhdr.output_id = it->second;
+					}
 					rec.loss = x.loss * prop;
 					outmap[fmhdr].push_back(rec);			// neglible cost
 				}				
@@ -387,7 +398,13 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 					fmxref_key k;
 					k.layer_id = layer;
 					k.agg_id = items[idx];
-					fmhdr.output_id = fm_xrefmap[k];
+					auto it = fm_xrefmap.find(k);
+					if (it == fm_xrefmap.end()) {
+						fmhdr.output_id = k.agg_id;
+					}
+					else {
+						fmhdr.output_id = it->second;
+					}					
 					rec.loss = x.loss * prop;
 					outmap[fmhdr].push_back(rec);			// neglible cost
 				}
@@ -535,8 +552,14 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 					if (x.allocrule_id == -1 || x.allocrule_id == 0) { // no back allocation
 						fmxref_key k;
 						k.layer_id = layer;
-						k.agg_id = x.agg_id;
-						fmhdr.output_id = fm_xrefmap[k];
+						k.agg_id = x.agg_id;						
+						auto it = fm_xrefmap.find(k);
+						if (it == fm_xrefmap.end()) {
+							fmhdr.output_id = k.agg_id;
+						}
+						else {
+							fmhdr.output_id = it->second;
+						}
 						rec.loss = x.loss;
 						outmap[fmhdr].push_back(rec);			// neglible cost
 					}
@@ -555,7 +578,13 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 							fmxref_key k;
 							k.layer_id = layer;
 							k.agg_id = items[gidx];
-							fmhdr.output_id = fm_xrefmap[k];
+							auto it = fm_xrefmap.find(k);
+							if (it == fm_xrefmap.end()) {
+								fmhdr.output_id = k.agg_id;
+							}
+							else {
+								fmhdr.output_id = it->second;
+							}
 							if (rec.loss > 0.0) {
 								outmap[fmhdr].push_back(rec);			// neglible cost
 							}
@@ -784,7 +813,12 @@ void fmcalc::init_fmxref()
 		fmxref_key k;
 		k.agg_id = f.agg_id;
 		k.layer_id = f.layer_id;
-		fm_xrefmap[k] = f.output_id;
+		if (k.agg_id == f.output_id && k.layer_id == 1) {
+			// skip it
+		}else {
+			fm_xrefmap[k] = f.output_id;
+		}
+		
 		i = fread(&f, sizeof(f), 1, fin);
 	}
 	fclose(fin);	

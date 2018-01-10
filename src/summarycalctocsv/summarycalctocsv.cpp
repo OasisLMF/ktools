@@ -52,7 +52,7 @@ using namespace std;
 
 bool firstOutput = true;
 
-void doit(bool skipheader, bool fullprecision)
+void doit(bool skipheader, bool fullprecision,bool show_exposure_value)
 {
 
 	int summarycalcstream_type = 0;
@@ -66,7 +66,8 @@ void doit(bool skipheader, bool fullprecision)
 	stream_type = streamno_mask & summarycalcstream_type;
 
 	if (stream_type == 1 ){
-		if (skipheader == false && stream_type==1) printf ("event_id,summary_id,sidx,loss\n");
+		if (skipheader == false && stream_type==1 && show_exposure_value==false) printf ("event_id,summary_id,sidx,loss\n");
+		if (skipheader == false && stream_type == 1 && show_exposure_value == true) printf("event_id,exposure_value,summary_id,sidx,loss\n");
 		int samplesize=0;
 		int summary_set = 0;
 		i=fread(&samplesize, sizeof(samplesize), 1, stdin);
@@ -79,8 +80,10 @@ void doit(bool skipheader, bool fullprecision)
 				i = fread(&sr, sizeof(sr), 1, stdin);
 				if (i == 0) break;
 				if (sr.sidx == 0) break;
-				if (fullprecision) printf("%d,%d,%d,%f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
-				else printf("%d,%d,%d,%.2f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
+				if (fullprecision == true && show_exposure_value == false) printf("%d,%d,%d,%f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);				
+				if (fullprecision == false && show_exposure_value == false) printf("%d,%d,%d,%.2f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
+				if (fullprecision == true && show_exposure_value == true) printf("%d,%.f,%d,%d,%f\n", sh.event_id, sh.expval, sh.summary_id, sr.sidx, sr.loss);
+				if (fullprecision == false && show_exposure_value == true) printf("%d,%.2f,%d,%d,%.2f\n", sh.event_id, sh.expval, sh.summary_id, sr.sidx, sr.loss);
 				if (firstOutput==true){
 					std::this_thread::sleep_for(std::chrono::milliseconds(PIPE_DELAY));  // used to stop possible race condition with kat
 					firstOutput=false;
@@ -98,6 +101,7 @@ void help()
 	fprintf(stderr,
 		"-s skip header\n"
 		"-f full precision\n"
+		"-e show exposure_value\n"
 		"-v version\n"
 		"-h help\n"
 	);
@@ -109,13 +113,17 @@ int main(int argc, char* argv[])
 	int opt;
 	bool skipheader = false;
 	bool fullprecision = false;
-	while ((opt = getopt(argc, argv, "vhfs")) != -1) {
+	bool show_exposure_value = false;
+	while ((opt = getopt(argc, argv, "vhfse")) != -1) {
 		switch (opt) {
 		case 's':
 			skipheader = true;
 			break;
 		case 'f':
 			fullprecision = true;
+			break;
+		case 'e':
+			show_exposure_value = true;
 			break;
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
@@ -128,6 +136,6 @@ int main(int argc, char* argv[])
 	}
 
 	initstreams();
-	doit(skipheader, fullprecision);
+	doit(skipheader, fullprecision, show_exposure_value);
 	return 0;
 }

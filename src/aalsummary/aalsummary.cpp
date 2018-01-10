@@ -48,7 +48,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 void aalsummary::outputresultscsv()
 {
-	printf("summary_id,type,mean,standard_deviation,exposure_value\n");
+	if(skipheader_ == false) printf("summary_id,type,mean,standard_deviation,exposure_value\n");
 
 	for (auto x : map_analytical_aal_) {
 		double mean = x.second.mean;

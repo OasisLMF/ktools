@@ -55,8 +55,9 @@ private:
 	void getnumberofperiods();
 	void processrec(const aal_rec &aalrec, std::map<int, aal_rec> &map_aal);
 	void process_file(const std::string &s);
-
+	bool skipheader_;
 public:
+	aalsummary(bool skipheader) : skipheader_(skipheader) {}
 	void doit(const std::string &subfolder);
 };
 

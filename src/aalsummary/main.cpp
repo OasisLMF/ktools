@@ -50,7 +50,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 void help()
 {
-	fprintf(stderr, "-K workspace sub folder\n-h help\n-v version\n");
+	fprintf(stderr, "-K workspace sub folder\n-h help\n-v version\n-s skip header\n");
 }
 
 int main(int argc, char* argv[])
@@ -58,6 +58,7 @@ int main(int argc, char* argv[])
 
 	std::string subfolder;
 	int opt;
+	bool skipheader=false;
 
 	if (argc == 1) {
 		fprintf(stderr, "Invalid parameters\n");
@@ -65,10 +66,13 @@ int main(int argc, char* argv[])
 		::exit(EXIT_FAILURE);
 	}
 
-	while ((opt = getopt(argc, argv, "vhK:")) != -1) {
+	while ((opt = getopt(argc, argv, "svhK:")) != -1) {
 		switch (opt) {
 		case 'K':
 			subfolder = optarg;
+			break;
+		case 's':
+			skipheader = true;
 			break;
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
@@ -83,7 +87,7 @@ int main(int argc, char* argv[])
 
 	initstreams();
 
-	aalsummary a;
+	aalsummary a(skipheader);
 	a.doit(subfolder);
 	return EXIT_SUCCESS;
 

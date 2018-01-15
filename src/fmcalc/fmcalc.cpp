@@ -32,7 +32,6 @@
 * DAMAGE.
 */
 /*
-Example implmentation for FM with back allocation
 
 Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
@@ -348,19 +347,22 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 		fmlevelrec rec;
         rec.loss = 0;
 		rec.sidx = sidx;		
-		for (auto x : agg_vec) {
+		for (LossRec &x : agg_vec) {
 			if (x.allocrule_id == -1 || x.allocrule_id == 0 ) { // no back allocation
-				fmxref_key k;
-				k.layer_id = layer;
-				k.agg_id = x.agg_id;
-				auto it = fm_xrefmap.find(k);
-				if (it == fm_xrefmap.end()) {
-					fmhdr.output_id = k.agg_id;
-				}else {
-					fmhdr.output_id = it->second;
-				}				
-				rec.loss = x.loss;
-				outmap[fmhdr].push_back(rec);			// neglible cost
+				if (x.agg_id > 0) {	// agg id cannot be zero
+					fmxref_key k;
+					k.layer_id = layer;
+					k.agg_id = x.agg_id;
+					auto it = fm_xrefmap.find(k);
+					if (it == fm_xrefmap.end()) {
+						fmhdr.output_id = k.agg_id;
+					}
+					else {
+						fmhdr.output_id = it->second;
+					}
+					rec.loss = x.loss;
+					outmap[fmhdr].push_back(rec);			// neglible cost
+				}
 			}			
 			if (x.allocrule_id == 1) {	// back allocate as a proportion of the total of the original guls	
 				OASIS_FLOAT gultotal = 0;

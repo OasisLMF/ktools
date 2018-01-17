@@ -350,18 +350,20 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 		for (LossRec &x : agg_vec) {
 			if (x.allocrule_id == -1 || x.allocrule_id == 0 ) { // no back allocation
 				if (x.agg_id > 0) {	// agg id cannot be zero
-					fmxref_key k;
-					k.layer_id = layer;
-					k.agg_id = x.agg_id;
-					auto it = fm_xrefmap.find(k);
-					if (it == fm_xrefmap.end()) {
-						fmhdr.output_id = k.agg_id;
-					}
-					else {
-						fmhdr.output_id = it->second;
-					}
 					rec.loss = x.loss;
-					outmap[fmhdr].push_back(rec);			// neglible cost
+					if (rec.loss > 0.0 || rec.sidx < 0) {
+						fmxref_key k;
+						k.layer_id = layer;
+						k.agg_id = x.agg_id;
+						auto it = fm_xrefmap.find(k);
+						if (it == fm_xrefmap.end()) {
+							fmhdr.output_id = k.agg_id;
+						}
+						else {
+							fmhdr.output_id = it->second;
+						}
+						outmap[fmhdr].push_back(rec);			// neglible cost
+					}
 				}
 			}			
 			if (x.allocrule_id == 1) {	// back allocate as a proportion of the total of the original guls	
@@ -374,18 +376,20 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
                     OASIS_FLOAT prop = 0;
                     if (gultotal > 0) prop = guls[idx] / gultotal;
 					//fmhdr.output_id = items[idx];
-					fmxref_key k;
-					k.layer_id = layer;
-					k.agg_id = items[idx];					
-					auto it = fm_xrefmap.find(k);
-					if (it == fm_xrefmap.end()) {
-						fmhdr.output_id = k.agg_id;
-					}
-					else {
-						fmhdr.output_id = it->second;
-					}
 					rec.loss = x.loss * prop;
-					outmap[fmhdr].push_back(rec);			// neglible cost
+					if (rec.loss > 0.0 || rec.sidx < 0) {
+						fmxref_key k;
+						k.layer_id = layer;
+						k.agg_id = items[idx];
+						auto it = fm_xrefmap.find(k);
+						if (it == fm_xrefmap.end()) {
+							fmhdr.output_id = k.agg_id;
+						}
+						else {
+							fmhdr.output_id = it->second;
+						}
+						outmap[fmhdr].push_back(rec);			// neglible cost
+					}
 				}				
 			}
 			if (x.allocrule_id == 2) {		// back allocate as a proportion of the total of the previous losses
@@ -397,18 +401,20 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 				for (int idx : avx[layer][vec_idx].item_idx) {
 					OASIS_FLOAT prop = 0;
 					if (prev_gul_total > 0) prop = prev_agg_vec[idx].loss / prev_gul_total;
-					fmxref_key k;
-					k.layer_id = layer;
-					k.agg_id = items[idx];
-					auto it = fm_xrefmap.find(k);
-					if (it == fm_xrefmap.end()) {
-						fmhdr.output_id = k.agg_id;
-					}
-					else {
-						fmhdr.output_id = it->second;
-					}					
 					rec.loss = x.loss * prop;
-					outmap[fmhdr].push_back(rec);			// neglible cost
+					if (rec.loss > 0.0 || rec.sidx < 0) {
+						fmxref_key k;
+						k.layer_id = layer;
+						k.agg_id = items[idx];
+						auto it = fm_xrefmap.find(k);
+						if (it == fm_xrefmap.end()) {
+							fmhdr.output_id = k.agg_id;
+						}
+						else {
+							fmhdr.output_id = it->second;
+						}
+						outmap[fmhdr].push_back(rec);			// neglible cost
+					}
 				}
 			}			
 		}
@@ -577,19 +583,20 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 							if (gultotal > 0) prop = guls[gidx] / gultotal;
 							// fmhdr.output_id = items[gidx];
 							rec.loss = x.loss * prop;
-							fmxref_key k;
-							k.layer_id = layer;
-							k.agg_id = items[gidx];
-							auto it = fm_xrefmap.find(k);
-							if (it == fm_xrefmap.end()) {
-								fmhdr.output_id = k.agg_id;
-							}
-							else {
-								fmhdr.output_id = it->second;
-							}
-							if (rec.loss > 0.0) {
+							if (rec.loss > 0.0 || rec.sidx < 0) {
+								fmxref_key k;
+								k.layer_id = layer;
+								k.agg_id = items[gidx];
+								auto it = fm_xrefmap.find(k);
+								if (it == fm_xrefmap.end()) {
+									fmhdr.output_id = k.agg_id;
+								}
+								else {
+									fmhdr.output_id = it->second;
+								}
 								outmap[fmhdr].push_back(rec);			// neglible cost
 							}
+							
 						}
 
 					}

@@ -82,7 +82,7 @@ void doit(bool skipheader, bool fullprecision,bool show_exposure_value)
 				if (sr.sidx == 0) break;
 				if (fullprecision == true && show_exposure_value == false) printf("%d,%d,%d,%f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);				
 				if (fullprecision == false && show_exposure_value == false) printf("%d,%d,%d,%.2f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
-				if (fullprecision == true && show_exposure_value == true) printf("%d,%.f,%d,%d,%f\n", sh.event_id, sh.expval, sh.summary_id, sr.sidx, sr.loss);
+				if (fullprecision == true && show_exposure_value == true) printf("%d,%f,%d,%d,%f\n", sh.event_id, sh.expval, sh.summary_id, sr.sidx, sr.loss);
 				if (fullprecision == false && show_exposure_value == true) printf("%d,%.2f,%d,%d,%.2f\n", sh.event_id, sh.expval, sh.summary_id, sr.sidx, sr.loss);
 				if (firstOutput==true){
 					std::this_thread::sleep_for(std::chrono::milliseconds(PIPE_DELAY));  // used to stop possible race condition with kat

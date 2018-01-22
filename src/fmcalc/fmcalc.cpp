@@ -103,6 +103,7 @@ bool operator<(const fmxref_key& lhs, const fmxref_key& rhs)
 inline void fmcalc::dofmcalc(vector <LossRec> &agg_vec)
 {
 	for (LossRec &x : agg_vec) {
+		if (x.agg_id == 0) break;
 		if (x.agg_id > 0) {
 			const profile_rec &profile = profile_vec_[x.policytc_id];
 			x.allocrule_id = profile.allocrule_id;

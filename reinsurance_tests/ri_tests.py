@@ -397,7 +397,7 @@ class DirectLayer(object):
         net_flag = ""
         if net:
             net_flag = "-n"
-        command = "gultobin -S 1 < guls.csv | xfmcalc -p direct {} | tee ils.bin | fmtocsv > ils.csv".format(
+        command = "gultobin -S 1 < guls.csv | fmcalc -p direct {} | tee ils.bin | fmtocsv > ils.csv".format(
             net_flag)
         proc = subprocess.Popen(command, shell=True)
         proc.wait()
@@ -624,7 +624,7 @@ class ReinsuranceLayer(object):
 
     def apply_fm(self, input):
         command = \
-            "xfmcalc -p {0} -n < {1}.bin | tee {0}.bin | fmtocsv > {0}.csv".format(
+            "fmcalc -p {0} -n < {1}.bin | tee {0}.bin | fmtocsv > {0}.csv".format(
                 self.name, input)
 
         proc = subprocess.Popen(command, shell=True)

@@ -591,23 +591,29 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 					}
 					if (x.allocrule_id == 1 || x.allocrule_id == 2) {	// back allocate as a proportion of the total of the original guls
 						OASIS_FLOAT gultotal = 0;
-						const std::vector<OASIS_FLOAT> &guls = event_guls[event_guls.size() - 1];
-						// int vec_idx = aggid_to_vectorlookup[x.agg_id];		// Same index applies to avx as to agg_vec
-						for (int gidx = 0; gidx < guls.size(); gidx++) {
-							gultotal += guls[gidx];
+						int index = event_guls.size() - 1;	// default index top level
+						if (sidx == -3) index = 0;						
+						const std::vector<OASIS_FLOAT> &guls = event_guls[index];
+						int vec_idx = aggid_to_vectorlookup[x.agg_id - 1];		// Same index applies to avx as to agg_vec
+						for (int idx : avx[layer][vec_idx].item_idx) {
+							gultotal += guls[idx];
 						}
-						for (int gidx = 0; gidx < guls.size(); gidx++) {
+						// int vec_idx = aggid_to_vectorlookup[x.agg_id];		// Same index applies to avx as to agg_vec
+						// for (int gidx = 0; gidx < guls.size(); gidx++) {
+						// 	gultotal += guls[gidx];
+						// }
+						for (int idx : avx[layer][vec_idx].item_idx) {
 							OASIS_FLOAT prop = 0;
-							if (gultotal > 0) prop = guls[gidx] / gultotal;
-							// fmhdr.output_id = items[gidx];
+							if (gultotal > 0) prop = guls[idx] / gultotal;
+							//fmhdr.output_id = items[idx];
 							rec.loss = x.loss * prop;
 							if (netvalue_) { // get net gul value							
-								rec.loss = guls[idx] - rec.loss;
-							}
+						 		rec.loss = guls[idx] - rec.loss;
+						 	}
 							if (rec.loss > 0.0 || rec.sidx < 0) {
 								fmxref_key k;
 								k.layer_id = layer;
-								k.agg_id = items[gidx];
+								k.agg_id = items[idx];
 								auto it = fm_xrefmap.find(k);
 								if (it == fm_xrefmap.end()) {
 									fmhdr.output_id = k.agg_id;
@@ -615,10 +621,32 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 								else {
 									fmhdr.output_id = it->second;
 								}
-								outmap[fmhdr].push_back(rec);			// neglible cost
+								outmap[fmhdr].push_back(rec);			// neglible cost	>= level2  check 598 for level 1
 							}
-							
 						}
+						// for (int gidx = 0; gidx < guls.size(); gidx++) {
+						// 	OASIS_FLOAT prop = 0;
+						// 	if (gultotal > 0) prop = guls[gidx] / gultotal;
+						// 	// fmhdr.output_id = items[gidx];
+						// 	rec.loss = x.loss * prop;
+						// 	if (netvalue_) { // get net gul value							
+						// 		rec.loss = guls[idx] - rec.loss;
+						// 	}
+						// 	if (rec.loss > 0.0 || rec.sidx < 0) {
+						// 		fmxref_key k;
+						// 		k.layer_id = layer;
+						// 		k.agg_id = items[gidx];
+						// 		auto it = fm_xrefmap.find(k);
+						// 		if (it == fm_xrefmap.end()) {
+						// 			fmhdr.output_id = k.agg_id;
+						// 		}
+						// 		else {
+						// 			fmhdr.output_id = it->second;
+						// 		}
+						// 		outmap[fmhdr].push_back(rec);			// neglible cost
+						// 	}
+							
+						// }
 
 					}
 				}

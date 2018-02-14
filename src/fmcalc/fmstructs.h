@@ -41,6 +41,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <vector>
 
 struct LossRec {
+	OASIS_FLOAT original_loss = 0;
 	OASIS_FLOAT loss = 0;
 	OASIS_FLOAT retained_loss = 0;
 	int agg_id;

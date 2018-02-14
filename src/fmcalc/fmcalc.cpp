@@ -104,6 +104,7 @@ inline void fmcalc::dofmcalc(vector <LossRec> &agg_vec)
 {
 	for (LossRec &x : agg_vec) {
 		if (x.agg_id == 0) break;
+		x.original_loss = x.loss;
 		if (x.agg_id > 0) {
 			const profile_rec &profile = profile_vec_[x.policytc_id];
 			x.allocrule_id = profile.allocrule_id;
@@ -310,7 +311,10 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
         agg_vec.resize(size);
 	}
 	else {
-		for (unsigned int i = 0;i < agg_vec.size();i++) agg_vec[i].loss = 0;
+		for (unsigned int i = 0; i < agg_vec.size(); i++) {
+			agg_vec[i].original_loss = 0;
+			agg_vec[i].loss = 0;
+		}
 	}
 
 	for (unsigned int i = 0;i < prev_agg_vec.size();i++){ // loop through previous levels of agg_vec
@@ -401,36 +405,52 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 					}
 				}				
 			}
-			if (x.allocrule_id == 2) {		// back allocate as a proportion of the total of the previous losses
-				OASIS_FLOAT prev_gul_total = 0;
+		
+			if (x.allocrule_id == 2) {		// back allocate as a proportion of the total of the previous losses				;
 				int vec_idx = aggid_to_vectorlookup[x.agg_id - 1];		// Same index applies to avx as to agg_vec
-				for (int idx : avx[layer][vec_idx].item_idx) {
-					prev_gul_total += prev_agg_vec[idx].loss;
-				}
-				for (int idx : avx[layer][vec_idx].item_idx) {
+																		//for (int idx : avx[layer][vec_idx].item_idx) {
+																		//	fprintf(stderr, "%d\n", idx);
+																		//	prev_gul_total += prev_agg_vec[idx].loss;
+																		//}
+				for (LossRec l : prev_agg_vec) {
+					std::vector<int>::const_iterator iter = l.item_idx->begin();
+					OASIS_FLOAT prev_gul_total = 0;
+					while (iter != l.item_idx->end()) {
+						prev_gul_total += guls[*iter];
+						iter++;
+					}
+					iter = l.item_idx->begin();
 					OASIS_FLOAT prop = 0;
-					if (prev_gul_total > 0) prop = prev_agg_vec[idx].loss / prev_gul_total;
-					if (netvalue_) { // get net gul value							
-						rec.loss = x.retained_loss * prop;
-					}
-					else {
-						rec.loss = x.loss * prop;
-					}
-					if (rec.loss > 0.0 || rec.sidx < 0) {
-						fmxref_key k;
-						k.layer_id = layer;
-						k.agg_id = items[idx];
-						auto it = fm_xrefmap.find(k);
-						if (it == fm_xrefmap.end()) {
-							fmhdr.output_id = k.agg_id;
+					while (iter != l.item_idx->end()) {
+						if (l.loss > 0) {
+							OASIS_FLOAT old_prop = guls[*iter] / prev_gul_total;
+							prop = (l.loss / x.original_loss)*old_prop;
+						}
+						if (netvalue_) { // get net gul value							
+							rec.loss = x.retained_loss * prop;
 						}
 						else {
-							fmhdr.output_id = it->second;
+							rec.loss = x.loss * prop;
+						}						
+						if (rec.loss > 0.0 || rec.sidx < 0) {
+							fmxref_key k;
+							k.layer_id = layer;
+							k.agg_id = items[*iter];
+							auto it = fm_xrefmap.find(k);
+							if (it == fm_xrefmap.end()) {
+								fmhdr.output_id = k.agg_id;
+							}
+							else {
+								fmhdr.output_id = it->second;
+							}
+							outmap[fmhdr].push_back(rec);			// neglible cost
 						}
-						outmap[fmhdr].push_back(rec);			// neglible cost
+						iter++;
 					}
+					
 				}
-			}			
+				
+			}
 		}
 		if (layer < max_layer_) {
 			layer++;
@@ -492,7 +512,7 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 
 			std::vector<int> &zzaggid_to_vectorlookup = aggid_to_vectorlookups[zzlevel]; // 
 			zzaggid_to_vectorlookup.resize(level_to_maxagg_id_[zzlevel] , -2);
-			int previous_layer = 1; // previous layer is always one becuase only the last layer can be greater than 1
+			int previous_layer = 1; // previous layer is always one because only the last layer can be greater than 1
 
 			for (unsigned int i = 0;i < prev[1].size();i++) {
 				int agg_id = pfm_vec_vec_[zzlevel][prev[previous_layer][i].agg_id];
@@ -563,8 +583,7 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 			if (sidx == -1) sidx = tiv_idx;
 			if (sidx == 0) sidx = mean_idx;
 
-
-			if (level == maxLevel_) {
+			if (level == maxLevel_ ) {
 				int layer = 1;
 				fmlevelrec rec;
 				rec.loss = 0;

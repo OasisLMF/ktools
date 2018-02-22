@@ -342,10 +342,6 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 		}
 	}
 	
-	if (sidx == 3) {
-		//fprintf(stderr, "We're here");
-	}
-
 	dofmcalc(agg_vec);
 
 	if (level == max_level) {
@@ -475,7 +471,14 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 	std::vector<std::vector<int>>  aggid_to_vectorlookups(maxLevel_ + 1);
 
 	std::vector<int> &aggid_to_vectorlookup = aggid_to_vectorlookups[level];	
-	aggid_to_vectorlookup.resize(level_to_maxagg_id_[level], -2);
+	int size = level_to_maxagg_id_[level];
+	if (size == -1) {
+		fprintf(stderr, "Error: Possible level %d not initialized\n", level);
+		exit(-1);
+	}
+	else {
+		aggid_to_vectorlookup.resize(size, -2);
+	}
 
 	const int layer_id = 1;
 	std::vector<std::vector<std::vector<policytcvidx>>> avxs;
@@ -511,7 +514,15 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 			next.resize(max_layer_ + 1);
 
 			std::vector<int> &zzaggid_to_vectorlookup = aggid_to_vectorlookups[zzlevel]; // 
-			zzaggid_to_vectorlookup.resize(level_to_maxagg_id_[zzlevel] , -2);
+			int size = level_to_maxagg_id_[zzlevel];
+			if (size == -1) {
+				fprintf(stderr, "Error: Possible level %d not initialized\n", zzlevel);
+				exit(-1);
+			}
+			else {
+				zzaggid_to_vectorlookup.resize(size, -2);
+			}
+			
 			int previous_layer = 1; // previous layer is always one because only the last layer can be greater than 1
 
 			for (unsigned int i = 0;i < prev[1].size();i++) {

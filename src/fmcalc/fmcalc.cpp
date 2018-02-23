@@ -567,7 +567,7 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 	
 	for (unsigned int idx = 0; idx < event_guls.size(); idx++) {	// loop sample + 1 times
 		const std::vector<OASIS_FLOAT> &guls = event_guls[idx];
-		if (gulhasvalue(guls)) {
+		if (idx < 2 || gulhasvalue(guls)) {
 			agg_vec.resize(total_loss_items);
 			fmlevelhdr fmhdr;
 			fmhdr.event_id = event_id;
@@ -589,6 +589,7 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 			}
 
 			dofmcalc(agg_vec);
+			
 
 			int sidx = idx - 1;
 			if (sidx == -1) sidx = tiv_idx;

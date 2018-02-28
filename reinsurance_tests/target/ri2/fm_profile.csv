@@ -1,0 +1,4 @@
+"policytc_id","calcrule_id","allocrule_id","ccy_id","deductible","limits","share_prop_of_lim","deductible_prop_of_loss","limit_prop_of_loss","deductible_prop_of_tiv","limit_prop_of_tiv","deductible_prop_of_limit"
+1, 12, 2, -1, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000
+2, 2, 2, -1, 0.000000, 100.000000, 1.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000
+3, 2, 2, -1, 100.000000, 100.000000, 0.500000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000

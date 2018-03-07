@@ -68,6 +68,7 @@ private:
 	void init_itemtotiv();
 	void init_fmxref();
 	void init(int MaxRunLevel);
+	void compute_item_proportions(std::vector<std::vector <LossRec>> &agg_vecs, const std::vector<OASIS_FLOAT> &guls, std::vector<OASIS_FLOAT> &items_prop);
 	void init_policytc(int MaxRunLevel);
 	bool loadcoverages(std::vector<OASIS_FLOAT> &coverages);
 	bool gulhasvalue(const std::vector<OASIS_FLOAT> &gul) const;

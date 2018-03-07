@@ -44,11 +44,14 @@ struct LossRec {
 	OASIS_FLOAT original_loss = 0;
 	OASIS_FLOAT loss = 0;
 	OASIS_FLOAT retained_loss = 0;
+	OASIS_FLOAT gul_total = 0;
+	OASIS_FLOAT proportion = 0;
 	int agg_id;
 	int policytc_id;
 	int allocrule_id;
 	int next_vec_idx = -1;
 	const std::vector<int> *item_idx;
+	std::vector<OASIS_FLOAT> item_prop;
 };
 
 struct policytcvidx {

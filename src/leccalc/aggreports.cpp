@@ -318,6 +318,7 @@ void aggreports::wheatsheaf(int handle, const std::map<outkey2, OASIS_FLOAT> &ou
 
 	fprintf(fout_[handle], "summary_id,sidx,return_period,loss\n");
 	for (auto s : items) {
+		if (s.first.sidx == -1) continue;		// skip -1 from wheatsheaf output
 		lossvec &lpv = s.second;
 		std::sort(lpv.rbegin(), lpv.rend());
 		int nextreturnperiodindex = 0;

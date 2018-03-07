@@ -82,8 +82,8 @@ getmodel::getmodel() {
 }
 
 getmodel::~getmodel() {
-  if (_temp_results != nullptr)
-    delete _temp_results;
+  //if (_temp_results != nullptr)
+    //delete _temp_results;
 }
 
 // only get those vulnerabilities that exist in the items file - so reduce
@@ -164,9 +164,10 @@ void getmodel::getDamageBinDictionary() {
   flseek(fin, 0L, SEEK_SET);
   int nrec = static_cast<int>(sz / sizeof(damagebindictionary));
 
-  damagebindictionary *damage_bins = new damagebindictionary[nrec];
-
-  if (fread(damage_bins, sizeof(damagebindictionary), nrec, fin) != nrec) {
+  //damagebindictionary *damage_bins = new damagebindictionary[nrec];
+  std::vector<damagebindictionary> damage_bins;
+  damage_bins.resize(nrec);
+  if (fread(&damage_bins[0], sizeof(damagebindictionary), nrec, fin) != nrec) {
     std::ostringstream poss;
     poss << "Error reading file " << DAMAGE_BIN_DICT_FILE;
     perror(poss.str().c_str());
@@ -180,7 +181,7 @@ void getmodel::getDamageBinDictionary() {
     _mean_damage_bins[i] = damage_bins[i].interpolation;
   }
 
-  delete[] damage_bins;
+  //delete[] damage_bins;
 }
 
 void getmodel::getFootPrints(){
@@ -213,7 +214,9 @@ void getmodel::doResults(
     std::map<int, std::vector<OASIS_FLOAT>> &vulnerabilities,
     std::vector<OASIS_FLOAT> intensity) const {
   for (int vulnerability_id : vulnerabilities_by_area_peril[areaperil_id]) {
-    Result *results = new Result[_num_damage_bins];
+    //Result *results = new Result[_num_damage_bins];
+	std::vector<Result> results;
+	results.resize(_num_damage_bins);
     int result_index = 0;
     auto vulnerability = vulnerabilities[vulnerability_id];
     int vulnerability_index = 0;
@@ -242,8 +245,8 @@ void getmodel::doResults(
     fwrite(&areaperil_id, SIZE_OF_INT, 1, stdout);
     fwrite(&vulnerability_id, SIZE_OF_INT, 1, stdout);
     fwrite(&num_results, SIZE_OF_INT, 1, stdout);
-    fwrite(results, SIZE_OF_RESULT, num_results, stdout);
-    delete[] results;
+    fwrite(&results[0], SIZE_OF_RESULT, num_results, stdout);
+    //delete[] results;
   }
 }
 
@@ -251,7 +254,7 @@ void getmodel::doResultsNoIntensityUncertainty(
     int &event_id, int &areaperil_id,
     std::map<int, std::set<int>> &vulnerabilities_by_area_peril,
     std::map<int, std::vector<OASIS_FLOAT>> &vulnerabilities,
-    int intensity_bin_index) const {
+    int intensity_bin_index)  {
   for (int vulnerability_id : vulnerabilities_by_area_peril[areaperil_id]) {
     int result_index = 0;
     OASIS_FLOAT cumulative_prob = 0;
@@ -272,7 +275,7 @@ void getmodel::doResultsNoIntensityUncertainty(
     fwrite(&areaperil_id, SIZE_OF_INT, 1, stdout);
     fwrite(&vulnerability_id, SIZE_OF_INT, 1, stdout);
     fwrite(&num_results, SIZE_OF_INT, 1, stdout);
-    fwrite(_temp_results, SIZE_OF_RESULT, num_results, stdout);
+    fwrite(&_temp_results[0], SIZE_OF_RESULT, num_results, stdout);
   }
 }
 
@@ -295,7 +298,8 @@ void getmodel::init(bool zip) {
   getFootPrints();
   initOutputStream();
 
-  _temp_results = new Result[_num_damage_bins];
+  //_temp_results = new Result[_num_damage_bins];
+  _temp_results.resize(_num_damage_bins);
   for (int damage_bin_index = 1; damage_bin_index <= _num_damage_bins; damage_bin_index++) {
     _temp_results[damage_bin_index - 1] =
         Result(0.0, _mean_damage_bins[damage_bin_index - 1]);

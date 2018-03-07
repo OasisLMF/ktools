@@ -295,7 +295,123 @@ inline void fmcalc::dofmcalc(vector <LossRec> &agg_vec)
 		}
 	}
 }
-
+/*
+void fmcalc::compute_item_proportions(vector<vector <LossRec>> &agg_vecs, const std::vector<OASIS_FLOAT> &guls, std::vector<OASIS_FLOAT> &items_prop)
+{
+items_prop.resize(guls.size(), 0);
+for (int level = 1; level < agg_vecs.size(); level++) {
+vector <LossRec> &agg_vec = agg_vecs[level];
+OASIS_FLOAT gul_total = 0;
+auto iter = agg_vec.begin();
+while (iter != agg_vec.end()) {
+OASIS_FLOAT total = 0;
+for (int idx : *(iter->item_idx)) {
+total += guls[idx];
+}
+iter->gul_total = total;
+gul_total += total;
+iter++;
+}
+iter = agg_vec.begin();
+while (iter != agg_vec.end()) {
+if (gul_total > 0) {
+iter->proportion = iter->gul_total / gul_total;
+}else {
+iter->proportion = 0;
+}
+if (level == 1) {
+iter->item_prop.resize((iter->item_idx)->size(), 0);
+OASIS_FLOAT total = 0;
+for (int idx : *(iter->item_idx)) {
+total += guls[idx];
+}
+int i = 0;
+if (total > 0) {
+for (int idx : *(iter->item_idx)) {
+iter->item_prop[i] = guls[idx] / total;
+items_prop[idx] = (guls[idx] / total) * iter->proportion;
+i++;
+}
+}
+}
+else {
+OASIS_FLOAT prop_total = 0;
+for (int idx : *(iter->item_idx)) {
+prop_total += items_prop[idx];
+}
+int i = 0;
+iter->item_prop.resize((iter->item_idx)->size(), 0);
+if (prop_total > 0) {
+for (int idx : *(iter->item_idx)) {
+iter->item_prop[i] = items_prop[idx] / prop_total;
+items_prop[idx] = (items_prop[idx] / prop_total) * iter->proportion;
+i++;
+}
+}
+}
+iter++;
+}
+}
+}
+*/
+void fmcalc::compute_item_proportions(vector<vector <LossRec>> &agg_vecs, const std::vector<OASIS_FLOAT> &guls, std::vector<OASIS_FLOAT> &items_prop)
+{	
+	items_prop.resize(guls.size(), 0);
+	for (int level = 1; level < agg_vecs.size(); level++) {
+		vector <LossRec> &agg_vec = agg_vecs[level];
+		OASIS_FLOAT loss_total = 0;
+		auto iter = agg_vec.begin();
+		while (iter != agg_vec.end()) {
+			OASIS_FLOAT total = 0;
+			for (int idx : *(iter->item_idx)) {
+				total += guls[idx];
+			}
+			iter->gul_total = total;
+			loss_total += iter->loss;
+			iter++;
+		}
+		iter = agg_vec.begin();
+		while (iter != agg_vec.end()) {
+			if (loss_total > 0) {
+				iter->proportion = iter->loss / loss_total;
+			}else {
+				iter->proportion = 0;
+			}
+			if (level == 1) {
+				iter->item_prop.resize((iter->item_idx)->size(), 0);				
+				OASIS_FLOAT total = 0;
+				for (int idx : *(iter->item_idx)) {
+					total += guls[idx];
+				}
+				int i = 0;
+				if (total > 0) {
+					for (int idx : *(iter->item_idx)) {
+						iter->item_prop[i] = guls[idx] / iter->gul_total;
+						items_prop[idx] = (guls[idx] / total) * iter->proportion;
+						//items_prop[idx] = (guls[idx] / iter->gul_total);
+						i++;
+					}
+				}
+			}
+			else {
+				OASIS_FLOAT prop_total = 0;
+				for (int idx : *(iter->item_idx)) {
+					prop_total += items_prop[idx];
+				}
+				int i = 0;
+				iter->item_prop.resize((iter->item_idx)->size(), 0);
+				if (prop_total > 0) {
+					for (int idx : *(iter->item_idx)) {
+						//iter->item_prop[i] = items_prop[idx] / prop_total;
+						items_prop[idx] = (items_prop[idx] / prop_total) * iter->proportion;
+						i++;
+					}
+				}
+			}
+			iter++;
+		}
+	}
+}
 inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlookups, vector<vector <LossRec>> &agg_vecs, int level, int max_level,
 	std::map<fmlevelhdr, std::vector<fmlevelrec> > &outmap, fmlevelhdr &fmhdr, int sidx, const std::vector<std::vector<std::vector<policytcvidx>>> &avxs, int layer, 
 	const std::vector<int> &items, const std::vector<OASIS_FLOAT> &guls)
@@ -399,7 +515,10 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 						}
 						outmap[fmhdr].push_back(rec);			// neglible cost
 					}
-				}				
+				}	
+				if (x.allocrule_id == 2) {
+					fprintf(stderr, "We are here");
+				}
 			}
 		
 			if (x.allocrule_id == 2) {		// back allocate as a proportion of the total of the previous losses				;
@@ -408,12 +527,41 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 																		//	fprintf(stderr, "%d\n", idx);
 																		//	prev_gul_total += prev_agg_vec[idx].loss;
 																		//}
+				std::vector<OASIS_FLOAT> items_prop;
+				compute_item_proportions(agg_vecs,guls, items_prop);
+				for (int idx : avx[layer][vec_idx].item_idx) {
+					OASIS_FLOAT prop = items_prop[idx];
+					if (netvalue_) { // get net gul value							
+						rec.loss = x.retained_loss * prop;
+					}
+					else {
+						rec.loss = x.loss * prop;
+					}
+					if (rec.loss > 0.0 || rec.sidx < 0) {
+						fmxref_key k;
+						k.layer_id = layer;
+						k.agg_id = items[idx];
+						auto it = fm_xrefmap.find(k);
+						if (it == fm_xrefmap.end()) {
+							fmhdr.output_id = k.agg_id;
+						}
+						else {
+							fmhdr.output_id = it->second;
+						}
+						outmap[fmhdr].push_back(rec);			// neglible cost
+					}
+				}
+/*
 				for (LossRec l : prev_agg_vec) {
 					std::vector<int>::const_iterator iter = l.item_idx->begin();
 					OASIS_FLOAT prev_gul_total = 0;
 					while (iter != l.item_idx->end()) {
 						prev_gul_total += guls[*iter];
 						iter++;
+					}
+					prev_gul_total = 0;
+					for (int idx : avx[layer][vec_idx].item_idx) {
+						prev_gul_total += prev_agg_vec[idx].loss;
 					}
 					iter = l.item_idx->begin();
 					OASIS_FLOAT prop = 0;
@@ -445,7 +593,7 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 					}
 					
 				}
-				
+	*/			
 			}
 		}
 		if (layer < max_layer_) {

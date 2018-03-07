@@ -71,7 +71,8 @@ private:
     int _num_intensity_bins = -1;
     int _num_damage_bins = -1;
     int _has_intensity_uncertainty = false;
-    Result* _temp_results;
+	std::vector<Result> _temp_results;
+    //Result* _temp_results;
     bool _zip = false;
     void getVulnerabilities(const std::set<int> &v);
     void getDamageBinDictionary();
@@ -94,7 +95,7 @@ private:
 		int &areaperil_id,
 		std::map<int, std::set<int> > &vulnerabilities_by_area_peril,
 		std::map<int, std::vector<OASIS_FLOAT> > &vulnerabilities,
-		int intensity_bin_index) const;
+		int intensity_bin_index) ;
 	
 	static void initOutputStream();
     int getVulnerabilityIndex(int intensity_bin_index, int damage_bin_index) const;

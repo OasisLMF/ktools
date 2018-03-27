@@ -79,6 +79,8 @@ The following Cygwin add-in packages are required;
 * make
 * diffutils
 * automake
+* autoconf2.1
+* autoconf2.5
 * libtools
 * zlib-devel
 * git

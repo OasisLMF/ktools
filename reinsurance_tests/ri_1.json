@@ -1,0 +1,9 @@
+[
+    {
+        "treaty_id": 1,
+        "location_id": 1,
+        "attachment": 10,
+        "limit": 100,
+        "share": 0.5
+    }
+]

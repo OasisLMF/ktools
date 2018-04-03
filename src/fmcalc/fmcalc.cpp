@@ -55,15 +55,6 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 using namespace std;
 
-// NOTE: we use multui dimensional arrays rather tham map with keys for performance resons
-
-struct fm_policyTC {
-	int level_id;
-	int agg_id;
-	int layer_id;
-	int PolicyTC_id;
-};
-
 struct pfmkey {
 	int level_id;
 	int item_id;
@@ -106,257 +97,211 @@ inline void fmcalc::dofmcalc(vector <LossRec> &agg_vec)
 		if (x.agg_id == 0) break;
 		x.original_loss = x.loss;
 		if (x.agg_id > 0) {
-			const profile_rec &profile = profile_vec_[x.policytc_id];
-			x.allocrule_id = profile.allocrule_id;
-			switch (profile.calcrule_id) {
-				case 1:
-				{
-					OASIS_FLOAT ded = 0;
-					OASIS_FLOAT lim = 0;
-					for (auto y : profile.tc_vec) {
-						if (y.tc_id == deductible) ded = y.tc_val;
-						if (y.tc_id == limit) lim = y.tc_val;
+			if (x.policytc_id > 0) {
+				const profile_rec &profile = profile_vec_[x.policytc_id];
+				x.allocrule_id = profile.allocrule_id;
+				switch (profile.calcrule_id) {
+					case 1:
+					{
+						OASIS_FLOAT ded = 0;
+						OASIS_FLOAT lim = 0;
+						for (auto y : profile.tc_vec) {
+							if (y.tc_id == deductible) ded = y.tc_val;
+							if (y.tc_id == limit) lim = y.tc_val;
+						}
+						//Function1 = IIf(Loss < Ded, 0, IIf(Loss > Ded + Lim, Lim, Loss - Ded))
+						OASIS_FLOAT loss = x.loss - ded;
+						if (loss < 0) loss = 0;
+						if (loss > lim) loss = lim;
+						x.retained_loss = x.retained_loss + (x.loss - loss);
+						x.loss = loss;
 					}
-					//Function1 = IIf(Loss < Ded, 0, IIf(Loss > Ded + Lim, Lim, Loss - Ded))
-					OASIS_FLOAT loss = x.loss - ded;
-					if (loss < 0) loss = 0;
-					if (loss > lim) loss = lim;
-					x.retained_loss = x.retained_loss + (x.loss - loss);
-					x.loss = loss;
-				}
-				break;
-				case 2:
-				{
-					OASIS_FLOAT ded = 0;
-					OASIS_FLOAT lim = 0;
-					OASIS_FLOAT share = 0;
-					for (auto y : profile.tc_vec) {
-						if (y.tc_id == deductible) ded = y.tc_val;
-						if (y.tc_id == limit) lim = y.tc_val;
-						if (y.tc_id == share_prop_of_limit) share = y.tc_val;
-					}
-					//Function2 = IIf(Loss < Ded, 0, IIf(Loss > Ded + Lim, Lim, Loss - Ded)) * Share	
-					OASIS_FLOAT loss = 0;
-					if (x.loss > (ded + lim)) loss = lim;
-					else loss = x.loss - ded;
-					if (loss < 0) loss = 0;
-					x.retained_loss = x.retained_loss + (x.loss - loss);
-					x.loss = loss * share;
-
-				}
-				break;
-				case 3:
-				{
-					OASIS_FLOAT ded = 0;
-					OASIS_FLOAT lim = 0;
-					for (auto y : profile.tc_vec) {
-						if (y.tc_id == deductible) ded = y.tc_val;
-						if (y.tc_id == limit) lim = y.tc_val;
-					}
-					//Function3 = IIf(Loss < Ded, 0, IIf(Loss > Ded, Lim, Loss))
-					OASIS_FLOAT loss = x.loss;
-					if (loss < ded) loss = 0;
-					else loss = loss;
-					if (loss > lim) loss = lim;
-					x.retained_loss = x.retained_loss + (x.loss - loss);
-					x.loss = loss;
-				}
-				break;
-				case 5:
-				{
-					OASIS_FLOAT ded = 0;
-					OASIS_FLOAT lim = 0;
-					for (auto y : profile.tc_vec) {
-						if (y.tc_id == deductible_prop_of_loss) ded = y.tc_val;
-						if (y.tc_id == limit_prop_of_loss) lim = y.tc_val;
-					}
-					//Function5 = Loss * (Lim - Ded)
-					OASIS_FLOAT loss = x.loss * (lim - ded);
-					x.retained_loss = x.retained_loss + (x.loss - loss);
-					x.loss = loss;
-				}
-				break;
-				case 9:
-				{
-					OASIS_FLOAT ded = 0;
-					OASIS_FLOAT lim = 0;
-					for (auto y : profile.tc_vec) {
-						if (y.tc_id == deductible_prop_of_limit) ded = y.tc_val;
-						if (y.tc_id == limit) lim = y.tc_val;
-					}
-					//Function9 = IIf(Loss < (Ded * lim), 0, IIf(Loss > (ded* lim) + Lim, Lim, Loss - (Ded * lim))
-					OASIS_FLOAT loss = x.loss - (ded * lim);
-					if (loss < 0) loss = 0;
-					if (loss > lim) loss = lim;
-					x.retained_loss = x.retained_loss + (x.loss - loss);
-					x.loss = loss;
-				}
-				break;
-				case 10:
-				{
-					OASIS_FLOAT ded = 0;
-					for (auto y : profile.tc_vec) {
-						if (y.tc_id == deductible) ded = y.tc_val;
-					}
-					// Function 10: Applies a cap on retained loss (maximum deductible)
-					OASIS_FLOAT loss = 0;
-					if (x.retained_loss > ded) {
-						loss = x.loss + x.retained_loss - ded;
+					break;
+					case 2:
+					{
+						OASIS_FLOAT ded = 0;
+						OASIS_FLOAT lim = 0;
+						OASIS_FLOAT share = 0;
+						for (auto y : profile.tc_vec) {
+							if (y.tc_id == deductible) ded = y.tc_val;
+							if (y.tc_id == limit) lim = y.tc_val;
+							if (y.tc_id == share_prop_of_limit) share = y.tc_val;
+						}
+						//Function2 = IIf(Loss < Ded, 0, IIf(Loss > Ded + Lim, Lim, Loss - Ded)) * Share	
+						OASIS_FLOAT loss = 0;
+						if (x.loss > (ded + lim)) loss = lim;
+						else loss = x.loss - ded;
 						if (loss < 0) loss = 0;
 						x.retained_loss = x.retained_loss + (x.loss - loss);
-					}
-					else {
-						loss = x.loss;
-						// retained loss stays the same
-					}
+						x.loss = loss * share;
 
-					x.loss = loss;
-				}
-				break;
-				case 11:
-				{
-					OASIS_FLOAT ded = 0;
-					for (auto y : profile.tc_vec) {
-						if (y.tc_id == deductible) ded = y.tc_val;
 					}
-					// Function 11: Applies a floor on retained loss (minimum deductible)
-					OASIS_FLOAT loss = 0;
-					if (x.retained_loss < ded) {
-						loss = x.loss + x.retained_loss - ded;
-						if (loss < 0) loss = 0;
+					break;
+					case 3:
+					{
+						OASIS_FLOAT ded = 0;
+						OASIS_FLOAT lim = 0;
+						for (auto y : profile.tc_vec) {
+							if (y.tc_id == deductible) ded = y.tc_val;
+							if (y.tc_id == limit) lim = y.tc_val;
+						}
+						//Function3 = IIf(Loss < Ded, 0, IIf(Loss > Ded, Lim, Loss))
+						OASIS_FLOAT loss = x.loss;
+						if (loss < ded) loss = 0;
+						else loss = loss;
+						if (loss > lim) loss = lim;
 						x.retained_loss = x.retained_loss + (x.loss - loss);
+						x.loss = loss;
 					}
-					else {
-						loss = x.loss;
-						// retained loss stays the same
+					break;
+					case 5:
+					{
+						OASIS_FLOAT ded = 0;
+						OASIS_FLOAT lim = 0;
+						for (auto y : profile.tc_vec) {
+							if (y.tc_id == deductible_prop_of_loss) ded = y.tc_val;
+							if (y.tc_id == limit_prop_of_loss) lim = y.tc_val;
+						}
+						//Function5 = Loss * (Lim - Ded)
+						OASIS_FLOAT loss = x.loss * (lim - ded);
+						x.retained_loss = x.retained_loss + (x.loss - loss);
+						x.loss = loss;
 					}
-
-					x.loss = loss;
-				}
-				break;
-				case 12:
-				{
-					for (auto &z : profile.tc_vec) {
-						if (z.tc_id == deductible) {
-							OASIS_FLOAT loss = x.loss - z.tc_val;
+					break;
+					case 9:
+					{
+						OASIS_FLOAT ded = 0;
+						OASIS_FLOAT lim = 0;
+						for (auto y : profile.tc_vec) {
+							if (y.tc_id == deductible_prop_of_limit) ded = y.tc_val;
+							if (y.tc_id == limit) lim = y.tc_val;
+						}
+						//Function9 = IIf(Loss < (Ded * lim), 0, IIf(Loss > (ded* lim) + Lim, Lim, Loss - (Ded * lim))
+						OASIS_FLOAT loss = x.loss - (ded * lim);
+						if (loss < 0) loss = 0;
+						if (loss > lim) loss = lim;
+						x.retained_loss = x.retained_loss + (x.loss - loss);
+						x.loss = loss;
+					}
+					break;
+					case 10:
+					{
+						OASIS_FLOAT ded = 0;
+						for (auto y : profile.tc_vec) {
+							if (y.tc_id == deductible) ded = y.tc_val;
+						}
+						// Function 10: Applies a cap on retained loss (maximum deductible)
+						OASIS_FLOAT loss = 0;
+						if (x.retained_loss > ded) {
+							loss = x.loss + x.retained_loss - ded;
 							if (loss < 0) loss = 0;
 							x.retained_loss = x.retained_loss + (x.loss - loss);
-							x.loss = loss;
-							break;
+						}
+						else {
+							loss = x.loss;
+							// retained loss stays the same
+						}
+
+						x.loss = loss;
+					}
+					break;
+					case 11:
+					{
+						OASIS_FLOAT ded = 0;
+						for (auto y : profile.tc_vec) {
+							if (y.tc_id == deductible) ded = y.tc_val;
+						}
+						// Function 11: Applies a floor on retained loss (minimum deductible)
+						OASIS_FLOAT loss = 0;
+						if (x.retained_loss < ded) {
+							loss = x.loss + x.retained_loss - ded;
+							if (loss < 0) loss = 0;
+							x.retained_loss = x.retained_loss + (x.loss - loss);
+						}
+						else {
+							loss = x.loss;
+							// retained loss stays the same
+						}
+
+						x.loss = loss;
+					}
+					break;
+					case 12:
+					{
+						for (auto &z : profile.tc_vec) {
+							if (z.tc_id == deductible) {
+								OASIS_FLOAT loss = x.loss - z.tc_val;
+								if (loss < 0) loss = 0;
+								x.retained_loss = x.retained_loss + (x.loss - loss);
+								x.loss = loss;
+								break;
+							}
 						}
 					}
-				}
-				break;
-				case 14:
-				{
-					OASIS_FLOAT lim = 0;
-					for (auto y : profile.tc_vec) {
-						if (y.tc_id == limit) lim = y.tc_val;
+					break;
+					case 14:
+					{
+						OASIS_FLOAT lim = 0;
+						for (auto y : profile.tc_vec) {
+							if (y.tc_id == limit) lim = y.tc_val;
+						}
+						//Function14 =  IIf(Loss > lim, Lim, Loss)
+						OASIS_FLOAT loss = x.loss;
+						if (loss > lim) loss = lim;
+						x.retained_loss = x.retained_loss + (x.loss - loss);
+						x.loss = loss;
 					}
-					//Function14 =  IIf(Loss > lim, Lim, Loss)
-					OASIS_FLOAT loss = x.loss;
-					if (loss > lim) loss = lim;
-					x.retained_loss = x.retained_loss + (x.loss - loss);
-					x.loss = loss;
-				}
-				break;
-				case 15:
-				{
-					OASIS_FLOAT lim = 0;
-					for (auto y : profile.tc_vec) {
-						if (y.tc_id == limit_prop_of_loss) lim = y.tc_val;
+					break;
+					case 15:
+					{
+						OASIS_FLOAT lim = 0;
+						for (auto y : profile.tc_vec) {
+							if (y.tc_id == limit_prop_of_loss) lim = y.tc_val;
+						}
+						//Function15 =  Loss * lim
+						OASIS_FLOAT loss = x.loss;
+						loss = loss * lim;
+						x.retained_loss = x.retained_loss + (x.loss - loss);
+						x.loss = loss;
 					}
-					//Function15 =  Loss * lim
-					OASIS_FLOAT loss = x.loss;
-					loss = loss * lim;
-					x.retained_loss = x.retained_loss + (x.loss - loss);
-					x.loss = loss;
-				}
-				break;
-				case 16:
-				{
-					OASIS_FLOAT ded = 0;
-					for (auto y : profile.tc_vec) {
-						if (y.tc_id == deductible_prop_of_loss) ded = y.tc_val;
+					break;
+					case 16:
+					{
+						OASIS_FLOAT ded = 0;
+						for (auto y : profile.tc_vec) {
+							if (y.tc_id == deductible_prop_of_loss) ded = y.tc_val;
+						}
+						//Function16 =  Loss - (loss * ded)
+						OASIS_FLOAT loss = x.loss;
+						loss = loss - (loss * ded);
+						if (loss < 0) loss = 0;
+						x.retained_loss = x.retained_loss + (x.loss - loss);
+						x.loss = loss;
 					}
-					//Function16 =  Loss - (loss * ded)
-					OASIS_FLOAT loss = x.loss;
-					loss = loss - (loss * ded);
-					if (loss < 0) loss = 0;
-					x.retained_loss = x.retained_loss + (x.loss - loss);
-					x.loss = loss;
-				}
-				break;
-				default:
-				{
-					fprintf(stderr, "Unknown calc rule %d\n", profile.calcrule_id);
+					break;
+					default:
+					{
+						fprintf(stderr, "Unknown calc rule %d\n", profile.calcrule_id);
+					}
 				}
 			}
 		}
 	}
 }
-/*
-void fmcalc::compute_item_proportions(vector<vector <LossRec>> &agg_vecs, const std::vector<OASIS_FLOAT> &guls, std::vector<OASIS_FLOAT> &items_prop)
+//
+// The item prop should not be needed so see if we can remove it all together 
+void fmcalc::compute_item_proportions(std::vector<std::vector <LossRec>> &agg_vecs, const std::vector<OASIS_FLOAT> &guls, std::vector<OASIS_FLOAT> &items_propxx)
 {
-items_prop.resize(guls.size(), 0);
-for (int level = 1; level < agg_vecs.size(); level++) {
-vector <LossRec> &agg_vec = agg_vecs[level];
-OASIS_FLOAT gul_total = 0;
-auto iter = agg_vec.begin();
-while (iter != agg_vec.end()) {
-OASIS_FLOAT total = 0;
-for (int idx : *(iter->item_idx)) {
-total += guls[idx];
-}
-iter->gul_total = total;
-gul_total += total;
-iter++;
-}
-iter = agg_vec.begin();
-while (iter != agg_vec.end()) {
-if (gul_total > 0) {
-iter->proportion = iter->gul_total / gul_total;
-}else {
-iter->proportion = 0;
-}
-if (level == 1) {
-iter->item_prop.resize((iter->item_idx)->size(), 0);
-OASIS_FLOAT total = 0;
-for (int idx : *(iter->item_idx)) {
-total += guls[idx];
-}
-int i = 0;
-if (total > 0) {
-for (int idx : *(iter->item_idx)) {
-iter->item_prop[i] = guls[idx] / total;
-items_prop[idx] = (guls[idx] / total) * iter->proportion;
-i++;
-}
-}
-}
-else {
-OASIS_FLOAT prop_total = 0;
-for (int idx : *(iter->item_idx)) {
-prop_total += items_prop[idx];
-}
-int i = 0;
-iter->item_prop.resize((iter->item_idx)->size(), 0);
-if (prop_total > 0) {
-for (int idx : *(iter->item_idx)) {
-iter->item_prop[i] = items_prop[idx] / prop_total;
-items_prop[idx] = (items_prop[idx] / prop_total) * iter->proportion;
-i++;
-}
-}
-}
-iter++;
-}
-}
-}
-*/
-void fmcalc::compute_item_proportions(vector<vector <LossRec>> &agg_vecs, const std::vector<OASIS_FLOAT> &guls, std::vector<OASIS_FLOAT> &items_prop)
-{	
+	std::vector<OASIS_FLOAT> items_prop;
 	items_prop.resize(guls.size(), 0);
+	for (int level = 1; level < agg_vecs.size(); level++) {
+		vector <LossRec> &agg_vec = agg_vecs[level];
+		auto iter = agg_vec.begin();
+		while (iter != agg_vec.end()) {
+			iter->item_prop.resize(guls.size(), 0);
+			iter++;
+		}
+	}
 	for (int level = 1; level < agg_vecs.size(); level++) {
 		vector <LossRec> &agg_vec = agg_vecs[level];
 		OASIS_FLOAT loss_total = 0;
@@ -374,11 +319,12 @@ void fmcalc::compute_item_proportions(vector<vector <LossRec>> &agg_vecs, const 
 		while (iter != agg_vec.end()) {
 			if (loss_total > 0) {
 				iter->proportion = iter->loss / loss_total;
-			}else {
+			}
+			else {
 				iter->proportion = 0;
 			}
 			if (level == 1) {
-				iter->item_prop.resize((iter->item_idx)->size(), 0);				
+				//iter->item_prop.resize((iter->item_idx)->size(), 0);
 				OASIS_FLOAT total = 0;
 				for (int idx : *(iter->item_idx)) {
 					total += guls[idx];
@@ -386,7 +332,7 @@ void fmcalc::compute_item_proportions(vector<vector <LossRec>> &agg_vecs, const 
 				int i = 0;
 				if (total > 0) {
 					for (int idx : *(iter->item_idx)) {
-						iter->item_prop[i] = guls[idx] / iter->gul_total;
+						iter->item_prop[idx] = guls[idx] / iter->gul_total;
 						items_prop[idx] = (guls[idx] / total) * iter->proportion;
 						//items_prop[idx] = (guls[idx] / iter->gul_total);
 						i++;
@@ -399,13 +345,13 @@ void fmcalc::compute_item_proportions(vector<vector <LossRec>> &agg_vecs, const 
 					prop_total += items_prop[idx];
 				}
 				int i = 0;
-				iter->item_prop.resize((iter->item_idx)->size(), 0);
+				// iter->item_prop.resize((iter->item_idx)->size(), 0);
 				if (prop_total > 0) {
 					for (int idx : *(iter->item_idx)) {
-						//iter->item_prop[i] = items_prop[idx] / prop_total;
+						iter->item_prop[idx] = items_prop[idx] / prop_total;
 						items_prop[idx] = (items_prop[idx] / prop_total) * iter->proportion;
 						i++;
-					}
+				}
 				}
 			}
 			iter++;
@@ -413,8 +359,8 @@ void fmcalc::compute_item_proportions(vector<vector <LossRec>> &agg_vecs, const 
 	}
 }
 inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlookups, vector<vector <LossRec>> &agg_vecs, int level, int max_level,
-	std::map<fmlevelhdr, std::vector<fmlevelrec> > &outmap, fmlevelhdr &fmhdr, int sidx, const std::vector<std::vector<std::vector<policytcvidx>>> &avxs, int layer, 
-	const std::vector<int> &items, const std::vector<OASIS_FLOAT> &guls)
+	std::map<fmlevelhdr, std::vector<fmlevelrec> > &outmap, fmlevelhdr &fmhdr, int gul_idx, const std::vector<std::vector<std::vector<policytcvidx>>> &avxs, int layer, 
+	const std::vector<int> &items, std::vector<vector<OASIS_FLOAT>> &event_guls)
 {
 	vector <LossRec> &prev_agg_vec = agg_vecs[level - 1];
 	vector <LossRec> &agg_vec = agg_vecs[level];
@@ -461,6 +407,10 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 	dofmcalc(agg_vec);
 
 	if (level == max_level) {
+		int sidx = gul_idx - 1;
+		if (sidx == -1) sidx = tiv_idx;
+		if (sidx == 0) sidx = mean_idx;
+
 		fmlevelrec rec;
         rec.loss = 0;
 		rec.sidx = sidx;		
@@ -487,8 +437,14 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 					}
 				}
 			}			
-			if (x.allocrule_id == 1) {	// back allocate as a proportion of the total of the original guls	
+			// at level 1 allocrule 2 and 1 are the same
+			if (x.allocrule_id == 2 && level == 1) x.allocrule_id = 1; 
+
+			if (x.allocrule_id == 1 ) {	// back allocate as a proportion of the total of the original guls	
 				OASIS_FLOAT gultotal = 0;
+				int index = gul_idx;	// default index top level
+				if (sidx == tiv_idx) index = 0;
+				const std::vector<OASIS_FLOAT> &guls = event_guls[index];
 				int vec_idx = aggid_to_vectorlookup[x.agg_id-1];		// Same index applies to avx as to agg_vec
 				for (int idx : avx[layer][vec_idx].item_idx) {
 					gultotal += guls[idx];
@@ -497,8 +453,13 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
                     OASIS_FLOAT prop = 0;
                     if (gultotal > 0) prop = guls[idx] / gultotal;
 					//fmhdr.output_id = items[idx];					
-					if (netvalue_) { // get net gul value							
-						rec.loss = x.retained_loss * prop;
+					if (netvalue_) { // get net gul value
+						if (level == 1) {
+							// because no calc rules have been applied yet there is no retained loss yet
+							rec.loss = guls[idx] - (x.loss * prop);
+						}else {							
+							rec.loss = x.retained_loss * prop;
+						}
 					}else {
 						rec.loss = x.loss * prop;
 					}
@@ -515,10 +476,7 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 						}
 						outmap[fmhdr].push_back(rec);			// neglible cost
 					}
-				}	
-				if (x.allocrule_id == 2) {
-					fprintf(stderr, "We are here");
-				}
+				}				
 			}
 		
 			if (x.allocrule_id == 2) {		// back allocate as a proportion of the total of the previous losses				;
@@ -527,10 +485,12 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 																		//	fprintf(stderr, "%d\n", idx);
 																		//	prev_gul_total += prev_agg_vec[idx].loss;
 																		//}
-				std::vector<OASIS_FLOAT> items_prop;
-				compute_item_proportions(agg_vecs,guls, items_prop);
+				const std::vector<OASIS_FLOAT> &guls = event_guls[gul_idx];
+				std::vector<OASIS_FLOAT> items_propx;
+				compute_item_proportions(agg_vecs, guls, items_propx);
 				for (int idx : avx[layer][vec_idx].item_idx) {
-					OASIS_FLOAT prop = items_prop[idx];
+					//OASIS_FLOAT prop = items_prop[idx];
+					OASIS_FLOAT prop = x.item_prop[idx];
 					if (netvalue_) { // get net gul value							
 						rec.loss = x.retained_loss * prop;
 					}
@@ -551,17 +511,17 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 						outmap[fmhdr].push_back(rec);			// neglible cost
 					}
 				}
-/*
+			}
+
+			if (x.allocrule_id == 3 && level > 1) {		// back allocate as a proportion of the total of the previous losses				;
+				const std::vector<OASIS_FLOAT> &guls = event_guls[gul_idx];
+				int vec_idx = aggid_to_vectorlookup[x.agg_id - 1];		// Same index applies to avx as to agg_vec																		
 				for (LossRec l : prev_agg_vec) {
 					std::vector<int>::const_iterator iter = l.item_idx->begin();
 					OASIS_FLOAT prev_gul_total = 0;
 					while (iter != l.item_idx->end()) {
 						prev_gul_total += guls[*iter];
 						iter++;
-					}
-					prev_gul_total = 0;
-					for (int idx : avx[layer][vec_idx].item_idx) {
-						prev_gul_total += prev_agg_vec[idx].loss;
 					}
 					iter = l.item_idx->begin();
 					OASIS_FLOAT prop = 0;
@@ -593,17 +553,17 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 					}
 					
 				}
-	*/			
+				
 			}
 		}
 		if (layer < max_layer_) {
 			layer++;
-			dofmcalc_r(aggid_to_vectorlookups, agg_vecs, level, max_level, outmap, fmhdr, sidx, avxs, layer,items, guls);
+			dofmcalc_r(aggid_to_vectorlookups, agg_vecs, level, max_level, outmap, fmhdr, gul_idx, avxs, layer,items, event_guls);
 		}
 	}
 	else {
 		level++;
-		dofmcalc_r(aggid_to_vectorlookups, agg_vecs, level, max_level, outmap, fmhdr, sidx, avxs, layer, items, guls);
+		dofmcalc_r(aggid_to_vectorlookups, agg_vecs, level, max_level, outmap, fmhdr, gul_idx, avxs, layer, items, event_guls);
 	}
 }
 
@@ -615,7 +575,7 @@ bool fmcalc::gulhasvalue(const std::vector<OASIS_FLOAT> &gul) const
 void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vector<OASIS_FLOAT>> &event_guls)
 {
 	
-	const int level = 1;
+	const int level = 0;
 	std::vector<std::vector<int>>  aggid_to_vectorlookups(maxLevel_ + 1);
 
 	std::vector<int> &aggid_to_vectorlookup = aggid_to_vectorlookups[level];	
@@ -634,7 +594,7 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
     avxs.resize(maxLevel_ + 1);
 	if (event_guls.size() > 0) {
 		auto &guls = event_guls[0];		// pick any set of events they'll all have the same size we just want the size
-		std::vector<std::vector<policytcvidx>> &avx = avxs[1];
+		std::vector<std::vector<policytcvidx>> &avx = avxs[level];
 
 		avx.resize(max_layer_+1);
 		for (unsigned int i = 0;i < guls.size();i++) {
@@ -645,18 +605,18 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 				policytcvidx a;
 				a.agg_id = agg_id;
 				a.policytc_id = policy_tc_vec_vec_vec_[level][agg_id][layer_id];
-				avx[1].push_back(a);			// populate the first layer
-				avx[1][avx[1].size() - 1].item_idx.push_back(i);
-				aggid_to_vectorlookup[agg_id-1] = avx[1].size() - 1;
+				avx[layer_id].push_back(a);			// populate the first layer
+				avx[layer_id][avx[layer_id].size() - 1].item_idx.push_back(i);
+				aggid_to_vectorlookup[agg_id-1] = avx[layer_id].size() - 1;
 				total_loss_items++;
 			}
 			else {
-				avx[1][current_idx].item_idx.push_back(i);
+				avx[layer_id][current_idx].item_idx.push_back(i);
 			}
 			
 		}
 		       
-		for (unsigned int zzlevel = 2;zzlevel < avxs.size();zzlevel++) {
+		for (unsigned int zzlevel = 1;zzlevel < avxs.size();zzlevel++) {
 			std::vector<std::vector<policytcvidx>>  &prev = avxs[zzlevel-1];
 			std::vector<std::vector<policytcvidx>>  &next = avxs[zzlevel];
 			next.resize(max_layer_ + 1);
@@ -673,10 +633,10 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 			
 			int previous_layer = 1; // previous layer is always one because only the last layer can be greater than 1
 
-			for (unsigned int i = 0;i < prev[1].size();i++) {
+			for (unsigned int i = 0;i < prev[previous_layer].size();i++) {
 				int agg_id = pfm_vec_vec_[zzlevel][prev[previous_layer][i].agg_id];
 				int current_idx = zzaggid_to_vectorlookup[agg_id-1];
-				if (current_idx == -2)
+				if (current_idx == -2)		// field not initialized
 				{
 
 					for (unsigned int layer = 1; layer < policy_tc_vec_vec_vec_[zzlevel][agg_id].size() ; layer++ ){ // loop through layers
@@ -712,14 +672,13 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 	vector <LossRec> &agg_vec = agg_vecs[level];
 	std::map<fmlevelhdr, std::vector<fmlevelrec>> outmap;
 	
-	
-	for (unsigned int idx = 0; idx < event_guls.size(); idx++) {	// loop sample + 1 times
-		const std::vector<OASIS_FLOAT> &guls = event_guls[idx];
-		if (idx < 2 || gulhasvalue(guls)) {
+	for (unsigned int gul_idx = 0; gul_idx < event_guls.size(); gul_idx++) {	// loop sample + 1 times
+		const std::vector<OASIS_FLOAT> &guls = event_guls[gul_idx];
+		if (gul_idx < 2 || gulhasvalue(guls)) {
 			agg_vec.resize(total_loss_items);
 			fmlevelhdr fmhdr;
 			fmhdr.event_id = event_id;
-			const std::vector<std::vector<policytcvidx>> &avx = avxs[1];
+			const std::vector<std::vector<policytcvidx>> &avx = avxs[level];
 			for (unsigned int i = 0; i < agg_vec.size(); i++) agg_vec[i].loss = 0;
 			int last_agg_id = -1;
 			int vec_idx = 0;
@@ -736,107 +695,10 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 				agg_vec[vec_idx].policytc_id = avx[1][vid].policytc_id;
 			}
 
-			dofmcalc(agg_vec);
+//			dofmcalc(agg_vec);					
 			
+			dofmcalc_r(aggid_to_vectorlookups, agg_vecs, level + 1, maxLevel_, outmap, fmhdr, gul_idx, avxs, 1, items, event_guls);
 
-			int sidx = idx - 1;
-			if (sidx == -1) sidx = tiv_idx;
-			if (sidx == 0) sidx = mean_idx;
-
-			if (level == maxLevel_ ) {
-				int layer = 1;
-				fmlevelrec rec;
-				rec.loss = 0;
-				rec.sidx = sidx;
-				//fmhdr.layer_id = layer;
-				for (auto x : agg_vec) {
-					if (x.allocrule_id == -1 || x.allocrule_id == 0) { // no back allocation
-						fmxref_key k;
-						k.layer_id = layer;
-						k.agg_id = x.agg_id;						
-						auto it = fm_xrefmap.find(k);
-						if (it == fm_xrefmap.end()) {
-							fmhdr.output_id = k.agg_id;
-						}
-						else {
-							fmhdr.output_id = it->second;
-						}
-						rec.loss = x.loss;
-						// do the flip here
-						if (netvalue_) { // get net gul value		
-							rec.loss = guls[idx] - rec.loss;
-						}
-						outmap[fmhdr].push_back(rec);			// neglible cost
-					}
-					if (x.allocrule_id == 1 || x.allocrule_id == 2) {	// back allocate as a proportion of the total of the original guls
-						OASIS_FLOAT gultotal = 0;
-						int index = event_guls.size() - 1;	// default index top level
-						if (sidx == -3) index = 0;						
-						const std::vector<OASIS_FLOAT> &guls = event_guls[index];
-						int vec_idx = aggid_to_vectorlookup[x.agg_id - 1];		// Same index applies to avx as to agg_vec
-						for (int idx : avx[layer][vec_idx].item_idx) {
-							gultotal += guls[idx];
-						}
-						// int vec_idx = aggid_to_vectorlookup[x.agg_id];		// Same index applies to avx as to agg_vec
-						// for (int gidx = 0; gidx < guls.size(); gidx++) {
-						// 	gultotal += guls[gidx];
-						// }
-						for (int idx : avx[layer][vec_idx].item_idx) {
-							OASIS_FLOAT prop = 0;
-							if (gultotal > 0) prop = guls[idx] / gultotal;
-							//fmhdr.output_id = items[idx];
-							rec.loss = x.loss * prop;
-							if (netvalue_) { // get net gul value							
-						 		rec.loss = guls[idx] - rec.loss;
-						 	}
-							if (rec.loss > 0.0 || rec.sidx < 0) {
-								fmxref_key k;
-								k.layer_id = layer;
-								k.agg_id = items[idx];
-								auto it = fm_xrefmap.find(k);
-								if (it == fm_xrefmap.end()) {
-									fmhdr.output_id = k.agg_id;
-								}
-								else {
-									fmhdr.output_id = it->second;
-								}
-								outmap[fmhdr].push_back(rec);			// neglible cost	>= level2  check 598 for level 1
-							}
-						}
-						// for (int gidx = 0; gidx < guls.size(); gidx++) {
-						// 	OASIS_FLOAT prop = 0;
-						// 	if (gultotal > 0) prop = guls[gidx] / gultotal;
-						// 	// fmhdr.output_id = items[gidx];
-						// 	rec.loss = x.loss * prop;
-						// 	if (netvalue_) { // get net gul value							
-						// 		rec.loss = guls[idx] - rec.loss;
-						// 	}
-						// 	if (rec.loss > 0.0 || rec.sidx < 0) {
-						// 		fmxref_key k;
-						// 		k.layer_id = layer;
-						// 		k.agg_id = items[gidx];
-						// 		auto it = fm_xrefmap.find(k);
-						// 		if (it == fm_xrefmap.end()) {
-						// 			fmhdr.output_id = k.agg_id;
-						// 		}
-						// 		else {
-						// 			fmhdr.output_id = it->second;
-						// 		}
-						// 		outmap[fmhdr].push_back(rec);			// neglible cost
-						// 	}
-							
-						// }
-
-					}
-				}
-				if (layer < max_layer_) {
-					layer++;
-					dofmcalc_r(aggid_to_vectorlookups, agg_vecs, level, maxLevel_, outmap, fmhdr, sidx, avxs, layer, items, guls);
-				}
-			}
-			else {
-				dofmcalc_r(aggid_to_vectorlookups, agg_vecs, level + 1, maxLevel_, outmap, fmhdr, sidx, avxs, 1, items, guls);
-			}
 			agg_vec.clear();
 		}
 	}
@@ -854,10 +716,30 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 	}
 }
 
+void fmcalc::addtcrow(const fm_policyTC &f)
+{
+	if (f.level_id <= maxRunLevel_) {
+		if (f.level_id > max_level_) max_level_ = f.level_id;
+		if (f.layer_id > max_layer_) max_layer_ = f.layer_id;
+		if (f.agg_id > max_agg_id_) max_agg_id_ = f.agg_id;
 
+		if (policy_tc_vec_vec_vec_.size() < f.level_id + 1) {
+			policy_tc_vec_vec_vec_.resize(f.level_id + 1);
+		}
+		if (policy_tc_vec_vec_vec_[f.level_id].size() < f.agg_id + 1) {
+			policy_tc_vec_vec_vec_[f.level_id].resize(f.agg_id + 1);
+		}
+
+		if (policy_tc_vec_vec_vec_[f.level_id][f.agg_id].size() < f.layer_id + 1) {
+			policy_tc_vec_vec_vec_[f.level_id][f.agg_id].resize(f.layer_id + 1);
+		}
+		policy_tc_vec_vec_vec_[f.level_id][f.agg_id][f.layer_id] = f.PolicyTC_id;
+	}
+
+}
 void fmcalc::init_policytc(int maxRunLevel)
 {
-    if (maxRunLevel == -1) maxRunLevel = 10000;
+    if (maxRunLevel != -1) maxRunLevel_ = maxRunLevel;
 	FILE *fin = NULL;
 	std::string file = FMPOLICYTC_FILE;
 	if (inputpath_.length() > 0) {
@@ -869,30 +751,21 @@ void fmcalc::init_policytc(int maxRunLevel)
 		fprintf(stderr, "%s: cannot open %s\n", __func__, file.c_str());
 		exit(EXIT_FAILURE);
 	}
-
-	fm_policyTC f;
-	int max_level = 0;
+	max_level_ = 0;
 	max_layer_ = 0;
 	max_agg_id_ = 0;
+	fm_policyTC f;
+	f.layer_id = 1;
+	f.level_id = 0;
+	f.PolicyTC_id = -1;
+	for (int i = 1; i <= level_to_maxagg_id_[0]; i++) {		
+		f.agg_id = i;		
+		addtcrow(f);
+	}
+	
 	int i = fread(&f, sizeof(f), 1, fin);
 	while (i != 0) {
-        if 	(f.level_id <= maxRunLevel){
-            if (f.level_id > max_level) max_level = f.level_id;
-            if (f.layer_id > max_layer_) max_layer_ = f.layer_id;
-			if (f.agg_id > max_agg_id_) max_agg_id_ = f.agg_id;
-	
-            if (policy_tc_vec_vec_vec_.size() < f.level_id + 1) {
-                policy_tc_vec_vec_vec_.resize(f.level_id + 1);
-            }
-            if (policy_tc_vec_vec_vec_[f.level_id].size() < f.agg_id + 1) {
-                policy_tc_vec_vec_vec_[f.level_id].resize(f.agg_id + 1);
-            }
-
-            if (policy_tc_vec_vec_vec_[f.level_id][f.agg_id].size() < f.layer_id + 1) {
-                policy_tc_vec_vec_vec_[f.level_id][f.agg_id].resize(f.layer_id + 1);
-            }
-            policy_tc_vec_vec_vec_[f.level_id][f.agg_id][f.layer_id] = f.PolicyTC_id;
-        }
+		addtcrow(f);   
 		i = fread(&f, sizeof(f), 1, fin);
 	}
 	fclose(fin);
@@ -914,15 +787,28 @@ void fmcalc::init_programme(int maxRunLevel)
 	}
 
 	fm_programme f;
-    if (maxRunLevel == -1) maxRunLevel = 10000;
+    if (maxRunLevel != -1) maxRunLevel_ = maxRunLevel;
 
+	if (level_to_maxagg_id_.size() == 0) {
+		level_to_maxagg_id_.resize(1, -1);
+	}
 	int i = fread(&f, sizeof(f), 1, fin);
 	while (i != 0) {
-        if (f.level_id <= maxRunLevel){
+        if (f.level_id <= maxRunLevel_){
 			if (maxLevel_ < f.level_id) {
 				maxLevel_ = f.level_id;
-				level_to_maxagg_id_.resize(maxLevel_+1, -1);
+				level_to_maxagg_id_.resize(maxLevel_ + 1, -1);
 			}
+			if (f.level_id == 1) {	
+				if (f.from_agg_id > level_to_maxagg_id_[0])level_to_maxagg_id_[0] = f.from_agg_id;
+				if (pfm_vec_vec_.size() < 1) {
+					pfm_vec_vec_.resize(1);
+				}
+				if (pfm_vec_vec_[0].size() < f.from_agg_id + 1) {
+					pfm_vec_vec_[0].resize(f.from_agg_id + 1);
+				}
+				pfm_vec_vec_[0][f.from_agg_id] = f.from_agg_id;
+			}					
 			if (f.to_agg_id > level_to_maxagg_id_[f.level_id])level_to_maxagg_id_[f.level_id] = f.to_agg_id;
             if (pfm_vec_vec_.size() < f.level_id + 1) {
                 pfm_vec_vec_.resize(f.level_id + 1);
@@ -1117,9 +1003,9 @@ void fmcalc::init_fmxref()
 }
 
 void fmcalc::init(int MaxRunLevel)
-{
-    init_policytc(MaxRunLevel);	
+{    
     init_programme(MaxRunLevel);
+	init_policytc(MaxRunLevel);
 	init_fmxref();
 	init_profile();
 	init_itemtotiv();

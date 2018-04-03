@@ -51,21 +51,6 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <unistd.h>
 #endif
 
-// int getmaxnoofitems()
-// {
-// 	FILE *fin = fopen(ITEMS_FILE, "rb");
-// 	if (fin == NULL) {
-// 		fprintf(stderr,"Error cannot open items.bin");
-// 		exit(-1);
-// 	}
-
-// 	flseek(fin, 0L, SEEK_END);
-// 	long long p = fltell(fin);
-// 	p = p / sizeof(item);
-// 	fclose(fin);
-// 	return int(p);
-
-// }
 
 void doit(int &maxLevel,const std::string &inputpath, bool netvalue)
 {

@@ -46,6 +46,7 @@ struct LossRec {
 	OASIS_FLOAT retained_loss = 0;
 	OASIS_FLOAT gul_total = 0;
 	OASIS_FLOAT proportion = 0;
+	OASIS_FLOAT net_loss = 0;
 	int agg_id;
 	int policytc_id;
 	int allocrule_id;

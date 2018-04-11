@@ -91,10 +91,14 @@ bool operator<(const fmxref_key& lhs, const fmxref_key& rhs)
 	return lhs.layer_id < rhs.layer_id;		
 }
 
-inline void fmcalc::dofmcalc(vector <LossRec> &agg_vec)
+inline void fmcalc::dofmcalc(vector <LossRec> &agg_vec,int layer)
 {
 	for (LossRec &x : agg_vec) {
 		if (x.agg_id == 0) break;
+		//if (layer > 1) {
+		//	x.loss = x.retained_loss;
+		//	x.retained_loss = 0;
+		//}
 		x.original_loss = x.loss;
 		if (x.agg_id > 0) {
 			if (x.policytc_id > 0) {
@@ -132,8 +136,9 @@ inline void fmcalc::dofmcalc(vector <LossRec> &agg_vec)
 						if (x.loss > (ded + lim)) loss = lim;
 						else loss = x.loss - ded;
 						if (loss < 0) loss = 0;
+						loss = loss * share;
 						x.retained_loss = x.retained_loss + (x.loss - loss);
-						x.loss = loss * share;
+						x.loss = loss;
 
 					}
 					break;
@@ -289,8 +294,8 @@ inline void fmcalc::dofmcalc(vector <LossRec> &agg_vec)
 	}
 }
 //
-// The item prop should not be needed so see if we can remove it all together 
-void fmcalc::compute_item_proportions(std::vector<std::vector <LossRec>> &agg_vecs, const std::vector<OASIS_FLOAT> &guls, std::vector<OASIS_FLOAT> &items_propxx)
+// The item prop should not be needed so see if we can remove it all together - still used in function calc
+void fmcalc::compute_item_proportions(std::vector<std::vector <LossRec>> &agg_vecs, const std::vector<OASIS_FLOAT> &guls)
 {
 	std::vector<OASIS_FLOAT> items_prop;
 	items_prop.resize(guls.size(), 0);
@@ -365,7 +370,8 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 	vector <LossRec> &prev_agg_vec = agg_vecs[level - 1];
 	vector <LossRec> &agg_vec = agg_vecs[level];
 	const std::vector<std::vector<policytcvidx>> &avx = avxs[level];
-	agg_vec.clear();
+	if (layer == 1)	agg_vec.clear();
+
 	std::vector<int> &aggid_to_vectorlookup = aggid_to_vectorlookups[level];
 
 	if (agg_vec.size() == 0) {
@@ -374,8 +380,14 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 	}
 	else {
 		for (unsigned int i = 0; i < agg_vec.size(); i++) {
-			agg_vec[i].original_loss = 0;
-			agg_vec[i].loss = 0;
+			if (layer == 1) {
+				agg_vec[i].original_loss = 0;
+				agg_vec[i].loss = 0;
+			}else{
+				agg_vec[i].loss = agg_vec[i].retained_loss;
+				agg_vec[i].original_loss = agg_vec[i].loss;
+				agg_vec[i].retained_loss = 0;
+			}
 		}
 	}
 
@@ -386,15 +398,16 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 				if (prev_agg_vec[i].next_vec_idx == -1) {	// next_vec_idx can be zero
 					prev_agg_vec[i].next_vec_idx = aggid_to_vectorlookup[agg_id - 1];
 				}
-				int vec_idx = prev_agg_vec[i].next_vec_idx;
-
-				if (agg_vec[vec_idx].policytc_id == 0) { // policytc_id cannot be zero - first position in lookup vector not used
+				int vec_idx = prev_agg_vec[i].next_vec_idx;				
+				if (agg_vec[vec_idx].policytc_id != avx[layer][vec_idx].policytc_id) { // policytc_id cannot be zero - first position in lookup vector not used
 					agg_vec[vec_idx].policytc_id = avx[layer][vec_idx].policytc_id;
 					agg_vec[vec_idx].agg_id = agg_id;
 					agg_vec[vec_idx].item_idx = &avx[layer][vec_idx].item_idx;
 				}
-				agg_vec[vec_idx].loss += prev_agg_vec[i].loss;
-				agg_vec[vec_idx].retained_loss += prev_agg_vec[i].retained_loss;
+				if (layer == 1) {
+					agg_vec[vec_idx].loss += prev_agg_vec[i].loss;
+					agg_vec[vec_idx].retained_loss += prev_agg_vec[i].retained_loss;
+				}
 			}
 		}
 		else {
@@ -404,7 +417,7 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 		}
 	}
 	
-	dofmcalc(agg_vec);
+	dofmcalc(agg_vec,layer);
 
 	if (level == max_level) {
 		int sidx = gul_idx - 1;
@@ -454,12 +467,13 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
                     if (gultotal > 0) prop = guls[idx] / gultotal;
 					//fmhdr.output_id = items[idx];					
 					if (netvalue_) { // get net gul value
-						if (level == 1) {
+						if (level == 1 && layer==1) {
 							// because no calc rules have been applied yet there is no retained loss yet
 							rec.loss = guls[idx] - (x.loss * prop);
 						}else {							
 							rec.loss = x.retained_loss * prop;
 						}
+
 					}else {
 						rec.loss = x.loss * prop;
 					}
@@ -474,7 +488,7 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 						else {
 							fmhdr.output_id = it->second;
 						}
-						outmap[fmhdr].push_back(rec);			// neglible cost
+						if (layer == max_layer_) outmap[fmhdr].push_back(rec);			// neglible cost
 					}
 				}				
 			}
@@ -486,10 +500,8 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 																		//	prev_gul_total += prev_agg_vec[idx].loss;
 																		//}
 				const std::vector<OASIS_FLOAT> &guls = event_guls[gul_idx];
-				std::vector<OASIS_FLOAT> items_propx;
-				compute_item_proportions(agg_vecs, guls, items_propx);
+				compute_item_proportions(agg_vecs, guls);
 				for (int idx : avx[layer][vec_idx].item_idx) {
-					//OASIS_FLOAT prop = items_prop[idx];
 					OASIS_FLOAT prop = x.item_prop[idx];
 					if (netvalue_) { // get net gul value							
 						rec.loss = x.retained_loss * prop;
@@ -511,50 +523,7 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 						outmap[fmhdr].push_back(rec);			// neglible cost
 					}
 				}
-			}
-
-			if (x.allocrule_id == 3 && level > 1) {		// back allocate as a proportion of the total of the previous losses				;
-				const std::vector<OASIS_FLOAT> &guls = event_guls[gul_idx];
-				int vec_idx = aggid_to_vectorlookup[x.agg_id - 1];		// Same index applies to avx as to agg_vec																		
-				for (LossRec l : prev_agg_vec) {
-					std::vector<int>::const_iterator iter = l.item_idx->begin();
-					OASIS_FLOAT prev_gul_total = 0;
-					while (iter != l.item_idx->end()) {
-						prev_gul_total += guls[*iter];
-						iter++;
-					}
-					iter = l.item_idx->begin();
-					OASIS_FLOAT prop = 0;
-					while (iter != l.item_idx->end()) {
-						if (l.loss > 0) {
-							OASIS_FLOAT old_prop = guls[*iter] / prev_gul_total;
-							prop = (l.loss / x.original_loss)*old_prop;
-						}
-						if (netvalue_) { // get net gul value							
-							rec.loss = x.retained_loss * prop;
-						}
-						else {
-							rec.loss = x.loss * prop;
-						}						
-						if (rec.loss > 0.0 || rec.sidx < 0) {
-							fmxref_key k;
-							k.layer_id = layer;
-							k.agg_id = items[*iter];
-							auto it = fm_xrefmap.find(k);
-							if (it == fm_xrefmap.end()) {
-								fmhdr.output_id = k.agg_id;
-							}
-							else {
-								fmhdr.output_id = it->second;
-							}
-							outmap[fmhdr].push_back(rec);			// neglible cost
-						}
-						iter++;
-					}
-					
-				}
-				
-			}
+			}			
 		}
 		if (layer < max_layer_) {
 			layer++;

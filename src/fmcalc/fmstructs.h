@@ -43,9 +43,10 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 struct LossRec {
 	OASIS_FLOAT original_loss = 0;
 	OASIS_FLOAT loss = 0;
-	OASIS_FLOAT retained_loss = 0;
+	OASIS_FLOAT retained_loss = 0;	// accumulated_deductible
 	OASIS_FLOAT gul_total = 0;
 	OASIS_FLOAT proportion = 0;
+	OASIS_FLOAT previous_retained_loss = 0;
 	OASIS_FLOAT net_loss = 0;
 	int agg_id;
 	int policytc_id;

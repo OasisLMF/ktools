@@ -91,7 +91,7 @@ bool operator<(const fmxref_key& lhs, const fmxref_key& rhs)
 	return lhs.layer_id < rhs.layer_id;		
 }
 
-inline void fmcalc::dofmcalc(vector <LossRec> &agg_vec,int layer)
+inline void fmcalc::dofmcalc(vector <LossRec> &agg_vec, int layer)
 {
 	for (LossRec &x : agg_vec) {
 		if (x.agg_id == 0) break;
@@ -136,8 +136,11 @@ inline void fmcalc::dofmcalc(vector <LossRec> &agg_vec,int layer)
 						if (x.loss > (ded + lim)) loss = lim;
 						else loss = x.loss - ded;
 						if (loss < 0) loss = 0;
+						float floss = x.retained_loss + (x.loss - loss);
 						loss = loss * share;
-						x.retained_loss = x.retained_loss + (x.loss - loss);
+						x.retained_loss = x.retained_loss + (x.loss - loss);	
+						if (layer >1)	x.net_loss = x.net_loss + (x.previous_retained_loss - loss);
+						else x.net_loss = x.retained_loss;						
 						x.loss = loss;
 
 					}
@@ -370,9 +373,23 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 	vector <LossRec> &prev_agg_vec = agg_vecs[level - 1];
 	vector <LossRec> &agg_vec = agg_vecs[level];
 	const std::vector<std::vector<policytcvidx>> &avx = avxs[level];
-	if (layer == 1)	agg_vec.clear();
+
+	std::vector<float> previous_retained_losses;
+
+	previous_retained_losses.resize(agg_vec.size());
+	if (layer > 1) {
+		for (unsigned int i = 0; i < agg_vec.size(); i++) {
+			previous_retained_losses[i] = agg_vec[i].retained_loss;
+		}
+	}
+
+	if (gul_idx == 2) {
+		fprintf(stderr, "We are here");
+	}
+	agg_vec.clear();
 
 	std::vector<int> &aggid_to_vectorlookup = aggid_to_vectorlookups[level];
+
 
 	if (agg_vec.size() == 0) {
         int size = aggid_to_vectorlookup.size();
@@ -404,11 +421,11 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 					agg_vec[vec_idx].agg_id = agg_id;
 					agg_vec[vec_idx].item_idx = &avx[layer][vec_idx].item_idx;
 				}
-				if (layer == 1) {
-					agg_vec[vec_idx].loss += prev_agg_vec[i].loss;
-					agg_vec[vec_idx].retained_loss += prev_agg_vec[i].retained_loss;
-				}
-			}
+
+				agg_vec[vec_idx].loss += prev_agg_vec[i].loss;
+				agg_vec[vec_idx].retained_loss += prev_agg_vec[i].retained_loss;
+
+			}	
 		}
 		else {
 			// this is valid when full array was not populated in previous level
@@ -417,7 +434,14 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 		}
 	}
 	
-	dofmcalc(agg_vec,layer);
+	if (layer > 1) {
+		if (agg_vec.size() == previous_retained_losses.size()) {
+			for (unsigned int i = 0; i < agg_vec.size(); i++) {
+				agg_vec[i].previous_retained_loss = previous_retained_losses[i];
+			}
+		}
+	}
+	dofmcalc(agg_vec, layer);
 
 	if (level == max_level) {
 		int sidx = gul_idx - 1;
@@ -446,7 +470,10 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 						else {
 							fmhdr.output_id = it->second;
 						}
-						outmap[fmhdr].push_back(rec);			// neglible cost
+						if (layer == 1 && fmhdr.output_id == 5 && sidx==1) {
+							fprintf(stderr, "We are here\n");
+						}
+						if (layer == max_layer_) outmap[fmhdr].push_back(rec);			// neglible cost
 					}
 				}
 			}			
@@ -471,7 +498,7 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 							// because no calc rules have been applied yet there is no retained loss yet
 							rec.loss = guls[idx] - (x.loss * prop);
 						}else {							
-							rec.loss = x.retained_loss * prop;
+							rec.loss = x.net_loss * prop;
 						}
 
 					}else {
@@ -520,7 +547,7 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 						else {
 							fmhdr.output_id = it->second;
 						}
-						outmap[fmhdr].push_back(rec);			// neglible cost
+						if (layer == max_layer_) outmap[fmhdr].push_back(rec);			// neglible cost
 					}
 				}
 			}			

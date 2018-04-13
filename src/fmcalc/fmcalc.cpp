@@ -399,9 +399,9 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 		}
 	}
 
-	if (gul_idx == 2) {
-		fprintf(stderr, "We are here");
-	}
+	//if (gul_idx == 2) {
+	//	fprintf(stderr, "We are here");
+	//}
 	agg_vec.clear();
 
 	std::vector<int> &aggid_to_vectorlookup = aggid_to_vectorlookups[level];
@@ -487,9 +487,9 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 						else {
 							fmhdr.output_id = it->second;
 						}
-						if (layer == 1 && fmhdr.output_id == 5 && sidx==1) {
-							fprintf(stderr, "We are here\n");
-						}
+						//if (layer == 1 && fmhdr.output_id == 5 && sidx==1) {
+						//	fprintf(stderr, "We are here\n");
+						//}
 						if (layer == max_layer_) outmap[fmhdr].push_back(rec);			// neglible cost
 					}
 				}

@@ -56,7 +56,7 @@ void doit(int &maxLevel,const std::string &inputpath, bool netvalue)
 {
     fmcalc fc(maxLevel, inputpath,netvalue);
 		
-
+	bool gulstreamType = true;
 	unsigned int fmstream_type = 1 | fmstream_id;
 
 	fwrite(&fmstream_type, sizeof(fmstream_type), 1, stdout);
@@ -75,6 +75,7 @@ void doit(int &maxLevel,const std::string &inputpath, bool netvalue)
 		stream_type = streamno_mask & gulstream_type;
 	}
 	if (stream_type2 == fmstream_id) {
+		gulstreamType = false;
 		stream_type = streamno_mask & fmstream_type;
 	}
 	if (stream_type != 1) {
@@ -121,8 +122,16 @@ void doit(int &maxLevel,const std::string &inputpath, bool netvalue)
 				gs.item_id = gh.item_id;
 				gs.sidx = gr.sidx;
 				gs.loss = gr.loss;
+				if (gulstreamType == false && gr.sidx == tiv_idx) {
+					items.push_back(gh.item_id);
+					for (unsigned int i = 0; i < event_guls.size(); i++) event_guls[i].resize(items.size());
+					current_item_index = static_cast<int> (items.size() - 1);
+					int sidx = 0;
+					//event_guls[sidx].resize(items.size());					
+					event_guls[sidx][current_item_index] = gs.loss;
+				}
 				if (gr.sidx >= mean_idx) {
-					if (gr.sidx == mean_idx) {
+					if (gr.sidx == mean_idx && gulstreamType == true) {
 						items.push_back(gh.item_id);
 						for (unsigned int i = 0; i < event_guls.size(); i++) event_guls[i].resize(items.size());
 						current_item_index = static_cast<int> (items.size() - 1);
@@ -130,7 +139,7 @@ void doit(int &maxLevel,const std::string &inputpath, bool netvalue)
 					int sidx = gs.sidx + 1;
 					if (gs.sidx == mean_idx) sidx = 1;
 					event_guls[sidx][current_item_index] = gs.loss;
-					if (gs.sidx == mean_idx) { // add additional row for tiv
+					if (gulstreamType == true && gs.sidx == mean_idx) { // add additional row for tiv
 						sidx = 0;
 						gs.loss = fc.gettiv(gs.item_id);
 						event_guls[sidx][current_item_index] = gs.loss;

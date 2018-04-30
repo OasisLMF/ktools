@@ -58,12 +58,18 @@ void doit()
   lineno++;
     while (fgets(line, sizeof(line), stdin) != 0)
     {
-    if (sscanf(line, "%d,%d,%d,%d,%d", &q.id, &q.coverage_id, &q.areaperil_id, &q.vulnerability_id, &q.group_id) != 5){
+#ifdef AREAPERIL_TYPE_LONG
+		int ret = sscanf(line, "%d,%d,%ld,%d,%d", &q.id, &q.coverage_id, &q.areaperil_id, &q.vulnerability_id, &q.group_id);
+#else
+		int ret = sscanf(line, "%d,%d,%d,%d,%d", &q.id, &q.coverage_id, &q.areaperil_id, &q.vulnerability_id, &q.group_id);
+#endif 
+		
+		if (ret != 5){
            fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
            return;
-       }
-      else
-       {
+		}
+		else
+		{
            fwrite(&q, sizeof(q), 1, stdout);
        }
        lineno++;

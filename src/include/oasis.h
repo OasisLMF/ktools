@@ -63,6 +63,13 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 typedef int32_t OASIS_INT ;
 typedef float OASIS_FLOAT;
 
+#define AREAPERIL_TYPE_LONGX
+#ifdef AREAPERIL_TYPE_LONG
+typedef long AREAPERIL_INT;
+#else
+typedef int AREAPERIL_INT;
+#endif
+
 
 const int mean_idx = -1;
 const int std_dev_idx = -2;
@@ -82,7 +89,7 @@ const unsigned int streamno_mask = 0x00FFFFFF;
 #pragma pack(push, 1)
 struct damagecdfrec {
         int event_id;
-        int areaperil_id;
+		AREAPERIL_INT areaperil_id;
         int vulnerability_id;
 };
 
@@ -152,7 +159,7 @@ struct fmlevelrec {
 
 struct exposure{
 	int item_id;
-	int areaperil_id;
+	AREAPERIL_INT areaperil_id;
 	int vulnerability_id;
 	int group_id;
 	OASIS_FLOAT tiv;
@@ -161,7 +168,7 @@ struct exposure{
 struct item {
   int id;
   int coverage_id;
-  int areaperil_id;
+  AREAPERIL_INT areaperil_id;
   int vulnerability_id;
   int group_id;
 };
@@ -253,7 +260,7 @@ struct Periods
 };
 struct EventRow
 {
-	int areaperil_id;
+	AREAPERIL_INT areaperil_id;
 	int intensity_bin_id;
 	OASIS_FLOAT probability;
 };

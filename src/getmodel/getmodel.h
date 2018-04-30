@@ -61,7 +61,7 @@ public:
 private:
 	
 	std::map<int, std::vector<OASIS_FLOAT> > _vulnerabilities;	
-    std::map<int, std::set<int> > _vulnerability_ids_by_area_peril;
+    std::map<AREAPERIL_INT, std::set<int> > _vulnerability_ids_by_area_peril;
     std::map<int, EventIndex> _event_index_by_event_id;
 	std::set<int> _area_perils;
 	std::vector<OASIS_FLOAT> _mean_damage_bins;
@@ -85,15 +85,15 @@ private:
     void doCdfInnerNoIntensityUncertaintyz(int event_id);
     void  doResults(
         int &event_id,
-        int &areaperil_id,
-        std::map<int, std::set<int> > &vulnerabilities_by_area_peril,
+		AREAPERIL_INT &areaperil_id,
+        std::map<AREAPERIL_INT, std::set<int> > &vulnerabilities_by_area_peril,
         std::map<int, std::vector<OASIS_FLOAT> > &vulnerabilities,
         std::vector<OASIS_FLOAT> intensity) const;
 
 	void  doResultsNoIntensityUncertainty(
 		int &event_id,
-		int &areaperil_id,
-		std::map<int, std::set<int> > &vulnerabilities_by_area_peril,
+		AREAPERIL_INT &areaperil_id,
+		std::map<AREAPERIL_INT, std::set<int> > &vulnerabilities_by_area_peril,
 		std::map<int, std::vector<OASIS_FLOAT> > &vulnerabilities,
 		int intensity_bin_index) ;
 	

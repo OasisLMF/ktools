@@ -58,8 +58,11 @@ void printrows(int event_id, FILE *finx, long long size )
 	while (i < size) {
 		EventRow row;
 		fread(&row, sizeof(row), 1,finx);
-		printf("%d, %d, %d, %.10e\n", event_id,row.areaperil_id,row.intensity_bin_id, row.probability);
-
+#ifdef AREAPERIL_TYPE_LONG
+		printf("%d, %ld, %d, %.10e\n", event_id,row.areaperil_id,row.intensity_bin_id, row.probability);
+#else
+		printf("%d, %d, %d, %.10e\n", event_id, row.areaperil_id, row.intensity_bin_id, row.probability);
+#endif
 		i += sizeof(row);
 	}
 }
@@ -82,7 +85,11 @@ void printrowsz(int event_id, FILE *finx, long long size )
 
 	EventRow *row = (EventRow *)&uncompressed_buf[0];
 	while (i < dest_length) {		
-		printf("%d, %d, %d, %.10e\n", event_id,row->areaperil_id,row->intensity_bin_id, row->probability);
+#ifdef AREAPERIL_TYPE_LONG
+		printf("%d, %ld, %d, %.10e\n", event_id,row->areaperil_id,row->intensity_bin_id, row->probability);
+#else
+		printf("%d, %d, %d, %.10e\n", event_id, row->areaperil_id, row->intensity_bin_id, row->probability);
+#endif
 		row++;
 		i += sizeof(EventRow);
 	}

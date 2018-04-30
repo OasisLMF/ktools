@@ -46,7 +46,7 @@
 
 struct Exposure {
   int location_id;
-  int areaperil_id;
+  AREAPERIL_INT areaperil_id;
   int vulnerability_id;
   int group_id;
   OASIS_FLOAT tiv;
@@ -209,8 +209,8 @@ void getmodel::initOutputStream() {
 }
 
 void getmodel::doResults(
-    int &event_id, int &areaperil_id,
-    std::map<int, std::set<int>> &vulnerabilities_by_area_peril,
+    int &event_id, AREAPERIL_INT &areaperil_id,
+    std::map<AREAPERIL_INT, std::set<int>> &vulnerabilities_by_area_peril,
     std::map<int, std::vector<OASIS_FLOAT>> &vulnerabilities,
     std::vector<OASIS_FLOAT> intensity) const {
   for (int vulnerability_id : vulnerabilities_by_area_peril[areaperil_id]) {
@@ -251,8 +251,8 @@ void getmodel::doResults(
 }
 
 void getmodel::doResultsNoIntensityUncertainty(
-    int &event_id, int &areaperil_id,
-    std::map<int, std::set<int>> &vulnerabilities_by_area_peril,
+    int &event_id, AREAPERIL_INT &areaperil_id,
+    std::map<AREAPERIL_INT, std::set<int>> &vulnerabilities_by_area_peril,
     std::map<int, std::vector<OASIS_FLOAT>> &vulnerabilities,
     int intensity_bin_index)  {
   for (int vulnerability_id : vulnerabilities_by_area_peril[areaperil_id]) {
@@ -344,7 +344,7 @@ void getmodel::doCdfInnerz(int event_id) {
   // we now have the data length
   int number_of_event_records = static_cast<int>(dest_length / sizeof_EventKey);
   EventRow *event_key = (EventRow *)&_uncompressed_buf[0];
-  int current_areaperil_id = -1;
+  AREAPERIL_INT current_areaperil_id = -1;
   for (int i = 0; i < number_of_event_records; i++) {      
     if (event_key->areaperil_id != current_areaperil_id) {
       if (do_cdf_for_area_peril) {
@@ -381,7 +381,7 @@ void getmodel::doCdfInner(int event_id) {
   }
   auto intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);
 
-  int current_areaperil_id = -1;
+  AREAPERIL_INT current_areaperil_id = -1;
   bool do_cdf_for_area_peril = false;
   intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);
 

@@ -242,7 +242,7 @@ void getmodel::doResults(
 
     int num_results = result_index;
     fwrite(&event_id, SIZE_OF_INT, 1, stdout);
-    fwrite(&areaperil_id, SIZE_OF_INT, 1, stdout);
+    fwrite(&areaperil_id, sizeof(areaperil_id), 1, stdout);
     fwrite(&vulnerability_id, SIZE_OF_INT, 1, stdout);
     fwrite(&num_results, SIZE_OF_INT, 1, stdout);
     fwrite(&results[0], SIZE_OF_RESULT, num_results, stdout);
@@ -272,7 +272,7 @@ void getmodel::doResultsNoIntensityUncertainty(
 
     int num_results = result_index;
     fwrite(&event_id, SIZE_OF_INT, 1, stdout);
-    fwrite(&areaperil_id, SIZE_OF_INT, 1, stdout);
+    fwrite(&areaperil_id, sizeof(areaperil_id), 1, stdout);
     fwrite(&vulnerability_id, SIZE_OF_INT, 1, stdout);
     fwrite(&num_results, SIZE_OF_INT, 1, stdout);
     fwrite(&_temp_results[0], SIZE_OF_RESULT, num_results, stdout);

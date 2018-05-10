@@ -18,11 +18,7 @@ This issue will be handled in future releases by implementing the rdrand random 
 
 ### Pre-requisites
 
-The g++ compiler build-essential, libtool, zlib1g-dev autoconf on debian distros or 'Development Tools':
-
-    apt install -y build-essential libtool zlig1g-dev autoconf
-
-and zlib-devel on red hat  needs to be installed in Linux.
+The g++ compiler build-essential, libtool, zlib1g-dev autoconf on debian distros or 'Development Tools' and zlib-devel on red hat  needs to be installed in Linux.
 
 ### Instructions
 

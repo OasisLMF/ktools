@@ -68,6 +68,7 @@ private:
 	int maxLevel_ = -1;
 	int maxRunLevel_ = 10000;
 	int max_level_ = 0;
+	std::vector<int> level_to_max_layer_;
 	std::string inputpath_;
 	bool netvalue_ = false;
 	std::vector<std::vector<int>> pfm_vec_vec_;  // initialized from fm/programme.bin  pfm_vec_vec[level_id][item_id] returns agg_id 
@@ -81,12 +82,13 @@ private:
 	void addtcrow(const fm_policyTC &f);
 	bool loadcoverages(std::vector<OASIS_FLOAT> &coverages);
 	bool gulhasvalue(const std::vector<OASIS_FLOAT> &gul) const;
-	void compute_item_proportions(std::vector<std::vector <LossRec>> &agg_vecs, const std::vector<OASIS_FLOAT> &guls);
-	inline void dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlookups_, std::vector<std::vector <LossRec>> &agg_vecs_, 
+	void compute_item_proportions(std::vector<std::vector<std::vector <LossRec>>> &agg_vecs, const std::vector<OASIS_FLOAT> &guls);
+	inline void dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlookups_, std::vector<std::vector<std::vector <LossRec>>> &agg_vecs_, 
 		int level_, int max_level_,	std::map<fmlevelhdr, std::vector<fmlevelrec> > &outmap_, 
 		fmlevelhdr &fmhdr_, int sidx_, const std::vector<std::vector<std::vector<policytcvidx>>> &avxs_, int layer_, 
 		const std::vector<int> &items_, std::vector<std::vector<OASIS_FLOAT>> &event_guls);
 	inline void dofmcalc(std::vector <LossRec> &agg_vec_, int layer);
+	
 };
 
 #endif  // FMCALC_H_

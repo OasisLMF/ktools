@@ -396,15 +396,16 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 	}
 
 	vector <LossRec> &prev_agg_vec = agg_vecs[level - 1][previous_layer_id];
+	vector <LossRec> &agg_vec_previous_layer = agg_vecs[level][previous_layer_id];	// current level but previous layer
 	vector <LossRec> &agg_vec = agg_vecs[level][layer];
 	const std::vector<std::vector<policytcvidx>> &avx = avxs[level];
 
 	std::vector<float> previous_retained_losses;
 
-	previous_retained_losses.resize(agg_vec.size());
+	previous_retained_losses.resize(agg_vec_previous_layer.size());
 	if (layer > 1) {
-		for (unsigned int i = 0; i < agg_vec.size(); i++) {
-			previous_retained_losses[i] = agg_vec[i].retained_loss;
+		for (unsigned int i = 0; i < agg_vec_previous_layer.size(); i++) {
+			previous_retained_losses[i] = agg_vec_previous_layer[i].retained_loss;
 		}
 	}
 

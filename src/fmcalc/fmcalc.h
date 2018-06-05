@@ -82,7 +82,8 @@ private:
 	void addtcrow(const fm_policyTC &f);
 	bool loadcoverages(std::vector<OASIS_FLOAT> &coverages);
 	bool gulhasvalue(const std::vector<OASIS_FLOAT> &gul) const;
-	void compute_item_proportions(std::vector<std::vector<std::vector <LossRec>>> &agg_vecs, const std::vector<OASIS_FLOAT> &guls);
+	void compute_item_proportions(std::vector<std::vector<std::vector <LossRec>>> &agg_vecs, const std::vector<OASIS_FLOAT> &guls,int level_, int layer_,int previous_layer_);
+	void compute_item_proportions_new(std::vector<std::vector<std::vector <LossRec>>> &agg_vecs, const std::vector<OASIS_FLOAT> &guls, int level_, int layer_, int previous_layer_);
 	inline void dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlookups_, std::vector<std::vector<std::vector <LossRec>>> &agg_vecs_, 
 		int level_, int max_level_,	std::map<fmlevelhdr, std::vector<fmlevelrec> > &outmap_, 
 		fmlevelhdr &fmhdr_, int sidx_, const std::vector<std::vector<std::vector<policytcvidx>>> &avxs_, int layer_, 

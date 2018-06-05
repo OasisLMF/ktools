@@ -1,1 +1,1 @@
-direent.h retrireived from here https://github.com/tronkko/dirent/blob/master/include/dirent.h
+direent.h retreived from here https://github.com/tronkko/dirent/blob/master/include/dirent.h

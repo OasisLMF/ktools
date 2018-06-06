@@ -1,3 +1,5 @@
+<img src="https://oasislmf.org/packages/oasis_theme_package/themes/oasis_theme/assets/src/oasis-lmf-colour.png" alt="Oasis LMF logo" width="250"/>
+
 # ktools
 
 This is the POSIX-compliant Oasis In-Memory Kernel toolkit.
@@ -160,7 +162,10 @@ To build linux docker image do following command
 docker build --file Dockerfile.ktools.alpine -t alpine-ktools .
 ```
 
-
-### Questions/problems?
+## Questions/problems?
 
 Email support@oasislmf.org
+
+## License
+The code in this project is licensed under BSD 3-clause license.
+

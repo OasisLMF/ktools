@@ -47,7 +47,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <algorithm>
 #include <fcntl.h>
 #include <assert.h>
-
+#include <unordered_set>
 
 #ifdef __unix
     #include <unistd.h>
@@ -313,12 +313,11 @@ inline void fmcalc::dofmcalc(vector <LossRec> &agg_vec, int layer)
 	}
 }
 
-//
 // The item prop should not be needed so see if we can remove it all together - still used in function calc
-void fmcalc::compute_item_proportions_new(std::vector<std::vector<std::vector <LossRec>>> &agg_vecs, const std::vector<OASIS_FLOAT> &guls, int level_, int layer_, int previous_layer_)
+void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossRec>>> &agg_vecs, const std::vector<OASIS_FLOAT> &guls, int level_, int layer_, int previous_layer_)
 {
 
-	if (layer_ == 1) {	
+	if (layer_ == 1) {
 		std::vector<OASIS_FLOAT> items_prop;
 		items_prop.resize(guls.size(), 0);
 
@@ -400,18 +399,53 @@ void fmcalc::compute_item_proportions_new(std::vector<std::vector<std::vector <L
 		else {
 			// This code is broken for fm22 - works for other examples except probably fm28
 			vector <LossRec> &prev_agg_vec = agg_vecs[level_ - 1][previous_layer_];
+			vector <LossRec> &prev_agg_vec_base = agg_vecs[level_ - 1][1];
+			for (int i = 0; i < prev_agg_vec.size(); i++) {
+				if (prev_agg_vec[i].item_prop.size() == 0) {
+					//prev_agg_vec[i].loss = prev_agg_vec_base[i].loss;
+					prev_agg_vec[i].item_prop = prev_agg_vec_base[i].item_prop;
+				}
+			}
+			//
 
-			for (int y = 0; y < agg_vecs[level_][layer_].size(); y++) {
-				auto it = agg_vecs[level_][layer_][y].item_idx->begin();
-				OASIS_FLOAT prev_gul_total = 0;
-				while (it != agg_vecs[level_][layer_][y].item_idx->end()) {
-					prev_gul_total += prev_agg_vec[*it].loss;
+			std::vector<int> v;
+			v.resize(guls.size(), -1);
+			auto iter = prev_agg_vec.begin();
+			int j = 0;
+
+			while (iter != prev_agg_vec.end()) {
+				auto it = iter->item_idx->begin();
+				while (it != iter->item_idx->end()) {
+					v[*it] = j;
 					it++;
 				}
+				j++;
+				iter++;
+			}
+			for (int y = 0; y < agg_vecs[level_][layer_].size(); y++) {
+				auto it = agg_vecs[level_][layer_][y].item_idx->begin();
+				// 1 create an item id  to prev_agg_vec index
+				// 2 use below loop to create a set which will then be used to iterate and get previous_gul_total
+				std::unordered_set<int> s;
+				while (it != agg_vecs[level_][layer_][y].item_idx->end()) {
+					s.insert(v[*it]);
+					//prev_gul_total += prev_agg_vec[*it].loss;
+					it++;
+				}
+
+				OASIS_FLOAT prev_gul_total = 0;
+				auto s_iter = s.begin();
+				while (s_iter != s.end()) {
+					prev_gul_total += prev_agg_vec[*s_iter].loss;
+					s_iter++;
+				}
+
+				// agg_vecs[level_][layer_][y].loss = prev_gul_total;
 				it = agg_vecs[level_][layer_][y].item_idx->begin();
 				while (it != agg_vecs[level_][layer_][y].item_idx->end()) {
 					if (prev_gul_total > 0) {
-						agg_vecs[level_][layer_][y].item_prop.push_back(prev_agg_vec[*it].loss / prev_gul_total);
+						// this is recomputing the first layers proportions
+						agg_vecs[level_][layer_][y].item_prop.push_back(prev_agg_vec[v[*it]].loss * prev_agg_vec[v[*it]].item_prop[*it] / prev_gul_total);
 					}
 					else {
 						agg_vecs[level_][layer_][y].item_prop.push_back(0);
@@ -436,9 +470,14 @@ void fmcalc::compute_item_proportions_new(std::vector<std::vector<std::vector <L
 
 	}
 }
+/*
+
+
+
+*/
 //
 // The item prop should not be needed so see if we can remove it all together - still used in function calc
-void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossRec>>> &agg_vecs, const std::vector<OASIS_FLOAT> &guls,int level_, int layer_, int previous_layer_)
+void fmcalc::compute_item_proportions_old(std::vector<std::vector<std::vector <LossRec>>> &agg_vecs, const std::vector<OASIS_FLOAT> &guls,int level_, int layer_, int previous_layer_)
 {
 
 	if (layer_ == 1) {	// Level 1 is always item_id to agg_id so there will always be only 1 item_idx  and therefore the allcated percentage should be 1
@@ -531,27 +570,14 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 				it++;
 			}
 		}
-		//for (int y = 0; y < agg_vecs[level_][layer_].size(); y++) {
-		//	agg_vecs[level_][layer_][y].item_prop = agg_vecs[level_][1][y].item_prop;
-		//}
 	}
-
-	//for (int level = 1; level < agg_vecs.size(); level++) {
-	//	for (int x = 2; x <= max_layer_; x++) {
-	//		for (int y = 2; y < agg_vecs[level][x].size(); y++) {
-	//			agg_vecs[level][x][y].item_prop = agg_vecs[level][1][1].item_prop;
-	//		}
-	//	}
-	//}
 }
 inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlookups, vector<vector<vector <LossRec>>> &agg_vecs, int level, int max_level,
 	std::map<fmlevelhdr, std::vector<fmlevelrec> > &outmap, fmlevelhdr &fmhdr, int gul_idx, const std::vector<std::vector<std::vector<policytcvidx>>> &avxs, int layer, 
 	const std::vector<int> &items, std::vector<vector<OASIS_FLOAT>> &event_guls)
 {
 	int previous_layer_id = 1;
-	//if (layer > 1) {
-	//	fprintf(stderr, "we are here");
-	//}
+	
 	if (layer <= level_to_max_layer_[level - 1]) {
 		previous_layer_id = layer;	// Only if the previous layer has this layer id then use it otherwise use the first layer
 	}
@@ -630,10 +656,7 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 	if (level == max_level) {
 		int sidx = gul_idx - 1;
 		if (sidx == -1) sidx = tiv_idx;
-		if (sidx == 0) sidx = mean_idx;
-		if (sidx == 1) {
-			//fprintf(stderr, "we are here");
-		}
+		if (sidx == 0) sidx = mean_idx;		
 		fmlevelrec rec;
         rec.loss = 0;
 		rec.sidx = sidx;		
@@ -717,7 +740,7 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 			if (x.allocrule_id == 2) {		// back allocate as a proportion of the total of the previous losses			
 				int vec_idx = aggid_to_vectorlookup[x.agg_id - 1];																				
 				const std::vector<OASIS_FLOAT> &guls = event_guls[gul_idx];
-				compute_item_proportions_new(agg_vecs, guls, level, layer, previous_layer_id);
+				compute_item_proportions(agg_vecs, guls, level, layer, previous_layer_id);
 				if (x.item_prop.size() > 0) {
 					for (int idx : avx[layer][vec_idx].item_idx) {
 						OASIS_FLOAT prop = x.item_prop[idx];		// this points to the final level and  current layer of agg_vecs breaks on layer id 2

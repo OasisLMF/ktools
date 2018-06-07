@@ -87,7 +87,13 @@ private:
 	inline void dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlookups_, std::vector<std::vector<std::vector <LossRec>>> &agg_vecs_, 
 		int level_, int max_level_,	std::map<fmlevelhdr, std::vector<fmlevelrec> > &outmap_, 
 		fmlevelhdr &fmhdr_, int sidx_, const std::vector<std::vector<std::vector<policytcvidx>>> &avxs_, int layer_, 
-		const std::vector<int> &items_, std::vector<std::vector<OASIS_FLOAT>> &event_guls);
+		const std::vector<int> &items_, std::vector<std::vector<OASIS_FLOAT>> &event_guls,
+		int previous_level, int previous_layer);
+	inline void dofmcalc_r_old(std::vector<std::vector<int>>  &aggid_to_vectorlookups_, std::vector<std::vector<std::vector <LossRec>>> &agg_vecs_,
+		int level_, int max_level_, std::map<fmlevelhdr, std::vector<fmlevelrec> > &outmap_,
+		fmlevelhdr &fmhdr_, int sidx_, const std::vector<std::vector<std::vector<policytcvidx>>> &avxs_, int layer_,
+		const std::vector<int> &items_, std::vector<std::vector<OASIS_FLOAT>> &event_guls,
+		int previous_level, int previous_layer);
 	inline void dofmcalc(std::vector <LossRec> &agg_vec_, int layer);
 	
 };

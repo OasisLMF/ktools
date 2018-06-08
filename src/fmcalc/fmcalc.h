@@ -56,12 +56,13 @@ class fmcalc {
 public:
 	void setmaxlevel(int maxlevel) { if (maxlevel > -1) maxLevel_ = maxlevel; }
 	void dofm(int event_id_, const std::vector<int> &items_, std::vector<std::vector<OASIS_FLOAT>> &event_guls_);
-	fmcalc(int maxRunLevel,const std::string &inputpath, bool netvalue): inputpath_(inputpath) , netvalue_(netvalue) { init(maxRunLevel); }
+	fmcalc(int maxRunLevel, int allocrule,const std::string &inputpath, bool netvalue): inputpath_(inputpath) , netvalue_(netvalue),allocrule_(allocrule) { init(maxRunLevel); }
 	inline OASIS_FLOAT gettiv(int item_id) { return item_to_tiv_[item_id]; }
 	int getmaxnoofitems();
 private:
 	std::vector<std::vector<std::vector<int>>> policy_tc_vec_vec_vec_; // policy_tc_vec_vec_vec_[level][agg_id][layer_id]
 	std::vector<int> level_to_maxagg_id_;
+	int allocrule_ = 0;
 	int max_layer_ = 0;		// initialized from policy_tc
 	int max_agg_id_ = 0;	// initialized from policy_tc
 	std::vector <profile_rec> profile_vec_;

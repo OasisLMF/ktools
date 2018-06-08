@@ -52,9 +52,9 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #endif
 
 
-void doit(int &maxLevel,const std::string &inputpath, bool netvalue)
+void doit(int maxLevel,int allocrule,const std::string &inputpath, bool netvalue)
 {
-    fmcalc fc(maxLevel, inputpath,netvalue);
+    fmcalc fc(maxLevel, allocrule, inputpath,netvalue);
 		
 	bool gulstreamType = true;
 	unsigned int fmstream_type = 1 | fmstream_id;
@@ -167,15 +167,18 @@ void help()
 int main(int argc, char* argv[])
 {
     int new_max = -1;
-
+	int allocrule = 0;
 	int opt;
 	std::string inputpath;
 	bool netvalue = false;
-    while ((opt = getopt(argc, argv, "nvhoM:p:")) != -1) {
+    while ((opt = getopt(argc, argv, "nvhoM:p:a:")) != -1) {
         switch (opt) {
          case 'M':
             new_max = atoi(optarg);
-            break;	
+            break;
+		 case 'a':
+			 allocrule = atoi(optarg);
+			 break;
 		 case 'v':
 			 fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
 			 exit(EXIT_FAILURE);
@@ -196,7 +199,7 @@ int main(int argc, char* argv[])
     }
 
 	initstreams("", "");   
-	doit(new_max,inputpath, netvalue);
+	doit(new_max, allocrule,inputpath, netvalue);
    
 	return 0;
 }

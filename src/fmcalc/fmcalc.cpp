@@ -103,7 +103,8 @@ inline void fmcalc::dofmcalc(vector <LossRec> &agg_vec, int layer)
 		if (x.agg_id > 0) {
 			if (x.policytc_id > 0) {
 				const profile_rec &profile = profile_vec_[x.policytc_id];
-				x.allocrule_id = profile.allocrule_id;
+				//x.allocrule_id = profile.allocrule_id;
+				x.allocrule_id = allocrule_;
 				switch (profile.calcrule_id) {
 					case 1:
 					{

@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fmcalc", "fmcalc\fmcalc.vcxproj", "{EF5DA772-DAE8-479F-861D-B73EF0988278}"
 EndProject
@@ -125,6 +125,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xfmcalc", "xfmcalc\xfmcalc.
 	ProjectSection(ProjectDependencies) = postProject
 		{B5960B46-527B-4833-918B-EC5735C03635} = {B5960B46-527B-4833-918B-EC5735C03635}
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fmprofilebinconv", "fmprofilebinconv\fmprofilebinconv.vcxproj", "{A3926D45-89BA-449B-934D-F29C258A96CA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -646,6 +648,16 @@ Global
 		{3614B08E-9308-4059-A452-1CF2CE4FD007}.Release|x64.Build.0 = Release|x64
 		{3614B08E-9308-4059-A452-1CF2CE4FD007}.Release|x86.ActiveCfg = Release|Win32
 		{3614B08E-9308-4059-A452-1CF2CE4FD007}.Release|x86.Build.0 = Release|Win32
+		{A3926D45-89BA-449B-934D-F29C258A96CA}.Debug|Any CPU.ActiveCfg = Debug|Win32
+		{A3926D45-89BA-449B-934D-F29C258A96CA}.Debug|x64.ActiveCfg = Debug|x64
+		{A3926D45-89BA-449B-934D-F29C258A96CA}.Debug|x64.Build.0 = Debug|x64
+		{A3926D45-89BA-449B-934D-F29C258A96CA}.Debug|x86.ActiveCfg = Debug|Win32
+		{A3926D45-89BA-449B-934D-F29C258A96CA}.Debug|x86.Build.0 = Debug|Win32
+		{A3926D45-89BA-449B-934D-F29C258A96CA}.Release|Any CPU.ActiveCfg = Release|Win32
+		{A3926D45-89BA-449B-934D-F29C258A96CA}.Release|x64.ActiveCfg = Release|x64
+		{A3926D45-89BA-449B-934D-F29C258A96CA}.Release|x64.Build.0 = Release|x64
+		{A3926D45-89BA-449B-934D-F29C258A96CA}.Release|x86.ActiveCfg = Release|Win32
+		{A3926D45-89BA-449B-934D-F29C258A96CA}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

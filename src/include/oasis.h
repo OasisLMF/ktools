@@ -211,19 +211,46 @@ struct fm_profile {
 	OASIS_FLOAT deductible_prop_of_limit;
 };
 
+struct fm_profile_old {
+	int policytc_id;
+	int calcrule_id;
+	int allocrule_id;
+	int ccy_id;
+	OASIS_FLOAT deductible;
+	OASIS_FLOAT limits;
+	OASIS_FLOAT share_prop_of_lim;
+	OASIS_FLOAT deductible_prop_of_loss;
+	OASIS_FLOAT limit_prop_of_loss;
+	OASIS_FLOAT deductible_prop_of_tiv;
+	OASIS_FLOAT limit_prop_of_tiv;
+	OASIS_FLOAT deductible_prop_of_limit;
+};
+
+struct fm_profile_new {
+	int profile_id;
+	int calcrule_id;
+	OASIS_FLOAT deductible1;
+	OASIS_FLOAT	deductible2;
+	OASIS_FLOAT deductible3;
+	OASIS_FLOAT attachment;
+	OASIS_FLOAT limit;
+	OASIS_FLOAT share1;
+	OASIS_FLOAT share2;
+	OASIS_FLOAT	share3;
+
+};
+
 struct fm_programme {
 	int from_agg_id;
 	int level_id;
 	int to_agg_id;
 };
 
-
 struct fmXref {
 	int output_id;
 	int agg_id;
 	int layer_id;
 };
-
 
 struct fmxrefxx
 {
@@ -314,6 +341,7 @@ inline void initstreams(std::string inFile="", std::string outFile="")
 #define FMPOLICYTC_FILE "input/fm_policytc.bin"
 #define FMPROGRAMME_FILE "input/fm_programme.bin"
 #define FMPROFILE_FILE "input/fm_profile.bin"
+#define FMPROFILE_FILE_NEW "input/fm_profile_new.bin"
 #define FMXREF_FILE "input/fm_xref.bin"
 #define ITEMS_FILE "input/items.bin"
 #define EVENTS_FILE "input/events.bin"

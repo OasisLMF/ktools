@@ -153,6 +153,7 @@ AC_CONFIG_FILES([
 		 src/returnperiodtocsv/Makefile
 		 src/kat/Makefile
 		 src/footprintconv/Makefile
+		 src/fmprofilebinconv/Makefile
                  ])
 AC_OUTPUT
 

@@ -71,6 +71,16 @@ enum tc {			// tc = terms and conditions
 	deductible_prop_of_limit
 };
 
+enum tc_new {			// tc = terms and conditions
+	deductible1,
+	deductible2,
+	deductible3,
+	attachment,
+	limit1,
+	share1,
+	share2,
+	share3
+};
 
 bool operator<(const fmlevelhdr& lhs, const fmlevelhdr& rhs)
 {
@@ -1411,6 +1421,39 @@ void fmcalc::init_itemtotiv()
 	fclose(fin);
 
 }
+void fmcalc::init_profile_new()
+{
+	FILE *fin = NULL;
+	std::string file = FMPROFILE_FILE_NEW;
+	if (inputpath_.length() > 0) {
+		file = inputpath_ + file.substr(5);
+	}
+	fin = fopen(file.c_str(), "rb");
+	if (fin == NULL) {
+		fprintf(stderr, "%s: cannot open %s\n", __func__, file.c_str());
+		exit(EXIT_FAILURE);
+	}
+	fm_profile_new f;
+	int i = fread(&f, sizeof(f), 1, fin);
+	while (i != 0) {
+		profile_rec_new p;
+		p.calcrule_id = f.calcrule_id;
+		add_tc(deductible1, f.deductible1, p.tc_vec);
+		add_tc(deductible2, f.deductible2, p.tc_vec);
+		add_tc(deductible3, f.deductible3, p.tc_vec);
+		add_tc(attachment, f.attachment, p.tc_vec);
+		add_tc(limit1, f.limit, p.tc_vec);
+		add_tc(share1, f.share1, p.tc_vec);
+		add_tc(share2, f.share2, p.tc_vec);
+		add_tc(share3, f.share3, p.tc_vec);
+		if (profile_vec_new_.size() < f.profile_id + 1) {
+			profile_vec_new_.resize(f.profile_id + 1);
+		}
+		profile_vec_new_[f.profile_id] = p;
+		i = fread(&f, sizeof(f), 1, fin);
+	}
+	fclose(fin);
+}
 void fmcalc::init_profile()
 {
 
@@ -1488,6 +1531,7 @@ void fmcalc::init(int MaxRunLevel)
 	init_policytc(MaxRunLevel);
 	init_fmxref();
 	init_profile();
+	init_profile_new();
 	init_itemtotiv();
 }
 

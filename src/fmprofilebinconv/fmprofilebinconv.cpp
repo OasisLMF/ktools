@@ -1,5 +1,5 @@
 /*
-* Copyright (c)2015 - 2016 Oasis LMF Limited
+* Copyright (c)2015 - 2016 Oasis LMF Limited 
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
@@ -34,54 +34,76 @@
 /*
 Author: Ben Matharu  email: ben.matharu@oasislmf.org
 */
-#ifndef FMSTUCTS_H_
-#define FMSTUCTS_H_
+
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "../include/oasis.h"
+
+#if defined(_MSC_VER)
+#include "../wingetopt/wingetopt.h"
+#else
+#include <unistd.h>
+#endif
 
 
-#include <vector>
-
-struct LossRec {
-	OASIS_FLOAT original_loss = 0;
-	OASIS_FLOAT loss = 0;
-	OASIS_FLOAT retained_loss = 0;	// accumulated_deductible
-	OASIS_FLOAT proportion = 0;
-	OASIS_FLOAT gul_total = 0;	
-	OASIS_FLOAT previous_layer_retained_loss = 0;
-	OASIS_FLOAT net_loss = 0;
-	int agg_id;
-	int policytc_id;
-	int allocrule_id;
-	int next_vec_idx = -1;
-	const std::vector<int> *item_idx;
-	std::vector<OASIS_FLOAT> item_prop;
-};
-
-struct policytcvidx {
-	int policytc_id;
-	int agg_id;
-	int next_vidx = -1;
-	std::vector<int> item_idx;
-};
-
-struct tc_rec {
-	OASIS_FLOAT tc_val;
-	unsigned char tc_id;
-};
-
-struct profile_rec {
-	int calcrule_id;
-	int allocrule_id;
-	int ccy_id;
-	std::vector<tc_rec> tc_vec;
-
-};
-
-struct profile_rec_new {
-	int calcrule_id;	
-	std::vector<tc_rec> tc_vec;
-
-};
+void doit()
+{
 
 
+	fm_profile q;
+	size_t i = fread(&q, sizeof(q), 1, stdin);
+	while (i != 0) {
+		fm_profile_new f;
+		f.profile_id = q.policytc_id;
+		f.calcrule_id = q.calcrule_id;
+		f.deductible1 = q.deductible;
+		f.deductible1 = q.deductible_prop_of_limit;
+		f.deductible1 = q.deductible_prop_of_tiv;
+		f.deductible1 = q.deductible_prop_of_loss;
+		
+		f.limit = q.limits;
+		f.limit = q.deductible_prop_of_loss;
+		f.limit = q.deductible_prop_of_tiv;
 
-#endif  // FMSTUCTS_H_
+		f.share1 = q.share_prop_of_lim;
+		f.attachment = 0;
+
+		fwrite(&f, sizeof(f), 1, stdout);
+		i = fread(&q, sizeof(q), 1, stdin);
+	}
+
+	
+}
+
+void help()
+{
+	fprintf(stderr, "-h help\n-v version\n");
+}
+
+int main(int argc, char* argv[])
+{
+
+	int opt;
+
+	while ((opt = getopt(argc, argv, "vh")) != -1) {
+		switch (opt) {
+		case 'v':
+			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+			exit(EXIT_FAILURE);
+			break;
+		case 'h':
+		default:
+			help();
+			exit(EXIT_FAILURE);
+		}
+	}
+	initstreams();
+	doit();
+
+	return EXIT_SUCCESS;
+
+}
+
+

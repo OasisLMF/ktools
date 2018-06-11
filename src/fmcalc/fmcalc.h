@@ -66,6 +66,7 @@ private:
 	int max_layer_ = 0;		// initialized from policy_tc
 	int max_agg_id_ = 0;	// initialized from policy_tc
 	std::vector <profile_rec> profile_vec_;
+	std::vector <profile_rec_new> profile_vec_new_;
 	int maxLevel_ = -1;
 	int maxRunLevel_ = 10000;
 	int max_level_ = 0;
@@ -76,6 +77,7 @@ private:
 	std::vector<OASIS_FLOAT> item_to_tiv_;	
 	void init_programme(int maxrunLevel);
 	void init_profile();
+	void init_profile_new();
 	void init_itemtotiv();
 	void init_fmxref();
 	void init(int MaxRunLevel);

@@ -64,7 +64,7 @@ void doitz() {
   fgets(line, sizeof(line), stdin); // skip header line
   lineno++;
   int last_event_id = 0;
-  int last_areaperil_id = 0;
+  AREAPERIL_INT last_areaperil_id = 0;
   EventRow r;
   EventIndex idx;
   idx.event_id = 0;
@@ -72,18 +72,22 @@ void doitz() {
   idx.size = 0;
   int event_id = 0;
   std::set<int> events;
-  std::set<int> areaperils;
-  fwrite(&intensity_bins_, sizeof(intensity_bins_), 1, foutx);
+  std::set<AREAPERIL_INT> areaperils;
+  ::fwrite(&intensity_bins_, sizeof(intensity_bins_), 1, foutx);
   idx.offset += sizeof(intensity_bins_);
-  fwrite(&hasIntensityUncertainty_, sizeof(hasIntensityUncertainty_), 1, foutx);
+  ::fwrite(&hasIntensityUncertainty_, sizeof(hasIntensityUncertainty_), 1, foutx);
   idx.offset += sizeof(hasIntensityUncertainty_);
   std::vector<EventRow> rv;
   std::vector<unsigned char> rvz;
 
   while (fgets(line, sizeof(line), stdin) != 0) {
     lineno++;
-    if (sscanf(line, "%d,%d,%d,%f", &event_id, &r.areaperil_id,
-               &r.intensity_bin_id, &r.probability) != 4) {
+#ifdef AREAPERIL_TYPE_LONG
+	int ret = sscanf(line, "%d,%ld,%d,%f", &event_id, &r.areaperil_id, &r.intensity_bin_id, &r.probability);
+#else
+	int ret = sscanf(line, "%d,%d,%d,%f", &event_id, &r.areaperil_id, &r.intensity_bin_id, &r.probability);
+#endif
+    if (ret != 4) {
       fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
       return;
     }
@@ -127,9 +131,11 @@ void doitz() {
       if (areaperils.find(r.areaperil_id) == areaperils.end()) {
         areaperils.insert(r.areaperil_id);
       } else {
-        fprintf(stderr, "Error (%d): areaperil_id %d data is not contiguous "
-                        "for event_id %d \n",
-                lineno, r.areaperil_id, event_id);
+#ifdef AREAPERIL_TYPE_LONG
+		fprintf(stderr, "Error (%d): areaperil_id %ld data is not contiguous for event_id %d \n", lineno, r.areaperil_id, event_id);
+#else
+		fprintf(stderr, "Error (%d): areaperil_id %d data is not contiguous for event_id %d \n", lineno, r.areaperil_id, event_id);
+#endif
         exit(-1);
       }
     }
@@ -159,7 +165,7 @@ void doit() {
   fgets(line, sizeof(line), stdin); // skip header line
   lineno++;
   int last_event_id = 0;
-  int last_areaperil_id = 0;
+  AREAPERIL_INT last_areaperil_id = 0;
   EventRow r;
   EventIndex idx;
   idx.event_id = 0;
@@ -168,15 +174,19 @@ void doit() {
   int event_id = 0;
   int count = 0; // 11616 / 968*12
   std::set<int> events;
-  std::set<int> areaperils;
+  std::set<AREAPERIL_INT> areaperils;
   fwrite(&intensity_bins_, sizeof(intensity_bins_), 1, foutx);
   idx.offset += sizeof(intensity_bins_);
   fwrite(&hasIntensityUncertainty_, sizeof(hasIntensityUncertainty_), 1, foutx);
   idx.offset += sizeof(hasIntensityUncertainty_);
   while (fgets(line, sizeof(line), stdin) != 0) {
     lineno++;
-    if (sscanf(line, "%d,%d,%d,%f", &event_id, &r.areaperil_id,
-               &r.intensity_bin_id, &r.probability) != 4) {
+#ifdef AREAPERIL_TYPE_LONG
+	int ret = sscanf(line, "%d,%ld,%d,%f", &event_id, &r.areaperil_id, &r.intensity_bin_id, &r.probability);
+#else
+	int ret = sscanf(line, "%d,%d,%d,%f", &event_id, &r.areaperil_id, &r.intensity_bin_id, &r.probability);
+#endif
+    if ( ret != 4) {
       fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
       return;
     }
@@ -210,9 +220,11 @@ void doit() {
       if (areaperils.find(r.areaperil_id) == areaperils.end()) {
         areaperils.insert(r.areaperil_id);
       } else {
-        fprintf(stderr, "Error (%d): areaperil_id %d data is not contiguous "
-                        "for event_id %d \n",
-                lineno, r.areaperil_id, event_id);
+#ifdef AREAPERIL_TYPE_LONG
+        fprintf(stderr, "Error (%d): areaperil_id %ld data is not contiguous for event_id %d \n", lineno, r.areaperil_id, event_id);
+#else
+		fprintf(stderr, "Error (%d): areaperil_id %d data is not contiguous for event_id %d \n", lineno, r.areaperil_id, event_id);
+#endif
         exit(-1);
       }
     }

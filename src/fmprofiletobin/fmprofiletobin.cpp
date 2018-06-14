@@ -47,10 +47,10 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <unistd.h>
 #endif
 
-void doit()
+void doit_old()
 {
 
-	fm_profile q;
+	fm_profile_old q;
     char line[4096];
     int lineno=0;
 	fgets(line, sizeof(line), stdin);
@@ -71,17 +71,45 @@ void doit()
 
 }
 
+void doit()
+{
+
+	fm_profile_new q;
+	char line[4096];
+	int lineno = 0;
+	fgets(line, sizeof(line), stdin);
+	lineno++;
+	while (fgets(line, sizeof(line), stdin) != 0)
+	{
+		if (sscanf(line, "%d,%d,%f,%f,%f,%f,%f,%f,%f,%f", 
+			&q.profile_id, &q.calcrule_id,
+			&q.deductible1, &q.deductible2, &q.deductible3,
+			&q.attachment, &q.limit, &q.share1, &q.share2,
+			&q.share3) != 10) {
+			fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
+			return;
+		}
+		else
+		{
+			fwrite(&q, sizeof(q), 1, stdout);
+		}
+		lineno++;
+	}
+
+}
+
 void help()
 {
-	fprintf(stderr, "-h help\n-v version\n");
+	fprintf(stderr, "-h help\n - o old format\n-v version\n");
 }
 
 int main(int argc, char* argv[])
 {
 
 	int opt;
+	bool oldFMProfile = false;
 
-	while ((opt = getopt(argc, argv, "vh")) != -1) {
+	while ((opt = getopt(argc, argv, "vho")) != -1) {
 		switch (opt) {
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
@@ -94,7 +122,13 @@ int main(int argc, char* argv[])
 		}
 	}
 	initstreams();
-	doit();
+
+	if (oldFMProfile == true) {
+		doit_old();
+	}
+	else {
+		doit();
+	}
 
 	return EXIT_SUCCESS;
 

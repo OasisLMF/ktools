@@ -133,17 +133,22 @@ inline void fmcalc::dofmcalc_new(vector <LossRec> &agg_vec, int layer)
 						OASIS_FLOAT ded = 0;
 						OASIS_FLOAT lim = 0;
 						OASIS_FLOAT share = 0;
+						OASIS_FLOAT att = 0;
 						for (auto y : profile.tc_vec) {
 							if (y.tc_id == deductible_1) ded = y.tc_val;
 							if (y.tc_id == limit_1) lim = y.tc_val;
 							if (y.tc_id == share_1) share = y.tc_val;
+							if (y.tc_id == attachment_1) att = y.tc_val;
 						}
-						//Function2 = IIf(Loss < Ded, 0, IIf(Loss > Ded + Lim, Lim, Loss - Ded)) * Share	
+						//Function2: deductible applies before attachment limit share
+						//IIf(Loss < Ded, 0, Loss - Ded)
+						//IIf(Loss < Att, 0, IIf(Loss > Att + Lim, Lim, Loss - Att)) * Share	
 						OASIS_FLOAT loss = 0;
-						if (x.loss > (ded + lim)) loss = lim;
-						else loss = x.loss - ded;
+						loss = x.loss - ded;
 						if (loss < 0) loss = 0;
-						float floss = x.retained_loss + (x.loss - loss);
+						if (loss > (att + lim)) loss = lim;
+						else loss = loss - att;
+						if (loss < 0) loss = 0;
 						loss = loss * share;
 						x.retained_loss = x.retained_loss + (x.loss - loss);
 						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);

@@ -49,7 +49,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 using namespace std;
 
-void doit(bool skipheader)
+void doit_old(bool skipheader)
 {
 	if (skipheader == false) {
 		printf("\"policytc_id\",\"calcrule_id\",\"allocrule_id\",\"ccy_id\",");
@@ -57,7 +57,7 @@ void doit(bool skipheader)
 		printf("\"deductible_prop_of_tiv\",\"limit_prop_of_tiv\",\"deductible_prop_of_limit\"\n");
 	}
 
-    fm_profile q;
+	fm_profile_old q;
     size_t i = fread(&q, sizeof(q), 1, stdin);
     while (i != 0) {
         printf("%d, %d, %d, %d, %f, %f, %f, %f, %f, %f, %f, %f\n",
@@ -70,10 +70,32 @@ void doit(bool skipheader)
     }
 }
 
+void doit(bool skipheader)
+{
+	if (skipheader == false) {
+		printf("\"profile_id\",\"calcrule_id\",\"deductible1\",\"deductible2\",");
+		printf("\"deductible3\",\"attachment\",\"limit\",\"share1\",\"share2\",");
+		printf("\"share3\"\n");
+	}
+
+	fm_profile_new q;
+	size_t i = fread(&q, sizeof(q), 1, stdin);
+	while (i != 0) {
+		printf("%d, %d, %f, %f, %f, %f, %f, %f, %f, %f\n",
+			q.profile_id, q.calcrule_id,
+			q.deductible1, q.deductible2, q.deductible3,
+			q.attachment, q.limit, q.share1, q.share2,
+			q.share3);
+
+		i = fread(&q, sizeof(q), 1, stdin);
+	}
+}
+
 void help()
 {
 	fprintf(stderr,
 		"-s Skip Header\n"
+		"-o old format\n"
 		"-v version\n"
 		"-h help"
 	);
@@ -83,9 +105,13 @@ int main(int argc, char* argv[])
 {
     int opt;
 	 bool skipheader = false;
+	 bool oldFMProfile = false;
 
-     while ((opt = getopt(argc, argv, "vhs")) != -1) {
+     while ((opt = getopt(argc, argv, "vhso")) != -1) {
          switch (opt) {
+		 case 'o':
+			 oldFMProfile = true;
+			 break;
 		  case 's':
 			  skipheader = true;
 			  break;
@@ -101,6 +127,11 @@ int main(int argc, char* argv[])
 
     initstreams("", "");
 
-	doit(skipheader);
-	return 0;
+	if (oldFMProfile == true) {
+		doit_old(skipheader);
+	}
+	else {
+		doit(skipheader);
+	}
+	return		0;
 }

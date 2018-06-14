@@ -58,16 +58,67 @@ void doit()
 		fm_profile_new f;
 		f.profile_id = q.policytc_id;
 		f.calcrule_id = q.calcrule_id;
-		f.deductible1 = q.deductible;
-		f.deductible1 = q.deductible_prop_of_limit;
-		f.deductible1 = q.deductible_prop_of_tiv;
-		f.deductible1 = q.deductible_prop_of_loss;
+		switch (f.calcrule_id) {
+			case 1:
+			case 3:
+			{
+				f.deductible1 = q.deductible;
+				f.limit = q.limits;
+			}
+			break;
+			case 2:
+			{
+				f.deductible1 = q.deductible;
+				f.limit = q.limits;
+				f.share1 = q.share_prop_of_lim;
+			}
+			break;
+			case 5:
+			{
+				f.deductible1 = q.deductible_prop_of_loss;
+				f.limit = q.limit_prop_of_loss;
+			}
+			break;
+			case 9:
+			{
+				f.deductible1 = q.deductible_prop_of_limit;
+				f.limit = q.limits;
+			}
+			break;
+			case 10:
+			{
+				f.deductible3 = q.deductible;
+			}
+			case 11:
+			{
+				f.deductible2 = q.deductible;
+			}
+			break;
+			case 12:
+			{
+				f.deductible1 = q.deductible;
+			}
+			break;
+			case 14:
+			{
+				f.limit = q.limits;
+			}
+			break;
+			case 15:
+			{
+				f.limit = q.limit_prop_of_loss;
+			}
+			break;
+			case 16:
+			{
+				f.deductible1 = q.deductible_prop_of_loss;
+			}
+			break;
+			default:
+				fprintf(stderr, "Unknown calcrule_id %d\n", q.calcrule_id);
+		}
 		
-		f.limit = q.limits;
-		f.limit = q.deductible_prop_of_loss;
-		f.limit = q.deductible_prop_of_tiv;
-
-		f.share1 = q.share_prop_of_lim;
+		
 		f.attachment = 0;
 
 		fwrite(&f, sizeof(f), 1, stdout);

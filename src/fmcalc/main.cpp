@@ -52,9 +52,9 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #endif
 
 
-void doit(int maxLevel,int allocrule,const std::string &inputpath, bool netvalue)
+void doit(int maxLevel,int allocrule,const std::string &inputpath, bool netvalue, bool oldFMProfile)
 {
-    fmcalc fc(maxLevel, allocrule, inputpath,netvalue);
+    fmcalc fc(maxLevel, allocrule, inputpath,netvalue, oldFMProfile);
 		
 	bool gulstreamType = true;
 	unsigned int fmstream_type = 1 | fmstream_id;
@@ -155,6 +155,8 @@ void help()
 {
 
     fprintf(stderr,
+		"-a set allocrule (default none)\n"
+		"-o run old fm_profile\n"
         "-M max level (optional)\n"
 		"-p inputpath (relative or full path)\n"
 		"-n feed net value (used for reinsurance)\n"
@@ -170,9 +172,14 @@ int main(int argc, char* argv[])
 	int allocrule = 0;
 	int opt;
 	std::string inputpath;
+	bool oldFMProfile = false;
+
 	bool netvalue = false;
     while ((opt = getopt(argc, argv, "nvhoM:p:a:")) != -1) {
         switch (opt) {
+		case 'o':
+			oldFMProfile = true;
+			break;
          case 'M':
             new_max = atoi(optarg);
             break;
@@ -199,7 +206,7 @@ int main(int argc, char* argv[])
     }
 
 	initstreams("", "");   
-	doit(new_max, allocrule,inputpath, netvalue);
+	doit(new_max, allocrule,inputpath, netvalue, oldFMProfile);
    
 	return 0;
 }

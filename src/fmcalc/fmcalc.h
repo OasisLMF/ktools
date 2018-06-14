@@ -56,7 +56,7 @@ class fmcalc {
 public:
 	void setmaxlevel(int maxlevel) { if (maxlevel > -1) maxLevel_ = maxlevel; }
 	void dofm(int event_id_, const std::vector<int> &items_, std::vector<std::vector<OASIS_FLOAT>> &event_guls_);
-	fmcalc(int maxRunLevel, int allocrule,const std::string &inputpath, bool netvalue): inputpath_(inputpath) , netvalue_(netvalue),allocrule_(allocrule) { init(maxRunLevel); }
+	fmcalc(int maxRunLevel, int allocrule,const std::string &inputpath, bool netvalue, bool oldFMProfile): inputpath_(inputpath) , netvalue_(netvalue),allocrule_(allocrule) { init(maxRunLevel); }
 	inline OASIS_FLOAT gettiv(int item_id) { return item_to_tiv_[item_id]; }
 	int getmaxnoofitems();
 private:
@@ -73,10 +73,11 @@ private:
 	std::vector<int> level_to_max_layer_;
 	std::string inputpath_;
 	bool netvalue_ = false;
+	bool oldFMProfile_ = false;
 	std::vector<std::vector<int>> pfm_vec_vec_;  // initialized from fm/programme.bin  pfm_vec_vec[level_id][item_id] returns agg_id 
 	std::vector<OASIS_FLOAT> item_to_tiv_;	
 	void init_programme(int maxrunLevel);
-	void init_profile();
+	void init_profile_old();
 	void init_profile_new();
 	void init_itemtotiv();
 	void init_fmxref();
@@ -97,7 +98,8 @@ private:
 		fmlevelhdr &fmhdr_, int sidx_, const std::vector<std::vector<std::vector<policytcvidx>>> &avxs_, int layer_,
 		const std::vector<int> &items_, std::vector<std::vector<OASIS_FLOAT>> &event_guls,
 		int previous_level, int previous_layer);
-	inline void dofmcalc(std::vector <LossRec> &agg_vec_, int layer);
+	inline void dofmcalc_old(std::vector <LossRec> &agg_vec_, int layer);
+	inline void dofmcalc_new(std::vector <LossRec> &agg_vec_, int layer);
 	
 };
 

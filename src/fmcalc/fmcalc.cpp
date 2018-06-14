@@ -72,14 +72,14 @@ enum tc {			// tc = terms and conditions
 };
 
 enum tc_new {			// tc = terms and conditions
-	deductible1,
-	deductible2,
-	deductible3,
-	attachment,
-	limit1,
-	share1,
-	share2,
-	share3
+	deductible_1,
+	deductible_2,
+	deductible_3,
+	attachment_1,
+	limit_1,
+	share_1,
+	share_2,
+	share_3
 };
 
 bool operator<(const fmlevelhdr& lhs, const fmlevelhdr& rhs)
@@ -100,15 +100,313 @@ bool operator<(const fmxref_key& lhs, const fmxref_key& rhs)
 	if (lhs.agg_id != rhs.agg_id)  return lhs.agg_id < rhs.agg_id;
 	return lhs.layer_id < rhs.layer_id;		
 }
-
-inline void fmcalc::dofmcalc(vector <LossRec> &agg_vec, int layer)
+inline void fmcalc::dofmcalc_new(vector <LossRec> &agg_vec, int layer)
 {
 	for (LossRec &x : agg_vec) {
 		if (x.agg_id == 0) break;
-		//if (layer > 1) {
-		//	x.loss = x.retained_loss;
-		//	x.retained_loss = 0;
-		//}
+		x.original_loss = x.loss;
+		if (x.agg_id > 0) {
+			if (x.policytc_id > 0) {
+				const profile_rec_new &profile = profile_vec_new_[x.policytc_id];
+				x.allocrule_id = allocrule_;
+				switch (profile.calcrule_id) {
+					case 1:
+					{
+						OASIS_FLOAT ded = 0;
+						OASIS_FLOAT lim = 0;
+						for (auto y : profile.tc_vec) {
+							if (y.tc_id == deductible_1) ded = y.tc_val;
+							if (y.tc_id == limit_1) lim = y.tc_val;
+						}
+						//Function1 = IIf(Loss < Ded, 0, IIf(Loss > Ded + Lim, Lim, Loss - Ded))
+						OASIS_FLOAT loss = x.loss - ded;
+						if (loss < 0) loss = 0;
+						if (loss > lim) loss = lim;
+						x.retained_loss = x.retained_loss + (x.loss - loss);
+						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
+						else x.net_loss = x.retained_loss;
+						x.loss = loss;
+					}
+					break;
+					case 2:
+					{
+						OASIS_FLOAT ded = 0;
+						OASIS_FLOAT lim = 0;
+						OASIS_FLOAT share = 0;
+						for (auto y : profile.tc_vec) {
+							if (y.tc_id == deductible_1) ded = y.tc_val;
+							if (y.tc_id == limit_1) lim = y.tc_val;
+							if (y.tc_id == share_1) share = y.tc_val;
+						}
+						//Function2 = IIf(Loss < Ded, 0, IIf(Loss > Ded + Lim, Lim, Loss - Ded)) * Share	
+						OASIS_FLOAT loss = 0;
+						if (x.loss > (ded + lim)) loss = lim;
+						else loss = x.loss - ded;
+						if (loss < 0) loss = 0;
+						float floss = x.retained_loss + (x.loss - loss);
+						loss = loss * share;
+						x.retained_loss = x.retained_loss + (x.loss - loss);
+						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
+						else x.net_loss = x.retained_loss;
+						x.loss = loss;
+					}
+					break;
+					case 3:
+					{
+						OASIS_FLOAT ded = 0;
+						OASIS_FLOAT lim = 0;
+						for (auto y : profile.tc_vec) {
+							if (y.tc_id == deductible_1) ded = y.tc_val;
+							if (y.tc_id == limit_1) lim = y.tc_val;
+						}
+						//Function3 = IIf(Loss < Ded, 0, IIf(Loss > Ded, Lim, Loss))
+						OASIS_FLOAT loss = x.loss;
+						if (loss < ded) loss = 0;
+						else loss = loss;
+						if (loss > lim) loss = lim;
+						x.retained_loss = x.retained_loss + (x.loss - loss);
+						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
+						else x.net_loss = x.retained_loss;
+						x.loss = loss;
+					}
+					break;
+					case 5:
+					{
+						OASIS_FLOAT ded = 0;
+						OASIS_FLOAT lim = 0;
+						for (auto y : profile.tc_vec) {
+							if (y.tc_id == deductible_1) ded = y.tc_val;
+							if (y.tc_id == limit_1) lim = y.tc_val;
+						}
+						//Function5 = Loss * (Lim - Ded)
+						OASIS_FLOAT loss = x.loss * (lim - ded);
+						x.retained_loss = x.retained_loss + (x.loss - loss);
+						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
+						else x.net_loss = x.retained_loss;
+						x.loss = loss;
+					}
+					break;
+					case 9:
+					{
+						OASIS_FLOAT ded = 0;
+						OASIS_FLOAT lim = 0;
+						for (auto y : profile.tc_vec) {
+							if (y.tc_id == deductible_1) ded = y.tc_val;
+							if (y.tc_id == limit_1) lim = y.tc_val;
+						}
+						//Function9 = IIf(Loss < (Ded * lim), 0, IIf(Loss > (ded* lim) + Lim, Lim, Loss - (Ded * lim))
+						OASIS_FLOAT loss = x.loss - (ded * lim);
+						if (loss < 0) loss = 0;
+						if (loss > lim) loss = lim;
+						x.retained_loss = x.retained_loss + (x.loss - loss);
+						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
+						else x.net_loss = x.retained_loss;
+						x.loss = loss;
+					}
+					break;
+					case 10:
+					{
+						OASIS_FLOAT ded = 0;
+						for (auto y : profile.tc_vec) {
+							if (y.tc_id == deductible_3) ded = y.tc_val;
+						}
+						// Function 10: Applies a cap on retained loss (maximum deductible)
+						OASIS_FLOAT loss = 0;
+						if (x.retained_loss > ded) {
+							loss = x.loss + x.retained_loss - ded;
+							if (loss < 0) loss = 0;
+							x.retained_loss = x.retained_loss + (x.loss - loss);
+						}
+						else {
+							loss = x.loss;
+							// retained loss stays the same
+						}
+						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
+						else x.net_loss = x.retained_loss;
+						x.loss = loss;
+					}
+					break;
+					case 11:
+					{
+						OASIS_FLOAT ded = 0;
+						for (auto y : profile.tc_vec) {
+							if (y.tc_id == deductible_2) ded = y.tc_val;
+						}
+						// Function 11: Applies a floor on retained loss (minimum deductible)
+						OASIS_FLOAT loss = 0;
+						if (x.retained_loss < ded) {
+							loss = x.loss + x.retained_loss - ded;
+							if (loss < 0) loss = 0;
+							x.retained_loss = x.retained_loss + (x.loss - loss);
+						}
+						else {
+							loss = x.loss;
+							// retained loss stays the same
+						}
+						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
+						else x.net_loss = x.retained_loss;
+						x.loss = loss;
+					}
+					break;
+					case 12:
+					{
+						for (auto &z : profile.tc_vec) {
+							if (z.tc_id == deductible_1) {
+								OASIS_FLOAT loss = x.loss - z.tc_val;
+								if (loss < 0) loss = 0;
+								x.retained_loss = x.retained_loss + (x.loss - loss);
+								x.loss = loss;
+								break;
+							}
+						}
+					}
+					break;
+					case 14:
+					{
+						OASIS_FLOAT lim = 0;
+						for (auto y : profile.tc_vec) {
+							if (y.tc_id == limit_1) lim = y.tc_val;
+						}
+						//Function14 =  IIf(Loss > lim, Lim, Loss)
+						OASIS_FLOAT loss = x.loss;
+						if (loss > lim) loss = lim;
+						x.retained_loss = x.retained_loss + (x.loss - loss);
+						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
+						else x.net_loss = x.retained_loss;
+						x.loss = loss;
+					}
+					break;
+					case 15:
+					{
+						OASIS_FLOAT lim = 0;
+						for (auto y : profile.tc_vec) {
+							if (y.tc_id == limit_1) lim = y.tc_val;
+						}
+						//Function15 =  Loss * lim
+						OASIS_FLOAT loss = x.loss;
+						loss = loss * lim;
+						x.retained_loss = x.retained_loss + (x.loss - loss);
+						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
+						else x.net_loss = x.retained_loss;
+						x.loss = loss;
+					}
+					break;
+					case 16:
+					{
+						OASIS_FLOAT ded = 0;
+						for (auto y : profile.tc_vec) {
+							if (y.tc_id == deductible_1) ded = y.tc_val;
+						}
+						//Function16 =  Loss - (loss * ded)
+						OASIS_FLOAT loss = x.loss;
+						loss = loss - (loss * ded);
+						if (loss < 0) loss = 0;
+						x.retained_loss = x.retained_loss + (x.loss - loss);
+						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
+						else x.net_loss = x.retained_loss;
+						x.loss = loss;
+					}
+					break;
+					case 21:
+					{
+						OASIS_FLOAT share1 = 0;
+						OASIS_FLOAT limit = 0;
+						for (auto y : profile.tc_vec) {
+							if (y.tc_id == share_1) share1 = y.tc_val;
+							if (y.tc_id == limit_1) limit = y.tc_val;
+						}
+						//Function21 =  Min (Loss * share1, limit)
+						OASIS_FLOAT loss = x.loss * share1;
+						if (loss > limit) loss = limit;						
+						if (loss < 0) loss = 0;
+						x.retained_loss = x.retained_loss + (x.loss - loss);
+						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
+						else x.net_loss = x.retained_loss;
+						x.loss = loss;
+					}
+					break;
+					case 22:
+					{
+						OASIS_FLOAT share1 = 0;
+						OASIS_FLOAT share2 = 0;
+						OASIS_FLOAT share3 = 0;
+						OASIS_FLOAT limit = 0;
+						for (auto y : profile.tc_vec) {
+							if (y.tc_id == share_1) share1 = y.tc_val;
+							if (y.tc_id == share_2) share2 = y.tc_val;
+							if (y.tc_id == share_3) share3 = y.tc_val;
+							if (y.tc_id == limit_1) limit = y.tc_val;
+						}
+						//Function22 =  Min (Loss * share1, limit) * share2 * share 3
+						OASIS_FLOAT loss = x.loss * share1;
+						if (loss > limit) loss = limit;
+						loss = loss * share2 * share3;
+						if (loss < 0) loss = 0;
+						x.retained_loss = x.retained_loss + (x.loss - loss);
+						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
+						else x.net_loss = x.retained_loss;
+						x.loss = loss;
+					}
+					break;
+					case 23:
+					{
+						OASIS_FLOAT share2 = 0;
+						OASIS_FLOAT share3 = 0;
+						OASIS_FLOAT limit = 0;
+						for (auto y : profile.tc_vec) {
+							if (y.tc_id == share_2) share2 = y.tc_val;
+							if (y.tc_id == share_3) share3 = y.tc_val;
+							if (y.tc_id == limit_1) limit = y.tc_val;
+						}
+						//Function23 =  Min(Loss, limit) * share 2 * share 3
+						OASIS_FLOAT loss = x.loss;
+						if (loss > limit) loss = limit;
+						loss = loss * share2 * share3;
+						if (loss < 0) loss = 0;
+						x.retained_loss = x.retained_loss + (x.loss - loss);
+						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
+						else x.net_loss = x.retained_loss;
+						x.loss = loss;
+					}
+					break;
+					case 24:
+					{
+						OASIS_FLOAT attachment = 0;
+						OASIS_FLOAT share1 = 0;
+						OASIS_FLOAT share2 = 0;
+						OASIS_FLOAT share3 = 0;
+						OASIS_FLOAT limit = 0;
+						for (auto y : profile.tc_vec) {
+							if (y.tc_id == attachment_1) attachment = y.tc_val;
+							if (y.tc_id == share_1) share1 = y.tc_val;
+							if (y.tc_id == share_2) share2 = y.tc_val;
+							if (y.tc_id == share_3) share3 = y.tc_val;
+							if (y.tc_id == limit_1) limit = y.tc_val;
+						}
+						//Function24 =  Min(Max(Loss - attachment,0),limit)*share 1 * share 2 * share3
+						OASIS_FLOAT loss = x.loss - attachment;
+						if (loss < 0) loss = 0;
+						if (loss > limit) loss = limit;
+						loss = loss * share1 * share2 * share3;						
+						x.retained_loss = x.retained_loss + (x.loss - loss);
+						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
+						else x.net_loss = x.retained_loss;
+						x.loss = loss;
+					}
+					break;
+					default:
+					{
+						fprintf(stderr, "Unknown calc rule %d\n", profile.calcrule_id);
+					}
+				}
+			}
+		}
+	}
+}
+inline void fmcalc::dofmcalc_old(vector <LossRec> &agg_vec, int layer)
+{
+	for (LossRec &x : agg_vec) {
+		if (x.agg_id == 0) break;
 		x.original_loss = x.loss;
 		if (x.agg_id > 0) {
 			if (x.policytc_id > 0) {
@@ -324,7 +622,7 @@ inline void fmcalc::dofmcalc(vector <LossRec> &agg_vec, int layer)
 	}
 }
 
-// The item prop should not be needed so see if we can remove it all together - still used in function calc
+// 
 void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossRec>>> &agg_vecs, const std::vector<OASIS_FLOAT> &guls, int level_, int layer_, int previous_layer_)
 {
 
@@ -397,8 +695,6 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 		}
 	}
 	else {
-		//fprintf(stderr, "TODO\n");
-		// agg_vec = agg_vecs[level][layer];
 		if (previous_layer_ < layer_) {
 			std::vector<OASIS_FLOAT> items_prop;
 			items_prop.resize(guls.size(), 0);
@@ -407,8 +703,7 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 			current_agg_vec[0].proportion = prev_agg_vec[0].proportion;
 			current_agg_vec[0].item_prop = prev_agg_vec[0].item_prop;
 		}
-		else {
-			// This code is broken for fm22 - works for other examples except probably fm28
+		else {			
 			vector <LossRec> &prev_agg_vec = agg_vecs[level_ - 1][previous_layer_];
 			vector <LossRec> &prev_agg_vec_base = agg_vecs[level_ - 1][1];
 			for (int i = 0; i < prev_agg_vec.size(); i++) {
@@ -664,8 +959,14 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 			}
 		}
 	}
+
 	
-	dofmcalc(agg_vec, layer);
+	if (oldFMProfile_ == true) {
+		dofmcalc_old(agg_vec, layer);
+	}
+	else {
+		dofmcalc_new(agg_vec, layer);
+	}
 
 	if (level == max_level) {
 		int sidx = gul_idx - 1;
@@ -894,7 +1195,7 @@ inline void fmcalc::dofmcalc_r_old(std::vector<std::vector<int>>  &aggid_to_vect
 		}
 	}
 
-	dofmcalc(agg_vec, layer);
+	dofmcalc_old(agg_vec, layer);
 
 	if (level == max_level) {
 		int sidx = gul_idx - 1;
@@ -1438,14 +1739,14 @@ void fmcalc::init_profile_new()
 	while (i != 0) {
 		profile_rec_new p;
 		p.calcrule_id = f.calcrule_id;
-		add_tc(deductible1, f.deductible1, p.tc_vec);
-		add_tc(deductible2, f.deductible2, p.tc_vec);
-		add_tc(deductible3, f.deductible3, p.tc_vec);
-		add_tc(attachment, f.attachment, p.tc_vec);
-		add_tc(limit1, f.limit, p.tc_vec);
-		add_tc(share1, f.share1, p.tc_vec);
-		add_tc(share2, f.share2, p.tc_vec);
-		add_tc(share3, f.share3, p.tc_vec);
+		add_tc(deductible_1, f.deductible1, p.tc_vec);
+		add_tc(deductible_2, f.deductible2, p.tc_vec);
+		add_tc(deductible_3, f.deductible3, p.tc_vec);
+		add_tc(attachment_1, f.attachment, p.tc_vec);
+		add_tc(limit_1, f.limit, p.tc_vec);
+		add_tc(share_1, f.share1, p.tc_vec);
+		add_tc(share_2, f.share2, p.tc_vec);
+		add_tc(share_3, f.share3, p.tc_vec);
 		if (profile_vec_new_.size() < f.profile_id + 1) {
 			profile_vec_new_.resize(f.profile_id + 1);
 		}
@@ -1454,11 +1755,11 @@ void fmcalc::init_profile_new()
 	}
 	fclose(fin);
 }
-void fmcalc::init_profile()
+void fmcalc::init_profile_old()
 {
 
 	FILE *fin = NULL;
-	std::string file = FMPROFILE_FILE;
+	std::string file = FMPROFILE_FILE_OLD;
 	if (inputpath_.length() > 0) {
 		file = inputpath_ + file.substr(5);
 	}
@@ -1530,8 +1831,12 @@ void fmcalc::init(int MaxRunLevel)
     init_programme(MaxRunLevel);
 	init_policytc(MaxRunLevel);
 	init_fmxref();
-	init_profile();
-	init_profile_new();
+	if (oldFMProfile_ == true) {
+		init_profile_old();
+	}
+	else {
+		init_profile_new();
+	}
 	init_itemtotiv();
 }
 

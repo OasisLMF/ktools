@@ -81,8 +81,10 @@ private:
 	void getIntensityInfo();
     void doCdfInner(int event_id);
     void doCdfInnerNoIntensityUncertainty(int event_id);
+#ifndef _MSC_VER
     void doCdfInnerz(int event_id);
     void doCdfInnerNoIntensityUncertaintyz(int event_id);
+#endif
     void  doResults(
         int &event_id,
 		AREAPERIL_INT &areaperil_id,

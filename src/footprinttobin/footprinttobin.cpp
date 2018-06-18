@@ -41,7 +41,9 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <stdlib.h>
 #include <set>
 #include <vector>
+#ifndef _MSC_VER
 #include <zlib.h>
+#endif
 
 #if defined(_MSC_VER)
 #include "../wingetopt/wingetopt.h"
@@ -55,6 +57,7 @@ int intensity_bins_ = -1;
 int hasIntensityUncertainty_ = true;
 bool skipheader_ = false;
 
+#ifndef _MSC_VER
 void doitz() {
   FILE *foutx = fopen("footprint.bin.z", "wb");
   FILE *fouty = fopen("footprint.idx.z", "wb");
@@ -155,6 +158,7 @@ void doitz() {
   fclose(foutx);
   fclose(fouty);
 }
+#endif
 
 void doit() {
   FILE *foutx = fopen("footprint.bin", "wb");
@@ -282,10 +286,17 @@ int main(int argc, char *argv[]) {
 
   initstreams();
   fprintf(stderr, "starting...\n");
-  if (zip)
-    doitz();
-  else
-    doit();
+  if (zip) {
+#ifdef _MSC_VER
+		fprintf(stderr, "Zip not supported in Microsoft build\n");
+		exit(-1);
+#else
+	  doitz();
+#endif
+  }else{
+	  doit();
+  }
+    
   fprintf(stderr, "done...\n");
   return 0;
 }

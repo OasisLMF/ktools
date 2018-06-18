@@ -42,8 +42,9 @@
 #include <map>
 #include "getmodel.h"
 #include "../include/oasis.h"
+#ifndef _MSC_VER
 #include <zlib.h>
-
+#endif
 struct Exposure {
   int location_id;
   AREAPERIL_INT areaperil_id;
@@ -309,18 +310,31 @@ void getmodel::init(bool zip) {
 void getmodel::doCdf(int event_id) {
   
   if (_has_intensity_uncertainty) {
-    if (_zip)
-      doCdfInnerz(event_id);
-    else
-      doCdfInner(event_id);
+	  if (_zip) {
+#ifndef _MSC_VER
+		  doCdfInnerz(event_id);
+#else
+		  fprintf(stderr, "zip not supported with microsoft build\n");
+		  exit(-1);
+#endif
+	  }
+	  else {
+		  doCdfInner(event_id);
+	  }
   } else {
-    if (_zip)
-      doCdfInnerNoIntensityUncertaintyz(event_id);
-    else
-      doCdfInnerNoIntensityUncertainty(event_id);
+	  if (_zip) {
+#ifndef _MSC_VER
+		  doCdfInnerNoIntensityUncertaintyz(event_id);
+#else
+		  fprintf(stderr, "zip not supported with microsft build\n");
+		  exit(-1);
+#endif
+	  }else {
+		  doCdfInnerNoIntensityUncertainty(event_id);
+	  }
   }
 }
-
+#ifndef _MSC_VER
 void getmodel::doCdfInnerz(int event_id) {
   auto sizeof_EventKey = sizeof(EventRow);
   auto fin = fopen(ZFOOTPRINT_FILE, "rb");
@@ -371,7 +385,7 @@ void getmodel::doCdfInnerz(int event_id) {
   _uncompressed_buf.clear();
   fclose(fin);
 }
-
+#endif
 void getmodel::doCdfInner(int event_id) {
   auto sizeof_EventKey = sizeof(EventRow);
   auto fin = fopen(FOOTPRINT_FILE, "rb");
@@ -417,6 +431,7 @@ void getmodel::doCdfInner(int event_id) {
   fclose(fin);
 }
 
+#ifndef _MSC_VER
 void getmodel::doCdfInnerNoIntensityUncertaintyz(int event_id) {
   auto sizeof_EventKey = sizeof(EventRow);
   FILE *fin = fopen(ZFOOTPRINT_FILE, "rb");
@@ -452,6 +467,7 @@ void getmodel::doCdfInnerNoIntensityUncertaintyz(int event_id) {
 
   fclose(fin);
 }
+#endif
 
 void getmodel::doCdfInnerNoIntensityUncertainty(int event_id) {
   auto sizeof_EventKey = sizeof(EventRow);

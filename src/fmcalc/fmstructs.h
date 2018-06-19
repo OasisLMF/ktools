@@ -55,6 +55,7 @@ struct LossRec {
 	int next_vec_idx = -1;
 	const std::vector<int> *item_idx;
 	std::vector<OASIS_FLOAT> item_prop;
+	std::vector<OASIS_FLOAT> item_net;
 };
 
 struct policytcvidx {

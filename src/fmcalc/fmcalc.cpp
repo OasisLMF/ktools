@@ -947,7 +947,7 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 				}
 
 				agg_vec[vec_idx].loss += agg_vec_previous_level[i].loss;
-				agg_vec[vec_idx].retained_loss += agg_vec_previous_level[i].retained_loss;
+				agg_vec[vec_idx].retained_loss += agg_vec_previous_level[i].retained_loss;				
 			}	
 		}
 		else {
@@ -980,7 +980,20 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 		fmlevelrec rec;
         rec.loss = 0;
 		rec.sidx = sidx;		
+		if (netvalue_ && layer > 1) {
+			for (int i = 0; i < agg_vec.size(); i++) {
+				agg_vec[i].item_net = agg_vec_previous_layer[i].item_net;
+			}
+		}
 		for (LossRec &x : agg_vec) {
+			if (netvalue_ && layer == 1) {
+				const std::vector<OASIS_FLOAT> &guls = event_guls[gul_idx];
+				x.item_net.resize(x.item_idx->size(), 0);
+				const std::vector<int> &z = *(x.item_idx);
+				for (int i = 0; i < x.item_net.size(); i++) {					
+					x.item_net[i]= guls[z[i]];
+				}								
+			}			
 			if (x.allocrule_id == -1 || x.allocrule_id == 0 ) { // no back allocation
 				if (x.agg_id > 0) {	// agg id cannot be zero
 					if (netvalue_) { // get net gul value							
@@ -1065,7 +1078,9 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 					for (int idx : avx[layer][vec_idx].item_idx) {
 						OASIS_FLOAT prop = x.item_prop[idx];		// this points to the final level and  current layer of agg_vecs breaks on layer id 2
 						if (netvalue_) { // get net gul value							
-							rec.loss = x.retained_loss * prop;
+							x.item_net[idx] = x.item_net[idx] - (x.loss * prop);
+							if (x.item_net[idx] < 0) x.item_net[idx] = 0;
+							rec.loss = x.item_net[idx];
 						}
 						else {
 							rec.loss = x.loss * prop;

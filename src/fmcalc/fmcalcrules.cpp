@@ -38,8 +38,22 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 */
 
 #include "fmcalc.h"
+#include <vector>
 
-inline void fmcalc::dofmcalc_new(vector <LossRec> &agg_vec, int layer)
+
+
+enum tc_new {			// tc = terms and conditions
+	deductible_1,
+	deductible_2,
+	deductible_3,
+	attachment_1,
+	limit_1,
+	share_1,
+	share_2,
+	share_3
+};
+
+void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 {
 	for (LossRec &x : agg_vec) {
 		if (x.agg_id == 0) break;

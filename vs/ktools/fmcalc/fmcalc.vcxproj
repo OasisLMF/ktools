@@ -143,6 +143,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\fmcalc\fmcalc.cpp" />
+    <ClCompile Include="..\..\..\src\fmcalc\fmcalcrules.cpp" />
     <ClCompile Include="..\..\..\src\fmcalc\main.cpp" />
   </ItemGroup>
   <ItemGroup>

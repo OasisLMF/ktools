@@ -100,6 +100,7 @@ bool operator<(const fmxref_key& lhs, const fmxref_key& rhs)
 	if (lhs.agg_id != rhs.agg_id)  return lhs.agg_id < rhs.agg_id;
 	return lhs.layer_id < rhs.layer_id;		
 }
+/*
 inline void fmcalc::dofmcalc_new(vector <LossRec> &agg_vec, int layer)
 {
 	for (LossRec &x : agg_vec) {
@@ -408,6 +409,7 @@ inline void fmcalc::dofmcalc_new(vector <LossRec> &agg_vec, int layer)
 		}
 	}
 }
+*/
 inline void fmcalc::dofmcalc_old(vector <LossRec> &agg_vec, int layer)
 {
 	for (LossRec &x : agg_vec) {

@@ -73,9 +73,9 @@ void doit_old(bool skipheader)
 void doit(bool skipheader)
 {
 	if (skipheader == false) {
-		printf("\"profile_id\",\"calcrule_id\",\"deductible_1\",\"deductible_2\",");
-		printf("\"deductible_3\",\"attachment_1\",\"limit_1\",\"share_1\",\"share_2\",");
-		printf("\"share_3\"\n");
+		printf("\"profile_id\",\"calcrule_id\",\"deductible1\",\"deductible2\",");
+		printf("\"deductible3\",\"attachment1\",\"limit1\",\"share1\",\"share2\",");
+		printf("\"share3\"\n");
 	}
 
 	fm_profile_new q;

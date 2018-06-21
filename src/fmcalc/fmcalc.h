@@ -100,6 +100,7 @@ private:
 		int previous_level, int previous_layer);
 	inline void dofmcalc_old(std::vector <LossRec> &agg_vec_, int layer);
 	void dofmcalc_new(std::vector <LossRec> &agg_vec_, int layer);
+	void add_tc(unsigned char tc_id, OASIS_FLOAT &tc_val, std::vector<tc_rec> &tc_vec);
 	
 };
 

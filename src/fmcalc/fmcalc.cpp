@@ -769,12 +769,14 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 				const std::vector<OASIS_FLOAT> &guls = event_guls[gul_idx];
 				compute_item_proportions(agg_vecs, guls, level, layer, previous_layer_id);
 				if (x.item_prop.size() > 0) {
-					for (int idx : avx[layer][vec_idx].item_idx) {
+					for (int i=0;i < avx[layer][vec_idx].item_idx.size();i++){
+						int idx = avx[layer][vec_idx].item_idx[i];
+					//for (int idx : avx[layer][vec_idx].item_idx) {
 						OASIS_FLOAT prop = x.item_prop[idx];		// this points to the final level and  current layer of agg_vecs breaks on layer id 2
 						if (netvalue_) { // get net gul value							
-							x.item_net[idx] = x.item_net[idx] - (x.loss * prop);
-							if (x.item_net[idx] < 0) x.item_net[idx] = 0;
-							rec.loss = x.item_net[idx];
+							x.item_net[i] = x.item_net[i] - (x.loss * prop);
+							if (x.item_net[i] < 0) x.item_net[i] = 0;
+							rec.loss = x.item_net[i];
 						}
 						else {
 							rec.loss = x.loss * prop;

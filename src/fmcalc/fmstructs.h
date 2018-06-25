@@ -47,6 +47,7 @@ struct LossRec {
 	OASIS_FLOAT proportion = 0;
 	OASIS_FLOAT gul_total = 0;	
 	OASIS_FLOAT previous_layer_retained_loss = 0;
+	OASIS_FLOAT effective_deductible = 0;
 	OASIS_FLOAT net_loss = 0;
 	OASIS_FLOAT accumulated_tiv = 0;	// accumulated tiv 
 	int agg_id;

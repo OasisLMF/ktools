@@ -74,6 +74,7 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 						//Function1 = IIf(Loss < Ded, 0, IIf(Loss > Ded + Lim, Lim, Loss - Ded))
 						OASIS_FLOAT loss = x.loss - ded;
 						if (loss < 0) loss = 0;
+						x.effective_deductible = x.effective_deductible + (x.loss - loss);
 						if (loss > lim) loss = lim;
 						x.retained_loss = x.retained_loss + (x.loss - loss);
 						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
@@ -99,6 +100,7 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 						OASIS_FLOAT loss = 0;
 						loss = x.loss - ded;
 						if (loss < 0) loss = 0;
+						x.effective_deductible = x.effective_deductible + (x.loss - loss);						
 						if (loss > (att + lim)) loss = lim;
 						else loss = loss - att;
 						if (loss < 0) loss = 0;
@@ -121,6 +123,7 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 						OASIS_FLOAT loss = x.loss;
 						if (loss < ded) loss = 0;
 						else loss = loss;
+						x.effective_deductible = x.effective_deductible + (x.loss - loss);
 						if (loss > lim) loss = lim;
 						x.retained_loss = x.retained_loss + (x.loss - loss);
 						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
@@ -139,6 +142,7 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 						//Function4 = IIf(Loss < Ded * TIV, 0, IIf(Loss > Ded * TIV + Lim, Lim, Loss - Ded * TIV))
 						OASIS_FLOAT loss = x.loss - (ded * x.accumulated_tiv);
 						if (loss < 0) loss = 0;
+						x.effective_deductible = x.effective_deductible + (x.loss - loss);
 						if (loss > lim) loss = lim;
 						x.retained_loss = x.retained_loss + (x.loss - loss);
 						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
@@ -155,7 +159,9 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 							if (y.tc_id == limit_1) lim = y.tc_val;
 						}
 						//Function5 = Loss * (Lim - Ded)
-						OASIS_FLOAT loss = x.loss * (lim - ded);
+						OASIS_FLOAT loss = x.loss - (x.loss * ded);
+						x.effective_deductible = x.effective_deductible + (x.loss - loss);
+						if (loss > (x.loss * lim)) loss = x.loss * lim;						
 						x.retained_loss = x.retained_loss + (x.loss - loss);
 						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
 						else x.net_loss = x.retained_loss;
@@ -171,6 +177,7 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 						//Function6 = IIf(Loss < Ded * TIV, 0, Loss -(Ded * TIV))
 						OASIS_FLOAT loss = x.loss - (ded * x.accumulated_tiv);
 						if (loss < 0) loss = 0;
+						x.effective_deductible = x.effective_deductible + (x.loss - loss);
 						x.retained_loss = x.retained_loss + (x.loss - loss);
 						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
 						else x.net_loss = x.retained_loss;
@@ -187,9 +194,10 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 						}
 						// Function 7: Applies a cap on retained loss (maximum deductible) and a limit
 						OASIS_FLOAT loss = 0;
-						if (x.retained_loss > ded) {
-							loss = x.loss + x.retained_loss - ded;
+						if (x.effective_deductible > ded) {
+							loss = x.loss + x.effective_deductible - ded;
 							if (loss < 0) loss = 0;
+							x.effective_deductible = x.effective_deductible + (x.loss - loss);
 							if (loss > lim) loss = lim;
 							x.retained_loss = x.retained_loss + (x.loss - loss);
 						}
@@ -212,9 +220,10 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 						}
 						// Function 11: Applies a floor on retained loss (minimum deductible) and a limit
 						OASIS_FLOAT loss = 0;
-						if (x.retained_loss < ded) {
-							loss = x.loss + x.retained_loss - ded;
+						if (x.effective_deductible < ded) {
+							loss = x.loss + x.effective_deductible - ded;
 							if (loss < 0) loss = 0;
+							x.effective_deductible = x.effective_deductible + (x.loss - loss);
 							if (loss > lim) loss = lim;
 							x.retained_loss = x.retained_loss + (x.loss - loss);
 						}
@@ -238,6 +247,7 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 						//Function9 = IIf(Loss < (Ded * lim), 0, IIf(Loss > (ded* lim) + Lim, Lim, Loss - (Ded * lim))
 						OASIS_FLOAT loss = x.loss - (ded * lim);
 						if (loss < 0) loss = 0;
+						x.effective_deductible = x.effective_deductible + (x.loss - loss);
 						if (loss > lim) loss = lim;
 						x.retained_loss = x.retained_loss + (x.loss - loss);
 						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
@@ -253,9 +263,10 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 						}
 						// Function 10: Applies a cap on retained loss (maximum deductible)
 						OASIS_FLOAT loss = 0;
-						if (x.retained_loss > ded) {
-							loss = x.loss + x.retained_loss - ded;
+						if (x.effective_deductible > ded) {
+							loss = x.loss + x.effective_deductible - ded;
 							if (loss < 0) loss = 0;
+							x.effective_deductible = x.effective_deductible + (x.loss - loss);
 							x.retained_loss = x.retained_loss + (x.loss - loss);
 						}
 						else {
@@ -275,9 +286,10 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 						}
 						// Function 11: Applies a floor on retained loss (minimum deductible)
 						OASIS_FLOAT loss = 0;
-						if (x.retained_loss < ded) {
-							loss = x.loss + x.retained_loss - ded;
+						if (x.effective_deductible < ded) {
+							loss = x.loss + x.effective_deductible - ded;
 							if (loss < 0) loss = 0;
+							x.effective_deductible = x.effective_deductible + (x.loss - loss);
 							x.retained_loss = x.retained_loss + (x.loss - loss);
 						}
 						else {
@@ -295,6 +307,7 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 							if (z.tc_id == deductible_1) {
 								OASIS_FLOAT loss = x.loss - z.tc_val;
 								if (loss < 0) loss = 0;
+								x.effective_deductible = x.effective_deductible + (x.loss - loss);
 								x.retained_loss = x.retained_loss + (x.loss - loss);
 								x.loss = loss;
 								break;
@@ -312,19 +325,21 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 						}
 						// Function 13: Applies a cap and floor on retained loss (minimum and maximum deductible)
 						OASIS_FLOAT loss = 0;
-						if (x.retained_loss > ded3) {
-							loss = x.loss + x.retained_loss - ded3;
+						if (x.effective_deductible > ded3) {
+							loss = x.loss + x.effective_deductible - ded3;
 							if (loss < 0) loss = 0;
+							x.effective_deductible = x.effective_deductible + (x.loss - loss);
 							x.retained_loss = x.retained_loss + (x.loss - loss);
 						}
-						if (x.retained_loss < ded2) {
-							loss = x.loss + x.retained_loss - ded2;
+						if (x.effective_deductible < ded2) {
+							loss = x.loss + x.effective_deductible - ded2;
 							if (loss < 0) loss = 0;
+							x.effective_deductible = x.effective_deductible + (x.loss - loss);
 							x.retained_loss = x.retained_loss + (x.loss - loss);
 						}
 						else {
 							loss = x.loss;
-							// retained loss stays the same
+							// effective deductible / retained loss stays the same
 						}
 						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
 						else x.net_loss = x.retained_loss;
@@ -371,6 +386,7 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 						OASIS_FLOAT loss = x.loss;
 						loss = loss - (loss * ded);
 						if (loss < 0) loss = 0;
+						x.effective_deductible = x.effective_deductible + (x.loss - loss);
 						x.retained_loss = x.retained_loss + (x.loss - loss);
 						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
 						else x.net_loss = x.retained_loss;
@@ -395,6 +411,7 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 						OASIS_FLOAT loss = 0;
 						loss = x.loss - (ded * x.loss);
 						if (loss < 0) loss = 0;
+						x.effective_deductible = x.effective_deductible + (x.loss - loss);
 						if (loss > (att + lim)) loss = lim;
 						else loss = loss - att;
 						if (loss < 0) loss = 0;
@@ -423,6 +440,7 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 						OASIS_FLOAT loss = 0;
 						loss = x.loss - (ded * x.accumulated_tiv);
 						if (loss < 0) loss = 0;
+						x.effective_deductible = x.effective_deductible + (x.loss - loss);
 						if (loss > (att + lim)) loss = lim;
 						else loss = loss - att;
 						if (loss < 0) loss = 0;
@@ -448,15 +466,18 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 						if (x.loss * ded1 > ded3) {
 							loss = x.loss - ded3;
 							if (loss < 0) loss = 0;
+							x.effective_deductible = x.effective_deductible + (x.loss - loss);
 							x.retained_loss = x.retained_loss + (x.loss - loss);
 						}
 						if (x.loss * ded1 < ded2) {
 							loss = x.loss - ded2;
 							if (loss < 0) loss = 0;
+							x.effective_deductible = x.effective_deductible + (x.loss - loss);
 							x.retained_loss = x.retained_loss + (x.loss - loss);
 						}
 						else {
 							loss = x.loss - (x.loss * ded1);
+							x.effective_deductible = x.effective_deductible + (x.loss - loss);
 							x.retained_loss = x.retained_loss + (x.loss - loss);
 						}
 						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
@@ -557,11 +578,11 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 							if (y.tc_id == share_3) share3 = y.tc_val;
 							if (y.tc_id == limit_1) limit = y.tc_val;
 						}
-						//Function24 =  Min(Max(Loss - attachment,0),limit)*share 1 * share 2 * share3
-						OASIS_FLOAT loss = x.loss - attachment;
+						//Function24 =  Min(Max((Loss *share1) - attachment,0),limit)* share2 * share3
+						OASIS_FLOAT loss = (x.loss * share1) - attachment;
 						if (loss < 0) loss = 0;
 						if (loss > limit) loss = limit;
-						loss = loss * share1 * share2 * share3;						
+						loss = loss * share2 * share3;						
 						x.retained_loss = x.retained_loss + (x.loss - loss);
 						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
 						else x.net_loss = x.retained_loss;

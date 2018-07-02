@@ -614,7 +614,7 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 }
 
 
-void fmcalc::init_profile_new()
+void fmcalc::init_profile_newx()
 {
 	FILE *fin = NULL;
 	std::string file = FMPROFILE_FILE_NEW;
@@ -639,6 +639,114 @@ void fmcalc::init_profile_new()
 		add_tc(share_1, f.share1, p.tc_vec);
 		add_tc(share_2, f.share2, p.tc_vec);
 		add_tc(share_3, f.share3, p.tc_vec);
+		if (profile_vec_new_.size() < f.profile_id + 1) {
+			profile_vec_new_.resize(f.profile_id + 1);
+		}
+		profile_vec_new_[f.profile_id] = p;
+		i = fread(&f, sizeof(f), 1, fin);
+	}
+	fclose(fin);
+}
+
+void fmcalc::init_profile_new()
+{
+	FILE *fin = NULL;
+	std::string file = FMPROFILE_FILE_NEW;
+	if (inputpath_.length() > 0) {
+		file = inputpath_ + file.substr(5);
+	}
+	fin = fopen(file.c_str(), "rb");
+	if (fin == NULL) {
+		fprintf(stderr, "%s: cannot open %s\n", __func__, file.c_str());
+		exit(EXIT_FAILURE);
+	}
+	fm_profile_new f;
+	int i = fread(&f, sizeof(f), 1, fin);
+	while (i != 0) {
+		profile_rec_new p;
+		p.calcrule_id = f.calcrule_id;
+		switch (p.calcrule_id) {
+			case 1:
+				add_tc(deductible_1, f.deductible1, p.tc_vec);
+				add_tc(limit_1, f.limit, p.tc_vec);
+			break;
+			case 2:
+				add_tc(deductible_1, f.deductible1, p.tc_vec);
+				add_tc(limit_1, f.limit, p.tc_vec);
+				add_tc(share_1, f.share1, p.tc_vec);
+				add_tc(attachment_1, f.attachment, p.tc_vec);
+				break;
+			case 3:
+				add_tc(deductible_1, f.deductible1, p.tc_vec);
+				add_tc(limit_1, f.limit, p.tc_vec);
+				break;
+			case 4:
+				add_tc(deductible_1, f.deductible1, p.tc_vec);
+				add_tc(limit_1, f.limit, p.tc_vec);
+				break;
+			case 5:
+				add_tc(deductible_1, f.deductible1, p.tc_vec);
+				add_tc(limit_1, f.limit, p.tc_vec);
+				break;
+			case 6:
+				add_tc(deductible_1, f.deductible1, p.tc_vec);
+				break;
+			case 9:
+				add_tc(deductible_1, f.deductible1, p.tc_vec);
+				add_tc(limit_1, f.limit, p.tc_vec);
+				break;
+			case 10:
+				add_tc(deductible_3, f.deductible3, p.tc_vec);
+				break;
+			case 11:
+				add_tc(deductible_2, f.deductible2, p.tc_vec);
+				break;
+			case 12:
+				add_tc(deductible_1, f.deductible1, p.tc_vec);
+				break;
+			case 14:
+				add_tc(limit_1, f.limit, p.tc_vec);
+				break;
+			case 15:
+				add_tc(limit_1, f.limit, p.tc_vec);
+				break;
+			case 16:
+				add_tc(deductible_1, f.deductible1, p.tc_vec);
+				break;
+			case 21:
+				add_tc(limit_1, f.limit, p.tc_vec);
+				add_tc(share_1, f.share1, p.tc_vec);
+				break;
+			case 23:
+				add_tc(share_2, f.share2, p.tc_vec);
+				add_tc(share_3, f.share3, p.tc_vec);
+				add_tc(limit_1, f.limit, p.tc_vec);
+				break;
+			case 24:
+				add_tc(attachment_1, f.attachment, p.tc_vec);
+				add_tc(share_1, f.share1, p.tc_vec);
+				add_tc(share_2, f.share2, p.tc_vec);
+				add_tc(share_3, f.share3, p.tc_vec);
+				add_tc(limit_1, f.limit, p.tc_vec);
+				break;
+			case 25:
+				add_tc(share_1, f.share1, p.tc_vec);
+				break;
+			default:
+			{
+				//fprintf(stderr, "Found calrule %d\n", p.calcrule_id);
+				add_tc(deductible_1, f.deductible1, p.tc_vec);
+				add_tc(deductible_2, f.deductible2, p.tc_vec);
+				add_tc(deductible_3, f.deductible3, p.tc_vec);
+				add_tc(attachment_1, f.attachment, p.tc_vec);
+				add_tc(limit_1, f.limit, p.tc_vec);
+				add_tc(share_1, f.share1, p.tc_vec);
+				add_tc(share_2, f.share2, p.tc_vec);
+				add_tc(share_3, f.share3, p.tc_vec);
+			}
+
+		}
+		
 		if (profile_vec_new_.size() < f.profile_id + 1) {
 			profile_vec_new_.resize(f.profile_id + 1);
 		}

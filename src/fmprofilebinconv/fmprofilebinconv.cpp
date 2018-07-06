@@ -89,6 +89,7 @@ void doit()
 			{
 				f.deductible3 = q.deductible;
 			}
+			break;
 			case 11:
 			{
 				f.deductible2 = q.deductible;

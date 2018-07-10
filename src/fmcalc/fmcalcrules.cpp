@@ -717,6 +717,26 @@ void fmcalc::init_profile_new()
 			case 16:
 				add_tc(deductible_1, f.deductible1, p.tc_vec);
 				break;
+			case 17:
+				add_tc(deductible_1, f.deductible1, p.tc_vec);
+				add_tc(limit_1, f.limit, p.tc_vec);
+				add_tc(share_1, f.share1, p.tc_vec);
+				add_tc(attachment_1, f.attachment, p.tc_vec);
+				break;
+			case 18:
+				add_tc(deductible_1, f.deductible1, p.tc_vec);
+				add_tc(limit_1, f.limit, p.tc_vec);
+				add_tc(share_1, f.share1, p.tc_vec);
+				add_tc(attachment_1, f.attachment, p.tc_vec);
+				break;
+			case 19:
+				add_tc(deductible_1, f.deductible1, p.tc_vec);
+				add_tc(deductible_2, f.deductible2, p.tc_vec);
+				add_tc(deductible_3, f.deductible3, p.tc_vec);
+				break;
+			case 20:
+				add_tc(deductible_1, f.deductible1, p.tc_vec);
+				break;
 			case 21:
 				add_tc(limit_1, f.limit, p.tc_vec);
 				add_tc(share_1, f.share1, p.tc_vec);

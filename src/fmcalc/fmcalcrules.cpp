@@ -335,15 +335,17 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 							x.effective_deductible = x.effective_deductible + (x.loss - loss);
 							x.retained_loss = x.retained_loss + (x.loss - loss);
 						}
-						if (x.effective_deductible < ded2) {
-							loss = x.loss + x.effective_deductible - ded2;
-							if (loss < 0) loss = 0;
-							x.effective_deductible = x.effective_deductible + (x.loss - loss);
-							x.retained_loss = x.retained_loss + (x.loss - loss);
-						}
 						else {
-							loss = x.loss;
-							// effective deductible / retained loss stays the same
+							if (x.effective_deductible < ded2) {
+								loss = x.loss + x.effective_deductible - ded2;
+								if (loss < 0) loss = 0;
+								x.effective_deductible = x.effective_deductible + (x.loss - loss);
+								x.retained_loss = x.retained_loss + (x.loss - loss);
+							}
+							else {
+								loss = x.loss;
+								// effective deductible / retained loss stays the same
+							}
 						}
 						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
 						else x.net_loss = x.retained_loss;

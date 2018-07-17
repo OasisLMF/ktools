@@ -51,11 +51,12 @@ Author: Joh Carter  email: johanna.carter@oasislmf.org
 
 void doit(bool skipheader)
 {
+	int samplesize = 0;
+	size_t i = fread(&samplesize, sizeof(int), 1, stdin);
 
 	if (skipheader == false) printf("\"summary_id\", \"type\", \"mean\", \"mean_squared\", \"max_exposure_value\"\n");
-
 	aal_rec q;
-	size_t i = fread(&q, sizeof(q), 1, stdin);
+	i = fread(&q, sizeof(q), 1, stdin);
 	while (i != 0) {
 		printf("%d, %d, %f, %f, %f\n",q.summary_id,q.type,q.mean,q.mean_squared,q.max_exposure_value);
 

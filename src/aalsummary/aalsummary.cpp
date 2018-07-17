@@ -49,17 +49,30 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 void aalsummary::outputresultscsv()
 {
 	if(skipheader_ == false) printf("summary_id,type,mean,standard_deviation,exposure_value\n");
+	int p1 = no_of_periods_ * no_of_samples_;
+	int p2 = p1 - 1;
 
 	for (auto x : map_analytical_aal_) {
 		double mean = x.second.mean;
-		double sd_dev = sqrt((x.second.mean_squared - (x.second.mean * x.second.mean / no_of_periods_)) / (no_of_periods_ - 1));
+		double mean_squared = x.second.mean * x.second.mean;
+		double s1 = x.second.mean_squared - mean_squared / p1;
+		double s2 = s1 / p2;
+		double sd_dev = sqrt(s2);
+		//double sd_dev = sqrt((x.second.mean_squared - (x.second.mean * x.second.mean / no_of_periods_)) / (no_of_periods_ - 1));
 		mean = mean / no_of_periods_;
 		printf("%d,%d,%f,%f,%f\n", x.first, x.second.type, mean, sd_dev, x.second.max_exposure_value);
 	}
 
+	p1 = no_of_periods_ * no_of_samples_;
+	p2 = p1 - 1;
+
 	for (auto x : map_sample_aal_) {
-		double mean = x.second.mean;
-		double sd_dev = sqrt((x.second.mean_squared - (x.second.mean * x.second.mean / no_of_periods_)) / (no_of_periods_ - 1));
+		double mean = x.second.mean / no_of_samples_;
+		double mean_squared = x.second.mean * x.second.mean;
+		double s1 = x.second.mean_squared - mean_squared / p1;
+		double s2 = s1 / p2;
+		double sd_dev = sqrt(s2);
+		//double sd_dev = sqrt((x.second.mean_squared - (x.second.mean * x.second.mean / no_of_periods_)) / (no_of_periods_ - 1));
 		mean = mean / no_of_periods_;
 		printf("%d,%d,%f,%f,%f\n", x.first, x.second.type, mean, sd_dev, x.second.max_exposure_value);
 	}
@@ -100,8 +113,9 @@ void aalsummary::process_file(const std::string &s)
 {
 
 	FILE *fin = fopen(s.c_str(), "rb");
+	size_t i = fread(&no_of_samples_, sizeof(int), 1, fin);
 	aal_rec aalrec;
-	size_t i = fread(&aalrec, sizeof(aal_rec), 1, fin);
+	i = fread(&aalrec, sizeof(aal_rec), 1, fin);
 	while (i != 0) {
 		if (aalrec.type == 1) processrec(aalrec, map_analytical_aal_);
 		if (aalrec.type == 2) processrec(aalrec, map_sample_aal_);

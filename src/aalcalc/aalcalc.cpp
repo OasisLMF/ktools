@@ -133,6 +133,7 @@ void aalcalc::outputresultscsv()
 
 void aalcalc::outputsummarybin()
 {
+	fwrite(&samplesize_, sizeof(samplesize_), 1, stdout);
 
 	for (auto x : map_analytical_aal_) {
 		fwrite(&x.second, sizeof(aal_rec), 1, stdout);
@@ -197,11 +198,14 @@ void aalcalc::do_analytical_calc(const summarySampleslevelHeader &sh,  double me
 void aalcalc::do_sample_calc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec)
 {
 	OASIS_FLOAT mean_loss=0;
+	OASIS_FLOAT mean_squared = 0;
 	for (auto x : vrec) {
 		mean_loss += x.loss;
+		mean_squared += x.loss * x.loss;
 	}
-	mean_loss = mean_loss / samplesize_;	
-	OASIS_FLOAT mean_squared = mean_loss*mean_loss;
+	//mean_loss = mean_loss / samplesize_;	
+	//mean_squared = mean_squared / (samplesize_*samplesize_);
+	//OASIS_FLOAT mean_squared = mean_loss*mean_loss;
 	int count = event_count_[sh.event_id];		// do the cartesian
 	mean_loss = mean_loss * count;
 	mean_squared = mean_squared * count;

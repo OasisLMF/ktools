@@ -48,6 +48,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 class aalsummary {
 private:
 	int no_of_periods_ = 0;
+	int no_of_samples_ = 100;
 	std::map<int, aal_rec> map_analytical_aal_;
 	std::map<int, aal_rec> map_sample_aal_;
 

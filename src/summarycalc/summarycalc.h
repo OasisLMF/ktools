@@ -69,6 +69,7 @@ private:
 	std::vector<OASIS_FLOAT> coverages_;
 	std::vector<OASIS_FLOAT> outputs_;
 	input_type inputtype_ = UNKNOWN;
+	std::string inputpath_;
 // functions
 	void reset_sssl_array(int sample_size);
 	void alloc_sssl_array(int sample_size);
@@ -100,6 +101,7 @@ public:
 	void setgulmode() { inputtype_ = GUL_STREAM; };
 
 	void setfmmode() { inputtype_ = FM_STREAM; };
+	void setinputpath(const std::string &s) { inputpath_ = s; }
 
 };
 

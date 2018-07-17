@@ -161,8 +161,11 @@ void summarycalc::init_o_to_s()
 }
 bool summarycalc::loadcoverages()
 {
-
-	FILE *fin = fopen(COVERAGES_FILE, "rb");
+	std::string file = COVERAGES_FILE;
+	if (inputpath_.length() > 0) {
+		file = inputpath_ + file.substr(5);
+	}
+	FILE *fin = fopen(file.c_str(), "rb");
 	if (fin == NULL) {
 		fprintf(stderr, "%s: Error opening file %s\n", __func__, COVERAGES_FILE);
 		exit(-1);
@@ -190,7 +193,11 @@ bool summarycalc::loadcoverages()
 }
 void summarycalc::loadgulsummaryxref()
 {
-	FILE *fin = fopen(GULSUMMARYXREF_FILE, "rb");
+	std::string file = GULSUMMARYXREF_FILE;
+	if (inputpath_.length() > 0) {
+		file = inputpath_ + file.substr(5);
+	}
+	FILE *fin = fopen(file.c_str(), "rb");
 	if (fin == NULL) {
 		fprintf(stderr, "%s: Error opening file %s\n", __func__, GULSUMMARYXREF_FILE);
 		::exit(-1);
@@ -218,7 +225,11 @@ void summarycalc::loadgulsummaryxref()
 
 void summarycalc::loadfmsummaryxref()
 {
-	FILE *fin = fopen(FMSUMMARYXREF_FILE, "rb");
+	std::string file = FMSUMMARYXREF_FILE;
+	if (inputpath_.length() > 0) {
+		file = inputpath_ + file.substr(5);
+	}
+	FILE *fin = fopen(file.c_str(), "rb");
 	if (fin == NULL) {
 		fprintf(stderr, "%s: Error opening file %s\n", __func__, FMSUMMARYXREF_FILE);
 		::exit(-1);

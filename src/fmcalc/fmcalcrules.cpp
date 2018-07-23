@@ -598,11 +598,15 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 					case 25:
 					{
 						OASIS_FLOAT share1 = 0;
+						OASIS_FLOAT share2 = 0;
+						OASIS_FLOAT share3 = 0;
 						for (auto y : profile.tc_vec) {
 							if (y.tc_id == share_1) share1 = y.tc_val;
+							if (y.tc_id == share_2) share2 = y.tc_val;
+							if (y.tc_id == share_3) share3 = y.tc_val;
 						}
 						//Function25 =  Loss * share1
-						OASIS_FLOAT loss = x.loss * share1;
+						OASIS_FLOAT loss = x.loss * share1 * share2 * share3;
 						x.retained_loss = x.retained_loss + (x.loss - loss);
 						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
 						else x.net_loss = x.retained_loss;
@@ -757,6 +761,8 @@ void fmcalc::init_profile_new()
 				break;
 			case 25:
 				add_tc(share_1, f.share1, p.tc_vec);
+				add_tc(share_2, f.share2, p.tc_vec);
+				add_tc(share_3, f.share3, p.tc_vec);
 				break;
 			default:
 			{

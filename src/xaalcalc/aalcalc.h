@@ -40,9 +40,34 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #define AALCALC_H_
 
 #include "../include/oasis.h"
+
+#include <string>
+#include <map>
+#include <vector>
+
 class aalcalc {
+private:
+	std::map<int, int> event_count_;	// count of events in occurrence table used to create cartesian effect on event_id
+	std::map<int, int> event_to_period_;	// Mapping of event to period no
+	int no_of_periods_ = 0;
+	int samplesize_ = -1;
+	std::map<int, aal_rec> map_analytical_aal_;
+	std::map<int, aal_rec> map_sample_aal_;
+	std::map <int, double> periodstoweighting_;
+	bool skipheader_ = false;
+// private functions
+	void loadoccurrence();
+	void loadperiodtoweigthing();
+	void process_summaryfile(const std::string &filename);
+	void do_analytical_calc(const summarySampleslevelHeader &sh, double mean_loss);
+	void do_sample_calc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec);
+	void doaalcalc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec, OASIS_FLOAT mean_loss);
+	void applyweightings(int event_id, const std::map <int, double> &periodstoweighting, std::vector<sampleslevelRec> &vrec) ;
+	void applyweightingstomap(std::map<int, aal_rec> &m, int i);
+	void applyweightingstomaps();
+	void outputresultscsv();
 public:
-	void doit() {}
+	void doit(const std::string &subfolder);
 };
 
 #endif  // AALCALC_H_

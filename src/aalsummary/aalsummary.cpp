@@ -113,6 +113,10 @@ void aalsummary::process_file(const std::string &s)
 {
 
 	FILE *fin = fopen(s.c_str(), "rb");
+	if (fin == NULL) {
+		fprintf(stderr, "Unable to open %s\n", s.c_str());
+		exit(-1);
+	}
 	size_t i = fread(&no_of_samples_, sizeof(int), 1, fin);
 	aal_rec aalrec;
 	i = fread(&aalrec, sizeof(aal_rec), 1, fin);

@@ -246,7 +246,6 @@ void aalcalc::process_summaryfile(const std::string &filename)
 		}
 	}
 	
-	fprintf(stderr, "%s\n", filename.c_str());
 	fclose(fin);
 }
 void aalcalc::outputresultscsv()
@@ -309,16 +308,78 @@ void aalcalc::doit(const std::string &subfolder)
 		//outputsummarybin();
 		//getnumberofperiods();
 		outputresultscsv();
-		fprintf(stderr, "aalcalc: done!!\n");
 	}
 	else {
 		fprintf(stderr, "Unable to open directory %s\n", path.c_str());
 		exit(-1);
 	}	
 }
+void aalcalc::debug_process_summaryfile(const std::string &filename)
+{
+	FILE *fin = fopen(filename.c_str(), "rb");
+	if (fin == NULL) {
+		fprintf(stderr, "%s: cannot open %s\n", __func__, filename.c_str());
+		exit(EXIT_FAILURE);
+	}
+
+	int summarycalcstream_type = 0;
+	size_t i = fread(&summarycalcstream_type, sizeof(summarycalcstream_type), 1, fin);
+	int stream_type = summarycalcstream_type & summarycalc_id;
+
+	if (stream_type != summarycalc_id) {
+		fprintf(stderr, "%s: Not a summarycalc stream type %d\n", __func__, stream_type);
+		exit(-1);
+	}
+	stream_type = streamno_mask & summarycalcstream_type;
+	bool haveData = false;
+
+	if (stream_type == 1) {
+		int summary_set = 0;
+		i = fread(&samplesize_, sizeof(samplesize_), 1, fin);
+		if (i != 0) i = fread(&summary_set, sizeof(summary_set), 1, fin);
+		printf("event_id,period_no,summary_id,sidx,loss\n");
+		summarySampleslevelHeader sh;
+		int j = 0;
+		OASIS_FLOAT mean_loss = 0;
+		while (i != 0) {
+			i = fread(&sh, sizeof(sh), 1, fin);
+			while (i != 0) {
+				haveData = true;
+				sampleslevelRec sr;
+				i = fread(&sr, sizeof(sr), 1, fin);
+				if (i == 0) break;
+				if (sr.sidx == 0) break;
+				printf("%d,%d,%d,%d,%f\n", sh.event_id, event_to_period_[sh.event_id], sh.summary_id, sr.sidx, sr.loss);
+			}
+			j++;
+		}		
+	}
+
+	fclose(fin);
+}
 
 
 void aalcalc::debug(const std::string &subfolder)
 {
-	fprintf(stderr, "TODO!!\n");
+	loadoccurrence();
+	std::string path = "work/" + subfolder;
+	if (path.substr(path.length() - 1, 1) != "/") {
+		path = path + "/";
+	}
+
+	DIR *dir;
+	struct dirent *ent;
+	if ((dir = opendir(path.c_str())) != NULL) {
+		while ((ent = readdir(dir)) != NULL) {
+			std::string s = ent->d_name;
+			if (s.length() > 4 && s.substr(s.length() - 4, 4) == ".bin") {
+				s = path + ent->d_name;
+				debug_process_summaryfile(s);
+			}
+		}
+	}
+	else {
+		fprintf(stderr, "Unable to open directory %s\n", path.c_str());
+		exit(-1);
+	}
 }

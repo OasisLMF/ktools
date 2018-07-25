@@ -59,6 +59,7 @@ private:
 	void loadoccurrence();
 	void loadperiodtoweigthing();
 	void process_summaryfile(const std::string &filename);
+	void debug_process_summaryfile(const std::string &filename);
 	void do_analytical_calc(const summarySampleslevelHeader &sh, double mean_loss);
 	void do_sample_calc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec);
 	void doaalcalc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec, OASIS_FLOAT mean_loss);

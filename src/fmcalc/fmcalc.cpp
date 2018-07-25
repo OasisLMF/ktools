@@ -1224,7 +1224,7 @@ void fmcalc::addtcrow(const fm_policyTC &f)
 	if (f.level_id <= maxRunLevel_) {
 		if (f.level_id > max_level_) max_level_ = f.level_id;
 		if (f.layer_id > max_layer_) max_layer_ = f.layer_id;
-		if (f.level_id < level_to_max_layer_.size() + 1) {
+		if (f.level_id >= (int) level_to_max_layer_.size() ) {	
 			level_to_max_layer_.resize(f.level_id + 1);
 			level_to_max_layer_[f.level_id] = 0;
 		}

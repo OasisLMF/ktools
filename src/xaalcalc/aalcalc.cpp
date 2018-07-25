@@ -302,6 +302,8 @@ void aalcalc::doit(const std::string &subfolder)
 				//setinputstream(s);
 				//processinputfile(samplesize, event_to_periods, maxsummaryid, agg_out_loss, max_out_loss);
 			}
+
+
 		}
 		applyweightingstomaps();
 		//outputsummarybin();
@@ -313,4 +315,10 @@ void aalcalc::doit(const std::string &subfolder)
 		fprintf(stderr, "Unable to open directory %s\n", path.c_str());
 		exit(-1);
 	}	
+}
+
+
+void aalcalc::debug(const std::string &subfolder)
+{
+	fprintf(stderr, "TODO!!\n");
 }

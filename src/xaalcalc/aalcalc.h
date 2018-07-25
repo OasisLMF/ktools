@@ -68,6 +68,7 @@ private:
 	void outputresultscsv();
 public:
 	void doit(const std::string &subfolder);
+	void debug(const std::string &subfolder);
 };
 
 #endif  // AALCALC_H_

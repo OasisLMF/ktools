@@ -125,6 +125,10 @@ int main(int argc, char* argv[])
 		}
 	}
 	initstreams();
+	if (maxsampleindex == -1) {
+		fprintf(stderr, "Sample size not supplied - please use -S parameter followed by the sample size\n");
+			exit(EXIT_FAILURE);
+	}
 	doit(maxsampleindex);
 
 	return EXIT_SUCCESS;

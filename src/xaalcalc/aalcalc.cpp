@@ -8,6 +8,22 @@
 #endif
 #include <math.h>
 
+
+bool operator<(const period_sidx_map_key& lhs, const period_sidx_map_key& rhs)
+{
+	if (lhs.period_no != rhs.period_no) {
+		return lhs.period_no < rhs.period_no;
+	}
+	else {
+		if (lhs.sidx != rhs.sidx) {
+			return lhs.sidx < rhs.sidx;
+		}else {
+			return lhs.summary_id < rhs.summary_id;
+		}
+	}
+}
+
+
 // Load and normalize weigthting table 
 // we must have entry for every return period!!!
 // otherwise no way to pad missing ones
@@ -154,8 +170,84 @@ void aalcalc::do_analytical_calc(const summarySampleslevelHeader &sh, double mea
 		//}
 	}
 }
+void aalcalc::do_sample_calc_end(){
 
-void aalcalc::do_sample_calc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec)
+	auto iter = map_sample_sum_loss_.begin();
+
+
+	while (iter != map_sample_sum_loss_.end()) {
+		auto a_iter = map_sample_aal_.find(iter->first.summary_id);
+		if (a_iter != map_sample_aal_.end()) {
+			aal_rec &a = a_iter->second;
+			if (a.max_exposure_value < iter->second.max_exposure_value) a.max_exposure_value = iter->second.max_exposure_value;
+			a.mean += iter->second.sum_of_loss;
+			a.mean_squared += iter->second.sum_of_loss_squared;
+		}
+		else {
+			aal_rec a;
+			a.summary_id = iter->first.summary_id;
+			a.type = 2;
+			a.max_exposure_value = iter->second.max_exposure_value;
+			a.mean = iter->second.sum_of_loss;
+			a.mean_squared = iter->second.sum_of_loss_squared;
+			map_sample_aal_[iter->first.summary_id] = a;
+		}
+		iter++;
+	}
+
+
+
+	//int p1 = no_of_periods_ * samplesize_;
+	//int p2 = p1 - 1;
+
+	//iter = map_sample_sum_loss_.begin();
+	//double mean = 0;
+	//double sum_of_square_losses = 0;
+	//while (iter != map_sample_sum_loss_.end()) {
+	//	mean += iter->second.sum_of_loss;
+	//	sum_of_square_losses += iter->second.sum_of_loss_squared;
+	//	iter++;
+	//}
+	//mean = mean / samplesize_;
+	//double mean_squared = mean * mean;
+
+	//double s1 = sum_of_square_losses - mean_squared / p1;
+	//double s2 = s1 / p2;
+	//double sd_dev = sqrt(s2);
+	//fprintf(stderr, "");
+}
+void aalcalc::do_sample_calc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec){
+
+	period_sidx_map_key k;
+	k.period_no = event_to_period_[sh.event_id];
+	k.summary_id = sh.summary_id;
+
+	if (k.period_no == 0) return;
+
+	//if (k.summary_id != 1) return;
+
+	for (auto x : vrec) {
+		k.sidx = x.sidx;
+		auto iter = map_sample_sum_loss_.find(k);
+		if (iter != map_sample_sum_loss_.end()) {
+			loss_rec &a = iter->second;
+			if (a.max_exposure_value < sh.expval) a.max_exposure_value = sh.expval;
+			a.sum_of_loss += x.loss;
+			a.sum_of_loss_squared += x.loss * x.loss;
+		}
+		else {
+			loss_rec l;
+			l.sum_of_loss = x.loss;
+			l.sum_of_loss_squared = x.loss * x.loss;
+			l.max_exposure_value = sh.expval;
+			map_sample_sum_loss_[k] = l;
+		}
+
+	}
+
+
+}
+void aalcalc::do_sample_calc_old(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec)
 {
 	OASIS_FLOAT mean_loss = 0;
 	OASIS_FLOAT mean_squared = 0;
@@ -305,6 +397,7 @@ void aalcalc::doit(const std::string &subfolder)
 
 		}
 		applyweightingstomaps();
+		do_sample_calc_end();
 		//outputsummarybin();
 		//getnumberofperiods();
 		outputresultscsv();

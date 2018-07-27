@@ -181,7 +181,8 @@ void aalcalc::do_sample_calc_end(){
 			aal_rec &a = a_iter->second;
 			if (a.max_exposure_value < iter->second.max_exposure_value) a.max_exposure_value = iter->second.max_exposure_value;
 			a.mean += iter->second.sum_of_loss;
-			a.mean_squared += iter->second.sum_of_loss_squared;
+			a.mean_squared += iter->second.sum_of_loss * iter->second.sum_of_loss;
+			//a.mean_squared += iter->second.sum_of_loss_squared;
 		}
 		else {
 			aal_rec a;
@@ -189,7 +190,8 @@ void aalcalc::do_sample_calc_end(){
 			a.type = 2;
 			a.max_exposure_value = iter->second.max_exposure_value;
 			a.mean = iter->second.sum_of_loss;
-			a.mean_squared = iter->second.sum_of_loss_squared;
+			a.mean_squared = iter->second.sum_of_loss * iter->second.sum_of_loss;
+			//a.mean_squared = iter->second.sum_of_loss_squared;
 			map_sample_aal_[iter->first.summary_id] = a;
 		}
 		iter++;
@@ -233,12 +235,12 @@ void aalcalc::do_sample_calc(const summarySampleslevelHeader &sh, const std::vec
 			loss_rec &a = iter->second;
 			if (a.max_exposure_value < sh.expval) a.max_exposure_value = sh.expval;
 			a.sum_of_loss += x.loss;
-			a.sum_of_loss_squared += x.loss * x.loss;
+			//a.sum_of_loss_squared += x.loss * x.loss;
 		}
 		else {
 			loss_rec l;
 			l.sum_of_loss = x.loss;
-			l.sum_of_loss_squared = x.loss * x.loss;
+			//l.sum_of_loss_squared = x.loss * x.loss;
 			l.max_exposure_value = sh.expval;
 			map_sample_sum_loss_[k] = l;
 		}

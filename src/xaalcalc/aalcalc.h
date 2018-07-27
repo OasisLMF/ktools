@@ -57,7 +57,7 @@ struct period_sidx_map_key {
 
 struct loss_rec {
 	double sum_of_loss;
-	double sum_of_loss_squared;
+	//double sum_of_loss_squared;
 	double max_exposure_value;
 };
 

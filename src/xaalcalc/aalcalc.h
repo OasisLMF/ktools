@@ -49,6 +49,12 @@ struct aal_rec_vec {
 	double max_exposure_value;
 };
 
+struct period_map_key {
+	int summary_id;
+	int period_no;
+	int sidx;
+};
+
 struct period_sidx_map_key {
 	int summary_id;
 	int period_no;
@@ -62,6 +68,7 @@ struct loss_rec {
 };
 
 bool operator<(const period_sidx_map_key& lhs, const period_sidx_map_key& rhs);
+bool operator<(const period_map_key& lhs, const period_map_key& rhs);
 
 class aalcalc {
 private:
@@ -72,6 +79,7 @@ private:
 	std::map<int, aal_rec> map_analytical_aal_;
 	std::map<int, aal_rec> map_sample_aal_;
 	std::map<period_sidx_map_key, loss_rec > map_sample_sum_loss_;
+	std::map<period_map_key, loss_rec > map_analytical_sum_loss_;
 	std::map <int, double> periodstoweighting_;
 	bool skipheader_ = false;
 // private functions
@@ -79,7 +87,9 @@ private:
 	void loadperiodtoweigthing();
 	void process_summaryfile(const std::string &filename);
 	void debug_process_summaryfile(const std::string &filename);
+	void do_analytical_calc_old(const summarySampleslevelHeader &sh, double mean_loss);
 	void do_analytical_calc(const summarySampleslevelHeader &sh, double mean_loss);
+	void do_analytical_calc_end();
 	void do_sample_calc_old(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec);
 	void do_sample_calc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec);
 	void do_sample_calc_end();

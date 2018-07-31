@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\src\aggregateditemtobin\aggregateitemtobin.cpp">
+    <ClCompile Include="..\..\..\src\areaperildisaggtocsv\areaperildisaggtocsv.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

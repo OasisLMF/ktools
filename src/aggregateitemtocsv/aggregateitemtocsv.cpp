@@ -15,9 +15,9 @@ using namespace std;
 void doit(bool skipheader)
 {
 
-	if (skipheader == false) printf("item_id, coverage_id, aggregate_areaperil_id, aggregate_vulnerability_id,areaperil_id,vulnerability_id,number_items, grouped\n");
+	if (skipheader == false) printf("item_id, coverage_id, aggregate_areaperil_id, aggregate_vulnerability_id, areaperil_id, vulnerability_id, number_items, grouped\n");
 
-	aggregated_item q;
+	aggregate_item q;
 	int i = fread(&q, sizeof(q), 1, stdin);
 	while (i != 0) {
 #ifdef AREAPERIL_TYPE_LONG

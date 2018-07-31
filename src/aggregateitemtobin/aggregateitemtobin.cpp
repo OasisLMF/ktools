@@ -15,7 +15,7 @@
 void doit()
 {
 
-	aggregated_item q;
+	aggregate_item q;
 	char line[4096];
 	int lineno = 0;
 	fgets(line, sizeof(line), stdin); // skip header line

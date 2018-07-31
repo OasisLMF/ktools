@@ -177,7 +177,7 @@ struct item {
   int group_id;
 };
 
-struct aggregated_item {
+struct aggregate_item {
 	int id;
 	int coverage_id;
 	AREAPERIL_INT aggregate_areaperil_id;
@@ -268,18 +268,18 @@ struct Vulnerability
 	OASIS_FLOAT probability;
 };
 
-struct area_peril_disagg
+struct areaperil_disagg
 {
-	int aggregate_area_peril_id;
-	int area_peril_id;
+	int aggregate_areaperil_id;
+	int areaperil_id;
 	OASIS_FLOAT probability;
 };
 
 struct vulnerability_disagg
 {
 	int aggregate_vulnerability_id;
-	int area_peril_id;
-	int vulnerability_id_id;
+	int areaperil_id;
+	int vulnerability_id;
 	OASIS_FLOAT probability;
 };
 

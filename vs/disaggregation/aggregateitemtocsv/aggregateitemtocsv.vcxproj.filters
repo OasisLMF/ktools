@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="aggregateditemtobin.cpp">
+    <ClCompile Include="..\..\..\src\aggregateitemtocsv\aggregateitemtocsv.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -15,7 +15,7 @@
 void doit()
 {
 
-	area_peril_disagg q;
+	areaperil_disagg q;
 	char line[4096];
 	int lineno = 0;
 	fgets(line, sizeof(line), stdin); // skip header line
@@ -23,12 +23,12 @@ void doit()
 	while (fgets(line, sizeof(line), stdin) != 0)
 	{
 #ifdef AREAPERIL_TYPE_LONG
-		int ret = sscanf(line, "%ld,%ld,%f",  &q.aggregate_areaperil_id, &q.area_peril_id, &q.probability);
+		int ret = sscanf(line, "%ld,%ld,%f",  &q.aggregate_areaperil_id, &q.areaperil_id, &q.probability);
 #else
-		int ret = sscanf(line, "%d,%d,%f", &q.aggregate_areaperil_id, &q.area_peril_id, &q.probability);
+		int ret = sscanf(line, "%d,%d,%f", &q.aggregate_areaperil_id, &q.areaperil_id, &q.probability);
 #endif 
 
-		if (ret != 6) {
+		if (ret != 3) {
 			fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
 			return;
 		}

@@ -133,25 +133,39 @@ void getmodel::getIntensityInfo() {
 }
 
 void getmodel::getItems(std::set<int> &v) {
-  // Read the exposures and generate a set of vulnerabilities by area peril
-  item item_rec;
+	// Read the exposures and generate a set of vulnerabilities by area peril
+	item item_rec;
 
-  FILE *fin = fopen(ITEMS_FILE, "rb");
-  if (fin == nullptr) {
-    fprintf(stderr, "%s: cannot open %s\n", __func__, ITEMS_FILE);
-    exit(EXIT_FAILURE);
-  }
+	FILE *fin = fopen(ITEMS_FILE, "rb");
+	if (fin == nullptr) {
+		fprintf(stderr, "%s: cannot open %s\n", __func__, ITEMS_FILE);
+		exit(EXIT_FAILURE);
+	}
 
-  while (fread(&item_rec, sizeof(item_rec), 1, fin) != 0) {
-    if (_vulnerability_ids_by_area_peril.count(item_rec.areaperil_id) == 0)
-      _vulnerability_ids_by_area_peril[item_rec.areaperil_id] = std::set<int>();
-    _vulnerability_ids_by_area_peril[item_rec.areaperil_id].insert(
-        item_rec.vulnerability_id);
-    _area_perils.insert(item_rec.areaperil_id);
-    v.insert(item_rec.vulnerability_id);
-  }
-  fclose(fin);
+	while (fread(&item_rec, sizeof(item_rec), 1, fin) != 0) {
+		if (_vulnerability_ids_by_area_peril.count(item_rec.areaperil_id) == 0)
+			_vulnerability_ids_by_area_peril[item_rec.areaperil_id] = std::set<int>();
+		_vulnerability_ids_by_area_peril[item_rec.areaperil_id].insert(
+			item_rec.vulnerability_id);
+		_area_perils.insert(item_rec.areaperil_id);
+		v.insert(item_rec.vulnerability_id);
+	}
+	fclose(fin);
 }
+
+/*void getmodel::getDisaggregateItems(std::set<int> &v) {
+	item item_rec;
+
+	while (fread(&item_rec, sizeof(item_rec), 1, stdin) != 0) {
+		if (_vulnerability_ids_by_area_peril.count(item_rec.areaperil_id) == 0)
+			_vulnerability_ids_by_area_peril[item_rec.areaperil_id] = std::set<int>();
+		_vulnerability_ids_by_area_peril[item_rec.areaperil_id].insert(
+			item_rec.vulnerability_id);
+		_area_perils.insert(item_rec.areaperil_id);
+		v.insert(item_rec.vulnerability_id);
+	}
+	fclose(fin);
+}*/
 
 void getmodel::getDamageBinDictionary() {
   FILE *fin = fopen(DAMAGE_BIN_DICT_FILE, "rb");

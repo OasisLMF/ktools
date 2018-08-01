@@ -268,14 +268,14 @@ struct Vulnerability
 	OASIS_FLOAT probability;
 };
 
-struct areaperil_disagg
+struct aggregate_areaperil_to_areaperil
 {
 	int aggregate_areaperil_id;
 	int areaperil_id;
 	OASIS_FLOAT probability;
 };
 
-struct vulnerability_disagg
+struct aggregate_vulnerability_to_vulnerability
 {
 	int aggregate_vulnerability_id;
 	int areaperil_id;
@@ -346,7 +346,7 @@ inline void initstreams(std::string inFile="", std::string outFile="")
 #define FMPROFILE_FILE "input/fm_profile.bin"
 #define FMXREF_FILE "input/fm_xref.bin"
 #define ITEMS_FILE "input/items.bin"
-#define AGGREGATED_ITEMS_FILE "input/aggregated_items.bin"
+#define AGGREGATE_ITEMS_FILE "input/aggregate_items.bin"
 #define EVENTS_FILE "input/events.bin"
 #define RETURNPERIODS_FILE "input/returnperiods.bin"
 #define OCCURRENCE_FILE "input/occurrence.bin"
@@ -357,8 +357,8 @@ inline void initstreams(std::string inFile="", std::string outFile="")
 #define DAMAGE_CDF_IDX_FILE "static/damage_cdf.idx"
 #define RANDOM_FILE "static/random.bin"
 #define DISAGG_RANDOM_FILE "static/disagg_random.bin"
-#define AGGREGATE_AP_TO_AP_FILE "static/agg_ap_to_ap.bin"
-#define AGGREGATE_VUL_TO_VUL_FILE "static/agg_vul_to_vul.bin"
+#define AGGREGATE_AREAPERIL_TO_AREAPERIL_FILE "static/agg_ap_to_ap.bin"
+#define AGGREGATE_VULNERABILITY_TO_VULNERABILITY_FILE "static/agg_vul_to_vul.bin"
 #define VULNERABILITY_FILE  "static/vulnerability.bin"
 #define FOOTPRINT_FILE  "static/footprint.bin"
 #define FOOTPRINT_IDX_FILE  "static/footprint.idx"

@@ -14,10 +14,12 @@ using namespace std;
 
 void doit(bool skipheader)
 {
+	long areaperils;
+	fread(&areaperils, sizeof(areaperils), 1, stdin); //drop number of areaperils
 
 	if (skipheader == false) printf("aggregate_areaperil_id, areaperil_id, probability\n");
 
-	areaperil_disagg q;
+	aggregate_areaperil_to_areaperil q;
 	int i = fread(&q, sizeof(q), 1, stdin);
 	while (i != 0) {
 #ifdef AREAPERIL_TYPE_LONG

@@ -185,6 +185,7 @@ struct aggregate_item {
 	AREAPERIL_INT areaperil_id;
 	int vulnerability_id;
 	int number_items;
+	int group_id;
 	bool grouped;
 };
 

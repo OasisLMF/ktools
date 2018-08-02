@@ -126,23 +126,14 @@ installertest()
 	../src/pltcalc/pltcalc < ../ktest/testout/gulsummarycalc2.bin > ../ktest/testout/gulplt2.csv
 	../src/pltcalc/pltcalc < ../ktest/testout/fmsummarycalc1.bin > ../ktest/testout/fmplt1.csv
 	../src/pltcalc/pltcalc < ../ktest/testout/fmsummarycalc2.bin > ../ktest/testout/fmplt2.csv
+
+	# test aalcalc	
+	../src/aalcalc/aalcalc -Kgul1/summary > ../ktest/testout/gulaalcalc1.csv
+	../src/aalcalc/aalcalc -Kgul2/summary > ../ktest/testout/gulaalcalc2.csv
+	../src/aalcalc/aalcalc -Kfm1/summary > ../ktest/testout/fmaalcalc1.csv
+	../src/aalcalc/aalcalc -Kfm2/summary > ../ktest/testout/fmaalcalc2.csv
+
 	
-	# test aalcalc
-	../src/aalcalc/aalcalc < ../ktest/testout/gulsummarycalc1.bin > ../ktest/testout/gulaalcalc1.bin
-	../src/aalcalc/aalcalc < ../ktest/testout/gulsummarycalc2.bin > ../ktest/testout/gulaalcalc2.bin
-	../src/aalcalc/aalcalc < ../ktest/testout/fmsummarycalc1.bin > ../ktest/testout/fmaalcalc1.bin
-	../src/aalcalc/aalcalc < ../ktest/testout/fmsummarycalc2.bin > ../ktest/testout/fmaalcalc2.bin
-
-	# test aalsummary
-	cp ../ktest/testout/gulaalcalc1.bin work/gul1/aal/gulaalcalc1.bin
-	cp ../ktest/testout/gulaalcalc2.bin work/gul2/aal/gulaalcalc2.bin
-	cp ../ktest/testout/fmaalcalc1.bin work/fm1/aal/fmaalcalc1.bin
-	cp ../ktest/testout/fmaalcalc2.bin work/fm2/aal/fmaalcalc2.bin
-	../src/aalsummary/aalsummary -Kgul1/aal > ../ktest/testout/gulaalsummary1.csv
-	../src/aalsummary/aalsummary -Kgul2/aal > ../ktest/testout/gulaalsummary2.csv
-	../src/aalsummary/aalsummary -Kfm1/aal > ../ktest/testout/fmaalsummary1.csv
-	../src/aalsummary/aalsummary -Kfm2/aal > ../ktest/testout/fmaalsummary2.csv
-
 	# test stream conversion components
 	# stdout to csv
 	../src/cdftocsv/cdftocsv -s < ../ktest/testout/getmodelout.bin > ../ktest/testout/getmodelout.csv
@@ -154,8 +145,6 @@ installertest()
 	../src/summarycalctocsv/summarycalctocsv -f < ../ktest/testout/gulsummarycalc1.bin > ../ktest/testout/gulsummarycalc1.csv
 	../src/summarycalctocsv/summarycalctocsv -f < ../ktest/testout/fmsummarycalc2.bin > ../ktest/testout/fmsummarycalc2.csv
 	../src/summarycalctocsv/summarycalctocsv -f < ../ktest/testout/fmsummarycalc1.bin > ../ktest/testout/fmsummarycalc1.csv
-
-	../src/aalcalctocsv/aalcalctocsv < ../ktest/testout/gulaalcalc1.bin > ../ktest/testout/gulaalcalc1.csv
 
 	# input data to csv and bin
 	../src/evetocsv/evetocsv < ../examples/input/events.bin | ../src/evetobin/evetobin > ../ktest/testout/events.bin

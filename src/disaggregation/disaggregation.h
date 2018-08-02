@@ -10,27 +10,30 @@
 
 
 std::ostream& operator<< (std::ostream &out, const aggregate_item &agg_item);
-bool operator< (const aggregate_item &a, const aggregate_item &i);
+std::ostream& operator<< (std::ostream &out, const item &item);
+
+//bool operator< (const aggregate_item &a, const aggregate_item &i);
+bool operator< (const item &a, const item &i);
 
 class disaggregation {
 public:
 	disaggregation();
 	~disaggregation();
 	void init();
-	void doDisagg();
+	void doDisagg(std::vector<item> &i);
 
 private:
 	std::map<AREAPERIL_INT, std::vector<OASIS_FLOAT>> _aggregate_areaperils;
 	std::map<int, std::vector<OASIS_FLOAT>> _aggregate_vulnerabilities;
 	std::map<AREAPERIL_INT, std::vector<int>> _vulnerabilities_by_areaperil;
-	std::set<aggregate_item> _aggregate_items;
+	std::vector<aggregate_item> _aggregate_items;
+	std::vector<aggregate_item> _expanded_aggregate_items;
 	std::vector<OASIS_FLOAT> _coverages;
 	std::set<int> _group_ids = { 0 };
 	std::set<int> _item_ids = { 0 };
-	
+
 	long _num_areaperils = -1;
 	long _num_vulnerabilities = -1;
-	int _num_items = -1;
 	bool _has_disagg_uncertainty = false;
 
 	void getAggregateAreaPerils(const std::set<AREAPERIL_INT> &a);
@@ -47,7 +50,7 @@ private:
 	void assignDisaggAreaPeril(aggregate_item &a, OASIS_FLOAT rand);
 	void assignDisaggVulnerability(aggregate_item &a, OASIS_FLOAT rand);
 
-	void aggregateItemtoItem(std::set<aggregate_item> &a, std::set<item> &i);
+	void aggregateItemtoItem(aggregate_item a, item &i);
 
 };
 #endif

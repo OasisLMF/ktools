@@ -29,5 +29,8 @@
     <ClCompile Include="..\..\..\src\disaggregation\disaggregation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\disaggregation\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

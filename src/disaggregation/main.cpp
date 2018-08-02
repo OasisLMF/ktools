@@ -8,22 +8,20 @@
 
 #include "disaggregation.h"
 
+
 int main() {
-	aggregate_item item;
-	item.aggregate_areaperil_id = 1;
-	item.aggregate_vulnerability_id = 1;
-	item.areaperil_id = 0;
-	item.coverage_id = 15;
-	item.grouped = 0;
-	item.id = 1;
-	item.number_items = 1;
-	item.vulnerability_id = 0;
 
 	disaggregation disagg;
 	initstreams();
-	disagg.doDisagg();
 
-	std::cerr << item;
+	std::vector<item> items;
+
+	disagg.doDisagg(items);
+
+	for (int i = 0; i < items.size(); ++i) {
+		item item = items[i];
+		std::cerr << item  << std::endl;
+	}
 
 	return EXIT_SUCCESS;
 }

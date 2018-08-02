@@ -25,6 +25,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\src\disaggregation\disaggregation.cpp" />
     <ClCompile Include="..\..\..\src\disaggregation\getrands.cpp" />
+    <ClCompile Include="..\..\..\src\disaggregation\main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\ktools\wingetopt\wingetopt.vcxproj">

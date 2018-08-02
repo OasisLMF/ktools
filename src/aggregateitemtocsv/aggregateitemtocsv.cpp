@@ -21,9 +21,11 @@ void doit(bool skipheader)
 	int i = fread(&q, sizeof(q), 1, stdin);
 	while (i != 0) {
 #ifdef AREAPERIL_TYPE_LONG
-		printf("%d, %d, %ld, %d, %ld, %d, %d, %d\n", q.id, q.coverage_id, q.aggregate_areaperil_id, q.aggregate_vulnerability_id, q.areaperil_id, q.vulnerability_id, q.number_items, q.grouped);
+		printf("%d, %d, %ld, %d, %ld, %d, %d, %d, %d\n", 
+			q.id, q.coverage_id, q.aggregate_areaperil_id, q.aggregate_vulnerability_id, q.areaperil_id, q.vulnerability_id, q.number_items, q.group_id, q.grouped);
 #else
-		printf("%d, %d, %d, %d, %d, %d, %d, %d\n", q.id, q.coverage_id, q.aggregate_areaperil_id, q.aggregate_vulnerability_id, q.areaperil_id, q.vulnerability_id, q.number_items, q.grouped);
+		printf("%d, %d, %d, %d, %d, %d, %d, %d, %d\n", 
+			q.id, q.coverage_id, q.aggregate_areaperil_id, q.aggregate_vulnerability_id, q.areaperil_id, q.vulnerability_id, q.number_items, q.group_id, q.grouped);
 #endif // 		
 		i = fread(&q, sizeof(q), 1, stdin);
 	}

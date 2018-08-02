@@ -23,12 +23,14 @@ void doit()
 	while (fgets(line, sizeof(line), stdin) != 0)
 	{
 #ifdef AREAPERIL_TYPE_LONG
-		int ret = sscanf(line, "%d,%d,%ld,%d,%d,%d,%d,%d", &q.id, &q.coverage_id, &q.aggregate_areaperil_id, &q.aggregate_vulnerability_id, &q.areaperil_id, &q.vulnerability_id, &q.number_items, &q.grouped);
+		int ret = sscanf(line, "%d,%d,%ld,%d,%d,%d,%d,%d,%d",
+			&q.id, &q.coverage_id, &q.aggregate_areaperil_id, &q.aggregate_vulnerability_id, &q.areaperil_id, &q.vulnerability_id, &q.number_items, &q.group_id, &q.grouped);
 #else
-		int ret = sscanf(line, "%d,%d,%d,%d,%d,%d,%d,%d", &q.id, &q.coverage_id, &q.aggregate_areaperil_id, &q.aggregate_vulnerability_id, &q.areaperil_id, &q.vulnerability_id, &q.number_items, &q.grouped);
+		int ret = sscanf(line, "%d,%d,%d,%d,%d,%d,%d,%d,%d",
+			&q.id, &q.coverage_id, &q.aggregate_areaperil_id, &q.aggregate_vulnerability_id, &q.areaperil_id, &q.vulnerability_id, &q.number_items, &q.group_id, &q.grouped);
 #endif 
 
-		if (ret != 8) {
+		if (ret != 9) {
 			fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
 			return;
 		}

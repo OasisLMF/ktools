@@ -24,16 +24,29 @@ disaggregation::disaggregation() {
 disaggregation::~disaggregation() {
 }
 
+/*
 bool operator< (const aggregate_item &a, const aggregate_item &i) {
 	if (a.id < i.id) { return true; }
 	else { return false; }
 }
+*/
+bool operator< (const item &a, const item &i) {
+	if (a.id < i.id) { return true; }
+	else { return false; }
+}
 
-ostream& operator<< (std::ostream &out, const aggregate_item &agg_item)
-{
+
+ostream& operator<< (std::ostream &out, const aggregate_item &agg_item) {
 	out << "Item :\nID: " << agg_item.id << "\nCoverage ID: " << agg_item.coverage_id << "\nAgg Areaperil ID: " << agg_item.aggregate_areaperil_id
 		<< "\nAgg Vulnerability ID: " << agg_item.aggregate_vulnerability_id << "\nAreaperil ID: " << agg_item.areaperil_id << "\nVulnerability ID: "
 		<< agg_item.vulnerability_id << "\nGrouped: " << agg_item.grouped << "\nNumber of Items: " << agg_item.number_items;
+
+	return out;
+}
+
+ostream& operator<< (std::ostream &out, const item &item) {
+	out << "Item :\nID: " << item.id << "\nCoverage ID: " << item.coverage_id << "\nAreaperil ID: " << item.areaperil_id << "\nVulnerability ID: "
+		<< item.vulnerability_id << "\nGroup ID: " << item.group_id;
 
 	return out;
 }
@@ -106,7 +119,7 @@ void disaggregation::getAggregateItems(set<int> &v, set<AREAPERIL_INT> &a) {
 	}
 
 	while (fread(&agg_item, sizeof(agg_item), 1, fin) != 0) {
-		_aggregate_items.insert(agg_item);
+		_aggregate_items.push_back(agg_item);
 		v.insert(agg_item.aggregate_vulnerability_id);
 		a.insert(agg_item.aggregate_areaperil_id);
 	}
@@ -141,13 +154,13 @@ void disaggregation::getCoverages() {
 }
 
 void disaggregation::expandNotGrouped(aggregate_item &a) {
-	_aggregate_items.erase(a);
+	//agg_index = _aggregate_items.erase(agg_index);
 	int number_of_items = a.number_items;
 	for (int c = 0; c < number_of_items; ++c) {
-		a.group_id = *_group_ids.end() + 1;
-		a.id = *_item_ids.end() + 1;
+		a.group_id = *_group_ids.rbegin() + 1;
+		a.id = *_item_ids.rbegin() + 1;
 		a.number_items = 1;
-		_aggregate_items.insert(a);
+		_expanded_aggregate_items.push_back(a);
 		_group_ids.insert(a.group_id);
 		_item_ids.insert(a.id);
 	}
@@ -155,15 +168,15 @@ void disaggregation::expandNotGrouped(aggregate_item &a) {
 }
 
 void disaggregation::expandGrouped(aggregate_item &a) {
-	_aggregate_items.erase(a);
+	//agg_index = _aggregate_items.erase(agg_index);
 	int number_of_items = a.number_items;
-	int group_id = *_group_ids.end() + 1;
+	int group_id = *_group_ids.rbegin() + 1;
 	_group_ids.insert(group_id);
 	for (int c = 0; c < number_of_items; ++c) {
 		a.group_id = group_id;
-		a.id = *_item_ids.end() + 1;
+		a.id = *_item_ids.rbegin() + 1;
 		a.number_items = 1;
-		_aggregate_items.insert(a);
+		_expanded_aggregate_items.push_back(a);
 		_item_ids.insert(a.id);
 	}
 }
@@ -175,12 +188,6 @@ void disaggregation::assignNewCoverageID(aggregate_item &a) {
 	tiv /= a.number_items;
 	a.coverage_id = _coverages.size();
 	_coverages.push_back(tiv);
-	if (a.grouped) {
-		expandGrouped(a);
-	}
-	else {
-		expandNotGrouped(a);
-	}
 }
 
 void disaggregation::assignDisaggAreaPeril(aggregate_item &a, OASIS_FLOAT rand) {
@@ -213,33 +220,62 @@ void disaggregation::assignDisaggVulnerability(aggregate_item &a, OASIS_FLOAT ra
 }
 
 
+void disaggregation::aggregateItemtoItem(aggregate_item a, item &i) {
+	i.id = a.id;
+	i.coverage_id = a.coverage_id;
+	i.areaperil_id = a.areaperil_id;
+	i.vulnerability_id = a.vulnerability_id;
+	i.group_id = a.group_id;
+}
 
-
-void disaggregation::doDisagg() {
+void disaggregation::doDisagg(vector<item> &i) {
 
 
 	set<AREAPERIL_INT> areas;
 	set<int> vuls;
-	vector<OASIS_FLOAT> randoms;	//need to figure out how to assign randoms numbers to vector from file/seed
-	
+	vector<OASIS_FLOAT> randoms(60, 0.5);	//need to figure out how to assign randoms numbers to vector from file/seed
+
 	getAggregateItems(vuls, areas);
 	getAggregateAreaPerils(areas);
 	getAggregateVulnerabilities(vuls);
+	getCoverages();
+
+	//getRands
 
 	int randc = 0;
 
-	for (set<aggregate_item>::iterator it = _aggregate_items.begin(); it != _aggregate_items.end(); ++it) {
+	for (vector<aggregate_item>::iterator it = _aggregate_items.begin(); it != _aggregate_items.end(); ++it) {
 		aggregate_item a = *it;
 		if (a.number_items != 1) {
 			assignNewCoverageID(a);
+			if (a.grouped) {
+				expandGrouped(a);
+			}
+			else {
+				expandNotGrouped(a);
+			}
+		}
+		else {
+			expandNotGrouped(a);
 		}
 	}
-	for (set<aggregate_item>::iterator it = _aggregate_items.begin(); it != _aggregate_items.end(); ++it) {
-		aggregate_item a = *it;
+
+	i.reserve(_expanded_aggregate_items.size());
+
+	for (int c = 0; c < _expanded_aggregate_items.size(); ++c) {
+		item item;
+		aggregate_item a = _expanded_aggregate_items[c]; 
+		
 		OASIS_FLOAT r = randoms[randc];
-		if (!a.areaperil_id) { assignDisaggAreaPeril(a, r); ++randc; }
-		if (!a.vulnerability_id) { assignDisaggVulnerability(a, r); ++randc; }
+		if (a.areaperil_id == 0) { assignDisaggAreaPeril(a, r); ++randc; }
+		if (a.vulnerability_id == 0) { assignDisaggVulnerability(a, r); ++randc; }
+
+		aggregateItemtoItem(a, item);
+
+		i.push_back(item);
 	}
 	
 }
+
+
 

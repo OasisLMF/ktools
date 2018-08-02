@@ -332,7 +332,7 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 			vector <LossRec> &agg_vec = agg_vecs[level][layer_];
 			auto iter = agg_vec.begin();
 			while (iter != agg_vec.end()) {
-				iter->item_prop.resize(guls.size(), 0);	// this is wrong should be same size as item_idx unless we are using the item_idx as an index into this
+				iter->item_prop.resize((iter->item_idx)->size(), 0);
 				iter++;
 			}
 		}
@@ -358,7 +358,6 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 					iter->proportion = 0;
 				}
 				if (level == 1) {
-					//iter->item_prop.resize((iter->item_idx)->size(), 0);
 					OASIS_FLOAT total = 0;
 					for (int idx : *(iter->item_idx)) {
 						total += guls[idx];
@@ -366,9 +365,8 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 					int i = 0;
 					if (total > 0) {
 						for (int idx : *(iter->item_idx)) {
-							iter->item_prop[idx] = guls[idx] / iter->gul_total;
+							iter->item_prop[i] = guls[idx] / iter->gul_total;
 							items_prop[idx] = (guls[idx] / total) * iter->proportion;
-							//items_prop[idx] = (guls[idx] / iter->gul_total);
 							i++;
 						}
 					}
@@ -379,10 +377,9 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 						prop_total += items_prop[idx];
 					}
 					int i = 0;
-					// iter->item_prop.resize((iter->item_idx)->size(), 0);
 					if (prop_total > 0) {
 						for (int idx : *(iter->item_idx)) {
-							iter->item_prop[idx] = items_prop[idx] / prop_total;
+							iter->item_prop[i] = items_prop[idx] / prop_total;
 							items_prop[idx] = (items_prop[idx] / prop_total) * iter->proportion;
 							i++;
 						}
@@ -457,19 +454,7 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 					it++;
 				}
 			}
-		}
-		//for (int level = 1; level < agg_vecs.size(); level++) {
-		//	vector <LossRec> &agg_vec = agg_vecs[level][layer_];
-		//	for (int i = 0; level < agg_vec.size(); i++) {
-		//		agg_vec[i].item_prop = prev_agg_vec[i].item_prop;
-		//	}
-		//	//auto iter = agg_vec.begin();
-		//	//while (iter != agg_vec.end()) {
-		//	//	iter->item_prop.resize(guls.size(), 0);	// this is wrong should be same size as item_idx unless we are using the item_idx as an index into this
-		//	//	iter++;
-		//	//}
-		//}
-
+		}		
 		return;
 
 	}
@@ -773,7 +758,7 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 					for (int i=0;i < avx[layer][vec_idx].item_idx.size();i++){
 						int idx = avx[layer][vec_idx].item_idx[i];
 					//for (int idx : avx[layer][vec_idx].item_idx) {
-						OASIS_FLOAT prop = x.item_prop[idx];		// this points to the final level and  current layer of agg_vecs breaks on layer id 2
+						OASIS_FLOAT prop = x.item_prop[i];		// this points to the final level and  current layer of agg_vecs breaks on layer id 2
 						if (netvalue_) { // get net gul value							
 							x.item_net[i] = x.item_net[i] - (x.loss * prop);
 							if (x.item_net[i] < 0) x.item_net[i] = 0;

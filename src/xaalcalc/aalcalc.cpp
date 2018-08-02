@@ -378,7 +378,7 @@ void aalcalc::process_summaryfile(const std::string &filename)
 void aalcalc::outputresultscsv()
 {
 	if (skipheader_ == false) printf("summary_id,type,mean,standard_deviation,exposure_value\n");
-	int p1 = no_of_periods_ * samplesize_;
+	int p1 = no_of_periods_ ;
 	int p2 = p1 - 1;
 
 	for (auto x : map_analytical_aal_) {

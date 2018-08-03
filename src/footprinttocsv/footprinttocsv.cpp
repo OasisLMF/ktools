@@ -99,7 +99,7 @@ void printrowsz(int event_id, FILE *finx, long long size )
 
 void doitz(bool skipheader)
 {
-	if (skipheader == false)  printf("\"event_id\", \"areaperil_id\", \"intensity_bin_id\", \"probability\"\n");
+	if (skipheader == false)  printf("event_id, areaperil_id, intensity_bin_id, probability\n");
 	FILE *finx = fopen("footprint.bin.z", "rb");
 	FILE *finy = fopen("footprint.idx.z", "rb");
 	EventIndex current_idx;
@@ -132,7 +132,7 @@ void doitz(bool skipheader)
 
 void doit(bool skipheader)
 {
-	if (skipheader == false)  printf("\"event_id\", \"areaperil_id\", \"intensity_bin_id\", \"probability\"\n");
+	if (skipheader == false)  printf("event_id, areaperil_id, intensity_bin_id, probability\n");
 	FILE *finx = fopen("footprint.bin", "rb");
 	FILE *finy = fopen("footprint.idx", "rb");
 

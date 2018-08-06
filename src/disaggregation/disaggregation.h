@@ -24,8 +24,9 @@ public:
 
 private:
 	std::map<AREAPERIL_INT, std::vector<OASIS_FLOAT>> _aggregate_areaperils;
-	std::map<int, std::vector<OASIS_FLOAT>> _aggregate_vulnerabilities;
-	std::map<AREAPERIL_INT, std::vector<int>> _vulnerabilities_by_areaperil;
+	std::map<int, std::map<AREAPERIL_INT, std::map<int, OASIS_FLOAT>>> _aggregate_vulnerabilities;
+	std::map<AREAPERIL_INT, std::map<int, OASIS_FLOAT>> _areaperil_to_vulnerabilities;
+	std::map<int, OASIS_FLOAT> _vulnerability_probability;
 	std::vector<aggregate_item> _aggregate_items;
 	std::vector<aggregate_item> _expanded_aggregate_items;
 	std::vector<OASIS_FLOAT> _coverages;
@@ -33,7 +34,6 @@ private:
 	std::set<int> _item_ids = { 0 };
 
 	long _num_areaperils = -1;
-	long _num_vulnerabilities = -1;
 	bool _has_disagg_uncertainty = false;
 
 	void getAggregateAreaPerils(const std::set<AREAPERIL_INT> &a);

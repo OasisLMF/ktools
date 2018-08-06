@@ -271,15 +271,15 @@ struct Vulnerability
 
 struct aggregate_areaperil_to_areaperil
 {
-	int aggregate_areaperil_id;
-	int areaperil_id;
+	AREAPERIL_INT aggregate_areaperil_id;
+	AREAPERIL_INT areaperil_id;
 	OASIS_FLOAT probability;
 };
 
 struct aggregate_vulnerability_to_vulnerability
 {
 	int aggregate_vulnerability_id;
-	int areaperil_id;
+	AREAPERIL_INT areaperil_id;
 	int vulnerability_id;
 	OASIS_FLOAT probability;
 };

@@ -74,7 +74,7 @@ void disaggregation::getAggregateAreaPerils(const set<AREAPERIL_INT> &a) {
 					agg_ap.probability;
 		}
 	}
-	fprintf(stderr, "areaperil file read\n");
+	fprintf(stderr, "areaperil file okay\n");
 	fclose(fin);
 }
 
@@ -87,28 +87,31 @@ void disaggregation::getAggregateVulnerabilities(const set<int> &v) {
 	}
 
 	int current_aggregate_vulnerability_id = -1;
-	fread(&_num_vulnerabilities, sizeof(_num_vulnerabilities), 1, fin);
+
 
 	while (fread(&agg_vul, sizeof(agg_vul), 1, fin) != 0) {
 		if (v.find(agg_vul.aggregate_vulnerability_id) != v.end()) { // only process those aggregate vuls that are 
 																// in the item file
 			if (agg_vul.aggregate_vulnerability_id != current_aggregate_vulnerability_id) {
 				_aggregate_vulnerabilities[agg_vul.aggregate_vulnerability_id] =
-					vector<OASIS_FLOAT>(_num_areaperils * _num_vulnerabilities, 0.0);
+					_areaperil_to_vulnerabilities;
 				current_aggregate_vulnerability_id = agg_vul.aggregate_vulnerability_id;
+
+				int current_areaperil_id = -1;
+				if (agg_vul.areaperil_id != current_areaperil_id) {
+					_areaperil_to_vulnerabilities[agg_vul.areaperil_id] = _vulnerability_probability;
+					current_areaperil_id = agg_vul.areaperil_id;
+				}
 			}
-			int VulnerabilityIndex = getVulIndex(agg_vul.vulnerability_id, agg_vul.areaperil_id);
-			_aggregate_vulnerabilities[agg_vul.aggregate_vulnerability_id][VulnerabilityIndex] =
+			_aggregate_vulnerabilities[agg_vul.aggregate_vulnerability_id][agg_vul.areaperil_id][agg_vul.vulnerability_id] =
 				agg_vul.probability;
 		}
 	}
-	fprintf(stderr, "vulnerability file read\n");
+	fprintf(stderr, "vulnerability file okay\n");
 	fclose(fin);
 }
 
-int disaggregation::getVulIndex(int vulnerability_index, int areaperil_index) const {
-	return (vulnerability_index - 1) + ((areaperil_index - 1) * _num_vulnerabilities);
-}
+
 
 void disaggregation::getAggregateItems(set<int> &v, set<AREAPERIL_INT> &a) {
 	aggregate_item agg_item;
@@ -123,7 +126,7 @@ void disaggregation::getAggregateItems(set<int> &v, set<AREAPERIL_INT> &a) {
 		v.insert(agg_item.aggregate_vulnerability_id);
 		a.insert(agg_item.aggregate_areaperil_id);
 	}
-	fprintf(stderr, "items file read\n");
+	fprintf(stderr, "items file okay\n");
 	fclose(fin);
 }
 
@@ -203,20 +206,21 @@ void disaggregation::assignDisaggAreaPeril(aggregate_item &a, OASIS_FLOAT rand) 
 }
 
 void disaggregation::assignDisaggVulnerability(aggregate_item &a, OASIS_FLOAT rand) {
-	vector<OASIS_FLOAT> dist_all_areaperils = _aggregate_vulnerabilities[a.aggregate_vulnerability_id];
-	int first = getVulIndex(1, a.areaperil_id);
-	vector<OASIS_FLOAT> dist;
-	vector<OASIS_FLOAT>::iterator it = dist_all_areaperils.begin() + first;
-	dist.assign(it, it + _num_vulnerabilities);
-	for (int i = 1; i < _num_vulnerabilities; ++i) {
-		dist[i] += dist[i - 1];
-	}
-	int vulnerability_id = 1;
+	map<AREAPERIL_INT, map<int, OASIS_FLOAT>> dist_all_areaperils = _aggregate_vulnerabilities[a.aggregate_vulnerability_id];
+	map<int, OASIS_FLOAT> dist = dist_all_areaperils[a.areaperil_id];
 
-	while (rand > dist[vulnerability_id - 1]) {
-		++vulnerability_id;
+	OASIS_FLOAT prob = 0.0;
+	for (map<int, OASIS_FLOAT>::iterator it = dist.begin(); it != dist.end(); ++it) {
+		it->second += prob;
+		prob = it->second;
 	}
-	a.vulnerability_id = vulnerability_id;
+	
+	map<int, OASIS_FLOAT>::iterator it = dist.begin();
+
+	while (rand > it->second) {
+		++it;
+	}
+	a.vulnerability_id = it->first;
 }
 
 

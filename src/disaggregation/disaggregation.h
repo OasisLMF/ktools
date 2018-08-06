@@ -40,7 +40,7 @@ private:
 	void getAggregateVulnerabilities(const std::set<int> &v);
 	void getAggregateItems(std::set<int> &v, std::set<AREAPERIL_INT> &a);
 	void getCoverages();
-	void doCumulativeProbs();
+	void doAreaPerilCumulativeProbs();
 	
 
 	void assignNewCoverageID(aggregate_item &a);

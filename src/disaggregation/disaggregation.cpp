@@ -156,19 +156,10 @@ void disaggregation::getCoverages() {
 	fclose(fin);
 }
 
-void disaggregation::doCumulativeProbs() {
+void disaggregation::doAreaPerilCumulativeProbs() {
 	for (map<AREAPERIL_INT, vector<OASIS_FLOAT>>::iterator it = _aggregate_areaperils.begin(); it != _aggregate_areaperils.end(); ++it) {
 		for (int i = 1; i < _num_areaperils; ++i) {
 			it->second[i] += it->second[i - 1];
-		}
-	}
-	for (map<int, map<AREAPERIL_INT, map<int, OASIS_FLOAT>>>::iterator it = _aggregate_vulnerabilities.begin(); it != _aggregate_vulnerabilities.end(); ++it) {
-		for (map<AREAPERIL_INT, map<int, OASIS_FLOAT>>::iterator it2 = it->second.begin(); it2 != it->second.end(); ++it2) {
-			OASIS_FLOAT prob = 0.0;
-			for (map<int, OASIS_FLOAT>::iterator it3 = it2->second.begin(); it3 != it2->second.end(); ++it3) {
-				it3->second += prob;
-				prob = it3->second;
-			}
 		}
 	}
 }
@@ -222,9 +213,13 @@ void disaggregation::assignDisaggAreaPeril(aggregate_item &a, OASIS_FLOAT rand) 
 void disaggregation::assignDisaggVulnerability(aggregate_item &a, OASIS_FLOAT rand) {
 	map<AREAPERIL_INT, map<int, OASIS_FLOAT>> dist_all_areaperils = _aggregate_vulnerabilities[a.aggregate_vulnerability_id];
 	map<int, OASIS_FLOAT> dist = dist_all_areaperils[a.areaperil_id];
+	OASIS_FLOAT prob = 0.0;
+	for (map<int, OASIS_FLOAT>::iterator it = dist.begin(); it != dist.end(); ++it) {
+		it->second += prob;
+		prob = it->second;
+	}
 
 	map<int, OASIS_FLOAT>::iterator it = dist.begin();
-
 	while (rand > it->second) {
 		++it;
 	}
@@ -251,7 +246,7 @@ void disaggregation::doDisagg(vector<item> &i) {
 	getAggregateAreaPerils(areas);
 	getAggregateVulnerabilities(vuls);
 	getCoverages();
-	doCumulativeProbs();
+	doAreaPerilCumulativeProbs();
 
 
 	//getRands

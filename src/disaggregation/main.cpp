@@ -42,7 +42,6 @@ void doit() {
 	for (int i = 0; i < items.size(); ++i) {
 		item item = items[i];
 		fwrite(&item, sizeof(item), 1, stdout);
-		std::cerr << item << std::endl;
 	}
 }
 
@@ -75,5 +74,6 @@ int main(int argc, char *argv[]) {
 	initstreams();
 	doit();
 
+	fprintf(stderr, "Disaggregation success");
 	return EXIT_SUCCESS;
 }

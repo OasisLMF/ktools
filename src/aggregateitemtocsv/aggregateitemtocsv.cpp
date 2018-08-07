@@ -15,7 +15,7 @@ using namespace std;
 void doit(bool skipheader)
 {
 	int tot_items;
-	fread(&tot_items, sizeof(tot_items), 1, stdin); //drop number of areaperils
+	fread(&tot_items, sizeof(tot_items), 1, stdin); //drop number of items
 
 	if (skipheader == false) printf("item_id, coverage_id, aggregate_areaperil_id, aggregate_vulnerability_id, areaperil_id, vulnerability_id, number_items, grouped\n");
 

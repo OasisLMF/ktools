@@ -320,7 +320,163 @@ inline void fmcalc::dofmcalc_old(vector <LossRec> &agg_vec, int layer)
 	}
 }
 
-// 
+// fairly recent old used for reproducing old runs
+void fmcalc::compute_item_proportionsx(std::vector<std::vector<std::vector <LossRec>>> &agg_vecs, const std::vector<OASIS_FLOAT> &guls, int level_, int layer_, int previous_layer_)
+{
+
+	if (layer_ == 1) {
+		std::vector<OASIS_FLOAT> items_prop;
+		items_prop.resize(guls.size(), 0);
+
+		for (int level = 1; level < agg_vecs.size(); level++) {
+			vector <LossRec> &agg_vec = agg_vecs[level][layer_];
+			auto iter = agg_vec.begin();
+			while (iter != agg_vec.end()) {
+				iter->item_prop.resize(guls.size(), 0);	// this is wrong should be same size as item_idx unless we are using the item_idx as an index into this
+				iter++;
+			}
+		}
+		for (int level = 1; level < agg_vecs.size(); level++) {
+			vector <LossRec> &agg_vec = agg_vecs[level][layer_];
+			OASIS_FLOAT loss_total = 0;
+			auto iter = agg_vec.begin();
+			while (iter != agg_vec.end()) {
+				OASIS_FLOAT total = 0;
+				for (int idx : *(iter->item_idx)) {	// because this is the first level there should only be one item_idx
+					total += guls[idx];
+				}
+				iter->gul_total = total;
+				loss_total += iter->loss;
+				iter++;
+			}
+			iter = agg_vec.begin();		// loop thru again
+			while (iter != agg_vec.end()) {
+				if (iter->loss > 0 && loss_total > 0) {
+					iter->proportion = iter->loss / loss_total;
+				}
+				else {
+					iter->proportion = 0;
+				}
+				if (level == 1) {
+					//iter->item_prop.resize((iter->item_idx)->size(), 0);
+					OASIS_FLOAT total = 0;
+					for (int idx : *(iter->item_idx)) {
+						total += guls[idx];
+					}
+					int i = 0;
+					if (total > 0) {
+						for (int idx : *(iter->item_idx)) {
+							iter->item_prop[idx] = guls[idx] / iter->gul_total;
+							items_prop[idx] = (guls[idx] / total) * iter->proportion;
+							//items_prop[idx] = (guls[idx] / iter->gul_total);
+							i++;
+						}
+					}
+				}
+				else {
+					OASIS_FLOAT prop_total = 0;
+					for (int idx : *(iter->item_idx)) {
+						prop_total += items_prop[idx];
+					}
+					int i = 0;
+					// iter->item_prop.resize((iter->item_idx)->size(), 0);
+					if (prop_total > 0) {
+						for (int idx : *(iter->item_idx)) {
+							iter->item_prop[idx] = items_prop[idx] / prop_total;
+							items_prop[idx] = (items_prop[idx] / prop_total) * iter->proportion;
+							i++;
+						}
+					}
+				}
+				iter++;
+			}
+		}
+	}
+	else {
+		if (previous_layer_ < layer_) {
+			std::vector<OASIS_FLOAT> items_prop;
+			items_prop.resize(guls.size(), 0);
+			vector <LossRec> &prev_agg_vec = agg_vecs[level_][1];
+			vector <LossRec> &current_agg_vec = agg_vecs[level_][layer_];
+			current_agg_vec[0].proportion = prev_agg_vec[0].proportion;
+			current_agg_vec[0].item_prop = prev_agg_vec[0].item_prop;
+		}
+		else {
+			vector <LossRec> &prev_agg_vec = agg_vecs[level_ - 1][previous_layer_];
+			vector <LossRec> &prev_agg_vec_base = agg_vecs[level_ - 1][1];
+			for (int i = 0; i < prev_agg_vec.size(); i++) {
+				if (prev_agg_vec[i].item_prop.size() == 0) {
+					//prev_agg_vec[i].loss = prev_agg_vec_base[i].loss;
+					prev_agg_vec[i].item_prop = prev_agg_vec_base[i].item_prop;
+				}
+			}
+			//
+
+			std::vector<int> v;
+			v.resize(guls.size(), -1);
+			auto iter = prev_agg_vec.begin();
+			int j = 0;
+
+			while (iter != prev_agg_vec.end()) {
+				auto it = iter->item_idx->begin();
+				while (it != iter->item_idx->end()) {
+					v[*it] = j;
+					it++;
+				}
+				j++;
+				iter++;
+			}
+			for (int y = 0; y < agg_vecs[level_][layer_].size(); y++) {
+				auto it = agg_vecs[level_][layer_][y].item_idx->begin();
+				// 1 create an item id  to prev_agg_vec index
+				// 2 use below loop to create a set which will then be used to iterate and get previous_gul_total
+				std::unordered_set<int> s;
+				while (it != agg_vecs[level_][layer_][y].item_idx->end()) {
+					s.insert(v[*it]);
+					//prev_gul_total += prev_agg_vec[*it].loss;
+					it++;
+				}
+
+				OASIS_FLOAT prev_gul_total = 0;
+				auto s_iter = s.begin();
+				while (s_iter != s.end()) {
+					prev_gul_total += prev_agg_vec[*s_iter].loss;
+					s_iter++;
+				}
+
+				// agg_vecs[level_][layer_][y].loss = prev_gul_total;
+				it = agg_vecs[level_][layer_][y].item_idx->begin();
+				while (it != agg_vecs[level_][layer_][y].item_idx->end()) {
+					if (prev_gul_total > 0) {
+						// this is recomputing the first layers proportions
+						// only the first three have values the rest are zero for prev_agg_vec[v[*it]].item_prop						
+						agg_vecs[level_][layer_][y].item_prop.push_back(prev_agg_vec[v[*it]].loss * prev_agg_vec[v[*it]].item_prop[*it] / prev_gul_total); 
+					}
+					else {
+						agg_vecs[level_][layer_][y].item_prop.push_back(0);
+					}
+					it++;
+				}
+			}
+		}
+		//for (int level = 1; level < agg_vecs.size(); level++) {
+		//	vector <LossRec> &agg_vec = agg_vecs[level][layer_];
+		//	for (int i = 0; level < agg_vec.size(); i++) {
+		//		agg_vec[i].item_prop = prev_agg_vec[i].item_prop;
+		//	}
+		//	//auto iter = agg_vec.begin();
+		//	//while (iter != agg_vec.end()) {
+		//	//	iter->item_prop.resize(guls.size(), 0);	// this is wrong should be same size as item_idx unless we are using the item_idx as an index into this
+		//	//	iter++;
+		//	//}
+		//}
+
+		return;
+
+	}
+}
+
+// new
 void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossRec>>> &agg_vecs, const std::vector<OASIS_FLOAT> &guls, int level_, int layer_, int previous_layer_)
 {
 
@@ -445,8 +601,22 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 				it = agg_vecs[level_][layer_][y].item_idx->begin();
 				while (it != agg_vecs[level_][layer_][y].item_idx->end()) {
 					if (prev_gul_total > 0) {
+						int j = -1;
+						const std::vector<int> &z = *(prev_agg_vec[v[*it]].item_idx);
+						for (int i = 0; i < z.size(); i++) {							
+							if (z[i] == *it) {
+								j = i;
+								break;
+							}
+						}
 						// this is recomputing the first layers proportions
-						agg_vecs[level_][layer_][y].item_prop.push_back(prev_agg_vec[v[*it]].loss * prev_agg_vec[v[*it]].item_prop[*it] / prev_gul_total);
+						if (j > -1) {
+							agg_vecs[level_][layer_][y].item_prop.push_back(prev_agg_vec[v[*it]].loss * prev_agg_vec[v[*it]].item_prop[j] / prev_gul_total);
+						}
+						else {
+							agg_vecs[level_][layer_][y].item_prop.push_back(0);
+						}
+
 					}
 					else {
 						agg_vecs[level_][layer_][y].item_prop.push_back(0);

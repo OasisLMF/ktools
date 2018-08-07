@@ -30,7 +30,7 @@ void getRands::userandfile()
 	}
 	fclose(fin);
 }
-getRands::getRands(rd_option rndopt, int rand_vec_size, int rand_seed) : gen_(time(0)), dis_(0, 1), rand_vec_size_(rand_vec_size), rand_seed_(rand_seed)
+getRands::getRands(rd_option rndopt, int rand_seed) : gen_(time(0)), dis_(0, 1), rand_seed_(rand_seed)
 {
 	if (rand_seed_ > 0) gen_.seed(rand_seed_);
 

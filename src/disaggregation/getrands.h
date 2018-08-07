@@ -17,7 +17,6 @@ enum rd_option {
 class getRands {
 private:
 	rd_option rndopt_;
-	int rand_vec_size_;
 	OASIS_FLOAT *buf_;
 	int base_offset_;
 	unsigned int buffersize_;
@@ -28,15 +27,10 @@ private:
 	int rand_seed_;
 	void userandfile();
 public:
-	getRands(rd_option rndopt, int rand_vec_size, int rand_seed);
+	getRands(rd_option rndopt, int rand_seed);
 	void seedRands(int rand_seed) { gen_.seed(rand_seed); }	// used for seeding via group_id and event_id
 	void clearbuff() {
 		delete[]buf_;
-	}
-	void clearvec()
-	{
-		rnd_.clear();
-		rnd_.resize(rand_vec_size_, -1);
 	}
 
 	inline OASIS_FLOAT nextrnd() { return (OASIS_FLOAT)dis_(gen_); }	// used after seeding via group id and event_id

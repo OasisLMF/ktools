@@ -19,8 +19,8 @@ class disaggregation {
 public:
 	disaggregation(rd_option rndopt, getRands &rnd, bool debug);
 	~disaggregation();
-	void init();
 	void doDisagg(std::vector<item> &i);
+	void outputNewCoverages();
 
 private:
 	getRands *rnd_;

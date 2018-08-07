@@ -202,11 +202,18 @@ void disaggregation::expandGrouped(aggregate_item &a) {
 
 void disaggregation::assignNewCoverageID(aggregate_item &a) {
 	//call only if number_items > 1
-	int old_coverage_id = a.coverage_id;
-	OASIS_FLOAT tiv = _coverages[old_coverage_id];
+	OASIS_FLOAT tiv = _coverages[a.coverage_id];
 	tiv /= a.number_items;
-	a.coverage_id = _coverages.size();
-	_coverages.push_back(tiv);
+	int i = 1;
+	while (_coverages[i] != tiv) {
+		++i;
+		if (i>_coverages.size()) {
+			a.coverage_id = _coverages.size();
+			_coverages.push_back(tiv);
+			return;
+		}
+	}
+	a.coverage_id = i;
 }
 
 void disaggregation::assignDisaggAreaPeril(aggregate_item &a, OASIS_FLOAT rand) {
@@ -346,6 +353,29 @@ void disaggregation::doDisagg(vector<item> &i) {
 		i.push_back(item);
 	}
 	
+}
+
+//appends new coverages to bin file
+void disaggregation::outputNewCoverages() {
+	FILE *fin = fopen(COVERAGES_FILE, "a+b");
+	if (fin == NULL) {
+		fprintf(stderr, "%s: Error reading file %s\n", __func__, COVERAGES_FILE);
+		exit(-1);
+	}
+
+	flseek(fin, 0L, SEEK_END);
+	long long sz = fltell(fin);
+
+	OASIS_FLOAT tiv;
+	unsigned int nrec = static_cast<unsigned int>(sz / sizeof(tiv));
+	
+	++nrec;
+
+	for (nrec; nrec < _coverages.size(); ++nrec) {
+		tiv = _coverages[nrec];
+		fwrite(&tiv, sizeof(tiv), 1, fin);
+	}
+	fclose(fin);
 }
 
 

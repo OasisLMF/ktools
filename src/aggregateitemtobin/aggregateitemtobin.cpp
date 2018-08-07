@@ -10,6 +10,7 @@
 #include <unistd.h>
 #endif
 
+int tot_items_ = -1;
 
 
 void doit()
@@ -18,6 +19,7 @@ void doit()
 	aggregate_item q;
 	char line[4096];
 	int lineno = 0;
+	fwrite(&tot_items_, sizeof(tot_items_), 1, stdout);
 	fgets(line, sizeof(line), stdin); // skip header line
 	lineno++;
 	while (fgets(line, sizeof(line), stdin) != 0)
@@ -53,8 +55,11 @@ int main(int argc, char* argv[])
 
 	int opt;
 
-	while ((opt = getopt(argc, argv, (char *) "vh")) != -1) {
+	while ((opt = getopt(argc, argv, (char *) "vhi:")) != -1) {
 		switch (opt) {
+		case 'i':
+			tot_items_ = atoi(optarg);
+			break;
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
 			exit(EXIT_FAILURE);

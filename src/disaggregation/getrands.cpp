@@ -41,9 +41,6 @@ getRands::getRands(rd_option rndopt, int rand_vec_size, int rand_seed) : gen_(ti
 	case rd_option::userandomnumberfile:
 		userandfile();
 		break;
-	case rd_option::usecachedvector:
-		rnd_.resize(rand_vec_size, -1);
-		break;
 	case rd_option::usehashedseed:
 		// nothing to do
 		break;

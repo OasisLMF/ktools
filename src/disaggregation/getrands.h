@@ -11,7 +11,6 @@ bool isPrime(int number);
 enum rd_option {
 	userandomnumberfile,		// user supplied random number file
 	usehashedseed,				// use hashed seed to get random numbers so no need for random number vector
-	usecachedvector				// uses cached vector for random numbers gets simular if not faster performance to file based random numbers
 };
 
 
@@ -50,16 +49,6 @@ public:
 			return buf_[ridx];
 		}
 		break;
-		case rd_option::usecachedvector:
-		{
-			OASIS_FLOAT f = rnd_[ridx % rand_vec_size_];
-			if (f < 0) {
-				f = (OASIS_FLOAT)dis_(gen_);
-				rnd_[ridx % rand_vec_size_] = f;
-			}
-			return f;
-		}
-		break;
 		case rd_option::usehashedseed:
 		{
 			return (OASIS_FLOAT)dis_(gen_);
@@ -68,16 +57,7 @@ public:
 		}
 	}
 
-	inline unsigned int getp1() const { return getp2(buffersize_ / 2); }
-	inline unsigned int getp2(unsigned int p1) const { // get next prime after p1
-		int i = p1 + 1;
-		while (true) {
-			if (isPrime(i)) return i;
-			i++;
-		}
-	}
 	int count() { return buffersize_; }
-	inline int rdxmax() const { return buffersize_; }
 };
 
 #endif // GETRANDS_H_

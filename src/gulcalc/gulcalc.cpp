@@ -272,9 +272,9 @@ void gulcalc::processrec(char *rec, int recsize)
 {
 damagecdfrec *d = (damagecdfrec *)rec;
 	char *endofRec = rec + recsize;
-	//long long p1 = rnd_->getp1();	// prime p1	make these long to force below expression to not have sign problem
-	//long long p2 = rnd_->getp2((unsigned int)p1);  // prime no p2
-	//long long p3 = rnd_->getp2((unsigned int)samplesize_);	// use as additional offset to stop collision
+	long long p1 = rnd_->getp1();	// prime p1	make these long to force below expression to not have sign problem
+	long long p2 = rnd_->getp2((unsigned int)p1);  // prime no p2
+	long long p3 = rnd_->getp2((unsigned int)samplesize_);	// use as additional offset to stop collision
 	int rnd_count = rnd_->rdxmax();
 
 	item_map_key k;

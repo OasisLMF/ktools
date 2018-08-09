@@ -324,7 +324,7 @@ void disaggregation::getRandomNumbers() {
 		break;
 	case rd_option::usehashedseed:
 		{
-			long s1 = 1543270363L % 2147483648L;		// hash group_id and event_id to seed random number
+			long s1 = 1543270363L % 2147483648L;		
 			long s2 = 1943272559L % 2147483648L;
 			s1 = (s1 + s2 + rand_seed) % 2147483648L;
 			rnd_->seedRands(s1);

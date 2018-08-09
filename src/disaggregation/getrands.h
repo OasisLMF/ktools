@@ -28,12 +28,12 @@ private:
 	void userandfile();
 public:
 	getRands(rd_option rndopt, int rand_seed);
-	void seedRands(int rand_seed) { gen_.seed(rand_seed); }	// used for seeding via group_id and event_id
+	void seedRands(int rand_seed) { gen_.seed(rand_seed); }	
 	void clearbuff() {
 		delete[]buf_;
 	}
 
-	inline OASIS_FLOAT nextrnd() { return (OASIS_FLOAT)dis_(gen_); }	// used after seeding via group id and event_id
+	inline OASIS_FLOAT nextrnd() { return (OASIS_FLOAT)dis_(gen_); }	
 
 	inline OASIS_FLOAT rnd(unsigned int ridx) {
 		switch (rndopt_) {

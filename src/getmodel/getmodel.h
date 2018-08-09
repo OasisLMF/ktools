@@ -78,7 +78,6 @@ private:
     void getDamageBinDictionary();
     void getFootPrints();
     void getItems(std::set<int> &v);
-	void getDisaggregateItems(std::set<int> &v);
 	void getIntensityInfo();
     void doCdfInner(int event_id);
     void doCdfInnerNoIntensityUncertainty(int event_id);

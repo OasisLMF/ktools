@@ -28,12 +28,12 @@ disaggregation::disaggregation(rd_option rndopt, getRands &rnd, bool debug) {
 disaggregation::~disaggregation() {
 }
 
-/*
+
 bool operator< (const aggregate_item &a, const aggregate_item &i) {
 	if (a.id < i.id) { return true; }
 	else { return false; }
 }
-*/
+
 bool operator< (const item &a, const item &i) {
 	if (a.id < i.id) { return true; }
 	else { return false; }
@@ -51,6 +51,12 @@ ostream& operator<< (std::ostream &out, const aggregate_item &agg_item) {
 ostream& operator<< (std::ostream &out, const item &item) {
 	out << "Item :\nID: " << item.id << "\nCoverage ID: " << item.coverage_id << "\nAreaperil ID: " << item.areaperil_id << "\nVulnerability ID: "
 		<< item.vulnerability_id << "\nGroup ID: " << item.group_id;
+
+	return out;
+}
+
+ostream& operator<< (std::ostream &out, const Weight &weight) {
+	out << "Area Peril: " << weight.areaperil << "\nVulnerability: " << weight.vulnerability << "\nWeight: " << weight.weight;
 
 	return out;
 }
@@ -216,6 +222,47 @@ void disaggregation::assignNewCoverageID(aggregate_item &a) {
 	a.coverage_id = i;
 }
 
+
+
+void disaggregation::getWeights(aggregate_item &i, map<aggregate_item, std::vector<Weight>> &_item_map_weights) {
+	vector<Weight> weights;
+	if (i.areaperil_id != 0) {
+		if (i.vulnerability_id != 0) {
+			weights.push_back(Weight(i.areaperil_id, i.vulnerability_id, 1));
+		}
+		else {
+			//only vulnerability aggregated
+			auto vul_probs = _aggregate_vulnerabilities[i.aggregate_vulnerability_id][i.areaperil_id];
+			for (auto it = vul_probs.begin(); it != vul_probs.end(); ++it) {
+				weights.push_back(Weight(i.areaperil_id, it->first, it->second));
+			}
+		}
+	}
+	else {
+		auto ap_probs = _aggregate_areaperils[i.aggregate_areaperil_id];
+		for (AREAPERIL_INT c = 0; c < ap_probs.size(); ++c) {
+			if (ap_probs[c] != 0) {
+				if (i.vulnerability_id != 0) {
+					//only areaperil aggregated
+					weights.push_back(Weight((c + 1), i.vulnerability_id, ap_probs[c]));
+				}
+				else {
+					//both aggregated
+					auto vul_probs = _aggregate_vulnerabilities[i.aggregate_vulnerability_id][c + 1];
+					for (auto it = vul_probs.begin(); it != vul_probs.end(); ++it) {
+						OASIS_FLOAT weight = it->second * ap_probs[c];
+						weights.push_back(Weight(c + 1, it->first, weight));
+					}
+				}
+			}
+		}
+	}
+	_item_map_weights[i] = weights;
+}
+
+
+
+/*
 void disaggregation::assignDisaggAreaPeril(aggregate_item &a, OASIS_FLOAT rand) {
 	vector<OASIS_FLOAT> dist = _aggregate_areaperils[a.aggregate_areaperil_id];
 	if (dist.empty()) {
@@ -314,7 +361,7 @@ void disaggregation::doDisagg(vector<item> &i) {
 
 	getRandomNumbers();
 
-	int randc = 0;
+	
 
 	for (auto it = _aggregate_items.begin(); it != _aggregate_items.end(); ++it) {
 		aggregate_item a = *it;
@@ -335,6 +382,8 @@ void disaggregation::doDisagg(vector<item> &i) {
 
 	i.reserve(_expanded_aggregate_items.size());
 
+	int randc = 0;
+
 	for (int c = 0; c < _expanded_aggregate_items.size(); ++c) {
 		item item;
 		aggregate_item a = _expanded_aggregate_items[c]; 
@@ -354,6 +403,7 @@ void disaggregation::doDisagg(vector<item> &i) {
 	}
 	
 }
+*/
 
 //appends new coverages to bin file
 void disaggregation::outputNewCoverages() {
@@ -380,3 +430,32 @@ void disaggregation::outputNewCoverages() {
 
 
 
+void disaggregation::doWeights(map<aggregate_item, vector<Weight>> &_item_map_weights) {
+	set<AREAPERIL_INT> areas;
+	set<int> vuls;
+
+	getAggregateItems(vuls, areas);
+	getAggregateAreaPerils(areas);
+	getAggregateVulnerabilities(vuls);
+	getCoverages();
+
+	for (auto it = _aggregate_items.begin(); it != _aggregate_items.end(); ++it) {
+		aggregate_item a = *it;
+		if (a.number_items == 0) {
+			fprintf(stderr, "Number of items in aggregate item cannot be 0\n");
+			exit(EXIT_FAILURE);
+		}
+		if (a.number_items != 1) {
+			assignNewCoverageID(a);
+		}
+		if (a.grouped) {
+			expandGrouped(a);
+		}
+		else {
+			expandNotGrouped(a);
+		}
+	}
+	for (aggregate_item a : _expanded_aggregate_items) {
+		getWeights(a, _item_map_weights);
+	}
+}

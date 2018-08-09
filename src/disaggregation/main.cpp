@@ -32,6 +32,7 @@ void doit() {
 	getRands rnd(rndopt, rand_seed);
 	disaggregation disagg(rndopt, rnd, debug);
 
+	/*
 	std::vector<item> items;
 
 	disagg.doDisagg(items);
@@ -42,6 +43,15 @@ void doit() {
 	for (int i = 0; i < items.size(); ++i) {
 		item item = items[i];
 		fwrite(&item, sizeof(item), 1, stdout);
+	}
+	*/
+	std::map<aggregate_item, std::vector<Weight>> _item_map_weights;
+	disagg.doWeights(_item_map_weights);
+	for (auto it = _item_map_weights.begin(); it != _item_map_weights.end(); ++it) {
+		cerr << it->first << endl;
+		for (Weight weight : it->second) {
+			cerr << weight << endl;
+		}
 	}
 }
 

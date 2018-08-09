@@ -12,8 +12,24 @@
 std::ostream& operator<< (std::ostream &out, const aggregate_item &agg_item);
 std::ostream& operator<< (std::ostream &out, const item &item);
 
-//bool operator< (const aggregate_item &a, const aggregate_item &i);
+
+
+bool operator< (const aggregate_item &a, const aggregate_item &i);
 bool operator< (const item &a, const item &i);
+
+struct Weight {
+	AREAPERIL_INT areaperil;
+	int vulnerability;
+	OASIS_FLOAT weight;
+
+	Weight(AREAPERIL_INT ap, int vul, OASIS_FLOAT w) {
+		areaperil = ap;
+		vulnerability = vul;
+		weight = w;
+	}
+};
+
+std::ostream& operator<< (std::ostream &out, const Weight &weight);
 
 class disaggregation {
 public:
@@ -21,6 +37,7 @@ public:
 	~disaggregation();
 	void doDisagg(std::vector<item> &i);
 	void outputNewCoverages();
+	void doWeights(std::map<aggregate_item, std::vector<Weight>> &_item_map_weights);
 
 private:
 	getRands *rnd_;
@@ -50,11 +67,15 @@ private:
 	void getAggregateVulnerabilities(const std::set<int> &v);
 	void getCoverages();
 	void doAreaPerilCumulativeProbs();
+
+	
 	
 
 	void assignNewCoverageID(aggregate_item &a);
 	void expandGrouped(aggregate_item &a);
 	void expandNotGrouped(aggregate_item &a);
+	void getWeights(aggregate_item &i,
+		std::map<aggregate_item, std::vector<Weight>> &_item_map_weights);
 	void assignDisaggAreaPeril(aggregate_item &a, OASIS_FLOAT rand);
 	void assignDisaggVulnerability(aggregate_item &a, OASIS_FLOAT rand);
 

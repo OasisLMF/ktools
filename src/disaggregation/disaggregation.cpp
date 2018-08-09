@@ -12,17 +12,14 @@
 
 
 using namespace std;
-extern int rand_seed;
 
 const size_t SIZE_OF_INT = sizeof(int);
 const size_t SIZE_OF_OASIS_FLOAT = sizeof(OASIS_FLOAT);
 
 //const unsigned int OUTPUT_STREAM_TYPE = 1;
 
-disaggregation::disaggregation(rd_option rndopt, getRands &rnd, bool debug) {
-	rnd_ = &rnd;
-	rndopt_ = rndopt;
-	debug_ = debug;
+disaggregation::disaggregation() {
+
 }
 
 disaggregation::~disaggregation() {
@@ -170,14 +167,6 @@ void disaggregation::getCoverages() {
 	fclose(fin);
 }
 
-void disaggregation::doAreaPerilCumulativeProbs() {
-	for (auto it = _aggregate_areaperils.begin(); it != _aggregate_areaperils.end(); ++it) {
-		for (int i = 1; i < _num_areaperils; ++i) {
-			it->second[i] += it->second[i - 1];
-		}
-	}
-}
-
 void disaggregation::expandNotGrouped(aggregate_item &a) {
 	//agg_index = _aggregate_items.erase(agg_index);
 	int number_of_items = a.number_items;
@@ -259,151 +248,6 @@ void disaggregation::getWeights(aggregate_item &i, map<aggregate_item, std::vect
 	}
 	_item_map_weights[i] = weights;
 }
-
-
-
-/*
-void disaggregation::assignDisaggAreaPeril(aggregate_item &a, OASIS_FLOAT rand) {
-	vector<OASIS_FLOAT> dist = _aggregate_areaperils[a.aggregate_areaperil_id];
-	if (dist.empty()) {
-		fprintf(stderr, "no disaggregation distribution found for aggregate areaperil id %d, check item %d\n",
-			a.aggregate_areaperil_id, a.id);
-		exit(EXIT_FAILURE);
-	}
-	AREAPERIL_INT areaperil_id = 1;
-	while (rand > dist[areaperil_id-1]) {
-		++areaperil_id;
-	}
-	a.areaperil_id = areaperil_id;
-}
-
-void disaggregation::assignDisaggVulnerability(aggregate_item &a, OASIS_FLOAT rand) {
-	map<AREAPERIL_INT, map<int, OASIS_FLOAT>> dist_all_areaperils = _aggregate_vulnerabilities[a.aggregate_vulnerability_id];
-	if (dist_all_areaperils.empty()) {
-		fprintf(stderr, "no disaggregation distribution found for aggregate vulnerability id %d, check item %d\n",
-			a.aggregate_vulnerability_id, a.id);
-		exit(EXIT_FAILURE);
-	}
-	map<int, OASIS_FLOAT> dist = dist_all_areaperils[a.areaperil_id];
-	if (dist.empty()) {
-		fprintf(stderr, "no disaggregation distribution found for aggregate vulnerability id %d and area peril id %d, check item %d\n",
-			a.aggregate_vulnerability_id, a.areaperil_id, a.id);
-		exit(EXIT_FAILURE);
-	}
-	
-	OASIS_FLOAT prob = 0.0;
-	for (auto it = dist.begin(); it != dist.end(); ++it) {
-		it->second += prob;
-		prob = it->second;
-	}
-
-	auto it = dist.begin();
-	while (rand > it->second) {
-		++it;
-	}
-	a.vulnerability_id = it->first;
-}
-
-
-void disaggregation::aggregateItemtoItem(aggregate_item a, item &i) {
-	i.id = a.id;
-	i.coverage_id = a.coverage_id;
-	i.areaperil_id = a.areaperil_id;
-	i.vulnerability_id = a.vulnerability_id;
-	i.group_id = a.group_id;
-}
-
-void disaggregation::getRandomNumbers() {
-	int maxsamples_ = _num_items * 2;
-
-	
-	int ridx = 0;
-	switch (rndopt_) {
-	case rd_option::userandomnumberfile:
-		// nothing to do
-		break;
-	case rd_option::usehashedseed:
-		{
-			long s1 = 1543270363L % 2147483648L;		
-			long s2 = 1943272559L % 2147483648L;
-			s1 = (s1 + s2 + rand_seed) % 2147483648L;
-			rnd_->seedRands(s1);
-		}
-		break;
-	default:
-		fprintf(stderr, "%s: Unknow random number option\n", __func__);
-		exit(-1);
-	}
-	for (int i = 0; i < maxsamples_; i++) {
-		OASIS_FLOAT  rval;
-		if (rndopt_ == rd_option::usehashedseed) rval = rnd_->nextrnd();
-		else rval = rnd_->rnd(i);
-		rands.push_back(rval);
-		if (debug_) {
-			cerr << rval << endl;
-		}
-	}
-
-}
-
-void disaggregation::doDisagg(vector<item> &i) {
-
-
-	set<AREAPERIL_INT> areas;
-	set<int> vuls;
-
-	getAggregateItems(vuls, areas);
-	getAggregateAreaPerils(areas);
-	getAggregateVulnerabilities(vuls);
-	getCoverages();
-	doAreaPerilCumulativeProbs();
-
-
-	getRandomNumbers();
-
-	
-
-	for (auto it = _aggregate_items.begin(); it != _aggregate_items.end(); ++it) {
-		aggregate_item a = *it;
-		if (a.number_items == 0) {
-			fprintf(stderr, "Number of items in aggregate item cannot be 0\n");
-			exit(EXIT_FAILURE);
-		}
-		if (a.number_items != 1) {
-			assignNewCoverageID(a);
-		}
-		if (a.grouped) {
-			expandGrouped(a);
-		}
-		else {
-			expandNotGrouped(a);
-		}
-	}
-
-	i.reserve(_expanded_aggregate_items.size());
-
-	int randc = 0;
-
-	for (int c = 0; c < _expanded_aggregate_items.size(); ++c) {
-		item item;
-		aggregate_item a = _expanded_aggregate_items[c]; 
-
-		if (randc >= rands.size()) {
-			fprintf(stderr, "insufficient random numbers, check total number of items");
-			exit(EXIT_FAILURE);
-		}
-		
-		OASIS_FLOAT r = rands[randc];
-		if (a.areaperil_id == 0) { assignDisaggAreaPeril(a, r); ++randc; }
-		if (a.vulnerability_id == 0) { assignDisaggVulnerability(a, r); ++randc; }
-
-		aggregateItemtoItem(a, item);
-
-		i.push_back(item);
-	}
-	
-}
-*/
 
 //appends new coverages to bin file
 void disaggregation::outputNewCoverages() {

@@ -29,22 +29,9 @@ void help()
 }
 
 void doit() {
-	getRands rnd(rndopt, rand_seed);
-	disaggregation disagg(rndopt, rnd, debug);
 
-	/*
-	std::vector<item> items;
+	disaggregation disagg;
 
-	disagg.doDisagg(items);
-
-	disagg.outputNewCoverages();
-
-
-	for (int i = 0; i < items.size(); ++i) {
-		item item = items[i];
-		fwrite(&item, sizeof(item), 1, stdout);
-	}
-	*/
 	std::map<aggregate_item, std::vector<Weight>> _item_map_weights;
 	disagg.doWeights(_item_map_weights);
 	for (auto it = _item_map_weights.begin(); it != _item_map_weights.end(); ++it) {
@@ -57,20 +44,8 @@ void doit() {
 
 int main(int argc, char *argv[]) {
 	int opt;
-	while ((opt = getopt(argc, argv, (char *) "avhdrs:")) != -1) {
+	while ((opt = getopt(argc, argv, (char *) "vh")) != -1) {
 		switch (opt) {
-		case 'a':
-			rndopt = rd_option::usehashedseed;
-			break;
-		case 'r':
-			rndopt = rd_option::userandomnumberfile;
-			break;
-		case 'd':
-			debug = true;
-			break;
-		case 's':
-			rand_seed = atoi(optarg);
-			break;
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
 			exit(EXIT_FAILURE);

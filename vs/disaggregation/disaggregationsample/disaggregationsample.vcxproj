@@ -21,11 +21,13 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\src\disaggregation\disaggregation.h" />
     <ClInclude Include="..\..\..\src\disaggregation\getrands.h" />
+    <ClInclude Include="..\..\..\src\getmodel\getmodel.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\disaggregation\disaggregation.cpp" />
     <ClCompile Include="..\..\..\src\disaggregation\getrands.cpp" />
     <ClCompile Include="..\..\..\src\disaggregation\main.cpp" />
+    <ClCompile Include="..\..\..\src\getmodel\getmodel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\ktools\wingetopt\wingetopt.vcxproj">
@@ -91,7 +93,12 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Program Files\msvc2015_64\include\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>C:\Program Files\msvc2015_64\lib\zlib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -99,7 +106,12 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Program Files\msvc2015_64\include\zlib;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>C:\Program Files\msvc2015_64\lib\zlib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>

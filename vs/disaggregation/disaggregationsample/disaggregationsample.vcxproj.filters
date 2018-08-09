@@ -21,6 +21,9 @@
     <ClInclude Include="..\..\..\src\disaggregation\getrands.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\getmodel\getmodel.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\disaggregation\getrands.cpp">
@@ -30,6 +33,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\disaggregation\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\getmodel\getmodel.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

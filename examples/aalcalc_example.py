@@ -41,10 +41,10 @@ procs = []
 
 while (counter <= total_processes) :
 	cmd="eve %d %d | getmodel | gulcalc -r -S%d -i - | fmcalc | summarycalc -f -2 - | aalcalc > work/aal2/p%d.bin " % (counter,total_processes,samplesize,counter)
-	print cmd	
+	print(cmd)
 	p1 = subprocess.Popen(cmd,shell=True)
 	procs.append(p1)
-	print cmd
+	print(cmd)
 	counter = counter + 1
 for p in procs:
 	p.wait()
@@ -52,7 +52,7 @@ counter=1
 
 # After all processes are finished, the final step is to run aalsummary on the work folder containing the aalcalc samples. 
 cmd="aalsummary -Kaal2 > results/aal/fm_aal.csv"
-print cmd
+print(cmd)
 p1 = subprocess.Popen(cmd,shell=True)
-print "Finished. View outputs in results/aal"
+print("Finished. View outputs in results/aal")
   

@@ -42,7 +42,7 @@ while (counter <= total_processes) :
 	cmd="eve %d %d | getmodel | gulcalc -r -S%d -i - | fmcalc | summarycalc -f -2 - > work/summary2/p%d.bin " % (counter,total_processes,samplesize,counter)
 	p1 = subprocess.Popen(cmd,shell=True)
 	procs.append(p1)
-	print cmd
+	print (cmd)
 	counter = counter + 1
 for p in procs:
 	p.wait()
@@ -52,7 +52,7 @@ counter=1
 cmd="leccalc -r -Ksummary2 -F results/lec/fm_lec_full_uncertainty_agg.csv -f results/lec/fm_lec_full_uncertainty_occ.csv -S results/lec/fm_lec_sample_mean_agg.csv -s results/lec/fm_lec_sample_mean_occ.csv -M results/lec/fm_lec_wheatsheaf_agg.csv -m results/lec/fm_lec_wheatsheaf_occ.csv "
 #cmd="leccalc -Ksummary2 -W results/lec/fm_lec_wheatsheaf_agg.csv -s results/lec/fm_lec_wheatsheaf_occ.csv"
 
-print cmd
+print(cmd)
 p1 = subprocess.Popen(cmd,shell=True)
-print "Finished. View outputs in results/lec"
+print("Finished. View outputs in results/lec")
   

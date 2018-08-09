@@ -30,8 +30,8 @@ def rmdir_f(folder):
 			if os.path.isfile(file_path):
 				os.unlink(file_path)
 			elif os.path.isdir(file_path): shutil.rmtree(file_path)
-		except Exception, e:
-			print e
+		except Exception (e):
+			print (e)
 
 # Sets up the results folder and named pipe folder
 def init():
@@ -62,12 +62,12 @@ def doit():
 		cmd="fmcalc < %s | summarycalc -f -%d - | summarycalctocsv > %s/fm_samples%d.csv" % (fifo,summaryset, resultsfolder,counter)
 		p1 = subprocess.Popen(cmd,shell=True)
 		procs.append(p1)		
-		print cmd
+		print (cmd)
 		# This command sents gulcalc item losses (-i) to the named pipe, to be picked up by the listening command above, while gulcalc coverage losses (-c) are sent down the pipeline to summarycalc which is output to results. 
 		cmd="eve %d %d | getmodel | gulcalc -r -S%d -i %s -c - | summarycalc -g -%d - | summarycalctocsv > %s/gul_samples%d.csv " % (counter,total_processes,samplesize, fifo,summaryset, resultsfolder, counter )
 		p1 = subprocess.Popen(cmd,shell=True)
 		procs.append(p1)
-		print cmd
+		print (cmd)
 		counter = counter + 1
 	# Waits for all processes to complete
 	for p in procs:
@@ -76,7 +76,7 @@ def doit():
 def fin():
 	global tmp_dir
 	shutil.rmtree(tmp_dir)
-	print "Finished. View outputs in results/samples"
+	print ("Finished. View outputs in results/samples")
 
 init()
 doit()

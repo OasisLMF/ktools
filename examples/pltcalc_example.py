@@ -40,7 +40,7 @@ while (counter <= total_processes) :
 	cmd="eve %d %d | getmodel | gulcalc -r -S%d -i - | fmcalc | summarycalc -f -2 - | pltcalc > results/plt/fm_plt_summary2_p%d.csv " % (counter,total_processes,samplesize,counter)
 	p1 = subprocess.Popen(cmd,shell=True)
 	procs.append(p1)
-	print cmd
+	print(cmd)
 	counter = counter + 1
 for p in procs:
 	p.wait()
@@ -51,7 +51,7 @@ counter=1
 filenames = []
 for file in os.listdir("results/plt"):
     if file.endswith(".csv"):
-    	file = "results/plt/"+ file
+        file = "results/plt/"+ file
         filenames.append(file)
 
 with open('results/plt/fm_plt_summary2.csv', 'w') as outfile:
@@ -64,4 +64,4 @@ with open('results/plt/fm_plt_summary2.csv', 'w') as outfile:
                 	outfile.write(line)
                 lineno=lineno+1  
 
-print "Finished. View outputs in results/plt"
+print ("Finished. View outputs in results/plt")

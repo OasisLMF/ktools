@@ -30,8 +30,8 @@ def rmdir_f(folder):
 			if os.path.isfile(file_path):
 				os.unlink(file_path)
 			elif os.path.isdir(file_path): shutil.rmtree(file_path)
-		except Exception, e:
-			print e
+		except Exception (e):
+			print (e)
 
 # Sets up the results folder and named pipe folder
 def init():
@@ -70,11 +70,11 @@ def doit():
 	cmd_fmkat = cmd_fmkat + ' > %s/fm_samples.csv' % (resultsfolder)
 	p1 = subprocess.Popen(cmd_fmkat,shell=True)
 	procs.append(p1)
-	print cmd_fmkat
+	print (cmd_fmkat)
 	cmd_gulkat = cmd_gulkat + ' > %s/gul_samples.csv' % (resultsfolder)
 	p1 = subprocess.Popen(cmd_gulkat,shell=True)
 	procs.append(p1)
-	print cmd_gulkat
+	print (cmd_gulkat)
 
 	# Main workflow. Creates and initiates processes one by one.
 	counter = 1
@@ -89,12 +89,12 @@ def doit():
 		cmd="fmcalc < %s | summarycalc -f -%d - | %s > %s/fmsummary%d " % (fifo_fm, summaryset, cmd_tocsv, tmp_dir,counter)
 		p1 = subprocess.Popen(cmd,shell=True)
 		procs.append(p1)		
-		print cmd
+		print (cmd)
 		# This command sents gulcalc item losses (-i) to the named pipe, to be picked up by the listening command above, while gulcalc coverage losses (-c) are sent down the pipeline to summarycalc which is output to the gulsummary pipe, which is passed to kat. 
 		cmd="eve %d %d | getmodel | gulcalc -r -S%d -i %s -c - | summarycalc -g -%d - | %s > %s/gulsummary%d" % (counter,total_processes,samplesize, fifo_fm, summaryset, cmd_tocsv, tmp_dir,counter)
 		p1 = subprocess.Popen(cmd,shell=True)
 		procs.append(p1)
-		print cmd
+		print (cmd)
 		cmd_tocsv = 'summarycalctocsv -s' # skip headers in output for the 2nd to last process.
 		counter = counter + 1
 
@@ -105,7 +105,7 @@ def doit():
 def fin():
 	global tmp_dir
 	shutil.rmtree(tmp_dir)
-	print "Finished. View outputs in results/samples_all"
+	print ("Finished. View outputs in results/samples_all")
 
 init()
 doit()

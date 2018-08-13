@@ -84,6 +84,7 @@ private:
 	bool skipheader_ = false;
 // private functions
 	void loadoccurrence();
+	void initsameplsize(const std::string &path);
 	void loadperiodtoweigthing();
 	void process_summaryfile(const std::string &filename);
 	void debug_process_summaryfile(const std::string &filename);

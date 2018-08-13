@@ -56,6 +56,7 @@ void aalcalc::loadperiodtoweigthing()
 	//		exit(-1);
 	//	}
 	// Weighting already normalzed just split over samples...
+	return;
 	auto iter = periodstoweighting_.begin();
 	while (iter != periodstoweighting_.end()) {
 		// iter->second = iter->second / total_weighting; // no need sinece already normalized 
@@ -407,15 +408,40 @@ void aalcalc::outputresultscsv()
 	}
 
 }
+void aalcalc::initsameplsize(const std::string &path)
+{
+	DIR *dir;
+	struct dirent *ent;
+	if ((dir = opendir(path.c_str())) != NULL) {
+		while ((ent = readdir(dir)) != NULL) {
+			std::string s = ent->d_name;
+			if (s.length() > 4 && s.substr(s.length() - 4, 4) == ".bin") {
+				s = path + ent->d_name;
+				FILE *fin = fopen(s.c_str(), "rb");
+				if (fin == NULL) {
+					fprintf(stderr, "%s: cannot open %s\n", __func__, s.c_str());
+					exit(EXIT_FAILURE);
+				}
+				int summarycalcstream_type = 0;
+				size_t i = fread(&summarycalcstream_type, sizeof(summarycalcstream_type), 1, fin);
+				i = fread(&samplesize_, sizeof(samplesize_), 1, fin);
+				fclose(fin);
+				break;
+			}
 
+		}
+	}
+}
 void aalcalc::doit(const std::string &subfolder)
 {
-	loadoccurrence();
-	loadperiodtoweigthing();	// move this to after the samplesize_ variable has been set i.e.  after reading the first 8 bytes of the first summary file
+	
 	std::string path = "work/" + subfolder;
 	if (path.substr(path.length() - 1, 1) != "/") {
 		path = path + "/";
 	}
+	initsameplsize(path);
+	loadoccurrence();
+	loadperiodtoweigthing();	// move this to after the samplesize_ variable has been set i.e.  after reading the first 8 bytes of the first summary file
 
 	DIR *dir;
 	struct dirent *ent;

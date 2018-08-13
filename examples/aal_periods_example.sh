@@ -53,6 +53,6 @@ dorun 4
 # sha1sum -c ctrl.sha1
 
 # cleanup
-rm input/periods.bin
-rm input/periods.csv
+# input/periods.bin
+# input/periods.csv
 

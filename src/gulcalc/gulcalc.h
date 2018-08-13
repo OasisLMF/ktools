@@ -61,6 +61,7 @@ struct item_map_rec {
 	int item_id;
 	int coverage_id;
 	int group_id;
+	OASIS_FLOAT weight;
 };
 
 

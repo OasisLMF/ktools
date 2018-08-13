@@ -123,6 +123,7 @@ bool getitems(std::map<item_map_key, std::vector<item_map_rec> > &item_map)
 		imr.item_id = itm.id;
 		imr.coverage_id = itm.coverage_id;
 		imr.group_id = itm.group_id;
+		//imr.weight = itm.weight;
 		item_map[imk].push_back(imr);
 		i = fread(&itm, sizeof(itm), 1, fin);
 	}

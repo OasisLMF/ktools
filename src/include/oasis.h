@@ -294,6 +294,16 @@ struct EventRow
 	AREAPERIL_INT areaperil_id;
 	int intensity_bin_id;
 	OASIS_FLOAT probability;
+
+	EventRow() : areaperil_id(-1), intensity_bin_id(-1), probability(0.0) {
+
+	}
+
+	EventRow(AREAPERIL_INT areaperil, int intensity_bin, OASIS_FLOAT prob) {
+		areaperil_id = areaperil;
+		intensity_bin_id = intensity_bin;
+		probability = prob;
+	}
 };
 
 struct EventIndex

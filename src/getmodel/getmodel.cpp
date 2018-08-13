@@ -495,3 +495,4 @@ void getmodel::doCdfInnerNoIntensityUncertainty(int event_id) {
 
   fclose(fin);
 }
+

@@ -11,9 +11,7 @@ using namespace std;
 
 // options
 bool debug = false;
-int rand_seed = 0;
 
-rd_option rndopt = rd_option::usehashedseed;
 
 void help()
 {
@@ -32,14 +30,9 @@ void doit() {
 
 	disaggregation disagg;
 
-	std::map<aggregate_item, std::vector<Weight>> _item_map_weights;
-	disagg.doWeights(_item_map_weights);
-	for (auto it = _item_map_weights.begin(); it != _item_map_weights.end(); ++it) {
-		cerr << it->first << endl;
-		for (Weight weight : it->second) {
-			cerr << weight << endl;
-		}
-	}
+	disagg.newItems();
+	disagg.outputNewCoverages();
+	disagg.test();
 }
 
 int main(int argc, char *argv[]) {

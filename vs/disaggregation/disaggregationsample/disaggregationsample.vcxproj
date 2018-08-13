@@ -20,14 +20,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\src\disaggregation\disaggregation.h" />
-    <ClInclude Include="..\..\..\src\disaggregation\getrands.h" />
-    <ClInclude Include="..\..\..\src\getmodel\getmodel.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\disaggregation\disaggregation.cpp" />
-    <ClCompile Include="..\..\..\src\disaggregation\getrands.cpp" />
     <ClCompile Include="..\..\..\src\disaggregation\main.cpp" />
-    <ClCompile Include="..\..\..\src\getmodel\getmodel.cpp" />
+    <ClCompile Include="CleanUp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\ktools\wingetopt\wingetopt.vcxproj">
@@ -86,7 +83,10 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>C:\Program Files\msvc2015_64\include\zlib;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Program Files\msvc2015_64\lib\zlib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -110,7 +110,7 @@
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>C:\Program Files\msvc2015_64\lib\zlib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>zlib.lib;zlibstatic.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

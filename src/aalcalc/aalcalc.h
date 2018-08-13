@@ -41,32 +41,66 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 #include "../include/oasis.h"
 
+#include <string>
 #include <map>
 #include <vector>
-#include <math.h>
+struct aal_rec_vec {
+	std::vector<float> v;
+	double max_exposure_value;
+};
+
+struct period_map_key {
+	int summary_id;
+	int period_no;
+	int sidx;
+};
+
+struct period_sidx_map_key {
+	int summary_id;
+	int period_no;
+	int sidx;
+};
+
+struct loss_rec {
+	double sum_of_loss;
+	//double sum_of_loss_squared;
+	double max_exposure_value;
+};
+
+bool operator<(const period_sidx_map_key& lhs, const period_sidx_map_key& rhs);
+bool operator<(const period_map_key& lhs, const period_map_key& rhs);
 
 class aalcalc {
 private:
 	std::map<int, int> event_count_;	// count of events in occurrence table used to create cartesian effect on event_id
 	std::map<int, int> event_to_period_;	// Mapping of event to period no
 	int no_of_periods_ = 0;
-	int samplesize_ = 0;
+	int samplesize_ = -1;
 	std::map<int, aal_rec> map_analytical_aal_;
 	std::map<int, aal_rec> map_sample_aal_;
-	std::map <int, double> periodstoweighting_;	
-	// functions
-	void loadperiodtoweigthing();
+	std::map<period_sidx_map_key, loss_rec > map_sample_sum_loss_;
+	std::map<period_map_key, loss_rec > map_analytical_sum_loss_;
+	std::map <int, double> periodstoweighting_;
+	bool skipheader_ = false;
+// private functions
 	void loadoccurrence();
-	void outputresultscsv();
-	void outputsummarybin();
+	void loadperiodtoweigthing();
+	void process_summaryfile(const std::string &filename);
+	void debug_process_summaryfile(const std::string &filename);
+	void do_analytical_calc_old(const summarySampleslevelHeader &sh, double mean_loss);
 	void do_analytical_calc(const summarySampleslevelHeader &sh, double mean_loss);
+	void do_analytical_calc_end();
+	void do_sample_calc_old(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec);
 	void do_sample_calc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec);
+	void do_sample_calc_end();
 	void doaalcalc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec, OASIS_FLOAT mean_loss);
+	void applyweightings(int event_id, const std::map <int, double> &periodstoweighting, std::vector<sampleslevelRec> &vrec) ;
 	void applyweightingstomap(std::map<int, aal_rec> &m, int i);
 	void applyweightingstomaps();
-	void applyweightings(int event_id, const std::map <int, double> &periodstoweighting, std::vector<sampleslevelRec> &vrec);
+	void outputresultscsv();
 public:
-	void doit();
+	void doit(const std::string &subfolder);
+	void debug(const std::string &subfolder);
 };
 
 #endif  // AALCALC_H_

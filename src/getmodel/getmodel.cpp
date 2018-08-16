@@ -487,12 +487,14 @@ void getmodel::getIntensityProbs(int event_id, std::map<AREAPERIL_INT, std::vect
 		}
 		fclose(fin);
 	}
+	/*
 	for (AREAPERIL_INT areaperil_id : _disagg_area_perils) {
 		if (areaperil_intensity.find(areaperil_id) == areaperil_intensity.end()) {
 			areaperil_intensity[areaperil_id] = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0);
 			areaperil_intensity[areaperil_id][0] = 1;
 		}
 	}
+	*/
 }
 
 void getmodel::newFootprint(int event_id, AREAPERIL_INT aggregate_areaperil_id, std::vector<EventRow> &new_Footprint) {
@@ -501,9 +503,17 @@ void getmodel::newFootprint(int event_id, AREAPERIL_INT aggregate_areaperil_id, 
 	new_Footprint.resize(_num_intensity_bins);
 	for (int intensity_bin_id = 0; intensity_bin_id < _num_intensity_bins; ++intensity_bin_id) {
 		OASIS_FLOAT prob = 0.0;
-		for (auto it = areaperil_intensity.begin(); it != areaperil_intensity.end(); ++it) {
-			OASIS_FLOAT weight = _aggregate_areaperils[aggregate_areaperil_id][it->first];
-			prob += it->second[intensity_bin_id] * weight;
+		for (auto it = _aggregate_areaperils[aggregate_areaperil_id].begin(); it != _aggregate_areaperils[aggregate_areaperil_id].end(); ++it) {
+			OASIS_FLOAT weight = it->second;
+			auto itr = areaperil_intensity.find(it->first);
+			if (itr != areaperil_intensity.end()) {
+				prob += itr->second[intensity_bin_id] * weight;
+			}
+			else {
+				if (intensity_bin_id == 0) {
+					prob += weight;
+				}
+			}
 		}
 		new_Footprint[intensity_bin_id] = EventRow(aggregate_areaperil_id, intensity_bin_id + 1, prob);
 	}

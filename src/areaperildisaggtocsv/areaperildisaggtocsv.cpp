@@ -14,7 +14,7 @@ using namespace std;
 
 void doit(bool skipheader)
 {
-	long areaperils;
+	int areaperils;
 	fread(&areaperils, sizeof(areaperils), 1, stdin); //drop number of areaperils
 
 	if (skipheader == false) printf("aggregate_areaperil_id, areaperil_id, probability\n");

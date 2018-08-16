@@ -10,7 +10,7 @@
 #include <unistd.h>
 #endif
 
-long areaperils_ = -1;
+int agg_ap_start_ = -1;
 
 
 void doit()
@@ -19,7 +19,7 @@ void doit()
 	aggregate_areaperil_to_areaperil q;
 	char line[4096];
 	int lineno = 0;
-	fwrite(&areaperils_, sizeof(areaperils_), 1, stdout);
+	fwrite(&agg_ap_start_, sizeof(agg_ap_start_), 1, stdout);
 	fgets(line, sizeof(line), stdin); // skip header line
 	lineno++;
 	while (fgets(line, sizeof(line), stdin) != 0)
@@ -36,9 +36,6 @@ void doit()
 		}
 		else
 		{
-			if (areaperils_ < q.areaperil_id) {
-				fprintf(stderr, "Max area peril id specifed %d is less than encountered in data %d\n", areaperils_, q.areaperil_id);
-			}
 			fwrite(&q, sizeof(q), 1, stdout);
 		}
 		lineno++;
@@ -48,7 +45,7 @@ void doit()
 
 void help()
 {
-	fprintf(stderr, "-a maximum area peril id\n-h help\n-v version\n");
+	fprintf(stderr, "-a minimum aggregated area peril id\n-h help\n-v version\n");
 }
 
 int main(int argc, char* argv[])
@@ -59,7 +56,7 @@ int main(int argc, char* argv[])
 	while ((opt = getopt(argc, argv, (char *) "vha:")) != -1) {
 		switch (opt) {
 		case 'a':
-			areaperils_ = atoi(optarg);
+			agg_ap_start_ = atoi(optarg);
 			break;
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
@@ -71,8 +68,8 @@ int main(int argc, char* argv[])
 			exit(EXIT_FAILURE);
 		}
 	}
-	if (areaperils_ == -1) {
-		std::cerr << "Area peril paramter not supplied\n";
+	if (agg_ap_start_ == -1) {
+		std::cerr << "Min aggregated area peril paramter not supplied\n";
 		help();
 		exit(EXIT_FAILURE);
 	}

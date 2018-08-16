@@ -45,9 +45,12 @@ Author: Mark Pinkerton  email: mark.pinkerton@oasislmf.org
 #include <list>
 #include <vector>
 #include "../include/oasis.h"
+bool operator< (const item &a, const item &i);
 
 struct Result;
 struct EventIndex;
+struct Weight;
+struct AggregateID;
 
 class getmodel {
 
@@ -58,43 +61,85 @@ public:
     void init(bool zip);
 	void doCdf(int event_id);
 
+
 private:
 	
 	std::map<int, std::vector<OASIS_FLOAT> > _vulnerabilities;	
     std::map<AREAPERIL_INT, std::set<int> > _vulnerability_ids_by_area_peril;
     std::map<int, EventIndex> _event_index_by_event_id;
-	std::set<int> _area_perils;
+	std::map<AREAPERIL_INT, std::map<AREAPERIL_INT,OASIS_FLOAT>> _aggregate_areaperils;
+	std::map<int, std::map<AREAPERIL_INT, std::map<int, OASIS_FLOAT>>> _aggregate_vulnerabilities;
+
+	std::set<AREAPERIL_INT> _area_perils;
+	std::set<int> _vulnerability_ids;
+	std::set<int> _aggregate_vulnerability_ids;
+	std::set<AREAPERIL_INT> _aggregate_areaperil_ids;
+	std::set<AREAPERIL_INT> _disagg_area_perils;
+	std::set<int> _group_ids = { 0 };
+	std::set<int> _item_ids = { 0 };
+
 	std::vector<OASIS_FLOAT> _mean_damage_bins;
     std::vector<unsigned char > _compressed_buf;
     std::vector<unsigned char > _uncompressed_buf;
-    
-    int _num_intensity_bins = -1;
-    int _num_damage_bins = -1;
-    int _has_intensity_uncertainty = false;
+	std::vector<aggregate_item> _aggregate_items;
+	std::vector<item> _expanded_items;
+	std::vector<OASIS_FLOAT> _coverages;
+
+
 	std::vector<Result> _temp_results;
-    //Result* _temp_results;
+	//Result* _temp_results;
+    
+	int _num_intensity_bins = -1;
+    int _num_damage_bins = -1;
+
+	//aggregate ids larger than non aggregate ids, this is the first id that is aggregate
+	int _agg_vul_start = -1;
+	int _agg_ap_start = -1;
+
+ 
+	bool _has_disagg_uncertainty = false;
+	bool _has_intensity_uncertainty = false;
     bool _zip = false;
-    void getVulnerabilities(const std::set<int> &v);
+
+
+	void getItems();
+	void getAggregateAreaPerils();
+	void getAggregateVulnerabilities();
+	void getCoverages();
+	void expandItems(aggregate_item &a);
+	void outputNewCoverages();
+
+	void newItems();
+
+	void mergeAggregateVulnerability(int aggregate_vulnerability_id, std::map<int, OASIS_FLOAT> &vulnerability_probability);
+
+    void getVulnerabilities();
     void getDamageBinDictionary();
     void getFootPrints();
-    void getItems(std::set<int> &v);
 	void getIntensityInfo();
+
+
+	void getIntensityProbs(int event_id, std::map<AREAPERIL_INT, std::vector<OASIS_FLOAT>> &areaperil_intensity);
+	void newFootprint(int event_id, AREAPERIL_INT aggregate_areaperil_id, std::vector<EventRow> &new_Footprint);
+	void newVulnerability(int aggregate_vulnerability_id, std::vector<OASIS_FLOAT> &new_Vulnerability,
+		AREAPERIL_INT areaperil_id);
+
+
     void doCdfInner(int event_id);
     void doCdfInnerNoIntensityUncertainty(int event_id);
+
+	//can use getIntensityProbs function to merge functions - apply for zip or not
     void doCdfInnerz(int event_id);
     void doCdfInnerNoIntensityUncertaintyz(int event_id);
+	void doCdfAggregate(int event_id);
     void  doResults(
         int &event_id,
 		AREAPERIL_INT &areaperil_id,
-        std::map<AREAPERIL_INT, std::set<int> > &vulnerabilities_by_area_peril,
-        std::map<int, std::vector<OASIS_FLOAT> > &vulnerabilities,
-        std::vector<OASIS_FLOAT> intensity) const;
+        std::vector<OASIS_FLOAT> intensity);
 
 	void  doResultsNoIntensityUncertainty(
 		int &event_id,
 		AREAPERIL_INT &areaperil_id,
-		std::map<AREAPERIL_INT, std::set<int> > &vulnerabilities_by_area_peril,
-		std::map<int, std::vector<OASIS_FLOAT> > &vulnerabilities,
 		int intensity_bin_index) ;
 	
 	static void initOutputStream();

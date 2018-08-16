@@ -170,22 +170,18 @@ struct exposure{
 };
 
 struct item {
-  int id;
-  int coverage_id;
-  AREAPERIL_INT areaperil_id;
-  int vulnerability_id;
-  int group_id;
+	int id;
+	int coverage_id;
+	AREAPERIL_INT areaperil_id;
+	int vulnerability_id;
+	int group_id;
 };
-
 struct aggregate_item {
 	int id;
 	int coverage_id;
-	AREAPERIL_INT aggregate_areaperil_id;
-	int aggregate_vulnerability_id;
 	AREAPERIL_INT areaperil_id;
 	int vulnerability_id;
 	int number_items;
-	int group_id;
 	bool grouped;
 };
 

@@ -83,7 +83,6 @@ private:
     std::vector<unsigned char > _uncompressed_buf;
 	std::vector<aggregate_item> _aggregate_items;
 	std::vector<item> _expanded_items;
-	std::vector<OASIS_FLOAT> _coverages;
 
 
 	std::vector<Result> _temp_results;
@@ -105,9 +104,9 @@ private:
 	void getItems();
 	void getAggregateAreaPerils();
 	void getAggregateVulnerabilities();
-	void getCoverages();
-	void expandItems(aggregate_item &a);
-	void outputNewCoverages();
+	void getCoverages(std::vector<OASIS_FLOAT> &_coverages);
+	void expandItems(aggregate_item &a, std::vector<OASIS_FLOAT> &_coverages);
+	void outputNewCoverages(std::vector<OASIS_FLOAT> &_coverages);
 
 	void newItems();
 

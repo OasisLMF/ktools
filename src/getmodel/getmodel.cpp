@@ -225,7 +225,7 @@ void getmodel::getAggregateVulnerabilities() {
 }
 
 
-void getmodel::getCoverages() {
+void getmodel::getCoverages(std::vector<OASIS_FLOAT> &_coverages) {
 	FILE *fin = fopen(COVERAGES_FILE, "rb");
 	if (fin == NULL) {
 		fprintf(stderr, "%s: Error reading file %s\n", __func__, COVERAGES_FILE);
@@ -251,7 +251,7 @@ void getmodel::getCoverages() {
 	fclose(fin);
 }
 
-void getmodel::expandItems(aggregate_item &a) {
+void getmodel::expandItems(aggregate_item &a, std::vector<OASIS_FLOAT> &_coverages) {
 	item i;
 	int number_of_items = a.number_items;
 	OASIS_FLOAT tiv = _coverages[a.coverage_id];
@@ -294,7 +294,7 @@ void getmodel::expandItems(aggregate_item &a) {
 
 
 //appends new coverages to bin file
-void getmodel::outputNewCoverages() {
+void getmodel::outputNewCoverages(std::vector<OASIS_FLOAT> &_coverages) {
 	FILE *fin = fopen(COVERAGES_FILE, "a+b");
 	if (fin == NULL) {
 		fprintf(stderr, "%s: Error opening file %s\n", __func__, COVERAGES_FILE);
@@ -322,7 +322,9 @@ void getmodel::newItems() {
 	getItems();
 	getAggregateAreaPerils();
 	getAggregateVulnerabilities();
-	getCoverages();
+
+	std::vector<OASIS_FLOAT> _coverages;
+	getCoverages(_coverages);
 
 	for (auto it = _aggregate_items.begin(); it != _aggregate_items.end(); ++it) {
 		aggregate_item a = *it;
@@ -330,9 +332,11 @@ void getmodel::newItems() {
 			fprintf(stderr, "Number of items in aggregate item cannot be 0\n");
 			exit(EXIT_FAILURE);
 		}
-		expandItems(a);
+		expandItems(a, _coverages);
 	}
-	outputNewCoverages();
+	outputNewCoverages(_coverages);
+
+	_coverages.clear();
 
 	FILE *fin = fopen(ITEMS_FILE, "wb");
 	if (fin == nullptr) {
@@ -417,10 +421,8 @@ void getmodel::mergeAggregateVulnerability(int aggregate_vulnerability_id, std::
 		int count = 0;
 		for (auto it = _aggregate_vulnerabilities[aggregate_vulnerability_id].begin();
 			it != _aggregate_vulnerabilities[aggregate_vulnerability_id].end(); ++it) {
-			if (it->second.find(*vul) != it->second.end()) {
-				prob += it->second.find(*vul)->second;
-				count++;
-			}
+			prob += it->second.find(*vul)->second;
+			count++;
 		}
 		prob /= count;
 		vulnerability_probability[*vul] = prob;

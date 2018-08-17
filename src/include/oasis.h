@@ -363,7 +363,6 @@ inline void initstreams(std::string inFile="", std::string outFile="")
 #define DAMAGE_CDF_BIN_FILE "static/damage_cdf.bin"
 #define DAMAGE_CDF_IDX_FILE "static/damage_cdf.idx"
 #define RANDOM_FILE "static/random.bin"
-#define DISAGG_RANDOM_FILE "static/disagg_random.bin"
 #define AGGREGATE_AREAPERIL_TO_AREAPERIL_FILE "static/agg_ap_to_ap.bin"
 #define AGGREGATE_VULNERABILITY_TO_VULNERABILITY_FILE "static/agg_vul_to_vul.bin"
 #define VULNERABILITY_FILE  "static/vulnerability.bin"

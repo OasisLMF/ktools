@@ -872,7 +872,7 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 				}
 			}			
 			// at level 1 allocrule 2 and 1 are the same
-			if (x.allocrule_id == 2 && level == 1) x.allocrule_id = 1; 
+			 if (x.allocrule_id == 2 && level == 1) x.allocrule_id = 1; 
 
 			if (x.allocrule_id == 1 ) {	// back allocate as a proportion of the total of the original guls	
 				OASIS_FLOAT gultotal = 0;
@@ -928,7 +928,7 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 					for (int i=0;i < avx[layer][vec_idx].item_idx.size();i++){
 						int idx = avx[layer][vec_idx].item_idx[i];
 					//for (int idx : avx[layer][vec_idx].item_idx) {
-						OASIS_FLOAT prop = x.item_prop[i];		// this points to the final level and  current layer of agg_vecs breaks on layer id 2
+						OASIS_FLOAT prop = x.item_prop[i];		
 						if (netvalue_) { // get net gul value							
 							x.item_net[i] = x.item_net[i] - (x.loss * prop);
 							if (x.item_net[i] < 0) x.item_net[i] = 0;

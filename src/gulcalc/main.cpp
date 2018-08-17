@@ -234,9 +234,9 @@ void help()
 		"-i [output pipe] - item output\n"
 		"-d debug (output random numbers instead of gul)\n"
 		"-s seed for random number generation (used for debugging)\n"
-		"-a automatically hashed seed driven random number generation (default)"
-		"-l legacy mechanism driven by random numbers generated dynamically per group - will be removed in future"
-		"-L gul limit (default 0)"
+		"-a automatically hashed seed driven random number generation (default)\n"
+		"-l legacy mechanism driven by random numbers generated dynamically per group - will be removed in future\n"
+		"-L gul limit (default 0)\n"
 		"-v version\n"
 		"-h help\n"
 		);

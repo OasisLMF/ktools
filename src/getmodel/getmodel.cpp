@@ -257,6 +257,19 @@ void getmodel::expandItems(aggregate_item &a) {
 	OASIS_FLOAT tiv = _coverages[a.coverage_id];
 	tiv /= a.number_items;
 
+	int c = 1;
+	while (_coverages[c] != tiv) {
+		++c;
+		if (c >= _coverages.size()) {
+			i.coverage_id = _coverages.size();
+			_coverages.push_back(tiv);
+			break;
+		}
+	}
+	i.coverage_id = c;
+	i.areaperil_id = a.areaperil_id;
+	i.vulnerability_id = a.vulnerability_id;
+
 	if (a.grouped) {
 		int group_id = *_group_ids.rbegin() + 1;
 		_group_ids.insert(group_id);
@@ -276,16 +289,6 @@ void getmodel::expandItems(aggregate_item &a) {
 			_item_ids.insert(i.id);
 		}
 	}
-	int c = 1;
-	while (_coverages[c] != tiv) {
-		++c;
-		if (c>=_coverages.size()) {
-			a.coverage_id = _coverages.size();
-			_coverages.push_back(tiv);
-			return;
-		}
-	}
-	a.coverage_id = c;
 
 }
 
@@ -329,15 +332,15 @@ void getmodel::newItems() {
 		}
 		expandItems(a);
 	}
-	void outputNewCoverages();
+	outputNewCoverages();
 
 	FILE *fin = fopen(ITEMS_FILE, "wb");
 	if (fin == nullptr) {
 		fprintf(stderr, "%s: cannot open %s\n", __func__, ITEMS_FILE);
 		exit(EXIT_FAILURE);
 	}
-	for (item a : _expanded_items) {
-		fwrite(&a, sizeof(a), 1, fin);
+	for (item i : _expanded_items) {
+		fwrite(&i, sizeof(i), 1, fin);
 	}
 	fclose(fin);
 }
@@ -487,14 +490,6 @@ void getmodel::getIntensityProbs(int event_id, std::map<AREAPERIL_INT, std::vect
 		}
 		fclose(fin);
 	}
-	/*
-	for (AREAPERIL_INT areaperil_id : _disagg_area_perils) {
-		if (areaperil_intensity.find(areaperil_id) == areaperil_intensity.end()) {
-			areaperil_intensity[areaperil_id] = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0);
-			areaperil_intensity[areaperil_id][0] = 1;
-		}
-	}
-	*/
 }
 
 void getmodel::newFootprint(int event_id, AREAPERIL_INT aggregate_areaperil_id, std::vector<EventRow> &new_Footprint) {

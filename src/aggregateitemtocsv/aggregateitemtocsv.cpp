@@ -14,17 +14,17 @@ using namespace std;
 
 void doit(bool skipheader)
 {
-	if (skipheader == false) printf("item_id, coverage_id, aggregate_areaperil_id, aggregate_vulnerability_id, areaperil_id, vulnerability_id, number_items, group_id, grouped\n");
+	if (skipheader == false) printf("item_id, coverage_id, areaperil_id, vulnerability_id, number_items, grouped\n");
 
 	aggregate_item q;
 	int i = fread(&q, sizeof(q), 1, stdin);
 	while (i != 0) {
 #ifdef AREAPERIL_TYPE_LONG
-		printf("%d, %d, %ld, %d, %ld, %d, %d, %d, %d\n", 
-			q.id, q.coverage_id, q.aggregate_areaperil_id, q.aggregate_vulnerability_id, q.areaperil_id, q.vulnerability_id, q.number_items, q.group_id, q.grouped);
+		printf("%d,%d,%ld,%d,%d,%d",
+			q.id, q.coverage_id, q.areaperil_id, q.vulnerability_id, q.number_items, q.grouped);
 #else
-		printf("%d, %d, %d, %d, %d, %d, %d, %d, %d\n", 
-			q.id, q.coverage_id, q.aggregate_areaperil_id, q.aggregate_vulnerability_id, q.areaperil_id, q.vulnerability_id, q.number_items, q.group_id, q.grouped);
+		printf("%d,%d,%d,%d,%d,%d",
+			q.id, q.coverage_id, q.areaperil_id, q.vulnerability_id, q.number_items, q.grouped);
 #endif // 		
 		i = fread(&q, sizeof(q), 1, stdin);
 	}

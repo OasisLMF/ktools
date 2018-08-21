@@ -110,8 +110,6 @@ private:
 
 	void newItems();
 
-	void mergeAggregateVulnerability(int aggregate_vulnerability_id, std::map<int, OASIS_FLOAT> &vulnerability_probability);
-
     void getVulnerabilities();
     void getDamageBinDictionary();
     void getFootPrints();
@@ -131,11 +129,22 @@ private:
     void doCdfInnerz(int event_id);
     void doCdfInnerNoIntensityUncertaintyz(int event_id);
 	void doCdfAggregate(int event_id);
+
+	void getDisaggregateCdfs(int event_id,
+		std::map<AREAPERIL_INT, std::map<int, std::vector<OASIS_FLOAT>>> &results_map,
+		std::map<AREAPERIL_INT, std::set<int>> &disaggregated_vul_by_ap);
+
+
     void  doResults(
         int &event_id,
 		AREAPERIL_INT &areaperil_id,
-        std::vector<OASIS_FLOAT> intensity);
-
+        std::vector<OASIS_FLOAT> intensity,
+		std::map<AREAPERIL_INT, std::set<int>> &vulnerability_ids_by_area_peril);
+	void doResultsAggregate(
+		int &event_id,
+		AREAPERIL_INT aggregate_areaperil_id,
+		std::set<int> &aggregate_vulnerability_ids,
+		std::map<AREAPERIL_INT, std::map<int, std::vector<OASIS_FLOAT>>> &results_map);
 	void  doResultsNoIntensityUncertainty(
 		int &event_id,
 		AREAPERIL_INT &areaperil_id,

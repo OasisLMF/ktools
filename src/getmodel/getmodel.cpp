@@ -399,6 +399,54 @@ void getmodel::getFootPrints() {
 	fclose(fin);
 }
 
+void getmodel::getDamageBinDictionary() {
+	FILE *fin = fopen(DAMAGE_BIN_DICT_FILE, "rb");
+	if (fin == nullptr) {
+		fprintf(stderr, "%s: cannot open %s\n", __func__, DAMAGE_BIN_DICT_FILE);
+		exit(-1);
+	}
+	flseek(fin, 0L, SEEK_END);
+	long long sz = fltell(fin);
+	flseek(fin, 0L, SEEK_SET);
+	int nrec = static_cast<int>(sz / sizeof(damagebindictionary));
+
+	//damagebindictionary *damage_bins = new damagebindictionary[nrec];
+	std::vector<damagebindictionary> damage_bins;
+	damage_bins.resize(nrec);
+	if (fread(&damage_bins[0], sizeof(damagebindictionary), nrec, fin) != nrec) {
+		std::ostringstream poss;
+		poss << "Error reading file " << DAMAGE_BIN_DICT_FILE;
+		perror(poss.str().c_str());
+		exit(-1);
+	}
+
+	fclose(fin);
+
+	_mean_damage_bins = std::vector<OASIS_FLOAT>(nrec);
+	for (int i = 0; i < nrec; i++) {
+		_mean_damage_bins[i] = damage_bins[i].interpolation;
+	}
+
+	//delete[] damage_bins;
+}
+
+void getmodel::init(bool zip) {
+	_zip = zip;
+
+	getIntensityInfo();
+	newItems();
+	getVulnerabilities();
+	getDamageBinDictionary();
+	getFootPrints();
+	initOutputStream();
+
+	//_temp_results = new Result[_num_damage_bins];
+	_temp_results.resize(_num_damage_bins);
+	for (int damage_bin_index = 1; damage_bin_index <= _num_damage_bins; damage_bin_index++) {
+		_temp_results[damage_bin_index - 1] =
+			Result(0.0, _mean_damage_bins[damage_bin_index - 1]);
+	}
+}
 
 
 void getmodel::getIntensityProbs(int event_id, std::map<AREAPERIL_INT, std::vector<OASIS_FLOAT>> &areaperil_intensity) {
@@ -558,41 +606,7 @@ void getmodel::newVulnerability(int aggregate_vulnerability_id,std::vector<OASIS
 	}
 }
 
-void getmodel::getDamageBinDictionary() {
-  FILE *fin = fopen(DAMAGE_BIN_DICT_FILE, "rb");
-  if (fin == nullptr) {
-    fprintf(stderr, "%s: cannot open %s\n", __func__, DAMAGE_BIN_DICT_FILE);
-    exit(-1);
-  }
-  flseek(fin, 0L, SEEK_END);
-  long long sz = fltell(fin);
-  flseek(fin, 0L, SEEK_SET);
-  int nrec = static_cast<int>(sz / sizeof(damagebindictionary));
 
-  //damagebindictionary *damage_bins = new damagebindictionary[nrec];
-  std::vector<damagebindictionary> damage_bins;
-  damage_bins.resize(nrec);
-  if (fread(&damage_bins[0], sizeof(damagebindictionary), nrec, fin) != nrec) {
-    std::ostringstream poss;
-    poss << "Error reading file " << DAMAGE_BIN_DICT_FILE;
-    perror(poss.str().c_str());
-    exit(-1);
-  }
-
-  fclose(fin);
-
-  _mean_damage_bins = std::vector<OASIS_FLOAT>(nrec);
-  for (int i = 0; i < nrec; i++) {
-    _mean_damage_bins[i] = damage_bins[i].interpolation;
-  }
-
-  //delete[] damage_bins;
-}
-
-
-void getmodel::initOutputStream() {
-  fwrite(&OUTPUT_STREAM_TYPE, sizeof(OUTPUT_STREAM_TYPE), 1, stdout);
-}
 
 void getmodel::doResults(
 	int &event_id, AREAPERIL_INT areaperil_id, 
@@ -650,6 +664,40 @@ void getmodel::doResults(
 }
 
 
+void getmodel::doResultsAggregate(
+	int &event_id,
+	AREAPERIL_INT aggregate_areaperil_id,
+	std::set<int> &aggregate_vulnerability_ids,
+	std::map<AREAPERIL_INT, std::map<int, std::vector<OASIS_FLOAT>>> &results_map) {
+	for (int aggregate_vulnerability_id : aggregate_vulnerability_ids) {
+		std::vector<Result> results;
+		results.resize(_num_damage_bins);
+		int result_index = 0;
+		std::map<AREAPERIL_INT, std::map<int, OASIS_FLOAT>> probabilities;
+		calcProbAgg(aggregate_areaperil_id, aggregate_vulnerability_id, probabilities);
+		for (int damage_bin_index = 0; damage_bin_index < _num_damage_bins;
+			damage_bin_index++) {
+			double cumulative_prob = 0;
+			for (auto ap = probabilities.begin(); ap != probabilities.end(); ++ap) {
+				for (auto vul = ap->second.begin(); vul != ap->second.end(); ++vul) {
+					double prob = results_map[ap->first][vul->first][result_index] * vul->second;
+					cumulative_prob += prob;
+				}
+			}
+			results[result_index++] = Result(static_cast<OASIS_FLOAT>(cumulative_prob),
+				_mean_damage_bins[damage_bin_index]);
+			if (cumulative_prob > 0.999999940)
+				break; // single precision value approx 1
+		}
+		int num_results = result_index;
+		fwrite(&event_id, SIZE_OF_INT, 1, stdout);
+		fwrite(&aggregate_areaperil_id, sizeof(aggregate_areaperil_id), 1, stdout);
+		fwrite(&aggregate_vulnerability_id, SIZE_OF_INT, 1, stdout);
+		fwrite(&num_results, SIZE_OF_INT, 1, stdout);
+		fwrite(&results[0], SIZE_OF_RESULT, num_results, stdout);
+	}
+}
+
 
 void getmodel::doResultsNoIntensityUncertainty(
 	int &event_id, AREAPERIL_INT &areaperil_id,
@@ -685,42 +733,14 @@ void getmodel::doResultsNoIntensityUncertainty(
 	}
 }
 
+void getmodel::initOutputStream() {
+	fwrite(&OUTPUT_STREAM_TYPE, sizeof(OUTPUT_STREAM_TYPE), 1, stdout);
+}
+
 int getmodel::getVulnerabilityIndex(int intensity_bin_index,
                                     int damage_bin_index) const {
   return (intensity_bin_index - 1) +
          ((damage_bin_index - 1) * _num_intensity_bins);
-}
-
-void getmodel::init(bool zip) {
-  _zip = zip;
-
-  getIntensityInfo();
-  newItems();
-  getVulnerabilities();
-  getDamageBinDictionary();
-  getFootPrints();
-  initOutputStream();
-
-  //_temp_results = new Result[_num_damage_bins];
-  _temp_results.resize(_num_damage_bins);
-  for (int damage_bin_index = 1; damage_bin_index <= _num_damage_bins; damage_bin_index++) {
-    _temp_results[damage_bin_index - 1] =
-        Result(0.0, _mean_damage_bins[damage_bin_index - 1]);
-  }
-}
-
-void getmodel::doCdf(int event_id) {
-	doCdfAggregate(event_id);
-
-	if (_has_intensity_uncertainty) {
-		doCdfInner(event_id);
-	}
-	else {
-		if (_zip)
-			doCdfInnerNoIntensityUncertaintyz(event_id);
-		else
-			doCdfInnerNoIntensityUncertainty(event_id);
-	}
 }
 
 void getmodel::getDisaggregateCdfs(int event_id,
@@ -761,39 +781,22 @@ void getmodel::getDisaggregateCdfs(int event_id,
 	}
 }
 
-void getmodel::doResultsAggregate(
-	int &event_id,
-	AREAPERIL_INT aggregate_areaperil_id,
-	std::set<int> &aggregate_vulnerability_ids, 
-	std::map<AREAPERIL_INT, std::map<int, std::vector<OASIS_FLOAT>>> &results_map) {
-	for (int aggregate_vulnerability_id : aggregate_vulnerability_ids) {
-		std::vector<Result> results;
-		results.resize(_num_damage_bins);
-		int result_index = 0;
-		std::map<AREAPERIL_INT, std::map<int, OASIS_FLOAT>> probabilities;
-		calcProbAgg(aggregate_areaperil_id, aggregate_vulnerability_id, probabilities);
-		for (int damage_bin_index = 0; damage_bin_index < _num_damage_bins;
-			damage_bin_index++) {
-			double cumulative_prob = 0;
-			for (auto ap = probabilities.begin(); ap != probabilities.end(); ++ap) {
-				for (auto vul = ap->second.begin(); vul != ap->second.end(); ++vul) {
-					double prob = results_map[ap->first][vul->first][result_index] * vul->second;
-					cumulative_prob += prob;
-				}
-			}
-			results[result_index++] = Result(static_cast<OASIS_FLOAT>(cumulative_prob), 
-				_mean_damage_bins[damage_bin_index]);
-			if (cumulative_prob > 0.999999940)
-				break; // single precision value approx 1
-		}
-		int num_results = result_index;
-		fwrite(&event_id, SIZE_OF_INT, 1, stdout);
-		fwrite(&aggregate_areaperil_id, sizeof(aggregate_areaperil_id), 1, stdout);
-		fwrite(&aggregate_vulnerability_id, SIZE_OF_INT, 1, stdout);
-		fwrite(&num_results, SIZE_OF_INT, 1, stdout);
-		fwrite(&results[0], SIZE_OF_RESULT, num_results, stdout);
+
+
+void getmodel::doCdf(int event_id) {
+	doCdfAggregate(event_id);
+
+	if (_has_intensity_uncertainty) {
+		doCdfInner(event_id);
+	}
+	else {
+		if (_zip)
+			doCdfInnerNoIntensityUncertaintyz(event_id);
+		else
+			doCdfInnerNoIntensityUncertainty(event_id);
 	}
 }
+
 
 void getmodel::doCdfAggregate(int event_id) {
 	auto intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);

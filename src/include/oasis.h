@@ -269,15 +269,18 @@ struct aggregate_areaperil_to_areaperil
 {
 	AREAPERIL_INT aggregate_areaperil_id;
 	AREAPERIL_INT areaperil_id;
-	OASIS_FLOAT probability;
 };
 
 struct aggregate_vulnerability_to_vulnerability
 {
 	int aggregate_vulnerability_id;
+	int vulnerability_id;
+};
+
+struct Weight {
 	AREAPERIL_INT areaperil_id;
 	int vulnerability_id;
-	OASIS_FLOAT probability;
+	OASIS_FLOAT weight;
 };
 
 struct Periods
@@ -365,6 +368,7 @@ inline void initstreams(std::string inFile="", std::string outFile="")
 #define RANDOM_FILE "static/random.bin"
 #define AGGREGATE_AREAPERIL_TO_AREAPERIL_FILE "static/agg_ap_to_ap.bin"
 #define AGGREGATE_VULNERABILITY_TO_VULNERABILITY_FILE "static/agg_vul_to_vul.bin"
+#define WEIGHTS_FILE "static/weights.bin"
 #define VULNERABILITY_FILE  "static/vulnerability.bin"
 #define FOOTPRINT_FILE  "static/footprint.bin"
 #define FOOTPRINT_IDX_FILE  "static/footprint.idx"

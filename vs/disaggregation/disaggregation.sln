@@ -5,8 +5,6 @@ VisualStudioVersion = 15.0.27703.2042
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "wingetopt", "..\ktools\wingetopt\wingetopt.vcxproj", "{B5960B46-527B-4833-918B-EC5735C03635}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "disaggregation", "disaggregationsample\disaggregationsample.vcxproj", "{B7B0D6CF-C53A-4714-92A4-B1691BDACA2E}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "areaperildisaggtobin", "areaperildisaggtobin\areaperildisaggtobin.vcxproj", "{3E2B8A2B-7195-4215-A7AE-BF03C1F71CEF}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vulnerabilitydisaggtobin", "vulnerabilitydisaggtobin\vulnerabilitydisaggtobin.vcxproj", "{46C17271-2173-43DB-9C05-BAE92CC2ACE3}"
@@ -22,6 +20,10 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "disaggregation(old)", "..\..\..\..\..\..\Users\zoeta\Downloads\ktools-1972da8120b1ac72ca0d0575292032cc268cdec4\vs\disaggregation\disaggregationsample\disaggregationold.vcxproj", "{6C122172-F171-44A7-B0F1-31E87B728A80}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "aggregateitemtocsv", "aggregateitemtocsv\aggregateitemtocsv.vcxproj", "{14E02D27-640C-4F84-9888-E12C0DC8D159}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "disaggregationweighttocsv", "disaggregationweighttocsv\disaggregationweighttocsv.vcxproj", "{A06DC44C-66AF-462B-B91E-F279886CA6A1}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "disaggregationweighttobin", "disaggregationweighttobin\disaggregationweighttobin.vcxproj", "{E88EE446-CD13-4793-A281-753BD0838027}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,13 +41,6 @@ Global
 		{B5960B46-527B-4833-918B-EC5735C03635}.Release|x64.Build.0 = Release|x64
 		{B5960B46-527B-4833-918B-EC5735C03635}.Release|x86.ActiveCfg = Release|Win32
 		{B5960B46-527B-4833-918B-EC5735C03635}.Release|x86.Build.0 = Release|Win32
-		{B7B0D6CF-C53A-4714-92A4-B1691BDACA2E}.Debug|x64.ActiveCfg = Debug|x64
-		{B7B0D6CF-C53A-4714-92A4-B1691BDACA2E}.Debug|x64.Build.0 = Debug|x64
-		{B7B0D6CF-C53A-4714-92A4-B1691BDACA2E}.Debug|x86.ActiveCfg = Debug|Win32
-		{B7B0D6CF-C53A-4714-92A4-B1691BDACA2E}.Debug|x86.Build.0 = Debug|Win32
-		{B7B0D6CF-C53A-4714-92A4-B1691BDACA2E}.Release|x64.ActiveCfg = Release|x64
-		{B7B0D6CF-C53A-4714-92A4-B1691BDACA2E}.Release|x64.Build.0 = Release|x64
-		{B7B0D6CF-C53A-4714-92A4-B1691BDACA2E}.Release|x86.ActiveCfg = Release|Win32
 		{3E2B8A2B-7195-4215-A7AE-BF03C1F71CEF}.Debug|x64.ActiveCfg = Debug|x64
 		{3E2B8A2B-7195-4215-A7AE-BF03C1F71CEF}.Debug|x64.Build.0 = Debug|x64
 		{3E2B8A2B-7195-4215-A7AE-BF03C1F71CEF}.Debug|x86.ActiveCfg = Debug|Win32
@@ -109,6 +104,22 @@ Global
 		{14E02D27-640C-4F84-9888-E12C0DC8D159}.Release|x64.Build.0 = Release|x64
 		{14E02D27-640C-4F84-9888-E12C0DC8D159}.Release|x86.ActiveCfg = Release|Win32
 		{14E02D27-640C-4F84-9888-E12C0DC8D159}.Release|x86.Build.0 = Release|Win32
+		{A06DC44C-66AF-462B-B91E-F279886CA6A1}.Debug|x64.ActiveCfg = Debug|x64
+		{A06DC44C-66AF-462B-B91E-F279886CA6A1}.Debug|x64.Build.0 = Debug|x64
+		{A06DC44C-66AF-462B-B91E-F279886CA6A1}.Debug|x86.ActiveCfg = Debug|Win32
+		{A06DC44C-66AF-462B-B91E-F279886CA6A1}.Debug|x86.Build.0 = Debug|Win32
+		{A06DC44C-66AF-462B-B91E-F279886CA6A1}.Release|x64.ActiveCfg = Release|x64
+		{A06DC44C-66AF-462B-B91E-F279886CA6A1}.Release|x64.Build.0 = Release|x64
+		{A06DC44C-66AF-462B-B91E-F279886CA6A1}.Release|x86.ActiveCfg = Release|Win32
+		{A06DC44C-66AF-462B-B91E-F279886CA6A1}.Release|x86.Build.0 = Release|Win32
+		{E88EE446-CD13-4793-A281-753BD0838027}.Debug|x64.ActiveCfg = Debug|x64
+		{E88EE446-CD13-4793-A281-753BD0838027}.Debug|x64.Build.0 = Debug|x64
+		{E88EE446-CD13-4793-A281-753BD0838027}.Debug|x86.ActiveCfg = Debug|Win32
+		{E88EE446-CD13-4793-A281-753BD0838027}.Debug|x86.Build.0 = Debug|Win32
+		{E88EE446-CD13-4793-A281-753BD0838027}.Release|x64.ActiveCfg = Release|x64
+		{E88EE446-CD13-4793-A281-753BD0838027}.Release|x64.Build.0 = Release|x64
+		{E88EE446-CD13-4793-A281-753BD0838027}.Release|x86.ActiveCfg = Release|Win32
+		{E88EE446-CD13-4793-A281-753BD0838027}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

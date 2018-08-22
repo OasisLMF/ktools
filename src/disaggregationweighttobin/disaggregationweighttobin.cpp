@@ -10,17 +10,24 @@
 #include <unistd.h>
 #endif
 
-void doit() {
-	
-	aggregate_vulnerability_to_vulnerability q;
+
+
+void doit()
+{
+	Weight q;
 	char line[4096];
 	int lineno = 0;
 	fgets(line, sizeof(line), stdin); // skip header line
 	lineno++;
 	while (fgets(line, sizeof(line), stdin) != 0)
 	{
-		int ret = sscanf(line, "%d,%d", &q.aggregate_vulnerability_id, &q.vulnerability_id);
-		if (ret != 2) {
+#ifdef AREAPERIL_TYPE_LONG
+		int ret = sscanf(line, "%ld,%d,%f", &q.areaperil_id, &q.vulnerability_id, &q.weight);
+#else
+		int ret = sscanf(line, "%d,%d,%f", &q.areaperil_id, &q.vulnerability_id, &q.weight);
+#endif 
+
+		if (ret != 3) {
 			fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
 			return;
 		}

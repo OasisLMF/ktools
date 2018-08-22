@@ -67,14 +67,14 @@ private:
 	std::map<int, std::vector<OASIS_FLOAT> > _vulnerabilities;	
     std::map<AREAPERIL_INT, std::set<int> > _vulnerability_ids_by_area_peril;
     std::map<int, EventIndex> _event_index_by_event_id;
-	std::map<AREAPERIL_INT, std::map<AREAPERIL_INT,OASIS_FLOAT>> _aggregate_areaperils;
-	std::map<int, std::map<AREAPERIL_INT, std::map<int, OASIS_FLOAT>>> _aggregate_vulnerabilities;
+	std::map<AREAPERIL_INT, std::set<AREAPERIL_INT>> _aggregate_areaperils;
+	std::map<int, std::set<int>> _aggregate_vulnerabilities;
 
 	std::set<AREAPERIL_INT> _area_perils;
 	std::set<int> _vulnerability_ids;
 	std::set<int> _aggregate_vulnerability_ids;
 	std::set<AREAPERIL_INT> _aggregate_areaperil_ids;
-	std::set<AREAPERIL_INT> _disagg_area_perils;
+	
 	std::set<int> _group_ids = { 0 };
 	std::set<int> _item_ids = { 0 };
 
@@ -83,7 +83,7 @@ private:
     std::vector<unsigned char > _uncompressed_buf;
 	std::vector<aggregate_item> _aggregate_items;
 	std::vector<item> _expanded_items;
-
+	std::vector<Weight> _weights;
 
 	std::vector<Result> _temp_results;
 	//Result* _temp_results;
@@ -95,15 +95,14 @@ private:
 	int _agg_vul_start = -1;
 	int _agg_ap_start = -1;
 
- 
 	bool _has_disagg_uncertainty = false;
 	bool _has_intensity_uncertainty = false;
     bool _zip = false;
 
-
 	void getItems();
-	void getAggregateAreaPerils();
-	void getAggregateVulnerabilities();
+	void getAggregateAreaPerils(std::set<AREAPERIL_INT> &_disagg_area_perils);
+	void getAggregateVulnerabilities(std::set<AREAPERIL_INT> &_disagg_vulnerabilities);
+	void getDisaggregationWeights(std::set<AREAPERIL_INT> &_disagg_area_perils, std::set<AREAPERIL_INT> &_disagg_vulnerabilities);
 	void getCoverages(std::vector<OASIS_FLOAT> &_coverages);
 	void expandItems(aggregate_item &a, std::vector<OASIS_FLOAT> &_coverages);
 	void outputNewCoverages(std::vector<OASIS_FLOAT> &_coverages);
@@ -115,30 +114,23 @@ private:
     void getFootPrints();
 	void getIntensityInfo();
 
+	void calcProbAggVul(AREAPERIL_INT areaperil_id, int vulnerability_id, std::map<int, OASIS_FLOAT> &vulnerability_probability);
+	void calcProbAggAp(int vulnerability_id, AREAPERIL_INT areaperil_id, std::map<AREAPERIL_INT, OASIS_FLOAT> &area_peril_probability);
+	void calcProbAgg(AREAPERIL_INT areaperil_id, int vulnerability_id,  std::map<AREAPERIL_INT, std::map<int, OASIS_FLOAT>> &probabilities);
 
 	void getIntensityProbs(int event_id, std::map<AREAPERIL_INT, std::vector<OASIS_FLOAT>> &areaperil_intensity);
-	void newFootprint(int event_id, AREAPERIL_INT aggregate_areaperil_id, std::vector<EventRow> &new_Footprint);
+	void newIntensity(int event_id, AREAPERIL_INT aggregate_areaperil_id, std::vector<OASIS_FLOAT> &new_Intensity, int vulnerability_id);
 	void newVulnerability(int aggregate_vulnerability_id, std::vector<OASIS_FLOAT> &new_Vulnerability,
 		AREAPERIL_INT areaperil_id);
 
-
     void doCdfInner(int event_id);
-    void doCdfInnerNoIntensityUncertainty(int event_id);
-
-	//can use getIntensityProbs function to merge functions - apply for zip or not
-    void doCdfInnerz(int event_id);
-    void doCdfInnerNoIntensityUncertaintyz(int event_id);
 	void doCdfAggregate(int event_id);
 
-	void getDisaggregateCdfs(int event_id,
-		std::map<AREAPERIL_INT, std::map<int, std::vector<OASIS_FLOAT>>> &results_map,
-		std::map<AREAPERIL_INT, std::set<int>> &disaggregated_vul_by_ap);
-
+    void doCdfInnerNoIntensityUncertainty(int event_id);
+    void doCdfInnerNoIntensityUncertaintyz(int event_id);
 
     void  doResults(
-        int &event_id,
-		AREAPERIL_INT &areaperil_id,
-        std::vector<OASIS_FLOAT> intensity,
+		int &event_id, AREAPERIL_INT areaperil_id,
 		std::map<AREAPERIL_INT, std::set<int>> &vulnerability_ids_by_area_peril);
 	void doResultsAggregate(
 		int &event_id,
@@ -149,6 +141,10 @@ private:
 		int &event_id,
 		AREAPERIL_INT &areaperil_id,
 		int intensity_bin_index) ;
+
+	void getDisaggregateCdfs(int event_id,
+		std::map<AREAPERIL_INT, std::map<int, std::vector<OASIS_FLOAT>>> &results_map,
+		std::map<AREAPERIL_INT, std::set<int>> &disaggregated_vul_by_ap);
 	
 	static void initOutputStream();
     int getVulnerabilityIndex(int intensity_bin_index, int damage_bin_index) const;

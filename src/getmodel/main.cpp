@@ -59,12 +59,12 @@ void help()
 	);
 }
 
-void doIt(bool zip)
+void doIt(bool zip, bool disaggregation)
 {
 
 	getmodel cdf_generator;
 
-	cdf_generator.init(zip);
+	cdf_generator.init(zip, disaggregation);
 
 	int event_id = -1;
 	while (fread(&event_id, sizeof(event_id), 1, stdin) != 0)
@@ -80,9 +80,14 @@ int main(int argc, char** argv)
 
 	start = std::clock();
 
+	bool disaggregation = false;
+
 	int opt;	
-	while ((opt = getopt(argc, argv, "vh")) != -1) {
+	while ((opt = getopt(argc, argv, "dvh")) != -1) {
 		switch (opt) {
+		case 'd':
+			disaggregation = true;
+			break;
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
 			exit(EXIT_FAILURE);
@@ -101,7 +106,7 @@ int main(int argc, char** argv)
 	if (fin != nullptr) zip=true;
 
 	initstreams();
-	doIt(zip);
+	doIt(zip, disaggregation);
 
 	duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
 

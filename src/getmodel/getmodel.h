@@ -58,7 +58,7 @@ public:
 
     getmodel();
     ~getmodel();
-    void init(bool zip);
+    void init(bool zip, bool disaggregation);
 	void doCdf(int event_id);
 
 
@@ -95,11 +95,11 @@ private:
 	int _agg_vul_start = -1;
 	int _agg_ap_start = -1;
 
-	bool _has_disagg_uncertainty = false;
+	bool _disaggregation = false;
 	bool _has_intensity_uncertainty = false;
     bool _zip = false;
 
-	void getItems();
+	void getAggregateItems();
 	void getAggregateAreaPerils(std::set<AREAPERIL_INT> &_disagg_area_perils);
 	void getAggregateVulnerabilities(std::set<AREAPERIL_INT> &_disagg_vulnerabilities);
 	void getDisaggregationWeights(std::set<AREAPERIL_INT> &_disagg_area_perils, std::set<AREAPERIL_INT> &_disagg_vulnerabilities);
@@ -108,6 +108,7 @@ private:
 	void outputNewCoverages(std::vector<OASIS_FLOAT> &_coverages);
 
 	void newItems();
+	void getItems();
 
     void getVulnerabilities();
     void getDamageBinDictionary();

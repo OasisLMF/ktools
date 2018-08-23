@@ -93,7 +93,7 @@ getmodel::~getmodel() {
 }
 
 
-void getmodel::getItems() {
+void getmodel::getAggregateItems() {
 	// Read the exposures and generate a set of vulnerabilities by area peril
 
 	FILE *finv = fopen(AGGREGATE_VULNERABILITY_TO_VULNERABILITY_FILE, "rb");
@@ -298,7 +298,7 @@ void getmodel::outputNewCoverages(std::vector<OASIS_FLOAT> &_coverages) {
 
 
 void getmodel::newItems() {
-	getItems();
+	getAggregateItems();
 	std::set<AREAPERIL_INT> _disagg_area_perils;
 	std::set<AREAPERIL_INT> _disagg_vulnerabilities;
 	getAggregateAreaPerils(_disagg_area_perils);
@@ -329,6 +329,27 @@ void getmodel::newItems() {
 	}
 	for (item i : _expanded_items) {
 		fwrite(&i, sizeof(i), 1, fin);
+	}
+	fclose(fin);
+}
+
+void getmodel::getItems() {
+	// Read the exposures and generate a set of vulnerabilities by area peril
+		item item_rec;
+
+	FILE *fin = fopen(ITEMS_FILE, "rb");
+	if (fin == nullptr) {
+		fprintf(stderr, "%s: cannot open %s\n", __func__, ITEMS_FILE);
+		exit(EXIT_FAILURE);
+	}
+
+	while (fread(&item_rec, sizeof(item_rec), 1, fin) != 0) {
+		if (_vulnerability_ids_by_area_peril.count(item_rec.areaperil_id) == 0)
+			_vulnerability_ids_by_area_peril[item_rec.areaperil_id] = std::set<int>();
+		_vulnerability_ids_by_area_peril[item_rec.areaperil_id].insert(
+			item_rec.vulnerability_id);
+		_area_perils.insert(item_rec.areaperil_id);
+		_vulnerability_ids.insert(item_rec.vulnerability_id);
 	}
 	fclose(fin);
 }
@@ -430,11 +451,17 @@ void getmodel::getDamageBinDictionary() {
 	//delete[] damage_bins;
 }
 
-void getmodel::init(bool zip) {
+void getmodel::init(bool zip, bool disaggregation) {
 	_zip = zip;
+	_disaggregation = disaggregation;
 
 	getIntensityInfo();
-	newItems();
+	if (_disaggregation) {
+		newItems();
+	}
+	else {
+		getItems();
+	}
 	getVulnerabilities();
 	getDamageBinDictionary();
 	getFootPrints();
@@ -612,7 +639,7 @@ void getmodel::doResults(
 	int &event_id, AREAPERIL_INT areaperil_id, 
 	std::map<AREAPERIL_INT, std::set<int>> &vulnerability_ids_by_area_peril) {
 	std::vector<OASIS_FLOAT> intensity (_num_intensity_bins, 0);
-	if (areaperil_id < _agg_ap_start) {
+	if (areaperil_id < _agg_ap_start || !_disaggregation) {
 		std::map<AREAPERIL_INT, std::vector<OASIS_FLOAT>> areaperil_intensity;
 		getIntensityProbs(event_id, areaperil_intensity);
 		if (areaperil_intensity.find(areaperil_id) != areaperil_intensity.end())
@@ -628,7 +655,7 @@ void getmodel::doResults(
 		results.resize(_num_damage_bins);
 		int result_index = 0;
 		std::vector<OASIS_FLOAT> vulnerability;
-		if (vulnerability_id < _agg_vul_start) {
+		if (vulnerability_id < _agg_vul_start || !_disaggregation) {
 			vulnerability = _vulnerabilities[vulnerability_id];
 		}
 		else {
@@ -636,7 +663,7 @@ void getmodel::doResults(
 		}
 		int vulnerability_index = 0;
 		double cumulative_prob = 0;
-		if (areaperil_id >= _agg_ap_start) {
+		if (_disaggregation && areaperil_id >= _agg_ap_start) {
 			newIntensity(event_id, areaperil_id, intensity, vulnerability_id);
 		}
 		for (int damage_bin_index = 0; damage_bin_index < _num_damage_bins;
@@ -709,7 +736,7 @@ void getmodel::doResultsNoIntensityUncertainty(
 	int intensity_bin_index) {
 	for (int vulnerability_id : _vulnerability_ids_by_area_peril[areaperil_id]) {
 		std::vector<OASIS_FLOAT> vulnerability;
-		if (vulnerability_id < _agg_vul_start) {
+		if (vulnerability_id < _agg_vul_start || !_disaggregation) {
 			vulnerability = _vulnerabilities[vulnerability_id];
 		}
 		else {
@@ -793,7 +820,8 @@ void getmodel::getDisaggregateCdfs(int event_id,
 
 
 void getmodel::doCdf(int event_id) {
-	doCdfAggregate(event_id);
+	if (_disaggregation)
+		doCdfAggregate(event_id);
 
 	if (_has_intensity_uncertainty) {
 		doCdfInner(event_id);

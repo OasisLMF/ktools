@@ -280,7 +280,7 @@ struct aggregate_vulnerability_to_vulnerability
 struct Weight {
 	AREAPERIL_INT areaperil_id;
 	int vulnerability_id;
-	OASIS_FLOAT weight;
+	OASIS_FLOAT count;
 };
 
 struct Periods

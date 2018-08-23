@@ -519,8 +519,8 @@ void getmodel::calcProbAggVul(AREAPERIL_INT areaperil_id, int vulnerability_id, 
 		if (weight.areaperil_id == areaperil_id) {
 			if (_aggregate_vulnerabilities[vulnerability_id].find(weight.vulnerability_id) !=
 				_aggregate_vulnerabilities[vulnerability_id].end()) {
-				vulnerability_probability[weight.vulnerability_id] = weight.weight;
-				total += weight.weight;
+				vulnerability_probability[weight.vulnerability_id] = weight.count;
+				total += weight.count;
 			}
 		}
 	}
@@ -535,8 +535,8 @@ void getmodel::calcProbAggAp(int vulnerability_id, AREAPERIL_INT areaperil_id, s
 		if (weight.vulnerability_id == vulnerability_id) {
 			if (_aggregate_areaperils[areaperil_id].find(weight.areaperil_id) !=
 				_aggregate_areaperils[areaperil_id].end()) {
-				area_peril_probability[weight.areaperil_id] = weight.weight;
-				total += weight.weight;
+				area_peril_probability[weight.areaperil_id] = weight.count;
+				total += weight.count;
 			}
 		}
 	}
@@ -552,8 +552,8 @@ void getmodel::calcProbAgg(AREAPERIL_INT areaperil_id, int vulnerability_id, std
 			_aggregate_areaperils[areaperil_id].end()) {
 			if (_aggregate_vulnerabilities[vulnerability_id].find(weight.vulnerability_id) !=
 				_aggregate_vulnerabilities[vulnerability_id].end()) {
-				probabilities[weight.areaperil_id][weight.vulnerability_id] = weight.weight;
-				total += weight.weight;
+				probabilities[weight.areaperil_id][weight.vulnerability_id] = weight.count;
+				total += weight.count;
 			}
 		}
 	}

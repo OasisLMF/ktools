@@ -14,15 +14,15 @@ using namespace std;
 
 void doit(bool skipheader)
 {
-	if (skipheader == false) printf("areaperil_id, vulnerability_id, weight\n");
+	if (skipheader == false) printf("areaperil_id, vulnerability_id, count\n");
 
 	Weight q;
 	int i = fread(&q, sizeof(q), 1, stdin);
 	while (i != 0) {
 #ifdef AREAPERIL_TYPE_LONG
-		printf("%ld, %d, %f\n", q.areaperil_id, q.vulnerability_id, q.weight);
+		printf("%ld, %d, %f\n", q.areaperil_id, q.vulnerability_id, q.count);
 #else
-		printf("%d, %d, %f\n", q.areaperil_id, q.vulnerability_id, q.weight);
+		printf("%d, %d, %f\n", q.areaperil_id, q.vulnerability_id, q.count);
 #endif // 		
 		i = fread(&q, sizeof(q), 1, stdin);
 	}

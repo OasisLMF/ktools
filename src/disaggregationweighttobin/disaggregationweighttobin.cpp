@@ -22,9 +22,9 @@ void doit()
 	while (fgets(line, sizeof(line), stdin) != 0)
 	{
 #ifdef AREAPERIL_TYPE_LONG
-		int ret = sscanf(line, "%ld,%d,%f", &q.areaperil_id, &q.vulnerability_id, &q.weight);
+		int ret = sscanf(line, "%ld,%d,%f", &q.areaperil_id, &q.vulnerability_id, &q.count);
 #else
-		int ret = sscanf(line, "%d,%d,%f", &q.areaperil_id, &q.vulnerability_id, &q.weight);
+		int ret = sscanf(line, "%d,%d,%f", &q.areaperil_id, &q.vulnerability_id, &q.count);
 #endif 
 
 		if (ret != 3) {

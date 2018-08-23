@@ -442,9 +442,9 @@ void getmodel::init(bool zip) {
 
 	//_temp_results = new Result[_num_damage_bins];
 	_temp_results.resize(_num_damage_bins);
-	for (int damage_bin_index = 1; damage_bin_index <= _num_damage_bins; damage_bin_index++) {
-		_temp_results[damage_bin_index - 1] =
-			Result(0.0, _mean_damage_bins[damage_bin_index - 1]);
+	for (int damage_bin_index = 0; damage_bin_index < _num_damage_bins; damage_bin_index++) {
+		_temp_results[damage_bin_index] =
+			Result(0.0, _mean_damage_bins[damage_bin_index]);
 	}
 }
 
@@ -611,11 +611,16 @@ void getmodel::newVulnerability(int aggregate_vulnerability_id,std::vector<OASIS
 void getmodel::doResults(
 	int &event_id, AREAPERIL_INT areaperil_id, 
 	std::map<AREAPERIL_INT, std::set<int>> &vulnerability_ids_by_area_peril) {
-	std::vector<OASIS_FLOAT> intensity;
+	std::vector<OASIS_FLOAT> intensity (_num_intensity_bins, 0);
 	if (areaperil_id < _agg_ap_start) {
 		std::map<AREAPERIL_INT, std::vector<OASIS_FLOAT>> areaperil_intensity;
 		getIntensityProbs(event_id, areaperil_intensity);
-		intensity = areaperil_intensity[areaperil_id];
+		if (areaperil_intensity.find(areaperil_id) != areaperil_intensity.end())
+			intensity = areaperil_intensity[areaperil_id];
+		else {
+			intensity[0] = 1;
+		}
+		areaperil_intensity.clear();
 	}
 	for (int vulnerability_id : vulnerability_ids_by_area_peril[areaperil_id]) {
 		//Result *results = new Result[_num_damage_bins];
@@ -765,8 +770,12 @@ void getmodel::getDisaggregateCdfs(int event_id,
 				for (int intensity_bin_index = 0;
 					intensity_bin_index < _num_intensity_bins; intensity_bin_index++) {
 					if (areaperil_intensity.find(ap->first) != areaperil_intensity.end()) {
-						prob += vulnerability[vulnerability_index++] *
+						prob += vulnerability[getVulnerabilityIndex(intensity_bin_index + 1, damage_bin_index + 1)] *
 							areaperil_intensity[ap->first][intensity_bin_index];
+					}
+					else {
+						if (intensity_bin_index == 0)
+							prob += vulnerability[getVulnerabilityIndex(intensity_bin_index + 1, damage_bin_index + 1)];
 					}
 				}
 
@@ -799,7 +808,6 @@ void getmodel::doCdf(int event_id) {
 
 
 void getmodel::doCdfAggregate(int event_id) {
-	auto intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);
 	std::map<AREAPERIL_INT, std::set<int>> vulnerability_ids_by_area_peril;
 	std::map<AREAPERIL_INT, std::set<int>> agg_vulnerability_ids_by_area_peril;
 	for (AREAPERIL_INT aggregate_areaperil_id : _aggregate_areaperil_ids) {

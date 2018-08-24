@@ -63,7 +63,7 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 				const profile_rec_new &profile = profile_vec_new_[x.policytc_id];
 				x.allocrule_id = allocrule_;
 				switch (profile.calcrule_id) {
-					case 1:
+					case 1:	// insurance only
 					{
 						OASIS_FLOAT ded = 0;
 						OASIS_FLOAT lim = 0;
@@ -77,9 +77,9 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 						x.effective_deductible = x.effective_deductible + (x.loss - loss);
 						if (loss > lim) loss = lim;
 						//x.retained_loss = x.retained_loss + (x.loss - loss);
-						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
-						else x.net_loss = x.loss - loss;
-						x.retained_loss = x.net_loss;
+						//if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
+						//else x.net_loss = x.loss - loss;
+						//x.retained_loss = x.net_loss;
 						x.loss = loss;
 					}
 					break;
@@ -134,7 +134,7 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 						x.loss = loss;
 					}
 					break;
-					case 4:
+					case 4:	// insurance only
 					{
 						OASIS_FLOAT ded = 0;
 						OASIS_FLOAT lim = 0;
@@ -148,13 +148,13 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 						x.effective_deductible = x.effective_deductible + (x.loss - loss);
 						if (loss > lim) loss = lim;
 						//x.retained_loss = x.retained_loss + (x.loss - loss);
-						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
-						else x.net_loss = x.loss - loss;
-						x.retained_loss = x.net_loss;
+						//if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
+						//else x.net_loss = x.loss - loss;
+						//x.retained_loss = x.net_loss;
 						x.loss = loss;
 					}
 					break;
-					case 5:
+					case 5: // insurance only
 					{
 						OASIS_FLOAT ded = 0;
 						OASIS_FLOAT lim = 0;
@@ -167,13 +167,13 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 						x.effective_deductible = x.effective_deductible + (x.loss - loss);
 						if (loss > (x.loss * lim)) loss = x.loss * lim;						
 						//x.retained_loss = x.retained_loss + (x.loss - loss);
-						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
-						else x.net_loss = x.loss - loss;
-						x.retained_loss = x.net_loss;
+						//if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
+						//else x.net_loss = x.loss - loss;
+						//x.retained_loss = x.net_loss;
 						x.loss = loss;
 					}
 					break;
-					case 6:
+					case 6: // insurance only
 					{
 						OASIS_FLOAT ded = 0;
 						for (auto y : profile.tc_vec) {
@@ -184,42 +184,41 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 						if (loss < 0) loss = 0;
 						x.effective_deductible = x.effective_deductible + (x.loss - loss);
 						//x.retained_loss = x.retained_loss + (x.loss - loss);
-						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
-						else x.net_loss = x.loss - loss;
-						x.retained_loss = x.net_loss;
+						//if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
+						//else x.net_loss = x.loss - loss;
+						//x.retained_loss = x.net_loss;
 						x.loss = loss;
 					}
 					break;
-					case 7:
+					case 7: // insurance only
 					{
 						OASIS_FLOAT ded = 0;
 						OASIS_FLOAT lim = 0;
 						for (auto y : profile.tc_vec) {
 							if (y.tc_id == deductible_3) ded = y.tc_val;
 							if (y.tc_id == limit_1) lim = y.tc_val;
-						}
-						// Function 7: Applies a cap on retained loss (maximum deductible) and a limit
+						}						
 						OASIS_FLOAT loss = 0;
 						if (x.effective_deductible > ded) {
 							loss = x.loss + x.effective_deductible - ded;
 							if (loss < 0) loss = 0;
 							x.effective_deductible = x.effective_deductible + (x.loss - loss);
 							if (loss > lim) loss = lim;
-							x.retained_loss = x.retained_loss + (x.loss - loss);
+							//x.retained_loss = x.retained_loss + (x.loss - loss);
 						}
 						else {
 							loss = x.loss;
 							if (loss > lim) loss = lim;
-							x.retained_loss = x.retained_loss + (x.loss - loss);
+							//x.retained_loss = x.retained_loss + (x.loss - loss);
 							
 						}
-						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
-						else x.net_loss = x.retained_loss;
-						x.retained_loss = x.net_loss;
+						//if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
+						//else x.net_loss = x.retained_loss;
+						//x.retained_loss = x.net_loss;
 						x.loss = loss;
 					}
 					break;
-					case 8:
+					case 8:	// insurance only
 					{
 						OASIS_FLOAT ded = 0;
 						OASIS_FLOAT lim = 0;
@@ -227,28 +226,27 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 							if (y.tc_id == deductible_2) ded = y.tc_val;
 							if (y.tc_id == limit_1) lim = y.tc_val;
 						}
-						// Function 8: Applies a floor on retained loss (minimum deductible) and a limit
 						OASIS_FLOAT loss = 0;
 						if (x.effective_deductible < ded) {
 							loss = x.loss + x.effective_deductible - ded;
 							if (loss < 0) loss = 0;
 							x.effective_deductible = x.effective_deductible + (x.loss - loss);
 							if (loss > lim) loss = lim;
-							x.retained_loss = x.retained_loss + (x.loss - loss);
+							//x.retained_loss = x.retained_loss + (x.loss - loss);
 						}
 						else {
 							loss = x.loss;
 							if (loss > lim) loss = lim;
-							x.retained_loss = x.retained_loss + (x.loss - loss);
+							//x.retained_loss = x.retained_loss + (x.loss - loss);
 							
 						}
-						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
-						else x.net_loss = x.retained_loss;
-						x.retained_loss = x.net_loss;
+						//if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
+						//else x.net_loss = x.retained_loss;
+						//x.retained_loss = x.net_loss;
 						x.loss = loss;
 					}
 					break;
-					case 9:
+					case 9: // insurance only
 					{
 						OASIS_FLOAT ded = 0;
 						OASIS_FLOAT lim = 0;
@@ -262,13 +260,13 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 						x.effective_deductible = x.effective_deductible + (x.loss - loss);
 						if (loss > lim) loss = lim;
 						//x.retained_loss = x.retained_loss + (x.loss - loss);
-						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
-						else x.net_loss = x.loss - loss;
-						x.retained_loss = x.net_loss;
+						//if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
+						//else x.net_loss = x.loss - loss;
+						//x.retained_loss = x.net_loss;
 						x.loss = loss;
 					}
 					break;
-					case 10:
+					case 10: // insurance only
 					{
 						OASIS_FLOAT ded = 0;
 						for (auto y : profile.tc_vec) {
@@ -280,39 +278,38 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 							loss = x.loss + x.effective_deductible - ded;
 							if (loss < 0) loss = 0;
 							x.effective_deductible = x.effective_deductible + (x.loss - loss);
-							x.retained_loss = x.retained_loss + (x.loss - loss);
+							//x.retained_loss = x.retained_loss + (x.loss - loss);
 						}
 						else {
 							loss = x.loss;
 							// retained loss stays the same
 						}
-						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
-						else x.net_loss = x.retained_loss;
-						x.retained_loss = x.net_loss;
+						//if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
+						//else x.net_loss = x.retained_loss;
+						//x.retained_loss = x.net_loss;
 						x.loss = loss;
 					}
 					break;
-					case 11:
+					case 11: // insurance only
 					{
 						OASIS_FLOAT ded = 0;
 						for (auto y : profile.tc_vec) {
 							if (y.tc_id == deductible_2) ded = y.tc_val;
 						}
-						// Function 11: Applies a floor on retained loss (minimum deductible)
 						OASIS_FLOAT loss = 0;
 						if (x.effective_deductible < ded) {
 							loss = x.loss + x.effective_deductible - ded;
 							if (loss < 0) loss = 0;
 							x.effective_deductible = x.effective_deductible + (x.loss - loss);
-							x.retained_loss = x.retained_loss + (x.loss - loss);
+							//x.retained_loss = x.retained_loss + (x.loss - loss);
 						}
 						else {
 							loss = x.loss;
 							// retained loss stays the same
 						}
-						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
-						else x.net_loss = x.retained_loss;
-						x.retained_loss = x.net_loss;
+						//if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
+						//else x.net_loss = x.retained_loss;
+						//x.retained_loss = x.net_loss;
 						x.loss = loss;
 					}
 					break;
@@ -330,7 +327,7 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 						}
 					}
 					break;
-					case 13:
+					case 13: // insurance only
 					{
 						OASIS_FLOAT ded2 = 0;
 						OASIS_FLOAT ded3 = 0;						
@@ -338,29 +335,28 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 							if (y.tc_id == deductible_2) ded2 = y.tc_val;
 							if (y.tc_id == deductible_3) ded3 = y.tc_val;
 						}
-						// Function 13: Applies a cap and floor on retained loss (minimum and maximum deductible)
 						OASIS_FLOAT loss = 0;
 						if (x.effective_deductible > ded3) {
 							loss = x.loss + x.effective_deductible - ded3;
 							if (loss < 0) loss = 0;
 							x.effective_deductible = x.effective_deductible + (x.loss - loss);
-							x.retained_loss = x.retained_loss + (x.loss - loss);
+							//x.retained_loss = x.retained_loss + (x.loss - loss);
 						}
 						else {
 							if (x.effective_deductible < ded2) {
 								loss = x.loss + x.effective_deductible - ded2;
 								if (loss < 0) loss = 0;
 								x.effective_deductible = x.effective_deductible + (x.loss - loss);
-								x.retained_loss = x.retained_loss + (x.loss - loss);
+								//x.retained_loss = x.retained_loss + (x.loss - loss);
 							}
 							else {
 								loss = x.loss;
 								// effective deductible / retained loss stays the same
 							}
 						}
-						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
-						else x.net_loss = x.retained_loss;
-						x.retained_loss = x.net_loss;
+						//if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
+						//else x.net_loss = x.retained_loss;
+						//x.retained_loss = x.net_loss;
 						x.loss = loss;
 					}
 					break;
@@ -380,7 +376,7 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 						x.loss = loss;
 					}
 					break;
-					case 15:
+					case 15: // insurance only
 					{
 						OASIS_FLOAT lim = 0;
 						for (auto y : profile.tc_vec) {
@@ -390,13 +386,13 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 						OASIS_FLOAT loss = x.loss;
 						loss = loss * lim;
 						//x.retained_loss = x.retained_loss + (x.loss - loss);
-						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
-						else x.net_loss = x.loss - loss;
-						x.retained_loss = x.net_loss;
+						//if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
+						//else x.net_loss = x.loss - loss;
+						//x.retained_loss = x.net_loss;
 						x.loss = loss;
 					}
 					break;
-					case 16:
+					case 16: // insurance only
 					{
 						OASIS_FLOAT ded = 0;
 						for (auto y : profile.tc_vec) {
@@ -408,13 +404,13 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 						if (loss < 0) loss = 0;
 						x.effective_deductible = x.effective_deductible + (x.loss - loss);
 						//x.retained_loss = x.retained_loss + (x.loss - loss);
-						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
-						else x.net_loss = x.loss - loss;
-						x.retained_loss = x.net_loss;
+						//if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
+						//else x.net_loss = x.loss - loss;
+						//x.retained_loss = x.net_loss;
 						x.loss = loss;
 					}
 					break;
-					case 17:
+					case 17: // insurance only
 					{
 						OASIS_FLOAT ded = 0;
 						OASIS_FLOAT lim = 0;
@@ -438,13 +434,13 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 						if (loss < 0) loss = 0;
 						loss = loss * share;
 						//x.retained_loss = x.retained_loss + (x.loss - loss);
-						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
-						else x.net_loss = x.loss - loss;
-						x.retained_loss = x.net_loss;
+						//if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
+						//else x.net_loss = x.loss - loss;
+						//x.retained_loss = x.net_loss;
 						x.loss = loss;
 					}
 					break;
-					case 18:
+					case 18: // insurance only
 					{
 						OASIS_FLOAT ded = 0;
 						OASIS_FLOAT lim = 0;
@@ -468,13 +464,13 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 						if (loss < 0) loss = 0;
 						loss = loss * share;
 						//x.retained_loss = x.retained_loss + (x.loss - loss);
-						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
-						else x.net_loss = x.loss - loss;
-						x.retained_loss = x.net_loss;
+						//if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
+						//else x.net_loss = x.loss - loss;
+						//x.retained_loss = x.net_loss;
 						x.loss = loss;
 					}
 					break;					
-					case 19:
+					case 19:// insurance only
 					{
 						OASIS_FLOAT ded1 = 0;
 						OASIS_FLOAT ded2 = 0;
@@ -490,24 +486,24 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 							loss = x.loss - ded3;
 							if (loss < 0) loss = 0;
 							x.effective_deductible = x.effective_deductible + (x.loss - loss);
-							x.retained_loss = x.retained_loss + (x.loss - loss);
+							//x.retained_loss = x.retained_loss + (x.loss - loss);
 						}
 						else {
 							if (x.loss * ded1 < ded2) {
 								loss = x.loss - ded2;
 								if (loss < 0) loss = 0;
 								x.effective_deductible = x.effective_deductible + (x.loss - loss);
-								x.retained_loss = x.retained_loss + (x.loss - loss);
+								//x.retained_loss = x.retained_loss + (x.loss - loss);
 							}
 							else {
 								loss = x.loss - (x.loss * ded1);
 								if (loss < 0) loss = 0;
 								x.effective_deductible = x.effective_deductible + (x.loss - loss);
-								x.retained_loss = x.retained_loss + (x.loss - loss);		
+								//x.retained_loss = x.retained_loss + (x.loss - loss);		
 							}
 						}
-						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
-						else x.net_loss = x.retained_loss;
+						//if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
+						//else x.net_loss = x.retained_loss;
 						x.loss = loss;
 					}
 					break;
@@ -650,39 +646,6 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 }
 
 
-void fmcalc::init_profile_newx()
-{
-	FILE *fin = NULL;
-	std::string file = FMPROFILE_FILE_NEW;
-	if (inputpath_.length() > 0) {
-		file = inputpath_ + file.substr(5);
-	}
-	fin = fopen(file.c_str(), "rb");
-	if (fin == NULL) {
-		fprintf(stderr, "%s: cannot open %s\n", __func__, file.c_str());
-		exit(EXIT_FAILURE);
-	}
-	fm_profile_new f;
-	int i = fread(&f, sizeof(f), 1, fin);
-	while (i != 0) {
-		profile_rec_new p;
-		p.calcrule_id = f.calcrule_id;
-		add_tc(deductible_1, f.deductible1, p.tc_vec);
-		add_tc(deductible_2, f.deductible2, p.tc_vec);
-		add_tc(deductible_3, f.deductible3, p.tc_vec);
-		add_tc(attachment_1, f.attachment, p.tc_vec);
-		add_tc(limit_1, f.limit, p.tc_vec);
-		add_tc(share_1, f.share1, p.tc_vec);
-		add_tc(share_2, f.share2, p.tc_vec);
-		add_tc(share_3, f.share3, p.tc_vec);
-		if (profile_vec_new_.size() < f.profile_id + 1) {
-			profile_vec_new_.resize(f.profile_id + 1);
-		}
-		profile_vec_new_[f.profile_id] = p;
-		i = fread(&f, sizeof(f), 1, fin);
-	}
-	fclose(fin);
-}
 
 void fmcalc::init_profile_new()
 {

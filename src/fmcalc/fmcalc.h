@@ -79,7 +79,6 @@ private:
 	void init_programme(int maxrunLevel);
 	void init_profile_old();
 	void init_profile_new();
-	void init_profile_newx();
 	void init_itemtotiv();
 	void init_fmxref();
 	void init(int MaxRunLevel);

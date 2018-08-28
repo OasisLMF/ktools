@@ -54,6 +54,7 @@ Author: Mark Pinkerton  email: mark.pinkerton@oasislmf.org
 void help()
 {
 	fprintf(stderr,
+		"-d disaggregation\n"
 		"-v version\n"
 		"-h help\n"
 	);

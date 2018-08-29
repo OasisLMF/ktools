@@ -768,18 +768,18 @@ def generate_test_data(
 
 			for aggregate_area_peril_count in range(1, num_agg_area_perils + 1):
 				aggregate_area_peril_id = aggregate_area_peril_count + num_area_perils
-				for area_peril_count in range(0, num_detail_per_aggregate):
-					area_peril_id = random.randint(1, num_area_perils)
-					if do_csv:
+				area_peril_ids = random.sample(xrange(1, num_area_perils+1), num_detail_per_aggregate)
+				if do_csv:
+					for area_peril_id in area_peril_ids:
 						agg_area_peril_csv_writer.writerow([aggregate_area_peril_id, area_peril_id])
 			if do_csv:
 				agg_area_peril_file_csv.close()
 
 			for aggregate_vulnerability_count in range(1, num_agg_vulnerabilities + 1):
 				aggregate_vulnerability_id = aggregate_vulnerability_count + num_vulnerabilities
-				for vulnerability_count in range(0, num_detail_per_aggregate):
-					vulnerability_id = random.randint(1, num_vulnerabilities)
-					if do_csv:
+				vulnerability_ids = random.sample(xrange(1, num_vulnerabilities+1), num_detail_per_aggregate)
+				if do_csv:
+					for vulnerability_id in vulnerability_ids:
 						agg_vulnerability_csv_writer.writerow([aggregate_vulnerability_id, vulnerability_id])
 			if do_csv:
 				agg_vulnerability_file_csv.close()

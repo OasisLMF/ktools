@@ -193,11 +193,10 @@ void getmodel::getDisaggregationWeights(std::set<AREAPERIL_INT> &_disagg_area_pe
 	}
 	while (fread(&weight, sizeof(weight), 1, fin) != 0) {
 		if (_disagg_area_perils.find(weight.areaperil_id)
-			!= _disagg_area_perils.end()) { // only process those aggregate vuls that are 
-													 // in the item file
-			if (_disagg_vulnerabilities.find(weight.vulnerability_id) != _disagg_vulnerabilities.end()) {
-				_weights.push_back(weight);
-			}
+			!= _disagg_area_perils.end() || 
+			_disagg_vulnerabilities.find(weight.vulnerability_id)
+			!= _disagg_vulnerabilities.end()) {
+			_weights.push_back(weight);
 		}
 	}
 	fclose(fin);

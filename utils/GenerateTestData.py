@@ -880,7 +880,7 @@ def generate_test_data(
 			"occurrencetocsv < static/occurrence.bin > \
 			data2/occurrence2.csv", shell=True)
 		subprocess.call(
-			"randtocsv < static/random.bin > data2/random2.csv", shell=True)
+			"randtocsv -r < static/random.bin > data2/random2.csv", shell=True)
 		subprocess.call(
 			"vulnerabilitytocsv < static/vulnerability.bin > \
 			data2/vulnerability2.csv", shell=True)

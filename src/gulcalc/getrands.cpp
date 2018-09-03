@@ -45,9 +45,9 @@ using namespace std;
 
 void getRands::userandfile()
 {
-	FILE *fin = fopen(DISAGG_RANDOM_FILE, "rb");
+	FILE *fin = fopen(RANDOM_FILE, "rb");
 	if (fin == NULL) {
-		fprintf(stderr, "%s: Error opening file %s\n", __func__, DISAGG_RANDOM_FILE);
+		fprintf(stderr, "%s: Error opening file %s\n", __func__, RANDOM_FILE);
 		exit(-1);
 	}
 	flseek(fin, 0L, SEEK_END);

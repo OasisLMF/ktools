@@ -153,6 +153,14 @@ AC_CONFIG_FILES([
 		 src/returnperiodtocsv/Makefile
 		 src/kat/Makefile
 		 src/footprintconv/Makefile
+		 src/aggregateitemtobin/Makefile
+		 src/aggregateitemtocsv/Makefile
+		 src/areaperildisaggtobin/Makefile
+		 src/areaperildisaggtocsv/Makefile
+		 src/disaggregationweighttobin/Makefile
+		 src/disaggregationweighttocsv/Makefile
+		 src/vulnerabilitydisaggtobin/Makefile
+		 src/vulnerabilitydisaggtocsv/Makefile
                  ])
 AC_OUTPUT
 

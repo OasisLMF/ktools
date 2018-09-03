@@ -44,13 +44,6 @@
 #include "../include/oasis.h"
 #include <zlib.h>
 
-struct Exposure {
-  int location_id;
-  AREAPERIL_INT areaperil_id;
-  int vulnerability_id;
-  int group_id;
-  OASIS_FLOAT tiv;
-};
 
 struct Result {
 

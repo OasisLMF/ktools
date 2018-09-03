@@ -630,14 +630,14 @@ void getmodel::newVulnerability(int aggregate_vulnerability_id,std::vector<OASIS
 void getmodel::doResults(
 	int &event_id, AREAPERIL_INT areaperil_id, 
 	std::map<AREAPERIL_INT, std::set<int>> &vulnerability_ids_by_area_peril) {
-	std::vector<OASIS_FLOAT> intensity (_num_intensity_bins, 0);
+	std::vector<OASIS_FLOAT> intensity;
 	if (areaperil_id < _agg_ap_start || !_disaggregation) {
 		std::map<AREAPERIL_INT, std::vector<OASIS_FLOAT>> areaperil_intensity;
 		getIntensityProbs(event_id, areaperil_intensity);
 		if (areaperil_intensity.find(areaperil_id) != areaperil_intensity.end())
 			intensity = areaperil_intensity[areaperil_id];
 		else {
-			intensity[0] = 1;
+			return;
 		}
 		areaperil_intensity.clear();
 	}

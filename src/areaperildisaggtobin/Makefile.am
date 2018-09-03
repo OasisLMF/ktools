@@ -1,3 +1,5 @@
 # Our binary is produced here
-bin_PROGRAMS = areaperildisaggtobin areaperildisaggtobin_SOURCES = areaperildisaggtobin.cpp 
+
+bin_PROGRAMS = areaperildisaggtobin
+areaperildisaggtobin_SOURCES = areaperildisaggtobin.cpp 
 

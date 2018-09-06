@@ -497,20 +497,21 @@ void getmodel::getIntensityProbs(
 		EventRow *event_key = (EventRow *)&_uncompressed_buf[0];
 		AREAPERIL_INT current_areaperil_id = -1;
 		for (int i = 0; i < number_of_event_records; i++) {
-			if (areaperils.empty()) {
-				fclose(fin);
-				return;
-			}
-			if (areaperils.find(event_key->areaperil_id) != areaperils.end()) {
-				if (event_key->areaperil_id != current_areaperil_id) {
+			if (event_key->areaperil_id != current_areaperil_id) {
+				if (areaperils.find(event_key->areaperil_id) != areaperils.end()) {
 					areaperil_intensity[event_key->areaperil_id] = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0);
 					current_areaperil_id = event_key->areaperil_id;
+					areaperil_intensity[event_key->areaperil_id][0] = event_key->probability;
 					areaperils.erase(current_areaperil_id);
 				}
-				else {
-					areaperil_intensity[event_key->areaperil_id][event_key->intensity_bin_id - 1] =
-						event_key->probability;
-				}
+			}
+			else {
+				areaperil_intensity[event_key->areaperil_id][event_key->intensity_bin_id - 1] =
+					event_key->probability;
+			}
+			if (areaperils.empty() && event_key->intensity_bin_id == _num_intensity_bins) {
+				fclose(fin);
+				return;
 			}
 			event_key++;
 		}
@@ -537,16 +538,17 @@ void getmodel::getIntensityProbs(
 
 		for (int i = 0; i < number_of_event_records; ++i) {
 			fread(&event_key, sizeof(event_key), 1, fin);
-			if (areaperils.find(event_key.areaperil_id) != areaperils.end()) {
-				if (event_key.areaperil_id != current_areaperil_id) {
+			if (event_key.areaperil_id != current_areaperil_id) {
+				if (areaperils.find(event_key.areaperil_id) != areaperils.end()) {
 					areaperil_intensity[event_key.areaperil_id] = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0);
 					current_areaperil_id = event_key.areaperil_id;
+					areaperil_intensity[event_key.areaperil_id][0] = event_key.probability;
 					areaperils.erase(current_areaperil_id);
 				}
-				else {
-					areaperil_intensity[event_key.areaperil_id][event_key.intensity_bin_id - 1] =
-						event_key.probability;
-				}
+			}
+			else {
+				areaperil_intensity[event_key.areaperil_id][event_key.intensity_bin_id - 1] =
+					event_key.probability;
 			}
 			if (areaperils.empty() && event_key.intensity_bin_id == _num_intensity_bins) {
 				fclose(fin);

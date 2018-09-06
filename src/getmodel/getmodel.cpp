@@ -86,7 +86,7 @@ getmodel::~getmodel() {
 }
 
 
-void getmodel::getAggregateItems() {
+void getmodel::getAggregateItems(std::vector<aggregate_item> &aggregate_items) {
 	// Read the exposures and generate a set of vulnerabilities by area peril
 
 	FILE *finv = fopen(AGGREGATE_VULNERABILITY_TO_VULNERABILITY_FILE, "rb");
@@ -118,7 +118,7 @@ void getmodel::getAggregateItems() {
 	}
 
 	while (fread(&item_rec, sizeof(item_rec), 1, fin) != 0) {
-		_aggregate_items.push_back(item_rec);
+		aggregate_items.push_back(item_rec);
 		if (_vulnerability_ids_by_area_peril.count(item_rec.areaperil_id) == 0)
 			_vulnerability_ids_by_area_peril[item_rec.areaperil_id] = std::set<int>();
 		_vulnerability_ids_by_area_peril[item_rec.areaperil_id].insert(
@@ -139,7 +139,7 @@ void getmodel::getAggregateItems() {
 	fclose(fin);
 }
 
-void getmodel::getAggregateAreaPerils(std::set<AREAPERIL_INT> &_disagg_area_perils) {
+void getmodel::getAggregateAreaPerils(std::set<AREAPERIL_INT> &disagg_area_perils) {
 	aggregate_areaperil_to_areaperil agg_ap;
 	FILE *fin = fopen(AGGREGATE_AREAPERIL_TO_AREAPERIL_FILE, "rb");
 	if (fin == nullptr) {
@@ -151,13 +151,13 @@ void getmodel::getAggregateAreaPerils(std::set<AREAPERIL_INT> &_disagg_area_peri
 			!= _aggregate_areaperil_ids.end()) { // only process those aggregate area perils that are 
 												 // in the item file
 			_aggregate_areaperils[agg_ap.aggregate_areaperil_id].insert(agg_ap.areaperil_id);
-			_disagg_area_perils.insert(agg_ap.areaperil_id);
+			disagg_area_perils.insert(agg_ap.areaperil_id);
 		}
 	}
 	fclose(fin);
 }
 
-void getmodel::getAggregateVulnerabilities(std::set<AREAPERIL_INT> &_disagg_vulnerabilities) {
+void getmodel::getAggregateVulnerabilities(std::set<AREAPERIL_INT> &disagg_vulnerabilities) {
 	aggregate_vulnerability_to_vulnerability agg_vul;
 	FILE *fin = fopen(AGGREGATE_VULNERABILITY_TO_VULNERABILITY_FILE, "rb");
 	if (fin == nullptr) {
@@ -171,13 +171,13 @@ void getmodel::getAggregateVulnerabilities(std::set<AREAPERIL_INT> &_disagg_vuln
 													 // in the item file
 			_aggregate_vulnerabilities[agg_vul.aggregate_vulnerability_id].insert(agg_vul.vulnerability_id);
 			_vulnerability_ids.insert(agg_vul.vulnerability_id);
-			_disagg_vulnerabilities.insert(agg_vul.vulnerability_id);
+			disagg_vulnerabilities.insert(agg_vul.vulnerability_id);
 		}
 	}
 	fclose(fin);
 }
 
-void getmodel::getDisaggregationWeights(std::set<AREAPERIL_INT> &_disagg_area_perils, std::set<AREAPERIL_INT> &_disagg_vulnerabilities) {
+void getmodel::getDisaggregationWeights(std::set<AREAPERIL_INT> &disagg_area_perils, std::set<AREAPERIL_INT> &disagg_vulnerabilities) {
 	Weight weight;
 	FILE *fin = fopen(WEIGHTS_FILE, "rb");
 	if (fin == NULL) {
@@ -185,10 +185,10 @@ void getmodel::getDisaggregationWeights(std::set<AREAPERIL_INT> &_disagg_area_pe
 		exit(-1);
 	}
 	while (fread(&weight, sizeof(weight), 1, fin) != 0) {
-		if (_disagg_area_perils.find(weight.areaperil_id)
-			!= _disagg_area_perils.end() || 
-			_disagg_vulnerabilities.find(weight.vulnerability_id)
-			!= _disagg_vulnerabilities.end()) {
+		if (disagg_area_perils.find(weight.areaperil_id)
+			!= disagg_area_perils.end() || 
+			disagg_vulnerabilities.find(weight.vulnerability_id)
+			!= disagg_vulnerabilities.end()) {
 			_weights.push_back(weight);
 		}
 	}
@@ -196,7 +196,7 @@ void getmodel::getDisaggregationWeights(std::set<AREAPERIL_INT> &_disagg_area_pe
 }
 
 
-void getmodel::getCoverages(std::vector<OASIS_FLOAT> &_coverages) {
+void getmodel::getCoverages(std::vector<OASIS_FLOAT> &coverages) {
 	FILE *fin = fopen(COVERAGES_FILE, "rb");
 	if (fin == NULL) {
 		fprintf(stderr, "%s: Error reading file %s\n", __func__, COVERAGES_FILE);
@@ -210,30 +210,30 @@ void getmodel::getCoverages(std::vector<OASIS_FLOAT> &_coverages) {
 	OASIS_FLOAT tiv;
 	unsigned int nrec = static_cast<unsigned int>(sz / sizeof(tiv));
 
-	_coverages.resize(nrec + 1);
+	coverages.resize(nrec + 1);
 	int coverage_id = 0;
 	size_t i = fread(&tiv, sizeof(tiv), 1, fin);
 	while (i != 0) {
 		coverage_id++;
-		_coverages[coverage_id] = tiv;
+		coverages[coverage_id] = tiv;
 		i = fread(&tiv, sizeof(tiv), 1, fin);
 	}
 
 	fclose(fin);
 }
 
-void getmodel::expandItems(aggregate_item &a, std::vector<OASIS_FLOAT> &_coverages) {
+void getmodel::expandItems(aggregate_item &a, std::vector<OASIS_FLOAT> &coverages, std::vector<item> &expanded_items) {
 	item i;
 	int number_of_items = a.number_items;
-	OASIS_FLOAT tiv = _coverages[a.coverage_id];
+	OASIS_FLOAT tiv = coverages[a.coverage_id];
 	tiv /= a.number_items;
 
 	int c = 1;
-	while (_coverages[c] != tiv) {
+	while (coverages[c] != tiv) {
 		++c;
-		if (c >= _coverages.size()) {
-			i.coverage_id = _coverages.size();
-			_coverages.push_back(tiv);
+		if (c >= coverages.size()) {
+			i.coverage_id = coverages.size();
+			coverages.push_back(tiv);
 			break;
 		}
 	}
@@ -247,7 +247,7 @@ void getmodel::expandItems(aggregate_item &a, std::vector<OASIS_FLOAT> &_coverag
 		for (int c = 0; c < number_of_items; ++c) {
 			i.group_id = group_id;
 			i.id = *_item_ids.rbegin() + 1;
-			_expanded_items.push_back(i);
+			expanded_items.push_back(i);
 			_item_ids.insert(i.id);
 		}
 	}
@@ -255,7 +255,7 @@ void getmodel::expandItems(aggregate_item &a, std::vector<OASIS_FLOAT> &_coverag
 		for (int c = 0; c < number_of_items; ++c) {
 			i.group_id = *_group_ids.rbegin() + 1;
 			i.id = *_item_ids.rbegin() + 1;
-			_expanded_items.push_back(i);
+			expanded_items.push_back(i);
 			_group_ids.insert(i.group_id);
 			_item_ids.insert(i.id);
 		}
@@ -290,36 +290,37 @@ void getmodel::outputNewCoverages(std::vector<OASIS_FLOAT> &_coverages) {
 
 
 void getmodel::newItems() {
-	getAggregateItems();
-	std::set<AREAPERIL_INT> _disagg_area_perils;
-	std::set<AREAPERIL_INT> _disagg_vulnerabilities;
-	getAggregateAreaPerils(_disagg_area_perils);
-	getAggregateVulnerabilities(_disagg_vulnerabilities);
-	getDisaggregationWeights(_disagg_area_perils, _disagg_vulnerabilities);
-	_disagg_area_perils.clear();
-	_disagg_vulnerabilities.clear();
+	std::vector<aggregate_item> aggregate_items;
+	getAggregateItems(aggregate_items);
+	std::set<AREAPERIL_INT> disagg_area_perils;
+	std::set<AREAPERIL_INT> disagg_vulnerabilities;
+	getAggregateAreaPerils(disagg_area_perils);
+	getAggregateVulnerabilities(disagg_vulnerabilities);
+	getDisaggregationWeights(disagg_area_perils, disagg_vulnerabilities);
+	disagg_area_perils.clear();
+	disagg_vulnerabilities.clear();
 
-	std::vector<OASIS_FLOAT> _coverages;
-	getCoverages(_coverages);
+	std::vector<OASIS_FLOAT> coverages;
+	getCoverages(coverages);
 
-	for (auto it = _aggregate_items.begin(); it != _aggregate_items.end(); ++it) {
+	std::vector<item> expanded_items;
+	for (auto it = aggregate_items.begin(); it != aggregate_items.end(); ++it) {
 		aggregate_item a = *it;
 		if (a.number_items == 0) {
 			fprintf(stderr, "Number of items in aggregate item cannot be 0\n");
 			exit(EXIT_FAILURE);
 		}
-		expandItems(a, _coverages);
+		expandItems(a, coverages, expanded_items);
 	}
-	outputNewCoverages(_coverages);
-
-	_coverages.clear();
+	outputNewCoverages(coverages);
+	coverages.clear();
 
 	FILE *fin = fopen(ITEMS_FILE, "wb");
 	if (fin == nullptr) {
 		fprintf(stderr, "%s: cannot open %s\n", __func__, ITEMS_FILE);
 		exit(EXIT_FAILURE);
 	}
-	for (item i : _expanded_items) {
+	for (item i : expanded_items) {
 		fwrite(&i, sizeof(i), 1, fin);
 	}
 	fclose(fin);
@@ -362,19 +363,18 @@ void getmodel::getVulnerabilities() {
 
 	while (fread(&vulnerability, sizeof(vulnerability), 1, fin) != 0) {
 		if (_vulnerability_ids.find(vulnerability.vulnerability_id) !=
-			_vulnerability_ids.end()) { // only process those vulnerabilities that are in the item
+			_vulnerability_ids.end() && 
+			_num_intensity_bins >= vulnerability.intensity_bin_id) { // only process those vulnerabilities that are in the item
 										// file
-			if (_num_intensity_bins >= vulnerability.intensity_bin_id) {
-				if (vulnerability.vulnerability_id != current_vulnerability_id) {
-					_vulnerabilities[vulnerability.vulnerability_id] =
-						std::vector<OASIS_FLOAT>(_num_intensity_bins * _num_damage_bins, 0.0);
-					current_vulnerability_id = vulnerability.vulnerability_id;
-				}
-				int vulnerabilityIndex = getVulnerabilityIndex(
-					vulnerability.intensity_bin_id, vulnerability.damage_bin_id);
-				_vulnerabilities[vulnerability.vulnerability_id][vulnerabilityIndex] =
-					vulnerability.probability;
+			if (vulnerability.vulnerability_id != current_vulnerability_id) {
+				_vulnerabilities[vulnerability.vulnerability_id] =
+					std::vector<OASIS_FLOAT>(_num_intensity_bins * _num_damage_bins, 0.0);
+				current_vulnerability_id = vulnerability.vulnerability_id;
 			}
+			int vulnerabilityIndex = getVulnerabilityIndex(
+				vulnerability.intensity_bin_id, vulnerability.damage_bin_id);
+			_vulnerabilities[vulnerability.vulnerability_id][vulnerabilityIndex] =
+				vulnerability.probability;
 		}
 	}
 	fclose(fin);
@@ -458,6 +458,7 @@ void getmodel::init(bool zip, bool disaggregation) {
 	getDamageBinDictionary();
 	getFootPrints();
 	initOutputStream();
+	newVulnerabilities();
 
 	//_temp_results = new Result[_num_damage_bins];
 	_temp_results.resize(_num_damage_bins);
@@ -468,12 +469,17 @@ void getmodel::init(bool zip, bool disaggregation) {
 }
 
 
-void getmodel::getIntensityProbs(int event_id, std::map<AREAPERIL_INT, std::vector<OASIS_FLOAT>> &areaperil_intensity) {
+void getmodel::getIntensityProbs(
+	int event_id,
+	std::map<AREAPERIL_INT, std::vector<OASIS_FLOAT>> &areaperil_intensity,
+	std::set<AREAPERIL_INT> &areaperils) {
 	if (_zip) {
 		auto sizeof_EventKey = sizeof(EventRow);
 		auto fin = fopen(ZFOOTPRINT_FILE, "rb");
-		if (_event_index_by_event_id.count(event_id) == 0)
+		if (_event_index_by_event_id.count(event_id) == 0) {
+			fclose(fin);
 			return;
+		}
 		flseek(fin, _event_index_by_event_id[event_id].offset, 0);
 
 		int size = _event_index_by_event_id[event_id].size;
@@ -491,14 +497,24 @@ void getmodel::getIntensityProbs(int event_id, std::map<AREAPERIL_INT, std::vect
 		EventRow *event_key = (EventRow *)&_uncompressed_buf[0];
 		AREAPERIL_INT current_areaperil_id = -1;
 		for (int i = 0; i < number_of_event_records; i++) {
-			if (event_key->areaperil_id != current_areaperil_id) {
-				areaperil_intensity[event_key->areaperil_id] = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0);
-				current_areaperil_id = event_key->areaperil_id;
+			if (areaperils.empty()) {
+				fclose(fin);
+				return;
 			}
-			areaperil_intensity[event_key->areaperil_id][event_key->intensity_bin_id - 1] =
-				event_key->probability;
+			if (areaperils.find(event_key->areaperil_id) != areaperils.end()) {
+				if (event_key->areaperil_id != current_areaperil_id) {
+					areaperil_intensity[event_key->areaperil_id] = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0);
+					current_areaperil_id = event_key->areaperil_id;
+					areaperils.erase(current_areaperil_id);
+				}
+				else {
+					areaperil_intensity[event_key->areaperil_id][event_key->intensity_bin_id - 1] =
+						event_key->probability;
+				}
+			}
 			event_key++;
 		}
+		fclose(fin);
 	}
 	else {
 		auto sizeof_EventKey = sizeof(EventRow);
@@ -520,13 +536,22 @@ void getmodel::getIntensityProbs(int event_id, std::map<AREAPERIL_INT, std::vect
 
 
 		for (int i = 0; i < number_of_event_records; ++i) {
-			fread(&event_key, sizeof(event_key), 1, fin);
-			if (event_key.areaperil_id != current_areaperil_id) {
-				areaperil_intensity[event_key.areaperil_id] = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0);
-				current_areaperil_id = event_key.areaperil_id;
+			if (areaperils.empty()) { 
+				fclose(fin);
+				return;
 			}
-			areaperil_intensity[event_key.areaperil_id][event_key.intensity_bin_id - 1] =
-				event_key.probability;
+			fread(&event_key, sizeof(event_key), 1, fin);
+			if (areaperils.find(event_key.areaperil_id) != areaperils.end()) {
+				if (event_key.areaperil_id != current_areaperil_id) {
+					areaperil_intensity[event_key.areaperil_id] = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0);
+					current_areaperil_id = event_key.areaperil_id;
+					areaperils.erase(current_areaperil_id);
+				}
+				else {
+					areaperil_intensity[event_key.areaperil_id][event_key.intensity_bin_id - 1] =
+						event_key.probability;
+				}
+			}
 		}
 		fclose(fin);
 	}
@@ -584,18 +609,22 @@ void getmodel::calcProbAgg(AREAPERIL_INT areaperil_id, int vulnerability_id, std
 }
 
 void getmodel::newIntensity(int event_id, AREAPERIL_INT aggregate_areaperil_id, std::vector<OASIS_FLOAT> &new_Intensity, int vulnerability_id) {
-	std::map<AREAPERIL_INT, std::vector<OASIS_FLOAT>> areaperil_intensity;
-	getIntensityProbs(event_id, areaperil_intensity);
 	new_Intensity.resize(_num_intensity_bins);
 	std::map<AREAPERIL_INT, OASIS_FLOAT> area_peril_probability;
 	calcProbAggAp(vulnerability_id, aggregate_areaperil_id, area_peril_probability);
+	std::set<AREAPERIL_INT> areaperils;
+	for (auto it = area_peril_probability.begin(); it != area_peril_probability.end(); ++it) {
+		areaperils.insert(it->first);
+	}
+	std::map<AREAPERIL_INT, std::vector<OASIS_FLOAT>> areaperil_intensity;
+	getIntensityProbs(event_id, areaperil_intensity, areaperils);
+	areaperils.clear();
 	for (int intensity_bin_id = 0; intensity_bin_id < _num_intensity_bins; ++intensity_bin_id) {
 		OASIS_FLOAT prob = 0.0;
 		for (auto it = area_peril_probability.begin(); it != area_peril_probability.end(); ++it) {
 			OASIS_FLOAT weight = it->second;
-			auto itr = areaperil_intensity.find(it->first);
-			if (itr != areaperil_intensity.end()) {
-				prob += itr->second[intensity_bin_id] * weight;
+			if (areaperil_intensity.find(it->first) != areaperil_intensity.end()) {
+				prob += areaperil_intensity.find(it->first)->second[intensity_bin_id] * weight;
 			}
 			else {
 				if (intensity_bin_id == 0) {
@@ -607,20 +636,29 @@ void getmodel::newIntensity(int event_id, AREAPERIL_INT aggregate_areaperil_id, 
 	}
 }
 
-void getmodel::newVulnerability(int aggregate_vulnerability_id,std::vector<OASIS_FLOAT> &new_Vulnerability,
-	AREAPERIL_INT areaperil_id) {
-	std::map<int, OASIS_FLOAT> vulnerability_probability;
-	calcProbAggVul(areaperil_id, aggregate_vulnerability_id, vulnerability_probability);
-	new_Vulnerability.resize(_num_damage_bins*_num_intensity_bins, 0.0);
-	for (int i = 0; i < _num_damage_bins; ++i) {
-		for (int c = 0; c < _num_intensity_bins; ++c) {
-			int index = getVulnerabilityIndex(c + 1, i + 1);
-			OASIS_FLOAT prob = 0.0;
-			for (auto it = _vulnerabilities.begin(); it != _vulnerabilities.end(); ++it) {
-				OASIS_FLOAT weight = vulnerability_probability[it->first];
-				prob += weight * it->second[index];
+void getmodel::newVulnerabilities() {
+	for (auto it = _vulnerability_ids_by_area_peril.begin(); it != _vulnerability_ids_by_area_peril.end(); it++) {
+		if (it->first < _agg_ap_start) {
+			for (auto itr = it->second.begin(); itr != it->second.end(); itr++) {
+				if (*itr >= _agg_vul_start) {
+					std::map<int, OASIS_FLOAT> vulnerability_probability;
+					calcProbAggVul(it->first, *itr, vulnerability_probability);
+					std::vector<OASIS_FLOAT> new_Vulnerability;
+					new_Vulnerability.resize(_num_damage_bins*_num_intensity_bins, 0.0);
+					int index = 0;
+					for (int i = 0; i < _num_damage_bins; ++i) {
+						for (int c = 0; c < _num_intensity_bins; ++c) {
+							OASIS_FLOAT prob = 0.0;
+							for (auto it = _vulnerabilities.begin(); it != _vulnerabilities.end(); ++it) {
+								OASIS_FLOAT weight = vulnerability_probability[it->first];
+								prob += weight * it->second[index];
+							}
+							new_Vulnerability[index++] = prob;
+						}
+					}
+					_aggregate_vulnerability_probs[it->first][*itr] = new_Vulnerability;
+				}
 			}
-			new_Vulnerability[index] = prob;
 		}
 	}
 }
@@ -632,13 +670,13 @@ void getmodel::doResults(
 	std::map<AREAPERIL_INT, std::set<int>> &vulnerability_ids_by_area_peril) {
 	std::vector<OASIS_FLOAT> intensity;
 	if (areaperil_id < _agg_ap_start || !_disaggregation) {
+		std::set<AREAPERIL_INT> areaperils;
+		areaperils.insert(areaperil_id);
 		std::map<AREAPERIL_INT, std::vector<OASIS_FLOAT>> areaperil_intensity;
-		getIntensityProbs(event_id, areaperil_intensity);
+		getIntensityProbs(event_id, areaperil_intensity, areaperils);
 		if (areaperil_intensity.find(areaperil_id) != areaperil_intensity.end())
 			intensity = areaperil_intensity[areaperil_id];
-		else {
-			return;
-		}
+		else { return; }
 		areaperil_intensity.clear();
 	}
 	for (int vulnerability_id : vulnerability_ids_by_area_peril[areaperil_id]) {
@@ -651,7 +689,7 @@ void getmodel::doResults(
 			vulnerability = _vulnerabilities[vulnerability_id];
 		}
 		else {
-			newVulnerability(vulnerability_id, vulnerability, areaperil_id);
+			vulnerability = _aggregate_vulnerability_probs[areaperil_id][vulnerability_id];
 		}
 		int vulnerability_index = 0;
 		double cumulative_prob = 0;
@@ -732,7 +770,7 @@ void getmodel::doResultsNoIntensityUncertainty(
 			vulnerability = _vulnerabilities[vulnerability_id];
 		}
 		else {
-			newVulnerability(vulnerability_id, vulnerability, areaperil_id);
+			vulnerability = _aggregate_vulnerability_probs[areaperil_id][vulnerability_id];
 		}
 		int result_index = 0;
 		OASIS_FLOAT cumulative_prob = 0;
@@ -771,8 +809,12 @@ void getmodel::getDisaggregateCdfs(int event_id,
 	std::map<AREAPERIL_INT, std::map<int, std::vector<OASIS_FLOAT>>> &results_map,
 	std::map<AREAPERIL_INT, std::set<int>> &disaggregated_vul_by_ap) {
 
+	std::set<AREAPERIL_INT> areaperils;
+	for (auto ap = disaggregated_vul_by_ap.begin(); ap != disaggregated_vul_by_ap.end(); ap++) {
+		areaperils.insert(ap->first);
+	}
 	std::map<AREAPERIL_INT, std::vector<OASIS_FLOAT>> areaperil_intensity;
-	getIntensityProbs(event_id, areaperil_intensity);
+	getIntensityProbs(event_id, areaperil_intensity, areaperils);
 
 	for (auto ap = disaggregated_vul_by_ap.begin(); ap != disaggregated_vul_by_ap.end(); ap++) {
 		for (auto vul = ap->second.begin(); vul != ap->second.end(); vul++) {
@@ -871,8 +913,10 @@ void getmodel::doCdfInner(int event_id) {
 void getmodel::doCdfInnerNoIntensityUncertaintyz(int event_id) {
 	auto sizeof_EventKey = sizeof(EventRow);
 	FILE *fin = fopen(ZFOOTPRINT_FILE, "rb");
-	if (_event_index_by_event_id.count(event_id) == 0)
+	if (_event_index_by_event_id.count(event_id) == 0) {
+		fclose(fin);
 		return;
+	}
 	flseek(fin, _event_index_by_event_id[event_id].offset, 0);
 	int size = _event_index_by_event_id[event_id].size;
 	_compressed_buf.resize(size + 1);

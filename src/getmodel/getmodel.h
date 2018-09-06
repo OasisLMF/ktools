@@ -69,6 +69,7 @@ private:
     std::map<int, EventIndex> _event_index_by_event_id;
 	std::map<AREAPERIL_INT, std::set<AREAPERIL_INT>> _aggregate_areaperils;
 	std::map<int, std::set<int>> _aggregate_vulnerabilities;
+	std::map <AREAPERIL_INT, std::map<int, std::vector<OASIS_FLOAT>>> _aggregate_vulnerability_probs;
 
 	std::set<AREAPERIL_INT> _area_perils;
 	std::set<int> _vulnerability_ids;
@@ -81,8 +82,6 @@ private:
 	std::vector<OASIS_FLOAT> _mean_damage_bins;
     std::vector<unsigned char > _compressed_buf;
     std::vector<unsigned char > _uncompressed_buf;
-	std::vector<aggregate_item> _aggregate_items;
-	std::vector<item> _expanded_items;
 	std::vector<Weight> _weights;
 
 	std::vector<Result> _temp_results;
@@ -99,13 +98,13 @@ private:
 	bool _has_intensity_uncertainty = false;
     bool _zip = false;
 
-	void getAggregateItems();
-	void getAggregateAreaPerils(std::set<AREAPERIL_INT> &_disagg_area_perils);
-	void getAggregateVulnerabilities(std::set<AREAPERIL_INT> &_disagg_vulnerabilities);
-	void getDisaggregationWeights(std::set<AREAPERIL_INT> &_disagg_area_perils, std::set<AREAPERIL_INT> &_disagg_vulnerabilities);
-	void getCoverages(std::vector<OASIS_FLOAT> &_coverages);
-	void expandItems(aggregate_item &a, std::vector<OASIS_FLOAT> &_coverages);
-	void outputNewCoverages(std::vector<OASIS_FLOAT> &_coverages);
+	void getAggregateItems(std::vector<aggregate_item> &aggregate_items);
+	void getAggregateAreaPerils(std::set<AREAPERIL_INT> &disagg_area_perils);
+	void getAggregateVulnerabilities(std::set<AREAPERIL_INT> &disagg_vulnerabilities);
+	void getDisaggregationWeights(std::set<AREAPERIL_INT> &disagg_area_perils, std::set<AREAPERIL_INT> &disagg_vulnerabilities);
+	void getCoverages(std::vector<OASIS_FLOAT> &coverages);
+	void expandItems(aggregate_item &a, std::vector<OASIS_FLOAT> &coverages, std::vector<item> &expanded_items);
+	void outputNewCoverages(std::vector<OASIS_FLOAT> &coverages);
 
 	void newItems();
 	void getItems();
@@ -119,10 +118,11 @@ private:
 	void calcProbAggAp(int vulnerability_id, AREAPERIL_INT areaperil_id, std::map<AREAPERIL_INT, OASIS_FLOAT> &area_peril_probability);
 	void calcProbAgg(AREAPERIL_INT areaperil_id, int vulnerability_id,  std::map<AREAPERIL_INT, std::map<int, OASIS_FLOAT>> &probabilities);
 
-	void getIntensityProbs(int event_id, std::map<AREAPERIL_INT, std::vector<OASIS_FLOAT>> &areaperil_intensity);
+	void getIntensityProbs(int event_id,
+		std::map<AREAPERIL_INT, std::vector<OASIS_FLOAT>> &areaperil_intensity,
+		std::set<AREAPERIL_INT> &areaperils);
 	void newIntensity(int event_id, AREAPERIL_INT aggregate_areaperil_id, std::vector<OASIS_FLOAT> &new_Intensity, int vulnerability_id);
-	void newVulnerability(int aggregate_vulnerability_id, std::vector<OASIS_FLOAT> &new_Vulnerability,
-		AREAPERIL_INT areaperil_id);
+	void newVulnerabilities();
 
     void doCdfInner(int event_id);
 	void doCdfAggregate(int event_id);

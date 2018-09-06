@@ -536,10 +536,6 @@ void getmodel::getIntensityProbs(
 
 
 		for (int i = 0; i < number_of_event_records; ++i) {
-			if (areaperils.empty()) { 
-				fclose(fin);
-				return;
-			}
 			fread(&event_key, sizeof(event_key), 1, fin);
 			if (areaperils.find(event_key.areaperil_id) != areaperils.end()) {
 				if (event_key.areaperil_id != current_areaperil_id) {
@@ -551,6 +547,10 @@ void getmodel::getIntensityProbs(
 					areaperil_intensity[event_key.areaperil_id][event_key.intensity_bin_id - 1] =
 						event_key.probability;
 				}
+			}
+			if (areaperils.empty() && event_key.intensity_bin_id == _num_intensity_bins) {
+				fclose(fin);
+				return;
 			}
 		}
 		fclose(fin);

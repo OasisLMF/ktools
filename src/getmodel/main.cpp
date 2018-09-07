@@ -67,6 +67,7 @@ void doIt(bool zip, bool disaggregation)
 
 	cdf_generator.init(zip, disaggregation);
 
+
 	int event_id = -1;
 	while (fread(&event_id, sizeof(event_id), 1, stdin) != 0)
 	{

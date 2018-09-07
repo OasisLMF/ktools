@@ -55,7 +55,7 @@ struct Attributes {
 	int vulnerability_id;
 };
 
-Attributes::Attributes(AREAPERIL_INT areaperil_id, int vulneraiblity_id) : areaperil_id(areaperil_id), vulnerability_id(vulnerability_id) {
+Attributes::Attributes(AREAPERIL_INT areaperil_id, int vulnerability_id) : areaperil_id(areaperil_id), vulnerability_id(vulnerability_id) {
 
 }
 
@@ -890,9 +890,8 @@ void getmodel::doCdf(int event_id) {
 	if (_disaggregation)
 		doCdfAggregate(event_id);
 
-	if (_has_intensity_uncertainty) {
+	if (_has_intensity_uncertainty)
 		doCdfInner(event_id);
-	}
 	else {
 		if (_zip)
 			doCdfInnerNoIntensityUncertaintyz(event_id);

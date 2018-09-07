@@ -14,7 +14,7 @@ using namespace std;
 
 void doit(bool skipheader)
 {
-	if (skipheader == false) printf("item_id, coverage_id, areaperil_id, vulnerability_id, number_items, grouped\n");
+	if (skipheader == false) printf("aggregate_item_id, coverage_id, areaperil_id, vulnerability_id, number_items, grouped\n");
 
 	aggregate_item q;
 	int i = fread(&q, sizeof(q), 1, stdin);

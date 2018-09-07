@@ -44,6 +44,21 @@
 #include "../include/oasis.h"
 #include <zlib.h>
 
+struct Attributes {
+
+	Attributes() : areaperil_id(-1), vulnerability_id(-1) {
+		//
+	}
+	Attributes(AREAPERIL_INT areaperil_id, int vulnerability_id);
+
+	AREAPERIL_INT areaperil_id;
+	int vulnerability_id;
+};
+
+Attributes::Attributes(AREAPERIL_INT areaperil_id, int vulneraiblity_id) : areaperil_id(areaperil_id), vulnerability_id(vulnerability_id) {
+
+}
+
 
 struct Result {
 
@@ -75,6 +90,24 @@ bool operator< (const item &a, const item &i) {
 	if (a.id < i.id) { return true; }
 	else { return false; }
 }
+
+bool operator< (const Attributes &id1, const Attributes &id2) {
+	if (id1.areaperil_id < id2.areaperil_id) { return true; }
+	else if (id1.areaperil_id == id2.areaperil_id && id1.vulnerability_id < id2.vulnerability_id) { return true; }
+	else { return false; }
+}
+
+bool operator== (const Attributes &id1, const Attributes &id2) {
+	if (id1.areaperil_id == id2.areaperil_id && id1.vulnerability_id == id2.vulnerability_id) { return true; }
+	else { return false; }
+}
+
+bool operator> (const Attributes &id1, const Attributes &id2) {
+	if (id1.areaperil_id > id2.areaperil_id) { return true; }
+	else if (id1.areaperil_id == id2.areaperil_id && id1.vulnerability_id > id2.vulnerability_id) { return true; }
+	else { return false; }
+}
+
 
 getmodel::getmodel() {
   //
@@ -177,7 +210,7 @@ void getmodel::getAggregateVulnerabilities(std::set<AREAPERIL_INT> &disagg_vulne
 	fclose(fin);
 }
 
-void getmodel::getDisaggregationWeights(std::set<AREAPERIL_INT> &disagg_area_perils, std::set<AREAPERIL_INT> &disagg_vulnerabilities) {
+void getmodel::getDisaggregationWeights(const std::set<AREAPERIL_INT> &disagg_area_perils, const std::set<AREAPERIL_INT> &disagg_vulnerabilities) {
 	Weight weight;
 	FILE *fin = fopen(WEIGHTS_FILE, "rb");
 	if (fin == NULL) {
@@ -222,7 +255,7 @@ void getmodel::getCoverages(std::vector<OASIS_FLOAT> &coverages) {
 	fclose(fin);
 }
 
-void getmodel::expandItems(aggregate_item &a, std::vector<OASIS_FLOAT> &coverages, std::vector<item> &expanded_items) {
+void getmodel::expandItems(aggregate_item a, std::vector<OASIS_FLOAT> &coverages, std::vector<item> &expanded_items) {
 	item i;
 	int number_of_items = a.number_items;
 	OASIS_FLOAT tiv = coverages[a.coverage_id];
@@ -591,22 +624,21 @@ void getmodel::calcProbAggAp(int vulnerability_id, AREAPERIL_INT areaperil_id, s
 	}
 }
 
-void getmodel::calcProbAgg(AREAPERIL_INT areaperil_id, int vulnerability_id, std::map<AREAPERIL_INT, std::map<int, OASIS_FLOAT>> &probabilities) {
+void getmodel::calcProbAgg(AREAPERIL_INT areaperil_id, int vulnerability_id, std::map<Attributes, OASIS_FLOAT> &probabilities) {
 	OASIS_FLOAT total = 0;
 	for (Weight weight : _weights) {
 		if (_aggregate_areaperils[areaperil_id].find(weight.areaperil_id) !=
 			_aggregate_areaperils[areaperil_id].end()) {
 			if (_aggregate_vulnerabilities[vulnerability_id].find(weight.vulnerability_id) !=
 				_aggregate_vulnerabilities[vulnerability_id].end()) {
-				probabilities[weight.areaperil_id][weight.vulnerability_id] = weight.count;
+				Attributes attributes(weight.areaperil_id, weight.vulnerability_id);
+				probabilities[attributes] = weight.count;
 				total += weight.count;
 			}
 		}
 	}
 	for (auto it = probabilities.begin(); it != probabilities.end(); it++) {
-		for (auto itr = it->second.begin(); itr != it->second.end(); itr++) {
-			itr->second /= total;
-		}
+		it->second /= total;
 	}
 }
 
@@ -731,22 +763,20 @@ void getmodel::doResults(
 void getmodel::doResultsAggregate(
 	int &event_id,
 	AREAPERIL_INT aggregate_areaperil_id,
-	std::set<int> &aggregate_vulnerability_ids,
-	std::map<AREAPERIL_INT, std::map<int, std::vector<OASIS_FLOAT>>> &results_map) {
+	const std::set<int> &aggregate_vulnerability_ids,
+	std::map<Attributes, std::vector<OASIS_FLOAT>> &results_map) {
 	for (int aggregate_vulnerability_id : aggregate_vulnerability_ids) {
 		std::vector<Result> results;
 		results.resize(_num_damage_bins);
 		int result_index = 0;
-		std::map<AREAPERIL_INT, std::map<int, OASIS_FLOAT>> probabilities;
+		std::map<Attributes, OASIS_FLOAT> probabilities;
 		calcProbAgg(aggregate_areaperil_id, aggregate_vulnerability_id, probabilities);
 		for (int damage_bin_index = 0; damage_bin_index < _num_damage_bins;
 			damage_bin_index++) {
 			double cumulative_prob = 0;
-			for (auto ap = probabilities.begin(); ap != probabilities.end(); ++ap) {
-				for (auto vul = ap->second.begin(); vul != ap->second.end(); ++vul) {
-					double prob = results_map[ap->first][vul->first][result_index] * vul->second;
-					cumulative_prob += prob;
-				}
+			for (auto it = probabilities.begin(); it != probabilities.end(); ++it) {
+				double prob = results_map[it->first][result_index] * it->second;
+				cumulative_prob += prob;
 			}
 			results[result_index++] = Result(static_cast<OASIS_FLOAT>(cumulative_prob),
 				_mean_damage_bins[damage_bin_index]);
@@ -808,8 +838,8 @@ int getmodel::getVulnerabilityIndex(int intensity_bin_index,
 }
 
 void getmodel::getDisaggregateCdfs(int event_id,
-	std::map<AREAPERIL_INT, std::map<int, std::vector<OASIS_FLOAT>>> &results_map,
-	std::map<AREAPERIL_INT, std::set<int>> &disaggregated_vul_by_ap) {
+	std::map<Attributes, std::vector<OASIS_FLOAT>> &results_map,
+	const std::map<AREAPERIL_INT, std::set<int>> &disaggregated_vul_by_ap) {
 
 	std::set<AREAPERIL_INT> areaperils;
 	for (auto ap = disaggregated_vul_by_ap.begin(); ap != disaggregated_vul_by_ap.end(); ap++) {
@@ -848,7 +878,8 @@ void getmodel::getDisaggregateCdfs(int event_id,
 				results[result_index++] = static_cast<OASIS_FLOAT>(cumulative_prob);
 				//}
 			}
-			results_map[ap->first][*vul] = results;
+			Attributes attributes(ap->first, *vul);
+			results_map[attributes] = results;
 		}
 	}
 }
@@ -898,7 +929,7 @@ void getmodel::doCdfAggregate(int event_id) {
 			}
 		}
 	}
-	std::map<AREAPERIL_INT, std::map<int, std::vector<OASIS_FLOAT>>> results_map;
+	std::map<Attributes, std::vector<OASIS_FLOAT>> results_map;
 	getDisaggregateCdfs(event_id, results_map, disaggregated_vul_by_ap);
 	for (auto it = agg_vulnerability_ids_by_area_peril.begin(); it != agg_vulnerability_ids_by_area_peril.end(); ++it) {
 		doResultsAggregate(event_id, it->first, it->second, results_map);

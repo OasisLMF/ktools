@@ -46,11 +46,12 @@ Author: Mark Pinkerton  email: mark.pinkerton@oasislmf.org
 #include <vector>
 #include "../include/oasis.h"
 bool operator< (const item &a, const item &i);
+bool operator< (const Attributes &id1, const Attributes &id2);
+bool operator> (const Attributes &id1, const Attributes &id2);
+bool operator== (const Attributes &id1, const Attributes &id2);
 
 struct Result;
-struct EventIndex;
-struct Weight;
-struct AggregateID;
+struct Attributes;
 
 class getmodel {
 
@@ -101,9 +102,9 @@ private:
 	void getAggregateItems(std::vector<aggregate_item> &aggregate_items);
 	void getAggregateAreaPerils(std::set<AREAPERIL_INT> &disagg_area_perils);
 	void getAggregateVulnerabilities(std::set<AREAPERIL_INT> &disagg_vulnerabilities);
-	void getDisaggregationWeights(std::set<AREAPERIL_INT> &disagg_area_perils, std::set<AREAPERIL_INT> &disagg_vulnerabilities);
+	void getDisaggregationWeights(const std::set<AREAPERIL_INT> &disagg_area_perils, const std::set<AREAPERIL_INT> &disagg_vulnerabilities);
 	void getCoverages(std::vector<OASIS_FLOAT> &coverages);
-	void expandItems(aggregate_item &a, std::vector<OASIS_FLOAT> &coverages, std::vector<item> &expanded_items);
+	void expandItems(aggregate_item a, std::vector<OASIS_FLOAT> &coverages, std::vector<item> &expanded_items);
 	void outputNewCoverages(std::vector<OASIS_FLOAT> &coverages);
 
 	void newItems();
@@ -116,7 +117,7 @@ private:
 
 	void calcProbAggVul(AREAPERIL_INT areaperil_id, int vulnerability_id, std::map<int, OASIS_FLOAT> &vulnerability_probability);
 	void calcProbAggAp(int vulnerability_id, AREAPERIL_INT areaperil_id, std::map<AREAPERIL_INT, OASIS_FLOAT> &area_peril_probability);
-	void calcProbAgg(AREAPERIL_INT areaperil_id, int vulnerability_id,  std::map<AREAPERIL_INT, std::map<int, OASIS_FLOAT>> &probabilities);
+	void calcProbAgg(AREAPERIL_INT areaperil_id, int vulnerability_id,  std::map<Attributes, OASIS_FLOAT> &probabilities);
 
 	void getIntensityProbs(int event_id,
 		std::map<AREAPERIL_INT, std::vector<OASIS_FLOAT>> &areaperil_intensity,
@@ -136,16 +137,16 @@ private:
 	void doResultsAggregate(
 		int &event_id,
 		AREAPERIL_INT aggregate_areaperil_id,
-		std::set<int> &aggregate_vulnerability_ids,
-		std::map<AREAPERIL_INT, std::map<int, std::vector<OASIS_FLOAT>>> &results_map);
+		const std::set<int> &aggregate_vulnerability_ids,
+		std::map<Attributes, std::vector<OASIS_FLOAT>> &results_map);
 	void  doResultsNoIntensityUncertainty(
 		int &event_id,
 		AREAPERIL_INT &areaperil_id,
 		int intensity_bin_index) ;
 
 	void getDisaggregateCdfs(int event_id,
-		std::map<AREAPERIL_INT, std::map<int, std::vector<OASIS_FLOAT>>> &results_map,
-		std::map<AREAPERIL_INT, std::set<int>> &disaggregated_vul_by_ap);
+		std::map<Attributes, std::vector<OASIS_FLOAT>> &results_map,
+		const std::map<AREAPERIL_INT, std::set<int>> &disaggregated_vul_by_ap);
 	
 	static void initOutputStream();
     int getVulnerabilityIndex(int intensity_bin_index, int damage_bin_index) const;

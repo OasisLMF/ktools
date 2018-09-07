@@ -45,13 +45,15 @@ Author: Mark Pinkerton  email: mark.pinkerton@oasislmf.org
 #include <list>
 #include <vector>
 #include "../include/oasis.h"
-bool operator< (const item &a, const item &i);
-bool operator< (const Attributes &id1, const Attributes &id2);
-bool operator> (const Attributes &id1, const Attributes &id2);
-bool operator== (const Attributes &id1, const Attributes &id2);
 
 struct Result;
 struct Attributes;
+
+bool operator< (const item &a, const item &i);
+
+bool operator< (const Attributes &id1, const Attributes &id2);
+bool operator> (const Attributes &id1, const Attributes &id2);
+bool operator== (const Attributes &id1, const Attributes &id2);
 
 class getmodel {
 

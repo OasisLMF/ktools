@@ -17,8 +17,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "getmodel", "..\ktools\getmo
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "aggregateitemtobin", "aggregateitemtobin\aggregateitemtobin.vcxproj", "{618695FC-1F58-4D22-B373-52C4DD1151CE}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "disaggregation(old)", "..\..\..\..\..\..\Users\zoeta\Downloads\ktools-1972da8120b1ac72ca0d0575292032cc268cdec4\vs\disaggregation\disaggregationsample\disaggregationold.vcxproj", "{6C122172-F171-44A7-B0F1-31E87B728A80}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "aggregateitemtocsv", "aggregateitemtocsv\aggregateitemtocsv.vcxproj", "{14E02D27-640C-4F84-9888-E12C0DC8D159}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "disaggregationweighttocsv", "disaggregationweighttocsv\disaggregationweighttocsv.vcxproj", "{A06DC44C-66AF-462B-B91E-F279886CA6A1}"
@@ -89,13 +87,6 @@ Global
 		{618695FC-1F58-4D22-B373-52C4DD1151CE}.Release|x64.Build.0 = Release|x64
 		{618695FC-1F58-4D22-B373-52C4DD1151CE}.Release|x86.ActiveCfg = Release|Win32
 		{618695FC-1F58-4D22-B373-52C4DD1151CE}.Release|x86.Build.0 = Release|Win32
-		{6C122172-F171-44A7-B0F1-31E87B728A80}.Debug|x64.ActiveCfg = Debug|x64
-		{6C122172-F171-44A7-B0F1-31E87B728A80}.Debug|x64.Build.0 = Debug|x64
-		{6C122172-F171-44A7-B0F1-31E87B728A80}.Debug|x86.ActiveCfg = Debug|Win32
-		{6C122172-F171-44A7-B0F1-31E87B728A80}.Debug|x86.Build.0 = Debug|Win32
-		{6C122172-F171-44A7-B0F1-31E87B728A80}.Release|x64.ActiveCfg = Release|x64
-		{6C122172-F171-44A7-B0F1-31E87B728A80}.Release|x64.Build.0 = Release|x64
-		{6C122172-F171-44A7-B0F1-31E87B728A80}.Release|x86.ActiveCfg = Release|Win32
 		{14E02D27-640C-4F84-9888-E12C0DC8D159}.Debug|x64.ActiveCfg = Debug|x64
 		{14E02D27-640C-4F84-9888-E12C0DC8D159}.Debug|x64.Build.0 = Debug|x64
 		{14E02D27-640C-4F84-9888-E12C0DC8D159}.Debug|x86.ActiveCfg = Debug|Win32

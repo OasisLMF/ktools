@@ -99,6 +99,9 @@ public:
 				return (OASIS_FLOAT)dis_(gen_);
 			}
 			break;
+			default:
+				fprintf(stderr, "Invalid rndopt_: %d", rndopt_);
+				return 0;
 		}		
 	}
 

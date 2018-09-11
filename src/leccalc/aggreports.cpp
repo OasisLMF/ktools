@@ -93,9 +93,9 @@ bool operator<(const wheatkey& lhs, const wheatkey& rhs)
 }
 
 aggreports::aggreports(int totalperiods, int maxsummaryid, std::map<outkey2, OASIS_FLOAT> &agg_out_loss, 
-	std::map<outkey2, OASIS_FLOAT> &max_out_loss, FILE **fout, bool useReturnPeriodFile, int samplesize) :
+	std::map<outkey2, OASIS_FLOAT> &max_out_loss, FILE **fout, bool useReturnPeriodFile, int samplesize, bool skipheader) :
 	totalperiods_(totalperiods), maxsummaryid_(maxsummaryid), agg_out_loss_(agg_out_loss), max_out_loss_(max_out_loss),
-	fout_(fout), useReturnPeriodFile_(useReturnPeriodFile), samplesize_(samplesize)
+	fout_(fout), useReturnPeriodFile_(useReturnPeriodFile), samplesize_(samplesize),skipheader_(skipheader)
 {
 	loadreturnperiods();
 };
@@ -171,7 +171,7 @@ void aggreports::fulluncertaintywithweighting(int handle, const std::map<outkey2
 		}
 	}
 
-	fprintf(fout_[handle], "summary_id,return_period,loss\n");	
+	if (skipheader_ == false) fprintf(fout_[handle], "summary_id,return_period,loss\n");
 
 	for (auto s : items) {
 		OASIS_FLOAT cummulative_weigthing = 0;
@@ -207,7 +207,7 @@ void aggreports::fulluncertainty(int handle,const std::map<outkey2, OASIS_FLOAT>
 		items[x.first.summary_id].push_back(x.second);
 	}
 
-	fprintf(fout_[handle], "summary_id,return_period,loss\n");
+	if (skipheader_ == false) fprintf(fout_[handle], "summary_id,return_period,loss\n");
 
 	for (auto s : items) {
 		lossvec &lpv = s.second;
@@ -316,7 +316,7 @@ void aggreports::wheatsheaf(int handle, const std::map<outkey2, OASIS_FLOAT> &ou
 		items[wk].push_back(x.second);
 	}
 
-	fprintf(fout_[handle], "summary_id,sidx,return_period,loss\n");
+	if (skipheader_ == false) fprintf(fout_[handle], "summary_id,sidx,return_period,loss\n");
 	for (auto s : items) {
 		if (s.first.sidx == -1) continue;		// skip -1 from wheatsheaf output
 		lossvec &lpv = s.second;
@@ -363,7 +363,7 @@ void aggreports::wheatsheafwithweighting(int handle, const std::map<outkey2, OAS
 		}
 	}
 
-	fprintf(fout_[handle], "summary_id,sidx,return_period,loss\n");
+	if (skipheader_ == false) fprintf(fout_[handle], "summary_id,sidx,return_period,loss\n");
 
 	for (auto s : items) {
 		OASIS_FLOAT cummulative_weigthing = 0;
@@ -447,7 +447,7 @@ void aggreports::wheatSheafMeanwithweighting(int samplesize, int handle, const s
 	for (int i = 1; i <= maxsummaryid_; i++) {		
 		mean_map[i] = std::vector<lossval>(maxcount, lossval());
 	}
-	fprintf(fout_[handle], "summary_id,type,return_period,loss\n");
+	if (skipheader_ == false) fprintf(fout_[handle], "summary_id,type,return_period,loss\n");
 
 	for (auto s : items) {
 		int nextreturnperiodindex = 0;
@@ -555,7 +555,7 @@ void aggreports::wheatSheafMean(int samplesize, int handle, const std::map<outke
 	for (int i = 1; i <= maxsummaryid_; i++) {
 		mean_map[i] = std::vector<OASIS_FLOAT>(maxcount, 0);
 	}
-	fprintf(fout_[handle],"summary_id,type,return_period,loss\n");
+	if (skipheader_ == false)  fprintf(fout_[handle],"summary_id,type,return_period,loss\n");
 	for (auto s : items) {
 		int nextreturnperiodindex = 0;
 		OASIS_FLOAT last_computed_rp = 0;	
@@ -681,7 +681,7 @@ void aggreports::sampleMeanwithweighting(int samplesize, int handle, const std::
 
 	std::map<summary_id_type_key, std::vector<lossval>> mean_map;
 
-	fprintf(fout_[handle], "summary_id,type,return_period,loss\n");
+	if (skipheader_ == false) fprintf(fout_[handle], "summary_id,type,return_period,loss\n");
 	for (auto s : items) {
 		summary_id_type_key st;
 		st.summary_id = s.first.summary_id;
@@ -740,7 +740,7 @@ void aggreports::sampleMean(int samplesize, int handle, const std::map<outkey2, 
 
 	std::map<summary_id_type_key, std::vector<OASIS_FLOAT>> mean_map;
 
-	fprintf(fout_[handle],"summary_id,type,return_period,loss\n");
+	if (skipheader_ == false) fprintf(fout_[handle],"summary_id,type,return_period,loss\n");
 	for (auto s : items) {
 		summary_id_type_key st;
 		st.summary_id = s.first.summary_id;

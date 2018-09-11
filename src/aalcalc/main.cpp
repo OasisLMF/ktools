@@ -11,13 +11,12 @@
 #include <unistd.h>
 #endif
 
-
-
 void help()
 {
 	fprintf(stderr, "-K workspace sub folder\n");
-	fprintf(stderr, "-h help\n");
 	fprintf(stderr, "-v version\n");
+	fprintf(stderr, "-h help\n");
+	
 }
 
 int main(int argc, char* argv[])
@@ -26,11 +25,19 @@ int main(int argc, char* argv[])
 	int opt;
 	int processid = 0;
 	bool debug = false;
-	while ((opt = getopt(argc, argv, (char *)"vdhK:")) != -1) {
+	bool welford = false;	// Use welford standard deviation
+	bool skipheader = false;
+	while ((opt = getopt(argc, argv, (char *)"swvdhK:")) != -1) {
 		switch (opt) {
+		case 'w':
+			welford = true;
+			break;
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
 			exit(EXIT_FAILURE);
+			break;
+		case 's':
+			skipheader = true;
 			break;
 		case 'K':
 			subfolder = optarg;
@@ -51,12 +58,16 @@ int main(int argc, char* argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	aalcalc a;
+	aalcalc a(skipheader);
 	if (debug == true) {
 		a.debug(subfolder);
 	}
 	else {
-		a.doit(subfolder);
+		if (welford == true) {
+			a.doitw(subfolder);
+		}else {
+			a.doit(subfolder);
+		}
 	}
 
 	return EXIT_SUCCESS;

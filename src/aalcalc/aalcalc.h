@@ -48,13 +48,12 @@ struct aal_rec_vec {
 	std::vector<float> v;
 	double max_exposure_value;
 };
-
+// key for analytic data
 struct period_map_key {
 	int summary_id;
 	int period_no;
-	int sidx;
 };
-
+// key for sample data
 struct period_sidx_map_key {
 	int summary_id;
 	int period_no;
@@ -67,7 +66,7 @@ struct loss_rec {
 	double max_exposure_value;
 };
 
-bool operator<(const period_sidx_map_key& lhs, const period_sidx_map_key& rhs);
+//bool operator<(const period_sidx_map_key& lhs, const period_sidx_map_key& rhs);
 bool operator<(const period_map_key& lhs, const period_map_key& rhs);
 
 class aalcalc {
@@ -87,20 +86,24 @@ private:
 	void initsameplsize(const std::string &path);
 	void loadperiodtoweigthing();
 	void process_summaryfile(const std::string &filename);
+	void process_summaryfilew(const std::string &filename);
 	void debug_process_summaryfile(const std::string &filename);
-	void do_analytical_calc_old(const summarySampleslevelHeader &sh, double mean_loss);
 	void do_analytical_calc(const summarySampleslevelHeader &sh, double mean_loss);
-	void do_analytical_calc_end();
-	void do_sample_calc_old(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec);
+	void do_analytical_calcw(const summarySampleslevelHeader &sh, double mean_loss);
+	void do_analytical_calc_end();	
+	void do_sample_calcw(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec);
 	void do_sample_calc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec);
 	void do_sample_calc_end();
 	void doaalcalc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec, OASIS_FLOAT mean_loss);
+	void doaalcalcw(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec, OASIS_FLOAT mean_loss);
 	void applyweightings(int event_id, const std::map <int, double> &periodstoweighting, std::vector<sampleslevelRec> &vrec) ;
 	void applyweightingstomap(std::map<int, aal_rec> &m, int i);
 	void applyweightingstomaps();
 	void outputresultscsv();
 public:
+	aalcalc(bool skipheader) : skipheader_(skipheader) {};
 	void doit(const std::string &subfolder);
+	void doitw(const std::string &subfolder);	// calcuate using welford method 
 	void debug(const std::string &subfolder);
 };
 

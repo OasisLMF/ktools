@@ -52,6 +52,7 @@ private:
 	int samplesize_ = 0;
 	std::vector<int> returnperiods_;
 	std::map <int, double> periodstoweighting_;
+	bool skipheader_ = false;
 
 //
 	void fulluncertainty(int handle, const std::map<outkey2, OASIS_FLOAT> &out_loss);	
@@ -78,6 +79,6 @@ public:
 	void outputOccSampleMean(int samplesize);
 	void outputAggSampleMean(int samplesize);
 	aggreports(int totalperiods, int maxsummaryid, std::map<outkey2, OASIS_FLOAT> &agg_out_loss, std::map<outkey2, OASIS_FLOAT> &max_out_loss,
-		FILE **fout, bool useReturnPeriodFile, int samplesize) ;
+		FILE **fout, bool useReturnPeriodFile, int samplesize, bool skipheader) ;
 };
 #endif // AGGREPORTS_H_

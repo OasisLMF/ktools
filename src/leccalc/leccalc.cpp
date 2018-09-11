@@ -188,7 +188,7 @@ void setinputstream(const std::string &inFile)
 
 }
 
-void doit(const std::string &subfolder, FILE **fout, bool useReturnPeriodFile)
+void doit(const std::string &subfolder, FILE **fout, bool useReturnPeriodFile, bool skipheader)
 {
 	std::string path = "work/" + subfolder;
 	if (path.substr(path.length() - 1, 1) != "/") {
@@ -225,7 +225,7 @@ void doit(const std::string &subfolder, FILE **fout, bool useReturnPeriodFile)
 		}
 	}
 
-	aggreports agg(totalperiods,maxsummaryid, agg_out_loss, max_out_loss, fout,useReturnPeriodFile,samplesize);
+	aggreports agg(totalperiods,maxsummaryid, agg_out_loss, max_out_loss, fout,useReturnPeriodFile,samplesize,skipheader);
 	agg.loadperiodtoweigthing();
 	agg.outputAggWheatsheaf();
 	agg.outputAggFulluncertainty();
@@ -265,6 +265,7 @@ void help()
 	fprintf(stderr, "-m Occurrence Wheatsheaf mean\n");
 	fprintf(stderr, "-K workspace sub folder\n");
 	fprintf(stderr, "-r use return period file\n");
+	fprintf(stderr, "-H Skip header\n");
 	fprintf(stderr, "-h help\n");
 	fprintf(stderr, "-v version\n");
 }
@@ -278,10 +279,14 @@ int main(int argc, char* argv[])
 
 	std::string subfolder;
 	int opt;
-	while ((opt = getopt(argc, argv, "vhrF:W:M:S:K:f:w:s:m:")) != -1) {
+	bool skipheader = false;
+	while ((opt = getopt(argc, argv, "vhrHF:W:M:S:K:f:w:s:m:")) != -1) {
 		switch (opt) {
 		case 'K':
 			subfolder = optarg;
+			break;
+		case 'H':
+			skipheader = true;
 			break;
 		case 'F':
 			openpipe(AGG_FULL_UNCERTAINTY, optarg, fout);
@@ -329,7 +334,7 @@ int main(int argc, char* argv[])
 		help();
 	}	
 	initstreams();	
-	doit(subfolder,fout, useReturnPeriodFile);
+	doit(subfolder,fout, useReturnPeriodFile,skipheader);
 	return 0;
 
 }

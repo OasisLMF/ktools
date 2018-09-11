@@ -1,4 +1,4 @@
-// TODO
+
 #include "aalcalc.h"
 
 #if defined(_MSC_VER)
@@ -11,26 +11,46 @@
 
 bool operator<(const period_sidx_map_key& lhs, const period_sidx_map_key& rhs)
 {
-	if (lhs.period_no != rhs.period_no) {
-		return lhs.period_no < rhs.period_no;
+
+	if (lhs.summary_id != rhs.summary_id) {
+		return lhs.summary_id < rhs.summary_id;
 	}
 	else {
 		if (lhs.sidx != rhs.sidx) {
 			return lhs.sidx < rhs.sidx;
-		}else {
-			return lhs.summary_id < rhs.summary_id;
+		}
+		else {
+			return lhs.period_no < rhs.period_no;
 		}
 	}
+
+	//if (lhs.period_no != rhs.period_no) {
+	//	return lhs.period_no < rhs.period_no;
+	//}
+	//else {
+	//	if (lhs.sidx != rhs.sidx) {
+	//		return lhs.sidx < rhs.sidx;
+	//	}else {
+	//		return lhs.summary_id < rhs.summary_id;
+	//	}
+	//}
 }
 
 bool operator<(const period_map_key& lhs, const period_map_key& rhs)
 {
-	if (lhs.period_no != rhs.period_no) {
+	if (lhs.summary_id != rhs.summary_id) {
+		return lhs.summary_id < rhs.summary_id;
+	}
+	else {
 		return lhs.period_no < rhs.period_no;
 	}
-	else {		
-		return lhs.summary_id < rhs.summary_id;		
-	}
+
+	//if (lhs.period_no != rhs.period_no) {
+	//	return lhs.period_no < rhs.period_no;
+	//}
+	//else {		
+	//	return lhs.summary_id < rhs.summary_id;		
+	//}
 }
 
 
@@ -132,87 +152,7 @@ void aalcalc::applyweightingstomaps()
 	applyweightingstomap(map_sample_aal_, i);
 }
 int analytic_count = 0;
-void aalcalc::do_analytical_calc_old(const summarySampleslevelHeader &sh, double mean_loss)
-{
 
-	if (periodstoweighting_.size() > 0) {
-		double factor = (double)periodstoweighting_.size();
-		auto it = event_to_period_.find(sh.event_id);
-		if (it != event_to_period_.end()) {
-			auto iter = periodstoweighting_.find(it->second);
-			if (iter != periodstoweighting_.end()) {
-				mean_loss = mean_loss * iter->second * factor;
-			}
-			else {
-				// no weighting so assume its zero
-				mean_loss = 0;
-			}
-		}
-	}
-	double mean_squared = mean_loss * mean_loss;
-	int count = event_count_[sh.event_id];		// do the cartesian
-	mean_loss = mean_loss * count;
-	mean_squared = mean_squared * count;
-	auto iter = map_analytical_aal_.find(sh.summary_id);
-	if (iter != map_analytical_aal_.end()) {
-		aal_rec &a = iter->second;
-		if (a.max_exposure_value < sh.expval) a.max_exposure_value = sh.expval;
-		a.mean += mean_loss;
-		a.mean_squared += mean_squared;
-		//if (mean_loss > 0) {
-		//	analytic_count++;
-		//	//if (analytic_count == 14461) {
-		//	//	fprintf(stderr, "Got here\n");
-		//	//}
-		//	//printf("%d: %d,%d, %f, %f, %f \n", analytic_count, a.summary_id, a.type, a.mean, a.mean_squared, a.max_exposure_value);
-		//}
-	}
-	else {
-		aal_rec a;
-		a.summary_id = sh.summary_id;
-		a.type = 1;
-		a.max_exposure_value = sh.expval;
-		a.mean = mean_loss;
-		a.mean_squared = mean_squared;
-		map_analytical_aal_[sh.summary_id] = a;
-		//if (mean_loss > 0) {
-		//	analytic_count++;
-		//	//printf("%d: %d,%d, %f, %f, %f \n", analytic_count, a.summary_id, a.type, a.mean, a.mean_squared, a.max_exposure_value);
-		//}
-	}
-}
-void aalcalc::do_sample_calc_old(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec)
-{
-	OASIS_FLOAT mean_loss = 0;
-	OASIS_FLOAT mean_squared = 0;
-	for (auto x : vrec) {
-		mean_loss += x.loss;
-		mean_squared += x.loss * x.loss;
-	}
-	//mean_loss = mean_loss / samplesize_;	
-	//mean_squared = mean_squared / (samplesize_*samplesize_);
-	//OASIS_FLOAT mean_squared = mean_loss*mean_loss;
-	int count = event_count_[sh.event_id];		// do the cartesian
-	mean_loss = mean_loss * count;
-	mean_squared = mean_squared * count;
-	auto iter = map_sample_aal_.find(sh.summary_id);
-	if (iter != map_sample_aal_.end()) {
-		aal_rec &a = iter->second;
-		if (a.max_exposure_value < sh.expval) a.max_exposure_value = sh.expval;
-		a.mean += mean_loss;
-		a.mean_squared += mean_squared;
-	}
-	else {
-		aal_rec a;
-		a.summary_id = sh.summary_id;
-		a.type = 2;
-		a.max_exposure_value = sh.expval;
-		a.mean = mean_loss;
-		a.mean_squared = mean_squared;
-		map_sample_aal_[sh.summary_id] = a;
-	}
-
-}
 
 void aalcalc::do_analytical_calc_end()
 {

@@ -21,7 +21,7 @@ def mkdir_p(path):
 # mkdir_p("work/aal2")
 mkdir_p("work/summary2")
 mkdir_p("results/aal")
-purge("work/aal2","")
+# purge("work/aal2","")
 purge("results/aal","fm_aal*")
 
 total_processes = multiprocessing.cpu_count()
@@ -46,7 +46,6 @@ while (counter <= total_processes) :
 	print(cmd)
 	p1 = subprocess.Popen(cmd,shell=True)
 	procs.append(p1)
-	print(cmd)
 	counter = counter + 1
 for p in procs:
 	p.wait()

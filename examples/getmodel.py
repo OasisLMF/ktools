@@ -106,8 +106,8 @@ def getAggregateCdf(attribute_cdfs, areaperil_id, vulnerability_id):
             except KeyError:
                 if damage_bin_id == 0:
                     cumulative_prob += weight_dict[attributes]
-        cdf.append(cumulative_prob)
-        if cumulative_prob > 0.999999955:
+        cdf.append(float(cumulative_prob))
+        if float(cumulative_prob) > 0.999999940395355:
             break
     return cdf
 

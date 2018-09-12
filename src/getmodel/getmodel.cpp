@@ -764,7 +764,7 @@ void getmodel::doResultsAggregate(
 	int &event_id,
 	AREAPERIL_INT aggregate_areaperil_id,
 	const std::set<int> &aggregate_vulnerability_ids,
-	std::map<Attributes, std::vector<OASIS_FLOAT>> &results_map) {
+	std::map<Attributes, std::vector<double>> &results_map) {
 	for (int aggregate_vulnerability_id : aggregate_vulnerability_ids) {
 		std::vector<Result> results;
 		results.resize(_num_damage_bins);
@@ -838,7 +838,7 @@ int getmodel::getVulnerabilityIndex(int intensity_bin_index,
 }
 
 void getmodel::getDisaggregateCdfs(int event_id,
-	std::map<Attributes, std::vector<OASIS_FLOAT>> &results_map,
+	std::map<Attributes, std::vector<double>> &results_map,
 	const std::map<AREAPERIL_INT, std::set<int>> &disaggregated_vul_by_ap) {
 
 	std::set<AREAPERIL_INT> areaperils;
@@ -850,7 +850,7 @@ void getmodel::getDisaggregateCdfs(int event_id,
 
 	for (auto ap = disaggregated_vul_by_ap.begin(); ap != disaggregated_vul_by_ap.end(); ap++) {
 		for (auto vul = ap->second.begin(); vul != ap->second.end(); vul++) {
-			std::vector<OASIS_FLOAT> results;
+			std::vector<double> results;
 			results.resize(_num_damage_bins);
 			int result_index = 0;
 			std::vector<OASIS_FLOAT> vulnerability;
@@ -875,7 +875,7 @@ void getmodel::getDisaggregateCdfs(int event_id,
 				// if (prob > 0 || damage_bin_index == 0)
 				//{
 				cumulative_prob += prob;
-				results[result_index++] = static_cast<OASIS_FLOAT>(cumulative_prob);
+				results[result_index++] = cumulative_prob;
 				//}
 			}
 			Attributes attributes(ap->first, *vul);
@@ -928,7 +928,7 @@ void getmodel::doCdfAggregate(int event_id) {
 			}
 		}
 	}
-	std::map<Attributes, std::vector<OASIS_FLOAT>> results_map;
+	std::map<Attributes, std::vector<double>> results_map;
 	getDisaggregateCdfs(event_id, results_map, disaggregated_vul_by_ap);
 	for (auto it = agg_vulnerability_ids_by_area_peril.begin(); it != agg_vulnerability_ids_by_area_peril.end(); ++it) {
 		doResultsAggregate(event_id, it->first, it->second, results_map);

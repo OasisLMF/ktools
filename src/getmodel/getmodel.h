@@ -140,14 +140,14 @@ private:
 		int &event_id,
 		AREAPERIL_INT aggregate_areaperil_id,
 		const std::set<int> &aggregate_vulnerability_ids,
-		std::map<Attributes, std::vector<OASIS_FLOAT>> &results_map);
+		std::map<Attributes, std::vector<double>> &results_map);
 	void  doResultsNoIntensityUncertainty(
 		int &event_id,
 		AREAPERIL_INT &areaperil_id,
 		int intensity_bin_index) ;
 
 	void getDisaggregateCdfs(int event_id,
-		std::map<Attributes, std::vector<OASIS_FLOAT>> &results_map,
+		std::map<Attributes, std::vector<double>> &results_map,
 		const std::map<AREAPERIL_INT, std::set<int>> &disaggregated_vul_by_ap);
 	
 	static void initOutputStream();

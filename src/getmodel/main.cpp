@@ -39,7 +39,6 @@ Author: Mark Pinkerton  email: mark.pinkerton@oasislmf.org
 
 #include <iostream>
 #include <stdio.h>
-#include <ctime>
 #include "getmodel.h"
 #include "../include/oasis.h"
 
@@ -77,11 +76,6 @@ void doIt(bool zip, bool disaggregation)
 
 int main(int argc, char** argv)
 {
-	std::clock_t start;
-	double duration;
-
-	start = std::clock();
-
 	bool disaggregation = false;
 
 	int opt;	
@@ -109,10 +103,6 @@ int main(int argc, char** argv)
 
 	initstreams();
 	doIt(zip, disaggregation);
-
-	duration = (std::clock() - start) / (double)CLOCKS_PER_SEC;
-
-	fprintf(stderr, "%lf\n", duration);
 
 	return EXIT_SUCCESS;
 }

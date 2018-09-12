@@ -44,7 +44,7 @@ installertest()
 
 	 cd disaggregation
 
-	 ../../src/eve/eve 1 1 | ../src/getmodel/getmodel -d > ../../ktest/testout/getmodelout_d.bin
+	 ../../src/eve/eve 1 1 | ../../src/getmodel/getmodel -d > ../../ktest/testout/getmodelout_d.bin
 
 	 cd ..
 	
@@ -222,7 +222,7 @@ installertest()
 	   cd ../..
 	   return
 	 else
-	   echo "All tests passed.\n"
+	   echo "All tests passed."
 	  cd ../..
 	  return
 	 fi

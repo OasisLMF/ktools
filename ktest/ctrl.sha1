@@ -1,4 +1,5 @@
 3e6ab5ba99a0e752ddab274e4096bf5053bfa4dc  coverages.bin
+fe21de2ca87d6b2fec5e5b104c71bc3b1c73c688  coverages_d.bin
 c56cbf73984063e2cc44d90da890d6d869f15d32  damage_bin_dict.bin
 463d765701db2b18e8982db524507ef82dfb75fc  events.bin
 743dd03dd3accfcc69beb544575e021ba4bfe799  eveout1.bin
@@ -53,6 +54,8 @@ ecb2d2949e8e011b220c4ded2216073566eb2bec  footprintin.bin
 67bfd69e1990571f6ec73ef28659e6d4a9484757  footprintin.idx
 0c755878cf74c70b4e054d3e65bf912020fc1c78  getmodelout.bin
 3296945af1ba573def912643b4d9e75012933fea  getmodelout.csv
+getmodelout_d.bin
+getmodelout_d.csv
 2db2cc2cedbe7d70c499affe2be3575db3353fe9  gulaalcalc1.bin
 58c0930620690987db0a3661f3f0b53c760fe1ce  gulaalcalc1.csv
 78c093b37ea02fde6b9bf43219dfbb7213e5ebfc  gulaalcalc2.bin
@@ -96,7 +99,12 @@ e9d3638496ba0bb7d544af2ff5b4af597308c68e  gul_wheatsheaf_oep_1.csv
 98b628deadeb4391fc0f355f829173589282bae1  gul_wheatsheaf_oep_1_r.csv
 c7d71c512a53ca70a35474ba50971fda5e0fc4ae  gul_wheatsheaf_oep_2_r.csv
 08fb14d88eb996b09699a4c7a1c68723ea1707fb  items.bin
+150b77ea97aeb27e29debcf57ded6001ed13507b  items_d.bin
+ab30d1430f8bda8429df4713bea8655692b74364  aggregate_items.bin
 34dae699968802713e1bded880ad969f212e5434  occurrence.bin
 ed069eb7fd4e8a58a40553ede7d50fba0b20efee  random.bin
 34744aa708c7cb804f7831e48d13677086da69de  returnperiods.bin
 dd1efa81ffc7ea3027c3bcc59dd442e2cfa5d25f  vulnerability.bin
+01b67d6697dcf10b6cf7c17cec096152df2709c1  weights.bin
+850d0316e94988be6337a89337acd7efe192ef96  agg_ap_to_ap.bin
+4e9eaececce3fa6e7ecdf7219d1724f0b031674d  agg_vul_to_vul.bin

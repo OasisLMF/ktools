@@ -41,6 +41,12 @@ installertest()
 
 	# # test getmodel
 	 ../src/eve/eve 1 1 | ../src/getmodel/getmodel > ../ktest/testout/getmodelout.bin
+
+	 cd disaggregation
+
+	 ../../src/eve/eve 1 1 | ../src/getmodel/getmodel -d > ../../ktest/testout/getmodelout_d.bin
+
+	 cd ..
 	
 	# test gulcalc item stream and coverage stream
 	../src/eve/eve 1 1 | ../src/getmodel/getmodel | ../src/gulcalc/gulcalc -S100 -L0.1 -r -i - > ../ktest/testout/gulcalci.bin
@@ -146,6 +152,7 @@ installertest()
 	# test stream conversion components
 	# stdout to csv
 	../src/cdftocsv/cdftocsv -s < ../ktest/testout/getmodelout.bin > ../ktest/testout/getmodelout.csv
+	../src/cdftocsv/cdftocsv -s < ../ktest/testout/getmodelout_d.bin > ../ktest/testout/getmodelout_d.csv
 	../src/gultocsv/gultocsv -f < ../ktest/testout/gulcalci.bin > ../ktest/testout/gulcalci.csv
 	../src/gultocsv/gultocsv -f < ../ktest/testout/gulcalcc.bin > ../ktest/testout/gulcalcc.csv
 	../src/fmtocsv/fmtocsv -f < ../ktest/testout/fmcalc.bin > ../ktest/testout/fmcalc.csv
@@ -164,7 +171,11 @@ installertest()
 
 	 ../src/itemtocsv/itemtocsv < ../examples/input/items.bin | ../src/itemtobin/itemtobin > ../ktest/testout/items.bin
 
+	 ../src/itemtocsv/itemtocsv < ../examples/disaggregation/input/items.bin | ../src/itemtobin/itemtobin > ../ktest/testout/items_d.bin
+
 	 ../src/coveragetocsv/coveragetocsv < ../examples/input/coverages.bin | ../src/coveragetobin/coveragetobin > ../ktest/testout/coverages.bin
+
+	 ../src/coveragetocsv/coveragetocsv < ../examples/disaggregation/input/coverages.bin | ../src/coveragetobin/coveragetobin > ../ktest/testout/coverages_d.bin
 
 	../src/damagebintocsv/damagebintocsv < ../examples/static/damage_bin_dict.bin | ../src/damagebintobin/damagebintobin > ../ktest/testout/damage_bin_dict.bin
 	
@@ -185,6 +196,14 @@ installertest()
 	../src/occurrencetocsv/occurrencetocsv < ../examples/input/occurrence.bin | ../src/occurrencetobin/occurrencetobin -P10000 > ../ktest/testout/occurrence.bin
 
 	../src/vulnerabilitytocsv/vulnerabilitytocsv < ../examples/static/vulnerability.bin | ../src/vulnerabilitytobin/vulnerabilitytobin -d 102 > ../ktest/testout/vulnerability.bin
+
+	../src/disaggregationweighttocsv/disaggregationweighttocsv < ../examples/disaggregation/static/weights.bin | ../src/disaggregationweighttobin/disaggregationweighttobin > ../ktest/testout/weights.bin
+
+	../src/vulnerabilitydisaggtocsv/vulnerabilitydisaggtocsv < ../examples/disaggregation/static/agg_vul_to_vul.bin | ../src/vulnerabilitydisaggtobin/vulnerabilitydisaggtobin > ../ktest/testout/agg_vul_to_vul.bin
+
+	../src/areaperildisaggtocsv/areaperildisaggtocsv < ../examples/disaggregation/static/agg_ap_to_ap.bin | ../src/areaperildisaggtobin/areaperildisaggtobin > ../ktest/testout/agg_ap_to_ap.bin
+	
+	../src/aggregateitemtocsv/aggregateitemtocsv < ../examples/disaggregation/input/aggregate_items.bin | ../src/aggregateitemtobin/aggregateitemtobin > ../ktest/testout/aggregate_items.bin
 	
 	cp static/footprint.bin ../ktest/testout/footprint.bin
     cp static/footprint.idx ../ktest/testout/footprint.idx

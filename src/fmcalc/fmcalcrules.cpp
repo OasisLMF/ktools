@@ -482,15 +482,15 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 						}
 						// Function 19: Applies a min and max deductible on deductible % loss
 						OASIS_FLOAT loss = 0;
-						if (x.loss * ded1 > ded3) {
-							loss = x.loss - ded3;
+						if ((x.loss * ded1) + x.effective_deductible > ded3) {
+							loss = x.loss + x.effective_deductible - ded3;
 							if (loss < 0) loss = 0;
 							x.effective_deductible = x.effective_deductible + (x.loss - loss);
 							//x.retained_loss = x.retained_loss + (x.loss - loss);
 						}
 						else {
-							if (x.loss * ded1 < ded2) {
-								loss = x.loss - ded2;
+							if ((x.loss * ded1) + x.effective_deductible < ded2) {
+								loss = x.loss + x.effective_deductible - ded2;
 								if (loss < 0) loss = 0;
 								x.effective_deductible = x.effective_deductible + (x.loss - loss);
 								//x.retained_loss = x.retained_loss + (x.loss - loss);
@@ -525,7 +525,45 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 					}
 					break;
 					case 21:
+					//  minimum and maximum applied to prior level effective deductible plus % tiv deductible
 					{
+						OASIS_FLOAT ded1 = 0;
+						OASIS_FLOAT ded2 = 0;
+						OASIS_FLOAT ded3 = 0;						
+						for (auto y : profile.tc_vec) {
+							if (y.tc_id == deductible_1) ded1 = y.tc_val;
+							if (y.tc_id == deductible_2) ded2 = y.tc_val;
+							if (y.tc_id == deductible_3) ded3 = y.tc_val;
+						}
+						OASIS_FLOAT loss = 0;
+						OASIS_FLOAT effective_ded = 0;
+						effective_ded = x.accumulated_tiv * ded1;
+						if (effective_ded > x.loss) effective_ded = x.loss;
+						if (effective_ded + x.effective_deductible > ded3) {
+							loss = x.loss + x.effective_deductible - ded3;
+							if (loss < 0) loss = 0;
+							x.effective_deductible = x.effective_deductible + (x.loss - loss);
+							//x.retained_loss = x.retained_loss + (x.loss - loss);
+						}
+						else {
+							if (effective_ded + x.effective_deductible < ded2) {
+								loss = x.loss + x.effective_deductible - ded2;
+								if (loss < 0) loss = 0;
+								x.effective_deductible = x.effective_deductible + (x.loss - loss);
+								//x.retained_loss = x.retained_loss + (x.loss - loss);
+							}
+							else {
+								loss = x.loss - effective_ded;
+								if (loss < 0) loss = 0;
+								x.effective_deductible = x.effective_deductible + (x.loss - loss);
+								//x.retained_loss = x.retained_loss + (x.loss - loss);		
+							}
+						}
+						//if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
+						//else x.net_loss = x.retained_loss;
+						// x.loss = loss;
+					}					
+/*	old calcrule 21		{
 						OASIS_FLOAT attachment = 0;
 						OASIS_FLOAT share1 = 0;
 						OASIS_FLOAT limit = 0;
@@ -542,7 +580,7 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 						else x.net_loss = x.loss - loss;
 						x.retained_loss = x.net_loss;
 						x.loss = loss;
-					}
+					}*/
 					break;
 					case 22:
 					{

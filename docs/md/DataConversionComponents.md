@@ -405,24 +405,21 @@ The csv file should contain the following fields and include a header row.
 
 | Name                     | Type   |  Bytes | Description                                    | Example     |
 |:-------------------------|--------|--------| :----------------------------------------------|------------:|
-| policytc_id              | int    |    4   | Oasis Financial Module policytc_id             |     34      |
-| calcrule_id              | int    |    4   | Oasis Financial Module calcrule_id             |      1      |
-| allocrule_id             | int    |    4   | Oasis Financial Module allocrule_id            |      0      |
-| ccy_id                   | int    |    4   | Oasis Financial Module ccy_id                  |      0      |
-| deductible               | float  |    4   | Deductible                                     |   50        |
-| limit                    | float  |    4   | Limit                                          |   100000    |
-| share_prop_of_lim        | float  |    4   | Share/participation as a proportion of limit   |   0         |
-| deductible_prop_of_loss  | float  |    4   | Deductible as a proportion of loss             |   0         |
-| limit_prop_of_loss       | float  |    4   | Limit as a proportion of loss                  |   0         |
-| deductible_prop_of_tiv   | float  |    4   | Deductible as a proportion of TIV              |   0         |
-| limit_prop_of_tiv        | float  |    4   | Limit as a proportion of TIV                   |   0         |
-| deductible_prop_of_limit | float  |    4   | Deductible as a proportion of limit            |   0         |
+| policytc_id              | int    |    4   | Primary key 						              |     34      |
+| calcrule_id              | int    |    4   | The calculation rule that applies to the terms |     12      |
+| deductible1              | int    |    4   | First deductible                               |    0.03     |
+| deductible2              | float  |    4   | Second deductible                              |   50000     |
+| deductible3              | float  |    4   | Third deductible                               |   100000    |
+| attachment1              | float  |    4   | Attachment point, or excess					  |   1000000   |
+| limit1				   | float  |    4   | Limit                                          |   5000000   |
+| share1                   | float  |    4   | First proportional share                       |   0.8       |
+| share2                   | float  |    4   | Second proportional share                      |   0.25      |
+| share3                   | float  |    4   | Third proportional share                       |   1         |
 
-* All distinct policytc_id values that appear in the policytc table must appear once in the policytc_id field of the profile table. We suggest that policytc_id=1 is included by default using calcrule_id = 12 and DED = 0 as a default 'null' calculation rule whenever no terms and conditions apply to a particular level_id / agg_id in the policytc table.
-* All data fields that are required by the relevant profile must be provided, with the correct calcrule_id (see FM Profiles)
+
+* A reference table listing the valid values for calcrule_id and which of the fields are required is available in FM Profiles
+* All distinct policytc_id values that appear in the policytc table must appear once in the policytc_id field of the profile table. We suggest that policytc_id=1 is included by default using calcrule_id = 12 and deductible1 = 0 as a default 'null' calculation rule whenever no terms and conditions apply to a particular level_id / agg_id in the policytc table.
 * Any fields that are not required for the profile should be set to zero.
-* allocrule_id may be set to 0 or 1 for each policytc_id.  Generally, it is recommended to use 0 everywhere except for the final level calculations when back-allocated losses are required, else 0 everywhere.
-* The ccy_id field is currently not used.
 
 ##### fmprofiletobin
 ```

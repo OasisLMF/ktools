@@ -13,6 +13,8 @@ With R1.5, a Linux-based in-memory calculation back-end was released, using the 
 
 In 2016 the functionality of ktools was extended to include the full range of Kernel calculations, including effective damageability distribution calculations and a wider range of financial module and output calculations.  The data stream structures and input data formats were also substantially revised to handle multi-peril models, user-definable summary levels for outputs, and multiple output workflows.  
 
+In 2018 the Financial Module was extended to perform net loss calculations for per occurrence forms of reinsurance, including facultative reinsurance, quota share, surplus share, per risk and catastrophe excess of loss treaties.
+
 ### Architecture
 
 The Kernel is provided as a toolkit of components (“ktools”) which can be invoked at the command line.  Each component is a separately compiled executable with a binary data stream of inputs and/or outputs.

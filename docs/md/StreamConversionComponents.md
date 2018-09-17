@@ -6,7 +6,6 @@ The following components convert the binary output of each calculation component
 * **[gultocsv](#gultocsv)** is a utility to convert binary format GULs to a csv. gulcalc standard output can be streamed directly into gultocsv, or a binary file of the same format can be piped in.
 * **[fmtocsv](#fmtocsv)** is a utility to convert binary format losses to a csv. fmcalc standard output can be streamed directly into fmtocsv, or a binary file of the same format can be piped in.
 * **[summarycalctocsv](#summarycalctocsv)** is a utility to convert binary format summarycalc losses to a csv. summarycalc standard output can be streamed directly into summarycalctocsv, or a binary file of the same format can be piped in.
-* **[aalcalctocsv](#aalcalctocsv)** is a utility to convert binary format aalcalc losses to a csv. aalcalc standard output can be streamed directly into aalcalctocsv, or a binary file of the same format can be piped in.
 
 Additionally, the following component is provided to convert csv data into binary format;
 * **[gultobin](#gultobin)** is a utility to convert gulcalc data in csv format into binary format such that it can be piped into fmcalc.
@@ -180,44 +179,6 @@ Csv file with the following fields;
 | summary_id        | int    |    4   | Oasis summary_id                                                    |    3        |
 | sidx              | int    |    4   | Sample index                                                        |    10       |
 | loss              | float  |    4   | The insured loss value                                              | 5375.675    |
-
-[Return to top](#streamconversioncomponents)
-
-<a id="aalcalctocsv"></a>
-### aalcalctocsv 
-***
-A component which converts the aalcalc output stream, or binary file with the same structure, to a csv file.
-
-##### Stdin stream_id
-
-| Byte 1 | Bytes 2-4 |  Description           |
-|:-------|-----------|:-----------------------|
-|    4   |     1     |  aalcalc stdout        |
-
-A binary file of the same format can be piped into aalcalctocsv.
-
-##### Usage
-```
-$ [stdin component] | aalcalctocsv > [output].csv
-$ aalcalctocsv < [stdin].bin > [output].csv
-```
-
-##### Example
-```
-$ eve 1 1 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -1 - | aalcalc | aalcalctocsv > aalcalc.csv
-$ aalcalctocsv < aalcalc.bin > aalcalc.csv 
-```
-
-##### Output
-Csv file with the following fields;
-
-| Name                | Type   |  Bytes | Description                                                         | Example     |
-|:--------------------|--------|--------| :-------------------------------------------------------------------|------------:|
-| summary_id          | int    |    4   | summary_id representing a grouping of losses                        |   10        |
-| type                | int    |    4   | 1 for analytical mean, 2 for mean calculated from samples           |    1        |
-| mean                | float  |    8   | sum of period mean losses                                           |    67856.9  |
-| mean_squared        | float  |    8   | sum of squared period mean losses                                   |    546577.8 |
-| max_exposure_value  | float  |    8   | maximum exposure value across all periods                           |    10098730 |
 
 [Return to top](#streamconversioncomponents)
 

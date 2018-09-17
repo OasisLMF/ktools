@@ -171,7 +171,7 @@ The purpose of the coverage stream is to cap losses to the coverage TIV where it
 <a id="fmcalc"></a>
 ### fmcalc
 ***
-fmcalc is the reference implementation of the Oasis Financial Module. It applies policy terms and conditions to the ground up losses and produces insured loss sample output.  It reads in losses from gulcalc at item level only (stream_id = 1). 
+fmcalc is the reference implementation of the Oasis Financial Module. It applies policy terms and conditions to the ground up losses and produces loss sample output.  It reads in losses from gulcalc at item level (stream_id = 1) or it can run recursively on losses output from fmcalc and apply several sets of policy terms and conditions. 
 
 ##### Stream_id
 
@@ -180,24 +180,27 @@ fmcalc is the reference implementation of the Oasis Financial Module. It applies
 |    2   |     1     |  fmcalc reference example                      |
 
 ##### Parameters
-There are no parameters as all of the information is taken from the gulcalc stdout stream and fm input data.
+Optional parameters are;
+* -p {string} The location of the input files. The default location is the 'input' directory in the present working directory
+* -a{integer} The back allocation rule to apply. The options are 0 (no allocation), 1 (ground up loss basis) or 2 (prior level loss basis). The default is 0. 
+* -n Output net losses. Net losses are the difference between the input loss and the calculated loss. The default is to output the calculated loss.
 
 ##### Usage
 ```
-$ [stdin component] | fmcalc | [stout component]
-$ [stdin component] | fmcalc > [stdout].bin
-$ fmcalc < [stdin].bin > [stdout].bin
+$ [stdin component] | fmcalc [parameters] | [stout component]
+$ [stdin component] | fmcalc [parameters] > [stdout].bin
+$ fmcalc [parameters] < [stdin].bin > [stdout].bin
 ```
 
 ##### Example
 ```
-$ eve 1 1 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -2 - | eltcalc > elt.csv
-$ eve 1 1 | getmodel | gulcalc -r -S100 -i - | fmcalc > fmcalc.bin
-$ fmcalc < gulcalc.bin > fmcalc.bin 
+$ eve 1 1 | getmodel | gulcalc -r -S100 -i - | fmcalc -p direct -a2 | summarycalc -f -2 - | eltcalc > elt.csv
+$ eve 1 1 | getmodel | gulcalc -r -S100 -i - | fmcalc -p direct -a1 > fmcalc.bin
+$ fmcalc -p ri1 -a2 -n < gulcalc.bin > fmcalc.bin 
 ```
 
 ##### Internal data
-The program requires the item, coverage and fm input data files, which are Oasis abstract data objects that describe an insurance programme. This data is picked up from the following files relative to the working directory;
+For the gulcalc stream input, the program requires the item, coverage and fm input data files, which are Oasis abstract data objects that describe an insurance or reinsurance programme. This data is picked up from the following files relative to the working directory by default;
 
 * input/items.bin
 * input/coverages.bin
@@ -205,6 +208,15 @@ The program requires the item, coverage and fm input data files, which are Oasis
 * input/fm_policytc.bin
 * input/fm_profile.bin
 * input/fm_xref.bin
+
+For fmcalc stream input, the program requires only the four fm input data files, 
+
+* input/fm_programme.bin
+* input/fm_policytc.bin
+* input/fm_profile.bin
+* input/fm_xref.bin
+
+The location of the files can be changed by using the -p parameter followed by the path location relative to the present working directory. eg -p ri1
 
 ##### Calculation
 See [Financial Module](FinancialModule.md)
@@ -216,7 +228,7 @@ See [Financial Module](FinancialModule.md)
 ***
 The purpose of summarycalc is firstly to aggregate the samples of loss to a level of interest for reporting, thereby reducing the volume of data in the stream. This is a generic first step which precedes all of the downstream output calculations.  Secondly, it unifies the formats of the gulcalc and fmcalc streams, so that they are transformed into an identical stream type for downstream outputs. Finally, it can generate up to 10 summary level outputs in one go, creating multiple output streams or files.
 
-The output is similar to the gulcalc or fmcalc input which are losses are by sample index and by event, but the ground up or insured loss input losses are grouped to an abstract level represented by a summary_id.  The relationship between the input identifier and the summary_id are defined in cross reference files called **gulsummaryxref** and **fmsummaryxref**.
+The output is similar to the gulcalc or fmcalc input which are losses are by sample index and by event, but the ground up or (re)insurance loss input losses are grouped to an abstract level represented by a summary_id.  The relationship between the input identifier and the summary_id are defined in cross reference files called **gulsummaryxref** and **fmsummaryxref**.
 
 ##### Stream_id
 

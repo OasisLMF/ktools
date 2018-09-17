@@ -12,17 +12,17 @@ This section explains the design of the Financial Module which has been implemen
 * Runtime parameters and usage instructions for fmcalc are covered in [4.1 Core Components](CoreComponents.md). 
 * The formats of the input files are covered in [4.3 Data Conversion Components](DataConversionComponents.md). 
  
-In addition, there separate github repository [ktest](https://github.com/OasisLMF/ktest) which is an extended test suite for ktools and contains a library of financial module worked examples provided by Oasis Members with a full set of input and output files (access on request).
+In addition, there separate github repository [ktest](https://github.com/OasisLMF/ktest) which is an extended test suite for ktools and contains a library of financial module worked examples provided by Oasis Members with a full set of input and output files.
 
-Note that other reference tables are referred to below that do not appear explicitly in the kernel as they are not directly required for calculation.  It is expected that a front end system will hold all of the exposure and policy data and generate the above three input files required for the kernel calculation.
+Note that other reference tables are referred to below that do not appear explicitly in the kernel as they are not directly required for calculation.  It is expected that a front end system will hold all of the exposure and policy data and generate the above four input files required for the kernel calculation.
 
 ## Scope
 
-The Financial Module outputs sample by sample losses by (re)insurance contract, or by item, which represents the individual coverage subject to economic loss. In the latter case, it is necessary to ‘back-allocate’ losses when they are calculated at a higher policy level.  The Financial Module does not, at present, output retained loss or ultimate net loss (UNL) perspectives. It does, though, allow the user to output losses at any stage of the calculation.
+The Financial Module outputs sample by sample losses by (re)insurance contract, or by item, which represents the individual coverage subject to economic loss from a particular peril. In the latter case, it is necessary to ‘back-allocate’ losses when they are calculated at a higher policy level.  The Financial Module can output retained loss or ultimate net loss (UNL) perspectives as an option, and at any stage in the calculation.
 
-The output contains anonymous keys representing the (re)insurance programme (prog_id) and policy (layer_id) at the chosen output level (output_id) and a loss value. Losses by sample number (idx) and event (event_id) are produced.  To make sense of the output, this output must be cross-referenced with Oasis dictionaries which contain the meaningful business information.
+The output contains anonymous keys representing the (re)insurance policy (agg_id and layer_id) at the chosen output level (output_id) and a loss value. Losses by sample number (idx) and event (event_id) are produced.  To make sense of the output, this output must be cross-referenced with Oasis dictionaries which contain the meaningful business information.
 
-The Financial Module does not support multi-currency calculations, although currency identifiers are included in the definition of profiles (see below) as placeholders for this functionality in future.
+The Financial Module does not support multi-currency calculations.
 
 ## Profiles
 
@@ -34,19 +34,33 @@ The Profiles currently supported are as follows;
 
 #### Supported Profiles
 
-| Profile description                                                | profile_id| calcrule_id |
-|:-------------------------------------------------------------------|-----------|------------:|
-| Deductible and limit                                               | 1         |   1         |
-| Franchise deductible and limit                                     | 2         |   3         |
-| Deductible only                                                    | 3         |  12         |
-| Deductible as a cap on the retention of input losses               | 4         |  10         |
-| Deductible as a floor on the retention of input losses             | 5         |  11         |
-| Deductible, limit and share                                        | 6         |   2         |
-| Deductible and limit as a proportion of loss                       | 10        |   5         |
-| Limit with deductible as a proportion of limit                     | 11        |   9         |
-| Limit only                                                         | 12        |   14        |
-| Limit as a proportion of loss                                      | 13        |   15        |
-| Deductible as a proportion of loss                                 | 14        |   16        |
+| Profile description                               |calcrule_id |
+|:--------------------------------------------------|-----------:|
+|deductible and limit                               |   1        |
+|deductible with attachment, limit and share        |   2        |
+|franchise deductible and limit                     |   3        |
+|deductible % TIV and limit                         |   4        |
+|deductible and limit % loss                        |   5        |
+|deductible % TIV                                   |   6        |
+|limit and maximum deductible                       |   7        |
+|limit and minimum deductible                       |   8        |
+|limit with deductible % limit                      |   9        |
+|maximum deductible                                 |   10       |
+|minimum deductible                                 |   11       |
+|deductible                                         |   12       |
+|minimum and maximum deductible                     |   13       |
+|limit only                                         |   14       |
+|limit % loss                                       |   15       |
+|deductible % loss                                  |   16       |
+|deductible % loss with attachment, limit and share |   17       |
+|deductible % tiv with attachment, limit and share  |   18       |
+|% loss deductible with min and max deductible      |   19       |
+|reverse franchise deductible                       |   20       |
+|% tiv deductible with min and max deductible       |   21       |
+|reinsurance with attachment and limit              |   22       |
+|reinsurance share only                             |   23       |
+
+
 
 See Appendix [B FM Profiles](fmprofiles.md) for more details. 
 
@@ -59,7 +73,7 @@ The Oasis Financial Module is a data-driven process design for calculating the l
 3. A **policytc** cross-reference file which associates a policy terms and conditions profile to each programme level aggregation.
 4. A **xref** file which specifies how the output losses are summarized.
 
-The profile not only provides the fields to be used in calculating losses (such as limit and deductible) but also which mathematical calculation (calcrule_id) and which allocation rule (allocrule_id) to apply.
+The profile not only provides the fields to be used in calculating losses (such as limit and deductible) but also which mathematical calculation (calcrule_id) to apply.
 
 ## Data requirements
 
@@ -101,7 +115,7 @@ The linkage between account and programme can be provided by a user defined **pr
 |       1  | 1           | ABC Insurance Co. 2016 renewal|
 
 
-Items 1-4 represent Structure, Other Structure, Contents and Time Element coverage ground up losses for a single property, respectively, and this example is a simple residential policy with combined property coverage terms. For this policy type, the Structure, Other Structure and Contents losses are aggregated, and a deductible and limit is applied to the total. A separate set of terms, again a simple deductible and limit, is applied to the “time element” coverage which, for residential policies, generally means costs for temporary accommodation. The total insured loss is the sum of the output from the combined property terms and the time element terms.
+Items 1-4 represent Structure, Other Structure, Contents and Time Element coverage ground up losses for a single property, respectively, and this example is a simple residential policy with combined property coverage terms. For this policy type, the Structure, Other Structure and Contents losses are aggregated, and a deductible and limit is applied to the total. A separate set of terms, again a simple deductible and limit, is applied to the “Time Element” coverage which, for residential policies, generally means costs for temporary accommodation. The total insured loss is the sum of the output from the combined property terms and the time element terms.
 
 ### Programme
 
@@ -118,39 +132,47 @@ The actual items falling into the programme are specified in the **programme** t
 
 Note that from_agg_id for level_id=1 is equal to the item_id in the input loss table (but in theory from_agg_id could represent a higher level of grouping, if required). 
 
-In level 1, items 1, 2 and 3 all have to_agg_id =1 so losses will be summed together before applying the combined deductible and limit, but item 4 (time) will be treated separately (not aggregated) as it has to_agg_id = 2. For level 2 we have all 4 items losses (now represented by two groups from_agg_id =1 and 2 from the previous level) aggregated together as they have the same to_agg_id = 1.
+In level 1, items 1, 2 and 3 all have to_agg_id =1 so losses will be summed together before applying the combined deductible and limit, but item 4 (time element) will be treated separately (not aggregated) as it has to_agg_id = 2. For level 2 we have all 4 items losses (now represented by two groups from_agg_id =1 and 2 from the previous level) aggregated together as they have the same to_agg_id = 1.
 
 ### Profile
 
-Next we have the profile description table, which list the profiles representing general policy types. Our example is represented by two general profiles which specify the input fields and mathematical operations to perform. In this example, the profile for the combined coverages and time is the same (albeit with different values) and requires a limit, a deductible, and an associated calculation rule, whereas the profile for the policy requires a limit, deductible, and share, and an associated calculation rule.
+Next we have the profile description table, which list the profiles representing general policy types. Our example is represented by two general profiles which specify the input fields and mathematical operations to perform. In this example, the profile for the combined coverages and time is the same (albeit with different values) and requires a limit, a deductible, and an associated calculation rule, whereas the profile for the policy requires a limit, attachment, and share, and an associated calculation rule.
 
-| Profile description                | profile_id| calcrule_id |
-|:-----------------------------------|-----------|------------:|
-| Deductible and limit               | 1         |   1         |
-| Deductible, limit and share        | 6         |   2         |
+| Profile description                            | calcrule_id |
+|:-----------------------------------------------|------------:|
+| deductible and limit                           |   1         |
+| deductible and/or attachment, limit and share  |   2         |
 
 
-There is a “profile value” table for each profile containing the applicable policy terms, each identified by a policytc_id. The table below shows the list of policy terms for profile_id 1.
+There is a “profile value” table for each profile containing the applicable policy terms, each identified by a policytc_id. The table below shows the list of policy terms for calcrule_id 1.
 
-| policytc_id | ccy_id | limit     | deductible   |
-|:------------|--------|-----------| -------------|
-|       1     | 1      | 1,000,000 | 1,000        |
-|       2     | 1      |    18,000 | 2,000        |
+| policytc_id | deductible1 | limit1     |
+|:------------|-------------| -----------|
+|       1     |  1,000      | 1,000,000  |
+|       2     |    2,000    | 18,000     |
 
-And next, for profile 6, the values for the overall policy deductible, limit and share
+And next, for calcrule_id 2, the values for the overall policy attachment, limit and share
 
-| policytc_id | ccy_id | limit     | deductible   | share_prop_of_lim  | 
-|:------------|--------|-----------| -------------|--------------------|
-|       3     | 1      | 1,000,000 | 1,000        |    0.1             |
+| policytc_id | deductible1 | attachment1 | limit1       | share1     | 
+|:------------|-------------|-------------| -------------|------------|
+|       3     | 0           | 1,000       | 1,000,000    |    0.1     |
 
-In practice, all profile values are stored in a single flattened format which contains all supported profile fields, but conceptually they belong in separate profile value tables (see fm profile in [4.3 Data Conversion Components](DataConversionComponents.md)).
+In practice, all profile values are stored in a single flattened format which contains all supported profile fields (see fm profile in [4.3 Data Conversion Components](DataConversionComponents.md)), but conceptually they belong in separate profile value tables.
 
-For any given profile we have two standard rules:
-* **calcrule_id**, being the Function used to calculate the losses from the given Profile’s fields. More information about the functions can be found in [FM Profiles](fmprofiles.md).
-* **allocrule_id**, being the rule for allocating losses back to ITEM level. There are three meaningful values here – don’t allocate (0) used typically for all levels where a breakdown of losses is not required in output, allocate back to ITEMs (1) in proportion to the input ground up losses, or allocate back to ITEMS (2) in proportion to the losses from the previous level calculation. If a breakdown of the policy losses is required in output, it is not necessary to back-allocate at every intermediate level. i.e. only the allocrule_id for final level calculations may be set to 1 or 2 and the prior levels can be set to allocrule_id 0.  This will result in the most efficient execution path.
+The flattened file is;
+
+fm_profile
+
+| policytc_id | calcrule_id | deductible1 | deductible2 | deductible3 | attachment1 | limit1    | share1 | share2 | share3 |
+|:------------|-------------|-------------| ------------|-------------|-------------|-----------|--------|--------|-------:|
+|       1     |      1      | 1,000       | 0           |     0       |    0        | 1,000,000 |  0     |   0    |  0     |
+|       1     |       1	    | 2,000       |     0       |    0        |    0      	|18,000     |  0     |   0    |  0     |
+|       1     | 2           | 0           |     0       |    0        | 1,000       | 1,000,000 |  0.1   |   0    |  0     |
+
+For any given profile we have one standard rule **calcrule_id**, being the mathematical function used to calculate the losses from the given profile’s fields. More information about the functions can be found in [FM Profiles](fmprofiles.md).
 
 ### Policytc
-The **policytc** table specifies the insurance policies (a policy in Oasis FM is a combination of prog_id and layer_id) and the separate terms and conditions which will be applied to each layer_id/agg_id for a given level. In our example, we have a limit and deductible with the same value applicable to the combination of the first three items, a limit and deductible for the fourth item (time) in level 1, and then a limit, deductible, and line applicable at level 2 covering all items. We’d represent this in terms of the distinct agg_ids as follows:
+The **policytc** table specifies the (re)insurance contracts (this is a combination of agg_id and layer_id) and the separate terms and conditions which will be applied to each layer_id/agg_id for a given level. In our example, we have a limit and deductible with the same value applicable to the combination of the first three items, a limit and deductible for the fourth item (time) in level 1, and then a limit, attachment, and share applicable at level 2 covering all items. We’d represent this in terms of the distinct agg_ids as follows:
 
 | layer_id | level_id | agg_id   | policytc_id |
 |:---------|----------| ---------|------------:|
@@ -162,9 +184,9 @@ In words, the data in the table mean;
 
 At Level 1;
 
-Apply policytc_id (calculation rule) 1 to (the sum of losses represented by) agg_id 1
+Apply policytc_id (terms and conditions) 1 to (the sum of losses represented by) agg_id 1
 
-Apply policy 2 to agg_id 2
+Apply policytc_id 2 to agg_id 2
 
 Then at level 2;
 
@@ -186,9 +208,10 @@ For this example at level 3, the policytc data might look as follows;
 |    2     |     3    |    1     |    23       |
 
 
-## Output and back-allocation
+### Output and back-allocation
 
-Losses are output by event, output level and sample.  The table looks like this;
+ 
+Losses are output by event, output_id and sample.  The table looks like this;
 
 | event_id|  output_id | sidx  |  loss    |
 |:--------|------------|-------|---------:|
@@ -202,16 +225,122 @@ The output_id is specified by the user in the **xref** table, and is a unique co
 | 1         | 1        |    1        | 
 | 2         | 1        |    2        |
 
-There are three options, depending on whether the losses are allocated back to the items at the final level or not. 
-* If allocrule_id = 0 for all policytc_ids at the final level then agg_id = to_agg_id of the final level in the **programme** table
-* If allocrule_id = 1 for all policytc_ids at the final level then output_id = from_agg_id of the first level in the **programme** table
-* If allocrule_id = 2 for all policytc_ids at the final level then output_id = from_agg_id of the first level in the **programme** table
+The output_id must be specified consistently with the back-allocation rule. Losses can either output at the contract level or back-allocated to the lowest level, which is item_id, using one of three command line options. There are three meaningful values here – don’t allocate (0) used typically for all levels where a breakdown of losses is not required in output, allocate back to items (1) in proportion to the input (ground up) losses, or allocate back to items (2) in proportion to the losses from the prior level calculation.
 
-In other words, losses are either output at the contract level or back-allocated to the lowest level, which is item_id. To avoid unnecessary computation, it is recommended not to back-allocate unless losses are required to be reported at a more detailed level than the contract level (site or zip code, for example). In this case, losses are re-aggregated up from item level (represented by output_id in fmcalc output) in summarycalc, using the fmsummaryxref table.
+```
+$ fmcalc -a0 # Losses are output at the contract level and not back-allocated
+$ fmcalc -a1 # Losses are back-allocated to items on the basis of the input losses (e.g. ground up loss)
+$ fmcalc -a2 # Losses are back-allocated to items on the basis of the prior level losses
+```
+The rules for specifying the output_ids in the xref table are as follows;
+ 
+* Rule 0: there is an output_id for every agg_id and layer_id of the final level in the **policytc** table
+* Rule 1: there is an output_id for every from_agg_id of the first level in the **programme** table, and for every layer_id in the final level of the **policytc** table
+* Rule 2: there is an output_id for every from_agg_id of the first level in the **programme** table, and for every layer_id in the final level of the **policytc** table
 
-In R1.1 of Oasis we took the view that it was simpler throughout to refer back to the base items rather than use a hierarchy of aggregated loss calculations. So, for example, we could have calculated a loss at the site level and then used this calculated loss directly at the policy conditions level but instead we allocated back to item level and then re-aggregated to the next level. The reason for this was that intermediate conditions may only apply to certain items so if we didn’t go back to the base item “ground-up” level then any higher level could have a complicated grouping of a level. 
+To make sense of this, if there is more than one output at the contract level, then each one must be back-allocated to all of the items, with each individual loss represented by a unique output_id. 
 
-In the implementation this required back-allocating losses to item at every level in a multi-level calculation even the next level calculaton did not require it, which was inefficient.   The aggregations are now defined in terms of the previous level groupings (from_agg_id in the programme table, rather than item_id) and the execution path now only supports simple hierarchies.
+To avoid unnecessary computation, it is recommended not to back-allocate unless losses are required to be reported at a more detailed level than the contract level (site or zip code, for example). In this case, losses are re-aggregated up from item level (represented by output_id in fmcalc output) in summarycalc, using the fmsummaryxref table.
+
+## Reinsurance
+
+The first run of fmcalc is designed to calculate the primary or direct insurance losses from the ground up losses of an exposure portfolio. fmcalc has been designed to be recursive, so that the 'gross' losses from the first run can be streamed back in to second and subsequent runs of fmcalc, each time with a different set of input files representing reinsurance contracts, and can output either the reinsurance gross loss, or net loss.  There are two modes of output;
+
+* **gross** meaning the loss to the policies or reinsurance contracts, and 
+* **net** being the difference between the input loss and the policy/contract losses
+
+net loss is output when the command line parameter -n is used, otherwise output loss is gross by default.
+
+### Support reinsurance types
+
+The types of reinsurance supported by the Financial Module are;
+* **Facultative** proportional or excess
+* **Quota share** with event limit
+* **Surplus share** with event limit
+* **Per risk** with event limit
+* **Catastrophe excess of loss** occurrence only
+
+### Required files
+
+Second and subsequent runs of fmcalc require the same four fm files fm_programme, fm_policytc, fm_profile, and fm_xref.
+
+This time, the hierarchy specified in fm_programme must be consistent with the range of output_ids from the incoming stream of losses, as specified in the fm_xref file from the previous iteration. Specifically, this means the range of values in from_agg_id at level 1 must match the range of values in output_id.
+
+For example;
+
+fm_xref (iteration 1)
+
+| output_id | agg_id   | layer_id    |
+|:----------|----------|------------:|
+| 1         | 1        |    1        | 
+| 2         | 1        |    2        |
+
+fm_programme (iteration 2)
+
+| from_agg_id | level_id| to_agg_id |
+|:------------|---------| ---------:|
+| 1           |     1   | 1         |
+| 2           |     1   | 2         |
+| 1           |     2   | 1         |
+| 2           |     2   | 1         |
+
+The abstraction of from_agg_id at level 1 from item_id means that losses needn't be back-allocated to item_id after every iteration of fmcalc. In fact, performance will be improved when back-allocation is minimised.
+
+### Example - Quota share reinsurance
+
+Using the two layer example from above, here's an example of the fm files for a simple quota share treaty with 50% ceded and 90% placed covering both policy layers.
+
+The command to run the direct insurance followed by reinsurance might look like this;
+
+```
+$ fmcalc -p direct < guls.bin | fmcalc -p ri1 -n > ri1_net.bin
+```
+In this command, ground up losses are being streamed into fmcalc to calculate the insurance losses, which are streamed into fmcalc again to calculate the reinsurance net loss. The direct insurance fm files would be located in the folder 'direct' and the reinsurance fm files in the folder 'ri1'. The -n flag in the second call of fmcalc results in net losses being output to the file 'ri1_net.bin'. These are the losses to the insurer net of recoveries from the quota share treaty.
+
+The fm_xref file from the direct insurance (first) iteration is
+
+fm_xref
+
+| output_id | agg_id   | layer_id    |
+|:----------|----------|------------:|
+| 1         | 1        |    1        | 
+| 2         | 1        |    2        |
+
+
+The fm files for the reinsurance (second) iteration would be as follows;
+
+fm_programme
+
+| from_agg_id | level_id| to_agg_id |
+|:------------|---------| ---------:|
+| 1           |     1   | 1         |
+| 2           |     1   | 1         |
+
+fm_policytc
+
+| layer_id | level_id | agg_id   | policytc_id |
+|:---------|----------| ---------|------------:|
+|    1     |     1    |    1     |    1        |
+
+fm_profile
+
+
+| policytc_id | calcrule_id | deductible1 | deductible2 | deductible3 | attachment1 | limit1    | share1 | share2 | share3 |
+|:------------|-------------|-------------| ------------|-------------|-------------|-----------|--------|--------|-------:|
+|       1     |      23     | 0           | 0           |     0       |    0        | 0         |  0.5   |   0.9  |  1     |
+
+
+fm_xref
+
+| output_id | agg_id   | layer_id    |
+|:----------|----------|------------:|
+| 1         | 1        |    1        | 
+
+
+### Inuring priority
+
+The Financial Module can support unlimited inuring priority levels for reinsurance. Each set of contracts with equal inuring priority would be calculated in one iteration. The net losses from the first inuring priority are streamed into the second inuring priority calculation, and so on.
+
 
 [Return to top](#financialmodule)
 

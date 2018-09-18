@@ -562,25 +562,8 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 						//if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
 						//else x.net_loss = x.retained_loss;
 						// x.loss = loss;
-					}					
-/*	old calcrule 21		{
-						OASIS_FLOAT attachment = 0;
-						OASIS_FLOAT share1 = 0;
-						OASIS_FLOAT limit = 0;
-						for (auto y : profile.tc_vec) {
-							if (y.tc_id == share_1) share1 = y.tc_val;
-							if (y.tc_id == limit_1) limit = y.tc_val;
-						}
-						//Function21 =  Min (Max( (Loss * share1) - attachment,0), limit)
-						OASIS_FLOAT loss = (x.loss * share1) - attachment;
-						if (loss > limit) loss = limit;						
-						if (loss < 0) loss = 0;
-						//x.retained_loss = x.retained_loss + (x.loss - loss);
-						if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
-						else x.net_loss = x.loss - loss;
-						x.retained_loss = x.net_loss;
-						x.loss = loss;
-					}*/
+					}	
+
 					break;
 					case 22:
 					{

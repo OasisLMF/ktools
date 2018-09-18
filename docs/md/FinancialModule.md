@@ -12,7 +12,7 @@ This section explains the design of the Financial Module which has been implemen
 * Runtime parameters and usage instructions for fmcalc are covered in [4.1 Core Components](CoreComponents.md). 
 * The formats of the input files are covered in [4.3 Data Conversion Components](DataConversionComponents.md). 
  
-In addition, there separate github repository [ktest](https://github.com/OasisLMF/ktest) which is an extended test suite for ktools and contains a library of financial module worked examples provided by Oasis Members with a full set of input and output files.
+In addition, there is a separate github repository [ktest](https://github.com/OasisLMF/ktest) which is an extended test suite for ktools and contains a library of financial module worked examples provided by Oasis Members with a full set of input and output files.
 
 Note that other reference tables are referred to below that do not appear explicitly in the kernel as they are not directly required for calculation.  It is expected that a front end system will hold all of the exposure and policy data and generate the above four input files required for the kernel calculation.
 
@@ -57,9 +57,10 @@ The Profiles currently supported are as follows;
 |% loss deductible with min and max deductible      |   19       |
 |reverse franchise deductible                       |   20       |
 |% tiv deductible with min and max deductible       |   21       |
-|reinsurance with attachment and limit              |   22       |
-|reinsurance share only                             |   23       |
-
+|reinsurance % ceded, limit and % placed            |   22       |
+|reinsurance limit and % placed                     |   23       |
+|reinsurance excess terms		                    |   24       |
+|reinsurance proportional terms                     |   25       |
 
 
 See Appendix [B FM Profiles](fmprofiles.md) for more details. 
@@ -327,7 +328,7 @@ fm_profile
 
 | policytc_id | calcrule_id | deductible1 | deductible2 | deductible3 | attachment1 | limit1    | share1 | share2 | share3 |
 |:------------|-------------|-------------| ------------|-------------|-------------|-----------|--------|--------|-------:|
-|       1     |      23     | 0           | 0           |     0       |    0        | 0         |  0.5   |   0.9  |  1     |
+|       1     |      25     | 0           | 0           |     0       |    0        | 0         |  0.5   |   0.9  |  1     |
 
 
 fm_xref
@@ -340,6 +341,12 @@ fm_xref
 ### Inuring priority
 
 The Financial Module can support unlimited inuring priority levels for reinsurance. Each set of contracts with equal inuring priority would be calculated in one iteration. The net losses from the first inuring priority are streamed into the second inuring priority calculation, and so on.
+
+Where there are multiple contracts with equal inuring priority, these are implemented as layers with a single iteration.
+
+The net calculation for iterations with multiple layers is;
+
+net loss = max(0, input loss - layer1 loss - layer2 loss + ... + layer n loss)
 
 
 [Return to top](#financialmodule)

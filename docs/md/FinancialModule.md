@@ -252,7 +252,7 @@ The first run of fmcalc is designed to calculate the primary or direct insurance
 
 net loss is output when the command line parameter -n is used, otherwise output loss is gross by default.
 
-### Support reinsurance types
+### Supported reinsurance types
 
 The types of reinsurance supported by the Financial Module are;
 * **Facultative** proportional or excess
@@ -346,7 +346,7 @@ Where there are multiple contracts with equal inuring priority, these are implem
 
 The net calculation for iterations with multiple layers is;
 
-net loss = max(0, input loss - layer1 loss - layer2 loss + ... + layer n loss)
+net loss = max(0, input loss - layer1 loss - layer2 loss - ... - layer n loss)
 
 
 [Return to top](#financialmodule)

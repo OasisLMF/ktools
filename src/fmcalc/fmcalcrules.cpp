@@ -539,14 +539,14 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 						OASIS_FLOAT effective_ded = 0;
 						effective_ded = x.accumulated_tiv * ded1;
 						if (effective_ded > x.loss) effective_ded = x.loss;
-						if (effective_ded + x.effective_deductible > ded3) {
+						if ((effective_ded + x.effective_deductible) > ded3) {
 							loss = x.loss + x.effective_deductible - ded3;
 							if (loss < 0) loss = 0;
 							x.effective_deductible = x.effective_deductible + (x.loss - loss);
 							//x.retained_loss = x.retained_loss + (x.loss - loss);
 						}
 						else {
-							if (effective_ded + x.effective_deductible < ded2) {
+							if ((effective_ded + x.effective_deductible) < ded2) {
 								loss = x.loss + x.effective_deductible - ded2;
 								if (loss < 0) loss = 0;
 								x.effective_deductible = x.effective_deductible + (x.loss - loss);
@@ -561,7 +561,7 @@ void fmcalc::dofmcalc_new(std::vector <LossRec> &agg_vec, int layer)
 						}
 						//if (layer >1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
 						//else x.net_loss = x.retained_loss;
-						// x.loss = loss;
+						 x.loss = loss;
 					}	
 
 					break;
@@ -754,8 +754,9 @@ void fmcalc::init_profile_new()
 				add_tc(deductible_1, f.deductible1, p.tc_vec);
 				break;
 			case 21:
-				add_tc(limit_1, f.limit, p.tc_vec);
-				add_tc(share_1, f.share1, p.tc_vec);
+				add_tc(deductible_1, f.deductible1, p.tc_vec);
+				add_tc(deductible_2, f.deductible2, p.tc_vec);
+				add_tc(deductible_3, f.deductible3, p.tc_vec);
 				break;
 			case 23:
 				add_tc(share_2, f.share2, p.tc_vec);

@@ -59,6 +59,7 @@ void help()
 		"-h help\n"
 		"-f input stream = fm\n"
 		"-g input stream = gul\n"
+		"-p input path\n"
 		"-[summarysetid] outfilepipe\n"
 		"where summarysetid range is 0 to 9\n"
 	);

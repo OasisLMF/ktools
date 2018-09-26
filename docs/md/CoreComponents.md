@@ -196,7 +196,8 @@ $ fmcalc [parameters] < [stdin].bin > [stdout].bin
 ```
 $ eve 1 1 | getmodel | gulcalc -r -S100 -i - | fmcalc -p direct -a2 | summarycalc -f -2 - | eltcalc > elt.csv
 $ eve 1 1 | getmodel | gulcalc -r -S100 -i - | fmcalc -p direct -a1 > fmcalc.bin
-$ fmcalc -p ri1 -a2 -n < gulcalc.bin > fmcalc.bin 
+$ fmcalc -p ri1 -a2 -n < gulcalc.bin > fmcalc.bin
+$ fmcalc -p direct | fmcalc -p ri1 -n | fmcalc -p ri2 -n < gulcalc.bin > fm_ri2_net.bin 
 ```
 
 ##### Internal data

@@ -215,69 +215,30 @@ In the latter case, the output format is;
 
 ### aalcalc <a id="aalcalc"></a>
 ***
-aalcalc produces binary files which contain the sum of means, and sum of squared means across all periods for each summary_id.  This is the first stage in the calculation of average annual loss and standard deviation of loss, which requires the aggregation of the sum of means and sum of squared means across all periods. Like the leccalc component, the final calculation cannot be performed within a single process containing a subset of the data, in cases where the events have been distributed across multiple processes.  Instead, the aalcalc binaries returned from all processes are read back into memory by the aalsummary component which completes the calculation of average annual loss and standard deviation.
+aalcalc produces the report for average annual loss and standard deviation of loss.  The time period over which average loss and standard deviation of loss is calculated is defined by the periods file, so it may be different than an annual period but it is common that an annual period is of most interest.
 
-Two types of mean are calculated in aalcalc; analytical mean (type 1) and sample mean (type 2).  If the analysis is run with zero samples, then only type 1 means are returned by aalcalc.
+It reads in all summarycalc binary files, and then computes overall average annual loss, standard deviation of loss and maximum exposure value across all periods, for each summary_id.  
+
+Two types of mean are calculated in aalcalc; analytical mean (type 1) and sample mean (type 2).  If the analysis is run with zero samples, then only type 1 statistics are returned by aalcalc.
+
+Like the leccalc component, the calculation cannot be performed within a single process containing a subset of the data, in cases where the events have been distributed across multiple processes.  Instead, the summarycalc binaries returned from all processes are read back into memory and then aalcalc computes overall average annual loss, standard deviation of loss and maximum exposure value across all periods, for each summary_id.
 
 ##### Parameters
 
-None
+* -K{sub-directory}. The sub-directory of /work containing the input summarycalc binary files.
 
 ##### Usage
 ```
-$ [stdin component] | aalcalc > aal.bin
-$ aalcalc < [stdin].bin > aal.bin
+$ aalcalc [parameters] > aal.csv
 ```
 
 ##### Example
 ```
-$ eve 1 1 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - | aalcalc > aal1.bin
-$ aalcalc < summarycalc.bin > aal.bin 
-```
-
-##### Output
-binary file containing the following fields;
-
-| Name                | Type   |  Bytes | Description                                                         | Example     |
-|:--------------------|--------|--------| :-------------------------------------------------------------------|------------:|
-| summary_id          | int    |    4   | summary_id representing a grouping of losses                        |   10        |
-| type                | int    |    4   | 1 for analytical mean, 2 for mean calculated from samples           |    1        |
-| mean                | float  |    8   | sum of period mean losses                                           |    67856.9  |
-| squared_mean        | float  |    8   | sum of squared period mean losses                                   |    546577.8 |
-| max_exposure_value  | float  |    8   | maximum exposure value across all periods                           |    10098730 |
-
-##### Internal data
-The program requires the occurrence file;
-
-* input/occurrence.bin
-
-##### Calculation
-The occurrence file is read into memory. From the summarycalc stream data, the event sample means and sample means squared are computed for each summary_id.  The sample means and squared sampled means are summed by period and summary_id, according to which events are assigned to periods in the occurrence data.  Then the means and squared means are summed across the periods, for each summary_id.  The exposure_value, which is held at an event_id, summary_id in the summarycalc header is also accumulated by summary_id and period, and then across periods. In this case however, it is the maximum exposure value which is carried through the accumulations, not the sum.
-
-[Return to top](#outputcomponents)
-
-### aalsummary <a id="aalsummary"></a>
-***
-aalsummary is the final stage calculation for average annual loss and standard deviation of loss.  It reads in all aalcalc binary files which contain the sum of means, and sum of squared means across different sets of periods for each summary_id, and then computes overall average annual loss, standard deviation of loss and maximum exposure value across all periods.  
-
-Two types of aal and standard deviation of loss are calculated in aalsummary; analytical (type 1) and sample (type 2).  If the analysis is run with zero samples, then only type 1 statistics are returned by aalsummary.
-
-##### Parameters
-
-* -K{sub-directory}. The sub-directory of /work containing the input aalcalc binary files.
-
-##### Usage
-```
-$ aalsummary [parameters] > aal.csv
-```
-
-##### Example
-```
-'First generate aalcalc binaries by running the core workflow, for the required summary set
-$ eve 1 2 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - | aalcalc > work/summary1/aal/aalcalc1.bin
-$ eve 2 2 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - | aalcalc > work/summary1/aal/aalcalc2.bin
-'Then run aalsummary, pointing to the specified sub-directory of work containing the aalcalc binaries.
-$ aalsummary -Ksummary1/aal > aal.csv 
+'First generate summarycalc binaries by running the core workflow, for the required summary set
+$ eve 1 2 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 work/summary1/summarycalc1.bin
+$ eve 2 2 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 work/summary1/summarycalc2.bin
+'Then run aalcalc, pointing to the specified sub-directory of work containing the summarycalc binaries.
+$ aalcalc -Ksummary1 > aal.csv 
 ```
 
 ##### Output
@@ -292,26 +253,26 @@ csv file containing the following fields;
 | exposure_value      | float  |    8   | maximum exposure value across all periods                           |    10098730 |
 
 ##### Internal data
-The program requires the occurrence file;
+aalcalc requires the occurrence.bin file;
 
 * input/occurrence.bin
 
-aalsummary does not have a standard input that can be streamed in. Instead, it reads in aalcalc binary data from a file in a fixed location. The location is in the 'work' subdirectory of the present working directory. For example;
+aalcalc does not have a standard input that can be streamed in. Instead, it reads in summarycalc binary data from a file in a fixed location.  The format of the binaries must match summarycalc standard output. The location is in the 'work' subdirectory of the present working directory. For example;
 
-* work/aalcalc1.bin
-* work/aalcalc2.bin
-* work/aalcalc3.bin
+* work/summarycalc1.bin
+* work/summarycalc2.bin
+* work/summarycalc3.bin
 
-The user must ensure the work subdirectory exists. The user may also specify a subdirectory of /work to store these files. e.g.
+The user must ensure the work subdirectory exists.  The user may also specify a subdirectory of /work to store these files. e.g.
 
-* work/summaryset1/aalcalc1.bin
-* work/summaryset1/aalcalc2.bin
-* work/summaryset1/aalcalc3.bin
+* work/summaryset1/summarycalc1.bin
+* work/summaryset1/summarycalc2.bin
+* work/summaryset1/summarycalc3.bin
 
-The aalcalc losses for all events (all processes) must be written to the /work folder before running aalsummary.
+The reason for aalcalc not having an input stream is that the calculation is not valid on a subset of events, i.e. within a single process when the calculation has been distributed across multiple processes.  It must bring together all event losses before assigning event losses to periods and calculating the statistics across periods.  The summarycalc losses for all events (all processes) must be written to the /work folder before running aalcalc.
 
 ##### Calculation
-The aalcalc binaries and the occurrence file are read into memory. The sum of means and sum of squared means are summed by type and summary_id.  Then using the total number of periods from the header of the occurrence data, the overall mean and standard deviation is calculated. The exposure_value is also accumulated by summary_id and type by taking the maximum value.
+The summarycalc binaries and the occurrence file are read into memory. Event losses are assigned to periods and the event losses are summed by summary_id, sample and period. Then using the total number of periods from the header of the occurrence data, the overall mean period loss and standard deviation period loss is calculated. For the type 1 output, the sample set is the numerically integrated period mean losses by summary_id. For the type 2 output, the sample set is taken to be all individual period samples for every summary_id, of size 'number of periods' x 'number of samples'. The exposure_value is also accumulated by summary_id and type by taking the maximum value across all the samples.
 
 [Return to top](#outputcomponents)
 

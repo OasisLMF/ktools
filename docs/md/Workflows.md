@@ -99,6 +99,29 @@ Figure 6 illustrates multiple summary level streams, each of which can go to dif
 ##### Figure 6. Multiple summary level workflows 
 ![alt text](../img/summarycalc.jpg "Ground up and insured loss workflow")
 
+## Financial Module workflows
+
+The fmcalc component can be used recursively in order to apply multiple sets of policy terms and conditions, in order to support reinsurance. Figure 7 shows a simple example workflow of a direct insurance calculation followed by a reinsurance calculation.
+
+```
+eve 1 2 | getmodel | gulcalc -r -S100 -i - | fmcalc -p direct | fmcalc -p ri1 -n > fmcalc_1.bin
+eve 2 2 | getmodel | gulcalc -r -S100 -i - | fmcalc -p direct | fmcalc -p ri1 -n > fmcalc_2.bin
+```
+
+##### Figure 7. Multiple fmcalc workflow 
+![alt text](../img/fmcalc.jpg "Multiple fmcalc workflow")
+
+
+Each call of fmcalc requires the same input files, so it is necessary to specify the location of the files for each call using the command line parameter -p and the relative folder path. Figure 8 demonstrates the required files for three consecutive calls of fmcalc.
+
+##### Figure 8. Multiple fmcalc workflow 
+![alt text](../img/fmcalcrequiredfiles.jpg "Required files for multiple fmcalc calls")
+
+It is possible to generate all of the outputs for each call of fmcalc in the same workflow, enabling multiple financial perspective reports, as shown in Figure 9.
+
+##### Figure 9. Multiple fmcalc outputs workflow 
+![alt text](../img/multiplefmcalc.jpg "Multiple fmcalc outputs workflow")
+
 [Return to top](#workflows)
 
 [Go to Appendix A Random numbers](RandomNumbers.md)

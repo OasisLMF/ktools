@@ -48,11 +48,11 @@ See example script [leccalc_example.py](../../examples/leccalc_example.py)
 ***
 ### 4. Portfolio summary level average annual loss
 
-This time, the samples are run through to aalcalc, and the aalcalc binaries are output to the work folder.  Until this stage the calculation is run over multiple processes. Then, in a single process, aalsummary reads the aalcalc binaries from the work folder and computes the aal output. 
+Similarly to lec curves, the samples are run through to summarycalc, and the summarycalc binaries are output to the work folder.  Until this stage the calculation is run over multiple processes. Then, in a single process, aalcalc reads the summarycalc binaries from the work folder and computes the aal output. 
 ```
-eve 1 2 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -2 - | aalcalc > work/summary2/p1.bin
-eve 2 2 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -2 - | aalcalc > work/summary2/p2.bin
-aalsummary -Ksummary2 > aal.csv
+eve 1 2 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -2 work/summary2/p1.bin
+eve 2 2 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -2 work/summary2/p2.bin
+aalcalc -Ksummary2 > aal.csv
 ```
 
 ##### Figure 4. aalcalc workflow
@@ -115,7 +115,7 @@ eve 2 2 | getmodel | gulcalc -r -S100 -i - | fmcalc -p direct | fmcalc -p ri1 -n
 Each call of fmcalc requires the same input files, so it is necessary to specify the location of the files for each call using the command line parameter -p and the relative folder path. Figure 8 demonstrates the required files for three consecutive calls of fmcalc.
 
 ##### Figure 8. Multiple fmcalc workflow 
-![alt text](../img/fmcalcrequiredfiles.jpg "Required files for multiple fmcalc calls")
+![alt text](../img/fmcalcrequireddata.jpg "Required files for multiple fmcalc calls")
 
 It is possible to generate all of the outputs for each call of fmcalc in the same workflow, enabling multiple financial perspective reports, as shown in Figure 9.
 

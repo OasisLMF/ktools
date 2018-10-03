@@ -5,20 +5,84 @@
 #else
 #include <dirent.h>
 #endif
+#include <math.h>       /* sqrt */
 
 
-float I = 0;
-float K = 0;
-float L = 0;
-// standard deviation implementation using welford method
+void aalcalc::do_sample_calc_endw()
+{
+
+}
+
+double total_samples = 0;
+double I = 0;
+double K = 0;
+double L = 0;
+
+void aalcalc::do_analytical_calc_endw()
+{
+
+	auto iter = map_analytical_sum_loss_w_.begin();
+	while (iter != map_analytical_sum_loss_w_.end()) {
+		auto a_iter = map_analytical_aal_w_.find(iter->first.summary_id);
+		if (a_iter != map_analytical_aal_w_.end()) {
+			aal_rec &a = a_iter->second;
+		}
+		else {
+			aal_rec a;
+			a.summary_id = iter->first.summary_id;
+			a.type = 1;
+			a.max_exposure_value = iter->second.max_exposure_value;
+			map_analytical_aal_[iter->first.summary_id] = a;
+		}
+		iter++;
+	}
+
+	double v = L / (total_samples - 1);
+	v = sqrt(v);
+	fprintf(stderr, "Welford standard deviation: %f\n", v);
+
+}
 void aalcalc::do_analytical_calcw(const summarySampleslevelHeader &sh, double mean_loss)
 {
+	period_map_key k;
+	k.period_no = event_to_period_[sh.event_id];
+	k.summary_id = sh.summary_id;
+
+	if (k.period_no == 0) return;
+	auto iter = map_analytical_sum_loss_w_.find(k);
+
+	if (iter != map_analytical_sum_loss_w_.end()) {
+		loss_rec_w &l = iter->second;
+		if (l.max_exposure_value < sh.expval) l.max_exposure_value = sh.expval;
+		l.w.I = l.w.I + 1;
+		double J = mean_loss;
+		double k1 = l.w.K + (J - l.w.K) / l.w.I;
+		l.w.L = L + (J - k1)*(J - l.w.K);
+		l.max_exposure_value = sh.expval;
+		l.w.K = k1;
+	}
+	else {
+		loss_rec_w l;
+		l.w.I = 0;
+		l.w.K = 0;
+		l.w.L = 0;		
+		l.w.I = l.w.I + 1;
+		double J = mean_loss;
+		double k1 = l.w.K + (J - l.w.K) / l.w.I;
+		l.w.L = L + (J - k1)*(J - l.w.K);
+		l.max_exposure_value = sh.expval;
+		l.w.K = k1;
+		map_analytical_sum_loss_w_[k] = l;
+	}
+	;
 	I = I + 1;
-	float J = mean_loss;
-	float k = K + (J - K) / I;
-	L = L + (J-k)*(J-K);
+	double J = mean_loss;
+	double k1 = K + (J - K) / I;
+	L = L + (J-k1)*(J-K);
+	K = k1;
+	total_samples++;
 	//fprintf(stderr,"I=%f J=%f K=%f L=%f\n", I, J, K, L);
-	fprintf(stderr, "%f\n",J);
+	//fprintf(stderr, "%f\n",J);
 }
 void aalcalc::do_sample_calcw(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec)
 {
@@ -105,8 +169,8 @@ void aalcalc::doitw(const std::string &subfolder)
 
 		}
 		applyweightingstomaps();
-		do_sample_calc_end();
-		do_analytical_calc_end();
+		do_sample_calc_endw();
+		do_analytical_calc_endw();
 		//outputsummarybin();
 		//getnumberofperiods();
 		outputresultscsv();

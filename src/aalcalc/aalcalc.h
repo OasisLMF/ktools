@@ -66,6 +66,27 @@ struct loss_rec {
 	double max_exposure_value;
 };
 
+struct welford_state_info {
+	double total_samples = 0;
+	double I = 0;
+	double K = 0;
+	double L = 0;
+};
+
+struct loss_rec_w {
+	welford_state_info w;
+	double max_exposure_value;
+};
+
+
+struct aal_rec_w {
+	int summary_id;
+	int type;
+	double mean;
+	double mean_squared;
+	double max_exposure_value;
+};
+
 //bool operator<(const period_sidx_map_key& lhs, const period_sidx_map_key& rhs);
 bool operator<(const period_map_key& lhs, const period_map_key& rhs);
 
@@ -76,9 +97,11 @@ private:
 	int no_of_periods_ = 0;
 	int samplesize_ = -1;
 	std::map<int, aal_rec> map_analytical_aal_;
+	std::map<int, aal_rec> map_analytical_aal_w_;
 	std::map<int, aal_rec> map_sample_aal_;
 	std::map<period_sidx_map_key, loss_rec > map_sample_sum_loss_;
 	std::map<period_map_key, loss_rec > map_analytical_sum_loss_;
+	std::map<period_map_key, loss_rec_w > map_analytical_sum_loss_w_;
 	std::map <int, double> periodstoweighting_;
 	bool skipheader_ = false;
 // private functions
@@ -91,9 +114,11 @@ private:
 	void do_analytical_calc(const summarySampleslevelHeader &sh, double mean_loss);
 	void do_analytical_calcw(const summarySampleslevelHeader &sh, double mean_loss);
 	void do_analytical_calc_end();	
+	void do_analytical_calc_endw();
 	void do_sample_calcw(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec);
 	void do_sample_calc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec);
 	void do_sample_calc_end();
+	void do_sample_calc_endw();
 	void doaalcalc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec, OASIS_FLOAT mean_loss);
 	void doaalcalcw(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec, OASIS_FLOAT mean_loss);
 	void applyweightings(int event_id, const std::map <int, double> &periodstoweighting, std::vector<sampleslevelRec> &vrec) ;

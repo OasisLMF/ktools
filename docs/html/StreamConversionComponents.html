@@ -16,7 +16,6 @@
 <li><strong><a href="#gultocsv">gultocsv</a></strong> is a utility to convert binary format GULs to a csv. gulcalc standard output can be streamed directly into gultocsv, or a binary file of the same format can be piped in.</li>
 <li><strong><a href="#fmtocsv">fmtocsv</a></strong> is a utility to convert binary format losses to a csv. fmcalc standard output can be streamed directly into fmtocsv, or a binary file of the same format can be piped in.</li>
 <li><strong><a href="#summarycalctocsv">summarycalctocsv</a></strong> is a utility to convert binary format summarycalc losses to a csv. summarycalc standard output can be streamed directly into summarycalctocsv, or a binary file of the same format can be piped in.</li>
-<li><strong><a href="#aalcalctocsv">aalcalctocsv</a></strong> is a utility to convert binary format aalcalc losses to a csv. aalcalc standard output can be streamed directly into aalcalctocsv, or a binary file of the same format can be piped in.</li>
 </ul>
 <p>Additionally, the following component is provided to convert csv data into binary format;</p>
 <ul>
@@ -37,14 +36,14 @@
 <thead>
 <tr class="header">
 <th align="left">Byte 1</th>
-<th align="left">Bytes 2-4</th>
+<th>Bytes 2-4</th>
 <th align="left">Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">0</td>
-<td align="left">1</td>
+<td>1</td>
 <td align="left">getmodel stdout</td>
 </tr>
 </tbody>
@@ -69,8 +68,8 @@ $ cdftocsv &lt; getmodel.bin &gt; cdf.csv </code></pre>
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -78,43 +77,43 @@ $ cdftocsv &lt; getmodel.bin &gt; cdf.csv </code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">event_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis event_id</td>
 <td align="right">4545</td>
 </tr>
 <tr class="even">
 <td align="left">areaperil_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis areaperil_id</td>
 <td align="right">345456</td>
 </tr>
 <tr class="odd">
 <td align="left">vulnerability_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis vulnerability_id</td>
 <td align="right">345</td>
 </tr>
 <tr class="even">
 <td align="left">bin_index</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Damage bin index</td>
 <td align="right">20</td>
 </tr>
 <tr class="odd">
 <td align="left">prob_to</td>
-<td align="left">float</td>
-<td align="left">4</td>
+<td>float</td>
+<td>4</td>
 <td align="left">The cumulative probability at the upper damage bin threshold</td>
 <td align="right">0.765</td>
 </tr>
 <tr class="even">
 <td align="left">bin_mean</td>
-<td align="left">float</td>
-<td align="left">4</td>
+<td>float</td>
+<td>4</td>
 <td align="left">The conditional mean of the damage bin</td>
 <td align="right">0.45</td>
 </tr>
@@ -130,19 +129,19 @@ $ cdftocsv &lt; getmodel.bin &gt; cdf.csv </code></pre>
 <thead>
 <tr class="header">
 <th align="left">Byte 1</th>
-<th align="left">Bytes 2-4</th>
+<th>Bytes 2-4</th>
 <th align="left">Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">1</td>
-<td align="left">1</td>
+<td>1</td>
 <td align="left">gulcalc item stdout</td>
 </tr>
 <tr class="even">
 <td align="left">1</td>
-<td align="left">2</td>
+<td>2</td>
 <td align="left">gulcalc coverage stdout</td>
 </tr>
 </tbody>
@@ -161,8 +160,8 @@ $ gultocsv &lt; gulcalci.bin &gt; gulcalci.csv </code></pre>
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -170,29 +169,29 @@ $ gultocsv &lt; gulcalci.bin &gt; gulcalci.csv </code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">event_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis event_id</td>
 <td align="right">4545</td>
 </tr>
 <tr class="even">
 <td align="left">item_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis item_id</td>
 <td align="right">300</td>
 </tr>
 <tr class="odd">
 <td align="left">sidx</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Sample index</td>
 <td align="right">10</td>
 </tr>
 <tr class="even">
 <td align="left">loss</td>
-<td align="left">float</td>
-<td align="left">4</td>
+<td>float</td>
+<td>4</td>
 <td align="left">The ground up loss value</td>
 <td align="right">5675.675</td>
 </tr>
@@ -203,8 +202,8 @@ $ gultocsv &lt; gulcalci.bin &gt; gulcalci.csv </code></pre>
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -212,29 +211,29 @@ $ gultocsv &lt; gulcalci.bin &gt; gulcalci.csv </code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">event_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis event_id</td>
 <td align="right">4545</td>
 </tr>
 <tr class="even">
 <td align="left">coverage_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis coverage_id</td>
 <td align="right">150</td>
 </tr>
 <tr class="odd">
 <td align="left">sidx</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Sample index</td>
 <td align="right">10</td>
 </tr>
 <tr class="even">
 <td align="left">loss</td>
-<td align="left">float</td>
-<td align="left">4</td>
+<td>float</td>
+<td>4</td>
 <td align="left">The ground up loss value</td>
 <td align="right">5675.675</td>
 </tr>
@@ -250,14 +249,14 @@ $ gultocsv &lt; gulcalci.bin &gt; gulcalci.csv </code></pre>
 <thead>
 <tr class="header">
 <th align="left">Byte 1</th>
-<th align="left">Bytes 2-4</th>
+<th>Bytes 2-4</th>
 <th align="left">Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">2</td>
-<td align="left">1</td>
+<td>1</td>
 <td align="left">fmcalc stdout</td>
 </tr>
 </tbody>
@@ -275,8 +274,8 @@ $ fmtocsv &lt; fmcalc.bin &gt; fmcalc.csv </code></pre>
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -284,29 +283,29 @@ $ fmtocsv &lt; fmcalc.bin &gt; fmcalc.csv </code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">event_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis event_id</td>
 <td align="right">4545</td>
 </tr>
 <tr class="even">
 <td align="left">output_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis output_id</td>
 <td align="right">5</td>
 </tr>
 <tr class="odd">
 <td align="left">sidx</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Sample index</td>
 <td align="right">10</td>
 </tr>
 <tr class="even">
 <td align="left">loss</td>
-<td align="left">float</td>
-<td align="left">4</td>
+<td>float</td>
+<td>4</td>
 <td align="left">The insured loss value</td>
 <td align="right">5375.675</td>
 </tr>
@@ -322,14 +321,14 @@ $ fmtocsv &lt; fmcalc.bin &gt; fmcalc.csv </code></pre>
 <thead>
 <tr class="header">
 <th align="left">Byte 1</th>
-<th align="left">Bytes 2-4</th>
+<th>Bytes 2-4</th>
 <th align="left">Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">3</td>
-<td align="left">1</td>
+<td>1</td>
 <td align="left">summarycalc stdout</td>
 </tr>
 </tbody>
@@ -347,8 +346,8 @@ $ summarycalctocsv &lt; summarycalc.bin &gt; summarycalc.csv </code></pre>
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -356,117 +355,31 @@ $ summarycalctocsv &lt; summarycalc.bin &gt; summarycalc.csv </code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">event_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis event_id</td>
 <td align="right">4545</td>
 </tr>
 <tr class="even">
 <td align="left">summary_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis summary_id</td>
 <td align="right">3</td>
 </tr>
 <tr class="odd">
 <td align="left">sidx</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Sample index</td>
 <td align="right">10</td>
 </tr>
 <tr class="even">
 <td align="left">loss</td>
-<td align="left">float</td>
-<td align="left">4</td>
+<td>float</td>
+<td>4</td>
 <td align="left">The insured loss value</td>
 <td align="right">5375.675</td>
-</tr>
-</tbody>
-</table>
-<p><a href="#streamconversioncomponents">Return to top</a></p>
-<p><a id="aalcalctocsv"></a></p>
-<h3 id="aalcalctocsv">aalcalctocsv</h3>
-<hr />
-<p>A component which converts the aalcalc output stream, or binary file with the same structure, to a csv file.</p>
-<h5 id="stdin-stream_id-4">Stdin stream_id</h5>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Byte 1</th>
-<th align="left">Bytes 2-4</th>
-<th align="left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">4</td>
-<td align="left">1</td>
-<td align="left">aalcalc stdout</td>
-</tr>
-</tbody>
-</table>
-<p>A binary file of the same format can be piped into aalcalctocsv.</p>
-<h5 id="usage-4">Usage</h5>
-<pre><code>$ [stdin component] | aalcalctocsv &gt; [output].csv
-$ aalcalctocsv &lt; [stdin].bin &gt; [output].csv</code></pre>
-<h5 id="example-4">Example</h5>
-<pre><code>$ eve 1 1 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -1 - | aalcalc | aalcalctocsv &gt; aalcalc.csv
-$ aalcalctocsv &lt; aalcalc.bin &gt; aalcalc.csv </code></pre>
-<h5 id="output-4">Output</h5>
-<p>Csv file with the following fields;</p>
-<table>
-<colgroup>
-<col width="17%" />
-<col width="7%" />
-<col width="7%" />
-<col width="56%" />
-<col width="11%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">summary_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
-<td align="left">summary_id representing a grouping of losses</td>
-<td align="right">10</td>
-</tr>
-<tr class="even">
-<td align="left">type</td>
-<td align="left">int</td>
-<td align="left">4</td>
-<td align="left">1 for analytical mean, 2 for mean calculated from samples</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="left">mean</td>
-<td align="left">float</td>
-<td align="left">8</td>
-<td align="left">sum of period mean losses</td>
-<td align="right">67856.9</td>
-</tr>
-<tr class="even">
-<td align="left">mean_squared</td>
-<td align="left">float</td>
-<td align="left">8</td>
-<td align="left">sum of squared period mean losses</td>
-<td align="right">546577.8</td>
-</tr>
-<tr class="odd">
-<td align="left">max_exposure_value</td>
-<td align="left">float</td>
-<td align="left">8</td>
-<td align="left">maximum exposure value across all periods</td>
-<td align="right">10098730</td>
 </tr>
 </tbody>
 </table>
@@ -480,8 +393,8 @@ $ aalcalctocsv &lt; aalcalc.bin &gt; aalcalc.csv </code></pre>
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -489,29 +402,29 @@ $ aalcalctocsv &lt; aalcalc.bin &gt; aalcalc.csv </code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">event_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis event_id</td>
 <td align="right">4545</td>
 </tr>
 <tr class="even">
 <td align="left">item_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis item_id</td>
 <td align="right">300</td>
 </tr>
 <tr class="odd">
 <td align="left">sidx</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Sample index</td>
 <td align="right">10</td>
 </tr>
 <tr class="even">
 <td align="left">loss</td>
-<td align="left">float</td>
-<td align="left">4</td>
+<td>float</td>
+<td>4</td>
 <td align="left">The ground up loss value</td>
 <td align="right">5675.675</td>
 </tr>
@@ -523,10 +436,10 @@ $ aalcalctocsv &lt; aalcalc.bin &gt; aalcalc.csv </code></pre>
 </ul>
 <h5 id="parameters">Parameters</h5>
 <p>-S, the number of samples must be provided. This can be equal to or greater than maximum sample index value that appears in the csv data.</p>
-<h5 id="usage-5">Usage</h5>
+<h5 id="usage-4">Usage</h5>
 <pre><code>$ gultobin [parameters] &lt; [input].csv | [stdin component]
 $ gultobin [parameters] &lt; [input].csv &gt; [output].bin</code></pre>
-<h5 id="example-5">Example</h5>
+<h5 id="example-4">Example</h5>
 <pre><code>$ gultobin -S100 &lt; gulcalci.csv | fmcalc &gt; fmcalc.bin
 $ gultobin -S100 &lt; gulcalci.csv &gt; gulcalci.bin</code></pre>
 <h5 id="stdout-stream_id">Stdout stream_id</h5>
@@ -534,14 +447,14 @@ $ gultobin -S100 &lt; gulcalci.csv &gt; gulcalci.bin</code></pre>
 <thead>
 <tr class="header">
 <th align="left">Byte 1</th>
-<th align="left">Bytes 2-4</th>
+<th>Bytes 2-4</th>
 <th align="left">Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">1</td>
-<td align="left">1</td>
+<td>1</td>
 <td align="left">gulcalc item stdout</td>
 </tr>
 </tbody>

@@ -40,8 +40,8 @@ $ eltcalc &lt; summarycalc.bin &gt; elt.csv </code></pre>
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -49,43 +49,43 @@ $ eltcalc &lt; summarycalc.bin &gt; elt.csv </code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">summary_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">summary_id representing a grouping of losses</td>
 <td align="right">10</td>
 </tr>
 <tr class="even">
 <td align="left">type</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">1 for analytical mean, 2 for sample mean</td>
 <td align="right">2</td>
 </tr>
 <tr class="odd">
 <td align="left">event_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis event_id</td>
 <td align="right">45567</td>
 </tr>
 <tr class="even">
 <td align="left">mean</td>
-<td align="left">float</td>
-<td align="left">4</td>
+<td>float</td>
+<td>4</td>
 <td align="left">mean</td>
 <td align="right">1345.678</td>
 </tr>
 <tr class="odd">
 <td align="left">standard_deviation</td>
-<td align="left">float</td>
-<td align="left">4</td>
+<td>float</td>
+<td>4</td>
 <td align="left">sample standard deviation, or 0 for type 1</td>
 <td align="right">945.89</td>
 </tr>
 <tr class="even">
 <td align="left">exposure_value</td>
-<td align="left">float</td>
-<td align="left">4</td>
+<td>float</td>
+<td>4</td>
 <td align="left">exposure value for summary_id affected by the event</td>
 <td align="right">70000</td>
 </tr>
@@ -165,8 +165,8 @@ $ leccalc -r -Ksummary1 -F lec_full_uncertainty_agg.csv -f lec_full_uncertainty_
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -174,22 +174,22 @@ $ leccalc -r -Ksummary1 -F lec_full_uncertainty_agg.csv -f lec_full_uncertainty_
 <tbody>
 <tr class="odd">
 <td align="left">summary_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">summary_id representing a grouping of losses</td>
 <td align="right">10</td>
 </tr>
 <tr class="even">
 <td align="left">return_period</td>
-<td align="left">float</td>
-<td align="left">4</td>
+<td>float</td>
+<td>4</td>
 <td align="left">return period interval</td>
 <td align="right">250</td>
 </tr>
 <tr class="odd">
 <td align="left">loss</td>
-<td align="left">float</td>
-<td align="left">4</td>
+<td>float</td>
+<td>4</td>
 <td align="left">loss exceedance threshold for return period</td>
 <td align="right">546577.8</td>
 </tr>
@@ -200,8 +200,8 @@ $ leccalc -r -Ksummary1 -F lec_full_uncertainty_agg.csv -f lec_full_uncertainty_
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -209,29 +209,29 @@ $ leccalc -r -Ksummary1 -F lec_full_uncertainty_agg.csv -f lec_full_uncertainty_
 <tbody>
 <tr class="odd">
 <td align="left">summary_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">summary_id representing a grouping of losses</td>
 <td align="right">10</td>
 </tr>
 <tr class="even">
 <td align="left">sidx</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis sample index</td>
 <td align="right">50</td>
 </tr>
 <tr class="odd">
 <td align="left">return_period</td>
-<td align="left">float</td>
-<td align="left">4</td>
+<td>float</td>
+<td>4</td>
 <td align="left">return period interval</td>
 <td align="right">250</td>
 </tr>
 <tr class="even">
 <td align="left">loss</td>
-<td align="left">float</td>
-<td align="left">4</td>
+<td>float</td>
+<td>4</td>
 <td align="left">loss exceedance threshold for return period</td>
 <td align="right">546577.8</td>
 </tr>
@@ -242,8 +242,8 @@ $ leccalc -r -Ksummary1 -F lec_full_uncertainty_agg.csv -f lec_full_uncertainty_
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -251,29 +251,29 @@ $ leccalc -r -Ksummary1 -F lec_full_uncertainty_agg.csv -f lec_full_uncertainty_
 <tbody>
 <tr class="odd">
 <td align="left">summary_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">summary_id representing a grouping of losses</td>
 <td align="right">10</td>
 </tr>
 <tr class="even">
 <td align="left">type</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">1 for analytical mean, 2 for sample mean</td>
 <td align="right">2</td>
 </tr>
 <tr class="odd">
 <td align="left">return_period</td>
-<td align="left">float</td>
-<td align="left">4</td>
+<td>float</td>
+<td>4</td>
 <td align="left">return period interval</td>
 <td align="right">250</td>
 </tr>
 <tr class="even">
 <td align="left">loss</td>
-<td align="left">float</td>
-<td align="left">4</td>
+<td>float</td>
+<td>4</td>
 <td align="left">loss exceedance threshold for return period</td>
 <td align="right">546577.8</td>
 </tr>
@@ -308,8 +308,8 @@ $ pltcalc &lt; summarycalc.bin &gt; plt.csv </code></pre>
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -317,43 +317,43 @@ $ pltcalc &lt; summarycalc.bin &gt; plt.csv </code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">event_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis event_id</td>
 <td align="right">45567</td>
 </tr>
 <tr class="even">
 <td align="left">period_no</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">identifying an abstract period of time, such as a year</td>
 <td align="right">56876</td>
 </tr>
 <tr class="odd">
 <td align="left">mean</td>
-<td align="left">float</td>
-<td align="left">4</td>
+<td>float</td>
+<td>4</td>
 <td align="left">sample mean</td>
 <td align="right">1345.678</td>
 </tr>
 <tr class="even">
 <td align="left">standard_deviation</td>
-<td align="left">float</td>
-<td align="left">4</td>
+<td>float</td>
+<td>4</td>
 <td align="left">sample standard deviation</td>
 <td align="right">945.89</td>
 </tr>
 <tr class="odd">
 <td align="left">exposure_value</td>
-<td align="left">float</td>
-<td align="left">4</td>
+<td>float</td>
+<td>4</td>
 <td align="left">exposure value for summary_id affected by the event</td>
 <td align="right">70000</td>
 </tr>
 <tr class="even">
 <td align="left">occ_date_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">the date_id of the event occurrence</td>
 <td align="right">28616</td>
 </tr>
@@ -372,8 +372,8 @@ $ pltcalc &lt; summarycalc.bin &gt; plt.csv </code></pre>
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -381,57 +381,57 @@ $ pltcalc &lt; summarycalc.bin &gt; plt.csv </code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">event_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis event_id</td>
 <td align="right">45567</td>
 </tr>
 <tr class="even">
 <td align="left">period_no</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">identifying an abstract period of time, such as a year</td>
 <td align="right">56876</td>
 </tr>
 <tr class="odd">
 <td align="left">mean</td>
-<td align="left">float</td>
-<td align="left">4</td>
+<td>float</td>
+<td>4</td>
 <td align="left">sample mean</td>
 <td align="right">1345.678</td>
 </tr>
 <tr class="even">
 <td align="left">standard_deviation</td>
-<td align="left">float</td>
-<td align="left">4</td>
+<td>float</td>
+<td>4</td>
 <td align="left">sample standard deviation</td>
 <td align="right">945.89</td>
 </tr>
 <tr class="odd">
 <td align="left">exposure_value</td>
-<td align="left">float</td>
-<td align="left">4</td>
+<td>float</td>
+<td>4</td>
 <td align="left">exposure value for summary_id affected by the event</td>
 <td align="right">70000</td>
 </tr>
 <tr class="even">
 <td align="left">occ_year</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">the year number of the event occurrence</td>
 <td align="right">56876</td>
 </tr>
 <tr class="odd">
 <td align="left">occ_month</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">the month of the event occurrence</td>
 <td align="right">5</td>
 </tr>
 <tr class="even">
 <td align="left">occ_day</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">the day of the event occurrence</td>
 <td align="right">16</td>
 </tr>
@@ -440,31 +440,30 @@ $ pltcalc &lt; summarycalc.bin &gt; plt.csv </code></pre>
 <p><a href="#outputcomponents">Return to top</a></p>
 <h3 id="aalcalc">aalcalc <a id="aalcalc"></a></h3>
 <hr />
-<p>aalcalc produces binary files which contain the sum of means, and sum of squared means across all periods for each summary_id. This is the first stage in the calculation of average annual loss and standard deviation of loss, which requires the aggregation of the sum of means and sum of squared means across all periods. Like the leccalc component, the final calculation cannot be performed within a single process containing a subset of the data, in cases where the events have been distributed across multiple processes. Instead, the aalcalc binaries returned from all processes are read back into memory by the aalsummary component which completes the calculation of average annual loss and standard deviation.</p>
-<p>Two types of mean are calculated in aalcalc; analytical mean (type 1) and sample mean (type 2). If the analysis is run with zero samples, then only type 1 means are returned by aalcalc.</p>
+<p>aalcalc produces the report for average annual loss and standard deviation of loss. The time period over which average loss and standard deviation of loss is calculated is defined by the periods file, so it may be different than an annual period but it is common that an annual period is of most interest.</p>
+<p>It reads in all summarycalc binary files, and then computes overall average annual loss, standard deviation of loss and maximum exposure value across all periods, for each summary_id.</p>
+<p>Two types of mean are calculated in aalcalc; analytical mean (type 1) and sample mean (type 2). If the analysis is run with zero samples, then only type 1 statistics are returned by aalcalc.</p>
+<p>Like the leccalc component, the calculation cannot be performed within a single process containing a subset of the data, in cases where the events have been distributed across multiple processes. Instead, the summarycalc binaries returned from all processes are read back into memory and then aalcalc computes overall average annual loss, standard deviation of loss and maximum exposure value across all periods, for each summary_id.</p>
 <h5 id="parameters-3">Parameters</h5>
-<p>None</p>
+<ul>
+<li>-K{sub-directory}. The sub-directory of /work containing the input summarycalc binary files.</li>
+</ul>
 <h5 id="usage-3">Usage</h5>
-<pre><code>$ [stdin component] | aalcalc &gt; aal.bin
-$ aalcalc &lt; [stdin].bin &gt; aal.bin</code></pre>
+<pre><code>$ aalcalc [parameters] &gt; aal.csv</code></pre>
 <h5 id="example-3">Example</h5>
-<pre><code>$ eve 1 1 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - | aalcalc &gt; aal1.bin
-$ aalcalc &lt; summarycalc.bin &gt; aal.bin </code></pre>
+<pre><code>&#39;First generate summarycalc binaries by running the core workflow, for the required summary set
+$ eve 1 2 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 work/summary1/summarycalc1.bin
+$ eve 2 2 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 work/summary1/summarycalc2.bin
+&#39;Then run aalcalc, pointing to the specified sub-directory of work containing the summarycalc binaries.
+$ aalcalc -Ksummary1 &gt; aal.csv </code></pre>
 <h5 id="output-3">Output</h5>
-<p>binary file containing the following fields;</p>
+<p>csv file containing the following fields;</p>
 <table>
-<colgroup>
-<col width="17%" />
-<col width="7%" />
-<col width="7%" />
-<col width="56%" />
-<col width="11%" />
-</colgroup>
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -472,135 +471,61 @@ $ aalcalc &lt; summarycalc.bin &gt; aal.bin </code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">summary_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">summary_id representing a grouping of losses</td>
 <td align="right">10</td>
 </tr>
 <tr class="even">
 <td align="left">type</td>
-<td align="left">int</td>
-<td align="left">4</td>
-<td align="left">1 for analytical mean, 2 for mean calculated from samples</td>
+<td>int</td>
+<td>4</td>
+<td align="left">1 for analytical statistics, 2 for sample statistics</td>
 <td align="right">1</td>
 </tr>
 <tr class="odd">
 <td align="left">mean</td>
-<td align="left">float</td>
-<td align="left">8</td>
-<td align="left">sum of period mean losses</td>
-<td align="right">67856.9</td>
+<td>float</td>
+<td>8</td>
+<td align="left">average annual loss</td>
+<td align="right">6785.9</td>
 </tr>
 <tr class="even">
-<td align="left">squared_mean</td>
-<td align="left">float</td>
-<td align="left">8</td>
-<td align="left">sum of squared period mean losses</td>
-<td align="right">546577.8</td>
+<td align="left">standard_deviation</td>
+<td>float</td>
+<td>8</td>
+<td align="left">standard deviation of loss</td>
+<td align="right">54657.8</td>
 </tr>
 <tr class="odd">
-<td align="left">max_exposure_value</td>
-<td align="left">float</td>
-<td align="left">8</td>
+<td align="left">exposure_value</td>
+<td>float</td>
+<td>8</td>
 <td align="left">maximum exposure value across all periods</td>
 <td align="right">10098730</td>
 </tr>
 </tbody>
 </table>
 <h5 id="internal-data-2">Internal data</h5>
-<p>The program requires the occurrence file;</p>
+<p>aalcalc requires the occurrence.bin file;</p>
 <ul>
 <li>input/occurrence.bin</li>
 </ul>
-<h5 id="calculation-3">Calculation</h5>
-<p>The occurrence file is read into memory. From the summarycalc stream data, the event sample means and sample means squared are computed for each summary_id. The sample means and squared sampled means are summed by period and summary_id, according to which events are assigned to periods in the occurrence data. Then the means and squared means are summed across the periods, for each summary_id. The exposure_value, which is held at an event_id, summary_id in the summarycalc header is also accumulated by summary_id and period, and then across periods. In this case however, it is the maximum exposure value which is carried through the accumulations, not the sum.</p>
-<p><a href="#outputcomponents">Return to top</a></p>
-<h3 id="aalsummary">aalsummary <a id="aalsummary"></a></h3>
-<hr />
-<p>aalsummary is the final stage calculation for average annual loss and standard deviation of loss. It reads in all aalcalc binary files which contain the sum of means, and sum of squared means across different sets of periods for each summary_id, and then computes overall average annual loss, standard deviation of loss and maximum exposure value across all periods.</p>
-<p>Two types of aal and standard deviation of loss are calculated in aalsummary; analytical (type 1) and sample (type 2). If the analysis is run with zero samples, then only type 1 statistics are returned by aalsummary.</p>
-<h5 id="parameters-4">Parameters</h5>
+<p>aalcalc does not have a standard input that can be streamed in. Instead, it reads in summarycalc binary data from a file in a fixed location. The format of the binaries must match summarycalc standard output. The location is in the 'work' subdirectory of the present working directory. For example;</p>
 <ul>
-<li>-K{sub-directory}. The sub-directory of /work containing the input aalcalc binary files.</li>
-</ul>
-<h5 id="usage-4">Usage</h5>
-<pre><code>$ aalsummary [parameters] &gt; aal.csv</code></pre>
-<h5 id="example-4">Example</h5>
-<pre><code>&#39;First generate aalcalc binaries by running the core workflow, for the required summary set
-$ eve 1 2 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - | aalcalc &gt; work/summary1/aal/aalcalc1.bin
-$ eve 2 2 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - | aalcalc &gt; work/summary1/aal/aalcalc2.bin
-&#39;Then run aalsummary, pointing to the specified sub-directory of work containing the aalcalc binaries.
-$ aalsummary -Ksummary1/aal &gt; aal.csv </code></pre>
-<h5 id="output-4">Output</h5>
-<p>csv file containing the following fields;</p>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">summary_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
-<td align="left">summary_id representing a grouping of losses</td>
-<td align="right">10</td>
-</tr>
-<tr class="even">
-<td align="left">type</td>
-<td align="left">int</td>
-<td align="left">4</td>
-<td align="left">1 for analytical statistics, 2 for sample statistics</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="left">mean</td>
-<td align="left">float</td>
-<td align="left">8</td>
-<td align="left">average annual loss</td>
-<td align="right">6785.9</td>
-</tr>
-<tr class="even">
-<td align="left">standard_deviation</td>
-<td align="left">float</td>
-<td align="left">8</td>
-<td align="left">standard deviation of loss</td>
-<td align="right">54657.8</td>
-</tr>
-<tr class="odd">
-<td align="left">exposure_value</td>
-<td align="left">float</td>
-<td align="left">8</td>
-<td align="left">maximum exposure value across all periods</td>
-<td align="right">10098730</td>
-</tr>
-</tbody>
-</table>
-<h5 id="internal-data-3">Internal data</h5>
-<p>The program requires the occurrence file;</p>
-<ul>
-<li>input/occurrence.bin</li>
-</ul>
-<p>aalsummary does not have a standard input that can be streamed in. Instead, it reads in aalcalc binary data from a file in a fixed location. The location is in the 'work' subdirectory of the present working directory. For example;</p>
-<ul>
-<li>work/aalcalc1.bin</li>
-<li>work/aalcalc2.bin</li>
-<li>work/aalcalc3.bin</li>
+<li>work/summarycalc1.bin</li>
+<li>work/summarycalc2.bin</li>
+<li>work/summarycalc3.bin</li>
 </ul>
 <p>The user must ensure the work subdirectory exists. The user may also specify a subdirectory of /work to store these files. e.g.</p>
 <ul>
-<li>work/summaryset1/aalcalc1.bin</li>
-<li>work/summaryset1/aalcalc2.bin</li>
-<li>work/summaryset1/aalcalc3.bin</li>
+<li>work/summaryset1/summarycalc1.bin</li>
+<li>work/summaryset1/summarycalc2.bin</li>
+<li>work/summaryset1/summarycalc3.bin</li>
 </ul>
-<p>The aalcalc losses for all events (all processes) must be written to the /work folder before running aalsummary.</p>
-<h5 id="calculation-4">Calculation</h5>
-<p>The aalcalc binaries and the occurrence file are read into memory. The sum of means and sum of squared means are summed by type and summary_id. Then using the total number of periods from the header of the occurrence data, the overall mean and standard deviation is calculated. The exposure_value is also accumulated by summary_id and type by taking the maximum value.</p>
+<p>The reason for aalcalc not having an input stream is that the calculation is not valid on a subset of events, i.e. within a single process when the calculation has been distributed across multiple processes. It must bring together all event losses before assigning event losses to periods and calculating the statistics across periods. The summarycalc losses for all events (all processes) must be written to the /work folder before running aalcalc.</p>
+<h5 id="calculation-3">Calculation</h5>
+<p>The summarycalc binaries and the occurrence file are read into memory. Event losses are assigned to periods and the event losses are summed by summary_id, sample and period. Then using the total number of periods from the header of the occurrence data, the overall mean period loss and standard deviation period loss is calculated. For the type 1 output, the sample set is the numerically integrated period mean losses by summary_id. For the type 2 output, the sample set is taken to be all individual period samples for every summary_id, of size 'number of periods' x 'number of samples'. The exposure_value is also accumulated by summary_id and type by taking the maximum value across all the samples.</p>
 <p><a href="#outputcomponents">Return to top</a></p>
 <p><a href="DataConversionComponents.html">Go to 4.3 Data conversion components section</a></p>
 <p><a href="Contents.html">Back to Contents</a></p>

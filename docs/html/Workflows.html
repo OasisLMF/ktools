@@ -39,10 +39,10 @@ leccalc -Ksummary2 -F lec_full_uncertainty_agg.csv -f lec_full_uncertainty_occ.c
 <p>See example script <a href="../../examples/leccalc_example.py">leccalc_example.py</a><br />
 ***</p>
 <h3 id="portfolio-summary-level-average-annual-loss">4. Portfolio summary level average annual loss</h3>
-<p>This time, the samples are run through to aalcalc, and the aalcalc binaries are output to the work folder. Until this stage the calculation is run over multiple processes. Then, in a single process, aalsummary reads the aalcalc binaries from the work folder and computes the aal output.</p>
-<pre><code>eve 1 2 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -2 - | aalcalc &gt; work/summary2/p1.bin
-eve 2 2 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -2 - | aalcalc &gt; work/summary2/p2.bin
-aalsummary -Ksummary2 &gt; aal.csv</code></pre>
+<p>Similarly to lec curves, the samples are run through to summarycalc, and the summarycalc binaries are output to the work folder. Until this stage the calculation is run over multiple processes. Then, in a single process, aalcalc reads the summarycalc binaries from the work folder and computes the aal output.</p>
+<pre><code>eve 1 2 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -2 work/summary2/p1.bin
+eve 2 2 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -2 work/summary2/p2.bin
+aalcalc -Ksummary2 &gt; aal.csv</code></pre>
 <h5 id="figure-4.-aalcalc-workflow">Figure 4. aalcalc workflow</h5>
 <p><img src="../img/aalcalc.jpg" title="aalcalc workflow" alt="alt text" /></p>
 <p>See example script <a href="../../examples/aalcalc_example.py">aalcalc_example.py</a><br />
@@ -73,6 +73,18 @@ eltcalc &lt; s2/p2.bin &gt; elt_s2_p2.csv</code></pre>
 <p>Figure 6 illustrates multiple summary level streams, each of which can go to different output calculations.</p>
 <h5 id="figure-6.-multiple-summary-level-workflows">Figure 6. Multiple summary level workflows</h5>
 <p><img src="../img/summarycalc.jpg" title="Ground up and insured loss workflow" alt="alt text" /></p>
+<h2 id="financial-module-workflows">Financial Module workflows</h2>
+<p>The fmcalc component can be used recursively in order to apply multiple sets of policy terms and conditions, in order to support reinsurance. Figure 7 shows a simple example workflow of a direct insurance calculation followed by a reinsurance calculation.</p>
+<pre><code>eve 1 2 | getmodel | gulcalc -r -S100 -i - | fmcalc -p direct | fmcalc -p ri1 -n &gt; fmcalc_1.bin
+eve 2 2 | getmodel | gulcalc -r -S100 -i - | fmcalc -p direct | fmcalc -p ri1 -n &gt; fmcalc_2.bin</code></pre>
+<h5 id="figure-7.-multiple-fmcalc-workflow">Figure 7. Multiple fmcalc workflow</h5>
+<p><img src="../img/fmcalc.jpg" title="Multiple fmcalc workflow" alt="alt text" /></p>
+<p>Each call of fmcalc requires the same input files, so it is necessary to specify the location of the files for each call using the command line parameter -p and the relative folder path. Figure 8 demonstrates the required files for three consecutive calls of fmcalc.</p>
+<h5 id="figure-8.-multiple-fmcalc-workflow">Figure 8. Multiple fmcalc workflow</h5>
+<p><img src="../img/fmcalcrequireddata.jpg" title="Required files for multiple fmcalc calls" alt="alt text" /></p>
+<p>It is possible to generate all of the outputs for each call of fmcalc in the same workflow, enabling multiple financial perspective reports, as shown in Figure 9.</p>
+<h5 id="figure-9.-multiple-fmcalc-outputs-workflow">Figure 9. Multiple fmcalc outputs workflow</h5>
+<p><img src="../img/multiplefmcalc.jpg" title="Multiple fmcalc outputs workflow" alt="alt text" /></p>
 <p><a href="#workflows">Return to top</a></p>
 <p><a href="RandomNumbers.html">Go to Appendix A Random numbers</a></p>
 <p><a href="Contents.html">Back to Contents</a></p>

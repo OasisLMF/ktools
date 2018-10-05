@@ -488,7 +488,7 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 			vector <LossRec> &agg_vec = agg_vecs[level][layer_];
 			auto iter = agg_vec.begin();
 			while (iter != agg_vec.end()) {
-				iter->item_prop.resize((iter->item_idx)->size(), 0);
+				if (iter->item_idx) iter->item_prop.resize((iter->item_idx)->size(), 0);
 				iter++;
 			}
 		}
@@ -498,8 +498,10 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 			auto iter = agg_vec.begin();
 			while (iter != agg_vec.end()) {
 				OASIS_FLOAT total = 0;
-				for (int idx : *(iter->item_idx)) {	// because this is the first level there should only be one item_idx
-					total += guls[idx];
+				if (iter->item_idx) {
+					for (int idx : *(iter->item_idx)) {	// because this is the first level there should only be one item_idx
+						total += guls[idx];
+					}
 				}
 				iter->gul_total = total;
 				loss_total += iter->loss;
@@ -515,8 +517,10 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 				}
 				if (level == 1) {
 					OASIS_FLOAT total = 0;
-					for (int idx : *(iter->item_idx)) {
-						total += guls[idx];
+					if (iter->item_idx) {
+						for (int idx : *(iter->item_idx)) {
+							total += guls[idx];
+						}
 					}
 					int i = 0;
 					if (total > 0) {
@@ -529,15 +533,19 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 				}
 				else {
 					OASIS_FLOAT prop_total = 0;
-					for (int idx : *(iter->item_idx)) {
-						prop_total += items_prop[idx];
+					if (iter->item_idx) {
+						for (int idx : *(iter->item_idx)) {
+							prop_total += items_prop[idx];
+						}
 					}
 					int i = 0;
 					if (prop_total > 0) {
-						for (int idx : *(iter->item_idx)) {
-							iter->item_prop[i] = items_prop[idx] / prop_total;
-							items_prop[idx] = (items_prop[idx] / prop_total) * iter->proportion;
-							i++;
+						if (iter->item_idx) {
+							for (int idx : *(iter->item_idx)) {
+								iter->item_prop[i] = items_prop[idx] / prop_total;
+								items_prop[idx] = (items_prop[idx] / prop_total) * iter->proportion;
+								i++;
+							}
 						}
 					}
 				}

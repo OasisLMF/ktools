@@ -79,8 +79,8 @@
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -88,36 +88,36 @@
 <tbody>
 <tr class="odd">
 <td align="left">bin_index</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Identifier of the damage bin</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
 <td align="left">bin_from</td>
-<td align="left">float</td>
-<td align="left">4</td>
+<td>float</td>
+<td>4</td>
 <td align="left">Lower damage threshold for the bin</td>
 <td align="right">0.01</td>
 </tr>
 <tr class="odd">
 <td align="left">bin_to</td>
-<td align="left">float</td>
-<td align="left">4</td>
+<td>float</td>
+<td>4</td>
 <td align="left">Upper damage threshold for the bin</td>
 <td align="right">0.02</td>
 </tr>
 <tr class="even">
 <td align="left">interpolation</td>
-<td align="left">float</td>
-<td align="left">4</td>
+<td>float</td>
+<td>4</td>
 <td align="left">Interpolation damage value for the bin (usually the mid-point)</td>
 <td align="right">0.015</td>
 </tr>
 <tr class="odd">
 <td align="left">interval_type</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Identifier of the interval type, e.g. closed, open</td>
 <td align="right">1201</td>
 </tr>
@@ -150,8 +150,8 @@
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -159,29 +159,29 @@
 <tbody>
 <tr class="odd">
 <td align="left">event_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis event_id</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
 <td align="left">areaperil_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis areaperil_id</td>
 <td align="right">4545</td>
 </tr>
 <tr class="odd">
 <td align="left">intensity_bin_index</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Identifier of the intensity damage bin</td>
 <td align="right">10</td>
 </tr>
 <tr class="even">
 <td align="left">prob</td>
-<td align="left">float</td>
-<td align="left">4</td>
+<td>float</td>
+<td>4</td>
 <td align="left">The probability mass for the intensity bin between 0 and 1</td>
 <td align="right">0.765</td>
 </tr>
@@ -213,8 +213,8 @@
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -222,8 +222,8 @@
 <tbody>
 <tr class="odd">
 <td align="left">rand</td>
-<td align="left">float</td>
-<td align="left">4</td>
+<td>float</td>
+<td>4</td>
 <td align="left">Number between 0 and 1</td>
 <td align="right">0.75875</td>
 </tr>
@@ -256,8 +256,8 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -265,29 +265,29 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">vulnerability_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis vulnerability_id</td>
 <td align="right">45</td>
 </tr>
 <tr class="even">
 <td align="left">intensity_bin_index</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Identifier of the hazard intensity bin</td>
 <td align="right">10</td>
 </tr>
 <tr class="odd">
 <td align="left">damage_bin_index</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Identifier of the damage bin</td>
 <td align="right">20</td>
 </tr>
 <tr class="even">
 <td align="left">prob</td>
-<td align="left">float</td>
-<td align="left">4</td>
+<td>float</td>
+<td>4</td>
 <td align="left">The probability mass for the damage bin</td>
 <td align="right">0.186</td>
 </tr>
@@ -314,8 +314,8 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -323,15 +323,15 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">coverage_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Identifier of the coverage</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
 <td align="left">tiv</td>
-<td align="left">float</td>
-<td align="left">4</td>
+<td>float</td>
+<td>4</td>
 <td align="left">The total insured value of the coverage</td>
 <td align="right">200000</td>
 </tr>
@@ -356,8 +356,8 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -365,8 +365,8 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">event_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis event_id</td>
 <td align="right">4545</td>
 </tr>
@@ -390,8 +390,8 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -399,36 +399,36 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">item_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Identifier of the exposure item</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
 <td align="left">coverage_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Identifier of the coverage</td>
 <td align="right">3</td>
 </tr>
 <tr class="odd">
 <td align="left">areaperil_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Identifier of the locator and peril</td>
 <td align="right">4545</td>
 </tr>
 <tr class="even">
 <td align="left">vulnerability_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Identifier of the vulnerability distribution</td>
 <td align="right">645</td>
 </tr>
 <tr class="odd">
 <td align="left">group_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Identifier of the correlaton group</td>
 <td align="right">3</td>
 </tr>
@@ -453,8 +453,8 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -462,22 +462,22 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">coverage_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Identifier of the coverage</td>
 <td align="right">3</td>
 </tr>
 <tr class="even">
 <td align="left">summary_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Identifier of the summary level grouping</td>
 <td align="right">3</td>
 </tr>
 <tr class="odd">
 <td align="left">summaryset_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Identifier of the summary set</td>
 <td align="right">1</td>
 </tr>
@@ -494,39 +494,39 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <thead>
 <tr class="header">
 <th align="left">coverage_id</th>
-<th align="left">summary_id</th>
+<th>summary_id</th>
 <th align="right">summaryset_id</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">1</td>
-<td align="left">1</td>
+<td>1</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
 <td align="left">2</td>
-<td align="left">1</td>
+<td>1</td>
 <td align="right">1</td>
 </tr>
 <tr class="odd">
 <td align="left">3</td>
-<td align="left">1</td>
+<td>1</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
 <td align="left">4</td>
-<td align="left">2</td>
+<td>2</td>
 <td align="right">1</td>
 </tr>
 <tr class="odd">
 <td align="left">5</td>
-<td align="left">2</td>
+<td>2</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
 <td align="left">6</td>
-<td align="left">2</td>
+<td>2</td>
 <td align="right">1</td>
 </tr>
 </tbody>
@@ -536,19 +536,19 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <thead>
 <tr class="header">
 <th align="left">summary_id</th>
-<th align="left">summaryset_id</th>
+<th>summaryset_id</th>
 <th align="right">summary_desc</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">1</td>
-<td align="left">1</td>
+<td>1</td>
 <td align="right">site_435</td>
 </tr>
 <tr class="even">
 <td align="left">2</td>
-<td align="left">1</td>
+<td>1</td>
 <td align="right">site_958</td>
 </tr>
 </tbody>
@@ -559,69 +559,69 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <thead>
 <tr class="header">
 <th align="left">coverage_id</th>
-<th align="left">summary_id</th>
+<th>summary_id</th>
 <th align="right">summaryset_id</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">1</td>
-<td align="left">1</td>
+<td>1</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
 <td align="left">2</td>
-<td align="left">1</td>
+<td>1</td>
 <td align="right">1</td>
 </tr>
 <tr class="odd">
 <td align="left">3</td>
-<td align="left">1</td>
+<td>1</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
 <td align="left">4</td>
-<td align="left">2</td>
+<td>2</td>
 <td align="right">1</td>
 </tr>
 <tr class="odd">
 <td align="left">5</td>
-<td align="left">2</td>
+<td>2</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
 <td align="left">6</td>
-<td align="left">2</td>
+<td>2</td>
 <td align="right">1</td>
 </tr>
 <tr class="odd">
 <td align="left">1</td>
-<td align="left">1</td>
+<td>1</td>
 <td align="right">2</td>
 </tr>
 <tr class="even">
 <td align="left">2</td>
-<td align="left">1</td>
+<td>1</td>
 <td align="right">2</td>
 </tr>
 <tr class="odd">
 <td align="left">3</td>
-<td align="left">1</td>
+<td>1</td>
 <td align="right">2</td>
 </tr>
 <tr class="even">
 <td align="left">4</td>
-<td align="left">1</td>
+<td>1</td>
 <td align="right">2</td>
 </tr>
 <tr class="odd">
 <td align="left">5</td>
-<td align="left">1</td>
+<td>1</td>
 <td align="right">2</td>
 </tr>
 <tr class="even">
 <td align="left">6</td>
-<td align="left">1</td>
+<td>1</td>
 <td align="right">2</td>
 </tr>
 </tbody>
@@ -645,8 +645,8 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -654,22 +654,22 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">from_agg_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis Financial Module from_agg_id</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
 <td align="left">level_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis Financial Module level_id</td>
 <td align="right">1</td>
 </tr>
 <tr class="odd">
 <td align="left">to_agg_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis Financial Module to_agg_id</td>
 <td align="right">1</td>
 </tr>
@@ -701,8 +701,8 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -710,96 +710,80 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">policytc_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
-<td align="left">Oasis Financial Module policytc_id</td>
+<td>int</td>
+<td>4</td>
+<td align="left">Primary key</td>
 <td align="right">34</td>
 </tr>
 <tr class="even">
 <td align="left">calcrule_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
-<td align="left">Oasis Financial Module calcrule_id</td>
-<td align="right">1</td>
+<td>int</td>
+<td>4</td>
+<td align="left">The calculation rule that applies to the terms</td>
+<td align="right">12</td>
 </tr>
 <tr class="odd">
-<td align="left">allocrule_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
-<td align="left">Oasis Financial Module allocrule_id</td>
-<td align="right">0</td>
+<td align="left">deductible1</td>
+<td>int</td>
+<td>4</td>
+<td align="left">First deductible</td>
+<td align="right">0.03</td>
 </tr>
 <tr class="even">
-<td align="left">ccy_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
-<td align="left">Oasis Financial Module ccy_id</td>
-<td align="right">0</td>
+<td align="left">deductible2</td>
+<td>float</td>
+<td>4</td>
+<td align="left">Second deductible</td>
+<td align="right">50000</td>
 </tr>
 <tr class="odd">
-<td align="left">deductible</td>
-<td align="left">float</td>
-<td align="left">4</td>
-<td align="left">Deductible</td>
-<td align="right">50</td>
-</tr>
-<tr class="even">
-<td align="left">limit</td>
-<td align="left">float</td>
-<td align="left">4</td>
-<td align="left">Limit</td>
+<td align="left">deductible3</td>
+<td>float</td>
+<td>4</td>
+<td align="left">Third deductible</td>
 <td align="right">100000</td>
 </tr>
-<tr class="odd">
-<td align="left">share_prop_of_lim</td>
-<td align="left">float</td>
-<td align="left">4</td>
-<td align="left">Share/participation as a proportion of limit</td>
-<td align="right">0</td>
-</tr>
 <tr class="even">
-<td align="left">deductible_prop_of_loss</td>
-<td align="left">float</td>
-<td align="left">4</td>
-<td align="left">Deductible as a proportion of loss</td>
-<td align="right">0</td>
+<td align="left">attachment1</td>
+<td>float</td>
+<td>4</td>
+<td align="left">Attachment point, or excess</td>
+<td align="right">1000000</td>
 </tr>
 <tr class="odd">
-<td align="left">limit_prop_of_loss</td>
-<td align="left">float</td>
-<td align="left">4</td>
-<td align="left">Limit as a proportion of loss</td>
-<td align="right">0</td>
+<td align="left">limit1</td>
+<td>float</td>
+<td>4</td>
+<td align="left">Limit</td>
+<td align="right">5000000</td>
 </tr>
 <tr class="even">
-<td align="left">deductible_prop_of_tiv</td>
-<td align="left">float</td>
-<td align="left">4</td>
-<td align="left">Deductible as a proportion of TIV</td>
-<td align="right">0</td>
+<td align="left">share1</td>
+<td>float</td>
+<td>4</td>
+<td align="left">First proportional share</td>
+<td align="right">0.8</td>
 </tr>
 <tr class="odd">
-<td align="left">limit_prop_of_tiv</td>
-<td align="left">float</td>
-<td align="left">4</td>
-<td align="left">Limit as a proportion of TIV</td>
-<td align="right">0</td>
+<td align="left">share2</td>
+<td>float</td>
+<td>4</td>
+<td align="left">Second proportional share</td>
+<td align="right">0.25</td>
 </tr>
 <tr class="even">
-<td align="left">deductible_prop_of_limit</td>
-<td align="left">float</td>
-<td align="left">4</td>
-<td align="left">Deductible as a proportion of limit</td>
-<td align="right">0</td>
+<td align="left">share3</td>
+<td>float</td>
+<td>4</td>
+<td align="left">Third proportional share</td>
+<td align="right">1</td>
 </tr>
 </tbody>
 </table>
 <ul>
-<li>All distinct policytc_id values that appear in the policytc table must appear once in the policytc_id field of the profile table. We suggest that policytc_id=1 is included by default using calcrule_id = 12 and DED = 0 as a default 'null' calculation rule whenever no terms and conditions apply to a particular level_id / agg_id in the policytc table.</li>
-<li>All data fields that are required by the relevant profile must be provided, with the correct calcrule_id (see FM Profiles)</li>
+<li>A reference table listing the valid values for calcrule_id and which of the fields are required is available in FM Profiles</li>
+<li>All distinct policytc_id values that appear in the policytc table must appear once in the policytc_id field of the profile table. We suggest that policytc_id=1 is included by default using calcrule_id = 12 and deductible1 = 0 as a default 'null' calculation rule whenever no terms and conditions apply to a particular level_id / agg_id in the policytc table.</li>
 <li>Any fields that are not required for the profile should be set to zero.</li>
-<li>allocrule_id may be set to 0 or 1 for each policytc_id. Generally, it is recommended to use 0 everywhere except for the final level calculations when back-allocated losses are required, else 0 everywhere.</li>
-<li>The ccy_id field is currently not used.</li>
 </ul>
 <h5 id="fmprofiletobin">fmprofiletobin</h5>
 <pre><code>$ fmprofiletobin &lt; fm_profile.csv &gt; fm_profile.bin</code></pre>
@@ -820,8 +804,8 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -829,29 +813,29 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">layer_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis Financial Module layer_id</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
 <td align="left">level_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis Financial Module level_id</td>
 <td align="right">1</td>
 </tr>
 <tr class="odd">
 <td align="left">agg_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis Financial Module agg_id</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
 <td align="left">policytc_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis Financial Module policytc_id</td>
 <td align="right">1</td>
 </tr>
@@ -889,8 +873,8 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -898,22 +882,22 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">output_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Identifier of the coverage</td>
 <td align="right">3</td>
 </tr>
 <tr class="even">
 <td align="left">summary_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Identifier of the summary level group for one or more output losses</td>
 <td align="right">1</td>
 </tr>
 <tr class="odd">
 <td align="left">summaryset_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Identifier of the summary set (0 to 9 inclusive)</td>
 <td align="right">1</td>
 </tr>
@@ -930,19 +914,19 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <thead>
 <tr class="header">
 <th align="left">output_id</th>
-<th align="left">summary_id</th>
+<th>summary_id</th>
 <th align="right">summaryset_id</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">1</td>
-<td align="left">1</td>
+<td>1</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
 <td align="left">2</td>
-<td align="left">2</td>
+<td>2</td>
 <td align="right">1</td>
 </tr>
 </tbody>
@@ -954,29 +938,29 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <thead>
 <tr class="header">
 <th align="left">output_id</th>
-<th align="left">summary_id</th>
+<th>summary_id</th>
 <th align="right">summaryset_id</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">1</td>
-<td align="left">1</td>
+<td>1</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
 <td align="left">2</td>
-<td align="left">2</td>
+<td>2</td>
 <td align="right">1</td>
 </tr>
 <tr class="odd">
 <td align="left">1</td>
-<td align="left">1</td>
+<td>1</td>
 <td align="right">2</td>
 </tr>
 <tr class="even">
 <td align="left">2</td>
-<td align="left">1</td>
+<td>1</td>
 <td align="right">2</td>
 </tr>
 </tbody>
@@ -1001,8 +985,8 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -1010,22 +994,22 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">output_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Identifier of the output group of losses</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
 <td align="left">agg_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Identifier of the agg_id to output</td>
 <td align="right">1</td>
 </tr>
 <tr class="odd">
 <td align="left">layer_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Identifier of the layer_id to output</td>
 <td align="right">1</td>
 </tr>
@@ -1043,19 +1027,19 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <thead>
 <tr class="header">
 <th align="left">output_id</th>
-<th align="left">agg_id</th>
+<th>agg_id</th>
 <th align="right">layer_id</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">1</td>
-<td align="left">1</td>
+<td>1</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
 <td align="left">2</td>
-<td align="left">1</td>
+<td>1</td>
 <td align="right">2</td>
 </tr>
 </tbody>
@@ -1065,49 +1049,49 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <thead>
 <tr class="header">
 <th align="left">output_id</th>
-<th align="left">agg_id</th>
+<th>agg_id</th>
 <th align="right">layer_id</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">1</td>
-<td align="left">1</td>
+<td>1</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
 <td align="left">2</td>
-<td align="left">2</td>
+<td>2</td>
 <td align="right">1</td>
 </tr>
 <tr class="odd">
 <td align="left">3</td>
-<td align="left">3</td>
+<td>3</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
 <td align="left">4</td>
-<td align="left">4</td>
+<td>4</td>
 <td align="right">1</td>
 </tr>
 <tr class="odd">
 <td align="left">5</td>
-<td align="left">1</td>
+<td>1</td>
 <td align="right">2</td>
 </tr>
 <tr class="even">
 <td align="left">6</td>
-<td align="left">2</td>
+<td>2</td>
 <td align="right">2</td>
 </tr>
 <tr class="odd">
 <td align="left">7</td>
-<td align="left">3</td>
+<td>3</td>
 <td align="right">2</td>
 </tr>
 <tr class="even">
 <td align="left">8</td>
-<td align="left">4</td>
+<td>4</td>
 <td align="right">2</td>
 </tr>
 </tbody>
@@ -1134,8 +1118,8 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -1143,36 +1127,36 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">event_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">The occurrence event_id</td>
 <td align="right">45567</td>
 </tr>
 <tr class="even">
 <td align="left">period_no</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">A numbered period in which the event occurs</td>
 <td align="right">56876</td>
 </tr>
 <tr class="odd">
 <td align="left">occ_year</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">the year number of the event occurrence</td>
 <td align="right">56876</td>
 </tr>
 <tr class="even">
 <td align="left">occ_month</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">the month of the event occurrence</td>
 <td align="right">5</td>
 </tr>
 <tr class="odd">
 <td align="left">occ_day</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">the day of the event occurrence</td>
 <td align="right">16</td>
 </tr>
@@ -1191,8 +1175,8 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -1200,22 +1184,22 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <tbody>
 <tr class="odd">
 <td align="left">event_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">The occurrence event_id</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
 <td align="left">period_no</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">A numbered period in which the event occurs</td>
 <td align="right">4545</td>
 </tr>
 <tr class="odd">
 <td align="left">occ_date_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">An integer representing an offset number of days to a base date</td>
 <td align="right">28626</td>
 </tr>
@@ -1247,8 +1231,8 @@ $ occurrencetobin -P10000 -D &lt; occurrence.csv &gt; occurrence.bin</code></pre
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -1256,8 +1240,8 @@ $ occurrencetobin -P10000 -D &lt; occurrence.csv &gt; occurrence.bin</code></pre
 <tbody>
 <tr class="odd">
 <td align="left">return_period</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Return period</td>
 <td align="right">250</td>
 </tr>
@@ -1282,8 +1266,8 @@ $ occurrencetobin -P10000 -D &lt; occurrence.csv &gt; occurrence.bin</code></pre
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -1291,15 +1275,15 @@ $ occurrencetobin -P10000 -D &lt; occurrence.csv &gt; occurrence.bin</code></pre
 <tbody>
 <tr class="odd">
 <td align="left">period_no</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">A numbered period in which the event occurs</td>
 <td align="right">4545</td>
 </tr>
 <tr class="even">
 <td align="left">weigth</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">relative weight to other periods</td>
 <td align="right">3</td>
 </tr>

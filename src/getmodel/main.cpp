@@ -42,12 +42,10 @@ Author: Mark Pinkerton  email: mark.pinkerton@oasislmf.org
 #include "getmodel.h"
 #include "../include/oasis.h"
 
-#if defined(_WIN32) || defined(_WIN64)
+#if defined(_MSC_VER)
 #include "../wingetopt/wingetopt.h"
-#endif
-#ifdef __unix
+#else
 #include <unistd.h>
-// #include <getopt.h>
 #endif
 
 void help()

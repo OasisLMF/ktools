@@ -38,21 +38,21 @@ $ eve 1 2 | getmodel | gulcalc -r -S100 -i - &gt; gulcalc1_2.bin</code></pre>
 <p><a id="getmodel"></a></p>
 <h3 id="getmodel">getmodel</h3>
 <hr />
-<p>getmodel generates a stream of effective damageability distributions (cdfs) from an input list of events. Specifically, it combines the probability distributions from the model files, eventfootprint.bin and vulnerability.bin, to generate effective damageability cdfs for the subset of exposures contained in the items.bin file and converts them into a binary stream.</p>
+<p>getmodel generates a stream of effective damageability distributions (cdfs) from an input list of events. Specifically, it combines the probability distributions from the model files, footprint.bin and vulnerability.bin, to generate effective damageability cdfs for the subset of exposures contained in the items.bin file and converts them into a binary stream.</p>
 <p>This is reference example of the class of programs which generates the damage distributions for an event set and streams them into memory. It is envisaged that model developers who wish to use the toolkit as a back-end calculator of their existing platforms can write their own version of getmodel, reading in their own source data and converting it into the standard output stream. As long as the standard input and output structures are adhered to, each program can be written in any language and read any input data.</p>
 <h5 id="stream_id-1">Stream_id</h5>
 <table>
 <thead>
 <tr class="header">
 <th align="left">Byte 1</th>
-<th align="left">Bytes 2-4</th>
+<th>Bytes 2-4</th>
 <th align="left">Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">0</td>
-<td align="left">1</td>
+<td>1</td>
 <td align="left">getmodel reference example</td>
 </tr>
 </tbody>
@@ -89,14 +89,14 @@ $ getmodel &lt; events.bin &gt; getmodel.bin </code></pre>
 <thead>
 <tr class="header">
 <th align="left">Byte 1</th>
-<th align="left">Bytes 2-4</th>
+<th>Bytes 2-4</th>
 <th align="left">Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">1</td>
-<td align="left">1</td>
+<td>1</td>
 <td align="left">gulcalc reference example</td>
 </tr>
 </tbody>
@@ -151,28 +151,28 @@ $ gulcalc -r -S100 -c gulcalcc.bin &lt; getmodel.bin </code></pre>
 <thead>
 <tr class="header">
 <th align="left">bin_from</th>
-<th align="left">bin_to</th>
-<th align="left">bin_mean</th>
+<th>bin_to</th>
+<th>bin_mean</th>
 <th align="left">Method used</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">0.1</td>
-<td align="left">0.2</td>
-<td align="left">0.15</td>
+<td>0.2</td>
+<td>0.15</td>
 <td align="left">Linear interpolation</td>
 </tr>
 <tr class="even">
 <td align="left">0.1</td>
-<td align="left">0.1</td>
-<td align="left">0.1</td>
+<td>0.1</td>
+<td>0.1</td>
 <td align="left">Sample bin value</td>
 </tr>
 <tr class="odd">
 <td align="left">0.1</td>
-<td align="left">0.2</td>
-<td align="left">0.14</td>
+<td>0.2</td>
+<td>0.14</td>
 <td align="left">Quadratic interpolation</td>
 </tr>
 </tbody>
@@ -192,36 +192,42 @@ $ gulcalc -r -S100 -c gulcalcc.bin &lt; getmodel.bin </code></pre>
 <p><a id="fmcalc"></a></p>
 <h3 id="fmcalc">fmcalc</h3>
 <hr />
-<p>fmcalc is the reference implementation of the Oasis Financial Module. It applies policy terms and conditions to the ground up losses and produces insured loss sample output. It reads in losses from gulcalc at item level only (stream_id = 1).</p>
+<p>fmcalc is the reference implementation of the Oasis Financial Module. It applies policy terms and conditions to the ground up losses and produces loss sample output. It reads in losses from gulcalc at item level (stream_id = 1) or it can run recursively on losses output from fmcalc and apply several sets of policy terms and conditions.</p>
 <h5 id="stream_id-3">Stream_id</h5>
 <table>
 <thead>
 <tr class="header">
 <th align="left">Byte 1</th>
-<th align="left">Bytes 2-4</th>
+<th>Bytes 2-4</th>
 <th align="left">Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">2</td>
-<td align="left">1</td>
+<td>1</td>
 <td align="left">fmcalc reference example</td>
 </tr>
 </tbody>
 </table>
 <h5 id="parameters-3">Parameters</h5>
-<p>There are no parameters as all of the information is taken from the gulcalc stdout stream and fm input data.</p>
+<p>Optional parameters are;</p>
+<ul>
+<li>-p {string} The location of the input files. The default location is the 'input' directory in the present working directory</li>
+<li>-a{integer} The back allocation rule to apply. The options are 0 (no allocation), 1 (ground up loss basis) or 2 (prior level loss basis). The default is 0.</li>
+<li>-n Output net losses. Net losses are the difference between the input loss and the calculated loss. The default is to output the calculated loss.</li>
+</ul>
 <h5 id="usage-3">Usage</h5>
-<pre><code>$ [stdin component] | fmcalc | [stout component]
-$ [stdin component] | fmcalc &gt; [stdout].bin
-$ fmcalc &lt; [stdin].bin &gt; [stdout].bin</code></pre>
+<pre><code>$ [stdin component] | fmcalc [parameters] | [stout component]
+$ [stdin component] | fmcalc [parameters] &gt; [stdout].bin
+$ fmcalc [parameters] &lt; [stdin].bin &gt; [stdout].bin</code></pre>
 <h5 id="example-3">Example</h5>
-<pre><code>$ eve 1 1 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -2 - | eltcalc &gt; elt.csv
-$ eve 1 1 | getmodel | gulcalc -r -S100 -i - | fmcalc &gt; fmcalc.bin
-$ fmcalc &lt; gulcalc.bin &gt; fmcalc.bin </code></pre>
+<pre><code>$ eve 1 1 | getmodel | gulcalc -r -S100 -i - | fmcalc -p direct -a2 | summarycalc -f -2 - | eltcalc &gt; elt.csv
+$ eve 1 1 | getmodel | gulcalc -r -S100 -i - | fmcalc -p direct -a1 &gt; fmcalc.bin
+$ fmcalc -p ri1 -a2 -n &lt; gulcalc.bin &gt; fmcalc.bin
+$ fmcalc -p direct | fmcalc -p ri1 -n | fmcalc -p ri2 -n &lt; gulcalc.bin &gt; fm_ri2_net.bin </code></pre>
 <h5 id="internal-data-3">Internal data</h5>
-<p>The program requires the item, coverage and fm input data files, which are Oasis abstract data objects that describe an insurance programme. This data is picked up from the following files relative to the working directory;</p>
+<p>For the gulcalc stream input, the program requires the item, coverage and fm input data files, which are Oasis abstract data objects that describe an insurance or reinsurance programme. This data is picked up from the following files relative to the working directory by default;</p>
 <ul>
 <li>input/items.bin</li>
 <li>input/coverages.bin</li>
@@ -230,6 +236,14 @@ $ fmcalc &lt; gulcalc.bin &gt; fmcalc.bin </code></pre>
 <li>input/fm_profile.bin</li>
 <li>input/fm_xref.bin</li>
 </ul>
+<p>For fmcalc stream input, the program requires only the four fm input data files,</p>
+<ul>
+<li>input/fm_programme.bin</li>
+<li>input/fm_policytc.bin</li>
+<li>input/fm_profile.bin</li>
+<li>input/fm_xref.bin</li>
+</ul>
+<p>The location of the files can be changed by using the -p parameter followed by the path location relative to the present working directory. eg -p ri1</p>
 <h5 id="calculation-2">Calculation</h5>
 <p>See <a href="FinancialModule.html">Financial Module</a></p>
 <p><a href="#corecomponents">Return to top</a></p>
@@ -237,20 +251,20 @@ $ fmcalc &lt; gulcalc.bin &gt; fmcalc.bin </code></pre>
 <h3 id="summarycalc">summarycalc</h3>
 <hr />
 <p>The purpose of summarycalc is firstly to aggregate the samples of loss to a level of interest for reporting, thereby reducing the volume of data in the stream. This is a generic first step which precedes all of the downstream output calculations. Secondly, it unifies the formats of the gulcalc and fmcalc streams, so that they are transformed into an identical stream type for downstream outputs. Finally, it can generate up to 10 summary level outputs in one go, creating multiple output streams or files.</p>
-<p>The output is similar to the gulcalc or fmcalc input which are losses are by sample index and by event, but the ground up or insured loss input losses are grouped to an abstract level represented by a summary_id. The relationship between the input identifier and the summary_id are defined in cross reference files called <strong>gulsummaryxref</strong> and <strong>fmsummaryxref</strong>.</p>
+<p>The output is similar to the gulcalc or fmcalc input which are losses are by sample index and by event, but the ground up or (re)insurance loss input losses are grouped to an abstract level represented by a summary_id. The relationship between the input identifier and the summary_id are defined in cross reference files called <strong>gulsummaryxref</strong> and <strong>fmsummaryxref</strong>.</p>
 <h5 id="stream_id-4">Stream_id</h5>
 <table>
 <thead>
 <tr class="header">
 <th align="left">Byte 1</th>
-<th align="left">Bytes 2-4</th>
+<th>Bytes 2-4</th>
 <th align="left">Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">3</td>
-<td align="left">1</td>
+<td>1</td>
 <td align="left">summarycalc reference example</td>
 </tr>
 </tbody>

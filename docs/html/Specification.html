@@ -65,34 +65,34 @@ These components are;</p>
 <thead>
 <tr class="header">
 <th align="left">Byte 1</th>
-<th align="left">Bytes 2-4</th>
+<th>Bytes 2-4</th>
 <th align="left">Description</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">0</td>
-<td align="left">1</td>
+<td>1</td>
 <td align="left">getmodel - Reference example for Oasis format effective damageability CDF output</td>
 </tr>
 <tr class="even">
 <td align="left">1</td>
-<td align="left">1</td>
+<td>1</td>
 <td align="left">gulcalc - Reference example for Oasis format item level ground up loss sample output</td>
 </tr>
 <tr class="odd">
 <td align="left">1</td>
-<td align="left">2</td>
+<td>2</td>
 <td align="left">gulcalc - Reference example for Oasis format coverage level ground up loss sample output</td>
 </tr>
 <tr class="even">
 <td align="left">2</td>
-<td align="left">1</td>
+<td>1</td>
 <td align="left">fmcalc - Reference example for Oasis format insured loss sample output</td>
 </tr>
 <tr class="odd">
 <td align="left">3</td>
-<td align="left">1</td>
+<td>1</td>
 <td align="left">summarycalc - Reference example for Oasis format summary level loss sample output</td>
 </tr>
 </tbody>
@@ -114,8 +114,8 @@ eve is used to partition lists of events such that a workflow can be distributed
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -123,8 +123,8 @@ eve is used to partition lists of events such that a workflow can be distributed
 <tbody>
 <tr class="odd">
 <td align="left">event_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis event_id</td>
 <td align="right">4545</td>
 </tr>
@@ -143,8 +143,8 @@ eve is used to partition lists of events such that a workflow can be distributed
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -152,8 +152,8 @@ eve is used to partition lists of events such that a workflow can be distributed
 <tbody>
 <tr class="odd">
 <td align="left">stream_id</td>
-<td align="left">int</td>
-<td align="left">1/3</td>
+<td>int</td>
+<td>1/3</td>
 <td align="left">Identifier of the data stream type.</td>
 <td align="right">0/1</td>
 </tr>
@@ -164,8 +164,8 @@ eve is used to partition lists of events such that a workflow can be distributed
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -173,29 +173,29 @@ eve is used to partition lists of events such that a workflow can be distributed
 <tbody>
 <tr class="odd">
 <td align="left">event_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis event_id</td>
 <td align="right">4545</td>
 </tr>
 <tr class="even">
 <td align="left">areaperil_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis areaperil_id</td>
 <td align="right">345456</td>
 </tr>
 <tr class="odd">
 <td align="left">vulnerability_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis vulnerability_id</td>
 <td align="right">345</td>
 </tr>
 <tr class="even">
 <td align="left">no_of_bins</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Number of records (bins) in the data package</td>
 <td align="right">20</td>
 </tr>
@@ -213,8 +213,8 @@ eve is used to partition lists of events such that a workflow can be distributed
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -222,15 +222,15 @@ eve is used to partition lists of events such that a workflow can be distributed
 <tbody>
 <tr class="odd">
 <td align="left">prob_to</td>
-<td align="left">float</td>
-<td align="left">4</td>
+<td>float</td>
+<td>4</td>
 <td align="left">The cumulative probability at the upper damage bin threshold</td>
 <td align="right">0.765</td>
 </tr>
 <tr class="even">
 <td align="left">bin_mean</td>
-<td align="left">float</td>
-<td align="left">4</td>
+<td>float</td>
+<td>4</td>
 <td align="left">The conditional mean of the damage bin</td>
 <td align="right">0.45</td>
 </tr>
@@ -249,8 +249,8 @@ eve is used to partition lists of events such that a workflow can be distributed
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -258,15 +258,15 @@ eve is used to partition lists of events such that a workflow can be distributed
 <tbody>
 <tr class="odd">
 <td align="left">stream_id</td>
-<td align="left">int</td>
-<td align="left">1/3</td>
+<td>int</td>
+<td>1/3</td>
 <td align="left">Identifier of the data stream type.</td>
 <td align="right">1/1</td>
 </tr>
 <tr class="even">
 <td align="left">no_of_samples</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Number of samples</td>
 <td align="right">100</td>
 </tr>
@@ -277,8 +277,8 @@ eve is used to partition lists of events such that a workflow can be distributed
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -286,15 +286,15 @@ eve is used to partition lists of events such that a workflow can be distributed
 <tbody>
 <tr class="odd">
 <td align="left">event_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis event_id</td>
 <td align="right">4545</td>
 </tr>
 <tr class="even">
 <td align="left">item_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis item_id</td>
 <td align="right">300</td>
 </tr>
@@ -305,8 +305,8 @@ eve is used to partition lists of events such that a workflow can be distributed
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -314,15 +314,15 @@ eve is used to partition lists of events such that a workflow can be distributed
 <tbody>
 <tr class="odd">
 <td align="left">sidx</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Sample index</td>
 <td align="right">10</td>
 </tr>
 <tr class="even">
 <td align="left">loss</td>
-<td align="left">float</td>
-<td align="left">4</td>
+<td>float</td>
+<td>4</td>
 <td align="left">The ground up loss for the sample</td>
 <td align="right">5675.675</td>
 </tr>
@@ -355,8 +355,8 @@ eve is used to partition lists of events such that a workflow can be distributed
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -364,15 +364,15 @@ eve is used to partition lists of events such that a workflow can be distributed
 <tbody>
 <tr class="odd">
 <td align="left">stream_id</td>
-<td align="left">int</td>
-<td align="left">1/3</td>
+<td>int</td>
+<td>1/3</td>
 <td align="left">Identifier of the data stream type.</td>
 <td align="right">1/2</td>
 </tr>
 <tr class="even">
 <td align="left">no_of_samples</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Number of samples</td>
 <td align="right">100</td>
 </tr>
@@ -383,8 +383,8 @@ eve is used to partition lists of events such that a workflow can be distributed
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -392,15 +392,15 @@ eve is used to partition lists of events such that a workflow can be distributed
 <tbody>
 <tr class="odd">
 <td align="left">event_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis event_id</td>
 <td align="right">4545</td>
 </tr>
 <tr class="even">
 <td align="left">coverage_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis coverage_id</td>
 <td align="right">150</td>
 </tr>
@@ -411,8 +411,8 @@ eve is used to partition lists of events such that a workflow can be distributed
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -420,21 +420,21 @@ eve is used to partition lists of events such that a workflow can be distributed
 <tbody>
 <tr class="odd">
 <td align="left">sidx</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Sample index</td>
 <td align="right">10</td>
 </tr>
 <tr class="even">
 <td align="left">loss</td>
-<td align="left">float</td>
-<td align="left">4</td>
+<td>float</td>
+<td>4</td>
 <td align="left">The ground up loss for the sample</td>
 <td align="right">5675.675</td>
 </tr>
 </tbody>
 </table>
-<p>Only the numerical integration mean is output for stream_id 2.</p>
+<p>The numerical integration standard deviation is not output for stream_id 2 but the numerical integration mean is output.</p>
 <table>
 <thead>
 <tr class="header">
@@ -451,17 +451,17 @@ eve is used to partition lists of events such that a workflow can be distributed
 </table>
 <p><a href="#specification">Return to top</a></p>
 <h2 id="fmcalc">fmcalc <a id="fmcalc"></a></h2>
-<p>fmcalc is the component which takes the gulcalc output stream as standard input and applies the policy terms and conditions to produce insured loss samples. The output is a table of insured loss samples in Oasis kernel format, including the insured loss for the mean ground up loss (sidx=-1) and the maximum exposed value (sidx=-3).</p>
+<p>fmcalc is the component which takes the gulcalc output stream as standard input and applies the policy terms and conditions to produce insured loss samples. fmcalc can also take the fmcalc output stream as input to perform recursive financial module calculations. The output is a table of loss samples in Oasis kernel format, including the loss for the mean ground up loss (sidx=-1) and the maximum exposed value (sidx=-3).</p>
 <h5 id="input-2">Input</h5>
-<p>Same as gulcalc output or a binary file of the same data structure can be piped into fmcalc.</p>
+<p>Same as gulcalc output or fmcalc output (below) or a binary file of either data structure can be piped into fmcalc.</p>
 <h5 id="output-3">Output</h5>
 <p>Stream header packet structure</p>
 <table>
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -469,15 +469,15 @@ eve is used to partition lists of events such that a workflow can be distributed
 <tbody>
 <tr class="odd">
 <td align="left">stream_id</td>
-<td align="left">int</td>
-<td align="left">1/3</td>
+<td>int</td>
+<td>1/3</td>
 <td align="left">Identifier of the data stream type.</td>
 <td align="right">2/1</td>
 </tr>
 <tr class="even">
 <td align="left">no_of_samples</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Number of samples</td>
 <td align="right">100</td>
 </tr>
@@ -488,8 +488,8 @@ eve is used to partition lists of events such that a workflow can be distributed
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -497,15 +497,15 @@ eve is used to partition lists of events such that a workflow can be distributed
 <tbody>
 <tr class="odd">
 <td align="left">event_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis event_id</td>
 <td align="right">4545</td>
 </tr>
 <tr class="even">
 <td align="left">output_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis output_id</td>
 <td align="right">300</td>
 </tr>
@@ -516,8 +516,8 @@ eve is used to partition lists of events such that a workflow can be distributed
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -525,15 +525,15 @@ eve is used to partition lists of events such that a workflow can be distributed
 <tbody>
 <tr class="odd">
 <td align="left">sidx</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Sample index</td>
 <td align="right">10</td>
 </tr>
 <tr class="even">
 <td align="left">loss</td>
-<td align="left">float</td>
-<td align="left">4</td>
+<td>float</td>
+<td>4</td>
 <td align="left">The insured loss for the sample</td>
 <td align="right">5625.675</td>
 </tr>
@@ -561,6 +561,7 @@ eve is used to partition lists of events such that a workflow can be distributed
 </table>
 <p>In the case of sidx = -1, this is the numerically integrated mean ground up loss passed through the financial terms from gulcalc.</p>
 <p>The maximum exposed value, sidx=-3, is generated by fmcalc and this is the TIV of the items passed through the financial terms. This represents a 100% loss scenario to all exposed items after applying the insurance terms and conditions and is used in outputs that require an exposed value.</p>
+<p>If the stream input is an fmcalc output data structure, then sample -3 losses are present in the data and this is carried forward through the calculations as the 100% loss scenario, rather than the TIV of the original items.</p>
 <p><a href="#specification">Return to top</a></p>
 <h2 id="summarycalc">summarycalc <a id="summarycalc"></a></h2>
 <p>summarycalc is a component which sums the sampled losses from either gulcalc or fmcalc to the users required level(s) for reporting results. This is a simple sum of the loss value by event_id, sidx and summary_id, where summary_id is a grouping of coverage_id for gulcalc or output_id for fmcalc defined in the user's input files.</p>
@@ -572,8 +573,8 @@ eve is used to partition lists of events such that a workflow can be distributed
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -581,15 +582,15 @@ eve is used to partition lists of events such that a workflow can be distributed
 <tbody>
 <tr class="odd">
 <td align="left">stream_id</td>
-<td align="left">int</td>
-<td align="left">1/3</td>
+<td>int</td>
+<td>1/3</td>
 <td align="left">Identifier of the data stream type.</td>
 <td align="right">3/1</td>
 </tr>
 <tr class="even">
 <td align="left">no_of_samples</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Number of samples</td>
 <td align="right">100</td>
 </tr>
@@ -607,8 +608,8 @@ eve is used to partition lists of events such that a workflow can be distributed
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -616,22 +617,22 @@ eve is used to partition lists of events such that a workflow can be distributed
 <tbody>
 <tr class="odd">
 <td align="left">event_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis event_id</td>
 <td align="right">4545</td>
 </tr>
 <tr class="even">
 <td align="left">summary_id</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Oasis summary_id</td>
 <td align="right">300</td>
 </tr>
 <tr class="odd">
 <td align="left">exposure_value</td>
-<td align="left">float</td>
-<td align="left">4</td>
+<td>float</td>
+<td>4</td>
 <td align="left">The TIV (from gulcalc) or maximum exposure value (fmcalc)</td>
 <td align="right">600000</td>
 </tr>
@@ -642,8 +643,8 @@ eve is used to partition lists of events such that a workflow can be distributed
 <thead>
 <tr class="header">
 <th align="left">Name</th>
-<th align="left">Type</th>
-<th align="left">Bytes</th>
+<th>Type</th>
+<th>Bytes</th>
 <th align="left">Description</th>
 <th align="right">Example</th>
 </tr>
@@ -651,15 +652,15 @@ eve is used to partition lists of events such that a workflow can be distributed
 <tbody>
 <tr class="odd">
 <td align="left">sidx</td>
-<td align="left">int</td>
-<td align="left">4</td>
+<td>int</td>
+<td>4</td>
 <td align="left">Sample index</td>
 <td align="right">10</td>
 </tr>
 <tr class="even">
 <td align="left">loss</td>
-<td align="left">float</td>
-<td align="left">4</td>
+<td>float</td>
+<td>4</td>
 <td align="left">The insured loss for the sample</td>
 <td align="right">5625.675</td>
 </tr>
@@ -671,7 +672,7 @@ eve is used to partition lists of events such that a workflow can be distributed
 <ul>
 <li>eltcalc</li>
 <li>leccalc</li>
-<li>aalcalc/aalsummary</li>
+<li>aalcalc</li>
 <li>pltcalc.</li>
 </ul>
 <p>outputcalc performs results analysis such as an event loss table or loss exceedance curve on the sampled output from summarycalc. The output is a results table in csv format.</p>

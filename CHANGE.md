@@ -2,7 +2,7 @@ Ktools Changelog
 ================
 
 ## [v3.0.1](https://github.com/OasisLMF/ktools/releases/tag/v3.0.1)
-
+* Compatability fix for working on MAC OS
 ## [v3.0.0](https://github.com/OasisLMF/ktools/releases/tag/v3.0.0)
 
 * New features:

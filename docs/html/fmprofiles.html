@@ -6,6 +6,43 @@
   <meta name="generator" content="pandoc" />
   <title></title>
   <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
 </head>
 <body>
 <p><img src="../img/banner.jpg" title="banner" alt="alt text" /></p>
@@ -15,69 +52,364 @@
 <thead>
 <tr class="header">
 <th align="left">Profile description</th>
-<th align="left">profile_id</th>
-<th align="right">calcrule_id</th>
+<th>calcrule_id</th>
+<th>d1</th>
+<th>d2</th>
+<th>d3</th>
+<th>a1</th>
+<th>l1</th>
+<th>s1</th>
+<th>s2</th>
+<th align="right">s3</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">Deductible and limit</td>
-<td align="left">1</td>
-<td align="right">1</td>
+<td align="left">deductible and limit</td>
+<td>1</td>
+<td>x</td>
+<td></td>
+<td></td>
+<td></td>
+<td>x</td>
+<td></td>
+<td></td>
+<td align="right"></td>
 </tr>
 <tr class="even">
-<td align="left">Franchise deductible and limit</td>
-<td align="left">2</td>
-<td align="right">3</td>
+<td align="left">deductible with attachment, limit and share</td>
+<td>2</td>
+<td>x</td>
+<td></td>
+<td></td>
+<td>x</td>
+<td>x</td>
+<td>x</td>
+<td></td>
+<td align="right"></td>
 </tr>
 <tr class="odd">
-<td align="left">Deductible only</td>
-<td align="left">3</td>
-<td align="right">12</td>
+<td align="left">franchise deductible and limit</td>
+<td>3</td>
+<td>x</td>
+<td></td>
+<td></td>
+<td></td>
+<td>x</td>
+<td></td>
+<td></td>
+<td align="right"></td>
 </tr>
 <tr class="even">
-<td align="left">Maximum Deductible</td>
-<td align="left">4</td>
-<td align="right">10</td>
+<td align="left">deductible % TIV and limit</td>
+<td>4</td>
+<td>x</td>
+<td></td>
+<td></td>
+<td></td>
+<td>x</td>
+<td></td>
+<td></td>
+<td align="right"></td>
 </tr>
 <tr class="odd">
-<td align="left">Minimum Deductible</td>
-<td align="left">5</td>
-<td align="right">11</td>
+<td align="left">deductible and limit % loss</td>
+<td>5</td>
+<td>x</td>
+<td></td>
+<td></td>
+<td></td>
+<td>x</td>
+<td></td>
+<td></td>
+<td align="right"></td>
 </tr>
 <tr class="even">
-<td align="left">Deductible, limit and share</td>
-<td align="left">6</td>
-<td align="right">2</td>
+<td align="left">deductible % TIV</td>
+<td>6</td>
+<td>x</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td align="right"></td>
 </tr>
 <tr class="odd">
-<td align="left">Deductible and limit as a proportion of loss</td>
-<td align="left">10</td>
-<td align="right">5</td>
+<td align="left">limit and maximum deductible</td>
+<td>7</td>
+<td></td>
+<td></td>
+<td>x</td>
+<td></td>
+<td>x</td>
+<td></td>
+<td></td>
+<td align="right"></td>
 </tr>
 <tr class="even">
-<td align="left">Limit with deductible as a proportion of limit</td>
-<td align="left">11</td>
-<td align="right">9</td>
+<td align="left">limit and minimum deductible</td>
+<td>8</td>
+<td></td>
+<td>x</td>
+<td></td>
+<td></td>
+<td>x</td>
+<td></td>
+<td></td>
+<td align="right"></td>
 </tr>
 <tr class="odd">
-<td align="left">Limit only</td>
-<td align="left">12</td>
-<td align="right">14</td>
+<td align="left">limit with deductible % limit</td>
+<td>9</td>
+<td>x</td>
+<td></td>
+<td></td>
+<td></td>
+<td>x</td>
+<td></td>
+<td></td>
+<td align="right"></td>
 </tr>
 <tr class="even">
-<td align="left">Limit as a proportion of loss</td>
-<td align="left">13</td>
-<td align="right">15</td>
+<td align="left">maximum deductible</td>
+<td>10</td>
+<td></td>
+<td></td>
+<td>x</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td align="right"></td>
 </tr>
 <tr class="odd">
-<td align="left">Deductible as a proportion of loss</td>
-<td align="left">14</td>
-<td align="right">16</td>
+<td align="left">minimum deductible</td>
+<td>11</td>
+<td></td>
+<td>x</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">deductible</td>
+<td>12</td>
+<td>x</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">minimum and maximum deductible</td>
+<td>13</td>
+<td></td>
+<td>x</td>
+<td>x</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">limit only</td>
+<td>14</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>x</td>
+<td></td>
+<td></td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">limit % loss</td>
+<td>15</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>x</td>
+<td></td>
+<td></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">deductible % loss</td>
+<td>16</td>
+<td>x</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">deductible % loss with attachment, limit and share</td>
+<td>17</td>
+<td>x</td>
+<td></td>
+<td></td>
+<td>x</td>
+<td>x</td>
+<td>x</td>
+<td></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">deductible % tiv with attachment, limit and share</td>
+<td>18</td>
+<td>x</td>
+<td></td>
+<td></td>
+<td>x</td>
+<td>x</td>
+<td>x</td>
+<td></td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">% loss deductible with min and max deductible</td>
+<td>19</td>
+<td>x</td>
+<td>x</td>
+<td>x</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">reverse franchise deductible</td>
+<td>20</td>
+<td>x</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td align="right"></td>
+</tr>
+<tr class="odd">
+<td align="left">% tiv deductible with min and max deductible</td>
+<td>21</td>
+<td>x</td>
+<td>x</td>
+<td>x</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td align="right"></td>
+</tr>
+<tr class="even">
+<td align="left">reinsurance % ceded, limit and % placed</td>
+<td>22</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>x</td>
+<td>x</td>
+<td>x</td>
+<td align="right">x</td>
+</tr>
+<tr class="odd">
+<td align="left">reinsurance limit and % placed</td>
+<td>23</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>x</td>
+<td></td>
+<td>x</td>
+<td align="right">x</td>
+</tr>
+<tr class="even">
+<td align="left">reinsurance excess terms</td>
+<td>24</td>
+<td></td>
+<td></td>
+<td></td>
+<td>x</td>
+<td>x</td>
+<td>x</td>
+<td>x</td>
+<td align="right">x</td>
+</tr>
+<tr class="odd">
+<td align="left">reinsurance proportional terms</td>
+<td>25</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>x</td>
+<td>x</td>
+<td align="right">x</td>
 </tr>
 </tbody>
 </table>
-<p>An allocation rule can be assigned to any profile at any stage in the calculation, which determines whether calculated losses should be back-allocated to the contributing items, and if so how. This is specified via an allocrule_id in the fm_profile data.</p>
+<p>The fields with an x are those which are required by the profile. The full names of the fields are as follows;</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Short name</th>
+<th align="right">Profile field name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">d1</td>
+<td align="right">deductible_1</td>
+</tr>
+<tr class="even">
+<td align="left">d2</td>
+<td align="right">deductible_2</td>
+</tr>
+<tr class="odd">
+<td align="left">d3</td>
+<td align="right">deductible_3</td>
+</tr>
+<tr class="even">
+<td align="left">a1</td>
+<td align="right">attachment_1</td>
+</tr>
+<tr class="odd">
+<td align="left">l1</td>
+<td align="right">limit_1</td>
+</tr>
+<tr class="even">
+<td align="left">s1</td>
+<td align="right">share_1</td>
+</tr>
+<tr class="odd">
+<td align="left">s2</td>
+<td align="right">share_2</td>
+</tr>
+<tr class="even">
+<td align="left">s3</td>
+<td align="right">share_3</td>
+</tr>
+</tbody>
+</table>
+<p>An allocation rule can be assigned to each call of fmcalc, which determines whether calculated losses should be back-allocated to the contributing items, and if so how. This is specified via the command line parameter -a.</p>
 <p>The choices are as follows;</p>
 <table>
 <thead>
@@ -88,25 +420,31 @@
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">Don't back-allocate losses</td>
+<td align="left">Don't back-allocate losses (default if no parameter supplied)</td>
 <td align="right">0</td>
 </tr>
 <tr class="even">
-<td align="left">Back allocate losses to items in proportion to ground up loss</td>
+<td align="left">Back allocate losses to items in proportion to input loss</td>
 <td align="right">1</td>
 </tr>
 <tr class="odd">
-<td align="left">Back-allocate losses to items in proportion to previous level loss</td>
+<td align="left">Back-allocate losses to items in proportion to prior level loss</td>
 <td align="right">2</td>
 </tr>
 </tbody>
 </table>
+<h2 id="effective-deductibles">Effective deductibles</h2>
+<p>Often there are more than one hierarchal levels with deductibles, and there is a choice of methods of accumulation of deductibles through the hierarchy. Whenever a rule with a deductible is used in the loss calculation then it is accumulated through the calculation in an <strong>effective_deductible</strong> variable. The effective deductible is the smaller of the deductible amount and the loss.</p>
+<p>All deductibles amounts calculated from the deductible_1 field are simply additive through the hierarchy.</p>
+<p>Ay any level, the user can specify a calcrule using a minimum and/or maximum deductible which changes the way that effective deductibles are accumulated.</p>
+<p>For a minimum deductible specified in calcrules using the deductible_2 field, the calculation increases the effective_deductible carried forward from the previous levels up to the minimum deductible if it is smaller.</p>
+<p>For a maximum deductible specified in calcrules using the deductible_3 field, the calculation decreases the effective_deductible carried forward from the previous levels down to the maximum deductible if it is larger.</p>
+<h2 id="calcrules">Calcrules</h2>
 <p>In the following notation;</p>
 <ul>
 <li>x.loss is the input loss to the calculation</li>
-<li>x.retained_loss is the input retained loss to the calculation (where required)</li>
+<li>x.effective_deductible is the input effective deductible to the calculation (where required)</li>
 <li>loss is the calculated loss</li>
-<li>ded, lim, and share are alias variables for the profile fields as required</li>
 </ul>
 <h3 id="deductible-and-limit">1. Deductible and limit</h3>
 <table>
@@ -122,38 +460,24 @@
 <td align="right">1</td>
 </tr>
 <tr class="even">
-<td align="left">ccy_id</td>
+<td align="left">calcrule_id</td>
 <td align="right">1</td>
 </tr>
 <tr class="odd">
-<td align="left">deductible</td>
+<td align="left">deductible_1</td>
 <td align="right">50000</td>
 </tr>
 <tr class="even">
-<td align="left">limit</td>
+<td align="left">limit_1</td>
 <td align="right">900000</td>
 </tr>
 </tbody>
 </table>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Rules</th>
-<th align="right">Value</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">calcrule_id</td>
-<td align="right">1</td>
-</tr>
-</tbody>
-</table>
 <h5 id="calculation-logic">Calculation logic</h5>
-<pre class="sh"><code>loss = x.loss - ded;
-if (loss &lt; 0) loss = 0;
-if (loss &gt; lim) loss = lim;</code></pre>
-<h3 id="franchise-deductible-and-limit">2. Franchise deductible and limit</h3>
+<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash"><span class="ex">loss</span> = x.loss - deductible_1<span class="kw">;</span>
+<span class="kw">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&lt;</span> 0<span class="kw">)</span> <span class="ex">loss</span> = 0<span class="kw">;</span>
+<span class="kw">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&gt;</span> limit_1<span class="kw">)</span> <span class="ex">loss</span> = limit_1<span class="kw">;</span></code></pre></div>
+<h3 id="deductible-attachment-limit-and-share">2. Deductible, attachment, limit and share</h3>
 <table>
 <thead>
 <tr class="header">
@@ -167,220 +491,160 @@ if (loss &gt; lim) loss = lim;</code></pre>
 <td align="right">1</td>
 </tr>
 <tr class="even">
-<td align="left">ccy_id</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="left">deductible</td>
-<td align="right">100000</td>
-</tr>
-<tr class="even">
-<td align="left">limit</td>
-<td align="right">1000000</td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Rules</th>
-<th align="right">Value</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
 <td align="left">calcrule_id</td>
-<td align="right">3</td>
-</tr>
-</tbody>
-</table>
-<h5 id="calculation-logic-1">Calculation logic</h5>
-<pre class="sh"><code>if (x.loss &lt; ded) loss = 0;
-    else loss = x.loss;
-if (loss &gt; lim) loss = lim;</code></pre>
-<h3 id="deductible-only">3. Deductible only</h3>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Attributes</th>
-<th align="right">Example</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">policytc_id</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="left">ccy_id</td>
-<td align="right">1</td>
+<td align="right">2</td>
 </tr>
 <tr class="odd">
-<td align="left">deductible</td>
-<td align="right">100000</td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Rules</th>
-<th align="right">Value</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">calcrule_id</td>
-<td align="right">12</td>
-</tr>
-</tbody>
-</table>
-<h5 id="calculation-logic-2">Calculation logic</h5>
-<pre class="sh"><code>loss = x.loss - ded;
-if (loss &lt; 0) loss = 0;</code></pre>
-<h3 id="maximum-deductible">4. Maximum deductible</h3>
-<p>If the accumulated deductibles from the previous level exceed the maximum deductible, the deductible is capped at the maximum deductible value</p>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Attributes</th>
-<th align="right">Example</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">policytc_id</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="left">ccy_id</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="left">deductible</td>
-<td align="right">40000</td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Rules</th>
-<th align="right">Value</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">calcrule_id</td>
-<td align="right">10</td>
-</tr>
-</tbody>
-</table>
-<h5 id="calculation-logic-3">Calculation logic</h5>
-<pre class="sh"><code>if (x.retained_loss &gt; ded) { 
-    loss = x.loss + x.retained_loss - ded;
-    if (loss &lt; 0) loss = 0;
-    }
-else {
-    loss = x.loss;
-     }</code></pre>
-<h3 id="minimum-deductible">5. Minimum deductible</h3>
-<p>If the accumulated deductibles from the previous level are less than the minimum deductible, the deductible is increased to the total loss or the minimum deductible value, whichever is greater.</p>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Attributes</th>
-<th align="right">Example</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">policytc_id</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="left">ccy_id</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="left">deductible</td>
-<td align="right">70000</td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Rules</th>
-<th align="right">Value</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">calcrule_id</td>
-<td align="right">11</td>
-</tr>
-</tbody>
-</table>
-<h5 id="calculation-logic-4">Calculation logic</h5>
-<pre class="sh"><code>if (x.retained_loss &lt; ded) { 
-    loss = x.loss + x.retained_loss - ded;
-    if (loss &lt; 0) loss = 0;
-    }
-else {
-    loss = x.loss;
-     }</code></pre>
-<h3 id="deductible-limit-and-share">6. Deductible, limit and share</h3>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Attributes</th>
-<th align="right">Example</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">policytc_id</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="left">ccy_id</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="left">deductible</td>
+<td align="left">deductible_1</td>
 <td align="right">70000</td>
 </tr>
 <tr class="even">
-<td align="left">limit</td>
-<td align="right">1000000</td>
+<td align="left">attachment_1</td>
+<td align="right">0</td>
 </tr>
 <tr class="odd">
-<td align="left">share_prop_of_lim</td>
+<td align="left">limit_1</td>
+<td align="right">1000000</td>
+</tr>
+<tr class="even">
+<td align="left">share_1</td>
 <td align="right">0.1</td>
 </tr>
 </tbody>
 </table>
+<h5 id="calculation-logic-1">Calculation logic</h5>
+<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash"><span class="ex">loss</span> = x.loss - deductible_1
+<span class="kw">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&lt;</span> 0<span class="kw">)</span> <span class="ex">loss</span> = 0<span class="kw">;</span>
+<span class="kw">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&gt;</span> (attachment_1 + limit_1<span class="kw">)</span>) <span class="ex">loss</span> = limit_1<span class="kw">;</span>
+    <span class="kw">else</span> <span class="ex">loss</span> = loss - attachment_1<span class="kw">;</span>
+<span class="kw">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&lt;</span> 0<span class="kw">)</span> <span class="ex">loss</span> = 0<span class="kw">;</span>
+<span class="ex">loss</span> = loss * share_1<span class="kw">;</span></code></pre></div>
+<h3 id="franchise-deductible-and-limit">3. Franchise deductible and limit</h3>
 <table>
 <thead>
 <tr class="header">
-<th align="left">Rules</th>
-<th align="right">Value</th>
+<th align="left">Attributes</th>
+<th align="right">Example</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
+<td align="left">policytc_id</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
 <td align="left">calcrule_id</td>
-<td align="right">2</td>
+<td align="right">3</td>
+</tr>
+<tr class="odd">
+<td align="left">deductible_1</td>
+<td align="right">100000</td>
+</tr>
+<tr class="even">
+<td align="left">limit_1</td>
+<td align="right">1000000</td>
+</tr>
+</tbody>
+</table>
+<h5 id="calculation-logic-2">Calculation logic</h5>
+<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash"><span class="kw">if</span> <span class="kw">(</span><span class="ex">x.loss</span> <span class="op">&lt;</span> deductible_1<span class="kw">)</span> <span class="ex">loss</span> = 0<span class="kw">;</span>
+    <span class="kw">else</span> <span class="ex">loss</span> = x.loss<span class="kw">;</span>
+<span class="kw">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&gt;</span> limit_1<span class="kw">)</span> <span class="ex">loss</span> = limit_1<span class="kw">;</span></code></pre></div>
+<h3 id="deductible-and-limit-as-a-proportion-of-loss">5. Deductible and limit as a proportion of loss</h3>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Attributes</th>
+<th align="right">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">policytc_id</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">calcrule_id</td>
+<td align="right">5</td>
+</tr>
+<tr class="odd">
+<td align="left">deductible_1</td>
+<td align="right">0.05</td>
+</tr>
+<tr class="even">
+<td align="left">limit_1</td>
+<td align="right">0.3</td>
+</tr>
+</tbody>
+</table>
+<h5 id="calculation-logic-3">Calculation logic</h5>
+<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash"><span class="ex">loss</span> = x.loss - (x.loss * deductible_1);
+<span class="kw">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&gt;</span> (x.loss * limit_1<span class="kw">)</span>) <span class="ex">loss</span> = x.loss * lim<span class="kw">;</span></code></pre></div>
+<h3 id="limit-with-deductible-as-a-proportion-of-limit">9. Limit with deductible as a proportion of limit</h3>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Attributes</th>
+<th align="right">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">policytc_id</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">calcrule_id</td>
+<td align="right">9</td>
+</tr>
+<tr class="odd">
+<td align="left">deductible_1</td>
+<td align="right">0.05</td>
+</tr>
+<tr class="even">
+<td align="left">limit_1</td>
+<td align="right">100000</td>
+</tr>
+</tbody>
+</table>
+<h5 id="calculation-logic-4">Calculation logic</h5>
+<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash"><span class="ex">loss</span> = x.loss - (deductible_1 * limit_1);
+<span class="kw">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&lt;</span> 0<span class="kw">)</span> <span class="ex">loss</span> = 0<span class="kw">;</span>
+<span class="kw">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&gt;</span> limit_1<span class="kw">)</span> <span class="ex">loss</span> = limit_1<span class="kw">;</span></code></pre></div>
+<h3 id="maximum-deductible">10. Maximum deductible</h3>
+<p>If the effective deductible carried forward from the previous level exceeds the maximum deductible, the effective deductible is decreased to the maximum deductible value</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Attributes</th>
+<th align="right">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">policytc_id</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">calcrule_id</td>
+<td align="right">10</td>
+</tr>
+<tr class="odd">
+<td align="left">deductible_3</td>
+<td align="right">40000</td>
 </tr>
 </tbody>
 </table>
 <h5 id="calculation-logic-5">Calculation logic</h5>
-<pre class="sh"><code>if (x.loss &gt; (ded + lim)) loss = lim;
-    else loss = x.loss - ded;
-if (loss &lt; 0) loss = 0;
-loss = loss * share;</code></pre>
-<h3 id="deductible-and-limit-as-a-proportion-of-loss">10. Deductible and limit as a proportion of loss</h3>
+<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash"><span class="kw">if</span> <span class="kw">(</span><span class="ex">x.effective_deductible</span> <span class="op">&gt;</span> deductible_3<span class="kw">)</span> <span class="kw">{</span> 
+    <span class="ex">loss</span> = x.loss + x.effective_deductible - deductible_3<span class="kw">;</span>
+    <span class="kw">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&lt;</span> 0<span class="kw">)</span> <span class="ex">loss</span> = 0<span class="kw">;</span>
+    <span class="kw">}</span>
+<span class="kw">else</span> <span class="kw">{</span>
+    <span class="ex">loss</span> = x.loss<span class="kw">;</span>
+     <span class="kw">}</span></code></pre></div>
+<h3 id="minimum-deductible">11. Minimum deductible</h3>
+<p>If the effective deductible carried forward from the previous level is less than the minimum deductible, the deductible is increased to the total loss or the minimum deductible value, whichever is greater.</p>
 <table>
 <thead>
 <tr class="header">
@@ -394,32 +658,24 @@ loss = loss * share;</code></pre>
 <td align="right">1</td>
 </tr>
 <tr class="even">
-<td align="left">deductible_prop_of_loss</td>
-<td align="right">0.05</td>
-</tr>
-<tr class="odd">
-<td align="left">limit_prop_of_loss</td>
-<td align="right">0.3</td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Rules</th>
-<th align="right">Value</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
 <td align="left">calcrule_id</td>
-<td align="right">5</td>
+<td align="right">11</td>
+</tr>
+<tr class="odd">
+<td align="left">deductible_2</td>
+<td align="right">70000</td>
 </tr>
 </tbody>
 </table>
 <h5 id="calculation-logic-6">Calculation logic</h5>
-<pre class="sh"><code>loss = x.loss * (lim - ded);</code></pre>
-<h3 id="limit-with-deductible-as-a-proportion-of-limit">11. Limit with deductible as a proportion of limit</h3>
+<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash"><span class="kw">if</span> <span class="kw">(</span><span class="ex">x.effective_deductible</span> <span class="op">&lt;</span> deductible_2<span class="kw">)</span> <span class="kw">{</span> 
+    <span class="ex">loss</span> = x.loss + x.effective_deductible - deductible_2<span class="kw">;</span>
+    <span class="kw">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&lt;</span> 0<span class="kw">)</span> <span class="ex">loss</span> = 0<span class="kw">;</span>
+    <span class="kw">}</span>
+<span class="kw">else</span> <span class="kw">{</span>
+    <span class="ex">loss</span> = x.loss<span class="kw">;</span>
+     <span class="kw">}</span></code></pre></div>
+<h3 id="deductible-only">12. Deductible only</h3>
 <table>
 <thead>
 <tr class="header">
@@ -433,38 +689,19 @@ loss = loss * share;</code></pre>
 <td align="right">1</td>
 </tr>
 <tr class="even">
-<td align="left">ccy_id</td>
-<td align="right">1</td>
-</tr>
-<tr class="odd">
-<td align="left">deductible_prop_of_loss</td>
-<td align="right">0.05</td>
-</tr>
-<tr class="even">
-<td align="left">limit</td>
-<td align="right">100000</td>
-</tr>
-</tbody>
-</table>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Rules</th>
-<th align="right">Value</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
 <td align="left">calcrule_id</td>
-<td align="right">9</td>
+<td align="right">12</td>
+</tr>
+<tr class="odd">
+<td align="left">deductible_1</td>
+<td align="right">100000</td>
 </tr>
 </tbody>
 </table>
 <h5 id="calculation-logic-7">Calculation logic</h5>
-<pre class="sh"><code>loss = x.loss - (ded * lim);
-if (loss &lt; 0) loss = 0;
-if (loss &gt; lim) loss = lim;</code></pre>
-<h3 id="limit-only">12. Limit only</h3>
+<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash"><span class="ex">loss</span> = x.loss - deductible_1<span class="kw">;</span>
+<span class="kw">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&lt;</span> 0<span class="kw">)</span> <span class="ex">loss</span> = 0<span class="kw">;</span></code></pre></div>
+<h3 id="limit-only">14. Limit only</h3>
 <table>
 <thead>
 <tr class="header">
@@ -478,8 +715,8 @@ if (loss &gt; lim) loss = lim;</code></pre>
 <td align="right">1</td>
 </tr>
 <tr class="even">
-<td align="left">ccy_id</td>
-<td align="right">1</td>
+<td align="left">calcrule_id</td>
+<td align="right">14</td>
 </tr>
 <tr class="odd">
 <td align="left">limit</td>
@@ -487,24 +724,10 @@ if (loss &gt; lim) loss = lim;</code></pre>
 </tr>
 </tbody>
 </table>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Rules</th>
-<th align="left">Value</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">calcrule_id</td>
-<td align="left">14</td>
-</tr>
-</tbody>
-</table>
 <h5 id="calculation-logic-8">Calculation logic</h5>
-<pre class="sh"><code>loss = x.loss;
-if (loss &gt; lim) loss = lim;</code></pre>
-<h3 id="limit-as-a-proportion-of-loss">13. Limit as a proportion of loss</h3>
+<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash"><span class="ex">loss</span> = x.loss<span class="kw">;</span>
+<span class="kw">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&gt;</span> limit_1<span class="kw">)</span> <span class="ex">loss</span> = limit_1<span class="kw">;</span></code></pre></div>
+<h3 id="limit-as-a-proportion-of-loss">15. Limit as a proportion of loss</h3>
 <table>
 <thead>
 <tr class="header">
@@ -518,29 +741,18 @@ if (loss &gt; lim) loss = lim;</code></pre>
 <td align="right">1</td>
 </tr>
 <tr class="even">
-<td align="left">limit_prop_of_loss</td>
+<td align="left">calcrule_id</td>
+<td align="right">15</td>
+</tr>
+<tr class="odd">
+<td align="left">limit_1</td>
 <td align="right">0.3</td>
 </tr>
 </tbody>
 </table>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Rules</th>
-<th align="right">Value</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">calcrule_id</td>
-<td align="right">15</td>
-</tr>
-</tbody>
-</table>
 <h5 id="calculation-logic-9">Calculation logic</h5>
-<pre class="sh"><code>loss = x.loss;
-loss = loss * lim;</code></pre>
-<h3 id="deductible-as-a-proportion-of-loss">14. Deductible as a proportion of loss</h3>
+<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash"><span class="ex">loss</span> = x.loss * limit_1<span class="kw">;</span></code></pre></div>
+<h3 id="deductible-as-a-proportion-of-loss">16. Deductible as a proportion of loss</h3>
 <table>
 <thead>
 <tr class="header">
@@ -554,29 +766,18 @@ loss = loss * lim;</code></pre>
 <td align="right">1</td>
 </tr>
 <tr class="even">
-<td align="left">deductible_prop_of_loss</td>
+<td align="left">calcrule_id</td>
+<td align="right">16</td>
+</tr>
+<tr class="odd">
+<td align="left">deductible_1</td>
 <td align="right">0.05</td>
 </tr>
 </tbody>
 </table>
-<table>
-<thead>
-<tr class="header">
-<th align="left">Rules</th>
-<th align="right">Value</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">calcrule_id</td>
-<td align="right">16</td>
-</tr>
-</tbody>
-</table>
 <h5 id="calculation-logic-10">Calculation logic</h5>
-<pre class="sh"><code>loss = x.loss;
-loss = loss - (loss * ded);
-if (loss &lt; 0) loss = 0;</code></pre>
+<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash"><span class="ex">loss</span> = x.loss - (x.loss * deductible_1);
+<span class="kw">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&lt;</span> 0<span class="kw">)</span> <span class="ex">loss</span> = 0<span class="kw">;</span></code></pre></div>
 <p><a href="#fmprofiles">Return to top</a></p>
 <p><a href="MultiPeril.html">Go to Appendix C Multi-peril model support</a></p>
 <p><a href="Contents.html">Back to Contents</a></p>

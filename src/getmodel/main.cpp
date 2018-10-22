@@ -48,6 +48,10 @@ Author: Mark Pinkerton  email: mark.pinkerton@oasislmf.org
 #include <unistd.h>
 #endif
 
+void doIt(bool zip);
+
+char *progname = 0;
+
 void help()
 {
 	fprintf(stderr,
@@ -56,22 +60,17 @@ void help()
 	);
 }
 
-void doIt(bool zip)
+#ifndef _MSC_VER
+void segfault_sigaction(int signal, siginfo_t *si, void *arg)
 {
-
-	getmodel cdf_generator;
-
-	cdf_generator.init(zip);
-
-	int event_id = -1;
-	while (fread(&event_id, sizeof(event_id), 1, stdin) != 0)
-	{
-		cdf_generator.doCdf(event_id);
-	}
+	fprintf(stderr, "%s: Segment fault at address: %p\n", progname, si->si_addr);
+	exit(0);
 }
+#endif
 
 int main(int argc, char** argv)
 {
+	progname = argv[0];
 	int opt;	
 	while ((opt = getopt(argc, argv, "vh")) != -1) {
 		switch (opt) {
@@ -92,7 +91,24 @@ int main(int argc, char** argv)
 	FILE *fin = fopen(ZFOOTPRINT_FILE, "rb");
 	if (fin != nullptr) zip=true;
 
-	initstreams();
-	doIt(zip);
+#ifndef _MSC_VER
+	struct sigaction sa;
+
+	memset(&sa, 0, sizeof(struct sigaction));
+	sigemptyset(&sa.sa_mask);
+	sa.sa_sigaction = segfault_sigaction;
+	sa.sa_flags = SA_SIGINFO;
+
+	sigaction(SIGSEGV, &sa, NULL);
+#endif
+
+	try {
+		initstreams();
+		doIt(zip);
+	}catch (std::bad_alloc) {
+		fprintf(stderr, "%s: Memory allocation failed\n", progname);
+		exit(0);
+	}
+
 	return EXIT_SUCCESS;
 }

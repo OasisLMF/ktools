@@ -497,3 +497,18 @@ void getmodel::doCdfInnerNoIntensityUncertainty(int event_id) {
 
   fclose(fin);
 }
+
+
+void doIt(bool zip)
+{
+
+	getmodel cdf_generator;
+
+	cdf_generator.init(zip);
+
+	int event_id = -1;
+	while (fread(&event_id, sizeof(event_id), 1, stdin) != 0)
+	{
+		cdf_generator.doCdf(event_id);
+	}
+}

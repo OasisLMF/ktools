@@ -46,6 +46,8 @@ Author: Mark Pinkerton  email: mark.pinkerton@oasislmf.org
 #include "../wingetopt/wingetopt.h"
 #else
 #include <unistd.h>
+#include <signal.h>
+#include <string.h>
 #endif
 
 void doIt(bool zip);

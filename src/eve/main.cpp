@@ -40,6 +40,12 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 #include <fstream>
 #include "../include/oasis.h"
+
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+#include <signal.h>
+#include <string.h>
+#endif
+
 namespace eve {
 	void emitevents(OASIS_INT pno_, OASIS_INT total_);
 }

@@ -31,31 +31,80 @@
 * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 * DAMAGE.
 */
-/*
 
-Convert aalcalctocsv output to csv
-Author: Joh Carter  email: johanna.carter@oasislmf.org
+/*
+eve: Event emitter for partioning work between multiple processes
+Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-
+#include <fstream>
 #include "../include/oasis.h"
+namespace eve {
+	void emitevents(OASIS_INT pno_, OASIS_INT total_);
+}
+char *progname;
 
-namespace aalcalctocsv {
-	void doit(bool skipheader)
-	{
-		int samplesize = 0;
-		size_t i = fread(&samplesize, sizeof(int), 1, stdin);
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+void segfault_sigaction(int signal, siginfo_t *si, void *arg)
+{
+	fprintf(stderr, "%s: Segment fault at address: %p\n", progname, si->si_addr);
+	exit(0);
+}
+#endif
 
-		if (skipheader == false) printf("\"summary_id\", \"type\", \"mean\", \"mean_squared\", \"max_exposure_value\"\n");
-		aal_rec q;
-		i = fread(&q, sizeof(q), 1, stdin);
-		while (i != 0) {
-			printf("%d, %d, %f, %f, %f\n", q.summary_id, q.type, q.mean, q.mean_squared, q.max_exposure_value);
 
-			i = fread(&q, sizeof(q), 1, stdin);
+void help()
+{
+	fprintf(stderr,
+		"usage: processno totalprocesses\n"
+		"-h help\n"
+		"-v version\n"
+	);
+}
+int main(int argc, char *argv[])
+{
+	progname = argv[0];
+
+	if (argc == 2) {
+		if (!strcmp(argv[1], "-v")) {
+			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+			return EXIT_FAILURE;
+		}
+		if (!strcmp(argv[1], "-h")) {
+			help();
+			return EXIT_FAILURE;
 		}
 	}
+
+	if (argc != 3) {
+		fprintf(stderr, "usage: processno totalprocesses\n");
+		return EXIT_FAILURE;
+	}
+
+	OASIS_INT pno = atoi(argv[1]);
+	OASIS_INT total = atoi(argv[2]);
+
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+	struct sigaction sa;
+
+	memset(&sa, 0, sizeof(struct sigaction));
+	sigemptyset(&sa.sa_mask);
+	sa.sa_sigaction = segfault_sigaction;
+	sa.sa_flags = SA_SIGINFO;
+
+	sigaction(SIGSEGV, &sa, NULL);
+#endif
+
+
+	try {
+		initstreams("", "");
+		eve::emitevents(pno, total);
+	}
+	catch (std::bad_alloc) {
+		fprintf(stderr, "%s: Memory allocation failed\n", progname);
+		exit(0);
+	}
+
+	return EXIT_SUCCESS;
 }

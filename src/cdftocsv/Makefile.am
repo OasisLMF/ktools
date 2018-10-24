@@ -1,4 +1,3 @@
 # Our binary is produced here
 bin_PROGRAMS = cdftocsv 
-cdftocsv_SOURCES = cdftocsv.cpp
-
+cdftocsv_SOURCES = cdftocsv.cpp main.cpp

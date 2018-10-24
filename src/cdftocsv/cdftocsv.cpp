@@ -45,147 +45,110 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <fstream>
 #include <sstream>
 
-#if defined(_MSC_VER)
-#include "../wingetopt/wingetopt.h"
-#else
-#include <unistd.h>
-#endif
 
 using namespace std;
 
-bool getdamagebindictionary(std::vector<damagebindictionary> &damagebindictionary_vec_)
-{
+namespace cdftocsv {
+	bool getdamagebindictionary(std::vector<damagebindictionary> &damagebindictionary_vec_)
+	{
 
-    FILE *fin = fopen(DAMAGE_BIN_DICT_FILE, "rb");
-    if (fin == NULL){
-        return false;
-    }
-    flseek(fin, 0L, SEEK_END);
-    long long sz = fltell(fin);
-    flseek(fin, 0L, SEEK_SET);
-    unsigned int nrec = static_cast<unsigned int> (sz / sizeof(damagebindictionary));
-    damagebindictionary *s1 = new damagebindictionary[nrec];
-    if (fread(s1, sizeof(damagebindictionary), nrec, fin) != nrec) {
-        fprintf(stderr, "Error reading file\n");
-        exit(-1);
-    }
+		FILE *fin = fopen(DAMAGE_BIN_DICT_FILE, "rb");
+		if (fin == NULL) {
+			return false;
+		}
+		flseek(fin, 0L, SEEK_END);
+		long long sz = fltell(fin);
+		flseek(fin, 0L, SEEK_SET);
+		unsigned int nrec = static_cast<unsigned int> (sz / sizeof(damagebindictionary));
+		damagebindictionary *s1 = new damagebindictionary[nrec];
+		if (fread(s1, sizeof(damagebindictionary), nrec, fin) != nrec) {
+			fprintf(stderr, "Error reading file\n");
+			exit(-1);
+		}
 
-    for (unsigned int i = 0; i < nrec; i++){
-        damagebindictionary_vec_.push_back(s1[i]);
-    }
-    delete[] s1;
+		for (unsigned int i = 0; i < nrec; i++) {
+			damagebindictionary_vec_.push_back(s1[i]);
+		}
+		delete[] s1;
 
-    fclose(fin);
-    return true;
-}
+		fclose(fin);
+		return true;
+	}
 
-bool getrec(char *rec_, FILE *stream, int recsize_)
-{
-    int totalread = 0;
-    while (totalread != recsize_){
-        int ch = getc( stream );
-        if (ch == EOF) {
-            return false;
-        }
-        *rec_ = ch;
-        totalread++;
-        rec_++;
-    }
+	bool getrec(char *rec_, FILE *stream, int recsize_)
+	{
+		int totalread = 0;
+		while (totalread != recsize_) {
+			int ch = getc(stream);
+			if (ch == EOF) {
+				return false;
+			}
+			*rec_ = ch;
+			totalread++;
+			rec_++;
+		}
 
-        return true;
+		return true;
 
-}
+	}
 
 
-struct prob_mean {
-        OASIS_FLOAT prob_to;
-        OASIS_FLOAT bin_mean;
-};
+	struct prob_mean {
+		OASIS_FLOAT prob_to;
+		OASIS_FLOAT bin_mean;
+	};
 
-void processrec(char *rec, int recsize,
-        const std::vector<damagebindictionary> &damagebindictionary_vec_)
-{
-    damagecdfrec *d = (damagecdfrec *)rec;
-    char *b = rec + sizeof(damagecdfrec);
-    int *bin_count = (int *)b;
-    b = b + sizeof(int);
-    prob_mean *pp = (prob_mean *)b;
-    for (int bin_index = 0; bin_index < *bin_count; bin_index++){
+	void processrec(char *rec, int recsize,
+		const std::vector<damagebindictionary> &damagebindictionary_vec_)
+	{
+		damagecdfrec *d = (damagecdfrec *)rec;
+		char *b = rec + sizeof(damagecdfrec);
+		int *bin_count = (int *)b;
+		b = b + sizeof(int);
+		prob_mean *pp = (prob_mean *)b;
+		for (int bin_index = 0; bin_index < *bin_count; bin_index++) {
 #ifdef AREAPERIL_TYPE_LONG
-        fprintf(stdout,"%d,%ld,%d,%d,%f,%f\n",d->event_id, d->areaperil_id, d->vulnerability_id,bin_index+1,pp->prob_to,pp->bin_mean );
+			fprintf(stdout, "%d,%ld,%d,%d,%f,%f\n", d->event_id, d->areaperil_id, d->vulnerability_id, bin_index + 1, pp->prob_to, pp->bin_mean);
 #else
-		fprintf(stdout, "%d,%d,%d,%d,%f,%f\n", d->event_id, d->areaperil_id, d->vulnerability_id, bin_index + 1, pp->prob_to, pp->bin_mean);
+			fprintf(stdout, "%d,%d,%d,%d,%f,%f\n", d->event_id, d->areaperil_id, d->vulnerability_id, bin_index + 1, pp->prob_to, pp->bin_mean);
 #endif
-        pp++;
-    }
-}
-void doit(bool skipheader)
-{
-
-	if (skipheader == false) fprintf(stdout, "event_id,areaperil_id,vulnerability_id,bin_index,prob_to,bin_mean\n");
-	std::vector<damagebindictionary> damagebindictionary_vec;
-	getdamagebindictionary(damagebindictionary_vec);
-	size_t total_bins = damagebindictionary_vec.size();
-	if (total_bins == 0 ) total_bins = 10000;
-	int max_recsize = (int)(total_bins * sizeof(prob_mean)) + sizeof(damagecdfrec)+sizeof(int);
-
-	char *rec = new char[max_recsize];
-	int stream_type = 0;
-
-	bool bSuccess = getrec((char *)&stream_type, stdin, sizeof(stream_type));
-
-	if (stream_type != 1) {
-		fprintf(stderr,"Invalid stream type %d expect stream type 1\n", stream_type);
-		exit(-1);
-	}
-	for(;;){
-		char *p = rec;
-		bSuccess = getrec(p, stdin, sizeof(damagecdfrec));
-		if (bSuccess == false) break;
-			p = p + sizeof(damagecdfrec);
-		bSuccess = getrec(p, stdin, sizeof(int)); // we now have bin count
-		int *q = (int *)p;
-		p = p + sizeof(int);
-		int recsize = (*q) * sizeof(prob_mean);
-				// we should now have damagecdfrec in memory
-		bSuccess = getrec(p, stdin, recsize);
-		recsize += sizeof(damagecdfrec)+sizeof(int);
-
-		processrec(rec, recsize, damagebindictionary_vec);
-	}
-}
-
-void help()
-{
-	fprintf(stderr, 
-		"-s skip header\n"
-		"-h help\n"
-		"-v version\n"
-	);
-}
-
-
-int main(int argc, char *argv[])
-{
-	int opt;
-	bool skipheader = false;
-	while ((opt = getopt(argc, argv, "vhs")) != -1) {
-		switch (opt) {
-		case 's':
-			skipheader = true;
-			break;
-		case 'v':
-			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
-			::exit(EXIT_FAILURE);
-			break;
-		case 'h':
-		default:
-			help();
-			::exit(EXIT_FAILURE);
+			pp++;
 		}
 	}
-    
-    initstreams();
-    doit(skipheader);
-    return EXIT_SUCCESS;
+	void doit(bool skipheader)
+	{
+
+		if (skipheader == false) fprintf(stdout, "event_id,areaperil_id,vulnerability_id,bin_index,prob_to,bin_mean\n");
+		std::vector<damagebindictionary> damagebindictionary_vec;
+		getdamagebindictionary(damagebindictionary_vec);
+		size_t total_bins = damagebindictionary_vec.size();
+		if (total_bins == 0) total_bins = 10000;
+		int max_recsize = (int)(total_bins * sizeof(prob_mean)) + sizeof(damagecdfrec) + sizeof(int);
+
+		char *rec = new char[max_recsize];
+		int stream_type = 0;
+
+		bool bSuccess = getrec((char *)&stream_type, stdin, sizeof(stream_type));
+
+		if (stream_type != 1) {
+			fprintf(stderr, "Invalid stream type %d expect stream type 1\n", stream_type);
+			exit(-1);
+		}
+		for (;;) {
+			char *p = rec;
+			bSuccess = getrec(p, stdin, sizeof(damagecdfrec));
+			if (bSuccess == false) break;
+			p = p + sizeof(damagecdfrec);
+			bSuccess = getrec(p, stdin, sizeof(int)); // we now have bin count
+			int *q = (int *)p;
+			p = p + sizeof(int);
+			int recsize = (*q) * sizeof(prob_mean);
+			// we should now have damagecdfrec in memory
+			bSuccess = getrec(p, stdin, recsize);
+			recsize += sizeof(damagecdfrec) + sizeof(int);
+
+			processrec(rec, recsize, damagebindictionary_vec);
+		}
+	}
+
 }

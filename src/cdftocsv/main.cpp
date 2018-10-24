@@ -32,30 +32,83 @@
 * DAMAGE.
 */
 /*
-
-Convert aalcalctocsv output to csv
-Author: Joh Carter  email: johanna.carter@oasislmf.org
-
+Author: Ben Matharu  email: ben.matharu@oasislmf.org
 */
 
 #include <stdio.h>
 #include <stdlib.h>
-
 #include "../include/oasis.h"
 
-namespace aalcalctocsv {
-	void doit(bool skipheader)
-	{
-		int samplesize = 0;
-		size_t i = fread(&samplesize, sizeof(int), 1, stdin);
+#if defined(_MSC_VER)
+#include "../wingetopt/wingetopt.h"
+#else
+#include <unistd.h>
+#endif
 
-		if (skipheader == false) printf("\"summary_id\", \"type\", \"mean\", \"mean_squared\", \"max_exposure_value\"\n");
-		aal_rec q;
-		i = fread(&q, sizeof(q), 1, stdin);
-		while (i != 0) {
-			printf("%d, %d, %f, %f, %f\n", q.summary_id, q.type, q.mean, q.mean_squared, q.max_exposure_value);
+namespace cdftocsv {
+	void doit(bool skipheader);
+}
 
-			i = fread(&q, sizeof(q), 1, stdin);
+char *progname;
+
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+void segfault_sigaction(int signal, siginfo_t *si, void *arg)
+{
+	fprintf(stderr, "%s: Segment fault at address: %p\n", progname, si->si_addr);
+	exit(0);
+}
+#endif
+
+
+void help()
+{
+	fprintf(stderr,
+		"-s skip header\n"
+		"-h help\n"
+		"-v version\n"
+	);
+}
+
+
+int main(int argc, char *argv[])
+{
+	progname = argv[0];
+	int opt;
+	bool skipheader = false;
+	while ((opt = getopt(argc, argv, "vhs")) != -1) {
+		switch (opt) {
+		case 's':
+			skipheader = true;
+			break;
+		case 'v':
+			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+			::exit(EXIT_FAILURE);
+			break;
+		case 'h':
+		default:
+			help();
+			::exit(EXIT_FAILURE);
 		}
 	}
+
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+	struct sigaction sa;
+
+	memset(&sa, 0, sizeof(struct sigaction));
+	sigemptyset(&sa.sa_mask);
+	sa.sa_sigaction = segfault_sigaction;
+	sa.sa_flags = SA_SIGINFO;
+
+	sigaction(SIGSEGV, &sa, NULL);
+#endif
+
+	try {
+		initstreams();
+		cdftocsv::doit(skipheader);
+	}
+	catch (std::bad_alloc) {
+		fprintf(stderr, "%s: Memory allocation failed\n", progname);
+		exit(0);
+	}
+	return EXIT_SUCCESS;
 }

@@ -60,7 +60,7 @@ void help()
 	);
 }
 
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
 void segfault_sigaction(int signal, siginfo_t *si, void *arg)
 {
 	fprintf(stderr, "%s: Segment fault at address: %p\n", progname, si->si_addr);
@@ -91,7 +91,7 @@ int main(int argc, char** argv)
 	FILE *fin = fopen(ZFOOTPRINT_FILE, "rb");
 	if (fin != nullptr) zip=true;
 
-#ifndef _MSC_VER
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
 	struct sigaction sa;
 
 	memset(&sa, 0, sizeof(struct sigaction));

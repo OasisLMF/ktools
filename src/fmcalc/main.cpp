@@ -49,6 +49,8 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include "../wingetopt/wingetopt.h"
 #else
 #include <unistd.h>
+#include <signal.h>
+#include <string.h>
 #endif
 
 char *progname = 0;

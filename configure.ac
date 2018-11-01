@@ -152,6 +152,7 @@ AC_CONFIG_FILES([
 		 src/kat/Makefile
 		 src/footprintconv/Makefile
 		 src/fmprofilebinconv/Makefile
+		 src/fptofpcache/Makefile
                  ])
 AC_OUTPUT
 

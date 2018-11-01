@@ -53,13 +53,14 @@ struct fm_policyTC {
 
 
 class fmcalc {
-public:
+public:	
+	fmcalc(int maxRunLevel, int allocrule,const std::string &inputpath, bool netvalue, bool oldFMProfile): inputpath_(inputpath) , netvalue_(netvalue),allocrule_(allocrule) { init(maxRunLevel); }	
+	void doit();
+private:
 	void setmaxlevel(int maxlevel) { if (maxlevel > -1) maxLevel_ = maxlevel; }
 	void dofm(int event_id_, const std::vector<int> &items_, std::vector<std::vector<OASIS_FLOAT>> &event_guls_);
-	fmcalc(int maxRunLevel, int allocrule,const std::string &inputpath, bool netvalue, bool oldFMProfile): inputpath_(inputpath) , netvalue_(netvalue),allocrule_(allocrule) { init(maxRunLevel); }
 	inline OASIS_FLOAT gettiv(int item_id) { return item_to_tiv_[item_id]; }
 	int getmaxnoofitems();
-private:
 	std::vector<std::vector<std::vector<int>>> policy_tc_vec_vec_vec_; // policy_tc_vec_vec_vec_[level][agg_id][layer_id]
 	std::vector<int> level_to_maxagg_id_;
 	int allocrule_ = 0;

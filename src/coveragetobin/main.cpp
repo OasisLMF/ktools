@@ -34,15 +34,10 @@
 /*
 Author: Ben Matharu  email: ben.matharu@oasislmf.org
 */
-#include <iostream>
-#include <fstream>
-#include <sstream>
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <algorithm>
-#include <fcntl.h>
-#include <assert.h>
-#include "fmcalc.h"
+
 #include "../include/oasis.h"
 
 #if defined(_MSC_VER)
@@ -51,21 +46,16 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <unistd.h>
 #endif
 
-char *progname = 0;
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+#include <signal.h>
+#include <string.h>
+#endif
 
-void help()
-{
-
-    fprintf(stderr,
-		"-a set allocrule (default none)\n"
-		"-o run old fm_profile\n"
-        "-M max level (optional)\n"
-		"-p inputpath (relative or full path)\n"
-		"-n feed net value (used for reinsurance)\n"
-		"-v version\n"
-		"-h help\n"
-	);
+namespace coveragetobin {
+	void doit();
 }
+
+char *progname;
 
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
 void segfault_sigaction(int signal, siginfo_t *si, void *arg)
@@ -76,45 +66,28 @@ void segfault_sigaction(int signal, siginfo_t *si, void *arg)
 #endif
 
 
-int main(int argc, char* argv[])
+
+void help()
+{
+	fprintf(stderr, "-h help\n-v version\n");
+}
+
+int main(int argc, char *argv[])
 {
 	progname = argv[0];
-    int new_max = -1;
-	int allocrule = 0;
 	int opt;
-	std::string inputpath;
-	bool oldFMProfile = false;
-
-	bool netvalue = false;
-    while ((opt = getopt(argc, argv, "nvhoM:p:a:")) != -1) {
-        switch (opt) {
-		case 'o':
-			oldFMProfile = true;
+	while ((opt = getopt(argc, argv, "vh")) != -1) {
+		switch (opt) {
+		case 'v':
+			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+			::exit(EXIT_FAILURE);
 			break;
-         case 'M':
-            new_max = atoi(optarg);
-            break;
-		 case 'a':
-			 allocrule = atoi(optarg);
-			 break;
-		 case 'v':
-			 fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
-			 exit(EXIT_FAILURE);
-			 break;
-		 case 'p':
-			 inputpath = optarg;
-			 break;
-		 case 'n':
-			 netvalue = true;
-			 break;
-        case 'h':
-           help();
-           exit(EXIT_FAILURE);
-        default:
-            help();
-            exit(EXIT_FAILURE);
-        }
-    }
+		case 'h':
+		default:
+			help();
+			::exit(EXIT_FAILURE);
+		}
+	}
 
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
 	struct sigaction sa;
@@ -126,17 +99,15 @@ int main(int argc, char* argv[])
 
 	sigaction(SIGSEGV, &sa, NULL);
 #endif
-
-
 	try {
-		initstreams("", "");
-		fmcalc fc(new_max, allocrule, inputpath, netvalue, oldFMProfile);
-		fc.doit();
+		initstreams();
+		coveragetobin::doit();
+		return 0;
 	}
 	catch (std::bad_alloc) {
 		fprintf(stderr, "%s: Memory allocation failed\n", progname);
 		exit(0);
 	}
 
-	return 0;
 }
+

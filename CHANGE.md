@@ -1,6 +1,9 @@
 Ktools Changelog
 ================
 
+## [v3.0.2](https://github.com/OasisLMF/ktools/releases/tag/v3.0.2)
+* Added exception handling for memory allocation errors and segmentation faults.
+
 ## [v3.0.1](https://github.com/OasisLMF/ktools/releases/tag/v3.0.1)
 * Compatability fix for working on MAC OS
 ## [v3.0.0](https://github.com/OasisLMF/ktools/releases/tag/v3.0.0)

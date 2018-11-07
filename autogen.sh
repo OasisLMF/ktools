@@ -1572,11 +1572,8 @@ if test "x$config" = "x" -o ! -f "$config" ; then
     $ECHO "misconfiguration."
 else
     $ECHO "The $PROJECT build system is now prepared. "
-    $ECHO "  To build for a POSIX build run:"
+    $ECHO "  To build run:"
     $ECHO "  $config"
-    $ECHO "  make"
-    $ECHO "  or for a Windows build run:"
-    $ECHO "  ./winconfigure"
     $ECHO "  make"
 fi
 

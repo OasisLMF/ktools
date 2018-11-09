@@ -45,184 +45,12 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 #include "gulcalc.h"
 
-using namespace std;
 
 // options
 bool verbose = false;
-int samplesize = -1;
-double gul_limit = 0.0;
-bool debug = false;
-bool itemLevelOutput = false;
-bool coverageLevelOutput = false;
-int rand_vector_size = 1000000;
-int rand_seed = 0;
 
-rd_option rndopt = rd_option::usehashedseed;
+char *progname;
 
-
-FILE *itemout = stdout;
-FILE *covout = stdout;
-
-std::string item_output;
-std::string coverage_output;
-
-bool getdamagebindictionary(std::vector<damagebindictionary> &damagebindictionary_vec_)
-{
-
-	FILE *fin = fopen(DAMAGE_BIN_DICT_FILE, "rb");
-	if (fin == NULL) {
-		fprintf(stderr, "%s: cannot open %s\n", __func__, DAMAGE_BIN_DICT_FILE);
-		exit(-1);
-	}
-
-	flseek(fin, 0L, SEEK_END);
-	long long sz = fltell(fin);
-
-	flseek(fin, 0L, SEEK_SET);
-	unsigned int nrec = static_cast<unsigned int>(sz / sizeof(damagebindictionary));
-	damagebindictionary *s1 = new damagebindictionary[nrec];
-	if (fread(s1, sizeof(damagebindictionary), nrec, fin) != nrec) {
-		fprintf(stderr, "%s: Error reading file %s\n", __func__, DAMAGE_BIN_DICT_FILE);
-		exit(-1);
-	}
-	damagebindictionary_vec_.clear();
-
-	for (unsigned int i = 0; i < nrec; i++) {
-		damagebindictionary_vec_.push_back(s1[i]);
-	}
-	delete[] s1;
-
-	fclose(fin);
-	return true;
-}
-
-bool getitems(std::map<item_map_key, std::vector<item_map_rec> > &item_map)
-{
-
-	FILE *fin = fopen(ITEMS_FILE, "rb");
-	if (fin == NULL) {
-		fprintf(stderr, "%s: cannot open %s\n", __func__, ITEMS_FILE);
-		exit(-1);
-	}
-
-	flseek(fin, 0L, SEEK_END);
-	long long sz = fltell(fin);
-	flseek(fin, 0L, SEEK_SET);
-
-	unsigned int nrec = static_cast<unsigned int>(sz / sizeof(item));
-
-	item_map.clear();
-
-	item itm;
-	size_t i = fread(&itm, sizeof(itm), 1, fin);
-	while (i != 0) {
-		item_map_key imk;
-		imk.areaperil_id = itm.areaperil_id;
-		imk.vulnerability_id = itm.vulnerability_id;
-		item_map_rec imr;
-		imr.item_id = itm.id;
-		imr.coverage_id = itm.coverage_id;
-		imr.group_id = itm.group_id;
-		item_map[imk].push_back(imr);
-		i = fread(&itm, sizeof(itm), 1, fin);
-	}
-
-	fclose(fin);
-
-	return true;
-}
-
-
-bool getcoverages(std::vector<OASIS_FLOAT> &coverages)
-{
-	FILE *fin = fopen(COVERAGES_FILE, "rb");
-	if (fin == NULL) {
-		fprintf(stderr, "%s: Error reading file %s\n", __func__, COVERAGES_FILE);
-		exit(-1);
-	}
-
-	flseek(fin, 0L, SEEK_END);
-	long long sz = fltell(fin);
-	flseek(fin, 0L, SEEK_SET);
-
-	OASIS_FLOAT tiv;
-	unsigned int nrec = static_cast<unsigned int>(sz / sizeof(tiv));
-
-	coverages.resize(nrec + 1);
-	int coverage_id = 0;
-	size_t i = fread(&tiv, sizeof(tiv), 1, fin);
-	while (i != 0) {
-		coverage_id++;
-		coverages[coverage_id] = tiv;
-		i = fread(&tiv, sizeof(tiv), 1, fin);
-	}
-
-	fclose(fin);
-	return true;
-
-}
-
-inline bool getrec(char *rec_, FILE *stream, int recsize_)
-{
-	if (fread(rec_, 1, recsize_, stream) == recsize_) return true;
-	return false;
-
-}
-
-// interface callback functions
-bool iGetrec(char *rec, int recsize)
-{
-	return getrec(rec, stdin, recsize);
-}
-
-void itemWriter(const void *ibuf, int size,int count) 
-{
-	fwrite(ibuf, size, count, itemout);
-}
-
-void coverageWriter(const void *ibuf,int size, int count)
-{
-	fwrite(ibuf, size, count, covout);
-}
-
-void doit()
-{
-	std::vector<damagebindictionary> damagebindictionary_vec;
-	getdamagebindictionary(damagebindictionary_vec);
-
-	std::map<item_map_key, std::vector<item_map_rec> > item_map;
-	getitems(item_map);
-
-	std::vector<OASIS_FLOAT> coverages;
-	getcoverages(coverages);
-
-	size_t total_bins = damagebindictionary_vec.size();
-	int max_recsize = (int)(total_bins * sizeof(prob_mean)) + sizeof(damagecdfrec) + sizeof(int);
-	
-	int last_event_id = -1;
-	int stream_type = 0;
-	bool bSuccess = getrec((char *)&stream_type, stdin, sizeof(stream_type));
-	if (bSuccess == false) {
-		cerr << "gulcalc: Error no stream type returned\n";
-		return; // exit thread if failed
-	}
-
-	void(*itmWriter)(const void *ibuf,int size, int count) ;
-	void(*covWriter)(const void *ibuf,int size, int count);
-	itmWriter = 0;
-	covWriter = 0;
-
-	getRands rnd(rndopt, rand_vector_size,rand_seed);
-
-	if (itemLevelOutput == true) itmWriter = itemWriter;
-	if (coverageLevelOutput == true) covWriter = coverageWriter;
-
-	gulcalc g(damagebindictionary_vec,coverages,item_map,rnd, gul_limit, rndopt,debug, samplesize, itmWriter, covWriter, iGetrec);
-	g.doit();
-
-	return;
-
-}
 
 void help()
 {
@@ -245,43 +73,41 @@ void help()
 int main(int argc, char *argv[])
 {
 	int opt;
-	// default values
-	//rand_vector_size = 1000000;
-	//samplesize = 0;
-	//rand_seed = -1;
+	gulcalcopts gopt;
+	progname = argv[0];
 	while ((opt = getopt(argc, argv, "alvhdrL:S:c:i:R:s:")) != -1) {
 		switch (opt) {
 		case 'S':
-			samplesize = atoi(optarg);
+			gopt.samplesize = atoi(optarg);
 			break;
 		case 'l':
-			rndopt = rd_option::usecachedvector;
+			gopt.rndopt = rd_option::usecachedvector;
 			break;
 		case 'a':
-			rndopt = rd_option::usehashedseed;
+			gopt.rndopt = rd_option::usehashedseed;
 			break;
 		case 'r':
-			rndopt = rd_option::userandomnumberfile;
+			gopt.rndopt = rd_option::userandomnumberfile;
 			break;
 		case 'L':
-			gul_limit = atof(optarg);
+			gopt.gul_limit = atof(optarg);
 			break;
 		case 'R':
-			rand_vector_size = atoi(optarg);
+			gopt.rand_vector_size = atoi(optarg);
 			break;
 		case 'i':
-			item_output = optarg;
-			itemLevelOutput = true;
+			gopt.item_output = optarg;
+			gopt.itemLevelOutput = true;
 			break;
 		case 'c':
-			coverage_output = optarg;
-			coverageLevelOutput = true;
+			gopt.coverage_output = optarg;
+			gopt.coverageLevelOutput = true;
 			break;
 		case 'd':
-			debug = true;
+			gopt.debug = true;
 			break;		
 		case 's':
-			rand_seed = atoi(optarg);
+			gopt.rand_seed = atoi(optarg);
 			break;
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
@@ -294,20 +120,26 @@ int main(int argc, char *argv[])
 		}
 	}
 	
-	if (itemLevelOutput == true) {
-		if (item_output == "-") itemout = stdout;
-		else itemout = fopen(item_output.c_str(), "wb");
+	if (gopt.itemLevelOutput == true) {
+		if (gopt.item_output == "-") gopt.itemout = stdout;
+		else gopt.itemout = fopen(gopt.item_output.c_str(), "wb");
 	}
-	if (coverageLevelOutput == true) {
-		if (coverage_output == "-") covout = stdout;
-		else covout = fopen(coverage_output.c_str(), "wb");
+	if (gopt.coverageLevelOutput == true) {
+		if (gopt.coverage_output == "-") gopt.covout = stdout;
+		else gopt.covout = fopen(gopt.coverage_output.c_str(), "wb");
 	}
 
-	if (itemLevelOutput == false && coverageLevelOutput == false) {
+	if (gopt.itemLevelOutput == false && gopt.coverageLevelOutput == false) {
 		fprintf(stderr, "%s: No output option selected\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}	
-	initstreams();
-	doit();
+
+	try {
+		initstreams();
+		doit(gopt);
+	}catch (std::bad_alloc) {
+			fprintf(stderr, "%s: Memory allocation failed\n", progname);
+			exit(EXIT_FAILURE);
+	}
 
 }

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string>
 
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
 #include <sys/sysinfo.h>
 
 
@@ -58,3 +59,9 @@ int main(int argc, char *argv[])
 	int core_count = atoi(argv[1]);
 	getcgroupLimit(core_count);	
 }
+#else
+int main(int argc, char *argv[])
+{
+	// just a stub for windows - not used in windows 
+}
+#endif

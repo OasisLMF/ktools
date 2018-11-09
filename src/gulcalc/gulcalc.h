@@ -84,9 +84,26 @@ struct gulGulSamples {
 const int gularraysize = 1000;
 const int bufsize = sizeof(gulitemSampleslevel)* gularraysize;
 
+struct gulcalcopts {
+	rd_option rndopt = rd_option::usehashedseed;
+	int rand_vector_size = 1000000;
+	int rand_seed = 0;
+	std::string item_output;
+	std::string coverage_output;
+	bool itemLevelOutput = false;
+	bool coverageLevelOutput = false;
+	int samplesize = -1;
+	double gul_limit = 0.0;
+	bool debug = false;
+	FILE *itemout = stdout;
+	FILE *covout = stdout;
+};
+
+
 class gulcalc  {
 private:
 	getRands *rnd_;
+	int rand_seed_ = 0;
 	const std::map<item_map_key, std::vector<item_map_rec> > *item_map_;
 	const std::vector<OASIS_FLOAT> *coverages_;
 	const std::vector<damagebindictionary> *damagebindictionary_vec_;
@@ -128,13 +145,15 @@ public:
 		int samplesize,
 		void (*itemWriter)(const void *ibuf,int size, int count),
 		void(*coverageWriter)(const void *ibuf,int size, int count),
-		bool(*iGetrec)(char *rec, int recsize)
+		bool(*iGetrec)(char *rec, int recsize),
+		int rand_seed
 		) {
 		damagebindictionary_vec_ = &damagebindictionary_vec;
 		coverages_ = &tivs;
 		cov_.resize(coverages_->size());
 		item_map_ = &item_map;
 		rnd_ = &rnd;
+
 		itemWriter_ = itemWriter;
 		coverageWriter_ = coverageWriter;
 		iGetrec_ = iGetrec;
@@ -151,6 +170,37 @@ public:
 		p1_ = rnd_->getp1();	// prime p1	make these long to force below expression to not have sign problem
 		p2_ = rnd_->getp2((unsigned int)p1_);  // prime no p2
 		p3_ = rnd_->getp2((unsigned int)samplesize_);	// use as additional offset to stop overlapping of random numbers 
+		rand_seed_ = rand_seed;
+	}
+	gulcalc(const std::vector<damagebindictionary> &damagebindictionary_vec, const std::vector<OASIS_FLOAT> &tivs,
+		const std::map<item_map_key, std::vector<item_map_rec> > &item_map, getRands &rnd,
+		const gulcalcopts &opt,
+		void(*itemWriter)(const void *ibuf, int size, int count),
+		void(*coverageWriter)(const void *ibuf, int size, int count),
+		bool(*iGetrec)(char *rec, int recsize)
+	) {
+		damagebindictionary_vec_ = &damagebindictionary_vec;
+		coverages_ = &tivs;
+		cov_.resize(coverages_->size());
+		item_map_ = &item_map;
+		rnd_ = &rnd;
+		itemWriter_ = itemWriter;
+		coverageWriter_ = coverageWriter;
+		iGetrec_ = iGetrec;
+		ibuf_ = new unsigned char[bufsize + sizeof(gulitemSampleslevel)]; // make the allocation bigger by 1 record to avoid overrunning
+		cbuf_ = new unsigned char[bufsize + sizeof(gulitemSampleslevel)]; // make the allocation bigger by 1 record to avoid overrunning
+		//TODO: when using double precision, these buffers above are overflowing,
+		//the hack fix is to replace sizeof(gulitemSampleslevel) with 2*sizeof(gulitemSampleslevel)
+		gul_limit_ = opt.gul_limit;
+		rndopt_ = opt.rndopt;
+		debug_ = opt.debug;
+		samplesize_ = opt.samplesize;
+		isFirstItemEvent_ = true;
+		isFirstCovEvent_ = true;
+		p1_ = rnd_->getp1();	// prime p1	make these long to force below expression to not have sign problem
+		p2_ = rnd_->getp2((unsigned int)p1_);  // prime no p2
+		p3_ = rnd_->getp2((unsigned int)samplesize_);	// use as additional offset to stop overlapping of random numbers 
+		rand_seed_ = opt.rand_seed;
 	}
 	~gulcalc() {
 		delete [] ibuf_;
@@ -159,4 +209,5 @@ public:
 	void doit();
 };
 
+void doit(const gulcalcopts &g);
 #endif // GULCALC_H_

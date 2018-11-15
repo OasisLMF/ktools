@@ -41,13 +41,21 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <fstream>
 #include "../include/oasis.h"
 
+#if defined(_MSC_VER)
+#include "../wingetopt/wingetopt.h"
+
+#else
+#include <unistd.h>
+#endif
+
+
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
 #include <signal.h>
 #include <string.h>
 #endif
 
 namespace eve {
-	void emitevents(OASIS_INT pno_, OASIS_INT total_);
+	void emitevents(OASIS_INT pno_, OASIS_INT total_, bool shuffle,bool textmode);
 }
 char *progname;
 
@@ -65,31 +73,63 @@ void help()
 	fprintf(stderr,
 		"usage: processno totalprocesses\n"
 		"-h help\n"
+		"-s shuffled events\n"
 		"-v version\n"
+		"-t text mode\n"
 	);
 }
 int main(int argc, char *argv[])
 {
 	progname = argv[0];
 
-	if (argc == 2) {
-		if (!strcmp(argv[1], "-v")) {
-			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
-			return EXIT_FAILURE;
-		}
-		if (!strcmp(argv[1], "-h")) {
+	int opt;
+	bool shuffle = false;
+	bool textmode = false;
+
+	while ((opt = getopt(argc, argv, "svht")) != -1) {
+		switch (opt) {
+		case 'v':
+			{
+				fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+				::exit(EXIT_FAILURE);
+			}
+			break;
+		case 's': {
+				  shuffle=true;
+			  }
+			break;
+		case 't':
+			{
+				textmode=true;
+			}
+			break;
+		case 'h':
+		default:
 			help();
-			return EXIT_FAILURE;
+			::exit(EXIT_FAILURE);
 		}
 	}
+	
+	bool parameter_error = false;
 
-	if (argc != 3) {
-		fprintf(stderr, "usage: processno totalprocesses\n");
-		return EXIT_FAILURE;
+	if (argv[optind] == NULL) {
+		  printf("arguments for processno not supplied\n");
+		  parameter_error=true;
+	}
+	if (argv[optind + 1] == NULL) {
+		  printf("totalprocesses not supplied\n");
+		  parameter_error=true;
 	}
 
-	OASIS_INT pno = atoi(argv[1]);
-	OASIS_INT total = atoi(argv[2]);
+	if (parameter_error == true){
+		exit(EXIT_FAILURE);
+	}
+
+	OASIS_INT pno = atoi(argv[optind]);
+	OASIS_INT total = atoi(argv[optind+1]);
+
+//	fprintf(stderr,"%d %d %d\n",pno, total, shuffle);
+
 
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
 	struct sigaction sa;
@@ -105,7 +145,7 @@ int main(int argc, char *argv[])
 
 	try {
 		initstreams("", "");
-		eve::emitevents(pno, total);
+		eve::emitevents(pno, total,shuffle,textmode);
 	}
 	catch (std::bad_alloc) {
 		fprintf(stderr, "%s: Memory allocation failed\n", progname);

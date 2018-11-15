@@ -42,32 +42,61 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include "../include/oasis.h"
 #include <math.h>
 
+#include <iostream>     // std::cout
+#include <algorithm>    // std::shuffle
+#include <vector>       // std::vector
+#include <random>       // std::default_random_engine
+
+
 extern char *progname;
 namespace eve {
-	void emitevents(OASIS_INT pno_, OASIS_INT total_)
+
+	void readevents(std::vector<int> &events)
 	{
 		FILE *fin = fopen(EVENTS_FILE, "rb");
 		if (fin == NULL) {
 			fprintf(stderr, "%s: %s: cannot open %s\n", progname, __func__, EVENTS_FILE);
 			exit(EXIT_FAILURE);
 		}
-		fseek(fin, 0L, SEEK_END);
-		long long  endpos = fltell(fin);
+		int eventid;
+		while (fread(&eventid, sizeof(eventid), 1, fin) == 1) {
+			events.push_back(eventid);
+		}
+		fclose(fin);
+	}
+	void doshuffle(std::vector<int> &events)
+	{
+		unsigned seed = 1234;
+		std::default_random_engine e(seed);
+		std::shuffle(events.begin(), events.end(), e);
+	}
 
-		int total_events = static_cast<OASIS_INT>(endpos / sizeof(OASIS_INT));
+	void emitevents(OASIS_INT pno_, OASIS_INT total_, std::vector<int> &events,bool textmode)
+	{
+		int total_events = events.size();
 		int chunksize = (int)ceil((OASIS_FLOAT)total_events / total_);
-		int end_pos = chunksize * pno_ * sizeof(OASIS_INT);
+		int end_pos = chunksize * pno_;
 		pno_--;
-		int start_pos = chunksize * pno_ * sizeof(OASIS_INT);
-		fseek(fin, start_pos, SEEK_SET);
-		while (start_pos < end_pos) {
-			int c = fgetc(fin);
-			if (c == EOF) break;
-			fputc(c, stdout);
+		int start_pos = chunksize * pno_;
+		if (end_pos > events.size()) end_pos = events.size();
+	//	fprintf(stderr,"Total events: %d chuck_size: %d start_pos: %d end_pos:%d\n",total_events, chunksize,start_pos,end_pos);
+		while (start_pos < end_pos){
+			int eventid = events[start_pos];
+			if (textmode == true) fprintf(stdout,"%d\n",eventid);
+			else fwrite(&eventid, sizeof(eventid), 1, stdout);
 			start_pos++;
 		}
 
-		fclose(fin);
+	}
+	void emitevents(OASIS_INT pno_, OASIS_INT total_,bool shuffle,bool textmode)
+	{
+
+		std::vector<int> events;
+		readevents(events);
+		if (shuffle == true) {
+			doshuffle(events);
+		}
+		emitevents(pno_,total_,events,textmode);
 		return;
 
 	}

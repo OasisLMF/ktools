@@ -2,7 +2,7 @@
 
 # ktools
 
-This is the POSIX-compliant Oasis In-Memory Kernel toolkit.
+This is the POSIX-compliant Oasis LMF In-Memory Kernel toolkit.
 
 ### Release
 
@@ -71,7 +71,7 @@ Follow the rest of the process as described above.
 ## Windows Installation
 
 ### Pre-requisites
-MSYS2 64-bit is required for the Windows native build.  MSYS2 is a Linux environment running in Windows.
+MSYS2 64-bit is required for the Windows native build.  MSYS2 is a Unix/Linux like development environment for building and distributing windows applications.
 https://www.msys2.org/
 
 Download and run the set-up program for MSYS2 64-bit. 

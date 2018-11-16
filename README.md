@@ -71,57 +71,46 @@ Follow the rest of the process as described above.
 ## Windows Installation
 
 ### Pre-requisites
-Cygwin 64-bit is required for the Windows native build.  Cygwin is a Linux environment running in Windows.
-http://www.cygwin.com/
+MSYS2 64-bit is required for the Windows native build.  MSYS2 is a Linux environment running in Windows.
+https://www.msys2.org/
 
-Download and run the set-up program for Cygwin. 
-The following Cygwin add-in packages are required;
-* gcc-g++
-* gcc-core
-* make
-* diffutils
+Download and run the set-up program for MSYS2 64-bit. 
+
+Open a MSYS2 terminal and perform the updates before continuing.
+
+The following add-in packages are required;
+
+* autoconf
 * automake
-* autoconf2.1
-* autoconf2.5
-* libtools
-* zlib-devel
 * git
+* libtool
+* make
+* mingw-w64-x86_64-toolchain
+* python
 
+These packages can be installed at the MSYS2 terminal command line.
 
-To build native Windows 64-bit executables;
-
-* mingw64-x86_64-gcc-g++
-* mingw64-x86_64-gcc-core
-* mingw64-x86_64-zlib
-
-Search for 'mingw', gcc', 'make' and 'diffutils' to find all of the relevant packages (Only 'gcc' illustrated below).
-![alt text](docs/img/cygwin1.jpg "Add-in packages")
+``` sh
+$ pacman -S autoconf automake git libtool make mingw-w64-x86_64-toolchain python
+```
+![alt text](docs/img/msys2packages.jpg "Install add-in packages")
 
 ### Instructions
 
-Copy ktools-[version].tar.gz onto your machine. 
-
-Open a Cygwin terminal. 
-
-![alt text](docs/img/cygwin2.jpg "Cygwin terminal")
-
-Change directory to the location of the tar.gz.
-
-Extract the files using the following command
+Clone the github repository at the MSYS2 terminal command line
 ``` sh
-$ tar -xvf ktools-[version].tar.gz
+$ git clone https://github.com/OasisLMF/ktools.git
 ```
 
-Go into the ktools folder and autgen using the following command;
-
+Go into the ktools folder and run autogen using the following command;
 ``` sh
-$ cd ktools-[version]
+$ cd ktools
 $ ./autogen.sh
 ```
 
 Configure using the following command;
 ``` sh
-$ ./winconfigure
+$ ./configure
 ```
 
 Make using the following command;
@@ -139,17 +128,13 @@ Finally, install the executables using the following command;
 $ make install
 ```
 
-The executables are located in C:/Oasis/bin. You should add this bin folder to your path in System Environment Variables.
-
-![alt text](docs/img/windowspath.jpg "Adding the path in system environment variables")
-
-The installation is complete. Restart the Cygwin session to refresh the path before usage.
+The installation is complete. The executables are located in /usr/local/bin. 
 
 ## Usage
 
 There is sample data and six example scripts which demonstrate how to invoke ktools in the /examples folder. These are written in python v2. 
 
-For example, to run the eltcalc_example script, go into the examples folder and run the following command (you must have python v2.X installed):
+For example, to run the eltcalc_example script, go into the examples folder and run the following command (you must have python installed):
 
 ``` sh
 $ cd examples
@@ -168,4 +153,3 @@ Email support@oasislmf.org
 
 ## License
 The code in this project is licensed under BSD 3-clause license.
-

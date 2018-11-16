@@ -46,53 +46,28 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <unistd.h>
 #endif
 
-void doit()
-{
+namespace damagebintobin {
+	void doit()
+	{
 
-	damagebindictionary q;
-    char line[4096];
-    int lineno=0;
-	fgets(line, sizeof(line), stdin);
-	lineno++;
-    while (fgets(line, sizeof(line), stdin) != 0)
-    {
-		if (sscanf(line, "%d,%f,%f,%f,%d", &q.bin_index, &q.bin_from, &q.bin_to, &q.interpolation, &q.interval_type) != 5){
-           fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
-           return;
-       }
-
-	    else
-       {
-           fwrite(&q, sizeof(q), 1, stdout);
-       }
-       lineno++;
-    }
-
-}
-
-void help()
-{
-	fprintf(stderr, "-h help\n-v version\n");
-}
-
-int main(int argc, char *argv[])
-{
-
-	int opt;
-	while ((opt = getopt(argc, argv, "vh")) != -1) {
-		switch (opt) {
-		case 'v':
-			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
-			::exit(EXIT_FAILURE);
-			break;
-		case 'h':
-		default:
-			help();
-			::exit(EXIT_FAILURE);
+		damagebindictionary q;
+		char line[4096];
+		int lineno=0;
+		fgets(line, sizeof(line), stdin);
+		lineno++;
+		while (fgets(line, sizeof(line), stdin) != 0)
+		{
+			if (sscanf(line, "%d,%f,%f,%f,%d", &q.bin_index, &q.bin_from, &q.bin_to, &q.interpolation, &q.interval_type) != 5){
+			fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
+			return;
 		}
-	}
 
-	initstreams();
-	doit();
-	return 0;
-}
+			else
+		{
+			fwrite(&q, sizeof(q), 1, stdout);
+		}
+		lineno++;
+		}
+
+	}
+}	

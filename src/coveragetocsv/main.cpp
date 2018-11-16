@@ -35,9 +35,8 @@
 Convert coveragetocsv output to csv
 Author: Joh Carter  email: johanna.carter@oasislmf.org
 */
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
+
+#include "../include/oasis.h"
 
 #if defined(_MSC_VER)
 #include "../wingetopt/wingetopt.h"
@@ -45,24 +44,74 @@ Author: Joh Carter  email: johanna.carter@oasislmf.org
 #include <unistd.h>
 #endif
 
-#include "../include/oasis.h"
-
-using namespace std;
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+#include <signal.h>
+#include <string.h>
+#endif
 
 namespace coveragetocsv {
-	void doit(bool skipheader)
-	{
-
-		if(skipheader == false) printf("\"coverage_id\", \"tiv\"\n");
-		
-		OASIS_FLOAT tiv;
-		int id = 0;
-		size_t i = fread(&tiv, sizeof(tiv), 1, stdin);
-		while (i != 0) {
-			id++;
-			printf("%d, %f\n", id, tiv);
-			i = fread(&tiv, sizeof(tiv), 1, stdin);
-		}
-	}
+	void doit(bool skipheader);
 }
 
+char *progname;
+
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+void segfault_sigaction(int signal, siginfo_t *si, void *arg)
+{
+	fprintf(stderr, "%s: Segment fault at address: %p\n", progname, si->si_addr);
+	exit(0);
+}
+#endif
+
+
+void help()
+{
+	fprintf(stderr, 
+		"-s skip header\n"
+		"-v version\n"
+		"-h help"
+	) ;
+}
+
+int main(int argc, char* argv[])
+{    
+    progname = argv[0];
+	 int opt;
+     bool skipheader = false;
+     while ((opt = getopt(argc, argv, "vhs")) != -1) {
+         switch (opt) {
+		  case 's':
+			  skipheader = true;
+			  break;
+		  case 'v':
+			  fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+			  exit(EXIT_FAILURE);
+			  break;
+         case 'h':
+            help();
+            exit(EXIT_FAILURE);
+         }
+     }
+
+
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+	struct sigaction sa;
+
+	memset(&sa, 0, sizeof(struct sigaction));
+	sigemptyset(&sa.sa_mask);
+	sa.sa_sigaction = segfault_sigaction;
+	sa.sa_flags = SA_SIGINFO;
+
+	sigaction(SIGSEGV, &sa, NULL);
+#endif
+	try {
+		initstreams();
+		coveragetocsv::doit(skipheader);
+		return 0;
+	}
+	catch (std::bad_alloc) {
+		fprintf(stderr, "%s: Memory allocation failed\n", progname);
+		exit(0);
+	}
+
+}

@@ -53,53 +53,27 @@ struct fm_policyTC {
   int layer_id;
   int PolicyTC_id;
 };
+namespace fmpolicytctobin {
+	void doit()
+	{
 
-void doit()
-{
-
-	fm_policyTC q;
-    char line[4096];
-    int lineno=0;
-	fgets(line, sizeof(line), stdin);
-	lineno++;
-    while (fgets(line, sizeof(line), stdin) != 0)
-    {
-		if (sscanf(line, "%d,%d,%d,%d",  &q.layer_id, &q.level_id, &q.agg_id, &q.PolicyTC_id) != 4){
-           fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
-           return;
-       }
-	    else
-       {
-           fwrite(&q, sizeof(q), 1, stdout);
-       }
-       lineno++;
-    }
-
-}
-
-void help()
-{
-	fprintf(stderr, "-h help\n-v version\n");
-}
-
-int main(int argc, char *argv[])
-{
-
-	int opt;
-	while ((opt = getopt(argc, argv, "vh")) != -1) {
-		switch (opt) {
-		case 'v':
-			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
-			::exit(EXIT_FAILURE);
-			break;
-		case 'h':
-		default:
-			help();
-			::exit(EXIT_FAILURE);
+		fm_policyTC q;
+		char line[4096];
+		int lineno = 0;
+		fgets(line, sizeof(line), stdin);
+		lineno++;
+		while (fgets(line, sizeof(line), stdin) != 0)
+		{
+			if (sscanf(line, "%d,%d,%d,%d", &q.layer_id, &q.level_id, &q.agg_id, &q.PolicyTC_id) != 4) {
+				fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
+				return;
+			}
+			else
+			{
+				fwrite(&q, sizeof(q), 1, stdout);
+			}
+			lineno++;
 		}
-	}
 
-	initstreams();
-	doit();
-	return 0;
+	}
 }

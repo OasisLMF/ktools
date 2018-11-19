@@ -1,4 +1,4 @@
 # Our binary is produced here
 bin_PROGRAMS = damagebintocsv 
-damagebintocsv_SOURCES = damagebintocsv.cpp
+damagebintocsv_SOURCES = damagebintocsv.cpp main.cpp
 

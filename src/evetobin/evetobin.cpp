@@ -46,56 +46,31 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <unistd.h>
 #endif
 
-
-void doit()
-{
-    OASIS_INT eventid;
-    char line[4096];
-    int lineno=1;
-	fgets(line, sizeof(line), stdin);	// skip first line header line
-	lineno++;
-    while (fgets(line, sizeof(line), stdin) != 0)
-    {
-       if (sscanf(line, "%d", &eventid) != 1){
-           fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
-           return;
-       }
-       else
-       {
-		   if (eventid < 1) {
-			   fprintf(stderr, "Invalid event ID: %d on line %d\n", eventid, lineno);
-			   fprintf(stderr, "Event ID's must be integers greater than zero\n");
-		   }
-           fwrite(&eventid, sizeof(eventid), 1, stdout);
-       }
-       lineno++;
-    }
-
-}
-
-void help()
-{
-	fprintf(stderr, "-h help\n-v version\n");
-}
-
-int main(int argc, char *argv[])
-{
-
-	int opt;
-	while ((opt = getopt(argc, argv, "vh")) != -1) {
-		switch (opt) {
-		case 'v':
-			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
-			::exit(EXIT_FAILURE);
-			break;
-		case 'h':
-		default:
-			help();
-			::exit(EXIT_FAILURE);
+namespace evetobin {
+	void doit()
+	{
+		OASIS_INT eventid;
+		char line[4096];
+		int lineno = 1;
+		fgets(line, sizeof(line), stdin);	// skip first line header line
+		lineno++;
+		while (fgets(line, sizeof(line), stdin) != 0)
+		{
+			if (sscanf(line, "%d", &eventid) != 1) {
+				fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
+				return;
+			}
+			else
+			{
+				if (eventid < 1) {
+					fprintf(stderr, "Invalid event ID: %d on line %d\n", eventid, lineno);
+					fprintf(stderr, "Event ID's must be integers greater than zero\n");
+				}
+				fwrite(&eventid, sizeof(eventid), 1, stdout);
+			}
+			lineno++;
 		}
+
 	}
 
-	initstreams();
-	doit();
-	return 0;
 }

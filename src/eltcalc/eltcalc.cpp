@@ -51,146 +51,113 @@ Author: Ben Matharu  email : ben.matharu@oasislmf.org
 #include <unistd.h>
 #endif
 
-using namespace std;
+
 #include "../include/oasis.h"
 
-bool skipHeader = false;
-bool firstOutput = true;
+using namespace std;
 
-bool isSummaryCalcStream(unsigned int stream_type)
-{
-	unsigned int stype = summarycalc_id & stream_type;
-	return (stype == summarycalc_id);
-}
+namespace eltcalc {
+	
+	bool firstOutput = true;
 
-void doetloutput(int samplesize)
-{
-	OASIS_FLOAT sumloss = 0.0;
-	OASIS_FLOAT sample_mean = 0.0;
-	OASIS_FLOAT analytical_mean = 0.0;
-	OASIS_FLOAT sd = 0;
-	OASIS_FLOAT sumlosssqr = 0.0;
-	if (skipHeader == false) printf("summary_id,type,event_id,mean,standard_deviation,exposure_value\n");
-	summarySampleslevelHeader sh;
-	int i = fread(&sh, sizeof(sh), 1, stdin);
-	while (i != 0) {
-		sampleslevelRec sr;
-		i = fread(&sr, sizeof(sr), 1, stdin);
+	bool isSummaryCalcStream(unsigned int stream_type)
+	{
+		unsigned int stype = summarycalc_id & stream_type;
+		return (stype == summarycalc_id);
+	}
+
+	void doetloutput(int samplesize, bool skipHeader)
+	{
+		OASIS_FLOAT sumloss = 0.0;
+		OASIS_FLOAT sample_mean = 0.0;
+		OASIS_FLOAT analytical_mean = 0.0;
+		OASIS_FLOAT sd = 0;
+		OASIS_FLOAT sumlosssqr = 0.0;
+		if (skipHeader == false) printf("summary_id,type,event_id,mean,standard_deviation,exposure_value\n");
+		summarySampleslevelHeader sh;
+		int i = fread(&sh, sizeof(sh), 1, stdin);
 		while (i != 0) {
-			if (sr.sidx > 0) {
-				sumloss += sr.loss;
-				sumlosssqr += (sr.loss * sr.loss);
-			}
-			if (sr.sidx == -1) analytical_mean = sr.loss;
+			sampleslevelRec sr;
 			i = fread(&sr, sizeof(sr), 1, stdin);
-			if (sr.sidx == 0) break;
-		}		
-		if (samplesize > 1) {
-			sample_mean = sumloss / samplesize;
-			sd = (sumlosssqr - ((sumloss*sumloss) / samplesize)) / (samplesize - 1);
-			OASIS_FLOAT x = sd / sumlosssqr;
-			if (x < 0.0000001) sd = 0;   // fix OASIS_FLOATing point precision problems caused by using large numbers
-			sd = sqrt(sd);
-		}
-		else {
-			if (samplesize == 0) {
-				sd = 0;
-				sample_mean = 0;
+			while (i != 0) {
+				if (sr.sidx > 0) {
+					sumloss += sr.loss;
+					sumlosssqr += (sr.loss * sr.loss);
+				}
+				if (sr.sidx == -1) analytical_mean = sr.loss;
+				i = fread(&sr, sizeof(sr), 1, stdin);
+				if (sr.sidx == 0) break;
 			}
-			if (samplesize == 1) {
+			if (samplesize > 1) {
 				sample_mean = sumloss / samplesize;
-				sd = 0;
+				sd = (sumlosssqr - ((sumloss*sumloss) / samplesize)) / (samplesize - 1);
+				OASIS_FLOAT x = sd / sumlosssqr;
+				if (x < 0.0000001) sd = 0;   // fix OASIS_FLOATing point precision problems caused by using large numbers
+				sd = sqrt(sd);
 			}
-		}
-		if (sh.expval > 0) {	// only output rows with a none zero exposure value
-			printf("%d,1,%d,%f,0,%f\n", sh.summary_id, sh.event_id, analytical_mean, sh.expval);
-			if (firstOutput == true) {
-				std::this_thread::sleep_for(std::chrono::milliseconds(PIPE_DELAY)); // used to stop possible race condition with kat
-				firstOutput = false;
+			else {
+				if (samplesize == 0) {
+					sd = 0;
+					sample_mean = 0;
+				}
+				if (samplesize == 1) {
+					sample_mean = sumloss / samplesize;
+					sd = 0;
+				}
 			}
-			if (samplesize) printf("%d,2,%d,%f,%f,%f\n", sh.summary_id, sh.event_id, sample_mean, sd, sh.expval);
-		}
-		
+			if (sh.expval > 0) {	// only output rows with a none zero exposure value
+				printf("%d,1,%d,%f,0,%f\n", sh.summary_id, sh.event_id, analytical_mean, sh.expval);
+				if (firstOutput == true) {
+					std::this_thread::sleep_for(std::chrono::milliseconds(PIPE_DELAY)); // used to stop possible race condition with kat
+					firstOutput = false;
+				}
+				if (samplesize) printf("%d,2,%d,%f,%f,%f\n", sh.summary_id, sh.event_id, sample_mean, sd, sh.expval);
+			}
 
-		if (i) i = fread(&sh, sizeof(sh), 1, stdin);
-		sumloss = 0.0;
-		sumlosssqr = 0.0;
-		sd = 0.0;
+
+			if (i) i = fread(&sh, sizeof(sh), 1, stdin);
+			sumloss = 0.0;
+			sumlosssqr = 0.0;
+			sd = 0.0;
+		}
+
+	}
+	void doit(bool skipHeader)
+	{
+		unsigned int stream_type = 0;
+		int i = fread(&stream_type, sizeof(stream_type), 1, stdin);
+
+		if (isSummaryCalcStream(stream_type) == true) {
+			unsigned int samplesize;
+			unsigned int summaryset_id;
+			i = fread(&samplesize, sizeof(samplesize), 1, stdin);
+			if (i == 1) i = fread(&summaryset_id, sizeof(summaryset_id), 1, stdin);
+			if (i == 1) {
+				doetloutput(samplesize, skipHeader);
+			}
+			else {
+				fprintf(stderr, "Stream read error\n");
+			}
+			return;
+		}
+
+		fprintf(stderr, "%s: Not a gul stream\n", __func__);
+		fprintf(stderr, "%s: invalid stream type %d\n", __func__, stream_type);
+		exit(-1);
 	}
 
-}
-void doit()
-{
-    unsigned int stream_type = 0;
-    int i = fread(&stream_type, sizeof(stream_type), 1, stdin);
 
-	if (isSummaryCalcStream(stream_type) == true) {		
-		unsigned int samplesize;
-		unsigned int summaryset_id;
-		i = fread(&samplesize, sizeof(samplesize), 1, stdin);
-		if (i == 1) i = fread(&summaryset_id, sizeof(summaryset_id), 1, stdin);
-		if (i == 1) {
-			doetloutput( samplesize);
-		}
-		else {
-			fprintf(stderr, "Stream read error\n");
-		}
-		return;
+	void touch(const std::string &filepath)
+	{
+		FILE *fout = fopen(filepath.c_str(), "wb");
+		fclose(fout);
 	}
-
-	fprintf(stderr, "%s: Not a gul stream\n",__func__);
-	fprintf(stderr, "%s: invalid stream type %d\n", __func__, stream_type);
-    exit(-1);
-}
-
-void help()
-{
-	fprintf(stderr,
-     "-v version\n"
-	 "-s skip header\n"
-     "-h help\n"
-	) ;
-}
-void touch(const std::string &filepath)
-{
-	FILE *fout = fopen(filepath.c_str(), "wb");
-	fclose(fout);
-}
-void setinitdone(int processid)
-{
-	if (processid) {
-		std::ostringstream s;
-		s << SEMA_DIR_PREFIX << "_elt/" << processid << ".id";
-		touch(s.str());
-	}
-}
-int main(int argc, char* argv[])
-{
-
-	int opt;
-	int processid = 0;
-	while ((opt = getopt(argc, argv, "vshP:")) != -1) {
-		switch (opt) {
-		case 'v':
-			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
-			exit(EXIT_FAILURE);
-			break;
-		case 'P':
-			processid = atoi(optarg);
-			break;
-		case 's':
-			skipHeader = true;
-			break;
-		case 'h':
-		default:
-			help();
-			exit(EXIT_FAILURE);
+	void setinitdone(int processid)
+	{
+		if (processid) {
+			std::ostringstream s;
+			s << SEMA_DIR_PREFIX << "_elt/" << processid << ".id";
+			touch(s.str());
 		}
 	}
-   initstreams();
-   setinitdone(processid);
-   doit();
-   return 0;
-
 }
-

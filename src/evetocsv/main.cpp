@@ -50,16 +50,51 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #endif
 
 namespace evetocsv {
-	void doit(bool skipheader)
-	{
-		if (skipheader == false) printf("\"event_id\"\n");
-		int eventid;
-		while (fread(&eventid, sizeof(eventid), 1, stdin) == 1) {
-			printf("%d\n", eventid);
-		}
+	void doit(bool skipheader);
+}
+char *progname;
 
-	}
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+void segfault_sigaction(int signal, siginfo_t *si, void *arg)
+{
+	fprintf(stderr, "%s: Segment fault at address: %p\n", progname, si->si_addr);
+	exit(0);
+}
+#endif
 
+
+void help()
+{
+	fprintf(stderr, "-s skip header\n-h help\n-v version\n");
 }
 
-
+int main(int argc, char* argv[])
+{
+	progname = argv[0];
+	int opt;
+	bool skipheader = false;
+	while ((opt = getopt(argc, argv, "svh")) != -1) {
+		switch (opt) {
+		case 's':
+			skipheader = true;
+			break;
+		case 'v':
+			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+			exit(EXIT_FAILURE);
+			break;
+		case 'h':
+		default:
+			help();
+			exit(EXIT_FAILURE);
+		}
+	}
+	initstreams();
+	try {
+		evetocsv::doit(skipheader);
+	}
+	catch (std::bad_alloc) {
+		fprintf(stderr, "%s: Memory allocation failed\n", progname);
+		exit(EXIT_FAILURE);
+	}
+	return EXIT_SUCCESS;
+}

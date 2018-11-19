@@ -31,35 +31,63 @@
 * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 * DAMAGE.
 */
-
 /*
-evetocsv: Convert binary event stream to csv stream
 Author: Ben Matharu  email: ben.matharu@oasislmf.org
-
 */
-
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "../include/oasis.h"
+
 #if defined(_MSC_VER)
 #include "../wingetopt/wingetopt.h"
 #else
 #include <unistd.h>
 #endif
 
-namespace evetocsv {
-	void doit(bool skipheader)
-	{
-		if (skipheader == false) printf("\"event_id\"\n");
-		int eventid;
-		while (fread(&eventid, sizeof(eventid), 1, stdin) == 1) {
-			printf("%d\n", eventid);
-		}
-
-	}
-
+namespace fmpolicytctobin {
+	void doit();
 }
 
+char *progname;
 
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+void segfault_sigaction(int signal, siginfo_t *si, void *arg)
+{
+	fprintf(stderr, "%s: Segment fault at address: %p\n", progname, si->si_addr);
+	exit(0);
+}
+#endif
+
+void help()
+{
+	fprintf(stderr, "-h help\n-v version\n");
+}
+
+int main(int argc, char *argv[])
+{
+	progname = argv[0];
+	int opt;
+	while ((opt = getopt(argc, argv, "vh")) != -1) {
+		switch (opt) {
+		case 'v':
+			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+			::exit(EXIT_FAILURE);
+			break;
+		case 'h':
+		default:
+			help();
+			::exit(EXIT_FAILURE);
+		}
+	}
+	try {
+		initstreams();
+		fmpolicytctobin::doit();	
+	}
+	catch (std::bad_alloc) {
+		fprintf(stderr, "%s: Memory allocation failed\n", progname);
+		exit(EXIT_FAILURE);
+	}
+	return EXIT_SUCCESS;
+}

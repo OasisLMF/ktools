@@ -46,44 +46,20 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <unistd.h>
 #endif
 
-void doit()
-{
-	printf("\"bin_index\", \"bin_from\", \"bin_to\", \"interpolation\", \"interval_type\"\n");
-	
-	damagebindictionary q;
-	size_t i = fread(&q, sizeof(q), 1, stdin);
-	while (i != 0) {
-		printf("%d, %f, %f, %f, %d\n",
-			q.bin_index, q.bin_from, q.bin_to, q.interpolation, q.interval_type);
+namespace damagebintocsv {
+	void doit()
+	{
+		printf("\"bin_index\", \"bin_from\", \"bin_to\", \"interpolation\", \"interval_type\"\n");
 
-		i = fread(&q, sizeof(q), 1, stdin);
-    }
+		damagebindictionary q;
+		size_t i = fread(&q, sizeof(q), 1, stdin);
+		while (i != 0) {
+			printf("%d, %f, %f, %f, %d\n",
+				q.bin_index, q.bin_from, q.bin_to, q.interpolation, q.interval_type);
 
-}
-
-void help()
-{
-	fprintf(stderr, "-h help\n-v version\n");
-}
-
-int main(int argc, char *argv[])
-{
-
-	int opt;
-	while ((opt = getopt(argc, argv, "vh")) != -1) {
-		switch (opt) {
-		case 'v':
-			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
-			::exit(EXIT_FAILURE);
-			break;
-		case 'h':
-		default:
-			help();
-			::exit(EXIT_FAILURE);
+			i = fread(&q, sizeof(q), 1, stdin);
 		}
+
 	}
 
-	initstreams();
-	doit();
-	return 0;
 }

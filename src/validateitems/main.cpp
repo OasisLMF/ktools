@@ -1,5 +1,5 @@
 /*
-* Copyright (c)2015 - 2016 Oasis LMF Limited
+* Copyright (c)2015 - 2018 Oasis LMF Limited
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
@@ -31,11 +31,11 @@
 * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 * DAMAGE.
 */
+
 /*
-Convert fmpolicttc output to csv
 Author: Ben Matharu  email: ben.matharu@oasislmf.org
 */
-#include <iostream>
+
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -45,31 +45,69 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <unistd.h>
 #endif
 
-
-
 #include "../include/oasis.h"
 
-using namespace std;
+char *progname;
 
-struct fm_policyTC {
-	int level_id;
-	int agg_id;
-	int layer_id;
-	int PolicyTC_id;
-};
-
-namespace fmpolicytctocsv {
-	void doit(bool skipheader)
-	{
-
-		if (skipheader == false)  printf("\"layer_id\",\"level_id\",\"agg_id\",\"policytc_id\"\n");
-
-		fm_policyTC q;
-		size_t i = fread(&q, sizeof(q), 1, stdin);
-		while (i != 0) {
-			printf(" %d, %d, %d, %d\n", q.layer_id, q.level_id, q.agg_id, q.PolicyTC_id);
-			i = fread(&q, sizeof(q), 1, stdin);
-		}
-	}
+namespace validateitems {
+	void doit();
 }
 
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+void segfault_sigaction(int signal, siginfo_t *si, void *arg)
+{
+	fprintf(stderr, "%s: Segment fault at address: %p\n", progname, si->si_addr);
+	exit(0);
+}
+#endif
+
+
+void help()
+{
+	fprintf(stderr, "-h help\n-v version\n");
+}
+
+int main(int argc, char* argv[])
+{
+	progname = argv[0];
+	int opt;
+	bool skipheader = false;
+	while ((opt = getopt(argc, argv, (char *) "svh")) != -1) {
+		switch (opt) {
+		case 's':
+			skipheader = true;
+			break;
+		case 'v':
+			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+			exit(EXIT_FAILURE);
+			break;
+		case 'h':
+		default:
+			help();
+			exit(EXIT_FAILURE);
+		}
+	}
+
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+	struct sigaction sa;
+
+	memset(&sa, 0, sizeof(struct sigaction));
+	sigemptyset(&sa.sa_mask);
+	sa.sa_sigaction = segfault_sigaction;
+	sa.sa_flags = SA_SIGINFO;
+
+	sigaction(SIGSEGV, &sa, NULL);
+#endif
+
+	try {
+		initstreams("", "");
+		validateitems::doit();
+	}
+	catch (std::bad_alloc) {
+		fprintf(stderr, "%s: Memory allocation failed\n", progname);
+		exit(EXIT_FAILURE);
+	}
+
+	return EXIT_SUCCESS;
+
+}

@@ -147,13 +147,14 @@ AC_CONFIG_FILES([
                  src/footprinttocsv/Makefile
                  src/periodstobin/Makefile
                  src/periodstocsv/Makefile
-				 src/returnperiodtobin/Makefile
-				 src/returnperiodtocsv/Makefile
-				 src/kat/Makefile
-				 src/footprintconv/Makefile
-				 src/fmprofilebinconv/Makefile
-				 src/fptofpcache/Makefile
-				 src/ktgetmem/Makefile
+		 src/returnperiodtobin/Makefile
+		 src/returnperiodtocsv/Makefile
+		 src/kat/Makefile
+		 src/footprintconv/Makefile
+		 src/fmprofilebinconv/Makefile
+		 src/fptofpcache/Makefile
+		 src/ktgetmem/Makefile
+		 src/validateitems/Makefile
                  ])
 AC_OUTPUT
 

@@ -34,7 +34,7 @@
 /*
 Author: Ben Matharu  email : ben.matharu@oasislmf.org
 */
-
+// Footprint to footprint cache
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -62,9 +62,6 @@ void segfault_sigaction(int signal, siginfo_t *si, void *arg)
 	exit(0);
 }
 #endif
-
-
-
 
 void help()
 {

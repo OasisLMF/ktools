@@ -81,6 +81,16 @@ int main(int argc, char *argv[])
 			::exit(EXIT_FAILURE);
 		}
 	}
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+	struct sigaction sa;
+
+	memset(&sa, 0, sizeof(struct sigaction));
+	sigemptyset(&sa.sa_mask);
+	sa.sa_sigaction = segfault_sigaction;
+	sa.sa_flags = SA_SIGINFO;
+
+	sigaction(SIGSEGV, &sa, NULL);
+#endif
 	try {
 		initstreams();
 		fmpolicytctobin::doit();	

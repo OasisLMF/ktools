@@ -39,13 +39,17 @@ Author: Joh Carter  email: johanna.carter@oasislmf.org
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "../include/oasis.h"
 #if defined(_MSC_VER)
+// zlib.h relies on this flag - sometimes our headers lie because we're 
+// developing on multiple platforms
+#undef HAVE_UNISTD_H
 #include "../wingetopt/wingetopt.h"
 #else
 #include <unistd.h>
 #endif
 
-#include "../include/oasis.h"
+
 #include <vector>
 #include <zlib.h>
 

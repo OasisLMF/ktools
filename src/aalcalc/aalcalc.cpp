@@ -24,16 +24,7 @@ bool operator<(const period_sidx_map_key& lhs, const period_sidx_map_key& rhs)
 		}
 	}
 
-	//if (lhs.period_no != rhs.period_no) {
-	//	return lhs.period_no < rhs.period_no;
-	//}
-	//else {
-	//	if (lhs.sidx != rhs.sidx) {
-	//		return lhs.sidx < rhs.sidx;
-	//	}else {
-	//		return lhs.summary_id < rhs.summary_id;
-	//	}
-	//}
+	
 }
 
 bool operator<(const period_map_key& lhs, const period_map_key& rhs)

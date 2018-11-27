@@ -68,7 +68,7 @@ void segfault_sigaction(int signal, siginfo_t *si, void *arg)
 
 void help()
 {
-	fprintf(stderr, "-h help\n-v version\n");
+	fprintf(stderr, "-h help\n-v version\n,-n no header row\n");
 }
 
 int main(int argc, char *argv[])
@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
 	progname = argv[0];
 	int opt;
     bool header = true;
-	while ((opt = getopt(argc, argv, "vh")) != -1) {
+	while ((opt = getopt(argc, argv, "vhn")) != -1) {
 		switch (opt) {
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);

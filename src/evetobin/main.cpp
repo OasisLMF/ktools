@@ -54,7 +54,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 char *progname;
 
 namespace evetobin {
-	void doit();
+	void doit(bool header);
 }
 
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
@@ -75,12 +75,16 @@ int main(int argc, char *argv[])
 {
 	progname = argv[0];
 	int opt;
+    bool header = true;
 	while ((opt = getopt(argc, argv, "vh")) != -1) {
 		switch (opt) {
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
 			::exit(EXIT_FAILURE);
 			break;
+        case 'n':
+			header = false;
+            break;
 		case 'h':
 		default:
 			help();
@@ -101,7 +105,7 @@ int main(int argc, char *argv[])
 
 	try {
 		initstreams();
-		evetobin::doit();
+		evetobin::doit(header);
 		return 0;
 	}
 	catch (std::bad_alloc) {

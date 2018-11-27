@@ -47,12 +47,14 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #endif
 
 namespace evetobin {
-	void doit()
+	void doit(bool header)
 	{
 		OASIS_INT eventid;
 		char line[4096];
 		int lineno = 1;
-		fgets(line, sizeof(line), stdin);	// skip first line header line
+		if (header) {
+			fgets(line, sizeof(line), stdin);	// skip first line header line
+		}
 		lineno++;
 		while (fgets(line, sizeof(line), stdin) != 0)
 		{

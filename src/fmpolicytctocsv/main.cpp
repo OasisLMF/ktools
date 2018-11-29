@@ -48,6 +48,12 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 #include "../include/oasis.h"
 
+
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+#include <signal.h>
+#include <string.h>
+#endif
+
 namespace fmpolicytctocsv {
 	void doit(bool skipheader);
 }

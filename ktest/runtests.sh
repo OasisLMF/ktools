@@ -36,15 +36,15 @@ installertest()
 	cd examples
 
 	# test eve
-	../src/eve/eve 1 2 > ../ktest/testout/eveout1.bin
-	../src/eve/eve 2 2 > ../ktest/testout/eveout2.bin
+	../src/eve/eve -n 1 2 > ../ktest/testout/eveout1.bin
+	../src/eve/eve -n 2 2 > ../ktest/testout/eveout2.bin
 
 	# # test getmodel
-	 ../src/eve/eve 1 1 | ../src/getmodel/getmodel > ../ktest/testout/getmodelout.bin
+	 ../src/eve/eve -n  1 1 | ../src/getmodel/getmodel > ../ktest/testout/getmodelout.bin
 	
 	# test gulcalc item stream and coverage stream
-	../src/eve/eve 1 1 | ../src/getmodel/getmodel | ../src/gulcalc/gulcalc -S100 -L0.1 -r -i - > ../ktest/testout/gulcalci.bin
-	../src/eve/eve 1 1 | ../src/getmodel/getmodel | ../src/gulcalc/gulcalc -S100 -L0.1 -r -c - > ../ktest/testout/gulcalcc.bin
+	../src/eve/eve -n 1 1 | ../src/getmodel/getmodel | ../src/gulcalc/gulcalc -S100 -L0.1 -r -i - > ../ktest/testout/gulcalci.bin
+	../src/eve/eve -n 1 1 | ../src/getmodel/getmodel | ../src/gulcalc/gulcalc -S100 -L0.1 -r -c - > ../ktest/testout/gulcalcc.bin
 
 	# test fmcalc
 	 ../src/fmcalc/fmcalc > ../ktest/testout/fmcalc.bin < ../ktest/testout/gulcalci.bin

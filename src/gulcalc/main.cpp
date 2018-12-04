@@ -74,6 +74,7 @@ int main(int argc, char *argv[])
 {
 	int opt;
 	gulcalcopts gopt;
+	gopt.gul_limit = 0.000001;
 	progname = argv[0];
 	while ((opt = getopt(argc, argv, "alvhdrL:S:c:i:R:s:")) != -1) {
 		switch (opt) {

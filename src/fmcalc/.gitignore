@@ -2,6 +2,7 @@ fmcalc
 fmcalc.exe
 gmon*
 *save
+*save2
 *png
 analysis.txt
 

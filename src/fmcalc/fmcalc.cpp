@@ -843,6 +843,7 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 				agg_vec[i].item_net = agg_vec_previous_layer[i].item_net;
 			}
 		}
+		bool item_proportions_computed = false;
 		for (LossRec &x : agg_vec) {
 			if (netvalue_ && layer == 1) {
 				const std::vector<OASIS_FLOAT> &guls = event_guls[gul_idx];
@@ -937,10 +938,13 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 				}
 
 				if (x.allocrule_id == 2) {		// back allocate as a proportion of the total of the previous losses			
-					int vec_idx = aggid_to_vectorlookup[x.agg_id - 1];
-					const std::vector<OASIS_FLOAT> &guls = event_guls[gul_idx];
-					compute_item_proportions(agg_vecs, guls, level, layer, previous_layer_id);
+					if (item_proportions_computed == false) {
+						const std::vector<OASIS_FLOAT> &guls = event_guls[gul_idx];
+						compute_item_proportions(agg_vecs, guls, level, layer, previous_layer_id);
+						item_proportions_computed = true;
+					}										
 					if (x.item_prop.size() > 0) {
+						int vec_idx = aggid_to_vectorlookup[x.agg_id - 1];
 						for (int i = 0; i < avx[layer][vec_idx].item_idx.size(); i++) {
 							int idx = avx[layer][vec_idx].item_idx[i];
 							//for (int idx : avx[layer][vec_idx].item_idx) {

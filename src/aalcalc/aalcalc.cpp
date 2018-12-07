@@ -293,7 +293,7 @@ void aalcalc::process_summaryfile(const std::string &filename)
 					vrec.clear();
 					break;
 				}
-				if (sr.sidx == -1) mean_loss = sr.loss;
+				if (sr.sidx == -1) mean_loss = sr.loss * event_count_[sh.event_id];
 				if (sr.sidx >= 0) vrec.push_back(sr);
 			}
 			haveData = false;

@@ -93,7 +93,7 @@ bool operator<(const period_map_key& lhs, const period_map_key& rhs);
 class aalcalc {
 private:
 	std::map<int, int> event_count_;	// count of events in occurrence table used to create cartesian effect on event_id
-	std::map<int, int> event_to_period_;	// Mapping of event to period no
+	std::map<int, std::vector<int>> event_to_period_;	// Mapping of event to period no
 	int no_of_periods_ = 0;
 	int samplesize_ = -1;
 	std::map<int, aal_rec> map_analytical_aal_;

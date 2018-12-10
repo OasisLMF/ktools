@@ -54,6 +54,8 @@ int main(int argc, char* argv[])
 		switch (opt) {
 		case 'w':
 			welford = true;
+			fprintf(stderr, "Not supported\n");
+			exit(-1);
 			break;
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);

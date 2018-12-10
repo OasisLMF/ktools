@@ -96,7 +96,7 @@ void aalcalc::loadoccurrence()
 	i = fread(&occ, sizeof(occ), 1, fin);
 	while (i != 0) {
 		event_count_[occ.event_id] = event_count_[occ.event_id] + 1;
-		event_to_period_[occ.event_id] = occ.period_no;
+		event_to_period_[occ.event_id].push_back(occ.period_no);
 		i = fread(&occ, sizeof(occ), 1, fin);
 	}
 
@@ -105,25 +105,25 @@ void aalcalc::loadoccurrence()
 void aalcalc::applyweightings(int event_id, const std::map <int, double> &periodstoweighting, std::vector<sampleslevelRec> &vrec)
 {
 	if (periodstoweighting.size() == 0) return;
-	double factor = periodstoweighting.size();
-	auto it = event_to_period_.find(event_id);
-	if (it != event_to_period_.end()) {
-		auto iter = periodstoweighting.find(it->second);
-		if (iter != periodstoweighting.end()) {
-			for (int i = 0; i < vrec.size(); i++) {
-				vrec[i].loss = vrec[i].loss * iter->second * factor;
-			}
-		}
-		else {
-			// Event not found in periods.bin so no weighting i.e zero 
-			for (int i = 0; i < vrec.size(); i++) vrec[i].loss = 0;
-			//	fprintf(stderr, "Event %d not found in periods.bin\n", event_id);
-			//		exit(-1);
-		}
-	}
-	else {
-		fprintf(stderr, "Event ID %d not found\n", event_id);
-	}
+	//double factor = periodstoweighting.size();
+	//auto it = event_to_period_.find(event_id);
+	//if (it != event_to_period_.end()) {
+	//	auto iter = periodstoweighting.find(it->second);
+	//	if (iter != periodstoweighting.end()) {
+	//		for (int i = 0; i < vrec.size(); i++) {
+	//			vrec[i].loss = vrec[i].loss * iter->second * factor;
+	//		}
+	//	}
+	//	else {
+	//		// Event not found in periods.bin so no weighting i.e zero 
+	//		for (int i = 0; i < vrec.size(); i++) vrec[i].loss = 0;
+	//		//	fprintf(stderr, "Event %d not found in periods.bin\n", event_id);
+	//		//		exit(-1);
+	//	}
+	//}
+	//else {
+	//	fprintf(stderr, "Event ID %d not found\n", event_id);
+	//}
 }
 
 void aalcalc::applyweightingstomap(std::map<int, aal_rec> &m, int i)
@@ -199,52 +199,57 @@ void aalcalc::do_sample_calc_end(){
 void aalcalc::do_sample_calc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec){
 
 	period_sidx_map_key k;
-	k.period_no = event_to_period_[sh.event_id];
+	
 	k.summary_id = sh.summary_id;
+	auto p_iter = event_to_period_.find(sh.event_id);
+	if (p_iter == event_to_period_.end()) return;
 
-	if (k.period_no == 0) return;
+	//k.period_no = event_to_period_[sh.event_id];
+	//if (k.period_no == 0) return;
+	for (auto p : p_iter->second) {
+		k.period_no = p;
+		for (auto x : vrec) {
+			k.sidx = x.sidx;
+			auto iter = map_sample_sum_loss_.find(k);
+			if (iter != map_sample_sum_loss_.end()) {
+				loss_rec &a = iter->second;
+				if (a.max_exposure_value < sh.expval) a.max_exposure_value = sh.expval;
+				a.sum_of_loss += x.loss;
+			}
+			else {
+				loss_rec l;
+				l.sum_of_loss = x.loss;
+				l.max_exposure_value = sh.expval;
+				map_sample_sum_loss_[k] = l;
+			}
 
-	for (auto x : vrec) {
-		k.sidx = x.sidx;
-		auto iter = map_sample_sum_loss_.find(k);
-		if (iter != map_sample_sum_loss_.end()) {
-			loss_rec &a = iter->second;
-			if (a.max_exposure_value < sh.expval) a.max_exposure_value = sh.expval;
-			a.sum_of_loss += x.loss;
 		}
-		else {
-			loss_rec l;
-			l.sum_of_loss = x.loss;
-			l.max_exposure_value = sh.expval;
-			map_sample_sum_loss_[k] = l;
-		}
-
 	}
-
-
+	
 }
 void aalcalc::do_analytical_calc(const summarySampleslevelHeader &sh, double mean_loss)
 {
-	period_map_key k;
-	k.period_no = event_to_period_[sh.event_id];
+	period_map_key k;	
 	k.summary_id = sh.summary_id;
-
-	if (k.period_no == 0) return;
-
-	auto iter = map_analytical_sum_loss_.find(k);
-	if (iter != map_analytical_sum_loss_.end()) {
-		loss_rec &a = iter->second;
-		if (a.max_exposure_value < sh.expval) a.max_exposure_value = sh.expval;
-		a.sum_of_loss += mean_loss;
+	//k.period_no = event_to_period_[sh.event_id];
+	//if (k.period_no == 0) return;
+	auto p_iter = event_to_period_.find(sh.event_id);
+	if (p_iter == event_to_period_.end()) return;
+	for (auto p : p_iter->second) {
+		k.period_no = p;
+		auto iter = map_analytical_sum_loss_.find(k);
+		if (iter != map_analytical_sum_loss_.end()) {
+			loss_rec &a = iter->second;
+			if (a.max_exposure_value < sh.expval) a.max_exposure_value = sh.expval;
+			a.sum_of_loss += mean_loss;
+		}
+		else {
+			loss_rec l;
+			l.sum_of_loss = mean_loss;
+			l.max_exposure_value = sh.expval;
+			map_analytical_sum_loss_[k] = l;
+		}
 	}
-	else {
-		loss_rec l;
-		l.sum_of_loss = mean_loss;
-		l.max_exposure_value = sh.expval;
-		map_analytical_sum_loss_[k] = l;
-	}
-
-
 }
 
 
@@ -287,13 +292,18 @@ void aalcalc::process_summaryfile(const std::string &filename)
 				haveData = true;
 				sampleslevelRec sr;
 				i = fread(&sr, sizeof(sr), 1, fin);
-				if (i == 0 || sr.sidx == 0) {
-					applyweightings(sh.event_id, periodstoweighting_, vrec);
-					doaalcalc(sh, vrec, mean_loss);
+				if (i == 0 || sr.sidx == 0) {					
+					auto iter = event_count_.find(sh.event_id);
+					if (iter != event_count_.end()) {
+						//for (int k = 0; k < event_count_[sh.event_id]; k++) {
+							applyweightings(sh.event_id, periodstoweighting_, vrec);
+							doaalcalc(sh, vrec, mean_loss);
+						//}
+					}
 					vrec.clear();
 					break;
 				}
-				if (sr.sidx == -1) mean_loss = sr.loss * event_count_[sh.event_id];
+				if (sr.sidx == -1) mean_loss = sr.loss;
 				if (sr.sidx >= 0) vrec.push_back(sr);
 			}
 			haveData = false;
@@ -319,7 +329,6 @@ void aalcalc::outputresultscsv()
 		double s1 = x.second.mean_squared - mean_squared / p1;
 		double s2 = s1 / p2;
 		double sd_dev = sqrt(s2);
-		//double sd_dev = sqrt((x.second.mean_squared - (x.second.mean * x.second.mean / no_of_periods_)) / (no_of_periods_ - 1));
 		mean = mean / no_of_periods_;
 		printf("%d,%d,%f,%f,%f\n", x.first, x.second.type, mean, sd_dev, x.second.max_exposure_value);
 	}
@@ -333,7 +342,6 @@ void aalcalc::outputresultscsv()
 		double s1 = x.second.mean_squared - mean_squared / p1;
 		double s2 = s1 / p2;
 		double sd_dev = sqrt(s2);
-		//double sd_dev = sqrt((x.second.mean_squared - (x.second.mean * x.second.mean / no_of_periods_)) / (no_of_periods_ - 1));
 		mean = mean / no_of_periods_;
 		printf("%d,%d,%f,%f,%f\n", x.first, x.second.type, mean, sd_dev, x.second.max_exposure_value);
 	}

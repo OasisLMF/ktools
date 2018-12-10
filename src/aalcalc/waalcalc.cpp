@@ -45,7 +45,8 @@ void aalcalc::do_analytical_calc_endw()
 void aalcalc::do_analytical_calcw(const summarySampleslevelHeader &sh, double mean_loss)
 {
 	period_map_key k;
-	k.period_no = event_to_period_[sh.event_id];
+	k.period_no = 0;
+	//k.period_no = event_to_period_[sh.event_id];
 	k.summary_id = sh.summary_id;
 
 	if (k.period_no == 0) return;

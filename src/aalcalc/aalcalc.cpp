@@ -443,7 +443,11 @@ void aalcalc::debug_process_summaryfile(const std::string &filename)
 				i = fread(&sr, sizeof(sr), 1, fin);
 				if (i == 0) break;
 				if (sr.sidx == 0) break;
-				printf("%d,%d,%d,%d,%f\n", sh.event_id, event_to_period_[sh.event_id], sh.summary_id, sr.sidx, sr.loss);
+				auto p_iter = event_to_period_[sh.event_id].begin();
+				while (p_iter != event_to_period_[sh.event_id].end()) {
+					printf("%d,%d,%d,%d,%f\n", sh.event_id, *p_iter, sh.summary_id, sr.sidx, sr.loss);
+				}
+
 			}
 			j++;
 		}		

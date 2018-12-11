@@ -1,6 +1,13 @@
 Ktools Changelog
 ================
 
+## [v3.0.3](https://github.com/OasisLMF/ktools/releases/tag/v3.0.3)
+* Performance optimization for Alloc rule 2
+* Fix for aalcalc standard deviation
+* Added summarycalctobin and removed fptofmcache
+* Improved error handling
+
+
 ## [v3.0.2](https://github.com/OasisLMF/ktools/releases/tag/v3.0.2)
 * Added exception handling for memory allocation errors and segmentation faults.
 

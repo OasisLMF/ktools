@@ -6,6 +6,7 @@ Ktools Changelog
 * Fix for aalcalc standard deviation
 * Added summarycalctobin and removed fptofmcache
 * Improved error handling
+* Event shuffling to distribute workload been CPU cores 
 
 
 ## [v3.0.2](https://github.com/OasisLMF/ktools/releases/tag/v3.0.2)

@@ -128,55 +128,81 @@ inline void dolecoutputaggsummary(int summary_id, int sidx, OASIS_FLOAT loss, co
 }
 
 
-void processinputfile(unsigned int &samplesize,const std::map<int, std::vector<int> > &event_to_periods, 
-		int &maxsummaryid, std::map<outkey2, OASIS_FLOAT> &agg_out_loss, std::map<outkey2, OASIS_FLOAT> &max_out_loss)
+void processinputfile(
+    unsigned int &samplesize,
+    const std::map<int, std::vector<int> > &event_to_periods, 
+    int &maxsummaryid, 
+    std::map<outkey2, OASIS_FLOAT> &agg_out_loss,
+    std::map<outkey2, OASIS_FLOAT> &max_out_loss)
 {
+    // read_stream_type()
 	unsigned int stream_type = 0;
 	size_t i = fread(&stream_type, sizeof(stream_type), 1, stdin);
-	if (isSummaryCalcStream(stream_type) == true) {
-		unsigned int summaryset_id;
-		i = fread(&samplesize, sizeof(samplesize), 1, stdin);
-		if (i == 1) i = fread(&summaryset_id, sizeof(summaryset_id), 1, stdin);
-		if (i == 1) {
-			while (i != 0) {
-				bool processEvent = true;
-				summarySampleslevelHeader sh;
-				i = fread(&sh, sizeof(sh), 1, stdin);
-				std::map<int, std::vector<int> >::const_iterator iter;
-				if (i) {
-					iter = event_to_periods.find(sh.event_id);
-					if (iter == event_to_periods.end()) {
-						// Event not found so don't process it
-						processEvent = false;
-						//fprintf(stderr, "Event id %d not found in occurrence.bin\n", sh.event_id);
-						//exit(-1);
-					}else {
-						if (maxsummaryid < sh.summary_id) maxsummaryid = sh.summary_id;
-					}
-				}
-				while (i != 0) {
-					sampleslevelRec sr;
-					i = fread(&sr, sizeof(sr), 1, stdin);
-					if (i == 0) break;
-					if (sr.sidx == 0) break;
-					//				dolecoutput1(sh.summary_id, sr.loss,iter->second);					
-					if (sr.sidx != -2) {
-						if (sr.loss > 0.0 && processEvent == true) dolecoutputaggsummary(sh.summary_id, sr.sidx, sr.loss, iter->second,agg_out_loss,max_out_loss);
-					}
-				}
-			}
-		}
-		else {
-			std::cerr << "Stream read error\n";
-			exit(-1);
-		}
-		return;
-	}
-	else {
+    if (i != 1 || isSummaryCalcStream(stream_type) != true) {
 		std::cerr << "Not a summarycalc stream\n";
 		std::cerr << "invalid stream type: " << stream_type << "\n";
 		exit(-1);
 	}
+
+    // read_sample_size()
+    i = fread(&samplesize, sizeof(samplesize), 1, stdin);
+    if (i != 1) {
+        std::cerr << "Stream read error: samplesize\n";
+        exit(-1);
+    }
+
+    // read_summary_set_id()
+    unsigned int summaryset_id;
+    i = fread(&summaryset_id, sizeof(summaryset_id), 1, stdin);
+    if (i != 1) {
+        std::cerr << "Stream read error: summaryset_id\n";
+        exit(-1);
+    }
+
+    // read_event()
+    while (i != 0) {
+        summarySampleslevelHeader sh;
+        i = fread(&sh, sizeof(sh), 1, stdin);
+        if (i != 1) {
+            break;
+        }
+
+        // discard samples if eventis not found
+        std::map<int, std::vector<int> >::const_iterator iter = event_to_periods.find(sh.event_id);
+        if (iter == event_to_periods.end()) { // Event not found so don't process it, but read samples
+            while (i != 0) {
+                sampleslevelRec sr;
+                i = fread(&sr, sizeof(sr), 1, stdin);
+                if (i != 1 || sr.sidx == 0) {
+                    break;
+                }
+            }
+            continue;
+        }
+
+        if (maxsummaryid < sh.summary_id)
+        {
+            maxsummaryid = sh.summary_id;
+        }
+        
+        // read_samples_and_compute_lec()
+        while (i != 0) {
+            sampleslevelRec sr;
+            i = fread(&sr, sizeof(sr), 1, stdin);
+            if (i != 1) {
+                break;
+            }
+
+            if (sr.sidx == 0) { // samples are sorted in decreasing index order. sidx == 0 => last sample (not used in calculation)
+                break;
+            }
+
+            if (sr.loss > 0.0)
+            {
+                dolecoutputaggsummary(sh.summary_id, sr.sidx, sr.loss, iter->second,agg_out_loss,max_out_loss);
+            }
+        }
+    }
 }
 
 void setinputstream(const std::string &inFile)

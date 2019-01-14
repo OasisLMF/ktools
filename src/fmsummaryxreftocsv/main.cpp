@@ -49,6 +49,11 @@ Author: Joh Carter  email: johanna.carter@oasislmf.org
 
 #include "../include/oasis.h"
 
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+#include <signal.h>
+#include <string.h>
+#endif
+
 char *progname = 0;
 void doit(bool skipheader);
 

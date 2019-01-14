@@ -193,7 +193,7 @@ void processinputfile(
                 break;
             }
 
-            if (sr.sidx == 0) { // samples are sorted in decreasing index order. sidx == 0 => last sample (not used in calculation)
+            if (sr.sidx == 0) {			//  end of sidx stream
                 break;
             }
 

@@ -1,5 +1,5 @@
 /*
-* Copyright (c)2015 - 2016 Oasis LMF Limited 
+* Copyright (c)2015 - 2016 Oasis LMF Limited
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
@@ -32,36 +32,88 @@
 * DAMAGE.
 */
 /*
+Convert footprint csv to binary
 Author: Ben Matharu  email: ben.matharu@oasislmf.org
 */
 
-#include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../include/oasis.h"
+#if defined(_MSC_VER)
+#include "../wingetopt/wingetopt.h"
+#else
+#include <unistd.h>
+#endif
 
-void doit()
-{
-
-	fmsummaryxref s;
-    char line[4096];
-    int lineno=0;
-	fgets(line, sizeof(line), stdin);
-	lineno++;
-    while (fgets(line, sizeof(line), stdin) != 0)
-    {
-		if (sscanf(line, "%d,%d,%d", &s.output_id, &s.summary_id, &s.summaryset_id) != 3){
-           fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
-           return;
-       }
-
-	    else
-       {
-           fwrite(&s, sizeof(s), 1, stdout);
-       }
-       lineno++;
-    }
-
+namespace footprinttobin {
+	void doit(int intensity_bins, int hasIntensityUncertainty, bool skipheader);
+	void doitz(int intensity_bins, int hasIntensityUncertainty);
 }
 
+#include "../include/oasis.h"
+char *progname;
+
+
+void help() {
+	fprintf(stderr, "-i max intensity bins\n"
+		"-n No intensity uncertainty\n"
+		"-s skip header\n"
+		"-v version\n");
+}
+
+int main(int argc, char *argv[]) {
+	int opt;
+	bool zip = false;
+	int intensity_bins = -1;
+	int hasIntensityUncertainty = true;
+	bool skipheader = false;
+
+	while ((opt = getopt(argc, argv, "zvshni:")) != -1) {
+		switch (opt) {
+		case 'v':
+			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+			exit(EXIT_FAILURE);
+			break;
+		case 'i':
+			intensity_bins = atoi(optarg);
+			break;
+		case 'n':
+			hasIntensityUncertainty = false;
+			break;
+		case 's':
+			skipheader = true;
+			break;
+		case 'z':
+			zip = true;
+			break;
+		case 'h':
+			help();
+			exit(EXIT_FAILURE);
+		default:
+			help();
+			exit(EXIT_FAILURE);
+		}
+	}
+	if (intensity_bins == -1) {
+		fprintf(stderr, "%s: Intensity bin parameter not supplied\n", __func__);
+		help();
+		exit(EXIT_FAILURE);
+	}
+
+	initstreams();
+	fprintf(stderr, "starting...\n");
+	if (zip) {
+#ifdef _MSC_VER
+		fprintf(stderr, "Zip not supported in Microsoft build\n");
+		exit(-1);
+#else
+		footprinttobin::doitz(intensity_bins, hasIntensityUncertainty);
+#endif
+	}
+	else {
+		footprinttobin::doit(intensity_bins,hasIntensityUncertainty,skipheader);
+	}
+
+	fprintf(stderr, "done...\n");
+	return 0;
+}

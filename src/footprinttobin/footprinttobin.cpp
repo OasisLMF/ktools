@@ -44,257 +44,194 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <zlib.h>
 
 
-#if defined(_MSC_VER)
-#include "../wingetopt/wingetopt.h"
-#else
-#include <unistd.h>
-#endif
-using namespace std;
 
 #include "../include/oasis.h"
-int intensity_bins_ = -1;
-int hasIntensityUncertainty_ = true;
-bool skipheader_ = false;
 
+namespace footprinttobin {
+	void doitz(int intensity_bins, int hasIntensityUncertainty) {
+		FILE *foutx = fopen("footprint.bin.z", "wb");
+		FILE *fouty = fopen("footprint.idx.z", "wb");
 
-void doitz() {
-  FILE *foutx = fopen("footprint.bin.z", "wb");
-  FILE *fouty = fopen("footprint.idx.z", "wb");
+		char line[4096];
+		int lineno = 0;
+		fgets(line, sizeof(line), stdin); // skip header line
+		lineno++;
+		int last_event_id = 0;
+		AREAPERIL_INT last_areaperil_id = 0;
+		EventRow r;
+		EventIndex idx;
+		idx.event_id = 0;
+		idx.offset = 0;
+		idx.size = 0;
+		int event_id = 0;
+		std::set<int> events;
+		std::set<AREAPERIL_INT> areaperils;
+		fwrite(&intensity_bins, sizeof(intensity_bins), 1, foutx);
+		idx.offset += sizeof(intensity_bins);
+		fwrite(&hasIntensityUncertainty, sizeof(hasIntensityUncertainty), 1, foutx);
+		idx.offset += sizeof(hasIntensityUncertainty);
+		std::vector<EventRow> rv;
+		std::vector<unsigned char> rvz;
 
-  char line[4096];
-  int lineno = 0;
-  fgets(line, sizeof(line), stdin); // skip header line
-  lineno++;
-  int last_event_id = 0;
-  AREAPERIL_INT last_areaperil_id = 0;
-  EventRow r;
-  EventIndex idx;
-  idx.event_id = 0;
-  idx.offset = 0;
-  idx.size = 0;
-  int event_id = 0;
-  std::set<int> events;
-  std::set<AREAPERIL_INT> areaperils;
-  ::fwrite(&intensity_bins_, sizeof(intensity_bins_), 1, foutx);
-  idx.offset += sizeof(intensity_bins_);
-  ::fwrite(&hasIntensityUncertainty_, sizeof(hasIntensityUncertainty_), 1, foutx);
-  idx.offset += sizeof(hasIntensityUncertainty_);
-  std::vector<EventRow> rv;
-  std::vector<unsigned char> rvz;
-
-  while (fgets(line, sizeof(line), stdin) != 0) {
-    lineno++;
+		while (fgets(line, sizeof(line), stdin) != 0) {
+			lineno++;
 #ifdef AREAPERIL_TYPE_LONG
-	int ret = sscanf(line, "%d,%ld,%d,%f", &event_id, &r.areaperil_id, &r.intensity_bin_id, &r.probability);
+			int ret = sscanf(line, "%d,%ld,%d,%f", &event_id, &r.areaperil_id, &r.intensity_bin_id, &r.probability);
 #else
-	int ret = sscanf(line, "%d,%d,%d,%f", &event_id, &r.areaperil_id, &r.intensity_bin_id, &r.probability);
+			int ret = sscanf(line, "%d,%d,%d,%f", &event_id, &r.areaperil_id, &r.intensity_bin_id, &r.probability);
 #endif
-    if (ret != 4) {
-      fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
-      return;
-    }
-    if (r.intensity_bin_id > intensity_bins_){
-    	fprintf(stderr, "Intensity bin id %d is greater than the max supplied (%d) in line %d:\n%s",r.intensity_bin_id, intensity_bins_, lineno, line);
-    	return;
-    }
-    if (event_id != last_event_id) {
-      if (events.find(event_id) == events.end()) {
-        events.insert(event_id);
-        areaperils.clear();
-        last_areaperil_id = r.areaperil_id;
-        areaperils.insert(r.areaperil_id);
-      } else {
-        fprintf(stderr, "Error (%d):Event_id %d has already been converted - "
-                        "all event data should be contiguous \n",
-                lineno, event_id);
-        exit(-1);
-      }
-      if (last_event_id) {        
-        rvz.clear();
-        rvz.resize(rv.size() * sizeof(r) + 1024);
-        unsigned long len = rvz.size();
-        compress(&rvz[0], &len, (unsigned char *)&rv[0], rv.size() * sizeof(r));
-        fwrite((unsigned char *)&rvz[0], len, 1, foutx);
-        rvz.clear();
-        //len = sizeof(r) * rv.size();
-        //fwrite((unsigned char *)&rv[0], len, 1, foutx);
-        rv.clear();
-        if (last_event_id) { 
-          idx.event_id = last_event_id;
-          idx.size = len;
-          fwrite(&idx, sizeof(idx), 1, fouty);
-          idx.offset += idx.size; // offset incremented for the next one
-        }        
-      }
-      last_event_id = event_id;
-    }
-    if (last_areaperil_id != r.areaperil_id) {
-      last_areaperil_id = r.areaperil_id;
-      if (areaperils.find(r.areaperil_id) == areaperils.end()) {
-        areaperils.insert(r.areaperil_id);
-      } else {
+			if (ret != 4) {
+				fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
+				return;
+			}
+			if (r.intensity_bin_id > intensity_bins) {
+				fprintf(stderr, "Intensity bin id %d is greater than the max supplied (%d) in line %d:\n%s", r.intensity_bin_id, intensity_bins, lineno, line);
+				return;
+			}
+			if (event_id != last_event_id) {
+				if (events.find(event_id) == events.end()) {
+					events.insert(event_id);
+					areaperils.clear();
+					last_areaperil_id = r.areaperil_id;
+					areaperils.insert(r.areaperil_id);
+				}
+				else {
+					fprintf(stderr, "Error (%d):Event_id %d has already been converted - "
+						"all event data should be contiguous \n",
+						lineno, event_id);
+					exit(-1);
+				}
+				if (last_event_id) {
+					rvz.clear();
+					rvz.resize(rv.size() * sizeof(r) + 1024);
+					unsigned long len = rvz.size();
+					compress(&rvz[0], &len, (unsigned char *)&rv[0], rv.size() * sizeof(r));
+					fwrite((unsigned char *)&rvz[0], len, 1, foutx);
+					rvz.clear();
+					//len = sizeof(r) * rv.size();
+					//fwrite((unsigned char *)&rv[0], len, 1, foutx);
+					rv.clear();
+					if (last_event_id) {
+						idx.event_id = last_event_id;
+						idx.size = len;
+						fwrite(&idx, sizeof(idx), 1, fouty);
+						idx.offset += idx.size; // offset incremented for the next one
+					}
+				}
+				last_event_id = event_id;
+			}
+			if (last_areaperil_id != r.areaperil_id) {
+				last_areaperil_id = r.areaperil_id;
+				if (areaperils.find(r.areaperil_id) == areaperils.end()) {
+					areaperils.insert(r.areaperil_id);
+				}
+				else {
 #ifdef AREAPERIL_TYPE_LONG
-		fprintf(stderr, "Error (%d): areaperil_id %ld data is not contiguous for event_id %d \n", lineno, r.areaperil_id, event_id);
+					fprintf(stderr, "Error (%d): areaperil_id %ld data is not contiguous for event_id %d \n", lineno, r.areaperil_id, event_id);
 #else
-		fprintf(stderr, "Error (%d): areaperil_id %d data is not contiguous for event_id %d \n", lineno, r.areaperil_id, event_id);
+					::fprintf(stderr, "Error (%d): areaperil_id %d data is not contiguous for event_id %d \n", lineno, r.areaperil_id, event_id);
 #endif
-        exit(-1);
-      }
-    }
-    rv.push_back(r);
-  
-  }
-  rvz.clear();
-  rvz.resize(rv.size() * sizeof(r) + 1024);
-  unsigned long len = rvz.size();
-  compress(&rvz[0], &len, (unsigned char *)&rv[0], rv.size() * sizeof(r));
-  fwrite((unsigned char *)&rvz[0], len, 1, foutx);
-  //int len = sizeof(r) * rv.size();
-  //fwrite((unsigned char *)&rv[0], sizeof(r) * rv.size(), 1, foutx);
-  idx.event_id = last_event_id;
-  idx.size = len;
-  fwrite(&idx, sizeof(idx), 1, fouty);
-  fclose(foutx);
-  fclose(fouty);
+					::exit(-1);
+				}
+			}
+			rv.push_back(r);
+
+		}
+		rvz.clear();
+		rvz.resize(rv.size() * sizeof(r) + 1024);
+		unsigned long len = rvz.size();
+		compress(&rvz[0], &len, (unsigned char *)&rv[0], rv.size() * sizeof(r));
+		fwrite((unsigned char *)&rvz[0], len, 1, foutx);
+		//int len = sizeof(r) * rv.size();
+		//fwrite((unsigned char *)&rv[0], sizeof(r) * rv.size(), 1, foutx);
+		idx.event_id = last_event_id;
+		idx.size = len;
+		fwrite(&idx, sizeof(idx), 1, fouty);
+		fclose(foutx);
+		fclose(fouty);
+	}
+
+	void doit(int intensity_bins, int hasIntensityUncertainty, bool skipheader){
+		FILE *foutx = fopen("footprint.bin", "wb");
+		FILE *fouty = fopen("footprint.idx", "wb");
+
+		char line[4096];
+		int lineno = 0;
+		fgets(line, sizeof(line), stdin); // skip header line
+		lineno++;
+		int last_event_id = 0;
+		AREAPERIL_INT last_areaperil_id = 0;
+		EventRow r;
+		EventIndex idx;
+		idx.event_id = 0;
+		idx.offset = 0;
+		idx.size = 0;
+		int event_id = 0;
+		int count = 0; // 11616 / 968*12
+		std::set<int> events;
+		std::set<AREAPERIL_INT> areaperils;
+		fwrite(&intensity_bins, sizeof(intensity_bins), 1, foutx);
+		idx.offset += sizeof(intensity_bins);
+		fwrite(&hasIntensityUncertainty, sizeof(hasIntensityUncertainty), 1, foutx);
+		idx.offset += sizeof(hasIntensityUncertainty);
+		while (fgets(line, sizeof(line), stdin) != 0) {
+			lineno++;
+#ifdef AREAPERIL_TYPE_LONG
+			int ret = sscanf(line, "%d,%ld,%d,%f", &event_id, &r.areaperil_id, &r.intensity_bin_id, &r.probability);
+#else
+			int ret = sscanf(line, "%d,%d,%d,%f", &event_id, &r.areaperil_id, &r.intensity_bin_id, &r.probability);
+#endif
+			if (ret != 4) {
+				fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
+				return;
+			}
+			if (r.intensity_bin_id > intensity_bins) {
+				fprintf(stderr, "Intensity bin id %d is greater than the max supplied (%d) in line %d:\n%s", r.intensity_bin_id, intensity_bins, lineno, line);
+				return;
+			}
+			if (event_id != last_event_id) {
+				if (events.find(event_id) == events.end()) {
+					events.insert(event_id);
+					areaperils.clear();
+					last_areaperil_id = r.areaperil_id;
+					areaperils.insert(r.areaperil_id);
+				}
+				else {
+					fprintf(stderr, "Error (%d):Event_id %d has already been converted - "
+						"all event data should be contiguous \n",
+						lineno, event_id);
+					exit(-1);
+				}
+				if (last_event_id) {
+					idx.event_id = last_event_id;
+					idx.size = count * sizeof(EventRow);
+					fwrite(&idx, sizeof(idx), 1, fouty);
+					idx.offset += idx.size;
+				}
+				last_event_id = event_id;
+				count = 0;
+			}
+			if (last_areaperil_id != r.areaperil_id) {
+				last_areaperil_id = r.areaperil_id;
+				if (areaperils.find(r.areaperil_id) == areaperils.end()) {
+					areaperils.insert(r.areaperil_id);
+				}
+				else {
+#ifdef AREAPERIL_TYPE_LONG
+					fprintf(stderr, "Error (%d): areaperil_id %ld data is not contiguous for event_id %d \n", lineno, r.areaperil_id, event_id);
+#else
+					fprintf(stderr, "Error (%d): areaperil_id %d data is not contiguous for event_id %d \n", lineno, r.areaperil_id, event_id);
+#endif
+					exit(-1);
+				}
+			}
+			fwrite(&r, sizeof(r), 1, foutx);
+			count++;
+		}
+		idx.event_id = last_event_id;
+		idx.size = count * sizeof(EventRow);
+		fwrite(&idx, sizeof(idx), 1, fouty);
+		fclose(foutx);
+		fclose(fouty);
 }
-
-void doit() {
-  FILE *foutx = fopen("footprint.bin", "wb");
-  FILE *fouty = fopen("footprint.idx", "wb");
-
-  char line[4096];
-  int lineno = 0;
-  fgets(line, sizeof(line), stdin); // skip header line
-  lineno++;
-  int last_event_id = 0;
-  AREAPERIL_INT last_areaperil_id = 0;
-  EventRow r;
-  EventIndex idx;
-  idx.event_id = 0;
-  idx.offset = 0;
-  idx.size = 0;
-  int event_id = 0;
-  int count = 0; // 11616 / 968*12
-  std::set<int> events;
-  std::set<AREAPERIL_INT> areaperils;
-  fwrite(&intensity_bins_, sizeof(intensity_bins_), 1, foutx);
-  idx.offset += sizeof(intensity_bins_);
-  fwrite(&hasIntensityUncertainty_, sizeof(hasIntensityUncertainty_), 1, foutx);
-  idx.offset += sizeof(hasIntensityUncertainty_);
-  while (fgets(line, sizeof(line), stdin) != 0) {
-    lineno++;
-#ifdef AREAPERIL_TYPE_LONG
-	int ret = sscanf(line, "%d,%ld,%d,%f", &event_id, &r.areaperil_id, &r.intensity_bin_id, &r.probability);
-#else
-	int ret = sscanf(line, "%d,%d,%d,%f", &event_id, &r.areaperil_id, &r.intensity_bin_id, &r.probability);
-#endif
-    if ( ret != 4) {
-      fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
-      return;
-    }
-    if (r.intensity_bin_id > intensity_bins_){
-    	fprintf(stderr, "Intensity bin id %d is greater than the max supplied (%d) in line %d:\n%s",r.intensity_bin_id, intensity_bins_, lineno, line);
-    	return;
-    }
-    if (event_id != last_event_id) {
-      if (events.find(event_id) == events.end()) {
-        events.insert(event_id);
-        areaperils.clear();
-        last_areaperil_id = r.areaperil_id;
-        areaperils.insert(r.areaperil_id);
-      } else {
-        fprintf(stderr, "Error (%d):Event_id %d has already been converted - "
-                        "all event data should be contiguous \n",
-                lineno, event_id);
-        exit(-1);
-      }
-      if (last_event_id) {
-        idx.event_id = last_event_id;
-        idx.size = count * sizeof(EventRow);
-        fwrite(&idx, sizeof(idx), 1, fouty);
-        idx.offset += idx.size;
-      }
-      last_event_id = event_id;
-      count = 0;
-    }
-    if (last_areaperil_id != r.areaperil_id) {
-      last_areaperil_id = r.areaperil_id;
-      if (areaperils.find(r.areaperil_id) == areaperils.end()) {
-        areaperils.insert(r.areaperil_id);
-      } else {
-#ifdef AREAPERIL_TYPE_LONG
-        fprintf(stderr, "Error (%d): areaperil_id %ld data is not contiguous for event_id %d \n", lineno, r.areaperil_id, event_id);
-#else
-		fprintf(stderr, "Error (%d): areaperil_id %d data is not contiguous for event_id %d \n", lineno, r.areaperil_id, event_id);
-#endif
-        exit(-1);
-      }
-    }
-    fwrite(&r, sizeof(r), 1, foutx);
-    count++;
-  }
-  idx.event_id = last_event_id;
-  idx.size = count * sizeof(EventRow);
-  fwrite(&idx, sizeof(idx), 1, fouty);
-  fclose(foutx);
-  fclose(fouty);
-}
-
-void help() {
-  fprintf(stderr, "-i max intensity bins\n"
-                  "-n No intensity uncertainty\n"
-                  "-s skip header\n"
-                  "-v version\n");
-}
-
-int main(int argc, char *argv[]) {
-  int opt;
-  bool zip = false;
-  while ((opt = getopt(argc, argv, "zvshni:")) != -1) {
-    switch (opt) {
-    case 'v':
-      fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
-      exit(EXIT_FAILURE);
-      break;
-    case 'i':
-      intensity_bins_ = atoi(optarg);
-      break;
-    case 'n':
-      hasIntensityUncertainty_ = false;
-      break;
-    case 's':
-      skipheader_ = true;
-      break;
-    case 'z':
-      zip = true;
-      break;
-    case 'h':
-      help();
-      exit(EXIT_FAILURE);
-    default:
-      help();
-      exit(EXIT_FAILURE);
-    }
-  }
-  if (intensity_bins_ == -1) {
-    fprintf(stderr, "%s: Intensity bin parameter not supplied\n", __func__);
-    help();
-    exit(EXIT_FAILURE);
-  }
-
-  initstreams();
-  fprintf(stderr, "starting...\n");
-  if (zip) {
-#ifdef _MSC_VER
-		fprintf(stderr, "Zip not supported in Microsoft build\n");
-		exit(-1);
-#else
-	  doitz();
-#endif
-  }else{
-	  doit();
-  }
-    
-  fprintf(stderr, "done...\n");
-  return 0;
 }

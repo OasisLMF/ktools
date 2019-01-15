@@ -49,10 +49,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 using namespace std;
 
-bool skipheader = false;
-bool fullprecision = false;
-
-void doit()
+void doit(bool skipheader, bool fullprecision)
 {
 
 	int fmstream_type;
@@ -94,40 +91,3 @@ void doit()
 
 }
 
-void help()
-{
-	fprintf(stderr,		
-	     "-s skip header\n"
-		"-f full precision\n"
-		"-v version\n"
-		"-h help\n"
-	) ;
-}
-
-int main(int argc, char* argv[])
-{
-
-	int opt;
-	
-	while ((opt = getopt(argc, argv, "vhfsI:O:")) != -1) {
-		switch (opt) {
-		case 's':
-			skipheader = true;
-			break;
-		case 'f':
-			fullprecision = true;
-			break;
-		case 'v':
-			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
-			exit(EXIT_FAILURE);
-			break;
-		case 'h':
-			help();
-			exit(EXIT_FAILURE);
-		}
-	}
-
-	initstreams("", "");
-	doit();
-	return 0;
-}

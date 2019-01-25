@@ -66,7 +66,6 @@ private:
 	int allocrule_ = 0;
 	int max_layer_ = 0;		// initialized from policy_tc
 	int max_agg_id_ = 0;	// initialized from policy_tc
-	std::vector <profile_rec> profile_vec_;
 	std::vector <profile_rec_new> profile_vec_new_;
 	int maxLevel_ = -1;
 	int maxRunLevel_ = 10000;
@@ -74,12 +73,10 @@ private:
 	std::vector<int> level_to_max_layer_;
 	std::string inputpath_;
 	bool netvalue_ = false;
-	bool oldFMProfile_ = false;
 	std::vector<std::vector<int>> pfm_vec_vec_;  // initialized from fm/programme.bin  pfm_vec_vec[level_id][item_id] returns agg_id 
 	std::vector<OASIS_FLOAT> item_to_tiv_;	
 	void init_programme(int maxrunLevel);
-	void init_profile_old();
-	void init_profile_new();
+	void init_profile();
 	void init_itemtotiv();
 	void init_fmxref();
 	void init(int MaxRunLevel);
@@ -87,13 +84,13 @@ private:
 	void addtcrow(const fm_policyTC &f);
 	bool loadcoverages(std::vector<OASIS_FLOAT> &coverages);
 	bool gulhasvalue(const std::vector<OASIS_FLOAT> &gul) const;
-	void compute_item_proportions(std::vector<std::vector<std::vector <LossRec>>> &agg_vecs, const std::vector<OASIS_FLOAT> &guls,int level_, int layer_,int previous_layer_);		
+	void compute_item_proportions(std::vector<std::vector<std::vector <LossRec>>> &agg_vecs, const std::vector<OASIS_FLOAT> &guls,int level_, int layer_,int previous_layer_);	
 	inline void dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlookups_, std::vector<std::vector<std::vector <LossRec>>> &agg_vecs_, 
 		int level_, int max_level_,	std::map<int, std::vector<fmlevelrec> > &outmap_, 
 		int sidx_, const std::vector<std::vector<std::vector<policytcvidx>>> &avxs_, int layer_,
 		const std::vector<int> &items_, std::vector<std::vector<OASIS_FLOAT>> &event_guls,
 		int previous_level, int previous_layer);	
-	void dofmcalc_new(std::vector <LossRec> &agg_vec_, int layer);
+	void dofmcalc(std::vector <LossRec> &agg_vec_, int layer);
 	void add_tc(unsigned char tc_id, OASIS_FLOAT &tc_val, std::vector<tc_rec> &tc_vec);
 	
 };

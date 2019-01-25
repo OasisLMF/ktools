@@ -114,7 +114,12 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 			vector <LossRec> &agg_vec = agg_vecs[level][layer_];
 			auto iter = agg_vec.begin();
 			while (iter != agg_vec.end()) {
-				if (iter->item_idx) iter->item_prop.resize((iter->item_idx)->size(), 0);
+				if (iter->item_idx) {
+					if (iter->item_prop == nullptr) {
+						iter->item_prop =  std::make_shared<std::vector<OASIS_FLOAT>>(std::vector<OASIS_FLOAT>());
+					}
+					(iter->item_prop)->resize((iter->item_idx)->size(), 0);
+				}
 				iter++;
 			}
 		}
@@ -151,7 +156,8 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 					int i = 0;
 					if (total > 0) {
 						for (int idx : *(iter->item_idx)) {
-							iter->item_prop[i] = guls[idx] / iter->gul_total;
+							std::vector<OASIS_FLOAT> &v = *(iter->item_prop);
+							v[i] = guls[idx] / iter->gul_total;
 							items_prop[idx] = (guls[idx] / total) * iter->proportion;
 							i++;
 						}
@@ -168,7 +174,8 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 					if (prop_total > 0) {
 						if (iter->item_idx) {
 							for (int idx : *(iter->item_idx)) {
-								iter->item_prop[i] = items_prop[idx] / prop_total;
+								std::vector<OASIS_FLOAT> &v = *(iter->item_prop);
+								v[i] = items_prop[idx] / prop_total;
 								items_prop[idx] = (items_prop[idx] / prop_total) * iter->proportion;
 								i++;
 							}
@@ -192,7 +199,8 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 			vector <LossRec> &prev_agg_vec = agg_vecs[level_ - 1][previous_layer_];
 			vector <LossRec> &prev_agg_vec_base = agg_vecs[level_ - 1][1];
 			for (int i = 0; i < prev_agg_vec.size(); i++) {
-				if (prev_agg_vec[i].item_prop.size() == 0) {
+				//if (prev_agg_vec[i].item_prop->size() == 0) {
+				if (prev_agg_vec[i].item_prop == nullptr) {
 					//prev_agg_vec[i].loss = prev_agg_vec_base[i].loss;
 					prev_agg_vec[i].item_prop = prev_agg_vec_base[i].item_prop;
 				}
@@ -234,6 +242,9 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 				// agg_vecs[level_][layer_][y].loss = prev_gul_total;
 				it = agg_vecs[level_][layer_][y].item_idx->begin();
 				while (it != agg_vecs[level_][layer_][y].item_idx->end()) {
+					if (agg_vecs[level_][layer_][y].item_prop == nullptr) {
+						agg_vecs[level_][layer_][y].item_prop = std::make_shared<std::vector<OASIS_FLOAT>>(std::vector<OASIS_FLOAT>());
+					}
 					if (prev_gul_total > 0) {
 						int j = -1;
 						const std::vector<int> &z = *(prev_agg_vec[v[*it]].item_idx);
@@ -245,15 +256,15 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 						}
 						// this is recomputing the first layers proportions
 						if (j > -1) {
-							agg_vecs[level_][layer_][y].item_prop.push_back(prev_agg_vec[v[*it]].loss * prev_agg_vec[v[*it]].item_prop[j] / prev_gul_total);
+							agg_vecs[level_][layer_][y].item_prop->push_back(prev_agg_vec[v[*it]].loss * prev_agg_vec[v[*it]].item_prop->at(j) / prev_gul_total);
 						}
 						else {
-							agg_vecs[level_][layer_][y].item_prop.push_back(0);
+							agg_vecs[level_][layer_][y].item_prop->push_back(0);
 						}
 
 					}
 					else {
-						agg_vecs[level_][layer_][y].item_prop.push_back(0);
+						agg_vecs[level_][layer_][y].item_prop->push_back(0);
 					}
 					it++;
 				}
@@ -291,34 +302,46 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 		}
 	}
 
-	agg_vec.clear();
-
-	std::vector<int> &aggid_to_vectorlookup = aggid_to_vectorlookups[level];
-
-
-	if (agg_vec.size() == 0) {
-        int size = aggid_to_vectorlookup.size();
-        agg_vec.resize(size);
+	std::vector<int> *aggid_to_vectorlookup = &aggid_to_vectorlookups[level];
+	//agg_vec.clear();
+	
+	auto iter = agg_vec.begin();
+	LossRec l;
+	while (iter != agg_vec.end()) {
+		if (iter->policytc_id == 0) break;
+		*iter = l;
+		iter++;
 	}
-	else {
-		for (unsigned int i = 0; i < agg_vec.size(); i++) {
-			if (layer == 1) {
-				agg_vec[i].original_loss = 0;
-				agg_vec[i].loss = 0;
-			}else{
-				agg_vec[i].loss = agg_vec[i].retained_loss;
-				agg_vec[i].original_loss = agg_vec[i].loss;
-				agg_vec[i].retained_loss = 0;
-			}
-		}
+
+	if (agg_vec.size() != aggid_to_vectorlookup->size()) {
+		agg_vec.resize(aggid_to_vectorlookup->size());
 	}
+
+
+
+	//if (agg_vec.size() == 0) {
+ //       int size = aggid_to_vectorlookup->size();
+ //       agg_vec.resize(size);
+	//}
+	//else {
+	//	for (unsigned int i = 0; i < agg_vec.size(); i++) {
+	//		if (layer == 1) {
+	//			agg_vec[i].original_loss = 0;
+	//			agg_vec[i].loss = 0;
+	//		}else{
+	//			agg_vec[i].loss = agg_vec[i].retained_loss;
+	//			agg_vec[i].original_loss = agg_vec[i].loss;
+	//			agg_vec[i].retained_loss = 0;
+	//		}
+	//	}
+	//}
 
 	for (unsigned int i = 0;i < agg_vec_previous_level.size();i++){ // loop through previous levels of agg_vec
 		if (agg_vec_previous_level[i].agg_id != 0) {
 			int agg_id = pfm_vec_vec_[level][agg_vec_previous_level[i].agg_id];
 			if (layer < policy_tc_vec_vec_vec_[level][agg_id].size()) {
 				if (agg_vec_previous_level[i].next_vec_idx == -1) {	// next_vec_idx can be zero
-					agg_vec_previous_level[i].next_vec_idx = aggid_to_vectorlookup[agg_id - 1];
+					agg_vec_previous_level[i].next_vec_idx = (*aggid_to_vectorlookup)[agg_id - 1];
 				}
 				int vec_idx = agg_vec_previous_level[i].next_vec_idx;
 				if (agg_vec[vec_idx].policytc_id != avx[layer][vec_idx].policytc_id) { // policytc_id cannot be zero - first position in lookup vector not used
@@ -348,8 +371,8 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 		}
 	}
 	
-	dofmcalc_new(agg_vec, layer);
-	
+	dofmcalc(agg_vec, layer);
+
 	if (level == max_level) {
 		int sidx = gul_idx - 1;
 		if (sidx == -1) sidx = tiv_idx;
@@ -366,15 +389,17 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 		for (LossRec &x : agg_vec) {
 			if (netvalue_ && layer == 1) {
 				const std::vector<OASIS_FLOAT> &guls = event_guls[gul_idx];
-				x.item_net.resize(x.item_idx->size(), 0);
+				x.item_net = std::make_shared<std::vector<OASIS_FLOAT>>(std::vector<OASIS_FLOAT>());
+				x.item_net->resize(x.item_idx->size(), 0);
 				const std::vector<int> &z = *(x.item_idx);
-				for (int i = 0; i < x.item_net.size(); i++) {					
-					x.item_net[i]= guls[z[i]];
+				for (int i = 0; i < x.item_net->size(); i++) {					
+					x.item_net->at(i)= guls[z[i]];
 				}								
 			}
 
+			int allocrule_id = allocrule_;
 			if (x.loss > 0.0 || rec.sidx < 0 || netvalue_) {
-				if (x.allocrule_id == -1 || x.allocrule_id == 0) { // no back allocation
+				if (allocrule_id == 0) { // no back allocation
 					if (x.agg_id > 0) {	// agg id cannot be zero
 						if (netvalue_) { // get net gul value							
 							rec.loss = x.retained_loss;
@@ -405,14 +430,14 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 					}
 				}
 				// at level 1 allocrule 2 and 1 are the same
-				if (x.allocrule_id == 2 && level == 1) x.allocrule_id = 1;
+				if (allocrule_id == 2 && level == 1) allocrule_id = 1;
 
-				if (x.allocrule_id == 1) {	// back allocate as a proportion of the total of the original guls	
+				if (allocrule_id == 1 && x.agg_id > 0) {	// back allocate as a proportion of the total of the original guls	
 					OASIS_FLOAT gultotal = 0;
 					int index = gul_idx;	// default index top level
 					if (sidx == tiv_idx) index = 0;
 					const std::vector<OASIS_FLOAT> &guls = event_guls[index];
-					int vec_idx = aggid_to_vectorlookup[x.agg_id - 1];		// Same index applies to avx as to agg_vec
+					int vec_idx = (*aggid_to_vectorlookup)[x.agg_id - 1];		// Same index applies to avx as to agg_vec
 					for (int idx : avx[layer][vec_idx].item_idx) {
 						gultotal += guls[idx];
 					}
@@ -450,28 +475,28 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 								if (layer == max_layer_) outmap[output_id].push_back(rec);			// neglible cost
 							}
 							else {
-								outmap[output_id].push_back(rec);			// neglible cost
+								 outmap[output_id].push_back(rec);			// neglible cost
 							}
 						}
 					}
 				}
 
-				if (x.allocrule_id == 2) {		// back allocate as a proportion of the total of the previous losses			
+				if (allocrule_id == 2 && x.agg_id > 0) {		// back allocate as a proportion of the total of the previous losses			
 					if (item_proportions_computed == false) {
 						const std::vector<OASIS_FLOAT> &guls = event_guls[gul_idx];
 						compute_item_proportions(agg_vecs, guls, level, layer, previous_layer_id);
 						item_proportions_computed = true;
 					}										
-					if (x.item_prop.size() > 0) {
-						int vec_idx = aggid_to_vectorlookup[x.agg_id - 1];
+					if (x.item_prop->size() > 0) {
+						int vec_idx = (*aggid_to_vectorlookup)[x.agg_id - 1];
 						for (int i = 0; i < avx[layer][vec_idx].item_idx.size(); i++) {
 							int idx = avx[layer][vec_idx].item_idx[i];
 							//for (int idx : avx[layer][vec_idx].item_idx) {
-							OASIS_FLOAT prop = x.item_prop[i];
+							OASIS_FLOAT prop = x.item_prop->at(i);
 							if (netvalue_) { // get net gul value							
-								x.item_net[i] = x.item_net[i] - (x.loss * prop);
-								if (x.item_net[i] < 0) x.item_net[i] = 0;
-								rec.loss = x.item_net[i];
+								x.item_net->at(i) = x.item_net->at(i) - (x.loss * prop);
+								if (x.item_net->at(i) < 0) x.item_net->at(i) = 0;
+								rec.loss = x.item_net->at(i);
 							}
 							else {
 								rec.loss = x.loss * prop;
@@ -905,46 +930,6 @@ void fmcalc::init_itemtotiv()
 
 }
 
-void fmcalc::init_profile_old()
-{
-
-	FILE *fin = NULL;
-	std::string file = FMPROFILE_FILE_OLD;
-	if (inputpath_.length() > 0) {
-		file = inputpath_ + file.substr(5);
-	}
-	fin = fopen(file.c_str(), "rb");
-	if (fin == NULL) {
-		fprintf(stderr, "%s: cannot open %s\n", __func__, file.c_str());
-		exit(EXIT_FAILURE);
-	}
-
-	fm_profile f;
-	int i = fread(&f, sizeof(f), 1, fin);
-	while (i != 0) {
-		profile_rec p;
-		p.allocrule_id = f.allocrule_id;
-		p.calcrule_id = f.calcrule_id;
-		p.ccy_id = f.ccy_id;
-
-		add_tc(deductible, f.deductible, p.tc_vec);
-		add_tc(limit, f.limits, p.tc_vec);
-		add_tc(share_prop_of_limit, f.share_prop_of_lim, p.tc_vec);		
-		add_tc(deductible_prop_of_loss, f.deductible_prop_of_loss, p.tc_vec);
-		add_tc(limit_prop_of_loss, f.limit_prop_of_loss, p.tc_vec);
-		add_tc(deductible_prop_of_tiv, f.deductible_prop_of_tiv, p.tc_vec);
-		add_tc(limit_prop_of_tiv, f.limit_prop_of_tiv, p.tc_vec);
-		add_tc(deductible_prop_of_limit, f.deductible_prop_of_limit, p.tc_vec);
-
-		if (profile_vec_.size() < f.policytc_id+1) {
-			profile_vec_.resize(f.policytc_id + 1);
-		}
-		profile_vec_[f.policytc_id] = p;
-	
-		i = fread(&f, sizeof(f), 1, fin);
-	}
-	fclose(fin);
-}
 
 void fmcalc::init_fmxref()
 {
@@ -980,13 +965,8 @@ void fmcalc::init(int MaxRunLevel)
 {    
     init_programme(MaxRunLevel);
 	init_policytc(MaxRunLevel);
-	init_fmxref();
-	if (oldFMProfile_ == true) {
-		init_profile_old();
-	}
-	else {
-		init_profile_new();
-	}
+	init_fmxref();	
+	init_profile();	
 	init_itemtotiv();
 }
 

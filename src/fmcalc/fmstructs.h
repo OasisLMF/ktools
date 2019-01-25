@@ -39,6 +39,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 
 #include <vector>
+#include <memory>
 
 struct LossRec {
 	OASIS_FLOAT original_loss = 0;
@@ -52,11 +53,13 @@ struct LossRec {
 	OASIS_FLOAT accumulated_tiv = 0;	// accumulated tiv 
 	int agg_id;
 	int policytc_id;
-	int allocrule_id;
+//	int allocrule_id;
 	int next_vec_idx = -1;
-	const std::vector<int> *item_idx;
-	std::vector<OASIS_FLOAT> item_prop;
-	std::vector<OASIS_FLOAT> item_net;
+	const std::vector<int> *item_idx = 0;
+	std::shared_ptr<std::vector<OASIS_FLOAT>> item_prop;
+	std::shared_ptr<std::vector<OASIS_FLOAT>> item_net;
+	//std::vector<OASIS_FLOAT> *item_prop = 0;
+	//std::vector<OASIS_FLOAT> *item_net=0;
 };
 
 struct policytcvidx {
@@ -71,7 +74,7 @@ struct tc_rec {
 	unsigned char tc_id;
 };
 
-struct profile_rec {
+struct profile_recx {
 	int calcrule_id;
 	int allocrule_id;
 	int ccy_id;

@@ -82,8 +82,11 @@ namespace validateitems {
             printf("TODO: Process unzipped file");
         }
     }
+
+	
     void check_vulnerability() {
         std::set<int> vulnerability_ids;
+		get_vulnerability_ids(vulnerability_ids);
         item q;
         FILE *fin = fopen(ITEMS_FILE, "rb");
         int i = fread(&q, sizeof(q), 1, fin);
@@ -91,7 +94,7 @@ namespace validateitems {
             if (vulnerability_ids.find(q.vulnerability_id) ==
                 vulnerability_ids.end()) {
                 fprintf(stderr,
-                        "vulnerability_id %d in items not found in %s\n",
+                        "vulnerability_id %d in items not found in %s\n", q.vulnerability_id,
                         VULNERABILITY_FILE);
             }
             i = fread(&q, sizeof(q), 1, fin);

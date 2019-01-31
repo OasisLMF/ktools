@@ -128,7 +128,10 @@ int main(int argc, char* argv[])
 
 	sigaction(SIGSEGV, &sa, NULL);
 #endif
-
+	if (allocrule < 0 || allocrule > 2) {
+		fprintf(stderr, "%s: Invalid allocrule %d\n", progname,allocrule);
+		exit(1);
+	}
 
 	try {
 		initstreams("", "");

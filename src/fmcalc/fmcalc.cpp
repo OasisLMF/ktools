@@ -110,19 +110,19 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 		std::vector<OASIS_FLOAT> items_prop;
 		items_prop.resize(guls.size(), 0);
 
-		for (int level = 1; level < agg_vecs.size(); level++) {
-			vector <LossRec> &agg_vec = agg_vecs[level][layer_];
-			auto iter = agg_vec.begin();
-			while (iter != agg_vec.end()) {
-				if (iter->item_idx) {
-					if (iter->item_prop == nullptr) {
-						iter->item_prop =  std::make_shared<std::vector<OASIS_FLOAT>>(std::vector<OASIS_FLOAT>());
-					}
-					(iter->item_prop)->resize((iter->item_idx)->size(), 0);
-				}
-				iter++;
-			}
-		}
+		//for (int level = 1; level < agg_vecs.size(); level++) {
+		//	vector <LossRec> &agg_vec = agg_vecs[level][layer_];
+		//	auto iter = agg_vec.begin();
+		//	while (iter != agg_vec.end()) {
+		//		if (iter->item_idx) {
+		//			if (iter->item_prop == nullptr) {
+		//				iter->item_prop =  std::make_shared<std::vector<OASIS_FLOAT>>(std::vector<OASIS_FLOAT>());
+		//			}
+		//			(iter->item_prop)->resize((iter->item_idx)->size(), 0);
+		//		}
+		//		iter++;
+		//	}
+		//}
 		for (int level = 1; level < agg_vecs.size(); level++) {
 			vector <LossRec> &agg_vec = agg_vecs[level][layer_];
 			OASIS_FLOAT loss_total = 0;
@@ -130,6 +130,10 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 			while (iter != agg_vec.end()) {
 				OASIS_FLOAT total = 0;
 				if (iter->item_idx) {
+					if (iter->item_prop == nullptr) {
+						iter->item_prop = std::make_shared<std::vector<OASIS_FLOAT>>(std::vector<OASIS_FLOAT>());
+					}
+					(iter->item_prop)->resize((iter->item_idx)->size(), 0);
 					for (int idx : *(iter->item_idx)) {	// because this is the first level there should only be one item_idx
 						total += guls[idx];
 					}
@@ -138,7 +142,7 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 				loss_total += iter->loss;
 				iter++;
 			}
-			iter = agg_vec.begin();		// loop thru again
+			iter = agg_vec.begin();		// loop thru again to work out proportion
 			while (iter != agg_vec.end()) {
 				if (iter->loss > 0 && loss_total > 0) {
 					iter->proportion = iter->loss / loss_total;

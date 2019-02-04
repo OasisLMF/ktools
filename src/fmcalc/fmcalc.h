@@ -91,8 +91,23 @@ private:
 		const std::vector<int> &items_, std::vector<std::vector<OASIS_FLOAT>> &event_guls,
 		int previous_level, int previous_layer);	
 	void dofmcalc(std::vector <LossRec> &agg_vec_, int layer);
-	void add_tc(unsigned char tc_id, OASIS_FLOAT &tc_val, std::vector<tc_rec> &tc_vec);
 	
 };
+
+
+void applycalcrule(const profile_rec_new &profile, LossRec &x, int layer);
+void add_tc(unsigned char tc_id, OASIS_FLOAT tc_val, std::vector<tc_rec> &tc_vec);
+
+enum tc_new {			// tc = terms and conditions
+	deductible_1,
+	deductible_2,
+	deductible_3,
+	attachment_1,
+	limit_1,
+	share_1,
+	share_2,
+	share_3
+};
+
 
 #endif  // FMCALC_H_

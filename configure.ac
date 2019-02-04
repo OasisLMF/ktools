@@ -155,6 +155,7 @@ AC_CONFIG_FILES([
 		 src/ktgetmem/Makefile
 		 src/validateitems/Makefile
 		 src/summarycalctobin/Makefile
+		 src/kunit/Makefile
                  ])
 AC_OUTPUT
 

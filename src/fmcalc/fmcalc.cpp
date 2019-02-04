@@ -829,16 +829,6 @@ void fmcalc::init_programme(int maxRunLevel)
 
 }
 
-void fmcalc::add_tc(unsigned char tc_id, OASIS_FLOAT &tc_val, std::vector<tc_rec> &tc_vec)
-{
-	if (tc_val > -1) {
-		tc_rec t;
-		t.tc_id = tc_id;
-		t.tc_val = tc_val;
-		tc_vec.push_back(t);
-	}
-}
-
 bool fmcalc::loadcoverages(std::vector<OASIS_FLOAT> &coverages)
 {
 

@@ -107,8 +107,8 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 {
 
 	if (layer_ == 1) {
-		std::vector<OASIS_FLOAT> items_prop;
-		items_prop.resize(guls.size(), 0);
+		std::vector<OASIS_FLOAT> items_prop (guls.size(), 0);
+		//items_prop.resize(guls.size(), 0);
 
 		//for (int level = 1; level < agg_vecs.size(); level++) {
 		//	vector <LossRec> &agg_vec = agg_vecs[level][layer_];
@@ -131,9 +131,10 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 				OASIS_FLOAT total = 0;
 				if (iter->item_idx) {
 					if (iter->item_prop == nullptr) {
-						iter->item_prop = std::make_shared<std::vector<OASIS_FLOAT>>(std::vector<OASIS_FLOAT>());
+						iter->item_prop = std::make_shared<std::vector<OASIS_FLOAT>>(std::vector<OASIS_FLOAT>((iter->item_idx)->size(), 0));
+					}else {
+						(iter->item_prop)->resize((iter->item_idx)->size(), 0);
 					}
-					(iter->item_prop)->resize((iter->item_idx)->size(), 0);
 					for (int idx : *(iter->item_idx)) {	// because this is the first level there should only be one item_idx
 						total += guls[idx];
 					}
@@ -192,8 +193,6 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 	}
 	else {
 		if (previous_layer_ < layer_) {
-			std::vector<OASIS_FLOAT> items_prop;
-			items_prop.resize(guls.size(), 0);
 			vector <LossRec> &prev_agg_vec = agg_vecs[level_][1];
 			vector <LossRec> &current_agg_vec = agg_vecs[level_][layer_];
 			current_agg_vec[0].proportion = prev_agg_vec[0].proportion;
@@ -211,8 +210,8 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 			}
 			//
 
-			std::vector<int> v;
-			v.resize(guls.size(), -1);
+			std::vector<int> v(guls.size(), -1);
+			//v.resize(guls.size(), -1);
 			auto iter = prev_agg_vec.begin();
 			int j = 0;
 
@@ -278,6 +277,7 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 
 	}
 }
+
 
 inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlookups, vector<vector<vector <LossRec>>> &agg_vecs, int level, int max_level,
 	std::map<int, std::vector<fmlevelrec> > &outmap, int gul_idx, const std::vector<std::vector<std::vector<policytcvidx>>> &avxs, int layer, 
@@ -390,6 +390,7 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 			}
 		}
 		bool item_proportions_computed = false;
+		
 		for (LossRec &x : agg_vec) {
 			if (netvalue_ && layer == 1) {
 				const std::vector<OASIS_FLOAT> &guls = event_guls[gul_idx];
@@ -490,7 +491,8 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 						const std::vector<OASIS_FLOAT> &guls = event_guls[gul_idx];
 						compute_item_proportions(agg_vecs, guls, level, layer, previous_layer_id);
 						item_proportions_computed = true;
-					}										
+					}
+
 					if (x.item_prop->size() > 0) {
 						int vec_idx = (*aggid_to_vectorlookup)[x.agg_id - 1];
 						for (int i = 0; i < avx[layer][vec_idx].item_idx.size(); i++) {

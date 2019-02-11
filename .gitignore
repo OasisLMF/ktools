@@ -25,3 +25,4 @@ mkinstalldirs
 vs2
 .nvimrc
 .vimrc
+*.TMP

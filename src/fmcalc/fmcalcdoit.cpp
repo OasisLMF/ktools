@@ -6,7 +6,7 @@ void fmcalc::doit()
 {
 	// fmcalc fc(maxLevel, allocrule, inputpath, netvalue, oldFMProfile);
 
-	bool gulstreamType = true;
+	isGULStreamType_ = true;
 	unsigned int fmstream_type = 1 | fmstream_id;
 
 	fwrite(&fmstream_type, sizeof(fmstream_type), 1, stdout);
@@ -25,9 +25,10 @@ void fmcalc::doit()
 		stream_type = streamno_mask & gulstream_type;
 	}
 	if (stream_type2 == fmstream_id) {
-		gulstreamType = false;
+		isGULStreamType_ = false;
 		stream_type = streamno_mask & fmstream_type;
 	}
+	if (isGULStreamType_ == true) init_itemtotiv();
 	if (stream_type != 1) {
 		fprintf(stderr, "%s: Unsupported gul stream type %d\n", __func__, stream_type);
 		exit(-1);
@@ -40,7 +41,7 @@ void fmcalc::doit()
 		fwrite(&samplesize, sizeof(samplesize), 1, stdout);
 		std::vector<std::vector<OASIS_FLOAT>> event_guls(samplesize + 2);	// one additional for mean and tiv
 		std::vector<int> items;
-		int max_no_of_items = getmaxnoofitems();
+	
 		int current_item_index = 0;
 
 		while (i != 0) {
@@ -50,7 +51,9 @@ void fmcalc::doit()
 				if (last_event_id != -1) {
 					dofm(last_event_id, items, event_guls);
 				}
-
+				//if (gh.event_id == 82904) {
+				//	printf("We are here!");
+				//}
 				items.clear();
 				for (unsigned int i = 0; i < event_guls.size(); i++) event_guls[i].clear();
 				last_event_id = gh.event_id;
@@ -72,7 +75,7 @@ void fmcalc::doit()
 				gs.item_id = gh.item_id;
 				gs.sidx = gr.sidx;
 				gs.loss = gr.loss;
-				if (gulstreamType == false && gr.sidx == tiv_idx) {
+				if (isGULStreamType_ == false && gr.sidx == tiv_idx) {
 					items.push_back(gh.item_id);
 					for (unsigned int i = 0; i < event_guls.size(); i++) event_guls[i].resize(items.size());
 					current_item_index = static_cast<int> (items.size() - 1);
@@ -81,7 +84,7 @@ void fmcalc::doit()
 					event_guls[sidx][current_item_index] = gs.loss;
 				}
 				if (gr.sidx >= mean_idx) {
-					if (gr.sidx == mean_idx && gulstreamType == true) {
+					if (gr.sidx == mean_idx && isGULStreamType_ == true) {
 						items.push_back(gh.item_id);
 						for (unsigned int i = 0; i < event_guls.size(); i++) event_guls[i].resize(items.size());
 						current_item_index = static_cast<int> (items.size() - 1);
@@ -89,7 +92,7 @@ void fmcalc::doit()
 					int sidx = gs.sidx + 1;
 					if (gs.sidx == mean_idx) sidx = 1;
 					event_guls[sidx][current_item_index] = gs.loss;
-					if (gulstreamType == true && gs.sidx == mean_idx) { // add additional row for tiv
+					if (isGULStreamType_ == true && gs.sidx == mean_idx) { // add additional row for tiv
 						sidx = 0;
 						gs.loss = gettiv(gs.item_id);
 						event_guls[sidx][current_item_index] = gs.loss;

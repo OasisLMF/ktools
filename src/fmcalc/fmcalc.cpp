@@ -408,7 +408,7 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 					if (x.agg_id > 0) {	// agg id cannot be zero
 						if (netvalue_) { // get net gul value							
 							rec.loss = x.retained_loss;
-							rec.loss = x.net_loss;
+							// rec.loss = x.net_loss;
 						}
 						else {
 							rec.loss = x.loss;
@@ -456,7 +456,7 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 								rec.loss = guls[idx] - (x.loss * prop);
 							}
 							else {
-								rec.loss = x.net_loss * prop;
+								rec.loss = x.retained_loss * prop;
 							}
 
 						}
@@ -688,7 +688,8 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 				int vid = aggid_to_vectorlookup[agg_id - 1];
 				agg_vec[vec_idx].agg_id = avx[1][vid].agg_id;
 				agg_vec[vec_idx].item_idx = &avx[1][vid].item_idx;
-				agg_vec[vec_idx].accumulated_tiv = item_to_tiv_[avx[1][vid].item_idx[0]+1];
+				if (isGULStreamType_ == true)	agg_vec[vec_idx].accumulated_tiv = item_to_tiv_[avx[1][vid].item_idx[0]+1];
+				else agg_vec[vec_idx].accumulated_tiv = 0;
 				agg_vec[vec_idx].policytc_id = avx[1][vid].policytc_id;
 			}
 
@@ -865,28 +866,6 @@ bool fmcalc::loadcoverages(std::vector<OASIS_FLOAT> &coverages)
 	return true;
 
 }
-int fmcalc::getmaxnoofitems()
-{
-
-	FILE *fin = NULL;
-	std::string file = ITEMS_FILE;
-	if (inputpath_.length() > 0) {
-		file = inputpath_ + file.substr(5);
-	}
-	fin = fopen(file.c_str(), "rb");
-	if (fin == NULL) {
-		fprintf(stderr, "%s: cannot open %s\n", __func__, file.c_str());
-		exit(EXIT_FAILURE);
-	}
-
-	flseek(fin, 0L, SEEK_END);
-	long long p = fltell(fin);
-	p = p / sizeof(item);
-	fclose(fin);
-	return int(p);
-
-}
-
 void fmcalc::init_itemtotiv()
 {
 	std::vector<OASIS_FLOAT> coverages;
@@ -963,6 +942,5 @@ void fmcalc::init(int MaxRunLevel)
 	init_policytc(MaxRunLevel);
 	init_fmxref();	
 	init_profile();	
-	init_itemtotiv();
 }
 

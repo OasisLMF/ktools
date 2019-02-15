@@ -51,6 +51,12 @@ namespace footprinttobin {
 }
 
 #include "../include/oasis.h"
+
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+#include <signal.h>
+#include <string.h>
+#endif
+
 char *progname;
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
 void segfault_sigaction(int signal, siginfo_t *si, void *arg) {

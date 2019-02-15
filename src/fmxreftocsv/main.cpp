@@ -61,7 +61,9 @@ void segfault_sigaction(int signal, siginfo_t *si, void *arg) {
 }
 #endif
 
-void doit(bool skipheader);
+namespace fmxreftocsv {
+	void doit(bool skipheader);
+}
 
 void help() {
     fprintf(stderr, "-s skip header\n"
@@ -100,7 +102,7 @@ int main(int argc, char *argv[]) {
 #endif
     try {
         initstreams("", "");
-        doit(skipheader);
+        fmxreftocsv::doit(skipheader);
     } catch (std::bad_alloc) {
         fprintf(stderr, "%s: Memory allocation failed\n", progname);
         exit(EXIT_FAILURE);

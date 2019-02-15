@@ -32,10 +32,9 @@
 * DAMAGE.
 */
 /*
-Convert footprint csv to binary
-Author: Ben Matharu  email: ben.matharu@oasislmf.org
+Convert footprint to csv
+Author: Joh Carter  email: johanna.carter@oasislmf.org
 */
-
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -45,9 +44,9 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <unistd.h>
 #endif
 
-namespace footprinttobin {
-	void doit(int intensity_bins, int hasIntensityUncertainty, bool skipheader);
-	void doitz(int intensity_bins, int hasIntensityUncertainty);
+namespace footprinttocsv {
+	void doit(bool skipheader);
+	void doitz(bool skipheader);
 }
 
 #include "../include/oasis.h"
@@ -61,69 +60,62 @@ void segfault_sigaction(int signal, siginfo_t *si, void *arg) {
 #endif
 
 
-
-void help() {
-	fprintf(stderr, "-i max intensity bins\n"
-		"-n No intensity uncertainty\n"
+void help()
+{
+	fprintf(stderr,
 		"-s skip header\n"
-		"-v version\n");
+		"-v version\n"
+		"-z zip input\n"
+		"-h help\n"
+	);
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char* argv[])
+{
 	int opt;
-	bool zip = false;
-	int intensity_bins = -1;
-	int hasIntensityUncertainty = true;
 	bool skipheader = false;
-	progname = argv[0];
-	while ((opt = getopt(argc, argv, "zvshni:")) != -1) {
+	bool zip = false;
+	while ((opt = getopt(argc, argv, "zvhs")) != -1) {
 		switch (opt) {
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
 			exit(EXIT_FAILURE);
 			break;
-		case 'i':
-			intensity_bins = atoi(optarg);
-			break;
-		case 'n':
-			hasIntensityUncertainty = false;
+		case 'z':
+			zip = true;
 			break;
 		case 's':
 			skipheader = true;
 			break;
-		case 'z':
-			zip = true;
-			break;
 		case 'h':
-			help();
-			exit(EXIT_FAILURE);
-		default:
 			help();
 			exit(EXIT_FAILURE);
 		}
 	}
-	if (intensity_bins == -1) {
-		fprintf(stderr, "%s: Intensity bin parameter not supplied\n", __func__);
-		help();
+
+	progname = argv[0];
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+	struct sigaction sa;
+
+	memset(&sa, 0, sizeof(struct sigaction));
+	sigemptyset(&sa.sa_mask);
+	sa.sa_sigaction = segfault_sigaction;
+	sa.sa_flags = SA_SIGINFO;
+
+	sigaction(SIGSEGV, &sa, NULL);
+#endif
+	try {
+		initstreams();
+		if (zip) {
+			footprinttocsv::doitz(skipheader);
+		}
+		else {
+			footprinttocsv::doit(skipheader);
+		}
+	}
+	catch (std::bad_alloc) {
+		fprintf(stderr, "%s: Memory allocation failed\n", progname);
 		exit(EXIT_FAILURE);
 	}
-
-	initstreams();
-	fprintf(stderr, "starting...\n");
-
-
-	if (zip) {
-#ifdef _MSC_VER
-		fprintf(stderr, "Zip not supported in Microsoft build\n");
-		exit(-1);
-#else
-		footprinttobin::doitz(intensity_bins, hasIntensityUncertainty);
-#endif
-	}
-	else {
-		footprinttobin::doit(intensity_bins,hasIntensityUncertainty,skipheader);
-	}
-
-	fprintf(stderr, "done...\n");
-	return 0;
+	return EXIT_SUCCESS;
 }

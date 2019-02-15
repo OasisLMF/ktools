@@ -51,9 +51,6 @@ void fmcalc::doit()
 				if (last_event_id != -1) {
 					dofm(last_event_id, items, event_guls);
 				}
-				//if (gh.event_id == 82904) {
-				//	printf("We are here!");
-				//}
 				items.clear();
 				for (unsigned int i = 0; i < event_guls.size(); i++) event_guls[i].clear();
 				last_event_id = gh.event_id;

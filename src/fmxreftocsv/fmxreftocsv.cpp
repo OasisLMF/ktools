@@ -49,17 +49,17 @@
 #include "../include/oasis.h"
 
 
+namespace fmxreftocsv {
+	void doit(bool skipheader)
+	{
 
-void doit(bool skipheader)
-{
+		if (skipheader == false) printf("\"output_id\",\"agg_id\",\"layer_id\"\n");
 
-	if (skipheader == false) printf("\"output_id\",\"agg_id\",\"layer_id\"\n");
-    
-    fmXref q;
-    size_t i = fread(&q, sizeof(q), 1, stdin);
-    while (i != 0) {
-        printf("%d, %d, %d\n",q.output_id, q.agg_id, q.layer_id);
-        i = fread(&q, sizeof(q), 1, stdin);
-    }
+		fmXref q;
+		size_t i = fread(&q, sizeof(q), 1, stdin);
+		while (i != 0) {
+			printf("%d, %d, %d\n", q.output_id, q.agg_id, q.layer_id);
+			i = fread(&q, sizeof(q), 1, stdin);
+		}
+	}
 }
-

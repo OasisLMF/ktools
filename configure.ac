@@ -43,16 +43,28 @@ AC_ARG_ENABLE([osx],
     AS_HELP_STRING([--enable-osx], [Enable OSX build]))
 
 AS_IF([test "x$enable_osx" = "xyes"], [
-	CXXFLAGS="-std=c++11 -D__unix  -Wno-unused-result -g -O3"
+	CXXFLAGSX="-std=c++11 -D__unix  -Wno-unused-result -g"
 ],
 [
-	CXXFLAGS="-std=c++11 -Wno-unused-result -ffunction-sections -fdata-sections -O3"
+	CXXFLAGSX="-std=c++11 -Wno-unused-result -ffunction-sections -fdata-sections"
 #	LDFLAGS="-Wl,--gc-sections -Wl,--strip-all"
 ]
 )
 
+dnl Optimization level for O3
+AC_ARG_ENABLE([o3],
+    AS_HELP_STRING([--enable-o3], [Enable O3 build]))
 
-# :${CXXFLAGS="-std=c++11 -Wno-unused-result -g -O3"}
+AS_IF([test "x$enable_o3" = "xyes"], [
+	CXXFLAGSY="-O3"
+],
+[
+	CXXFLAGSY="-O2"
+]
+)
+
+
+:${CXXFLAGS="$CXXFLAGSX $CXXFLAGSY"}
 
 AM_CONDITIONAL(DEBUG, test x"$debug" = x"true")
 
@@ -76,8 +88,6 @@ AM_CONDITIONAL(DEBUG, test x"$debug" = x"true")
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADERS([config.h])
 
-
-#LDFLAGS=-static
 
 # Checks for programs.
 AC_PROG_CXX([c++ g++])

@@ -4,6 +4,7 @@ Ktools Changelog
 
 ## [v3.0.5](https://github.com/OasisLMF/ktools/releases/tag/v3.0.5)
 * Fix for Alloc rules [0,1],  Netloss calculation in Reinsurance 
+* Switch to -O2 compile flag by default, use `./configure --enable-o3` to enable -O3 optimization 
 
 ## [v3.0.3](https://github.com/OasisLMF/ktools/releases/tag/v3.0.3)
 * Performance optimization for Alloc rule 2

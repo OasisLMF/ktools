@@ -94,8 +94,8 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			if (loss < 0) loss = 0;
 			loss = loss * share;
 			//x.retained_loss = x.retained_loss + (x.loss - loss);
-			if (layer > 1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
-			else x.net_loss = x.loss - loss;
+			if (layer > 1)	x.net_loss = x.previous_layer_retained_loss - loss;
+			else x.net_loss = x.net_loss + (x.loss - loss);
 			x.retained_loss = x.net_loss;
 			x.loss = loss;
 		}
@@ -115,8 +115,8 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			x.effective_deductible = x.effective_deductible + (x.loss - loss);
 			if (loss > lim) loss = lim;
 			//x.retained_loss = x.retained_loss + (x.loss - loss);
-			if (layer > 1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
-			else x.net_loss = x.loss - loss;
+			if (layer > 1)	x.net_loss = x.previous_layer_retained_loss - loss;
+			else x.net_loss = x.net_loss + (x.loss - loss);
 			x.retained_loss = x.net_loss;
 			x.loss = loss;
 		}
@@ -327,8 +327,8 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			OASIS_FLOAT loss = x.loss;
 			if (loss > lim) loss = lim;
 			//x.retained_loss = x.retained_loss + (x.loss - loss);
-			if (layer > 1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
-			else x.net_loss = x.loss - loss;
+			if (layer > 1)	x.net_loss = x.previous_layer_retained_loss - loss;
+			else x.net_loss = x.net_loss + (x.loss - loss);
 			x.retained_loss = x.net_loss;
 			x.loss = loss;
 		}
@@ -459,8 +459,8 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			if (loss > ded) loss = 0;
 			else loss = loss;
 			//x.retained_loss = x.retained_loss + (x.loss - loss);
-			if (layer > 1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
-			else x.net_loss = x.loss - loss;
+			if (layer > 1)	x.net_loss = x.previous_layer_retained_loss - loss;
+			else x.net_loss = x.net_loss + (x.loss - loss);
 			x.retained_loss = x.net_loss;
 			x.loss = loss;
 		}
@@ -522,8 +522,8 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			loss = loss * share2 * share3;
 			if (loss < 0) loss = 0;
 			//x.retained_loss = x.retained_loss + (x.loss - loss);
-			if (layer > 1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
-			else x.net_loss = x.loss - loss;
+			if (layer > 1)	x.net_loss = x.previous_layer_retained_loss - loss;
+			else x.net_loss = x.net_loss + (x.loss - loss);
 			x.retained_loss = x.net_loss;
 			x.loss = loss;
 		}
@@ -544,8 +544,8 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			loss = loss * share2 * share3;
 			if (loss < 0) loss = 0;
 			//x.retained_loss = x.retained_loss + (x.loss - loss);
-			if (layer > 1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
-			else x.net_loss = x.loss - loss;
+			if (layer > 1)	x.net_loss = x.previous_layer_retained_loss - loss;
+			else x.net_loss = x.net_loss + (x.loss - loss);
 			x.retained_loss = x.net_loss;
 			x.loss = loss;
 		}
@@ -570,8 +570,8 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			if (loss > limit) loss = limit;
 			loss = loss * share2 * share3;
 			//x.retained_loss = x.retained_loss + (x.loss - loss);
-			if (layer > 1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
-			else x.net_loss = x.loss - loss;
+			if (layer > 1)	x.net_loss = x.previous_layer_retained_loss - loss;
+			else x.net_loss = x.net_loss + (x.loss - loss);
 			x.retained_loss = x.net_loss;
 			x.loss = loss;
 		}
@@ -589,8 +589,8 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			//Function25 =  Loss * share1
 			OASIS_FLOAT loss = x.loss * share1 * share2 * share3;
 			//x.retained_loss = x.retained_loss + (x.loss - loss);
-			if (layer > 1)	x.net_loss = x.net_loss + (x.previous_layer_retained_loss - loss);
-			else x.net_loss = x.loss - loss;
+			if (layer > 1)	x.net_loss = x.previous_layer_retained_loss - loss;
+			else x.net_loss = x.net_loss + (x.loss - loss);
 			x.retained_loss = x.net_loss;
 			x.loss = loss;
 		}

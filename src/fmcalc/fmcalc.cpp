@@ -407,8 +407,7 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 				if (allocrule_id == 0) { // no back allocation
 					if (x.agg_id > 0) {	// agg id cannot be zero
 						if (netvalue_) { // get net gul value							
-							rec.loss = x.retained_loss;
-							// rec.loss = x.net_loss;
+							rec.loss = x.retained_loss;							
 						}
 						else {
 							rec.loss = x.loss;

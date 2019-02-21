@@ -322,24 +322,6 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 	}
 
 
-
-	//if (agg_vec.size() == 0) {
- //       int size = aggid_to_vectorlookup->size();
- //       agg_vec.resize(size);
-	//}
-	//else {
-	//	for (unsigned int i = 0; i < agg_vec.size(); i++) {
-	//		if (layer == 1) {
-	//			agg_vec[i].original_loss = 0;
-	//			agg_vec[i].loss = 0;
-	//		}else{
-	//			agg_vec[i].loss = agg_vec[i].retained_loss;
-	//			agg_vec[i].original_loss = agg_vec[i].loss;
-	//			agg_vec[i].retained_loss = 0;
-	//		}
-	//	}
-	//}
-
 	for (unsigned int i = 0;i < agg_vec_previous_level.size();i++){ // loop through previous levels of agg_vec
 		if (agg_vec_previous_level[i].agg_id != 0) {
 			int agg_id = pfm_vec_vec_[level][agg_vec_previous_level[i].agg_id];

@@ -612,8 +612,6 @@ void fmcalc::dofmcalc(std::vector <LossRec> &agg_vec, int layer)
 {
 	for (LossRec &x : agg_vec) {
 		if (x.agg_id == 0) break;
-		// x.allocrule_id = allocrule_;
-		x.original_loss = x.loss;
 		if (x.agg_id > 0) {
 			if (x.loss > 0 || x.retained_loss > 0) {
 				if (x.policytc_id > 0) {

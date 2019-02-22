@@ -54,7 +54,7 @@ struct fm_policyTC {
 
 class fmcalc {
 public:	
-	fmcalc(int maxRunLevel, int allocrule,const std::string &inputpath, bool netvalue, bool oldFMProfile): inputpath_(inputpath) , netvalue_(netvalue),allocrule_(allocrule) { init(maxRunLevel); }	
+	fmcalc(int maxRunLevel, int allocrule,const std::string &inputpath, bool netvalue, bool oldFMProfile, bool debug): inputpath_(inputpath) , netvalue_(netvalue),allocrule_(allocrule), debug_(debug) { init(maxRunLevel); }	
 	void doit();
 private:
 	void setmaxlevel(int maxlevel) { if (maxlevel > -1) maxLevel_ = maxlevel; }
@@ -73,6 +73,7 @@ private:
 	std::vector<int> level_to_max_layer_;
 	std::string inputpath_;
 	bool netvalue_ = false;
+	bool debug_ = false;
 	std::vector<std::vector<int>> pfm_vec_vec_;  // initialized from fm/programme.bin  pfm_vec_vec[level_id][item_id] returns agg_id 
 	std::vector<OASIS_FLOAT> item_to_tiv_;	
 	void init_programme(int maxrunLevel);

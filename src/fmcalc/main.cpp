@@ -64,6 +64,7 @@ void help()
         "-M max level (optional)\n"
 		"-p inputpath (relative or full path)\n"
 		"-n feed net value (used for reinsurance)\n"
+		"-d debug\n"
 		"-v version\n"
 		"-h help\n"
 	);
@@ -86,12 +87,16 @@ int main(int argc, char* argv[])
 	int opt;
 	std::string inputpath;
 	bool oldFMProfile = false;
+	bool debug = false;
 
 	bool netvalue = false;
-    while ((opt = getopt(argc, argv, "nvhoM:p:a:")) != -1) {
+    while ((opt = getopt(argc, argv, "dnvhoM:p:a:")) != -1) {
         switch (opt) {
 		case 'o':
 			oldFMProfile = true;
+			break;
+		case 'd':
+			debug = true;
 			break;
          case 'M':
             new_max = atoi(optarg);
@@ -135,7 +140,7 @@ int main(int argc, char* argv[])
 
 	try {
 		initstreams("", "");
-		fmcalc fc(new_max, allocrule, inputpath, netvalue, oldFMProfile);
+		fmcalc fc(new_max, allocrule, inputpath, netvalue, oldFMProfile,debug);
 		fc.doit();
 	}
 	catch (std::bad_alloc) {

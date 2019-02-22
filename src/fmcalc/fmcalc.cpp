@@ -385,7 +385,7 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 			}
 
 			int allocrule_id = allocrule_;
-			if (x.loss > 0.0 || rec.sidx < 0 || netvalue_) {
+			if (x.loss > 0.0 || rec.sidx < 0 || netvalue_ || debug_) {
 				if (allocrule_id == 0) { // no back allocation
 					if (x.agg_id > 0) {	// agg id cannot be zero
 						if (netvalue_) { // get net gul value							
@@ -394,7 +394,7 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 						else {
 							rec.loss = x.loss;
 						}
-						if (rec.loss > 0.0 || rec.sidx < 0) {
+						if (rec.loss > 0.0 || rec.sidx < 0 || debug_) {
 							fmxref_key k;
 							k.layer_id = layer;
 							k.agg_id = x.agg_id;
@@ -444,7 +444,7 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 						else {
 							rec.loss = x.loss * prop;
 						}
-						if (rec.loss > 0.0 || rec.sidx < 0) {
+						if (rec.loss > 0.0 || rec.sidx < 0 || debug_) {
 							fmxref_key k;
 							k.layer_id = layer;
 							k.agg_id = items[idx];
@@ -474,7 +474,7 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 						item_proportions_computed = true;
 					}
 
-					if (x.item_prop->size() > 0) {
+					if (x.item_prop && x.item_prop->size() > 0) {
 						int vec_idx = (*aggid_to_vectorlookup)[x.agg_id - 1];
 						for (int i = 0; i < avx[layer][vec_idx].item_idx.size(); i++) {
 							int idx = avx[layer][vec_idx].item_idx[i];
@@ -488,7 +488,7 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 							else {
 								rec.loss = x.loss * prop;
 							}
-							if (rec.loss > 0.0 || rec.sidx < 0) {
+							if (rec.loss > 0.0 || rec.sidx < 0 || debug_) {
 								fmxref_key k;
 								k.layer_id = layer;
 								k.agg_id = items[idx];

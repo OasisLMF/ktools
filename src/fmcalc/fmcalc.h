@@ -54,7 +54,9 @@ struct fm_policyTC {
 
 class fmcalc {
 public:	
-	fmcalc(int maxRunLevel, int allocrule,const std::string &inputpath, bool netvalue, bool oldFMProfile, bool debug): inputpath_(inputpath) , netvalue_(netvalue),allocrule_(allocrule), debug_(debug) { init(maxRunLevel); }	
+	fmcalc(int maxRunLevel, int allocrule,const std::string &inputpath, bool netvalue, bool oldFMProfile, bool debug, bool allocruleOptimizationOff):
+		inputpath_(inputpath) , netvalue_(netvalue),allocrule_(allocrule), debug_(debug), allocruleOptimizationOff_(allocruleOptimizationOff)
+		{ init(maxRunLevel); }	
 	void doit();
 private:
 	void setmaxlevel(int maxlevel) { if (maxlevel > -1) maxLevel_ = maxlevel; }
@@ -74,6 +76,7 @@ private:
 	std::string inputpath_;
 	bool netvalue_ = false;
 	bool debug_ = false;
+	bool allocruleOptimizationOff_ = false;
 	std::vector<std::vector<int>> pfm_vec_vec_;  // initialized from fm/programme.bin  pfm_vec_vec[level_id][item_id] returns agg_id 
 	std::vector<OASIS_FLOAT> item_to_tiv_;	
 	void init_programme(int maxrunLevel);

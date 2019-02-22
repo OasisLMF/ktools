@@ -64,6 +64,7 @@ void help()
         "-M max level (optional)\n"
 		"-p inputpath (relative or full path)\n"
 		"-n feed net value (used for reinsurance)\n"
+		"-O Alloc rule2 optimization off"
 		"-d debug\n"
 		"-v version\n"
 		"-h help\n"
@@ -88,12 +89,16 @@ int main(int argc, char* argv[])
 	std::string inputpath;
 	bool oldFMProfile = false;
 	bool debug = false;
+	bool allocruleOptimizationOff = false;
 
 	bool netvalue = false;
-    while ((opt = getopt(argc, argv, "dnvhoM:p:a:")) != -1) {
+    while ((opt = getopt(argc, argv, "dnvhoOM:p:a:")) != -1) {
         switch (opt) {
 		case 'o':
 			oldFMProfile = true;
+			break;
+		case 'O':
+			allocruleOptimizationOff = true;
 			break;
 		case 'd':
 			debug = true;
@@ -140,7 +145,7 @@ int main(int argc, char* argv[])
 
 	try {
 		initstreams("", "");
-		fmcalc fc(new_max, allocrule, inputpath, netvalue, oldFMProfile,debug);
+		fmcalc fc(new_max, allocrule, inputpath, netvalue, oldFMProfile,debug, allocruleOptimizationOff);
 		fc.doit();
 	}
 	catch (std::bad_alloc) {

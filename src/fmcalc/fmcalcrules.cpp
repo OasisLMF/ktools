@@ -39,6 +39,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 #include "fmcalc.h"
 #include <vector>
+#include <stdio.h>
 
 void add_tc(unsigned char tc_id, OASIS_FLOAT tc_val, std::vector<tc_rec> &tc_vec)
 {
@@ -623,7 +624,119 @@ void fmcalc::dofmcalc(std::vector <LossRec> &agg_vec, int layer)
 	}
 }
 
+void fmcalc::init_profile_rec(fm_profile_new &f)
+{
+	profile_rec_new p;
+	p.calcrule_id = f.calcrule_id;
+	switch (p.calcrule_id) {
+		case 1:
+			add_tc(deductible_1, f.deductible1, p.tc_vec);
+			add_tc(limit_1, f.limit, p.tc_vec);
+			break;
+		case 2:
+			add_tc(deductible_1, f.deductible1, p.tc_vec);
+			add_tc(limit_1, f.limit, p.tc_vec);
+			add_tc(share_1, f.share1, p.tc_vec);
+			add_tc(attachment_1, f.attachment, p.tc_vec);
+			break;
+		case 3:
+			add_tc(deductible_1, f.deductible1, p.tc_vec);
+			add_tc(limit_1, f.limit, p.tc_vec);
+			break;
+		case 4:
+			add_tc(deductible_1, f.deductible1, p.tc_vec);
+			add_tc(limit_1, f.limit, p.tc_vec);
+			break;
+		case 5:
+			add_tc(deductible_1, f.deductible1, p.tc_vec);
+			add_tc(limit_1, f.limit, p.tc_vec);
+			break;
+		case 6:
+			add_tc(deductible_1, f.deductible1, p.tc_vec);
+			break;
+		case 9:
+			add_tc(deductible_1, f.deductible1, p.tc_vec);
+			add_tc(limit_1, f.limit, p.tc_vec);
+			break;
+		case 10:
+			add_tc(deductible_3, f.deductible3, p.tc_vec);
+			break;
+		case 11:
+			add_tc(deductible_2, f.deductible2, p.tc_vec);
+			break;
+		case 12:
+			add_tc(deductible_1, f.deductible1, p.tc_vec);
+			break;
+		case 14:
+			add_tc(limit_1, f.limit, p.tc_vec);
+			break;
+		case 15:
+			add_tc(limit_1, f.limit, p.tc_vec);
+			break;
+		case 16:
+			add_tc(deductible_1, f.deductible1, p.tc_vec);
+			break;
+		case 17:
+			add_tc(deductible_1, f.deductible1, p.tc_vec);
+			add_tc(limit_1, f.limit, p.tc_vec);
+			add_tc(share_1, f.share1, p.tc_vec);
+			add_tc(attachment_1, f.attachment, p.tc_vec);
+			break;
+		case 18:
+			add_tc(deductible_1, f.deductible1, p.tc_vec);
+			add_tc(limit_1, f.limit, p.tc_vec);
+			add_tc(share_1, f.share1, p.tc_vec);
+			add_tc(attachment_1, f.attachment, p.tc_vec);
+			break;
+		case 19:
+			add_tc(deductible_1, f.deductible1, p.tc_vec);
+			add_tc(deductible_2, f.deductible2, p.tc_vec);
+			add_tc(deductible_3, f.deductible3, p.tc_vec);
+			break;
+		case 20:
+			add_tc(deductible_1, f.deductible1, p.tc_vec);
+			break;
+		case 21:
+			add_tc(deductible_1, f.deductible1, p.tc_vec);
+			add_tc(deductible_2, f.deductible2, p.tc_vec);
+			add_tc(deductible_3, f.deductible3, p.tc_vec);
+			break;
+		case 23:
+			add_tc(share_2, f.share2, p.tc_vec);
+			add_tc(share_3, f.share3, p.tc_vec);
+			add_tc(limit_1, f.limit, p.tc_vec);
+			break;
+		case 24:
+			add_tc(attachment_1, f.attachment, p.tc_vec);
+			add_tc(share_1, f.share1, p.tc_vec);
+			add_tc(share_2, f.share2, p.tc_vec);
+			add_tc(share_3, f.share3, p.tc_vec);
+			add_tc(limit_1, f.limit, p.tc_vec);
+			break;
+		case 25:
+			add_tc(share_1, f.share1, p.tc_vec);
+			add_tc(share_2, f.share2, p.tc_vec);
+			add_tc(share_3, f.share3, p.tc_vec);
+			break;
+		default:
+		{
+			//fprintf(stderr, "Found calrule %d\n", p.calcrule_id);
+			add_tc(deductible_1, f.deductible1, p.tc_vec);
+			add_tc(deductible_2, f.deductible2, p.tc_vec);
+			add_tc(deductible_3, f.deductible3, p.tc_vec);
+			add_tc(attachment_1, f.attachment, p.tc_vec);
+			add_tc(limit_1, f.limit, p.tc_vec);
+			add_tc(share_1, f.share1, p.tc_vec);
+			add_tc(share_2, f.share2, p.tc_vec);
+			add_tc(share_3, f.share3, p.tc_vec);
+		}
 
+	}
+	if (profile_vec_new_.size() < f.profile_id + 1) {
+		profile_vec_new_.resize(f.profile_id + 1);
+	}
+	profile_vec_new_[f.profile_id] = p;
+}
 
 void fmcalc::init_profile()
 {
@@ -639,119 +752,15 @@ void fmcalc::init_profile()
 	}
 	fm_profile_new f;
 	int i = fread(&f, sizeof(f), 1, fin);
-	while (i != 0) {
-		profile_rec_new p;
-		p.calcrule_id = f.calcrule_id;
-		switch (p.calcrule_id) {
-			case 1:
-				add_tc(deductible_1, f.deductible1, p.tc_vec);
-				add_tc(limit_1, f.limit, p.tc_vec);
-			break;
-			case 2:
-				add_tc(deductible_1, f.deductible1, p.tc_vec);
-				add_tc(limit_1, f.limit, p.tc_vec);
-				add_tc(share_1, f.share1, p.tc_vec);
-				add_tc(attachment_1, f.attachment, p.tc_vec);
-				break;
-			case 3:
-				add_tc(deductible_1, f.deductible1, p.tc_vec);
-				add_tc(limit_1, f.limit, p.tc_vec);
-				break;
-			case 4:
-				add_tc(deductible_1, f.deductible1, p.tc_vec);
-				add_tc(limit_1, f.limit, p.tc_vec);
-				break;
-			case 5:
-				add_tc(deductible_1, f.deductible1, p.tc_vec);
-				add_tc(limit_1, f.limit, p.tc_vec);
-				break;
-			case 6:
-				add_tc(deductible_1, f.deductible1, p.tc_vec);
-				break;
-			case 9:
-				add_tc(deductible_1, f.deductible1, p.tc_vec);
-				add_tc(limit_1, f.limit, p.tc_vec);
-				break;
-			case 10:
-				add_tc(deductible_3, f.deductible3, p.tc_vec);
-				break;
-			case 11:
-				add_tc(deductible_2, f.deductible2, p.tc_vec);
-				break;
-			case 12:
-				add_tc(deductible_1, f.deductible1, p.tc_vec);
-				break;
-			case 14:
-				add_tc(limit_1, f.limit, p.tc_vec);
-				break;
-			case 15:
-				add_tc(limit_1, f.limit, p.tc_vec);
-				break;
-			case 16:
-				add_tc(deductible_1, f.deductible1, p.tc_vec);
-				break;
-			case 17:
-				add_tc(deductible_1, f.deductible1, p.tc_vec);
-				add_tc(limit_1, f.limit, p.tc_vec);
-				add_tc(share_1, f.share1, p.tc_vec);
-				add_tc(attachment_1, f.attachment, p.tc_vec);
-				break;
-			case 18:
-				add_tc(deductible_1, f.deductible1, p.tc_vec);
-				add_tc(limit_1, f.limit, p.tc_vec);
-				add_tc(share_1, f.share1, p.tc_vec);
-				add_tc(attachment_1, f.attachment, p.tc_vec);
-				break;
-			case 19:
-				add_tc(deductible_1, f.deductible1, p.tc_vec);
-				add_tc(deductible_2, f.deductible2, p.tc_vec);
-				add_tc(deductible_3, f.deductible3, p.tc_vec);
-				break;
-			case 20:
-				add_tc(deductible_1, f.deductible1, p.tc_vec);
-				break;
-			case 21:
-				add_tc(deductible_1, f.deductible1, p.tc_vec);
-				add_tc(deductible_2, f.deductible2, p.tc_vec);
-				add_tc(deductible_3, f.deductible3, p.tc_vec);
-				break;
-			case 23:
-				add_tc(share_2, f.share2, p.tc_vec);
-				add_tc(share_3, f.share3, p.tc_vec);
-				add_tc(limit_1, f.limit, p.tc_vec);
-				break;
-			case 24:
-				add_tc(attachment_1, f.attachment, p.tc_vec);
-				add_tc(share_1, f.share1, p.tc_vec);
-				add_tc(share_2, f.share2, p.tc_vec);
-				add_tc(share_3, f.share3, p.tc_vec);
-				add_tc(limit_1, f.limit, p.tc_vec);
-				break;
-			case 25:
-				add_tc(share_1, f.share1, p.tc_vec);
-				add_tc(share_2, f.share2, p.tc_vec);
-				add_tc(share_3, f.share3, p.tc_vec);
-				break;
-			default:
-			{
-				//fprintf(stderr, "Found calrule %d\n", p.calcrule_id);
-				add_tc(deductible_1, f.deductible1, p.tc_vec);
-				add_tc(deductible_2, f.deductible2, p.tc_vec);
-				add_tc(deductible_3, f.deductible3, p.tc_vec);
-				add_tc(attachment_1, f.attachment, p.tc_vec);
-				add_tc(limit_1, f.limit, p.tc_vec);
-				add_tc(share_1, f.share1, p.tc_vec);
-				add_tc(share_2, f.share2, p.tc_vec);
-				add_tc(share_3, f.share3, p.tc_vec);
-			}
-
-		}
-		
-		if (profile_vec_new_.size() < f.profile_id + 1) {
-			profile_vec_new_.resize(f.profile_id + 1);
-		}
-		profile_vec_new_[f.profile_id] = p;
+	while (i != 0) {		
+		init_profile_rec(f);
+		if (noop_profile_id < f.profile_id) noop_profile_id = f.profile_id;
 		i = fread(&f, sizeof(f), 1, fin);
 	}
+	noop_profile_id++;
+	fm_profile_new d;	// dummy
+	d.profile_id = noop_profile_id;
+	d.calcrule_id = 14;
+	init_profile_rec(d);
 	fclose(fin);
 }

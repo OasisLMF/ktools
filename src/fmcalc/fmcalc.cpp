@@ -47,7 +47,9 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <algorithm>
 #include <fcntl.h>
 #include <assert.h>
+#include <set>
 #include <unordered_set>
+#include <algorithm>
 
 #ifdef __unix
     #include <unistd.h>
@@ -71,16 +73,23 @@ enum tc {			// tc = terms and conditions
 	deductible_prop_of_limit
 };
 
-//enum tc_new {			// tc = terms and conditions
-//	deductible_1,
-//	deductible_2,
-//	deductible_3,
-//	attachment_1,
-//	limit_1,
-//	share_1,
-//	share_2,
-//	share_3
-//};
+struct layer_agg {
+	int layer_id;
+	int agg_id;
+};
+
+bool operator<(const layer_agg& lhs, const layer_agg& rhs)
+{
+	if (lhs.layer_id != rhs.layer_id)  return lhs.layer_id < rhs.layer_id;
+	return lhs.agg_id < rhs.agg_id;		// should never reach here since these two are always equal 
+}
+
+bool operator<(const fm_policyTC& lhs, const fm_policyTC& rhs)
+{
+	if (lhs.layer_id != rhs.layer_id) return lhs.layer_id < rhs.layer_id;
+	if (lhs.level_id != rhs.level_id) return lhs.level_id < rhs.level_id;
+	return lhs.agg_id < rhs.agg_id;
+}
 
 bool operator<(const fmlevelhdr& lhs, const fmlevelhdr& rhs)
 {
@@ -739,10 +748,9 @@ void fmcalc::addtcrow(const fm_policyTC &f)
 	}
 
 }
-void fmcalc::init_policytc(int maxRunLevel)
+void fmcalc::parse_policytc(std::vector< fm_policyTC> &p)
 {
-    if (maxRunLevel != -1) maxRunLevel_ = maxRunLevel;
-	FILE *fin = NULL;
+	FILE* fin = NULL;
 	std::string file = FMPOLICYTC_FILE;
 	if (inputpath_.length() > 0) {
 		file = inputpath_ + file.substr(5);
@@ -753,9 +761,62 @@ void fmcalc::init_policytc(int maxRunLevel)
 		fprintf(stderr, "%s: cannot open %s\n", __func__, file.c_str());
 		exit(EXIT_FAILURE);
 	}
-	max_level_ = 0;
-	max_layer_ = 0;
-	max_agg_id_ = 0;
+	fm_policyTC f;
+	
+	int max_layer_id = 0;
+	int max_level_id = 0;
+	int i = fread(&f, sizeof(f), 1, fin);
+	while (i != 0) {
+		p.push_back(f);		
+		if (f.level_id > max_level_id) max_level_id = f.level_id;			
+		i = fread(&f, sizeof(f), 1, fin);
+	}
+	fclose(fin);
+	std::set<layer_agg> la;
+	auto iter = p.begin();
+	int max_agg_id = 0;
+
+	while (iter != p.end()) {
+		if (iter->level_id == max_level_id) {
+			if (iter->agg_id > max_agg_id) max_agg_id = iter->agg_id;
+			if (iter->layer_id > max_layer_id) max_layer_id = iter->layer_id;
+			layer_agg l;
+			l.agg_id = iter->agg_id;
+			l.layer_id = iter->layer_id;
+			la.insert(l);
+		}
+		iter++;
+	}
+
+
+	for (int i = 1;i <= max_layer_id;i++) {
+		for (int j = 1;j <= max_agg_id;j++) {
+			layer_agg l;
+			l.layer_id = i;
+			l.agg_id = j;
+			auto iter = la.find(l);
+			if (iter == la.end()) {
+				fm_policyTC f;
+				f.agg_id = l.agg_id;
+				f.layer_id = l.layer_id;
+				f.level_id = max_level_id;
+				f.PolicyTC_id = noop_profile_id;
+				p.push_back(f);
+			}
+		}
+	}
+
+
+	std::sort(p.begin(), p.end());
+
+}
+void fmcalc::init_policytc(int maxRunLevel)
+{
+	if (maxRunLevel != -1) maxRunLevel_ = maxRunLevel;
+
+	std::vector< fm_policyTC> p;
+	parse_policytc(p);
+
 	fm_policyTC f;
 	f.layer_id = 1;
 	f.level_id = 0;
@@ -764,13 +825,32 @@ void fmcalc::init_policytc(int maxRunLevel)
 		f.agg_id = i;		
 		addtcrow(f);
 	}
-	
+
+
+	auto iter = p.begin();
+	while (iter != p.end()) {
+		addtcrow(*iter);
+		iter++;
+	}
+/*
+	FILE* fin = NULL;
+	std::string file = FMPOLICYTC_FILE;
+	if (inputpath_.length() > 0) {
+		file = inputpath_ + file.substr(5);
+	}
+	fin = fopen(file.c_str(), "rb");
+
+	if (fin == NULL) {
+		fprintf(stderr, "%s: cannot open %s\n", __func__, file.c_str());
+		exit(EXIT_FAILURE);
+	}
 	int i = fread(&f, sizeof(f), 1, fin);
 	while (i != 0) {
 		addtcrow(f);   
 		i = fread(&f, sizeof(f), 1, fin);
 	}
 	fclose(fin);
+*/
 
 }
 
@@ -936,8 +1016,9 @@ void fmcalc::init_fmxref()
 void fmcalc::init(int MaxRunLevel)
 {    
     init_programme(MaxRunLevel);
+	init_profile();
 	init_policytc(MaxRunLevel);
 	init_fmxref();	
-	init_profile();	
+	
 }
 

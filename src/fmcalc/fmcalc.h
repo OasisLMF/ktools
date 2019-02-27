@@ -81,10 +81,12 @@ private:
 	std::vector<OASIS_FLOAT> item_to_tiv_;	
 	void init_programme(int maxrunLevel);
 	void init_profile();
+	void init_profile_rec(fm_profile_new &f);
 	void init_itemtotiv();
 	void init_fmxref();
 	void init(int MaxRunLevel);
 	void init_policytc(int MaxRunLevel);
+	void parse_policytc(std::vector< fm_policyTC>& p);
 	void addtcrow(const fm_policyTC &f);
 	bool loadcoverages(std::vector<OASIS_FLOAT> &coverages);
 	bool gulhasvalue(const std::vector<OASIS_FLOAT> &gul) const;
@@ -95,7 +97,7 @@ private:
 		const std::vector<int> &items_, std::vector<std::vector<OASIS_FLOAT>> &event_guls,
 		int previous_level, int previous_layer);	
 	void dofmcalc(std::vector <LossRec> &agg_vec_, int layer);
-	
+	int noop_profile_id = 0;
 };
 
 

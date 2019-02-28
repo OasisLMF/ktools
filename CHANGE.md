@@ -1,6 +1,8 @@
 Ktools Changelog
 ================
 
+## [v3.0.6](https://github.com/OasisLMF/ktools/releases/tag/v3.0.6)
+* fmcalc - Fix for Alloc rules 1 & 2: 
 
 ## [v3.0.5](https://github.com/OasisLMF/ktools/releases/tag/v3.0.5)
 * Fix for Alloc rules [0,1],  Netloss calculation in Reinsurance 

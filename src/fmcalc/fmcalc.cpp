@@ -204,7 +204,7 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 		if (previous_layer_ < layer_) {
 			vector <LossRec> &prev_agg_vec = agg_vecs[level_][1];
 			vector <LossRec> &current_agg_vec = agg_vecs[level_][layer_];
-			int iMax = prev_agg_vec.size();
+			size_t iMax =  prev_agg_vec.size();
 			if (current_agg_vec.size() > iMax) iMax = current_agg_vec.size();
 			for (int i = 0; i < iMax; i++) {
 				current_agg_vec[i].proportion = prev_agg_vec[i].proportion;
@@ -230,10 +230,12 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 			int j = 0;
 
 			while (iter != prev_agg_vec.end()) {
-				auto it = iter->item_idx->begin();
-				while (it != iter->item_idx->end()) {
-					v[*it] = j;
-					it++;
+				if (iter->item_idx) {
+					auto it = iter->item_idx->begin();
+					while (it != iter->item_idx->end()) {
+						v[*it] = j;
+						it++;
+					}
 				}
 				j++;
 				iter++;
@@ -606,7 +608,7 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 				a.policytc_id = policy_tc_vec_vec_vec_[level][agg_id][layer_id];
 				avx[layer_id].push_back(a);			// populate the first layer
 				avx[layer_id][avx[layer_id].size() - 1].item_idx.push_back(i);
-				aggid_to_vectorlookup[agg_id-1] = avx[layer_id].size() - 1;
+				aggid_to_vectorlookup[agg_id-1] = (int) avx[layer_id].size() - 1;
 				total_loss_items++;
 			}
 			else {
@@ -651,7 +653,7 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 						for (int x : prev[previous_layer][i].item_idx) {
 							next[layer][current_idx].item_idx.push_back(x);	
 						}
-						zzaggid_to_vectorlookup[agg_id-1] = next[layer].size() - 1; // temp use for getting 
+						zzaggid_to_vectorlookup[agg_id-1] = (int) next[layer].size() - 1; // temp use for getting 
 					}						
 				}
 				else {
@@ -932,7 +934,7 @@ bool fmcalc::loadcoverages(std::vector<OASIS_FLOAT> &coverages)
 
 	coverages.resize(nrec + 1);
 	int coverage_id = 0;
-	int i = fread(&tiv, sizeof(tiv), 1, fin);
+	size_t i = fread(&tiv, sizeof(tiv), 1, fin);
 	while (i != 0) {
 		coverage_id++;
 		coverages[coverage_id] = tiv;
@@ -963,11 +965,11 @@ void fmcalc::init_itemtotiv()
 	long long sz = fltell(fin);
 	flseek(fin, 0L, SEEK_SET);
 	int last_item_id = 0;
-	unsigned int nrec = sz / sizeof(item);
+	unsigned int nrec = (unsigned int) sz / (unsigned int)sizeof(item);
 	item_to_tiv_.resize(nrec+1,0.0);
 
 	item itm;
-	int i = fread(&itm, sizeof(itm), 1, fin);
+	size_t i = fread(&itm, sizeof(itm), 1, fin);
 	while (i != 0) {
 		last_item_id++;
 		if (itm.id != last_item_id) {
@@ -997,7 +999,7 @@ void fmcalc::init_fmxref()
 	}
 
 	fmXref f;
-	int i = fread(&f, sizeof(f), 1, fin);
+	size_t i = fread(&f, sizeof(f), 1, fin);
 	while (i != 0) {
 		fmxref_key k;
 		k.agg_id = f.agg_id;
@@ -1008,7 +1010,7 @@ void fmcalc::init_fmxref()
 			fm_xrefmap[k] = f.output_id;
 		}
 		
-		i = fread(&f, sizeof(f), 1, fin);
+		i = fread(&f, sizeof(f),  1, fin);
 	}
 	fclose(fin);	
 }

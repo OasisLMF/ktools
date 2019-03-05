@@ -471,14 +471,13 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 							}
 							else {
 								output_id = it->second;
-							}
-
-							if (netvalue_) {
-								if (layer == max_layer_) outmap[output_id].push_back(rec);			// neglible cost
-							}
-							else {
-								 outmap[output_id].push_back(rec);			// neglible cost
-							}
+								if (netvalue_) {
+									if (layer == max_layer_) outmap[output_id].push_back(rec);			// neglible cost
+								}
+								else {
+									outmap[output_id].push_back(rec);			// neglible cost
+								}
+							}							
 						}
 					}
 				}
@@ -521,13 +520,13 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 								}
 								else {
 									output_id = it->second;
-								}
-								if (netvalue_) {
-									if (layer == max_layer_) outmap[output_id].push_back(rec);			// neglible cost
-								}
-								else {
-									outmap[output_id].push_back(rec);			// neglible cost
-								}
+									if (netvalue_) {
+										if (layer == max_layer_) outmap[output_id].push_back(rec);			// neglible cost
+									}
+									else {
+										outmap[output_id].push_back(rec);			// neglible cost
+									}
+								}								
 							}
 						}
 					}

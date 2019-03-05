@@ -421,13 +421,13 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 							}
 							else {
 								output_id = it->second;
-							}
-							if (netvalue_) {
-								if (layer == max_layer_) outmap[output_id].push_back(rec);			// neglible cost
-							}
-							else {
-								outmap[output_id].push_back(rec);			// neglible cost
-							}
+								if (netvalue_) {
+									if (layer == max_layer_) outmap[output_id].push_back(rec);			// neglible cost
+								}
+								else {
+									outmap[output_id].push_back(rec);			// neglible cost
+								}
+							}							
 						}
 					}
 				}
@@ -1004,12 +1004,14 @@ void fmcalc::init_fmxref()
 		fmxref_key k;
 		k.agg_id = f.agg_id;
 		k.layer_id = f.layer_id;
+/*
 		if (k.agg_id == f.output_id && k.layer_id == 1) {
 			// skip it
 		}else {
 			fm_xrefmap[k] = f.output_id;
 		}
-		
+*/
+		fm_xrefmap[k] = f.output_id;
 		i = fread(&f, sizeof(f),  1, fin);
 	}
 	fclose(fin);	

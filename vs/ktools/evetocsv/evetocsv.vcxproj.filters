@@ -18,5 +18,8 @@
     <ClCompile Include="..\..\..\src\evetocsv\evetocsv.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\evetocsv\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

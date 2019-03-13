@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25123.0
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.489
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fmcalc", "fmcalc\fmcalc.vcxproj", "{EF5DA772-DAE8-479F-861D-B73EF0988278}"
 EndProject
@@ -76,8 +76,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "aalcalc", "aalcalc\aalcalc.
 		{B5960B46-527B-4833-918B-EC5735C03635} = {B5960B46-527B-4833-918B-EC5735C03635}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "aalsummary", "aalsummary\aalsummary.vcxproj", "{604B5F75-44DD-41BC-9DFF-0D5844AD2727}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "aalcalctocsv", "aalcalctocsv\aalcalctocsv.vcxproj", "{5C02F1B5-AB9D-42DE-8868-5A9E2C1F38A8}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vulnerabilitytobin", "vulnerabilitytobin\vulnerabilitytobin.vcxproj", "{1730B808-F39B-4ECB-9B1A-8A9568FEAF45}"
@@ -120,11 +118,6 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "periodstobin", "periodstobin\periodstobin.vcxproj", "{30380255-EBFE-401A-B444-4BB1F4D44D15}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "periodstocsv", "periodstocsv\periodstocsv.vcxproj", "{6C9870B8-86E1-4C66-B189-133431432570}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "xfmcalc", "xfmcalc\xfmcalc.vcxproj", "{3614B08E-9308-4059-A452-1CF2CE4FD007}"
-	ProjectSection(ProjectDependencies) = postProject
-		{B5960B46-527B-4833-918B-EC5735C03635} = {B5960B46-527B-4833-918B-EC5735C03635}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "fmprofilebinconv", "fmprofilebinconv\fmprofilebinconv.vcxproj", "{A3926D45-89BA-449B-934D-F29C258A96CA}"
 EndProject
@@ -458,16 +451,6 @@ Global
 		{72AD63C6-8844-4DBF-875B-72F3168B894C}.Release|x64.Build.0 = Release|x64
 		{72AD63C6-8844-4DBF-875B-72F3168B894C}.Release|x86.ActiveCfg = Release|Win32
 		{72AD63C6-8844-4DBF-875B-72F3168B894C}.Release|x86.Build.0 = Release|Win32
-		{604B5F75-44DD-41BC-9DFF-0D5844AD2727}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{604B5F75-44DD-41BC-9DFF-0D5844AD2727}.Debug|x64.ActiveCfg = Debug|x64
-		{604B5F75-44DD-41BC-9DFF-0D5844AD2727}.Debug|x64.Build.0 = Debug|x64
-		{604B5F75-44DD-41BC-9DFF-0D5844AD2727}.Debug|x86.ActiveCfg = Debug|Win32
-		{604B5F75-44DD-41BC-9DFF-0D5844AD2727}.Debug|x86.Build.0 = Debug|Win32
-		{604B5F75-44DD-41BC-9DFF-0D5844AD2727}.Release|Any CPU.ActiveCfg = Release|Win32
-		{604B5F75-44DD-41BC-9DFF-0D5844AD2727}.Release|x64.ActiveCfg = Release|x64
-		{604B5F75-44DD-41BC-9DFF-0D5844AD2727}.Release|x64.Build.0 = Release|x64
-		{604B5F75-44DD-41BC-9DFF-0D5844AD2727}.Release|x86.ActiveCfg = Release|Win32
-		{604B5F75-44DD-41BC-9DFF-0D5844AD2727}.Release|x86.Build.0 = Release|Win32
 		{5C02F1B5-AB9D-42DE-8868-5A9E2C1F38A8}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{5C02F1B5-AB9D-42DE-8868-5A9E2C1F38A8}.Debug|x64.ActiveCfg = Debug|x64
 		{5C02F1B5-AB9D-42DE-8868-5A9E2C1F38A8}.Debug|x64.Build.0 = Debug|x64
@@ -638,16 +621,6 @@ Global
 		{6C9870B8-86E1-4C66-B189-133431432570}.Release|x64.Build.0 = Release|x64
 		{6C9870B8-86E1-4C66-B189-133431432570}.Release|x86.ActiveCfg = Release|Win32
 		{6C9870B8-86E1-4C66-B189-133431432570}.Release|x86.Build.0 = Release|Win32
-		{3614B08E-9308-4059-A452-1CF2CE4FD007}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{3614B08E-9308-4059-A452-1CF2CE4FD007}.Debug|x64.ActiveCfg = Debug|x64
-		{3614B08E-9308-4059-A452-1CF2CE4FD007}.Debug|x64.Build.0 = Debug|x64
-		{3614B08E-9308-4059-A452-1CF2CE4FD007}.Debug|x86.ActiveCfg = Debug|Win32
-		{3614B08E-9308-4059-A452-1CF2CE4FD007}.Debug|x86.Build.0 = Debug|Win32
-		{3614B08E-9308-4059-A452-1CF2CE4FD007}.Release|Any CPU.ActiveCfg = Release|Win32
-		{3614B08E-9308-4059-A452-1CF2CE4FD007}.Release|x64.ActiveCfg = Release|x64
-		{3614B08E-9308-4059-A452-1CF2CE4FD007}.Release|x64.Build.0 = Release|x64
-		{3614B08E-9308-4059-A452-1CF2CE4FD007}.Release|x86.ActiveCfg = Release|Win32
-		{3614B08E-9308-4059-A452-1CF2CE4FD007}.Release|x86.Build.0 = Release|Win32
 		{A3926D45-89BA-449B-934D-F29C258A96CA}.Debug|Any CPU.ActiveCfg = Debug|Win32
 		{A3926D45-89BA-449B-934D-F29C258A96CA}.Debug|x64.ActiveCfg = Debug|x64
 		{A3926D45-89BA-449B-934D-F29C258A96CA}.Debug|x64.Build.0 = Debug|x64
@@ -661,5 +634,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BC2AFB11-39EE-4388-97C5-A4C32F4AB4D2}
 	EndGlobalSection
 EndGlobal

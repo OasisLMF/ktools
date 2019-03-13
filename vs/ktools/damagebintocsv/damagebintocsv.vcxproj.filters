@@ -18,5 +18,8 @@
     <ClCompile Include="..\..\..\src\damagebintocsv\damagebintocsv.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\damagebintocsv\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

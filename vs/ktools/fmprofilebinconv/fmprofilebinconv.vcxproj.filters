@@ -18,5 +18,8 @@
     <ClCompile Include="..\..\..\src\fmprofilebinconv\fmprofilebinconv.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\fmprofilebinconv\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

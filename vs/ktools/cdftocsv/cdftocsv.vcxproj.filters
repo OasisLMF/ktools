@@ -18,5 +18,8 @@
     <ClCompile Include="..\..\..\src\cdftocsv\cdftocsv.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\cdftocsv\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

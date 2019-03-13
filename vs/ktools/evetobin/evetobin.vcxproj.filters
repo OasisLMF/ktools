@@ -18,5 +18,8 @@
     <ClCompile Include="..\..\..\src\evetobin\evetobin.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\evetobin\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

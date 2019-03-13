@@ -18,5 +18,8 @@
     <ClCompile Include="..\..\..\src\fmpolicytctobin\fmpolicytctobin.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\fmpolicytctobin\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -115,7 +115,6 @@ struct outrec {
 };
 void dopltcalc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec)
 {
-	static int j = 0;
 	std::vector<period_occ> &vp = m_occ[sh.event_id];	
 	bool hasrec = false;
 	bool firsttime = true;
@@ -156,7 +155,6 @@ void dopltcalc(const summarySampleslevelHeader &sh, const std::vector<sampleslev
 			else {
 				printf("%d,%d,%d,%0.2f,%0.2f,%0.2f,%d\n", o.summary_id, o.period_no, o.event_id, o.mean, o.standard_deviation, o.exp_value, o.occ_date_id);
 			}
-			j++;
 		}
 	}
 

@@ -46,7 +46,7 @@ AS_IF([test "x$enable_osx" = "xyes"], [
 	CXXFLAGSX="-std=c++11 -D__unix  -Wno-unused-result -g"
 ],
 [
-	CXXFLAGSX="-std=c++11 -Wno-unused-result -ffunction-sections -fdata-sections"
+	CXXFLAGSX="-std=c++11 -Wno-unused-result -fthreadsafe-statics -frtti -fno-omit-frame-pointer "
 #	LDFLAGS="-Wl,--gc-sections -Wl,--strip-all"
 ]
 )

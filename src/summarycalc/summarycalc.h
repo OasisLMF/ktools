@@ -70,6 +70,7 @@ private:
 	std::vector<OASIS_FLOAT> outputs_;
 	input_type inputtype_ = UNKNOWN;
 	std::string inputpath_;
+	bool zerooutput_ = false;
 // functions
 	void reset_sssl_array(int sample_size);
 	void alloc_sssl_array(int sample_size);
@@ -102,7 +103,7 @@ public:
 
 	void setfmmode() { inputtype_ = FM_STREAM; };
 	void setinputpath(const std::string &s) { inputpath_ = s; }
-
+	void enablezerooutput() { zerooutput_ = true; }
 };
 
 #endif // SUMMARYCALC_H_

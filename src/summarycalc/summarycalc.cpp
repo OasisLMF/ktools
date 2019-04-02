@@ -278,7 +278,7 @@ void summarycalc::outputsummaryset(int sample_size, int summary_set, int event_i
 				}
 				else {
 					s.loss = ssl[i][j].loss;
-					if (s.sidx > 0) {
+					if (zerooutput_ == false) {
 						if (s.loss > 0.0) fwrite(&s, sizeof(s), 1, fout[summary_set]);
 					}else {
 						fwrite(&s, sizeof(s), 1, fout[summary_set]);
@@ -475,7 +475,7 @@ void summarycalc::dofmsummary()
 void summarycalc::doit()
 {
 	if (inputtype_ == UNKNOWN) {
-		fprintf(stderr,"summarycalc: tream type unknown\n");
+		fprintf(stderr,"summarycalc: stream type unknown\n");
 		return;
 	}
 	

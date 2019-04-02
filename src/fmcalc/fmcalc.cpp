@@ -209,8 +209,7 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 			for (int i = 0; i < iMax; i++) {
 				current_agg_vec[i].proportion = prev_agg_vec[i].proportion;
 				current_agg_vec[i].item_prop = prev_agg_vec[i].item_prop;
-			}
-			// fprintf(stderr, "We are here\n");
+			}			
 		}
 		else {			
 			vector <LossRec> &prev_agg_vec = agg_vecs[level_ - 1][previous_layer_];
@@ -485,12 +484,6 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 				if (allocrule_id == 2 && x.agg_id > 0) {		// back allocate as a proportion of the total of the previous losses			
 					if (item_proportions_computed == false) {
 						const std::vector<OASIS_FLOAT> &guls = event_guls[gul_idx];
-						//if (x.agg_id == 2 && layer==2) {
-						//	fprintf(stderr, "We are here\n");
-						//}
-						//if (layer == 2) {
-						//	fprintf(stderr, "We are here\n");
-						//}
 						compute_item_proportions(agg_vecs, guls, level, layer, previous_layer_id);
 						if (allocruleOptimizationOff_ == false) item_proportions_computed = true;
 					}

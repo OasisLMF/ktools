@@ -147,13 +147,15 @@ void dopltcalc(const summarySampleslevelHeader &sh, const std::vector<sampleslev
 			OASIS_FLOAT x = sd / squared_loss_sum;
 			if (x < 0.0000001) sd = 0;   // fix OASIS_FLOATing point precision problems caused by using large numbers
 			o.standard_deviation = sqrt(sd);
-			if (date_algorithm_) {
-				int occ_year, occ_month, occ_day;
-				d(o.occ_date_id, occ_year, occ_month, occ_day);
-				printf("%d,%d,%d,%0.2f,%0.2f,%0.2f,%d,%d,%d\n", o.summary_id, o.period_no, o.event_id, o.mean, o.standard_deviation, o.exp_value, occ_year, occ_month,occ_day);
-			}
-			else {
-				printf("%d,%d,%d,%0.2f,%0.2f,%0.2f,%d\n", o.summary_id, o.period_no, o.event_id, o.mean, o.standard_deviation, o.exp_value, o.occ_date_id);
+			if (o.mean > 0 || o.standard_deviation > 0) {
+				if (date_algorithm_) {
+					int occ_year, occ_month, occ_day;
+					d(o.occ_date_id, occ_year, occ_month, occ_day);
+					printf("%d,%d,%d,%0.2f,%0.2f,%0.2f,%d,%d,%d\n", o.summary_id, o.period_no, o.event_id, o.mean, o.standard_deviation, o.exp_value, occ_year, occ_month, occ_day);
+				}
+				else {
+					printf("%d,%d,%d,%0.2f,%0.2f,%0.2f,%d\n", o.summary_id, o.period_no, o.event_id, o.mean, o.standard_deviation, o.exp_value, o.occ_date_id);
+				}
 			}
 		}
 	}

@@ -79,14 +79,13 @@ namespace eltcalc {
 		while (i != 0) {
 			sampleslevelRec sr;
 			i = fread(&sr, sizeof(sr), 1, stdin);
-			while (i != 0) {
+			while (i != 0 && sr.sidx != 0) {
 				if (sr.sidx > 0) {
 					sumloss += sr.loss;
 					sumlosssqr += (sr.loss * sr.loss);
 				}
 				if (sr.sidx == -1) analytical_mean = sr.loss;
 				i = fread(&sr, sizeof(sr), 1, stdin);
-				if (sr.sidx == 0) break;
 			}
 			if (samplesize > 1) {
 				sample_mean = sumloss / samplesize;
@@ -116,9 +115,11 @@ namespace eltcalc {
 
 
 			if (i) i = fread(&sh, sizeof(sh), 1, stdin);
+
 			sumloss = 0.0;
 			sumlosssqr = 0.0;
 			sd = 0.0;
+			analytical_mean = 0.0;
 		}
 
 	}

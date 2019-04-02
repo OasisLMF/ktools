@@ -60,6 +60,7 @@ void help()
 		"-f input stream = fm\n"
 		"-g input stream = gul\n"
 		"-p input path\n"
+		"-z output zeros\n"
 		"-[summarysetid] outfilepipe\n"
 		"where summarysetid range is 0 to 9\n"
 	);
@@ -78,9 +79,9 @@ int main(int argc, char* argv[])
 	bool noneTrue = true;
 	bool inputtypegul = false;
 	bool inputtypefm = false;
-	
+
 	summarycalc f;
-	while ((opt = getopt(argc, argv, "vhfgp:0:1:2:3:4:5:6:7:8:9:")) != -1) {
+	while ((opt = getopt(argc, argv, "vzhfgp:0:1:2:3:4:5:6:7:8:9:")) != -1) {
 		switch (opt) {
 		case 'g':
 			inputtypegul = true;
@@ -89,6 +90,9 @@ int main(int argc, char* argv[])
 		case 'f':
 			inputtypefm = true;
 			f.setfmmode();
+			break;
+		case 'z':
+			f.enablezerooutput();
 			break;
 		case 'p':
 			f.setinputpath(optarg);

@@ -36,12 +36,6 @@ bool operator<(const period_map_key& lhs, const period_map_key& rhs)
 		return lhs.period_no < rhs.period_no;
 	}
 
-	//if (lhs.period_no != rhs.period_no) {
-	//	return lhs.period_no < rhs.period_no;
-	//}
-	//else {		
-	//	return lhs.summary_id < rhs.summary_id;		
-	//}
 }
 
 
@@ -142,16 +136,14 @@ void aalcalc::applyweightingstomaps()
 	applyweightingstomap(map_analytical_aal_, i);
 	applyweightingstomap(map_sample_aal_, i);
 }
-int analytic_count = 0;
 
-
-void aalcalc::do_analytical_calc_end()
+void aalcalc::do_calc_end(std::map<period_sidx_map_key, loss_rec >& sum_loss_map, std::map<int, aal_rec> &map_aal,int type)
 {
-	auto iter = map_analytical_sum_loss_.begin();
-	while (iter != map_analytical_sum_loss_.end()) {
-		auto a_iter = map_analytical_aal_.find(iter->first.summary_id);
-		if (a_iter != map_analytical_aal_.end()) {
-			aal_rec &a = a_iter->second;
+	auto iter = sum_loss_map.begin();
+	while (iter != sum_loss_map.end()) {
+		auto a_iter = map_aal.find(iter->first.summary_id);
+		if (a_iter != map_aal.end()) {
+			aal_rec& a = a_iter->second;
 			if (a.max_exposure_value < iter->second.max_exposure_value) a.max_exposure_value = iter->second.max_exposure_value;
 			a.mean += iter->second.sum_of_loss;
 			a.mean_squared += iter->second.sum_of_loss * iter->second.sum_of_loss;
@@ -159,47 +151,28 @@ void aalcalc::do_analytical_calc_end()
 		else {
 			aal_rec a;
 			a.summary_id = iter->first.summary_id;
-			a.type = 1;
+			a.type = type;
 			a.max_exposure_value = iter->second.max_exposure_value;
 			a.mean = iter->second.sum_of_loss;
 			a.mean_squared = iter->second.sum_of_loss * iter->second.sum_of_loss;
-			map_analytical_aal_[iter->first.summary_id] = a;
+			map_aal[iter->first.summary_id] = a;
 		}
 		iter++;
 	}
+}
+void aalcalc::do_analytical_calc_end()
+{
+	do_calc_end(map_analytical_sum_loss_,map_analytical_aal_,1);
 }
 void aalcalc::do_sample_calc_end(){
 
-	auto iter = map_sample_sum_loss_.begin();
-
-
-	while (iter != map_sample_sum_loss_.end()) {
-		auto a_iter = map_sample_aal_.find(iter->first.summary_id);
-		if (a_iter != map_sample_aal_.end()) {
-			aal_rec &a = a_iter->second;
-			if (a.max_exposure_value < iter->second.max_exposure_value) a.max_exposure_value = iter->second.max_exposure_value;
-			a.mean += iter->second.sum_of_loss;
-			a.mean_squared += iter->second.sum_of_loss * iter->second.sum_of_loss;
-		}
-		else {
-			aal_rec a;
-			a.summary_id = iter->first.summary_id;
-			a.type = 2;
-			a.max_exposure_value = iter->second.max_exposure_value;
-			a.mean = iter->second.sum_of_loss;
-			a.mean_squared = iter->second.sum_of_loss * iter->second.sum_of_loss;
-			map_sample_aal_[iter->first.summary_id] = a;
-		}
-		iter++;
-	}
-
+	do_calc_end(map_sample_sum_loss_, map_sample_aal_,2);
+	
 }
 
-
-void aalcalc::do_sample_calc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec){
-
+void aalcalc::do_sample_calc(const summarySampleslevelHeader& sh, const std::vector<sampleslevelRec>& vrec, std::map<period_sidx_map_key, loss_rec > &sum_loss_map) {
 	period_sidx_map_key k;
-	
+
 	k.summary_id = sh.summary_id;
 	auto p_iter = event_to_period_.find(sh.event_id);
 	if (p_iter == event_to_period_.end()) return;
@@ -210,9 +183,9 @@ void aalcalc::do_sample_calc(const summarySampleslevelHeader &sh, const std::vec
 		k.period_no = p;
 		for (auto x : vrec) {
 			k.sidx = x.sidx;
-			auto iter = map_sample_sum_loss_.find(k);
-			if (iter != map_sample_sum_loss_.end()) {
-				loss_rec &a = iter->second;
+			auto iter = sum_loss_map.find(k);
+			if (iter != sum_loss_map.end()) {
+				loss_rec& a = iter->second;
 				if (a.max_exposure_value < sh.expval) a.max_exposure_value = sh.expval;
 				a.sum_of_loss += x.loss;
 			}
@@ -220,36 +193,25 @@ void aalcalc::do_sample_calc(const summarySampleslevelHeader &sh, const std::vec
 				loss_rec l;
 				l.sum_of_loss = x.loss;
 				l.max_exposure_value = sh.expval;
-				map_sample_sum_loss_[k] = l;
+				sum_loss_map[k] = l;
 			}
 
 		}
 	}
-	
 }
-void aalcalc::do_analytical_calc(const summarySampleslevelHeader &sh, double mean_loss)
-{
-	period_map_key k;	
-	k.summary_id = sh.summary_id;
-	//k.period_no = event_to_period_[sh.event_id];
-	//if (k.period_no == 0) return;
-	auto p_iter = event_to_period_.find(sh.event_id);
-	if (p_iter == event_to_period_.end()) return;
-	for (auto p : p_iter->second) {
-		k.period_no = p;
-		auto iter = map_analytical_sum_loss_.find(k);
-		if (iter != map_analytical_sum_loss_.end()) {
-			loss_rec &a = iter->second;
-			if (a.max_exposure_value < sh.expval) a.max_exposure_value = sh.expval;
-			a.sum_of_loss += mean_loss;
-		}
-		else {
-			loss_rec l;
-			l.sum_of_loss = mean_loss;
-			l.max_exposure_value = sh.expval;
-			map_analytical_sum_loss_[k] = l;
-		}
-	}
+
+void aalcalc::do_sample_calc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec){
+	do_sample_calc(sh, vrec, map_sample_sum_loss_);	
+}
+void aalcalc::do_analytical_calc(const summarySampleslevelHeader& sh, double mean_loss) {
+	
+	std::vector<sampleslevelRec> vrec;
+	sampleslevelRec s;
+	s.sidx = -1;
+	s.loss = mean_loss;
+	vrec.push_back(s);
+	do_sample_calc(sh, vrec, map_analytical_sum_loss_);
+	
 }
 
 
@@ -283,11 +245,20 @@ void aalcalc::process_summaryfile(const std::string &filename)
 		i = fread(&samplesize_, sizeof(samplesize_), 1, fin);
 		if (i != 0) i = fread(&summary_set, sizeof(summary_set), 1, fin);
 		std::vector<sampleslevelRec> vrec;
+		summarySampleslevelHeader last_sh;
+		last_sh.event_id = 0;
+		last_sh.summary_id = 0;
+
 		summarySampleslevelHeader sh;
 		int j = 0;
 		OASIS_FLOAT mean_loss = 0;
 		while (i != 0) {
 			i = fread(&sh, sizeof(sh), 1, fin);
+			if (sh.event_id != last_sh.event_id || sh.summary_id != last_sh.summary_id) {
+				last_sh.event_id = sh.event_id;
+				last_sh.summary_id = sh.summary_id;
+				mean_loss = 0;
+			}
 			while (i != 0) {
 				haveData = true;
 				sampleslevelRec sr;

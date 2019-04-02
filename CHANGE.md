@@ -1,6 +1,11 @@
 Ktools Changelog
 ================
 
+## [v3.0.7](https://github.com/OasisLMF/ktools/releases/tag/v3.0.7)
+* fmcalc - Remove zeros from summarycalc outputs
+* fmcalc - Remove conditial use of agg_id as output_id
+* Fix build for Ubuntu 16.04
+
 ## [v3.0.6](https://github.com/OasisLMF/ktools/releases/tag/v3.0.6)
 * fmcalc - Fix for Alloc rules 1 & 2: 
 

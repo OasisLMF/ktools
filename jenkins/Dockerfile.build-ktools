@@ -1,6 +1,6 @@
-FROM gcc:latest
+FROM gcc:6.3.0
 
-RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
+RUN apt upgrade -y && rm -rf /var/lib/apt/lists/*
 WORKDIR /var/ktools
 COPY . /var/ktools
 COPY ./jenkins/entrypoint_build.sh /usr/local/bin/build.sh

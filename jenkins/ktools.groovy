@@ -8,7 +8,7 @@ node {
       parameters([
         [$class: 'StringParameterDefinition',  name: 'KTOOLS_BRANCH', defaultValue: BRANCH_NAME],
         [$class: 'StringParameterDefinition',  name: 'RELEASE_TAG', defaultValue: "${BRANCH_NAME}-${BUILD_NUMBER}"],
-        [$class: 'StringParameterDefinition',  name: 'TEST_GCC', defaultValue: "8 7 6.3.0 6"],
+        [$class: 'StringParameterDefinition',  name: 'TEST_GCC', defaultValue: "8 7 6"],
         [$class: 'BooleanParameterDefinition', name: 'PURGE', defaultValue: Boolean.valueOf(true)],
         [$class: 'BooleanParameterDefinition', name: 'PUBLISH', defaultValue: Boolean.valueOf(false)],
         [$class: 'BooleanParameterDefinition', name: 'SLACK_MESSAGE', defaultValue: Boolean.valueOf(false)]

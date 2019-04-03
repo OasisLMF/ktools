@@ -80,8 +80,8 @@ node {
         if(! hasFailed && params.PUBLISH){
             sshagent (credentials: [git_creds]) {
                 dir(ktools_workspace) {
-                    sh "git tag ${env.TAG_RELEASE}"
-                    sh "git  push origin ${env.TAG_RELEASE}"
+                    sh "git tag ${TAG_RELEASE}"
+                    sh "git  push origin ${TAG_RELEASE}"
                 }
             }
         }

@@ -32,12 +32,8 @@ node {
                     if (ktools_branch.matches("PR-[0-9]+")){
                         // Checkout PR and merge into target branch, test on the result
                         sh "git fetch origin pull/$CHANGE_ID/head:$BRANCH_NAME"
-                        sh "git checkout $BRANCH_NAME"
-                        sh "git format-patch $CHANGE_TARGET --stdout > ${BRANCH_NAME}.patch"
                         sh "git checkout $CHANGE_TARGET"
-                        sh "git apply --stat ${BRANCH_NAME}.patch"  // Print files changed
-                        sh "git apply --check ${BRANCH_NAME}.patch" // Check for merge conflicts
-                        sh "git apply ${BRANCH_NAME}.patch"         // Apply the patch
+                        sh "git merge $BRANCH_NAME"
                     } else {
                         // Checkout branch
                         sh "git checkout ${ktools_branch}"
@@ -61,7 +57,6 @@ node {
                 }
             }
         }
-
     } catch(hudson.AbortException | org.jenkinsci.plugins.workflow.steps.FlowInterruptedException buildException) {
         hasFailed = true
         error('Build Failed')
@@ -85,16 +80,10 @@ node {
         if(! hasFailed && params.PUBLISH){
             sshagent (credentials: [git_creds]) {
                 dir(ktools_workspace) {
-                    sh PIPELINE + " git_tag ${env.TAG_RELEASE}"
+                    sh "git tag ${TAG_RELEASE}"
+                    sh "git  push origin ${TAG_RELEASE}"
                 }
             }
-        }
-        //Store logs
-        dir(ktools_workspace) {
-            // Store build files here 
-
-            //archiveArtifacts artifacts: 'stage/log/**/*.*', excludes: '*stage/log/**/*.gitkeep'
-            //archiveArtifacts artifacts: "stage/output/**/*.*"
         }
     }
 }

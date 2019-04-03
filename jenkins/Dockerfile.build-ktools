@@ -1,4 +1,4 @@
-FROM gcc:6.3.0
+FROM gcc:latest
 
 RUN apt upgrade -y && rm -rf /var/lib/apt/lists/*
 WORKDIR /var/ktools

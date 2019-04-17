@@ -182,20 +182,21 @@ void aalcalc::do_sample_calc(const summarySampleslevelHeader& sh, const std::vec
 	for (auto p : p_iter->second) {
 		k.period_no = p;
 		for (auto x : vrec) {
-			k.sidx = x.sidx;
-			auto iter = sum_loss_map.find(k);
-			if (iter != sum_loss_map.end()) {
-				loss_rec& a = iter->second;
-				if (a.max_exposure_value < sh.expval) a.max_exposure_value = sh.expval;
-				a.sum_of_loss += x.loss;
+			if (x.loss > 0) {
+				k.sidx = x.sidx;
+				auto iter = sum_loss_map.find(k);
+				if (iter != sum_loss_map.end()) {
+					loss_rec& a = iter->second;
+					if (a.max_exposure_value < sh.expval) a.max_exposure_value = sh.expval;
+					a.sum_of_loss += x.loss;
+				}
+				else {
+					loss_rec l;
+					l.sum_of_loss = x.loss;
+					l.max_exposure_value = sh.expval;
+					sum_loss_map[k] = l;
+				}
 			}
-			else {
-				loss_rec l;
-				l.sum_of_loss = x.loss;
-				l.max_exposure_value = sh.expval;
-				sum_loss_map[k] = l;
-			}
-
 		}
 	}
 }

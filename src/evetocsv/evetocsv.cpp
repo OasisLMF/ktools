@@ -43,11 +43,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <stdlib.h>
 
 #include "../include/oasis.h"
-#if defined(_MSC_VER)
-#include "../wingetopt/wingetopt.h"
-#else
-#include <unistd.h>
-#endif
+
 
 namespace evetocsv {
 	void doit(bool skipheader)

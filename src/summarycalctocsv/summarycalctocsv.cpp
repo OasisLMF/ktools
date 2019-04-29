@@ -52,9 +52,66 @@ using namespace std;
 
 bool firstOutput = true;
 
-void doit(bool skipheader, bool fullprecision,bool show_exposure_value)
-{
+int rowcount = 0;
 
+void doitz(bool skipheader, bool fullprecision, bool show_exposure_value, bool remove_zero_exposure_records)
+{
+	int summarycalcstream_type = 0;
+	int i = fread(&summarycalcstream_type, sizeof(summarycalcstream_type), 1, stdin);
+	int stream_type = summarycalcstream_type & summarycalc_id;
+
+	if (stream_type != summarycalc_id) {
+		std::cerr << "Not a summarycalc stream type\n";
+		exit(-1);
+	}
+	stream_type = streamno_mask & summarycalcstream_type;
+
+	if (stream_type == 1) {
+		if (skipheader == false && stream_type == 1 && show_exposure_value == false) printf("event_id,summary_id,sidx,loss\n");
+		if (skipheader == false && stream_type == 1 && show_exposure_value == true) printf("event_id,exposure_value,summary_id,sidx,loss\n");
+		int samplesize = 0;
+		int summary_set = 0;
+		i = fread(&samplesize, sizeof(samplesize), 1, stdin);
+		if (i != 0) i = fread(&summary_set, sizeof(samplesize), 1, stdin);
+		while (i != 0) {
+			summarySampleslevelHeader sh;
+			i = fread(&sh, sizeof(sh), 1, stdin);
+			while (i != 0) {
+				sampleslevelRec sr;
+				i = fread(&sr, sizeof(sr), 1, stdin);
+				if (i == 0) break;
+				if (sr.sidx == 0) break;
+				bool showRecord = false;
+				if (remove_zero_exposure_records) {
+					if (sh.expval > 0) {
+						showRecord = true;
+					}
+				}else {
+					showRecord = true;
+				}
+				
+				if (showRecord) {
+					if (fullprecision == true && show_exposure_value == false) printf("%d,%d,%d,%f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
+					if (fullprecision == false && show_exposure_value == false) printf("%d,%d,%d,%.2f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
+					if (fullprecision == true && show_exposure_value == true) printf("%d,%f,%d,%d,%f\n", sh.event_id, sh.expval, sh.summary_id, sr.sidx, sr.loss);
+					if (fullprecision == false && show_exposure_value == true) printf("%d,%.2f,%d,%d,%.2f\n", sh.event_id, sh.expval, sh.summary_id, sr.sidx, sr.loss);
+					if (firstOutput == true) {
+						std::this_thread::sleep_for(std::chrono::milliseconds(PIPE_DELAY));  // used to stop possible race condition with kat
+						firstOutput = false;
+					}
+				}
+			}
+		}
+		return;
+	}
+	fprintf(stderr, "Unsupported summarycalc stream type\n");
+}
+void doit(bool skipheader, bool fullprecision,bool show_exposure_value, bool remove_zero_exposure_records)
+{
+	if (remove_zero_exposure_records == true) {
+		doitz(skipheader, fullprecision, show_exposure_value, remove_zero_exposure_records);
+		return;
+	}
 	int summarycalcstream_type = 0;
 	int i = fread(&summarycalcstream_type, sizeof(summarycalcstream_type), 1, stdin);
 	int stream_type = summarycalcstream_type & summarycalc_id;
@@ -75,11 +132,17 @@ void doit(bool skipheader, bool fullprecision,bool show_exposure_value)
 		while (i != 0){
 			summarySampleslevelHeader sh;
 			i = fread(&sh, sizeof(sh), 1, stdin);
+			int last_sidx = 0;
 			while (i != 0){
 				sampleslevelRec sr;
 				i = fread(&sr, sizeof(sr), 1, stdin);
-				if (i == 0) break;
+				if (i == 0) break;	
+				//if (last_sidx == 0 && sr.sidx == 0) {
+				//	fprintf(stderr, "We are here\n");
+				//}
 				if (sr.sidx == 0) break;
+				last_sidx = sr.sidx;
+				rowcount++;
 				if (fullprecision == true && show_exposure_value == false) printf("%d,%d,%d,%f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);				
 				if (fullprecision == false && show_exposure_value == false) printf("%d,%d,%d,%.2f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
 				if (fullprecision == true && show_exposure_value == true) printf("%d,%f,%d,%d,%f\n", sh.event_id, sh.expval, sh.summary_id, sr.sidx, sr.loss);
@@ -103,6 +166,7 @@ void help()
 		"-f full precision\n"
 		"-e show exposure_value\n"
 		"-v version\n"
+		"-z remove records with zero exposure values\n"
 		"-h help\n"
 	);
 }
@@ -114,7 +178,8 @@ int main(int argc, char* argv[])
 	bool skipheader = false;
 	bool fullprecision = false;
 	bool show_exposure_value = false;
-	while ((opt = getopt(argc, argv, "vhfse")) != -1) {
+	bool remove_zero_exposure_records = false;
+	while ((opt = getopt(argc, argv, "zvhfse")) != -1) {
 		switch (opt) {
 		case 's':
 			skipheader = true;
@@ -124,6 +189,9 @@ int main(int argc, char* argv[])
 			break;
 		case 'e':
 			show_exposure_value = true;
+			break;
+		case 'z':
+			remove_zero_exposure_records = true;
 			break;
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
@@ -136,6 +204,7 @@ int main(int argc, char* argv[])
 	}
 
 	initstreams();
-	doit(skipheader, fullprecision, show_exposure_value);
+	doit(skipheader, fullprecision, show_exposure_value, remove_zero_exposure_records);
+	//fprintf(stderr, "Row count: %d\n", rowcount);
 	return 0;
 }

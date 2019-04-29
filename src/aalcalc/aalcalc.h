@@ -87,11 +87,17 @@ struct aal_rec_w {
 	double max_exposure_value;
 };
 
+struct event_offset_rec{
+	int event_id;	
+	int fileindex;
+	long long offset;
+};
 //bool operator<(const period_sidx_map_key& lhs, const period_sidx_map_key& rhs);
 bool operator<(const period_map_key& lhs, const period_map_key& rhs);
 
 class aalcalc {
 private:
+	std::map<int, std::vector<event_offset_rec>> summary_id_to_event_offset_;
 	std::map<int, int> event_count_;	// count of events in occurrence table used to create cartesian effect on event_id
 	std::map<int, std::vector<int>> event_to_period_;	// Mapping of event to period no
 	int no_of_periods_ = 0;
@@ -108,6 +114,8 @@ private:
 	bool skipheader_ = false;
 // private functions
 	void loadoccurrence();
+	void indexevents(const std::string& fullfilename, std::string& filename);
+	void load_event_to_summary_index(const std::string& subfolder);
 	void initsameplsize(const std::string &path);
 	void loadperiodtoweigthing();
 	void process_summaryfile(const std::string &filename);
@@ -133,6 +141,7 @@ private:
 public:
 	aalcalc(bool skipheader) : skipheader_(skipheader) {};
 	void doit(const std::string &subfolder);
+	void doitx(const std::string& subfolder);		// exprimental
 	void doitw(const std::string &subfolder);	// calcuate using welford method 
 	void debug(const std::string &subfolder);
 };

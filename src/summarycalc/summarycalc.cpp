@@ -268,29 +268,32 @@ void summarycalc::outputsummaryset(int sample_size, int summary_set, int event_i
 		sh.event_id = event_id;
 		sh.summary_id = i;
 		sh.expval = se[i];
-		fwrite(&sh, sizeof(sh), 1, fout[summary_set]);
-		for (int j = 0; j < sample_size + 3; j++) {
-			if (j != 2) {
-				sampleslevelRec s;
-				s.sidx = j - 2;
-				if (s.sidx == -2) {
-					// skip
-				}
-				else {
-					s.loss = ssl[i][j].loss;
-					if (zerooutput_ == false) {
-						if (s.loss > 0.0) fwrite(&s, sizeof(s), 1, fout[summary_set]);
-					}else {
-						fwrite(&s, sizeof(s), 1, fout[summary_set]);
+		if (sh.expval > 0 || zerooutput_ == true) {
+			fwrite(&sh, sizeof(sh), 1, fout[summary_set]);
+			for (int j = 0; j < sample_size + 3; j++) {
+				if (j != 2) {
+					sampleslevelRec s;
+					s.sidx = j - 2;
+					if (s.sidx == -2) {
+						// skip
 					}
-					
+					else {
+						s.loss = ssl[i][j].loss;
+						if (zerooutput_ == false) {
+							if (s.loss > 0.0) fwrite(&s, sizeof(s), 1, fout[summary_set]);
+						}
+						else {
+							fwrite(&s, sizeof(s), 1, fout[summary_set]);
+						}
+
+					}
 				}
 			}
+			sampleslevelRec s;
+			s.sidx = 0;
+			s.loss = 0.0;
+			fwrite(&s, sizeof(s), 1, fout[summary_set]);
 		}
-		sampleslevelRec s;
-		s.sidx = 0;
-		s.loss = 0.0;
-		fwrite(&s, sizeof(s), 1, fout[summary_set]);
 	}
 }
 

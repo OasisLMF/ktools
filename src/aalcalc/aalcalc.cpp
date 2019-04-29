@@ -96,6 +96,153 @@ void aalcalc::loadoccurrence()
 
 	fclose(fin);
 }
+
+void aalcalc::indexevents(const std::string& fullfilename, std::string& filename) {
+	FILE* fin = fopen(fullfilename.c_str(), "rb");
+	if (fin == NULL) {
+		fprintf(stderr, "%s: cannot open %s\n", __func__, fullfilename.c_str());
+		exit(EXIT_FAILURE);
+	}
+	std::string ss = filename.substr(1, filename.length() - 5);
+	int fileindex = atoi(ss.c_str());
+	long long offset = 0;
+	int summarycalcstream_type = 0;
+	size_t i = fread(&summarycalcstream_type, sizeof(summarycalcstream_type), 1, fin);
+	if (i != 0) offset += sizeof(summarycalcstream_type);
+	int stream_type = summarycalcstream_type & summarycalc_id;
+
+	if (stream_type != summarycalc_id) {
+		fprintf(stderr, "%s: Not a summarycalc stream type %d\n", __func__, stream_type);
+		exit(-1);
+	}
+
+	stream_type = streamno_mask & summarycalcstream_type;
+	int samplesize;
+	i = fread(&samplesize, sizeof(samplesize), 1, fin);
+	if (i != 0) offset += sizeof(samplesize);
+	int summary_set = 0;
+	if (i != 0) i = fread(&summary_set, sizeof(summary_set), 1, fin);
+	if (i != 0) offset += sizeof(summary_set);
+	summarySampleslevelHeader sh;
+	int last_event_id = -1;
+	int last_summary_id = -1;
+	long long last_offset = -1;
+	bool skiprecord = false;
+	while (i != 0) {
+		i = fread(&sh, sizeof(sh), 1, fin);
+		if (i != 0) {
+			if (last_event_id != sh.event_id || last_summary_id != sh.summary_id) {				
+				//fprintf(stdout, "%d, %s, %lld\n", sh.event_id, filename.c_str(), offset);
+				if (skiprecord == false && last_event_id > 0) {
+					event_offset_rec s;
+					//s.filename = filename;
+					s.offset = last_offset;
+					s.event_id = last_event_id;
+					s.fileindex = fileindex;
+					summary_id_to_event_offset_[last_summary_id].push_back(s);
+				}
+				else {
+					skiprecord = false;
+				}
+				last_event_id = sh.event_id;
+				last_summary_id = sh.summary_id;
+				last_offset = offset;
+			}
+			offset += sizeof(sh);
+		}
+
+		while (i != 0) {
+			sampleslevelRec sr;
+			i = fread(&sr, sizeof(sr), 1, fin);
+			if (i != 0) offset += sizeof(sr);
+			if (i == 0) break;
+			if (sr.sidx == 0) break;
+			if (sr.sidx == -1 && sr.loss == 0.0) skiprecord = true;
+		}
+	}
+
+	fclose(fin);
+
+}
+struct ind_rec {
+	int summary_id;
+	int event_id;
+	int fileindex;
+	long long offset;
+};
+void savesummaryIndex(const std::string& subfolder,const std::map<int, std::vector<event_offset_rec>> &summary_id_to_event_offset)
+{
+	std::string path = "work/" + subfolder;
+	if (path.substr(path.length() - 1, 1) != "/") {
+		path = path + "/";
+	}
+
+	path = path + "index.idx";
+	FILE* fout = fopen(path.c_str(), "wb");
+	auto iter = summary_id_to_event_offset.begin();
+	while (iter != summary_id_to_event_offset.end()) {
+		auto iter2 = iter->second.begin();
+		while (iter2 != iter->second.end()) {
+			ind_rec xx;
+			xx.summary_id = iter->first;
+			xx.event_id = iter2->event_id;
+			xx.fileindex = iter2->fileindex;
+			xx.offset = iter2->offset;
+			//fprintf(fout, "%d,%d,%d,%lld\n", iter->first, iter2->event_id,iter2->fileindex,iter2->offset);
+			fwrite(&xx, sizeof(xx),1, fout);
+			iter2++;
+		}
+		iter++;
+	}
+	fclose(fout);
+}
+void loadsummaryindex(const std::string& subfolder, std::map<int, std::vector<event_offset_rec>>& summary_id_to_event_offset)
+{
+	std::string path = "work/" + subfolder;
+	if (path.substr(path.length() - 1, 1) != "/") {
+		path = path + "/";
+	}
+	path = path + "index.idx";
+	FILE* fin = fopen(path.c_str(), "rb");
+	ind_rec idx;
+	size_t i = fread(&idx, sizeof(idx), 1, fin);
+	while (i > 0) {
+		event_offset_rec r;
+		r.event_id = idx.event_id;
+		r.fileindex = idx.fileindex;
+		r.offset = idx.offset;
+		summary_id_to_event_offset[idx.summary_id].push_back(r);
+		i = fread(&idx, sizeof(idx), 1, fin);
+	}
+	fclose(fin);
+}
+void aalcalc::load_event_to_summary_index(const std::string& subfolder)
+{
+	
+	std::string path = "work/" + subfolder;
+	if (path.substr(path.length() - 1, 1) != "/") {
+		path = path + "/";
+	}
+
+	DIR* dir;
+	struct dirent* ent;
+	if ((dir = opendir(path.c_str())) != NULL) {
+		while ((ent = readdir(dir)) != NULL) {
+			std::string s = ent->d_name;
+			if (s.length() > 4 && s.substr(s.length() - 4, 4) == ".bin") {
+				std::string s2 = path + ent->d_name;				
+				indexevents(s2, s);
+			}
+		}
+	}
+	else {
+		fprintf(stderr, "Unable to open directory %s\n", path.c_str());
+		exit(-1);
+	}
+	// Save summaryIndex
+	savesummaryIndex(subfolder,summary_id_to_event_offset_);	
+	exit(-1);
+}
 void aalcalc::applyweightings(int event_id, const std::map <int, double> &periodstoweighting, std::vector<sampleslevelRec> &vrec)
 {
 	if (periodstoweighting.size() == 0) return;
@@ -342,6 +489,41 @@ void aalcalc::initsameplsize(const std::string &path)
 
 		}
 	}
+}
+void process_event(const std::string& path,int summary_id, const event_offset_rec &r)
+{
+	char filename[100];
+	sprintf(filename, "P%d.bin", r.fileindex);
+	std::string fullname = path + filename;
+	FILE* fin = fopen(fullname.c_str(), "rb");
+	// do seek and iterate over record
+	summarySampleslevelHeader sh;
+	fread(&sh, sizeof(sh), 1, fin);
+	// now read the associated records
+	// see function process_summaryfile for processing logic
+	fclose(fin);
+}
+void aalcalc::doitx(const std::string& subfolder)
+{
+	std::string path = "work/" + subfolder;
+	if (path.substr(path.length() - 1, 1) != "/") {
+		path = path + "/";
+	}
+	initsameplsize(path);
+	//load_event_to_summary_index(subfolder);
+	loadsummaryindex(subfolder, summary_id_to_event_offset_);
+	loadoccurrence();
+	loadperiodtoweigthing();	// move this to after the samplesize_ variable has been set i.e.  after reading the first 8 bytes of the first summary file
+	auto iter = summary_id_to_event_offset_.begin();
+	while (iter != summary_id_to_event_offset_.end()) {
+		auto iter2 = iter->second.begin();
+		while (iter2 != iter->second.end()) { // process summary_id in iter.first
+			process_event(path,iter->first, *iter2);
+			iter2++;
+		}
+		iter++;
+	}
+
 }
 void aalcalc::doit(const std::string &subfolder)
 {

@@ -204,6 +204,10 @@ void loadsummaryindex(const std::string& subfolder, std::map<int, std::vector<ev
 	}
 	path = path + "index.idx";
 	FILE* fin = fopen(path.c_str(), "rb");
+	if (fin == nullptr) {
+		fprintf(stderr, "File %s not  found\n", path.c_str());
+		exit(-1);
+	}
 	ind_rec idx;
 	size_t i = fread(&idx, sizeof(idx), 1, fin);
 	while (i > 0) {
@@ -503,6 +507,7 @@ void process_event(const std::string& path,int summary_id, const event_offset_re
 	// see function process_summaryfile for processing logic
 	fclose(fin);
 }
+
 void aalcalc::doitx(const std::string& subfolder)
 {
 	std::string path = "work/" + subfolder;
@@ -510,21 +515,99 @@ void aalcalc::doitx(const std::string& subfolder)
 		path = path + "/";
 	}
 	initsameplsize(path);
-	//load_event_to_summary_index(subfolder);
-	loadsummaryindex(subfolder, summary_id_to_event_offset_);
 	loadoccurrence();
 	loadperiodtoweigthing();	// move this to after the samplesize_ variable has been set i.e.  after reading the first 8 bytes of the first summary file
-	auto iter = summary_id_to_event_offset_.begin();
-	while (iter != summary_id_to_event_offset_.end()) {
-		auto iter2 = iter->second.begin();
-		while (iter2 != iter->second.end()) { // process summary_id in iter.first
-			process_event(path,iter->first, *iter2);
-			iter2++;
-		}
-		iter++;
+	char line[4096];
+
+	std::vector<std::string> filelist;
+	std::string filename = path + "filelist.idx";
+	FILE* fin = fopen(filename.c_str(), "rb");
+	if (fin == NULL) {
+		fprintf(stderr, "%s: cannot open %s\n", __func__, filename.c_str());
+		exit(EXIT_FAILURE);
+	}
+	
+	while (fgets(line, sizeof(line), fin) != 0) {
+		char *pos;
+		if ((pos = strchr(line, '\n')) != NULL) *pos = '\0';   // remove newline from buffer
+		
+		std::string s = line;
+		filelist.push_back(s);
 	}
 
+	fclose(fin);
+
+	int lineno = 1;
+	filename = path + "summaries.idx";
+	fin = fopen(filename.c_str(), "rb");
+	if (fin == NULL) {
+		fprintf(stderr, "%s: cannot open %s\n", __func__, filename.c_str());
+		exit(EXIT_FAILURE);
+	}
+
+	int summary_id;
+	int file_index;
+	long long file_offset;
+	int last_summary_id = -1;
+	int last_file_index = -1;
+	FILE *summary_fin = nullptr;
+	while (fgets(line, sizeof(line), fin) != 0)
+	{
+		int ret = sscanf(line, "%d, %d, %lld", &summary_id, &file_index, &file_offset);
+		if (ret != 3) {
+			fprintf(stderr, "Invalid data in line %d:\n%s %d", lineno, line, ret);
+			return;
+		}
+		else
+		{
+			if (last_summary_id != summary_id) {
+				last_summary_id = summary_id;
+				applyweightingstomaps();
+				do_sample_calc_end();
+				do_analytical_calc_end();
+				map_analytical_sum_loss_.clear();
+				map_sample_sum_loss_.clear();
+
+			}
+			if (last_file_index != file_index) {
+				if (summary_fin != nullptr) fclose(summary_fin);
+				last_file_index = file_index;
+				filename = path + filelist[file_index];
+				summary_fin = fopen(filename.c_str(), "rb");
+				if (summary_fin == nullptr) {
+					fprintf(stderr, "%s: cannot open %s\n", __func__, filename.c_str());
+					exit(EXIT_FAILURE);
+				}
+			}
+			if (summary_fin) {
+				std::vector<sampleslevelRec> vrec;
+				flseek(summary_fin, file_offset, SEEK_SET);
+				summarySampleslevelHeader sh;
+				int i = fread(&sh, sizeof(sh), 1, summary_fin);
+				OASIS_FLOAT mean_loss = 0;
+				while (i != 0) {
+					sampleslevelRec sr;
+					i = fread(&sr, sizeof(sr), 1, summary_fin);
+					if (i == 0 || sr.sidx == 0) break;
+					if (sr.sidx == -1) mean_loss = sr.loss;
+					if (sr.sidx >= 0) vrec.push_back(sr);
+				}
+				doaalcalc(sh, vrec, mean_loss);
+			}
+
+		}
+		lineno++;
+	}
+
+	fclose(fin);
+	applyweightingstomaps();
+	do_sample_calc_end();
+	do_analytical_calc_end();
+	map_analytical_sum_loss_.clear();
+	map_sample_sum_loss_.clear();
+	outputresultscsv();
 }
+
 void aalcalc::doit(const std::string &subfolder)
 {
 	

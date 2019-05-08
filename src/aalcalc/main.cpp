@@ -50,7 +50,7 @@ int main(int argc, char* argv[])
 	bool debug = false;
 	bool welford = false;	// Use welford standard deviation
 	bool skipheader = false;
-	bool experimental = false;
+	bool x_experimental = false;
 	while ((opt = getopt(argc, argv, (char *)"xswvdhK:")) != -1) {
 		switch (opt) {
 		case 'w':
@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
 			debug = true;			
 			break;
 		case 'x':
-			experimental = true;
+			x_experimental = true;
 			break;
 		case 'h':
 		default:
@@ -109,11 +109,11 @@ int main(int argc, char* argv[])
 			if (welford == true) {
 				a.doitw(subfolder);
 			}else {
-				if (experimental == true) {
+				if (x_experimental == true) {
 					a.doitx(subfolder);
-				}else {
-					a.doit(subfolder);
+					return EXIT_SUCCESS;
 				}
+				a.doit(subfolder);				
 			}
 		}
 	}

@@ -45,10 +45,30 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 #include "../include/oasis.h"
 
+#include <vector> 
+#include <string>
+#include <map>
+
+
+
+struct summary_keyz {
+	int summary_id;
+	int fileindex;
+};
+
+bool operator<(const summary_keyz& lhs, const summary_keyz& rhs)
+{
+	if (lhs.summary_id != rhs.summary_id) {
+		return lhs.summary_id < rhs.summary_id;
+	}
+	else {
+		return lhs.fileindex < rhs.fileindex;
+	}
+}
+
 namespace summaryindex {
 
-void indexevents(const std::string& fullfilename, std::string &filename) {
-	fprintf(stderr, "Indexing: %s\n", fullfilename.c_str());
+	void indexevents(const std::string& fullfilename, std::string& filename, std::vector<int> &event_ids, std::map<summary_keyz, std::vector<long long>> &summary_id_file_id_to_offset, int file_id) {
 	FILE* fin = fopen(fullfilename.c_str(), "rb");
 	if (fin == NULL) {
 		fprintf(stderr, "%s: cannot open %s\n", __func__, fullfilename.c_str());
@@ -77,13 +97,17 @@ void indexevents(const std::string& fullfilename, std::string &filename) {
 	while (i != 0) {
 		i = fread(&sh, sizeof(sh), 1, fin);
 		if (i != 0) {
-			if (last_event_id != sh.event_id) {
+			summary_keyz k;
+			k.summary_id = sh.summary_id;
+			k.fileindex = file_id;
+			summary_id_file_id_to_offset[k].push_back(offset);
+			if (sh.event_id != last_event_id) {
 				last_event_id = sh.event_id;
-				fprintf(stdout, "%d, %s, %lld\n", sh.event_id, filename.c_str(),offset);
+				event_ids.push_back(sh.event_id);
 			}
+			// fprintf(stdout, "%d, %d, %lld\n", sh.summary_id,sh.event_id, offset);
 			offset += sizeof(sh);
 		}
-
 		while (i != 0) {
 			sampleslevelRec sr;
 			i = fread(&sr, sizeof(sr), 1, fin);
@@ -102,14 +126,21 @@ void doit(const std::string& subfolder)
 		path = path + "/";
 	}
 
+	std::vector<std::string> files;
+	//std::map<int, std::vector<int>> summary_id_to_events;
+	std::map<summary_keyz, std::vector<long long>> summary_id_file_id_to_offset;
+	std::vector<int> event_ids;
 	DIR* dir;
 	struct dirent* ent;
+	int file_index = 0;
 	if ((dir = opendir(path.c_str())) != NULL) {
 		while ((ent = readdir(dir)) != NULL) {
 			std::string s = ent->d_name;
 			if (s.length() > 4 && s.substr(s.length() - 4, 4) == ".bin") {
 				std::string s2 = path + ent->d_name;
-				indexevents(s2, s);
+				files.push_back(s);
+				indexevents(s2, s, event_ids, summary_id_file_id_to_offset, file_index);
+				file_index++;
 			}
 		}
 	}
@@ -117,6 +148,55 @@ void doit(const std::string& subfolder)
 		fprintf(stderr, "Unable to open directory %s\n", path.c_str());
 		exit(-1);
 	}
+
+	std::string filename =  path + "filelist.idx";
+	FILE* fout = fopen(filename.c_str(), "wb");
+	if (fout == NULL) {
+		fprintf(stderr, "%s: cannot open %s\n", __func__, filename.c_str());
+		exit(EXIT_FAILURE);
+	}
+	auto iter = files.begin();
+	while (iter != files.end()) {
+		fprintf(fout, "%s\n", iter->c_str());
+		iter++;
+	}
+
+	fclose(fout);
+
+	//filename = path + "events.idx";
+	//fout = fopen(filename.c_str(), "wb");
+	//if (fout == NULL) {
+	//	fprintf(stderr, "%s: cannot open %s\n", __func__, filename.c_str());
+	//	exit(EXIT_FAILURE);
+	//}
+	//
+	//auto e_iter = event_ids.begin();
+	//while (e_iter != event_ids.end()) {
+	//	fprintf(fout, "%d\n", *e_iter);
+	//	e_iter++;
+	//}
+
+	//fclose(fout);
+
+	filename = path + "summaries.idx";
+	fout = fopen(filename.c_str(), "wb");
+	if (fout == NULL) {
+		fprintf(stderr, "%s: cannot open %s\n", __func__, filename.c_str());
+		exit(EXIT_FAILURE);
+	}
+
+	auto s_iter = summary_id_file_id_to_offset.begin();
+	while (s_iter != summary_id_file_id_to_offset.end()) {
+		auto v_iter = s_iter->second.begin();
+		while (v_iter != s_iter->second.end()) {
+			fprintf(fout, "%d, %d, %lld\n", s_iter->first.summary_id, s_iter->first.fileindex, *v_iter);
+			v_iter++;
+		}
+		s_iter++;
+	}
+	fclose(fout);
+
+
 	// todo
 }
 

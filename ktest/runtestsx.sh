@@ -129,10 +129,10 @@ installertest()
 	../src/pltcalc/pltcalc < ../ktest/testout/fmsummarycalc2.bin > ../ktest/testout/fmplt2.csv
 
 	# build indexs for the summaries
-	../src/summaryindex/summaryindex -K gul1/summary
-	../src/summaryindex/summaryindex -K gul2/summary
-	../src/summaryindex/summaryindex -K fm1/summary
-	../src/summaryindex/summaryindex -K fm2/summary
+	# ../src/summaryindex/summaryindex -K gul1/summary
+	# ../src/summaryindex/summaryindex -K gul2/summary
+	# ../src/summaryindex/summaryindex -K fm1/summary
+	# ../src/summaryindex/summaryindex -K fm2/summary
 
 	# test aalcalc	
 	../src/aalcalc/aalcalc -x -Kgul1/summary > ../ktest/testout/gulaalcalc1.csv
@@ -208,4 +208,4 @@ installertest()
 
 init
 installertest
-fin
+#fin

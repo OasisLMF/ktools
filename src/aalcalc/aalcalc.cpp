@@ -9,18 +9,38 @@
 #include <math.h>
 
 
+//bool operator<(const period_sidx_map_key& lhs, const period_sidx_map_key& rhs)
+//{
+//
+//	if (lhs.period_no != rhs.period_no) {
+//		return lhs.period_no < rhs.period_no;
+//	}
+//	else {
+//
+//		return lhs.sidx < rhs.sidx;
+//
+//	}
+//
+//
+//}
+
+
+namespace summaryindex {
+	void doit(const std::string& subfolder);
+}
+
 bool operator<(const period_sidx_map_key& lhs, const period_sidx_map_key& rhs)
 {
 
-	if (lhs.summary_id != rhs.summary_id) {
-		return lhs.summary_id < rhs.summary_id;
+	if (lhs.sidx != rhs.sidx) {
+		return lhs.sidx < rhs.sidx;
 	}
 	else {
-		if (lhs.sidx != rhs.sidx) {
-			return lhs.sidx < rhs.sidx;
+		if (lhs.period_no != rhs.period_no) {
+			return lhs.period_no < rhs.period_no;
 		}
 		else {
-			return lhs.period_no < rhs.period_no;
+			return lhs.summary_id < rhs.summary_id;
 		}
 	}
 
@@ -287,7 +307,72 @@ void aalcalc::applyweightingstomaps()
 	applyweightingstomap(map_analytical_aal_, i);
 	applyweightingstomap(map_sample_aal_, i);
 }
+void aalcalc::do_calc_end_new()
+{
+	auto iter = set_periods_.begin();
+	while (iter != set_periods_.end()) {
+		int vidx = (samplesize_ + 1) * (*iter);
+		for (int sidx = 0; sidx < samplesize_ + 1; sidx++) {
+			loss_rec& aa = vec_sample_sum_loss_[vidx+sidx];
+			if (sidx > 0) {
+				aal_rec& a = vec_sample_aal_[current_summary_id_];
+				a.type = 2;
+				if (a.summary_id == 0) a.summary_id = current_summary_id_;
+				if (a.max_exposure_value < aa.max_exposure_value) a.max_exposure_value = aa.max_exposure_value;
+				a.mean += aa.sum_of_loss;
+				a.mean_squared += aa.sum_of_loss * aa.sum_of_loss;
 
+				//auto a_iter = map_sample_aal_.find(current_summary_id_);
+				//if (a_iter != map_sample_aal_.end()) {
+				//	aal_rec& a = a_iter->second;
+				//	if (a.max_exposure_value < aa.max_exposure_value) a.max_exposure_value = aa.max_exposure_value;
+				//	a.mean += aa.sum_of_loss;
+				//	a.mean_squared += aa.sum_of_loss * aa.sum_of_loss;
+				//}
+				//else {
+				//	aal_rec a;
+				//	a.summary_id = current_summary_id_;
+				//	a.type = 2;
+				//	a.max_exposure_value = aa.max_exposure_value;
+				//	a.mean = aa.sum_of_loss;
+				//	a.mean_squared = aa.sum_of_loss * aa.sum_of_loss;
+				//	map_sample_aal_[current_summary_id_] = a;
+				//}
+			}
+			else {
+
+				aal_rec& a = vec_analytical_aal_[current_summary_id_];
+				a.type = 1;
+				if (a.max_exposure_value < aa.max_exposure_value) a.max_exposure_value = aa.max_exposure_value;
+				a.mean += aa.sum_of_loss;
+				a.mean_squared += aa.sum_of_loss * aa.sum_of_loss;
+				if (a.summary_id == 0) a.summary_id = current_summary_id_;
+
+				//auto a_iter = map_analytical_aal_.find(current_summary_id_);
+				//if (a_iter != map_analytical_aal_.end()) {
+				//	aal_rec& a = a_iter->second;
+				//	if (a.max_exposure_value < aa.max_exposure_value) a.max_exposure_value = aa.max_exposure_value;
+				//	a.mean += aa.sum_of_loss;
+				//	a.mean_squared += aa.sum_of_loss * aa.sum_of_loss;
+				//}
+				//else {
+				//	aal_rec a;
+				//	a.summary_id = current_summary_id_;
+				//	a.type = 1;
+				//	a.max_exposure_value = aa.max_exposure_value;
+				//	a.mean = aa.sum_of_loss;
+				//	a.mean_squared = aa.sum_of_loss * aa.sum_of_loss;
+				//	map_analytical_aal_[current_summary_id_] = a;
+				//}
+			}
+			aa.max_exposure_value = 0;
+			aa.sum_of_loss = 0;
+		}
+		iter++;
+	}
+	set_periods_.clear();
+	set_periods_.reserve(5000);
+}
 void aalcalc::do_calc_end(std::map<period_sidx_map_key, loss_rec >& sum_loss_map, std::map<int, aal_rec> &map_aal,int type)
 {
 	auto iter = sum_loss_map.begin();
@@ -321,6 +406,50 @@ void aalcalc::do_sample_calc_end(){
 	
 }
 
+void aalcalc::do_sample_calc_newx(const summarySampleslevelHeader& sh, const std::vector<sampleslevelRec>& vrec) {
+
+	// k.summary_id = sh.summary_id;
+	auto p_iter = event_to_period_.find(sh.event_id);
+	if (p_iter == event_to_period_.end()) return;
+
+	//k.period_no = event_to_period_[sh.event_id];
+	//if (k.period_no == 0) return;
+	//for (auto p : p_iter->second) {
+	//	k.period_no = p;
+	//	for (auto x : vrec) {
+	//		if (x.loss > 0) {
+	//			k.sidx = x.sidx;
+	//			auto iter = sum_loss_map.find(k);
+	//			if (iter != sum_loss_map.end()) {
+	//				loss_rec& a = iter->second;
+	//				if (a.max_exposure_value < sh.expval) a.max_exposure_value = sh.expval;
+	//				a.sum_of_loss += x.loss;
+	//			}
+	//			else {
+	//				loss_rec l;
+	//				l.sum_of_loss = x.loss;
+	//				l.max_exposure_value = sh.expval;
+	//				sum_loss_map[k] = l;
+	//			}
+	//		}
+	//	}
+	//}
+
+	for (auto period_no : p_iter->second) {
+		set_periods_.insert(period_no);
+		int vidx = 0;
+		for (auto x : vrec) {
+			if (x.loss > 0) {
+				int sidx = (x.sidx == -1) ? 0 : x.sidx;
+				vidx = (samplesize_ + 1) * period_no + sidx;
+				loss_rec & a = vec_sample_sum_loss_[vidx];
+				if (a.max_exposure_value < sh.expval) a.max_exposure_value = sh.expval;
+				a.sum_of_loss += x.loss;
+			}
+		}
+	}
+}
+
 void aalcalc::do_sample_calc(const summarySampleslevelHeader& sh, const std::vector<sampleslevelRec>& vrec, std::map<period_sidx_map_key, loss_rec > &sum_loss_map) {
 	period_sidx_map_key k;
 
@@ -328,7 +457,7 @@ void aalcalc::do_sample_calc(const summarySampleslevelHeader& sh, const std::vec
 	auto p_iter = event_to_period_.find(sh.event_id);
 	if (p_iter == event_to_period_.end()) return;
 
-	//k.period_no = event_to_period_[sh.event_id];
+	// k.period_no = event_to_period_[sh.event_id];
 	//if (k.period_no == 0) return;
 	for (auto p : p_iter->second) {
 		k.period_no = p;
@@ -350,8 +479,12 @@ void aalcalc::do_sample_calc(const summarySampleslevelHeader& sh, const std::vec
 			}
 		}
 	}
+
 }
 
+void aalcalc::do_sample_calc_new(const summarySampleslevelHeader& sh, const std::vector<sampleslevelRec>& vrec) {
+	do_sample_calc_newx(sh, vrec);
+}
 void aalcalc::do_sample_calc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec){
 	do_sample_calc(sh, vrec, map_sample_sum_loss_);	
 }
@@ -366,11 +499,17 @@ void aalcalc::do_analytical_calc(const summarySampleslevelHeader& sh, double mea
 	
 }
 
+void aalcalc::doaalcalc_new(const summarySampleslevelHeader& sh, const std::vector<sampleslevelRec>& vrec, OASIS_FLOAT mean_loss)
+{
+	//do_analytical_calc(sh, mean_loss);
+	// if (samplesize_) do_sample_calc(sh, vrec);
+	do_sample_calc_new(sh, vrec);
+}
 
 void aalcalc::doaalcalc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec, OASIS_FLOAT mean_loss)
 {
 	do_analytical_calc(sh, mean_loss);
-	if (samplesize_) do_sample_calc(sh, vrec);
+	if (samplesize_) do_sample_calc(sh, vrec);	
 }
 
 void aalcalc::process_summaryfile(const std::string &filename)
@@ -440,6 +579,33 @@ void aalcalc::process_summaryfile(const std::string &filename)
 	
 	fclose(fin);
 }
+void aalcalc::outputresultscsv_new(std::vector<aal_rec>& vec_aal, int periods,int sample_size)
+{
+	int p1 = periods * sample_size;
+	int p2 = p1 - 1;
+
+	auto v_iter = vec_aal.begin();
+	while (v_iter != vec_aal.end()) {
+		if (v_iter->summary_id > 0) {
+			double mean = v_iter->mean / sample_size;
+			double mean_squared = v_iter->mean * v_iter->mean;
+			double s1 = v_iter->mean_squared - mean_squared / p1;
+			double s2 = s1 / p2;
+			double sd_dev = sqrt(s2);
+			mean = mean / periods;
+			printf("%d,%d,%f,%f,%f\n", v_iter->summary_id, v_iter->type, mean, sd_dev, v_iter->max_exposure_value);
+		}
+		v_iter++;
+	}
+}
+void aalcalc::outputresultscsv_new()
+{
+	if (skipheader_ == false) printf("summary_id,type,mean,standard_deviation,exposure_value\n");
+
+	outputresultscsv_new(vec_analytical_aal_, no_of_periods_,1);
+	outputresultscsv_new(vec_sample_aal_, no_of_periods_ , samplesize_);
+
+}
 void aalcalc::outputresultscsv()
 {
 	if (skipheader_ == false) printf("summary_id,type,mean,standard_deviation,exposure_value\n");
@@ -508,17 +674,44 @@ void process_event(const std::string& path,int summary_id, const event_offset_re
 	fclose(fin);
 }
 
+void aalcalc::getmaxsummaryid(std::string &path)
+{
+	std::string filename = path + "max_summary_id.idx";
+	FILE *fin = fopen(filename.c_str(), "rb");
+	if (fin == NULL) {
+		fprintf(stderr, "%s: cannot open %s\n", __func__, filename.c_str());
+		exit(EXIT_FAILURE);
+	}
+
+	char line[4096];
+	if (fgets(line, sizeof(line), fin) != 0)
+	{
+		int ret = sscanf(line, "%d", &max_summary_id_);
+		if (ret != 1) {
+			fprintf(stderr, "Invalid data in line %d:\n%s %d", 1, line, ret);
+			exit(-1);
+		}		
+	}
+
+	fclose(fin);
+}
 void aalcalc::doitx(const std::string& subfolder)
 {
 	std::string path = "work/" + subfolder;
 	if (path.substr(path.length() - 1, 1) != "/") {
 		path = path + "/";
 	}
+	summaryindex::doit(subfolder);
 	initsameplsize(path);
+	getmaxsummaryid(path);
+	//max_summary_id_ = 88360;
+	 //fprintf(stderr, "Max summary_id %d\n", max_summary_id_);
 	loadoccurrence();
 	loadperiodtoweigthing();	// move this to after the samplesize_ variable has been set i.e.  after reading the first 8 bytes of the first summary file
 	char line[4096];
-
+	vec_sample_sum_loss_.resize(no_of_periods_ * (samplesize_+1));
+	vec_sample_aal_.resize(max_summary_id_ + 1);
+	vec_analytical_aal_.resize(max_summary_id_ + 1);
 	std::vector<std::string> filelist;
 	std::string filename = path + "filelist.idx";
 	FILE* fin = fopen(filename.c_str(), "rb");
@@ -556,18 +749,24 @@ void aalcalc::doitx(const std::string& subfolder)
 		int ret = sscanf(line, "%d, %d, %lld", &summary_id, &file_index, &file_offset);
 		if (ret != 3) {
 			fprintf(stderr, "Invalid data in line %d:\n%s %d", lineno, line, ret);
-			return;
+			exit(-1);
 		}
 		else
 		{
-			if (last_summary_id != summary_id) {
-				last_summary_id = summary_id;
+			if (last_summary_id != summary_id) {				
+				int x = summary_id % 500;
+				if (x == 0) {
+					fprintf(stderr, "Processing summary_id %d\n", summary_id);
+				}
+				current_summary_id_ = last_summary_id;
 				applyweightingstomaps();
-				do_sample_calc_end();
-				do_analytical_calc_end();
-				map_analytical_sum_loss_.clear();
-				map_sample_sum_loss_.clear();
-
+				do_calc_end_new();
+				//do_calc_end();
+				//do_sample_calc_end();
+				//do_analytical_calc_end();
+//				map_analytical_sum_loss_.clear();
+//				map_sample_sum_loss_.clear();
+				last_summary_id = summary_id;
 			}
 			if (last_file_index != file_index) {
 				if (summary_fin != nullptr) fclose(summary_fin);
@@ -590,9 +789,10 @@ void aalcalc::doitx(const std::string& subfolder)
 					i = fread(&sr, sizeof(sr), 1, summary_fin);
 					if (i == 0 || sr.sidx == 0) break;
 					if (sr.sidx == -1) mean_loss = sr.loss;
-					if (sr.sidx >= 0) vrec.push_back(sr);
+					// if (sr.sidx >= 0) vrec.push_back(sr);
+					vrec.push_back(sr);
 				}
-				doaalcalc(sh, vrec, mean_loss);
+				doaalcalc_new(sh, vrec, mean_loss);
 			}
 
 		}
@@ -600,12 +800,16 @@ void aalcalc::doitx(const std::string& subfolder)
 	}
 
 	fclose(fin);
+	current_summary_id_ = last_summary_id;
 	applyweightingstomaps();
-	do_sample_calc_end();
-	do_analytical_calc_end();
+	do_calc_end_new();
+	// do_calc_end();
+	//do_sample_calc_end();
+	//do_analytical_calc_end();
 	map_analytical_sum_loss_.clear();
 	map_sample_sum_loss_.clear();
-	outputresultscsv();
+	//outputresultscsv();
+	outputresultscsv_new();
 }
 
 void aalcalc::doit(const std::string &subfolder)

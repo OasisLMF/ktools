@@ -1,4 +1,4 @@
 # Our binary is produced here
 bin_PROGRAMS = aalcalc 
-aalcalc_SOURCES = aalcalc.cpp main.cpp waalcalc.cpp
+aalcalc_SOURCES = aalcalc.cpp main.cpp waalcalc.cpp summaryindex.cpp
 

@@ -7,6 +7,7 @@
 #include <dirent.h>
 #endif
 #include <math.h>
+#include <string.h>
 
 
 //bool operator<(const period_sidx_map_key& lhs, const period_sidx_map_key& rhs)

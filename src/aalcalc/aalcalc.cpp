@@ -768,10 +768,10 @@ void aalcalc::doitx(const std::string& subfolder)
 		else
 		{
 			if (last_summary_id != summary_id) {				
-				int x = summary_id % 500;
-				if (x == 0) {
-					fprintf(stderr, "Processing summary_id %d\n", summary_id);
-				}
+				//int x = summary_id % 500;
+				//if (x == 0) {
+				//	fprintf(stderr, "Processing summary_id %d\n", summary_id);
+				//}
 				current_summary_id_ = last_summary_id;
 				applyweightingstomaps();
 				do_calc_end_new();

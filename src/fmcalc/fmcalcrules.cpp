@@ -272,13 +272,16 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			// Function 10: Applies a cap on retained loss (maximum deductible)
 			OASIS_FLOAT loss = 0;
 			OASIS_FLOAT accumulated_limit = 0;
+			OASIS_FLOAT loss_adjustment = 0;
 			if (x.effective_deductible > ded) {
 				loss = x.loss + x.effective_deductible - ded;
 				if (loss < 0) loss = 0;
+				loss_adjustment = loss - x.loss;
 				x.effective_deductible = x.effective_deductible + (x.loss - loss);
 				if (x.limit_surplus > 0 ) {
 					accumulated_limit = x.loss;
 					if (loss > accumulated_limit) loss = accumulated_limit;
+					x.limit_surplus = x.limit_surplus + loss_adjustment; 
 				}
 			}
 			else {
@@ -296,14 +299,18 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			}
 			OASIS_FLOAT loss = 0;
 			OASIS_FLOAT accumulated_limit = 0;
+			OASIS_FLOAT loss_adjustment = 0;
+
 			if (x.effective_deductible < ded) {
 				loss = x.loss + x.effective_deductible - ded;
 				if (loss < 0) loss = 0;
+				loss_adjustment = loss - x.loss;
 				x.effective_deductible = x.effective_deductible + (x.loss - loss);
 				if (x.limit_surplus > 0 ) {
 					accumulated_limit = x.loss;
 					loss = loss + x.limit_surplus;
 					if (loss > accumulated_limit) loss = accumulated_limit;
+					x.limit_surplus = x.limit_surplus + loss_adjustment; 
 				}
 	
 			}
@@ -340,14 +347,17 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			}
 			OASIS_FLOAT loss = 0;
 			OASIS_FLOAT accumulated_limit = 0;
+			OASIS_FLOAT loss_adjustment = 0;
 
 			if (x.effective_deductible > ded3) {
 				loss = x.loss + x.effective_deductible - ded3;
 				if (loss < 0) loss = 0;
+				loss_adjustment = loss - x.loss;
 				x.effective_deductible = x.effective_deductible + (x.loss - loss);
 				if (x.limit_surplus > 0 ) {
 					accumulated_limit = x.loss;
 					if (loss > accumulated_limit) loss = accumulated_limit;
+					x.limit_surplus = x.limit_surplus + loss_adjustment;
 				}
 				//x.retained_loss = x.retained_loss + (x.loss - loss);
 			}
@@ -355,11 +365,13 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 				if (x.effective_deductible < ded2) {
 					loss = x.loss + x.effective_deductible - ded2;
 					if (loss < 0) loss = 0;
+					loss_adjustment = loss - x.loss;
 					x.effective_deductible = x.effective_deductible + (x.loss - loss);
 					if (x.limit_surplus > 0 ) {
 						accumulated_limit = x.loss;
 						loss = loss + x.limit_surplus;
 						if (loss > accumulated_limit) loss = accumulated_limit;
+						x.limit_surplus = x.limit_surplus + loss_adjustment;
 					}					
 				}
 				else {
@@ -484,14 +496,17 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			// Function 19: Applies a min and max deductible on deductible % loss
 			OASIS_FLOAT loss = 0;
 			OASIS_FLOAT accumulated_limit = 0;
+			OASIS_FLOAT loss_adjustment = 0;
 
 			if ((x.loss * ded1) + x.effective_deductible > ded3) {
 				loss = x.loss + x.effective_deductible - ded3;
 				if (loss < 0) loss = 0;
+				loss_adjustment = loss - x.loss;
 				x.effective_deductible = x.effective_deductible + (x.loss - loss);
 				if (x.limit_surplus > 0 ) {
 					accumulated_limit = x.loss;
 					if (loss > accumulated_limit) loss = accumulated_limit;
+					x.limit_surplus = x.limit_surplus + loss_adjustment;
 				}
 				//x.retained_loss = x.retained_loss + (x.loss - loss);
 			}
@@ -499,11 +514,13 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 				if ((x.loss * ded1) + x.effective_deductible < ded2) {
 					loss = x.loss + x.effective_deductible - ded2;
 					if (loss < 0) loss = 0;
+					loss_adjustment = loss - x.loss;
 					x.effective_deductible = x.effective_deductible + (x.loss - loss);
 					if (x.limit_surplus > 0 ) {
 						accumulated_limit = x.loss;
 						loss = loss + x.limit_surplus;
 						if (loss > accumulated_limit) loss = accumulated_limit;
+						x.limit_surplus = x.limit_surplus + loss_adjustment;
 					}					
 					//x.retained_loss = x.retained_loss + (x.loss - loss);
 				}
@@ -549,15 +566,19 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			OASIS_FLOAT loss = 0;
 			OASIS_FLOAT effective_ded = 0;
 			OASIS_FLOAT accumulated_limit = 0;
+			OASIS_FLOAT loss_adjustment = 0;
+
 			effective_ded = x.accumulated_tiv * ded1;
 			if (effective_ded > x.loss) effective_ded = x.loss;
 			if ((effective_ded + x.effective_deductible) > ded3) {
 				loss = x.loss + x.effective_deductible - ded3;
 				if (loss < 0) loss = 0;
+				loss_adjustment = loss - x.loss;
 				x.effective_deductible = x.effective_deductible + (x.loss - loss);
 				if (x.limit_surplus > 0 ) {
 					accumulated_limit = x.loss;
 					if (loss > accumulated_limit) loss = accumulated_limit;
+					x.limit_surplus = x.limit_surplus + loss_adjustment;
 				}
 				//x.retained_loss = x.retained_loss + (x.loss - loss);
 			}
@@ -565,11 +586,13 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 				if ((effective_ded + x.effective_deductible) < ded2) {
 					loss = x.loss + x.effective_deductible - ded2;
 					if (loss < 0) loss = 0;
+					loss_adjustment = loss - x.loss;
 					x.effective_deductible = x.effective_deductible + (x.loss - loss);
 					if (x.limit_surplus > 0 ) {
 						accumulated_limit = x.loss;
 						loss = loss + x.limit_surplus;
 						if (loss > accumulated_limit) loss = accumulated_limit;
+						x.limit_surplus = x.limit_surplus + loss_adjustment;
 					}					
 					//x.retained_loss = x.retained_loss + (x.loss - loss);
 				}

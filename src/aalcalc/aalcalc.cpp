@@ -341,7 +341,6 @@ void aalcalc::do_calc_end_new()
 				//}
 			}
 			else {
-
 				aal_rec& a = vec_analytical_aal_[current_summary_id_];
 				a.type = 1;
 				if (a.max_exposure_value < aa.max_exposure_value) a.max_exposure_value = aa.max_exposure_value;
@@ -372,7 +371,7 @@ void aalcalc::do_calc_end_new()
 		iter++;
 	}
 	set_periods_.clear();
-	set_periods_.reserve(5000);
+	//set_periods_.reserve(50000);
 }
 void aalcalc::do_calc_end(std::map<period_sidx_map_key, loss_rec >& sum_loss_map, std::map<int, aal_rec> &map_aal,int type)
 {
@@ -437,7 +436,14 @@ void aalcalc::do_sample_calc_newx(const summarySampleslevelHeader& sh, const std
 	//}
 
 	for (auto period_no : p_iter->second) {
-		set_periods_.insert(period_no);
+
+//		if (max_set_period_size_ < set_periods_.size()) {
+//			max_set_period_size_ = set_periods_.size();
+//			fprintf(stderr, "Max set_period_size: %d\n", max_set_period_size_);
+//		}
+
+		set_periods_.emplace(period_no);
+
 		int vidx = 0;
 		for (auto x : vrec) {
 			if (x.loss > 0) {
@@ -710,10 +716,11 @@ void aalcalc::doitx(const std::string& subfolder)
 	loadoccurrence();
 	loadperiodtoweigthing();	// move this to after the samplesize_ variable has been set i.e.  after reading the first 8 bytes of the first summary file
 	char line[4096];
-	vec_sample_sum_loss_.resize(no_of_periods_ * (samplesize_+1));
+	vec_sample_sum_loss_.resize(((no_of_periods_+1) * (samplesize_+1)) + 1);
 	vec_sample_aal_.resize(max_summary_id_ + 1);
 	vec_analytical_aal_.resize(max_summary_id_ + 1);
 	std::vector<std::string> filelist;
+	std::vector<FILE *> filehandles;
 	std::string filename = path + "filelist.idx";
 	FILE* fin = fopen(filename.c_str(), "rb");
 	if (fin == NULL) {
@@ -723,10 +730,16 @@ void aalcalc::doitx(const std::string& subfolder)
 	
 	while (fgets(line, sizeof(line), fin) != 0) {
 		char *pos;
-		if ((pos = strchr(line, '\n')) != NULL) *pos = '\0';   // remove newline from buffer
-		
+		if ((pos = strchr(line, '\n')) != NULL) *pos = '\0';   // remove newline from buffer		
 		std::string s = line;
+		filename = path + s;
+		FILE* in = fopen(filename.c_str(), "rb");
+		if (in == NULL) {
+			fprintf(stderr, "%s: cannot open %s\n", __func__, s.c_str());
+			exit(EXIT_FAILURE);
+		}
 		filelist.push_back(s);
+		filehandles.push_back(in);
 	}
 
 	fclose(fin);
@@ -744,7 +757,7 @@ void aalcalc::doitx(const std::string& subfolder)
 	long long file_offset;
 	int last_summary_id = -1;
 	int last_file_index = -1;
-	FILE *summary_fin = nullptr;
+	FILE* summary_fin = nullptr;
 	while (fgets(line, sizeof(line), fin) != 0)
 	{
 		int ret = sscanf(line, "%d, %d, %lld", &summary_id, &file_index, &file_offset);
@@ -769,32 +782,33 @@ void aalcalc::doitx(const std::string& subfolder)
 //				map_sample_sum_loss_.clear();
 				last_summary_id = summary_id;
 			}
+			
 			if (last_file_index != file_index) {
-				if (summary_fin != nullptr) fclose(summary_fin);
+				// if (summary_fin != nullptr) fclose(summary_fin);
 				last_file_index = file_index;
-				filename = path + filelist[file_index];
-				summary_fin = fopen(filename.c_str(), "rb");
-				if (summary_fin == nullptr) {
-					fprintf(stderr, "%s: cannot open %s\n", __func__, filename.c_str());
-					exit(EXIT_FAILURE);
-				}
+				summary_fin = filehandles[file_index];
+				//filename = path + filelist[file_index];
+				//summary_fin = fopen(filename.c_str(), "rb");
+				//if (summary_fin == nullptr) {
+				//	fprintf(stderr, "%s: cannot open %s\n", __func__, filename.c_str());
+				//	exit(EXIT_FAILURE);
+				//}
 			}
-			if (summary_fin) {
-				std::vector<sampleslevelRec> vrec;
-				flseek(summary_fin, file_offset, SEEK_SET);
-				summarySampleslevelHeader sh;
-				int i = fread(&sh, sizeof(sh), 1, summary_fin);
-				OASIS_FLOAT mean_loss = 0;
-				while (i != 0) {
-					sampleslevelRec sr;
-					i = fread(&sr, sizeof(sr), 1, summary_fin);
-					if (i == 0 || sr.sidx == 0) break;
-					if (sr.sidx == -1) mean_loss = sr.loss;
-					// if (sr.sidx >= 0) vrec.push_back(sr);
-					vrec.push_back(sr);
-				}
-				doaalcalc_new(sh, vrec, mean_loss);
+
+			std::vector<sampleslevelRec> vrec;
+			flseek(summary_fin, file_offset, SEEK_SET);
+			summarySampleslevelHeader sh;
+			int i = fread(&sh, sizeof(sh), 1, summary_fin);
+			OASIS_FLOAT mean_loss = 0;
+			while (i != 0) {
+				sampleslevelRec sr;
+				i = fread(&sr, sizeof(sr), 1, summary_fin);
+				if (i == 0 || sr.sidx == 0) break;
+				if (sr.sidx == -1) mean_loss = sr.loss;
+				// if (sr.sidx >= 0) vrec.push_back(sr);
+				vrec.push_back(sr);
 			}
+			doaalcalc_new(sh, vrec, mean_loss);
 
 		}
 		lineno++;
@@ -811,6 +825,12 @@ void aalcalc::doitx(const std::string& subfolder)
 	map_sample_sum_loss_.clear();
 	//outputresultscsv();
 	outputresultscsv_new();
+	auto iter = filehandles.begin();
+	while (iter != filehandles.end()) {
+		fclose(*iter);
+		iter++;
+	}
+	filehandles.clear();	
 }
 
 void aalcalc::doit(const std::string &subfolder)

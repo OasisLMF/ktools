@@ -49,7 +49,6 @@ struct LossRec {
 	OASIS_FLOAT previous_layer_retained_loss = 0;
 	OASIS_FLOAT effective_deductible = 0;
 	OASIS_FLOAT accumulated_tiv = 0;	// accumulated tiv 
-	OASIS_FLOAT limit_surplus = 0;
 	int agg_id;
 	int policytc_id;
 	int next_vec_idx = -1;

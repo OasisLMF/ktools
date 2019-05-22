@@ -702,7 +702,7 @@ void aalcalc::getmaxsummaryid(std::string &path)
 
 	fclose(fin);
 }
-void aalcalc::doitx(const std::string& subfolder)
+void aalcalc::doit(const std::string& subfolder)
 {
 	std::string path = "work/" + subfolder;
 	if (path.substr(path.length() - 1, 1) != "/") {
@@ -711,8 +711,6 @@ void aalcalc::doitx(const std::string& subfolder)
 	summaryindex::doit(subfolder);
 	initsameplsize(path);
 	getmaxsummaryid(path);
-	//max_summary_id_ = 88360;
-	 //fprintf(stderr, "Max summary_id %d\n", max_summary_id_);
 	loadoccurrence();
 	loadperiodtoweigthing();	// move this to after the samplesize_ variable has been set i.e.  after reading the first 8 bytes of the first summary file
 	char line[4096];
@@ -768,47 +766,34 @@ void aalcalc::doitx(const std::string& subfolder)
 		else
 		{
 			if (last_summary_id != summary_id) {				
-				//int x = summary_id % 500;
-				//if (x == 0) {
-				//	fprintf(stderr, "Processing summary_id %d\n", summary_id);
-				//}
 				current_summary_id_ = last_summary_id;
 				applyweightingstomaps();
 				do_calc_end_new();
-				//do_calc_end();
-				//do_sample_calc_end();
-				//do_analytical_calc_end();
-//				map_analytical_sum_loss_.clear();
-//				map_sample_sum_loss_.clear();
 				last_summary_id = summary_id;
 			}
 			
 			if (last_file_index != file_index) {
-				// if (summary_fin != nullptr) fclose(summary_fin);
 				last_file_index = file_index;
 				summary_fin = filehandles[file_index];
-				//filename = path + filelist[file_index];
-				//summary_fin = fopen(filename.c_str(), "rb");
-				//if (summary_fin == nullptr) {
-				//	fprintf(stderr, "%s: cannot open %s\n", __func__, filename.c_str());
-				//	exit(EXIT_FAILURE);
-				//}
 			}
-
-			std::vector<sampleslevelRec> vrec;
-			flseek(summary_fin, file_offset, SEEK_SET);
-			summarySampleslevelHeader sh;
-			int i = fread(&sh, sizeof(sh), 1, summary_fin);
-			OASIS_FLOAT mean_loss = 0;
-			while (i != 0) {
-				sampleslevelRec sr;
-				i = fread(&sr, sizeof(sr), 1, summary_fin);
-				if (i == 0 || sr.sidx == 0) break;
-				if (sr.sidx == -1) mean_loss = sr.loss;
-				// if (sr.sidx >= 0) vrec.push_back(sr);
-				vrec.push_back(sr);
+			if (summary_fin != nullptr) {
+				std::vector<sampleslevelRec> vrec;
+				flseek(summary_fin, file_offset, SEEK_SET);
+				summarySampleslevelHeader sh;
+				int i = fread(&sh, sizeof(sh), 1, summary_fin);
+				OASIS_FLOAT mean_loss = 0;
+				while (i != 0) {
+					sampleslevelRec sr;
+					i = fread(&sr, sizeof(sr), 1, summary_fin);
+					if (i == 0 || sr.sidx == 0) break;
+					if (sr.sidx == -1) mean_loss = sr.loss;
+					vrec.push_back(sr);
+				}
+				doaalcalc_new(sh, vrec, mean_loss);
+			}else {
+				fprintf(stderr, "File handle is a nullptr");
+				exit(EXIT_FAILURE);
 			}
-			doaalcalc_new(sh, vrec, mean_loss);
 
 		}
 		lineno++;
@@ -818,12 +803,9 @@ void aalcalc::doitx(const std::string& subfolder)
 	current_summary_id_ = last_summary_id;
 	applyweightingstomaps();
 	do_calc_end_new();
-	// do_calc_end();
-	//do_sample_calc_end();
-	//do_analytical_calc_end();
+
 	map_analytical_sum_loss_.clear();
 	map_sample_sum_loss_.clear();
-	//outputresultscsv();
 	outputresultscsv_new();
 	auto iter = filehandles.begin();
 	while (iter != filehandles.end()) {
@@ -833,7 +815,7 @@ void aalcalc::doitx(const std::string& subfolder)
 	filehandles.clear();	
 }
 
-void aalcalc::doit(const std::string &subfolder)
+void aalcalc::doit_l(const std::string &subfolder)
 {
 	
 	std::string path = "work/" + subfolder;

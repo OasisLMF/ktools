@@ -161,8 +161,8 @@ private:
 	void getmaxsummaryid(std::string& path);
 public:
 	aalcalc(bool skipheader) : skipheader_(skipheader) {};
-	void doit(const std::string &subfolder);
-	void doitx(const std::string& subfolder);		// exprimental
+	void doit_l(const std::string &subfolder);
+	void doit(const std::string& subfolder);		// exprimental
 	void doitw(const std::string &subfolder);	// calcuate using welford method 
 	void debug(const std::string &subfolder);
 };

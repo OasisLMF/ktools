@@ -135,10 +135,10 @@ installertest()
 	# ../src/summaryindex/summaryindex -K fm2/summary
 
 	# test aalcalc	
-	../src/aalcalc/aalcalc -x -Kgul1/summary > ../ktest/testout/gulaalcalc1.csv
-	../src/aalcalc/aalcalc -x -Kgul2/summary > ../ktest/testout/gulaalcalc2.csv
-	../src/aalcalc/aalcalc -x -Kfm1/summary > ../ktest/testout/fmaalcalc1.csv
-	../src/aalcalc/aalcalc -x -Kfm2/summary > ../ktest/testout/fmaalcalc2.csv
+	../src/aalcalc/aalcalc -l -Kgul1/summary > ../ktest/testout/gulaalcalc1.csv
+	../src/aalcalc/aalcalc -l -Kgul2/summary > ../ktest/testout/gulaalcalc2.csv
+	../src/aalcalc/aalcalc -l -Kfm1/summary > ../ktest/testout/fmaalcalc1.csv
+	../src/aalcalc/aalcalc -l -Kfm2/summary > ../ktest/testout/fmaalcalc2.csv
 
 	
 	# test stream conversion components

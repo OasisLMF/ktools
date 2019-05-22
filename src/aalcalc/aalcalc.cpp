@@ -68,6 +68,8 @@ void aalcalc::loadperiodtoweigthing()
 {
 	FILE *fin = fopen(PERIODS_FILE, "rb");
 	if (fin == NULL) return;
+	fprintf(stderr, "Weighting for period files are not supported in this version - due to changes in the way aalcalc works!\n");
+	exit(EXIT_FAILURE);
 	Periods p;
 	double total_weighting = 0;
 	size_t i = fread(&p, sizeof(Periods), 1, fin);

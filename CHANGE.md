@@ -1,6 +1,12 @@
 Ktools Changelog
 ================
 
+## [v3.0.8](https://github.com/OasisLMF/ktools/releases/tag/v3.0.8)
+* Update to aalcalc
+* Introduced limit_surplus carry through rules
+* fix for min max deductible over or under limit scenario
+* Trim summary calc output remove zero exposure values
+
 ## [v3.0.7](https://github.com/OasisLMF/ktools/releases/tag/v3.0.7)
 * fmcalc - Remove zeros from summarycalc outputs
 * fmcalc - Remove conditial use of agg_id as output_id

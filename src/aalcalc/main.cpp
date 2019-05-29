@@ -1,15 +1,4 @@
 
-
-// #include "aalcalc.h"
-// #include "../../config.h"
-
-// #if defined(_MSC_VER)
-// #include "../wingetopt/wingetopt.h"
-// #else
-// #include <unistd.h>
-// #endif
-
-
 #include <fstream>
 #include "../include/oasis.h"
 

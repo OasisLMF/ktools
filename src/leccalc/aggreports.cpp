@@ -204,10 +204,10 @@ void aggreports::fulluncertainty(int handle,const std::map<outkey2, OASIS_FLOAT>
 	if (fout_[handle] == nullptr) return;
 	std::map<int, lossvec> items;
 	for (auto x : out_loss) {
-		items[x.first.summary_id].push_back(x.second);
+		if (x.first.sidx == -1)	items[x.first.summary_id].push_back(x.second);
 	}
 
-	if (skipheader_ == false) fprintf(fout_[handle], "summary_id,return_period,loss\n");
+	if (skipheader_ == false) fprintf(fout_[handle], "type, summary_id,return_period,loss\n");
 
 	for (auto s : items) {
 		lossvec &lpv = s.second;
@@ -223,7 +223,7 @@ void aggreports::fulluncertainty(int handle,const std::map<outkey2, OASIS_FLOAT>
 			if (useReturnPeriodFile_) {
 				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, s.first, 0);
 			}else{
-				fprintf(fout_[handle],"%d,%f,%f\n", s.first, retperiod, lp);
+				fprintf(fout_[handle],"1, %d,%f,%f\n", s.first, retperiod, lp);
 			}
 			i++;
 		}
@@ -235,6 +235,41 @@ void aggreports::fulluncertainty(int handle,const std::map<outkey2, OASIS_FLOAT>
 		}
 
 	}
+
+// Now type 2
+	items.clear();
+	for (auto x : out_loss) {
+		if (x.first.sidx > 0)	items[x.first.summary_id].push_back(x.second);
+	}
+
+	for (auto s : items) {
+		lossvec& lpv = s.second;
+		std::sort(lpv.rbegin(), lpv.rend());
+		int nextreturnperiodindex = 0;
+		OASIS_FLOAT last_computed_rp = 0;
+		OASIS_FLOAT last_computed_loss = 0;
+		int i = 1;
+		OASIS_FLOAT t = (OASIS_FLOAT)totalperiods_;
+		if (samplesize_) t = (OASIS_FLOAT)(totalperiods_ * samplesize_);
+		for (auto lp : lpv) {
+			OASIS_FLOAT retperiod = t / i;
+			if (useReturnPeriodFile_) {
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, s.first, 0);
+			}
+			else {
+				fprintf(fout_[handle], "2, %d,%f,%f\n", s.first, retperiod, lp);
+			}
+			i++;
+		}
+		if (useReturnPeriodFile_) {
+			doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first, 0);
+			while (nextreturnperiodindex < returnperiods_.size()) {
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first, 0);
+			}
+		}
+
+	}
+
 }
 void aggreports::outputOccFulluncertainty()
 {

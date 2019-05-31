@@ -17,10 +17,10 @@ init()
 	mkdir -p examples/work/gul2/summary
 	mkdir -p examples/work/fm1/summary
 	mkdir -p examples/work/fm2/summary
-	mkdir -p examples/work/gul1/aal
-	mkdir -p examples/work/gul2/aal
-	mkdir -p examples/work/fm1/aal
-	mkdir -p examples/work/fm2/aal
+	#mkdir -p examples/work/gul1/aal
+	#mkdir -p examples/work/gul2/aal
+	#mkdir -p examples/work/fm1/aal
+	#mkdir -p examples/work/fm2/aal
 
 }
 

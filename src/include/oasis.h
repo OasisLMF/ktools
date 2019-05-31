@@ -67,7 +67,7 @@ typedef float OASIS_FLOAT;
 #ifdef AREAPERIL_TYPE_LONG
 typedef long AREAPERIL_INT;
 #else
-typedef int AREAPERIL_INT;
+typedef unsigned int AREAPERIL_INT;
 #endif
 
 

@@ -1,6 +1,7 @@
 Makefile
 testout
 testout_old
+testout_old2
 cw64bld
 uwbld
 g

@@ -216,8 +216,7 @@ void aggreports::fulluncertainty(int handle,const std::map<outkey2, OASIS_FLOAT>
 		OASIS_FLOAT last_computed_rp = 0;
 		OASIS_FLOAT last_computed_loss = 0;
 		int i = 1;
-		OASIS_FLOAT t = (OASIS_FLOAT) totalperiods_;
-		if (samplesize_) t = (OASIS_FLOAT) (totalperiods_ * samplesize_ );
+		OASIS_FLOAT t = (OASIS_FLOAT) totalperiods_;		
 		for (auto lp : lpv) {
 			OASIS_FLOAT retperiod = t / i;
 			if (useReturnPeriodFile_) {

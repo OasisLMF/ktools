@@ -47,6 +47,8 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include "../wingetopt/wingetopt.h"
 #else
 #include <unistd.h>
+#include <signal.h>
+#include <string.h>
 #endif
 
 
@@ -57,8 +59,7 @@ char* progname;
 
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
 void segfault_sigaction(int signal, siginfo_t* si, void* arg) {
-	fprintf(stderr, "%s: Segment fault at address: %p\n", progname,
-		si->si_addr);
+	fprintf(stderr, "%s: Segment fault at address: %p\n", progname,si->si_addr);
 	exit(0);
 }
 #endif

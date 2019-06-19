@@ -47,63 +47,33 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <unistd.h>
 #endif
 
+namespace itemtobin {
+	void doit()
+	{
 
-void doit()
-{
-
-  item q;
-    char line[4096];
-    int lineno=0;
-  fgets(line, sizeof(line), stdin); // skip header line
-  lineno++;
-    while (fgets(line, sizeof(line), stdin) != 0)
-    {
-#ifdef AREAPERIL_TYPE_LONG
-		int ret = sscanf(line, "%d,%d,%ld,%d,%d", &q.id, &q.coverage_id, &q.areaperil_id, &q.vulnerability_id, &q.group_id);
-#else
-		int ret = sscanf(line, "%d,%d,%d,%d,%d", &q.id, &q.coverage_id, &q.areaperil_id, &q.vulnerability_id, &q.group_id);
-#endif 
-		
-		if (ret != 5){
-           fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
-           return;
-		}
-		else
+		item q;
+		char line[4096];
+		int lineno = 0;
+		fgets(line, sizeof(line), stdin); // skip header line
+		lineno++;
+		while (fgets(line, sizeof(line), stdin) != 0)
 		{
-           fwrite(&q, sizeof(q), 1, stdout);
-       }
-       lineno++;
-    }
+#ifdef AREAPERIL_TYPE_LONG
+			int ret = sscanf(line, "%d,%d,%ld,%d,%d", &q.id, &q.coverage_id, &q.areaperil_id, &q.vulnerability_id, &q.group_id);
+#else
+			int ret = sscanf(line, "%d,%d,%d,%d,%d", &q.id, &q.coverage_id, &q.areaperil_id, &q.vulnerability_id, &q.group_id);
+#endif 
 
-}
-
-void help()
-{
-	fprintf(stderr, "-h help\n-v version\n");
-}
-
-int main(int argc, char* argv[])
-{
-
-	int opt;
-
-	while ((opt = getopt(argc, argv, "vh")) != -1) {
-		switch (opt) {
-		case 'v':
-			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
-			exit(EXIT_FAILURE);
-			break;
-		case 'h':
-		default:
-			help();
-			exit(EXIT_FAILURE);
+			if (ret != 5) {
+				fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
+				return;
+			}
+			else
+			{
+				fwrite(&q, sizeof(q), 1, stdout);
+			}
+			lineno++;
 		}
+
 	}
-	initstreams();
-	doit();
-
-	return EXIT_SUCCESS;
-
 }
-
-

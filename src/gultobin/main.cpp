@@ -1,5 +1,5 @@
 /*
-* Copyright (c)2015 - 2016 Oasis LMF Limited 
+* Copyright (c)2015 - 2016 Oasis LMF Limited
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
@@ -45,59 +45,67 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include "../wingetopt/wingetopt.h"
 #else
 #include <unistd.h>
-#include <signal.h>
-#include <string.h>
 #endif
 
+char* progname;
 namespace gultobin {
-	void doit(int maxsampleindex)
-	{
+	void doit(int maxsampleindex);
+}
 
-		gulitemSampleslevel q;
-		char line[4096];
-		int lineno = 0;
-		fgets(line, sizeof(line), stdin);
-		lineno++;
-		int gulstream_type = gulstream_id | 1;
-		fwrite(&gulstream_type, sizeof(int), 1, stdout);
-		fwrite(&maxsampleindex, sizeof(int), 1, stdout);
-		gulSampleslevelHeader gh;
-		gh.event_id = -1;
-		while (fgets(line, sizeof(line), stdin) != 0)
-		{
-			if (sscanf(line, "%d,%d,%d,%f", &q.event_id, &q.item_id, &q.sidx, &q.loss) != 4) {
-				fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
-				return;
-			}
-			else
-			{
-				if (gh.event_id != q.event_id || gh.item_id != q.item_id) {
-					if (gh.event_id != -1) {
-						gulSampleslevelRec gr;
-						gr.sidx = 0;
-						gr.loss = 0;
-						fwrite(&gr, sizeof(gr), 1, stdout);
-					}
-					gh.event_id = q.event_id;
-					gh.item_id = q.item_id;
-					fwrite(&gh, sizeof(gh), 1, stdout);
-					gulSampleslevelRec gr;
-					gr.sidx = q.sidx;
-					gr.loss = q.loss;
-					fwrite(&gr, sizeof(gr), 1, stdout);
-				}
-				else {
-					gulSampleslevelRec gr;
-					gr.sidx = q.sidx;
-					gr.loss = q.loss;
-					fwrite(&gr, sizeof(gr), 1, stdout);
-				}
+void help()
+{
+	fprintf(stderr,
+		"-S maximum sample index\n"
+		"-h help\n"
+		"-v version\n");
+}
 
+int main(int argc, char* argv[])
+{
 
-			}
-			lineno++;
+	int opt;
+	int maxsampleindex = -1;
+	while ((opt = getopt(argc, argv, "vhS:")) != -1) {
+		switch (opt) {
+		case 'S':
+			maxsampleindex = atoi(optarg);
+			break;
+		case 'v':
+			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+			exit(EXIT_FAILURE);
+			break;
+		case 'h':
+		default:
+			help();
+			exit(EXIT_FAILURE);
 		}
+	}
+	progname = argv[0];
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+	struct sigaction sa;
 
+	memset(&sa, 0, sizeof(struct sigaction));
+	sigemptyset(&sa.sa_mask);
+	sa.sa_sigaction = segfault_sigaction;
+	sa.sa_flags = SA_SIGINFO;
+
+	sigaction(SIGSEGV, &sa, NULL);
+#endif
+
+	try {
+		initstreams();
+		if (maxsampleindex == -1) {
+			fprintf(stderr, "Sample size not supplied - please use -S parameter followed by the sample size\n");
+			exit(EXIT_FAILURE);
+		}
+		gultobin::doit(maxsampleindex);
+
+		return EXIT_SUCCESS;
+	}catch (std::bad_alloc) {
+		fprintf(stderr, "%s: Memory allocation failed\n", progname);
+		exit(EXIT_FAILURE);
 	}
 
 }
+
+

@@ -229,7 +229,7 @@ namespace leccalc {
 		std::map<outkey2, OASIS_FLOAT> max_out_loss;
 
 
-		unsigned int samplesize;
+		unsigned int samplesize=0;
 		int maxsummaryid = -1;
 		if (subfolder.size() == 0) {
 			processinputfile(samplesize, event_to_periods, maxsummaryid, agg_out_loss, max_out_loss);

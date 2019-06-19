@@ -97,6 +97,7 @@ struct gulcalcopts {
 	bool debug = false;
 	FILE *itemout = stdout;
 	FILE *covout = stdout;
+	int mode = 0;		// default mode = 0 
 };
 
 
@@ -206,7 +207,8 @@ public:
 		delete [] ibuf_;
 		delete [] cbuf_;
 	}
-	void doit();
+	void mode0();
+	void mode1();
 };
 
 void doit(const gulcalcopts &g);

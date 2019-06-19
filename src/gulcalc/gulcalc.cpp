@@ -412,7 +412,47 @@ void gulcalc::init()
 	}
 	std::this_thread::sleep_for(std::chrono::milliseconds(PIPE_DELAY));
 }
-void gulcalc::doit()
+void gulcalc::mode1()
+{
+	// Change this 
+	// collate the data as coverage_id,sidx,item_id,loss
+	// then when the items are on the same coverage split the loss proportionally
+	// process each event and output the data
+	// 
+	init();
+
+	int total_bins = damagebindictionary_vec_->size();
+	int max_recsize = (int)(total_bins * sizeof(prob_mean)) + sizeof(damagecdfrec) + sizeof(int);
+	int last_event_id = -1;
+
+	char* rec = new char[max_recsize];
+	damagecdfrec* d = (damagecdfrec*)rec;
+
+	for (;;)
+	{
+		char* p = rec;
+		bool bSuccess = iGetrec_(p, sizeof(damagecdfrec));
+		if (bSuccess == false) break;
+		p = p + sizeof(damagecdfrec);
+		bSuccess = iGetrec_(p, sizeof(int)); // we now have bin count
+		int* q = (int*)p;
+		p = p + sizeof(int);
+		int recsize = (*q) * sizeof(prob_mean);
+		// we should now have damagecdfrec in memory
+		bSuccess = iGetrec_(p, recsize);
+		recsize += sizeof(damagecdfrec) + sizeof(int);
+		if (d->event_id != last_event_id) {
+			if (last_event_id > 0) outputcoveragedata(last_event_id);
+			last_event_id = d->event_id;
+			if (rndopt_ == rd_option::usecachedvector) rnd_->clearvec();
+		}
+
+		processrec(rec, recsize);
+	}
+	//outputcoveragedata(d->event_id);
+	if (itemWriter_)  itemWriter_(ibuf_, sizeof(unsigned char), itembufoffset_);
+}
+void gulcalc::mode0()
 {
 	init();
 

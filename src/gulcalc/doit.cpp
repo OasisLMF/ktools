@@ -161,7 +161,8 @@ void doit(const gulcalcopts &opt)
 	if (opt.coverageLevelOutput == true) covWriter = coverageWriter;
 
 	gulcalc g(damagebindictionary_vec, coverages, item_map, rnd, opt.gul_limit, opt.rndopt, opt.debug, opt.samplesize, itmWriter, covWriter, iGetrec,opt.rand_seed);
-	g.doit();
+	if (opt.mode == 0) g.mode0();
+	if (opt.mode == 1) g.mode1();
 
 	return;
 

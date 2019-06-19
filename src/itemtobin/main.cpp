@@ -1,5 +1,5 @@
 /*
-* Copyright (c)2015 - 2016 Oasis LMF Limited 
+* Copyright (c)2015 - 2016 Oasis LMF Limited
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
@@ -45,59 +45,40 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include "../wingetopt/wingetopt.h"
 #else
 #include <unistd.h>
-#include <signal.h>
-#include <string.h>
 #endif
 
-namespace gultobin {
-	void doit(int maxsampleindex)
-	{
+namespace itemtobin {
+	void doit();
+}
 
-		gulitemSampleslevel q;
-		char line[4096];
-		int lineno = 0;
-		fgets(line, sizeof(line), stdin);
-		lineno++;
-		int gulstream_type = gulstream_id | 1;
-		fwrite(&gulstream_type, sizeof(int), 1, stdout);
-		fwrite(&maxsampleindex, sizeof(int), 1, stdout);
-		gulSampleslevelHeader gh;
-		gh.event_id = -1;
-		while (fgets(line, sizeof(line), stdin) != 0)
-		{
-			if (sscanf(line, "%d,%d,%d,%f", &q.event_id, &q.item_id, &q.sidx, &q.loss) != 4) {
-				fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
-				return;
-			}
-			else
-			{
-				if (gh.event_id != q.event_id || gh.item_id != q.item_id) {
-					if (gh.event_id != -1) {
-						gulSampleslevelRec gr;
-						gr.sidx = 0;
-						gr.loss = 0;
-						fwrite(&gr, sizeof(gr), 1, stdout);
-					}
-					gh.event_id = q.event_id;
-					gh.item_id = q.item_id;
-					fwrite(&gh, sizeof(gh), 1, stdout);
-					gulSampleslevelRec gr;
-					gr.sidx = q.sidx;
-					gr.loss = q.loss;
-					fwrite(&gr, sizeof(gr), 1, stdout);
-				}
-				else {
-					gulSampleslevelRec gr;
-					gr.sidx = q.sidx;
-					gr.loss = q.loss;
-					fwrite(&gr, sizeof(gr), 1, stdout);
-				}
+void help()
+{
+	fprintf(stderr, "-h help\n-v version\n");
+}
 
+int main(int argc, char* argv[])
+{
 
-			}
-			lineno++;
+	int opt;
+
+	while ((opt = getopt(argc, argv, "vh")) != -1) {
+		switch (opt) {
+		case 'v':
+			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+			exit(EXIT_FAILURE);
+			break;
+		case 'h':
+		default:
+			help();
+			exit(EXIT_FAILURE);
 		}
-
 	}
+	initstreams();
+	itemtobin::doit();
+
+	return EXIT_SUCCESS;
 
 }
+
+
+

@@ -30,13 +30,13 @@ dorun()
 
 }
 
-rm input/periods.bin
-rm input/periods.csv
+rm -f input/periods.bin
+rm -f input/periods.csv
 
 mkdir -p results/aal/periods
 
 ./aalcalc_example.py 1
-mv "results/aal/fm_aal.csv" "results/aal/periods/fm_aal0.csv"
+
 
 seq 1 10000 | awk 'BEGIN{ print "period_no, weighting" };{print $1",", 0.0001}'  > input/periods.csv 
 dorun 1

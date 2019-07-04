@@ -41,18 +41,23 @@ procs = []
 
 
 while (counter <= total_processes) :
-	cmd="eve %d %d | getmodel | gulcalc -r -S%d -i - | fmcalc | summarycalc -f -2 - > work/summary2/p%d.bin " % (counter,total_processes,samplesize,counter)
-	print(cmd)
-	p1 = subprocess.Popen(cmd,shell=True)
-	procs.append(p1)
-	counter = counter + 1
+    cmd="../src/eve/eve %d %d | ../src/getmodel/getmodel | ../src/gulcalc/gulcalc -r -S%d -i - | ../src/fmcalc/fmcalc | ../src/summarycalc/summarycalc -f -2 - > work/summary2/p%d.bin " % (counter,total_processes,samplesize,counter)
+    if os.name == "nt":
+        cmd = cmd.replace("/","\\")
+    print(cmd)
+    p1 = subprocess.Popen(cmd,shell=True)
+    procs.append(p1)
+    counter = counter + 1
+
 for p in procs:
 	p.wait()
 counter=1
 
 # aalcalc runs on the output of summarycalc
 
-cmd="aalcalc -Ksummary2 > results/aal/fm_aal.csv"
+cmd="../src/aalcalc/aalcalc -Ksummary2 > results/aal/fm_aal.csv"
+if os.name == "nt":
+    cmd = cmd.replace("/","\\")
 print(cmd)
 p1 = subprocess.Popen(cmd,shell=True)
 print("Finished. View outputs in results/aal")

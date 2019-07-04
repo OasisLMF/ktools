@@ -68,8 +68,8 @@ void aalcalc::loadperiodtoweigthing()
 {
 	FILE *fin = fopen(PERIODS_FILE, "rb");
 	if (fin == NULL) return;
-	fprintf(stderr, "Weighting for period files are not supported in this version - due to changes in the way aalcalc works!\n");
-	exit(EXIT_FAILURE);
+	//fprintf(stderr, "Weighting for period files are not supported in this version - due to changes in the way aalcalc works!\n");
+	//exit(EXIT_FAILURE);
 	Periods p;
 	double total_weighting = 0;
 	size_t i = fread(&p, sizeof(Periods), 1, fin);
@@ -436,6 +436,8 @@ void aalcalc::do_sample_calc_newx(const summarySampleslevelHeader& sh, const std
 	//		}
 	//	}
 	//}
+	// periodstoweighting_.clear();
+	double factor = periodstoweighting_.size();
 
 	for (auto period_no : p_iter->second) {
 
@@ -445,6 +447,11 @@ void aalcalc::do_sample_calc_newx(const summarySampleslevelHeader& sh, const std
 //		}
 
 		set_periods_.emplace(period_no);
+		double weighting = 1;
+		auto iter = periodstoweighting_.find(period_no);
+		if (factor > 0 && iter != periodstoweighting_.end()) {
+			weighting = iter->second * factor;
+		}
 
 		int vidx = 0;
 		for (auto x : vrec) {
@@ -453,7 +460,7 @@ void aalcalc::do_sample_calc_newx(const summarySampleslevelHeader& sh, const std
 				vidx = (samplesize_ + 1) * period_no + sidx;
 				loss_rec & a = vec_sample_sum_loss_[vidx];
 				if (a.max_exposure_value < sh.expval) a.max_exposure_value = sh.expval;
-				a.sum_of_loss += x.loss;
+				a.sum_of_loss += (x.loss * weighting);
 			}
 		}
 	}

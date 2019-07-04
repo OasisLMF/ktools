@@ -51,6 +51,8 @@ namespace damagebintobin {
 	{
 
 		damagebindictionary q;
+		damagebindictionary p = {};
+		bool dataValid = true;
 		char line[4096];
 		int lineno=0;
 		fgets(line, sizeof(line), stdin);
@@ -64,10 +66,35 @@ namespace damagebintobin {
 
 			else
 		{
+			if (lineno == 1) {
+				if (q.bin_from != 0.0) {
+					fprintf(stderr, "Lower limit for first bin is not 0. Are you sure this is what you want?\n");
+				}
+				if (q.bin_index != 1) {
+					fprintf(stderr, "First bin index must be 1.\n");
+					return;
+				}
+			}
+			if (p.bin_index != q.bin_index-1) {
+				fprintf(stderr, "Non-contiguous bin indices %d line %d and %d line %d.\n", p.bin_index, lineno-1, q.bin_index, lineno);
+				dataValid = false;
+			}
+			if (q.interpolation < q.bin_from || q.bin_to < q.interpolation) {
+				fprintf(stderr, "Interpolation damage value %f for bin %d lies outside range [%f, %f].\n", q.interpolation, q.bin_index, q.bin_from, q.bin_to);
+				dataValid = false;
+			}
+			
 			fwrite(&q, sizeof(q), 1, stdout);
 		}
 		lineno++;
+		p = q;
 		}
+
+		if (q.bin_to != 1.0) {
+			fprintf(stderr, "Upper limit for last bin is not 1. Are you sure this is what you want?\n");
+		}
+
+		if (dataValid == false) return;
 
 	}
 }	

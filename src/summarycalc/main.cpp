@@ -58,7 +58,9 @@ void help()
 		"-v version\n"
 		"-h help\n"
 		"-f input stream = fm\n"
-		"-g input stream = gul\n"
+		"-g input stream = gul coverage\n"
+		"-c input stream = gul coverage\n"
+		"-i input stream = gul item\n"
 		"-p input path\n"
 		"-z output zeros\n"
 		"-[summarysetid] outfilepipe\n"
@@ -76,19 +78,25 @@ void help()
 int main(int argc, char* argv[])
 {
 	int opt;
-	bool noneTrue = true;
-	bool inputtypegul = false;
-	bool inputtypefm = false;
-
+	bool noneOutputTrue = true;
+	int truecount = 0;
 	summarycalc f;
-	while ((opt = getopt(argc, argv, "vzhfgp:0:1:2:3:4:5:6:7:8:9:")) != -1) {
+	while ((opt = getopt(argc, argv, "vzhcifgp:0:1:2:3:4:5:6:7:8:9:")) != -1) {
 		switch (opt) {
 		case 'g':
-			inputtypegul = true;
-			f.setgulmode();
+			truecount++;
+			f.setgulcoveragemode();
+			break;
+		case 'c':
+			truecount++;
+			f.setgulcoveragemode();
+			break;
+		case 'i':
+			truecount++;
+			f.setgulitemmode();
 			break;
 		case 'f':
-			inputtypefm = true;
+			truecount++;
 			f.setfmmode();
 			break;
 		case 'z':
@@ -108,7 +116,7 @@ int main(int argc, char* argv[])
 		case '8':
 		case '9':
 			f.openpipe(opt - '0', optarg);
-			noneTrue = false;
+			noneOutputTrue = false;
 			break;
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
@@ -121,16 +129,16 @@ int main(int argc, char* argv[])
 		}
 	}
 
-	if (inputtypegul == false && inputtypefm == false) {
-		std::cerr << "no input type selected\n Please use -g or -f\n";
+	if (truecount == 0 ) {
+		std::cerr << "no input type selected\n Please use -g or -f or -i or -c\n";
 		return -1;
 	}
-	if (inputtypegul == true && inputtypefm == true) {
-		std::cerr << "Can't have -f and -g switches together\n";
+	if (truecount > 1) {
+		std::cerr << "Only one input type can be selected from -g or -f or -i or -c\n";
 		return -1;
 	}
 
-	if (noneTrue) return -1; // no output stream so nothing to do...
+	if (noneOutputTrue) return -1; // no output stream so nothing to do...
 	
 	f.doit();
 	return 0;

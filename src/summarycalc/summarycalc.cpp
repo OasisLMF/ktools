@@ -387,7 +387,43 @@ void summarycalc::dosummary(int sample_size,int event_id,int coverage_or_output_
 	}
 }
 
-void summarycalc::dogulsummary()
+void summarycalc::dogulitemsummary()
+{
+	loadcoverages();
+	loadgulsummaryxref();
+	outputstreamtype();
+	unsigned int streamtype = 0;
+	int i = fread(&streamtype, sizeof(streamtype), 1, stdin);
+	if (isGulStream(streamtype) == true) {
+		int stream_type = streamtype & streamno_mask;
+		unsigned int samplesize = 0;
+		if (stream_type == 1) {
+			i = fread(&samplesize, sizeof(samplesize), 1, stdin);
+			alloc_sssl_array(samplesize);
+			reset_sssl_array(samplesize);
+			alloc_sse_array();
+			reset_sse_array();
+			outputsamplesize(samplesize);
+			gulSampleslevelHeader gh;
+			bool havedata = false;
+			while (i == 1) {
+				i = fread(&gh, sizeof(gh), 1, stdin);
+				if (i > 0 && havedata == false) havedata = true;
+				while (i != 0) {
+					gulSampleslevelRec gr;
+					i = fread(&gr, sizeof(gr), 1, stdin);
+					if (i == 0) break;
+					if (gr.sidx == 0) break;
+					dosummary(samplesize, gh.event_id, gh.item_id, gr.sidx, gr.loss, coverages_[gh.item_id]);
+				}
+			}
+			return;
+		}
+		std::cerr << "summarycalc: Unexpected Gul stream type " << stream_type << " expecting gulitem stream\n";
+		::exit(-1);
+	}
+}
+void summarycalc::dogulcoveragesummary()
 {
 	loadcoverages();
 	loadgulsummaryxref();	
@@ -486,8 +522,11 @@ void summarycalc::doit()
 		dofmsummary();
 	}
 	
-	if (inputtype_ == GUL_STREAM) {
-		dogulsummary();
+	if (inputtype_ == GUL_COVERAGE_STREAM) {
+		dogulcoveragesummary();
+	}
+	if (inputtype_ == GUL_ITEM_STREAM) {
+		dogulitemsummary();
 	}
 	
 }

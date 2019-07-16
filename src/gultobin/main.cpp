@@ -47,10 +47,24 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <unistd.h>
 #endif
 
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+#include <signal.h>
+#include <string.h>
+#endif
+
+
 char* progname;
 namespace gultobin {
 	void doit(int maxsampleindex);
 }
+
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+void segfault_sigaction(int signal, siginfo_t *si, void *arg)
+{
+	fprintf(stderr, "%s: Segment fault at address: %p\n", progname, si->si_addr);
+	exit(0);
+}
+#endif
 
 void help()
 {

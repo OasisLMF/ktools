@@ -702,6 +702,56 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			x.loss = loss;
 		}
 		break;
+		case 26:// insurance only
+		{
+			OASIS_FLOAT ded1 = 0;
+			OASIS_FLOAT ded2 = 0;
+			OASIS_FLOAT ded3 = 0;
+			for (auto y : profile.tc_vec) {
+				if (y.tc_id == deductible_1) ded1 = y.tc_val;
+				if (y.tc_id == deductible_2) ded2 = y.tc_val;
+				if (y.tc_id == deductible_3) ded3 = y.tc_val;
+			}
+			// Function 26: Applies a min and max deductible on deductible as an amount
+			OASIS_FLOAT loss = 0;
+			OASIS_FLOAT accumulated_limit = 0;
+			OASIS_FLOAT loss_adjustment = 0;
+
+			if (ded1 + x.effective_deductible > ded3) {
+				loss = x.loss + x.effective_deductible - ded3;
+				if (loss < 0) loss = 0;
+				loss_adjustment = loss - x.loss;
+				x.effective_deductible = x.effective_deductible + (x.loss - loss);
+				if (x.limit_surplus > 0 ) {
+					accumulated_limit = x.loss;
+					if (loss > accumulated_limit) loss = accumulated_limit;
+					x.limit_surplus = x.limit_surplus + loss_adjustment;
+				}
+				//x.retained_loss = x.retained_loss + (x.loss - loss);
+			}
+			else {
+				if (ded1 + x.effective_deductible < ded2) {
+					loss = x.loss + x.effective_deductible - ded2;
+					if (loss < 0) loss = 0;
+					loss_adjustment = loss - x.loss;
+					x.effective_deductible = x.effective_deductible + (x.loss - loss);
+					if (x.limit_surplus > 0 ) {
+						accumulated_limit = x.loss;
+						loss = loss + x.limit_surplus;
+						if (loss > accumulated_limit) loss = accumulated_limit;
+						x.limit_surplus = x.limit_surplus + loss_adjustment;
+					}					
+					//x.retained_loss = x.retained_loss + (x.loss - loss);
+				}
+				else {
+					loss = x.loss - ded1;
+					if (loss < 0) loss = 0;
+					x.effective_deductible = x.effective_deductible + (x.loss - loss);
+					//x.retained_loss = x.retained_loss + (x.loss - loss);		
+				}
+			}			
+			x.loss = loss;
+		}
 		default:
 		{
 			fprintf(stderr, "Unknown calc rule %d\n", profile.calcrule_id);

@@ -164,6 +164,7 @@ AC_CONFIG_FILES([
 		 src/fmprofilebinconv/Makefile
 		 src/ktgetmem/Makefile
 		 src/validateitems/Makefile
+		 src/validatedamagebin/Makefile
 		 src/summarycalctobin/Makefile
 		 src/summaryindex/Makefile
 		 src/kunit/Makefile

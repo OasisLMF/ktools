@@ -75,7 +75,7 @@ bool getitems(std::map<item_map_key, std::vector<item_map_rec> > &item_map)
 }
 
 
-bool getcoverages(std::vector<OASIS_FLOAT> &coverages)
+void getcoverages(std::vector<OASIS_FLOAT> &coverages)
 {
 	FILE *fin = fopen(COVERAGES_FILE, "rb");
 	if (fin == NULL) {
@@ -100,7 +100,6 @@ bool getcoverages(std::vector<OASIS_FLOAT> &coverages)
 	}
 
 	fclose(fin);
-	return true;
 
 }
 
@@ -160,9 +159,9 @@ void doit(const gulcalcopts &opt)
 	if (opt.itemLevelOutput == true) itmWriter = itemWriter;
 	if (opt.coverageLevelOutput == true) covWriter = coverageWriter;
 
-	gulcalc g(damagebindictionary_vec, coverages, item_map, rnd, opt.gul_limit, opt.rndopt, opt.debug, opt.samplesize, itmWriter, covWriter, iGetrec,opt.rand_seed);
-	if (opt.mode == 0) g.mode0();
-	if (opt.mode == 1) g.mode1();
+	gulcalc g(damagebindictionary_vec, coverages, item_map, rnd, opt.loss_threshold, opt.rndopt, opt.debug, opt.samplesize, itmWriter, covWriter, iGetrec,opt.rand_seed);
+	if (opt.mode == 0) g.mode0();		// classic gulcalc
+	if (opt.mode == 1) g.mode1();		// first type of back allocation
 
 	return;
 

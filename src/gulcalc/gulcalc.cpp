@@ -50,6 +50,9 @@
 #include <chrono>
 #include <thread>
 
+#include <algorithm> 
+
+
 #include "../include/oasis.h"
 
 

@@ -154,13 +154,13 @@ void gulcalc::clearmode1_data()
 void gulcalc::outputmode1data(int event_id)
 {
 	
-	for (int j = 1; j < mode1_.size(); j++) {
+	for (int j = 1; j < mode1_.size(); j++) {	// iterate over coverage id
 		// map of item to a vector of
 		std::map<int, std::vector< gulSampleslevelRec> > gxi;
+		OASIS_FLOAT tiv = 0;
 		if (mode1_[j].size() > 0) {
-			for (int i = 0; i < mode1_[j].size(); i++) {	// now the sidx loop
-				OASIS_FLOAT tiv = (*coverages_)[j];
-
+			tiv = (*coverages_)[j];			
+			for (int i = 0; i < mode1_[j].size(); i++) {	// now the sidx loop				
 					splittiv(mode1_[j][i], tiv);
 					auto iter = mode1_[j][i].begin();
 					while (iter != mode1_[j][i].end()) {	// now iterate over valid item_id,losses
@@ -187,11 +187,16 @@ void gulcalc::outputmode1data(int event_id)
 				g.sidx = iter2->sidx;
 				g.loss = iter2->loss;
 				gulrows.push_back(g);
-				//itemoutputgul(g);
+				if (g.sidx == -1) {
+					g.sidx = -3;
+					g.loss = tiv / gxi.size();
+					gulrows.push_back(g);
+				}
 				iter2++;
 			}
 			iter++;
 		}
+
 
 		sort(gulrows.begin(), gulrows.end());
 		auto v_iter = gulrows.begin();

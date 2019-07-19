@@ -93,14 +93,17 @@ struct gulcalcopts {
 	bool itemLevelOutput = false;
 	bool coverageLevelOutput = false;
 	int samplesize = -1;
-	double gul_limit = 0.0;
+	double loss_threshold = 0.0;
 	bool debug = false;
 	FILE *itemout = stdout;
 	FILE *covout = stdout;
 	int mode = 0;		// default mode = 0 
 };
 
-
+struct gulItemIDLoss {
+	int item_id;
+	double loss;
+};
 class gulcalc  {
 private:
 	getRands *rnd_;
@@ -109,12 +112,12 @@ private:
 	const std::vector<OASIS_FLOAT> *coverages_;
 	const std::vector<damagebindictionary> *damagebindictionary_vec_;
 	void gencovoutput(gulcoverageSampleslevel &gc);
-	void gencovoutputx(gulcoverageSampleslevel &gc);
+	void genmode1output(gulitemSampleslevel& gc, int coverage_id);
 	std::vector<std::vector<OASIS_FLOAT>> cov_;
-	std::map<int, std::vector<OASIS_FLOAT>> covx_;
+	std::vector<std::vector<std::vector<gulItemIDLoss>>> mode1_;
 	void covoutputgul(gulcoverageSampleslevel &gc);
 	void outputcoveragedata(int event_id);
-	void outputcoveragedatax(int event_id);
+	void outputmode1data(int event_id);
 	void itemoutputgul(gulitemSampleslevel &gg);
 	void(*itemWriter_)(const void *ibuf, int size, int count);
 	void(*coverageWriter_)(const void *ibuf, int size, int count);
@@ -126,7 +129,7 @@ private:
 	unsigned char *cbuf_;	// coverage level buffer
 	int itembufoffset_ = 0;
 	int covbufoffset_ = 0;
-	double gul_limit_;
+	double loss_threshold_;
 	rd_option rndopt_;
 	bool debug_;
 	int samplesize_;
@@ -135,11 +138,13 @@ private:
 	long long p1_;
 	long long p2_;
 	long long p3_;
+	void clearmode1_data();
 public:	
 	void processrec(char *rec, int recsize);
-	gulcalc(const std::vector<damagebindictionary> &damagebindictionary_vec,const std::vector<OASIS_FLOAT> &tivs,
+	void processrec_mode1(char* rec, int recsize);
+	 gulcalc(const std::vector<damagebindictionary> &damagebindictionary_vec,const std::vector<OASIS_FLOAT> &tivs,
 		const std::map<item_map_key, std::vector<item_map_rec> > &item_map, getRands &rnd, 
-		double gul_limit,
+		double loss_threshold,
 		//bool userandomtable,
 		rd_option rndopt,
 		bool debug,
@@ -152,6 +157,7 @@ public:
 		damagebindictionary_vec_ = &damagebindictionary_vec;
 		coverages_ = &tivs;
 		cov_.resize(coverages_->size());
+		mode1_.resize(coverages_->size());
 		item_map_ = &item_map;
 		rnd_ = &rnd;
 
@@ -162,7 +168,7 @@ public:
 		cbuf_ = new unsigned char[bufsize + sizeof(gulitemSampleslevel)]; // make the allocation bigger by 1 record to avoid overrunning
 		//TODO: when using double precision, these buffers above are overflowing,
 		//the hack fix is to replace sizeof(gulitemSampleslevel) with 2*sizeof(gulitemSampleslevel)
-		gul_limit_ = gul_limit;
+		loss_threshold_ = loss_threshold;
 		rndopt_ = rndopt;				
 		debug_ = debug;
 		samplesize_ = samplesize;
@@ -172,37 +178,7 @@ public:
 		p2_ = rnd_->getp2((unsigned int)p1_);  // prime no p2
 		p3_ = rnd_->getp2((unsigned int)samplesize_);	// use as additional offset to stop overlapping of random numbers 
 		rand_seed_ = rand_seed;
-	}
-	gulcalc(const std::vector<damagebindictionary> &damagebindictionary_vec, const std::vector<OASIS_FLOAT> &tivs,
-		const std::map<item_map_key, std::vector<item_map_rec> > &item_map, getRands &rnd,
-		const gulcalcopts &opt,
-		void(*itemWriter)(const void *ibuf, int size, int count),
-		void(*coverageWriter)(const void *ibuf, int size, int count),
-		bool(*iGetrec)(char *rec, int recsize)
-	) {
-		damagebindictionary_vec_ = &damagebindictionary_vec;
-		coverages_ = &tivs;
-		cov_.resize(coverages_->size());
-		item_map_ = &item_map;
-		rnd_ = &rnd;
-		itemWriter_ = itemWriter;
-		coverageWriter_ = coverageWriter;
-		iGetrec_ = iGetrec;
-		ibuf_ = new unsigned char[bufsize + sizeof(gulitemSampleslevel)]; // make the allocation bigger by 1 record to avoid overrunning
-		cbuf_ = new unsigned char[bufsize + sizeof(gulitemSampleslevel)]; // make the allocation bigger by 1 record to avoid overrunning
-		//TODO: when using double precision, these buffers above are overflowing,
-		//the hack fix is to replace sizeof(gulitemSampleslevel) with 2*sizeof(gulitemSampleslevel)
-		gul_limit_ = opt.gul_limit;
-		rndopt_ = opt.rndopt;
-		debug_ = opt.debug;
-		samplesize_ = opt.samplesize;
-		isFirstItemEvent_ = true;
-		isFirstCovEvent_ = true;
-		p1_ = rnd_->getp1();	// prime p1	make these long to force below expression to not have sign problem
-		p2_ = rnd_->getp2((unsigned int)p1_);  // prime no p2
-		p3_ = rnd_->getp2((unsigned int)samplesize_);	// use as additional offset to stop overlapping of random numbers 
-		rand_seed_ = opt.rand_seed;
-	}
+	}	
 	~gulcalc() {
 		delete [] ibuf_;
 		delete [] cbuf_;

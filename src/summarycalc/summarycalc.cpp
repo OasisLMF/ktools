@@ -159,6 +159,41 @@ void summarycalc::init_o_to_s()
 		if (fout[i] != nullptr) co_to_s[i] = new coverage_id_or_output_id_to_Summary_id;
 	}
 }
+void summarycalc::loaditemtocoverage()
+{
+	FILE* fin = NULL;
+	std::string file = ITEMS_FILE;
+	if (inputpath_.length() > 0) {
+		file = inputpath_ + file.substr(5);
+	}
+	fin = fopen(file.c_str(), "rb");
+	if (fin == NULL) {
+		fprintf(stderr, "%s: cannot open %s\n", __func__, file.c_str());
+		exit(EXIT_FAILURE);
+	}
+
+	flseek(fin, 0L, SEEK_END);
+	long long sz = fltell(fin);
+	flseek(fin, 0L, SEEK_SET);
+	int last_item_id = 0;
+	unsigned int nrec = (unsigned int)sz / (unsigned int)sizeof(item);
+	item_to_coverage_.resize(nrec + 1, 0.0);
+
+	item itm;
+	size_t i = fread(&itm, sizeof(itm), 1, fin);
+	while (i != 0) {
+		last_item_id++;
+		if (itm.id != last_item_id) {
+			fprintf(stderr, "Item ids are not contiguous or do not start from one");
+			exit(-1);
+		}
+		last_item_id = itm.id;
+		item_to_coverage_[itm.id] = itm.coverage_id;
+		i = fread(&itm, sizeof(itm), 1, fin);
+	}
+	fclose(fin);
+
+}
 bool summarycalc::loadcoverages()
 {
 	std::string file = COVERAGES_FILE;
@@ -390,6 +425,7 @@ void summarycalc::dosummary(int sample_size,int event_id,int coverage_or_output_
 void summarycalc::dogulitemsummary()
 {
 	loadcoverages();
+	loaditemtocoverage();
 	loadgulsummaryxref();
 	outputstreamtype();
 	unsigned int streamtype = 0;
@@ -414,7 +450,8 @@ void summarycalc::dogulitemsummary()
 					i = fread(&gr, sizeof(gr), 1, stdin);
 					if (i == 0) break;
 					if (gr.sidx == 0) break;
-					dosummary(samplesize, gh.event_id, gh.item_id, gr.sidx, gr.loss, coverages_[gh.item_id]);
+					int coverage_id = item_to_coverage_[gh.item_id];
+					dosummary(samplesize, gh.event_id, coverage_id, gr.sidx, gr.loss, coverages_[coverage_id]);
 				}
 			}
 			return;

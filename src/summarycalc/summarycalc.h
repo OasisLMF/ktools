@@ -56,7 +56,7 @@ typedef std::vector<int> coverage_id_or_output_id_to_Summary_id;	// will turn in
 //typedef std::map<int, int> output_id_to_Summary_id;		// will turn into vectors once code is working
 
 class summarycalc {
-	enum input_type {UNKNOWN,GUL_COVERAGE_STREAM,GUL_ITEM_STREAM,FM_STREAM};
+	enum input_type {UNKNOWN,GUL_COVERAGE_STREAM,GUL_ITEM_STREAM,FM_STREAM,GUL_NEW_ITEM_STREAM};
 private:
 	int min_summary_id_[MAX_SUMMARY_SETS] = { MAX_SUMMARY_ID ,MAX_SUMMARY_ID , MAX_SUMMARY_ID , MAX_SUMMARY_ID , MAX_SUMMARY_ID , MAX_SUMMARY_ID , MAX_SUMMARY_ID , MAX_SUMMARY_ID , MAX_SUMMARY_ID  ,MAX_SUMMARY_ID };  // min should be equal to one											  
 	int max_summary_id_[MAX_SUMMARY_SETS] = { -1,-1,-1,-1,-1,-1,-1,-1,-1,-1 };
@@ -68,6 +68,7 @@ private:
 	//bool *bsummary;
 	std::vector<OASIS_FLOAT> coverages_;
 	std::vector<OASIS_FLOAT> outputs_;
+	std::vector<int> item_to_coverage_;
 	input_type inputtype_ = UNKNOWN;
 	std::string inputpath_;
 	bool zerooutput_ = false;
@@ -92,6 +93,7 @@ private:
 	void processsummeryset(int summaryset, int event_id, int coverage_id, int sidx, OASIS_FLOAT gul);
 	void dosummary(int sample_size, int event_id, int coverage_id, int sidx, OASIS_FLOAT gul, OASIS_FLOAT expval);
 	bool loadcoverages();
+	void loaditemtocoverage();
 
 public:
 	summarycalc();
@@ -102,6 +104,7 @@ public:
 	void openpipe(int summary_id, const std::string &pipe);
 	void setgulcoveragemode() { inputtype_ = GUL_COVERAGE_STREAM; };
 	void setgulitemmode() { inputtype_ = GUL_ITEM_STREAM; };
+	void setgulnewitemmode() { inputtype_ = GUL_NEW_ITEM_STREAM; };
 	void setfmmode() { inputtype_ = FM_STREAM; };
 	void setinputpath(const std::string &s) { inputpath_ = s; }
 	void enablezerooutput() { zerooutput_ = true; }

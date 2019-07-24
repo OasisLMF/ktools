@@ -6,7 +6,7 @@ export CXX=/opt/clang/bin/clang++
 LOG_BUILD='/tmp/log/ktools-build.log'
 ARCH_TARGET=$(uname --m)
 BIN_TARGET='/var/ktools'
-TAR_TARGET="/var/ktools/tar/ktools_$ARCH_TARGET.tar.gz"
+TAR_TARGET="/var/ktools/tar/Linux_$ARCH_TARGET.tar.gz"
 mkdir -p $(dirname $LOG_BUILD)
 mkdir -p $(dirname $TAR_TARGET)
 

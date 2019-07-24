@@ -1,7 +1,7 @@
 
 node {
     hasFailed = false
-    //sh 'sudo /var/lib/jenkins/jenkins-chown'
+    sh 'sudo /var/lib/jenkins/jenkins-chown'
     deleteDir() // wipe out the workspace
 
     properties([
@@ -49,16 +49,49 @@ node {
     
         // Create static build CLANG 
         if (params.PUBLISH){
-            stage("Ktools Builder: CLANG") {
+            stage("Ktools Builder: x86_64") {
                 dir(ktools_workspace) {
                     //  Build Static TAR using clang
                     sh "docker build -f $env.KTOOLS_IMAGE_CLANG -t ktools-builder ."
-                    sh 'docker run -v $(pwd):/var/ktools ktools-builder"
+                    sh 'docker run -v $(pwd):/var/ktools ktools-builder'
                     
-                    //Archive TAR to CI
+                    // Archive TAR to CI
                     archiveArtifacts artifacts: 'tar/**/*.*'
                 }
             }
+
+            // Tag and release 
+            stage("Create Release: GitHub") {
+                dir(ktools_workspace) {
+                    sshagent (credentials: [git_creds]) {
+                        sh "git tag ${RELEASE_TAG}"
+                        sh "git  push origin ${RELEASE_TAG}"
+                    }
+                    
+                    withCredentials([string(credentialsId: 'github-api-token', variable: 'gh_token')]) {
+                        String repo = "OasisLMF/ktools"
+
+                        def json_request = readJSON text: '{}'             
+                        json_request['tag_name'] = RELEASE_TAG
+                        json_request['target_commitish'] = 'master'
+                        json_request['name'] = RELEASE_TAG
+                        json_request['body'] = ""
+                        json_request['draft'] = false
+                        json_request['prerelease'] = false
+                        writeJSON file: 'gh_request.json', json: json_request
+                        sh 'curl -XPOST -H "Authorization:token ' + gh_token + "\" --data @gh_request.json https://api.github.com/repos/$repo/releases > gh_response.json"
+
+                        // Fetch release ID and post build tar
+                        def response = readJSON file: "gh_response.json" 
+                        release_id = response['id']
+                        dir('tar') {
+                            filename='Linux_x86_64.tar.gz'
+                            sh 'curl -XPOST -H "Authorization:token ' + gh_token + '" -H "Content-Type:application/octet-stream" --data-binary @' + filename + " https://uploads.github.com/repos/$repo/releases/$release_id/assets?name=" + filename
+                        }    
+                    }
+                }
+            }
+        
         // Test dynamic linked builds GCC 
         } else {
             gcc_vers = params.TEST_GCC.split()
@@ -73,6 +106,7 @@ node {
                 }
             }
         }
+
     } catch(hudson.AbortException | org.jenkinsci.plugins.workflow.steps.FlowInterruptedException buildException) {
         hasFailed = true
         error('Build Failed')
@@ -93,16 +127,5 @@ node {
 
         // Handle JOB Publish
         // TODO: append to CHANGELOG
-        if(! hasFailed && params.PUBLISH){
-            sshagent (credentials: [git_creds]) {
-                dir(ktools_workspace) {
-                    sh "git tag ${RELEASE_TAG}"
-                    sh "git  push origin ${RELEASE_TAG}"
-
-                    //POST TAR TO GH RELEASE
-                    //  -- Hook into github API and upload tar.gz to matching tag
-                }
-            }
-        }
     }
 }

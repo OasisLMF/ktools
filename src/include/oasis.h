@@ -326,7 +326,7 @@ inline void initstreams(std::string inFile="", std::string outFile="")
 	_setmode(_fileno(stdout), O_BINARY);
 	_setmode(_fileno(stdin), O_BINARY);
 #else
-	freopen(NULL, "wb", stdout);
+	freopen(NULL, "a+b", stdout);
 	freopen(NULL, "rb", stdin);
 #endif
 

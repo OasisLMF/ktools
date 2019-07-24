@@ -22,7 +22,8 @@ node {
     String git_creds = "1335b248-336a-47a9-b0f6-9f7314d6f1f4"
 
     // Set Global ENV
-    env.KTOOLS_IMAGE     = "jenkins/Dockerfile.build-ktools"                     // Docker image for worker
+    env.KTOOLS_IMAGE_GCC   = "jenkins/Dockerfile.build-ktools"   // Docker image for testing gcc build
+    env.KTOOLS_IMAGE_CLANG = "jenkins/Dockerfile.clang-build"    // Docker image for building static build of ktools
 
     try {
         stage('Clone: Ktools') {
@@ -41,19 +42,34 @@ node {
                 }
             }
         }
+        // Print Build Params here 
         stage('Shell Env'){
-            // Print Build Params here 
             sh "env"
         }
-        
-        gcc_vers = params.TEST_GCC.split()
-        for(int i=0; i < gcc_vers.size(); i++) {
-            stage("Ktools Tester: GCC: ${gcc_vers[i]}") {
+    
+        // Create static build CLANG 
+        if (params.PUBLISH){
+            stage("Ktools Builder: CLANG") {
                 dir(ktools_workspace) {
-                    // Build & run ktools testing image
-                    sh "sed -i 's/FROM.*/FROM gcc:${gcc_vers[i]}/g' $env.KTOOLS_IMAGE"
-                    sh "docker build -f $env.KTOOLS_IMAGE -t ktools-runner:${gcc_vers[i]} ."
-                    sh "docker run ktools-runner:${gcc_vers[i]}"
+                    //  Build Static TAR using clang
+                    sh "docker build -f $env.KTOOLS_IMAGE_CLANG -t ktools-builder ."
+                    sh 'docker run -v $(pwd):/var/ktools ktools-builder"
+                    
+                    //Archive TAR to CI
+                    archiveArtifacts artifacts: 'tar/**/*.*'
+                }
+            }
+        // Test dynamic linked builds GCC 
+        } else {
+            gcc_vers = params.TEST_GCC.split()
+            for(int i=0; i < gcc_vers.size(); i++) {
+                stage("Ktools Tester: GCC ${gcc_vers[i]}") {
+                    dir(ktools_workspace) {
+                        // Build & run ktools testing image
+                        sh "sed -i 's/FROM.*/FROM gcc:${gcc_vers[i]}/g' $env.KTOOLS_IMAGE_GCC"
+                        sh "docker build -f $env.KTOOLS_IMAGE_GCC -t ktools-runner:${gcc_vers[i]} ."
+                        sh "docker run ktools-runner:${gcc_vers[i]}"
+                    }
                 }
             }
         }
@@ -80,8 +96,11 @@ node {
         if(! hasFailed && params.PUBLISH){
             sshagent (credentials: [git_creds]) {
                 dir(ktools_workspace) {
-                    sh "git tag ${TAG_RELEASE}"
-                    sh "git  push origin ${TAG_RELEASE}"
+                    sh "git tag ${RELEASE_TAG}"
+                    sh "git  push origin ${RELEASE_TAG}"
+
+                    //POST TAR TO GH RELEASE
+                    //  -- Hook into github API and upload tar.gz to matching tag
                 }
             }
         }

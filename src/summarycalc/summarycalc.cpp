@@ -258,9 +258,10 @@ void summarycalc::loadgulsummaryxref()
 	fclose(fin);
 }
 
-void summarycalc::loadfmsummaryxref()
+void summarycalc::loadsummaryxref(const std::string& filename)
 {
-	std::string file = FMSUMMARYXREF_FILE;
+	//std::string file = FMSUMMARYXREF_FILE;
+	std::string file = filename;
 	if (inputpath_.length() > 0) {
 		file = inputpath_ + file.substr(5);
 	}
@@ -289,7 +290,7 @@ void summarycalc::loadfmsummaryxref()
 		i = fread(&s, sizeof(fmsummaryxref), 1, fin);
 	}
 
-	fclose(fin);
+		fclose(fin);
 }
 
 void summarycalc::outputsummaryset(int sample_size, int summary_set, int event_id)
@@ -547,7 +548,7 @@ void summarycalc::dosummaryprocessing(int samplesize)
 }
 void summarycalc::dofmsummary()
 {
-	loadfmsummaryxref();
+	loadsummaryxref(FMSUMMARYXREF_FILE);
 	outputstreamtype();
 	unsigned int streamtype = 0;
 	int i = fread(&streamtype, sizeof(streamtype), 1, stdin);
@@ -575,9 +576,7 @@ void summarycalc::dofmsummary()
 // the item stream is going behave more like the fm stream execept the input will be of type item not fm 
 void summarycalc::dogulitemsummary()
 {
-	loadcoverages();
-	loaditemtocoverage();	
-	loadgulsummaryxref();
+	loadsummaryxref(GULSUMMARYXREF_FILE);
 	outputstreamtype();
 	unsigned int streamtype = 0;
 	int i = fread(&streamtype, sizeof(streamtype), 1, stdin);

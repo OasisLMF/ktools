@@ -79,7 +79,7 @@ private:
 	void alloc_sse_array();
 	void init_c_to_s();
 	void init_o_to_s();
-	void loadfmsummaryxref();
+	void loadsummaryxref(const std::string &filename);
 	void loadgulsummaryxref();
 	void outputsummaryset(int sample_size, int summary_set, int event_id);	
 	void outputstreamtype(int summary_set);

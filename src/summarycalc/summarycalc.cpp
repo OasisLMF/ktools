@@ -148,15 +148,15 @@ void summarycalc::init_c_to_s()
 {
 	for (int i = 0; i < MAX_SUMMARY_SETS; i++) {
 		if (fout[i] != nullptr) {
-			co_to_s[i] = new coverage_id_or_output_id_to_Summary_id;
-			co_to_s[i]->resize(coverages_.size());
+			co_to_s_[i] = new coverage_id_or_output_id_to_Summary_id;
+			co_to_s_[i]->resize(coverages_.size());
 		}
 	}
 }
 void summarycalc::init_o_to_s()
 {
 	for (int i = 0; i < MAX_SUMMARY_SETS; i++) {
-		if (fout[i] != nullptr) co_to_s[i] = new coverage_id_or_output_id_to_Summary_id;
+		if (fout[i] != nullptr) co_to_s_[i] = new coverage_id_or_output_id_to_Summary_id;
 	}
 }
 void summarycalc::loaditemtocoverage()
@@ -250,7 +250,7 @@ void summarycalc::loadgulsummaryxref()
 			if (s.summary_id < min_summary_id_[s.summaryset_id]) min_summary_id_[s.summaryset_id] = s.summary_id;
 			if (s.summary_id > max_summary_id_[s.summaryset_id]) max_summary_id_[s.summaryset_id] = s.summary_id;
 			//co_to_s[s.summaryset_id]->insert({ s.coverage_id,s.summary_id });
-			(*co_to_s[s.summaryset_id])[s.coverage_id] = s.summary_id ;
+			(*co_to_s_[s.summaryset_id])[s.coverage_id] = s.summary_id ;
 		}
 		i = fread(&s, sizeof(gulsummaryxref), 1, fin);
 	}
@@ -283,8 +283,8 @@ void summarycalc::loadfmsummaryxref()
 			if (s.summary_id < min_summary_id_[s.summaryset_id]) min_summary_id_[s.summaryset_id] = s.summary_id;
 			if (s.summary_id > max_summary_id_[s.summaryset_id]) max_summary_id_[s.summaryset_id] = s.summary_id;
 			// co_to_s[s.summaryset_id]->insert({ s.output_id,s.summary_id });
-			if ((*co_to_s[s.summaryset_id]).size() < (s.output_id + 1)) (*co_to_s[s.summaryset_id]).resize(s.output_id + 1, 0);
-			(*co_to_s[s.summaryset_id])[s.output_id] = s.summary_id ;
+			if ((*co_to_s_[s.summaryset_id]).size() < (s.output_id + 1)) (*co_to_s_[s.summaryset_id]).resize(s.output_id + 1, 0);
+			(*co_to_s_[s.summaryset_id])[s.output_id] = s.summary_id ;
 		}
 		i = fread(&s, sizeof(fmsummaryxref), 1, fin);
 	}
@@ -386,7 +386,7 @@ void summarycalc::outputsummary(int sample_size,int event_id)
 void summarycalc::processsummeryset(int summaryset, int event_id, int coverage_id, int sidx, OASIS_FLOAT gul)
 {
 	loss_exp **ssl = sssl[summaryset];
-	coverage_id_or_output_id_to_Summary_id &p = *co_to_s[summaryset];
+	coverage_id_or_output_id_to_Summary_id &p = *co_to_s_[summaryset];
 	int summary_id = p[coverage_id];	
 	ssl[summary_id][sidx+2].loss += gul;
 }
@@ -409,8 +409,15 @@ void summarycalc::dosummary(int sample_size,int event_id,int coverage_or_output_
 	if (coverage_or_output_id != last_coverage_or_output_id) {
   		for (int i = 0; i < MAX_SUMMARY_SETS; i++) {
 			if (fout[i] != nullptr) {
-				coverage_id_or_output_id_to_Summary_id &p = *co_to_s[i];
-				int summary_id = p[coverage_or_output_id];
+				coverage_id_or_output_id_to_Summary_id &p = *co_to_s_[i];
+				int summary_id = 0;
+				if (item_to_coverage_.size() > 0) {
+					int cov_id = item_to_coverage_[coverage_or_output_id];
+					summary_id = p[cov_id];
+				}
+				else {
+					summary_id = p[coverage_or_output_id];
+				}
 				OASIS_FLOAT *se = sse[i];
 				se[summary_id] += expval;
 			}
@@ -418,11 +425,15 @@ void summarycalc::dosummary(int sample_size,int event_id,int coverage_or_output_
 		last_coverage_or_output_id = coverage_or_output_id;
 	}
 	for (int i = 0; i < MAX_SUMMARY_SETS; i++) {
-		if (fout[i] != nullptr) processsummeryset(i, event_id, last_coverage_or_output_id, sidx, gul);
+		int cov_id = last_coverage_or_output_id;
+		if (item_to_coverage_.size() > 0) {
+			cov_id = item_to_coverage_[last_coverage_or_output_id];
+		}
+		if (fout[i] != nullptr) processsummeryset(i, event_id, cov_id, sidx, gul);
 	}
 }
-
-void summarycalc::dogulitemsummary()
+// item like stream
+void summarycalc::dogulitemxsummary()
 {
 	loadcoverages();
 	loaditemtocoverage();
@@ -505,46 +516,88 @@ void summarycalc::dogulcoveragesummary()
 	
 	::exit(-1);
 }
-
+void summarycalc::dosummaryprocessing(int samplesize)
+{
+	alloc_sssl_array(samplesize);
+	reset_sssl_array(samplesize);
+	alloc_sse_array();
+	reset_sse_array();
+	outputsamplesize(samplesize);
+	fmlevelhdr fh;
+	OASIS_FLOAT expure_val = 0;
+	bool havedata = false;
+	int i = 1;
+	while (i == 1) {
+		i = fread(&fh, sizeof(fh), 1, stdin);
+		if (i > 0 && havedata == false) havedata = true;
+		while (i != 0) {
+			sampleslevelRec sr;
+			i = fread(&sr, sizeof(sr), 1, stdin);
+			if (i == 0) break;
+			if (sr.sidx == 0) break;
+			if (sr.sidx == -3) {
+				expure_val = sr.loss;
+			}
+			else {
+				dosummary(samplesize, fh.event_id, fh.output_id, sr.sidx, sr.loss, expure_val);
+			}
+		}
+	}
+	if (havedata) outputsummary(samplesize, fh.event_id);
+}
 void summarycalc::dofmsummary()
 {
 	loadfmsummaryxref();
 	outputstreamtype();
 	unsigned int streamtype = 0;
 	int i = fread(&streamtype, sizeof(streamtype), 1, stdin);
-	if (isFMStream(streamtype) == true) {
-		int stream_type = streamtype & streamno_mask;
-		unsigned int samplesize = 0;
-		i = fread(&samplesize, sizeof(samplesize), 1, stdin);
-		alloc_sssl_array(samplesize);
-		reset_sssl_array(samplesize);
-		alloc_sse_array();
-		reset_sse_array();
-		outputsamplesize(samplesize);
-		fmlevelhdr fh;
-		OASIS_FLOAT expure_val = 0;
-		bool havedata = false;
-		while (i == 1) {
-			i = fread(&fh, sizeof(fh), 1, stdin);
-			if (i > 0 && havedata == false) havedata = true;
-			while (i != 0) {
-				sampleslevelRec sr;
-				i = fread(&sr, sizeof(sr), 1, stdin);
-				if (i == 0) break;
-				if (sr.sidx == 0) break;
-				if (sr.sidx == -3) {
-					expure_val = sr.loss;
-				}else {
-					dosummary(samplesize, fh.event_id, fh.output_id, sr.sidx, sr.loss, expure_val);
-				}				
-			}			
+	if (i) {
+		if (isFMStream(streamtype) == true) {
+			int stream_type = streamtype & streamno_mask;
+			unsigned int samplesize = 0;
+			i = fread(&samplesize, sizeof(samplesize), 1, stdin);
+			if (i)	dosummaryprocessing(samplesize);
+			else std::cerr << "summarycalc: Read error on stream\n";
+			return;
 		}
-		if (havedata) outputsummary(samplesize, fh.event_id);
-		return;
-	}else {
-		std::cerr << "summarycalc: Not a fm stream\n";
-		std::cerr << "summarycalc: invalid stream type: " << streamtype << "\n";
-	}	
+		else {
+			std::cerr << "summarycalc: Not a fm stream\n";
+			std::cerr << "summarycalc: invalid stream type: " << streamtype << "\n";
+		}
+	}
+	else {
+		std::cerr << "summarycalc: Read error on stream\n";
+	}
+	::exit(-1);
+
+}
+
+// the item stream is going behave more like the fm stream execept the input will be of type item not fm 
+void summarycalc::dogulitemsummary()
+{
+	loadcoverages();
+	loaditemtocoverage();	
+	loadgulsummaryxref();
+	outputstreamtype();
+	unsigned int streamtype = 0;
+	int i = fread(&streamtype, sizeof(streamtype), 1, stdin);
+	if (i) {
+		if (isGulStream(streamtype) == true) {
+			int stream_type = streamtype & streamno_mask;
+			unsigned int samplesize = 0;
+			i = fread(&samplesize, sizeof(samplesize), 1, stdin);
+			if (i)	dosummaryprocessing(samplesize);
+			else std::cerr << "summarycalc: Read error on stream\n";
+			return;
+		}
+		else {
+			std::cerr << "summarycalc: Not a fm stream\n";
+			std::cerr << "summarycalc: invalid stream type: " << streamtype << "\n";
+		}
+	}
+	else {
+		std::cerr << "summarycalc: Read error on stream\n";
+	}
 	::exit(-1);
 
 }
@@ -565,5 +618,7 @@ void summarycalc::doit()
 	if (inputtype_ == GUL_ITEM_STREAM) {
 		dogulitemsummary();
 	}
-	
+	if (inputtype_ == GUL_ITEMX_STREAM) {
+		dogulitemxsummary();
+	}
 }

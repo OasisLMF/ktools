@@ -62,10 +62,10 @@ void help()
 		"-i [output pipe] - item output\n"
 		"-d debug (output random numbers instead of gul)\n"
 		"-s seed for random number generation (used for debugging)\n"
-		"-a automatically hashed seed driven random number generation (default)\n"
+		"-A automatically hashed seed driven random number generation (default)\n"
 		"-l legacy mechanism driven by random numbers generated dynamically per group - will be removed in future\n"
 		"-L Loss threshold (default 0)\n"
-		"-A alloc rule (default 0)\n"
+		"-a alloc rule (default 0)\n"
 		"-m execution mode (default 0) mode 1\n"
 		"-v version\n"
 		"-h help\n"
@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
 	gulcalcopts gopt;
 	gopt.loss_threshold = 0.000001;
 	progname = argv[0];
-	while ((opt = getopt(argc, argv, "alvhdrA:L:S:c:i:R:s:m:")) != -1) {
+	while ((opt = getopt(argc, argv, "Alvhdra:L:S:c:i:R:s:m:")) != -1) {
 		switch (opt) {
 		case 'S':
 			gopt.samplesize = atoi(optarg);
@@ -86,10 +86,10 @@ int main(int argc, char *argv[])
 		case 'l':
 			gopt.rndopt = rd_option::usecachedvector;
 			break;
-		case 'a':
+		case 'A':
 			gopt.rndopt = rd_option::usehashedseed;
 			break;
-		case 'A':
+		case 'a':
 			gopt.mode = atoi(optarg);	// alloc rule and mode are the same thing
 			break;
 		case 'r':

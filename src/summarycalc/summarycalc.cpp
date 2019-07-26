@@ -581,7 +581,7 @@ void summarycalc::dogulitemsummary()
 	unsigned int streamtype = 0;
 	int i = fread(&streamtype, sizeof(streamtype), 1, stdin);
 	if (i) {
-		if (isGulStream(streamtype) == true) {
+		if (isFMStream(streamtype) == true) {
 			int stream_type = streamtype & streamno_mask;
 			unsigned int samplesize = 0;
 			i = fread(&samplesize, sizeof(samplesize), 1, stdin);

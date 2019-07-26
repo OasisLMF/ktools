@@ -56,9 +56,12 @@ void doit()
 	int gulstream_type = 0;
 	int i = fread(&gulstream_type, sizeof(gulstream_type), 1, stdin);
 	int stream_type = gulstream_type & gulstream_id ;
+	if (stream_type == 0) {
+		stream_type = gulstream_type & loss_stream_id;
+	}
 
-	if (stream_type != gulstream_id) {
-		fprintf(stderr, "%s: Not a gul stream type\n", __func__);
+	if (stream_type != gulstream_id && stream_type != loss_stream_id) {
+		fprintf(stderr, "gultocsv: %s: Not a gul stream type\n", __func__);
 		exit(-1);
 	}
 	stream_type = streamno_mask &gulstream_type;

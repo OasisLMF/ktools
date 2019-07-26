@@ -121,6 +121,7 @@ private:
 	void itemoutputgul(gulitemSampleslevel &gg);
 	void(*itemWriter_)(const void *ibuf, int size, int count);
 	void(*coverageWriter_)(const void *ibuf, int size, int count);
+    void (*lossWriter_)(const void *ibuf, int size, int count);	// loss stream writer
 	bool(*iGetrec_)(char *rec, int recsize);
 	OASIS_FLOAT getgul(damagebindictionary &b, gulGulSamples &g);
 	void output_mean(const item_map_rec &er, OASIS_FLOAT tiv, prob_mean *pp, int bin_count, OASIS_FLOAT &gul_mean, OASIS_FLOAT &std_dev);
@@ -151,6 +152,7 @@ public:
 		int samplesize,
 		void (*itemWriter)(const void *ibuf,int size, int count),
 		void(*coverageWriter)(const void *ibuf,int size, int count),
+        void (*lossWriter)(const void *ibuf, int size, int count),
 		bool(*iGetrec)(char *rec, int recsize),
 		int rand_seed
 		) {
@@ -163,6 +165,7 @@ public:
 
 		itemWriter_ = itemWriter;
 		coverageWriter_ = coverageWriter;
+        lossWriter_ = lossWriter;
 		iGetrec_ = iGetrec;
 		ibuf_ = new unsigned char[bufsize + sizeof(gulitemSampleslevel)]; // make the allocation bigger by 1 record to avoid overrunning
 		cbuf_ = new unsigned char[bufsize + sizeof(gulitemSampleslevel)]; // make the allocation bigger by 1 record to avoid overrunning

@@ -293,9 +293,10 @@ void gulcalc::covoutputgul(gulcoverageSampleslevel &gg)
 
 void gulcalc::itemoutputgul(gulitemSampleslevel &gg)
 {
-	if (itemWriter_ == 0)  return;
+	if (itemWriter_ == 0 && lossWriter_ == 0)  return;
 	if (itembufoffset_ >= bufsize) {
-		itemWriter_(ibuf_, sizeof(unsigned char), itembufoffset_);
+		if (itemWriter_) itemWriter_(ibuf_, sizeof(unsigned char), itembufoffset_);
+		if (lossWriter_) lossWriter_(ibuf_, sizeof(unsigned char), itembufoffset_);
 		itembufoffset_ = 0;
 	}
 
@@ -607,13 +608,19 @@ void gulcalc::init()
 		itemWriter_(&gulstream_type, sizeof(gulstream_type), 1);
 		itemWriter_(&samplesize_, sizeof(samplesize_), 1);
 	}
-
-	gulstream_type = gul_coverage_stream | gulstream_id;
-
+	
 	if (coverageWriter_ != 0) {
+        gulstream_type = gul_coverage_stream | gulstream_id;
 		coverageWriter_(&gulstream_type, sizeof(gulstream_type), 1);
 		coverageWriter_(&samplesize_, sizeof(samplesize_), 1);
 	}
+
+	if (lossWriter_ != 0) {
+            gulstream_type = gul_item_stream | loss_stream_id;
+            lossWriter_(&gulstream_type, sizeof(gulstream_type), 1);
+            lossWriter_(&samplesize_, sizeof(samplesize_), 1);
+    }
+
 	std::this_thread::sleep_for(std::chrono::milliseconds(PIPE_DELAY));
 }
 void gulcalc::mode1()
@@ -654,7 +661,8 @@ void gulcalc::mode1()
 		processrec_mode1(rec, recsize);
 	}
 	outputmode1data(d->event_id);
-	if (itemWriter_)  itemWriter_(ibuf_, sizeof(unsigned char), itembufoffset_);
+	if (itemWriter_) itemWriter_(ibuf_, sizeof(unsigned char), itembufoffset_);
+	if (lossWriter_) lossWriter_(ibuf_, sizeof(unsigned char), itembufoffset_);
 }
 void gulcalc::mode0()
 {
@@ -690,5 +698,6 @@ void gulcalc::mode0()
 	}
 	outputcoveragedata(d->event_id);
 	if (itemWriter_)  itemWriter_(ibuf_, sizeof(unsigned char), itembufoffset_);
+	if (lossWriter_)  lossWriter_(ibuf_, sizeof(unsigned char), itembufoffset_);
 	if (coverageWriter_) coverageWriter_(cbuf_, sizeof(unsigned char), covbufoffset_);
 }

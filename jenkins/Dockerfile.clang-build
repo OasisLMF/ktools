@@ -1,0 +1,11 @@
+FROM rsmmr/clang:latest
+
+RUN apt upgrade -y && \
+    apt-get install -y  build-essential libtool zlib1g-dev autoconf && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY ./jenkins/entrypoint_clang-build.sh /usr/local/bin/build.sh
+#COPY . /var/ktools
+
+WORKDIR /var/ktools
+ENTRYPOINT build.sh

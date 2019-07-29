@@ -80,7 +80,9 @@ const unsigned int cdfstream_id = 0;		// high byte is zero
 const unsigned int gulstream_id = 1 << 24;
 const unsigned int fmstream_id = 2 << 24;
 const unsigned int summarycalc_id = 3 << 24;
-const unsigned int aacalc_id = 4 << 24;
+//const unsigned int aacalc_id = 4 << 24;
+const unsigned int loss_stream_id = 2 << 24;		// This stream (loss stream)  will eventaully be used for both fm and gul. gulstream_id and fmstream_id will be deprecated in the future
+													// the streamid is the same as fmstream_id this is because its stucture is identical eventually we will remove the name fmstream_id
 
 const unsigned int gul_item_stream = 1;
 const unsigned int gul_coverage_stream = 2;
@@ -326,7 +328,7 @@ inline void initstreams(std::string inFile="", std::string outFile="")
 	_setmode(_fileno(stdout), O_BINARY);
 	_setmode(_fileno(stdin), O_BINARY);
 #else
-	freopen(NULL, "wb", stdout);
+	freopen(NULL, "a+b", stdout);
 	freopen(NULL, "rb", stdin);
 #endif
 

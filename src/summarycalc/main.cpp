@@ -81,7 +81,7 @@ int main(int argc, char* argv[])
 	bool noneOutputTrue = true;
 	int truecount = 0;
 	summarycalc f;
-	while ((opt = getopt(argc, argv, "vzhcifgp:0:1:2:3:4:5:6:7:8:9:")) != -1) {
+	while ((opt = getopt(argc, argv, "vzhcixfgp:0:1:2:3:4:5:6:7:8:9:")) != -1) {
 		switch (opt) {
 		case 'g':
 			truecount++;
@@ -94,6 +94,10 @@ int main(int argc, char* argv[])
 		case 'i':
 			truecount++;
 			f.setgulitemmode();
+			break;
+		case 'x':
+			truecount++;
+			f.setgulitemxmode();		// item experimental mode
 			break;
 		case 'f':
 			truecount++;

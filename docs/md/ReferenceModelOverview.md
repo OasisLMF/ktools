@@ -17,7 +17,7 @@ The set of **[core components](CoreComponents.md)** provided in this release is 
 * **fmcalc** performs the insurance and reinsurance loss calculations on the ground up loss samples, mean, and total insured value. The output is a stream of loss samples in one of two financial perspectives: net or gross. The result can be output to a binary file or streamed into summarycalc.
 * **summarycalc** performs a summing of sampled losses according to the user's reporting requirements.  For example this might involve summing coverage losses to regional level, or policy losses to portfolio level.  The output is sampled loss by event_id and summary_id, which represents a meaningful group of losses to the user. 
 
-The standard input and standard output data streams for the core components are covered in the Specification. 
+The standard input and standard output data streams for the core components are covered in the [Specification](Specification.md). 
 
 Figure 1 shows the core components workflow and the required data input files.
 
@@ -50,7 +50,23 @@ The version of the installed components can be found by using the command line p
 
 ```
 $ gulcalc -v
+gulcalc : version: 3.0.7
 ```
+
+Component usage guidance is available using the parameter -h
+
+```
+$ fmcalc -h
+-a set allocrule (default none)
+-M max level (optional)
+-p inputpath (relative or full path)
+-n feed net value (used for reinsurance)
+-O Alloc rule2 optimization off
+-d debug
+-v version
+-h help
+```
+
 The components have additional command line parameters depending on their particular function.  These are described in detail in the following pages.
 
 [Return to top](#referencemodel)

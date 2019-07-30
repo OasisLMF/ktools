@@ -166,6 +166,7 @@ AC_CONFIG_FILES([
 		 src/validateitems/Makefile
 		 src/validatedamagebin/Makefile
 		 src/validatefootprint/Makefile
+		 src/validatevulnerability/Makefile
 		 src/summarycalctobin/Makefile
 		 src/summaryindex/Makefile
 		 src/kunit/Makefile

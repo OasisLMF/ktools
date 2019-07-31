@@ -1,6 +1,12 @@
 Ktools Changelog
 ================
 
+## [v3.1.0](https://github.com/OasisLMF/ktools/releases/tag/v3.1.0)
+* New loss stream type for gulcalc added
+* Fix item stream processing
+* Added support for back allocation to gulcalc
+* Made fm and gulcalc streams symmetric 
+
 ## [v3.0.8](https://github.com/OasisLMF/ktools/releases/tag/v3.0.8)
 * Update to aalcalc
 * Introduced limit_surplus carry through rules

@@ -1,7 +1,7 @@
 ![alt text](../img/banner.jpg "banner")
 # Appendix B: FM Profiles <a id="fmprofiles"></a>
 
-This section specifies the attributes and rules for the following list of profiles.
+This section specifies the attributes and rules for the following list of Financial module profiles.
 
 
 | Profile description                               |calcrule_id |d1   |d2   |d3   |a1   |l1   |s1   |s2   |s3   |
@@ -31,6 +31,7 @@ This section specifies the attributes and rules for the following list of profil
 |reinsurance limit and % placed                     |   23       |     |     |     |     |x    |     |x    |x    |
 |reinsurance excess terms                           |   24       |     |     |     |x    |x    |x    |x    |x    |
 |reinsurance proportional terms                     |   25       |     |     |     |     |     |x    |x    |x    |
+|deductible amount with min and max deductible      |   26       |x    |x    |x    |     |     |     |     |     |
 
 The fields with an x are those which are required by the profile. The full names of the fields are as follows;
 

@@ -25,11 +25,11 @@ Figure 2 shows the workflows for the gultobin component.
 ***
 A component which converts the getmodel output stream, or binary file with the same structure, to a csv file.
 
-##### Stdin stream_id
+##### Standard input stream
 
 | Byte 1 | Bytes 2-4 |  Description      |
 |:-------|-----------|:------------------|
-|    0   |     1     |  getmodel stdout  |
+|    0   |     1     |  cdf              |
 
 A binary file of the same format can be piped into cdftocsv.
 
@@ -62,14 +62,14 @@ Csv file with the following fields;
 <a id="gultocsv"></a>
 ### gultocsv 
 ***
-A component which converts the gulcalc output stream, or binary file with the same structure, to a csv file.
+A component which converts the gulcalc item or coverage stream, or binary file with the same structure, to a csv file.
 
-##### Stdin stream_id
+##### Standard input stream
 
 | Byte 1 | Bytes 2-4 |  Description             |
 |:-------|-----------|:-------------------------|
-|    1   |     1     |  gulcalc item stdout     |
-|    1   |     2     |  gulcalc coverage stdout |
+|    1   |     1     |  gulcalc item            |
+|    1   |     2     |  gulcalc coverage        |
 
 A binary file of the same format can be piped into gultocsv.
 
@@ -88,7 +88,7 @@ $ gultocsv < gulcalci.bin > gulcalci.csv
 ##### Output
 Csv file with the following fields;
 
-gulcalc stream_id=1
+gulcalc item stream 1/1
 
 | Name              | Type   |  Bytes | Description                                                         | Example     |
 |:------------------|--------|--------| :-------------------------------------------------------------------|------------:|
@@ -97,7 +97,7 @@ gulcalc stream_id=1
 | sidx              | int    |    4   | Sample index                                                        |     10      |
 | loss              | float  |    4   | The ground up loss value                                            | 5675.675    |
 
-gulcalc stream_id=2
+gulcalc coverage stream 1/2
 
 | Name              | Type   |  Bytes | Description                                                         | Example     |
 |:------------------|--------|--------| :-------------------------------------------------------------------|------------:|
@@ -113,11 +113,11 @@ gulcalc stream_id=2
 ***
 A component which converts the fmcalc output stream, or binary file with the same structure, to a csv file.
 
-##### Stdin stream_id
+##### Standard input stream
 
 | Byte 1 | Bytes 2-4 |  Description      |
 |:-------|-----------|:------------------|
-|    2   |     1     |  fmcalc stdout    |
+|    2   |     1     |  loss             |
 
 A binary file of the same format can be piped into fmtocsv.
 
@@ -129,7 +129,7 @@ $ fmtocsv < [stdin].bin > [output].csv
 
 ##### Example
 ```
-$ eve 1 1 | getmodel | gulcalc -r -S100 -i - | fmcalc | fmtocsv > fmcalc.csv
+$ eve 1 1 | getmodel | gulcalc -r -S100 -a1 -i - | fmcalc | fmtocsv > fmcalc.csv
 $ fmtocsv < fmcalc.bin > fmcalc.csv 
 ```
 
@@ -150,11 +150,11 @@ Csv file with the following fields;
 ***
 A component which converts the summarycalc output stream, or binary file with the same structure, to a csv file.
 
-##### Stdin stream_id
+##### Standard input stream
 
 | Byte 1 | Bytes 2-4 |  Description           |
 |:-------|-----------|:-----------------------|
-|    3   |     1     |  summarycalc stdout    |
+|    3   |     1     |  summary               |
 
 A binary file of the same format can be piped into summarycalctocsv.
 
@@ -166,7 +166,7 @@ $ summarycalctocsv < [stdin].bin > [output].csv
 
 ##### Example
 ```
-$ eve 1 1 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -1 - | summarycalctocsv > summarycalc.csv
+$ eve 1 1 | getmodel | gulcalc -r -S100 -a1 -i - | fmcalc | summarycalc -f -1 - | summarycalctocsv > summarycalc.csv
 $ summarycalctocsv < summarycalc.bin > summarycalc.csv 
 ```
 
@@ -185,7 +185,7 @@ Csv file with the following fields;
 <a id="gultobin"></a>
 ### gultobin 
 ***
-A component which converts gulcalc data in csv format into gulcalc binary standard output, for stream_id=1 (item stream).
+A component which converts gulcalc data in csv format into gulcalc binary item stream (1/1).
 
 ##### Input file format
 
@@ -196,7 +196,7 @@ A component which converts gulcalc data in csv format into gulcalc binary standa
 | sidx              | int    |    4   | Sample index                                                        |     10      |
 | loss              | float  |    4   | The ground up loss value                                            | 5675.675    |
 
-* For each event_id and item_id combination, a record for sidx = -1 (mean) and sidx = -2 (standard deviation) must be included, even if the loss values are zero. 
+* For each event_id and item_id combination, a record for sidx = -1 (mean) and sidx = -2 (standard deviation) must be included at the top, even if the loss values are zero. 
 * For each event_id and item_id combination, one or more sampled losses for sidx > 0 may be provided, but records for samples with zero loss may be omitted.
 
 ##### Parameters
@@ -214,11 +214,11 @@ $ gultobin -S100 < gulcalci.csv | fmcalc > fmcalc.bin
 $ gultobin -S100 < gulcalci.csv > gulcalci.bin
 ```
 
-##### Stdout stream_id
+##### Standard output stream
 
 | Byte 1 | Bytes 2-4 |  Description             |
 |:-------|-----------|:-------------------------|
-|    1   |     1     |  gulcalc item stdout     |
+|    1   |     1     |  gulcalc item            |
 
 [Return to top](#streamconversioncomponents)
 

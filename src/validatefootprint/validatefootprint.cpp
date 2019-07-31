@@ -54,6 +54,7 @@ namespace validatefootprint {
     FootprintRow p = {}, q;
     bool dataValid = true;
     std::set<int> intensityBins;
+    int maxIntensityBin = 0;
     char const * sEvent = "Event";
     char const * sAreaperil = "Areaperil";
     float prob = 0.0;
@@ -122,6 +123,13 @@ namespace validatefootprint {
 	intensityBins.insert(q.intensity_bin_id);
 	prob += q.probability;
 
+	// Get maximum value of intensity_bin_index
+	if(q.intensity_bin_id > maxIntensityBin) {
+
+	  maxIntensityBin = q.intensity_bin_id;
+
+	}
+
       } else {
 
 	fprintf(stderr, "Duplicate intensity bin for event-areaperil");
@@ -148,6 +156,7 @@ namespace validatefootprint {
     if(dataValid == true) {
 
       fprintf(stderr, "All checks pass.\n");
+      fprintf(stderr, "Maximum value of intensity_bin_index = %d\n", maxIntensityBin);
 
     } else {
 

@@ -1,4 +1,3 @@
-
 node {
     hasFailed = false
     sh 'sudo /var/lib/jenkins/jenkins-chown'
@@ -8,7 +7,7 @@ node {
       parameters([
         [$class: 'StringParameterDefinition',  name: 'KTOOLS_BRANCH', defaultValue: BRANCH_NAME],
         [$class: 'StringParameterDefinition',  name: 'RELEASE_TAG', defaultValue: "${BRANCH_NAME}-${BUILD_NUMBER}"],
-        [$class: 'StringParameterDefinition',  name: 'TEST_GCC', defaultValue: "8 7 6"],
+        [$class: 'StringParameterDefinition',  name: 'TEST_GCC', defaultValue: ""],
         [$class: 'BooleanParameterDefinition', name: 'PURGE', defaultValue: Boolean.valueOf(true)],
         [$class: 'BooleanParameterDefinition', name: 'PUBLISH', defaultValue: Boolean.valueOf(false)],
         [$class: 'BooleanParameterDefinition', name: 'SLACK_MESSAGE', defaultValue: Boolean.valueOf(false)]
@@ -22,8 +21,8 @@ node {
     String git_creds = "1335b248-336a-47a9-b0f6-9f7314d6f1f4"
 
     // Set Global ENV
-    env.KTOOLS_IMAGE_GCC   = "jenkins/Dockerfile.build-ktools"   // Docker image for testing gcc build
-    env.KTOOLS_IMAGE_CLANG = "jenkins/Dockerfile.clang-build"    // Docker image for building static build of ktools
+    env.KTOOLS_IMAGE_GCC   = "jenkins/Dockerfile.gcc-build"    // Docker image for Dynamic linked build
+    env.KTOOLS_IMAGE_CLANG = "jenkins/Dockerfile.clang-build"  // Docker image for static ktools build
 
     try {
         stage('Clone: Ktools') {
@@ -48,18 +47,30 @@ node {
         }
     
         // Create static build CLANG 
-        if (params.PUBLISH){
-            stage("Ktools Builder: x86_64") {
+        stage("Ktools Builder: Linux_x86_64") {
+            dir(ktools_workspace) {
+                //  Build Static TAR using clang
+                sh "docker build -f $env.KTOOLS_IMAGE_CLANG -t ktools-builder ."
+                sh 'docker run -v $(pwd):/var/ktools ktools-builder'
+                // Archive TAR to CI
+                archiveArtifacts artifacts: 'tar/**/*.*'
+            }
+        }
+
+        // Optional: test dynamic linked builds GCC 
+        gcc_vers = params.TEST_GCC.split()
+        for(int i=0; i < gcc_vers.size(); i++) {
+            stage("Ktools Tester: GCC ${gcc_vers[i]}") {
                 dir(ktools_workspace) {
-                    //  Build Static TAR using clang
-                    sh "docker build -f $env.KTOOLS_IMAGE_CLANG -t ktools-builder ."
-                    sh 'docker run -v $(pwd):/var/ktools ktools-builder'
-                    
-                    // Archive TAR to CI
-                    archiveArtifacts artifacts: 'tar/**/*.*'
+                    // Build & run ktools testing image
+                    sh "sed -i 's/FROM.*/FROM gcc:${gcc_vers[i]}/g' $env.KTOOLS_IMAGE_GCC"
+                    sh "docker build -f $env.KTOOLS_IMAGE_GCC -t ktools-runner:${gcc_vers[i]} ."
+                    sh "docker run ktools-runner:${gcc_vers[i]}"
                 }
             }
+        }
 
+        if (params.PUBLISH){
             // Tag and release 
             stage("Create Release: GitHub") {
                 dir(ktools_workspace) {
@@ -91,22 +102,7 @@ node {
                     }
                 }
             }
-        
-        // Test dynamic linked builds GCC 
-        } else {
-            gcc_vers = params.TEST_GCC.split()
-            for(int i=0; i < gcc_vers.size(); i++) {
-                stage("Ktools Tester: GCC ${gcc_vers[i]}") {
-                    dir(ktools_workspace) {
-                        // Build & run ktools testing image
-                        sh "sed -i 's/FROM.*/FROM gcc:${gcc_vers[i]}/g' $env.KTOOLS_IMAGE_GCC"
-                        sh "docker build -f $env.KTOOLS_IMAGE_GCC -t ktools-runner:${gcc_vers[i]} ."
-                        sh "docker run ktools-runner:${gcc_vers[i]}"
-                    }
-                }
-            }
-        }
-
+        } 
     } catch(hudson.AbortException | org.jenkinsci.plugins.workflow.steps.FlowInterruptedException buildException) {
         hasFailed = true
         error('Build Failed')
@@ -114,18 +110,5 @@ node {
         dir(ktools_workspace) {
             //Run house cleaning (if needed)
         }
-        //Notify on slack -- Needs fixing
-        if(params.SLACK_MESSAGE && (params.PUBLISH || hasFailed)){
-            // def slackColor = hasFailed ? '#FF0000' : '#27AE60'
-            // SLACK_GIT_URL = "https://github.com/OasisLMF/${model_name}/tree/${model_branch}"
-            // SLACK_MSG = "*${env.JOB_NAME}* - (<${env.BUILD_URL}|${env.RELEASE_TAG}>): " + (hasFailed ? 'FAILED' : 'PASSED')
-            // SLACK_MSG += "\nBranch: <${SLACK_GIT_URL}|${model_branch}>"
-            // SLACK_MSG += "\nMode: " + (params.PUBLISH ? 'Publish' : 'Build Test')
-            // SLACK_CHAN = (params.PUBLISH ? "#builds-release":"#builds-dev")
-            // slackSend(channel: SLACK_CHAN, message: SLACK_MSG, color: slackColor)
-        }
-
-        // Handle JOB Publish
-        // TODO: append to CHANGELOG
     }
 }

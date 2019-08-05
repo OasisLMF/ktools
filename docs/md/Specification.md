@@ -46,7 +46,7 @@ Higher byte;
 
 Reserved stream_ids;
 
-| Byte 1   | Bytes 2-4    |  Description                                                             		         |
+| Byte 1   | Bytes 2-4    |  Description                                                             		         
 |:---------|--------------|:-------------------------------------------------------------------------------------|
 |    0     |     1        |  cdf - Oasis format effective damageability CDF output                               |
 |    1     |     1        |  gulcalc -  Oasis format item level ground up loss sample output **(deprecated)**    |
@@ -56,16 +56,17 @@ Reserved stream_ids;
 
 The supported standard input and output streams of the Reference model components are summarized here;
 
-| Component    | Standard input      |  Standard output                      | Stream option parameters          |
-|:-------------|:--------------------|:--------------------------------------|:----------------------------------|
-| getmodel     | none                | 0/1 cdf                               | none                              |
-| gulcalc      | 0/1 cdf             | 1/1 gulcalc item **(deprecated)**     | -i                                |
-| gulcalc      | 0/1 cdf             | 1/2 gulcalc coverage **(deprecated)** | -c                                |
-| gulcalc      | 0/1 cdf             | 2/1 loss                              | -i -a{}                           |
-| fmcalc       | 2/1 loss            | 2/1 loss                              | none                              |
-| summarycalc  | 1/2 gulcalc coverage| 3/1 summary **(deprecated)**          | -g                                | 
-| summarycalc  | 2/1 loss            | 3/1 summary                           | -i gulcalc input, -f fmcalc input | 
-| outputcalc   | 3/1 summary         | none                                  | none                              | 
+| Component    | Standard input                        |  Standard output                      | Stream option parameters          |
+|:-------------|:--------------------------------------|:--------------------------------------|:----------------------------------|
+| getmodel     | none                                  | 0/1 cdf                               | none                              |
+| gulcalc      | 0/1 cdf                               | 1/1 gulcalc item **(deprecated)**     | -i                                |
+| gulcalc      | 0/1 cdf                               | 1/2 gulcalc coverage **(deprecated)** | -c                                |
+| gulcalc      | 0/1 cdf                               | 2/1 loss                              | -i -a{}                           |
+| fmcalc       | 1/1 gulcalc item  **(deprecated)**    | 2/1 loss                              | none                              |
+| fmcalc       | 2/1 loss                              | 2/1 loss                              | none                              |
+| summarycalc  | 1/2 gulcalc coverage  **(deprecated)**| 3/1 summary                           | -g                                | 
+| summarycalc  | 2/1 loss                              | 3/1 summary                           | -i gulcalc input, -f fmcalc input | 
+| outputcalc   | 3/1 summary                           | none                                  | none                              | 
 
 
 ## Stream structure

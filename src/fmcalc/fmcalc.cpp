@@ -134,6 +134,7 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 		//}
 		for (int level = 1; level < agg_vecs.size(); level++) {
 			vector <LossRec> &agg_vec = agg_vecs[level][layer_];
+			vector <LossRec>& previous_agg_vec = agg_vecs[level-1][layer_];
 			OASIS_FLOAT loss_total = 0;
 			auto iter = agg_vec.begin();
 			while (iter != agg_vec.end()) {
@@ -152,51 +153,68 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 				loss_total += iter->loss;
 				iter++;
 			}
-			iter = agg_vec.begin();		// loop thru again to work out proportion
-			while (iter != agg_vec.end()) {
-				if (iter->loss > 0 && loss_total > 0) {
-					iter->proportion = iter->loss / loss_total;
-				}
-				else {
-					iter->proportion = 0;
-				}
-				if (level == 1) {
-					OASIS_FLOAT total = 0;
-					if (iter->item_idx) {
-						for (int idx : *(iter->item_idx)) {
-							total += guls[idx];
-						}
+			if (loss_total > 0) {
+				iter = agg_vec.begin();		// loop thru again to work out proportion
+				while (iter != agg_vec.end()) {
+					if (iter->loss > 0 && loss_total > 0) {
+						iter->proportion = iter->loss / loss_total;
 					}
-					int i = 0;
-					if (total > 0) {
-						for (int idx : *(iter->item_idx)) {
-							std::vector<OASIS_FLOAT> &v = *(iter->item_prop);
-							v[i] = guls[idx] / iter->gul_total;
-							items_prop[idx] = (guls[idx] / total) * iter->proportion;
-							i++;
-						}
+					else {
+						iter->proportion = 0;
 					}
-				}
-				else {
-					OASIS_FLOAT prop_total = 0;
-					if (iter->item_idx) {
-						for (int idx : *(iter->item_idx)) {
-							prop_total += items_prop[idx];
-						}
-					}
-					int i = 0;
-					if (prop_total > 0) {
+					if (level == 1) {
+						OASIS_FLOAT total = 0;
 						if (iter->item_idx) {
 							for (int idx : *(iter->item_idx)) {
-								std::vector<OASIS_FLOAT> &v = *(iter->item_prop);
-								v[i] = items_prop[idx] / prop_total;
-								items_prop[idx] = (items_prop[idx] / prop_total) * iter->proportion;
+								total += guls[idx];
+							}
+						}
+						int i = 0;
+						if (total > 0) {
+							for (int idx : *(iter->item_idx)) {
+								std::vector<OASIS_FLOAT>& v = *(iter->item_prop);
+								v[i] = guls[idx] / iter->gul_total;
+								items_prop[idx] = (guls[idx] / total) * iter->proportion;
 								i++;
 							}
 						}
 					}
+					else {
+						OASIS_FLOAT prop_total = 0;
+						if (iter->item_idx) {
+							for (int idx : *(iter->item_idx)) {
+								prop_total += items_prop[idx];
+							}
+						}
+						int i = 0;
+						if (prop_total > 0) {
+							if (iter->item_idx) {
+								for (int idx : *(iter->item_idx)) {
+									std::vector<OASIS_FLOAT>& v = *(iter->item_prop);
+									v[i] = items_prop[idx] / prop_total;
+									items_prop[idx] = (items_prop[idx] / prop_total) * iter->proportion;
+									i++;
+								}
+							}
+						}
+					}
+					iter++;
 				}
-				iter++;
+			}
+			else {	
+				// if there is is loss_total loss just copy previous level proportions
+				auto iter = agg_vec.begin();		// loop thru again to work out proportion
+				auto previous_iter = previous_agg_vec.begin();		// loop thru again to work out proportion
+				while (iter != agg_vec.end()) {
+					if (iter->item_idx) {
+						for (int idx : *(iter->item_idx)) {
+							std::vector<OASIS_FLOAT>& v = *(iter->item_prop);
+							iter->proportion = iter->proportion + items_prop[idx];
+							//fprintf(stderr, "sidx = %d\,", idx);
+						}
+					}
+					iter++;
+				}
 			}
 		}
 	}

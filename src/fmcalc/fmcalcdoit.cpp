@@ -13,7 +13,10 @@ void fmcalc::doit()
 
 	int gulstream_type = 0;
 	size_t i = fread(&gulstream_type, sizeof(gulstream_type), 1, stdin);
-
+	if (i == 0) {
+		fprintf(stderr, "%s: Read error on input stream\n", __func__);
+		exit(-1);
+	}
 	int stream_type = gulstream_type & gulstream_id;
 	int stream_type2 = gulstream_type & fmstream_id;
 

@@ -55,13 +55,13 @@ using namespace std;
 
 
 
-bool isGulStream(unsigned int stream_type)
+bool summarycalc::isGulStream(unsigned int stream_type)
 {
 	unsigned int stype = gulstream_id & stream_type;
 	return (stype == gulstream_id);
 }
 
-bool isFMStream(unsigned int stream_type)
+bool summarycalc::isFMStream(unsigned int stream_type)
 {
 	unsigned int stype = fmstream_id & stream_type;
 	return (stype == fmstream_id);
@@ -177,7 +177,7 @@ void summarycalc::loaditemtocoverage()
 	flseek(fin, 0L, SEEK_SET);
 	int last_item_id = 0;
 	unsigned int nrec = (unsigned int)sz / (unsigned int)sizeof(item);
-	item_to_coverage_.resize(nrec + 1, 0.0);
+	item_to_coverage_.resize(nrec + 1, 0);
 
 	item itm;
 	size_t i = fread(&itm, sizeof(itm), 1, fin);
@@ -211,15 +211,16 @@ bool summarycalc::loadcoverages()
 	flseek(fin, 0L, SEEK_SET);
 
 	OASIS_FLOAT tiv;
-	unsigned int nrec = sz / sizeof(tiv);
+	unsigned int nrec = (unsigned int)sz / (unsigned int) sizeof(tiv);
 
 	coverages_.resize(nrec + 1);
 	int coverage_id = 0;
-	int i = fread(&tiv, sizeof(tiv), 1, fin);
+	int i = (int) fread(&tiv,sizeof(tiv),1, fin);
 	while (i != 0) {
 		coverage_id++;
 		coverages_[coverage_id] = tiv;
-		i = fread(&tiv, sizeof(tiv), 1, fin);
+		i = (int)fread(&tiv, sizeof(tiv),
+			1, fin);
 	}
 
 	fclose(fin);
@@ -240,7 +241,7 @@ void summarycalc::loadgulsummaryxref()
 
 	init_c_to_s();
 	gulsummaryxref s;
-	int i = fread(&s, sizeof(gulsummaryxref), 1, fin);
+	int i = (int)fread(&s, sizeof(gulsummaryxref), 1, fin);
 	while (i != 0) {
 		if (s.summaryset_id > 9) {
 			fprintf(stderr, "%s: Invalid summaryset id  %d found in %s\n", __func__, s.summaryset_id, GULSUMMARYXREF_FILE);
@@ -252,7 +253,7 @@ void summarycalc::loadgulsummaryxref()
 			//co_to_s[s.summaryset_id]->insert({ s.coverage_id,s.summary_id });
 			(*co_to_s_[s.summaryset_id])[s.coverage_id] = s.summary_id ;
 		}
-		i = fread(&s, sizeof(gulsummaryxref), 1, fin);
+		i = (int) fread(&s, sizeof(gulsummaryxref), 1, fin);
 	}
 
 	fclose(fin);
@@ -274,7 +275,7 @@ void summarycalc::loadsummaryxref(const std::string& filename)
 	init_o_to_s();
 
 	fmsummaryxref s;
-	int i = fread(&s, sizeof(fmsummaryxref), 1, fin);
+	int i = (int)fread(&s, sizeof(fmsummaryxref), 1, fin);
 	while (i != 0) {
 		if (s.summaryset_id > 9) {
 			fprintf(stderr, "%s: Invalid summaryset id  %d found in %s\n", __func__, s.summaryset_id, FMSUMMARYXREF_FILE);
@@ -287,7 +288,7 @@ void summarycalc::loadsummaryxref(const std::string& filename)
 			if ((*co_to_s_[s.summaryset_id]).size() < (s.output_id + 1)) (*co_to_s_[s.summaryset_id]).resize(s.output_id + 1, 0);
 			(*co_to_s_[s.summaryset_id])[s.output_id] = s.summary_id ;
 		}
-		i = fread(&s, sizeof(fmsummaryxref), 1, fin);
+		i = (int) fread(&s, sizeof(fmsummaryxref), 1, fin);
 	}
 
 		fclose(fin);
@@ -441,12 +442,12 @@ void summarycalc::dogulitemxsummary()
 	loadgulsummaryxref();
 	outputstreamtype();
 	unsigned int streamtype = 0;
-	int i = fread(&streamtype, sizeof(streamtype), 1, stdin);
+	int i = (int) fread(&streamtype, sizeof(streamtype), 1, stdin);
 	if (isGulStream(streamtype) == true) {
 		int stream_type = streamtype & streamno_mask;
 		unsigned int samplesize = 0;
 		if (stream_type == 1) {
-			i = fread(&samplesize, sizeof(samplesize), 1, stdin);
+			i = (int) fread(&samplesize, sizeof(samplesize), 1, stdin);
 			alloc_sssl_array(samplesize);
 			reset_sssl_array(samplesize);
 			alloc_sse_array();
@@ -455,11 +456,11 @@ void summarycalc::dogulitemxsummary()
 			gulSampleslevelHeader gh;
 			bool havedata = false;
 			while (i == 1) {
-				i = fread(&gh, sizeof(gh), 1, stdin);
+				i = (int)fread(&gh, sizeof(gh), 1, stdin);
 				if (i > 0 && havedata == false) havedata = true;
 				while (i != 0) {
 					gulSampleslevelRec gr;
-					i = fread(&gr, sizeof(gr), 1, stdin);
+					i = (int) fread(&gr, sizeof(gr), 1, stdin);
 					if (i == 0) break;
 					if (gr.sidx == 0) break;
 					int coverage_id = item_to_coverage_[gh.item_id];
@@ -478,13 +479,13 @@ void summarycalc::dogulcoveragesummary()
 	loadgulsummaryxref();	
 	outputstreamtype();
 	unsigned int streamtype = 0;
-	int i = fread(&streamtype, sizeof(streamtype), 1, stdin);
+	int i = (int) fread(&streamtype, sizeof(streamtype), 1, stdin);
 
 	if (isGulStream(streamtype) == true) {
 		int stream_type = streamtype & streamno_mask;
 		unsigned int samplesize = 0;
 		if (stream_type == 2) {
-			i = fread(&samplesize, sizeof(samplesize), 1, stdin);
+			i = (int) fread(&samplesize, sizeof(samplesize), 1, stdin);
 			alloc_sssl_array(samplesize);
 			reset_sssl_array(samplesize);
 			alloc_sse_array();
@@ -493,11 +494,11 @@ void summarycalc::dogulcoveragesummary()
 			gulSampleslevelHeader gh;
 			bool havedata = false;
 			while (i == 1) {
-				i = fread(&gh, sizeof(gh), 1, stdin);
+				i = (int) fread(&gh, sizeof(gh), 1, stdin);
 				if (i > 0 && havedata == false) havedata = true;
 				while (i != 0) {
 					gulSampleslevelRec gr;
-					i = fread(&gr, sizeof(gr), 1, stdin);
+					i = (int)fread(&gr, sizeof(gr), 1, stdin);
 					if (i == 0) break;
 					if (gr.sidx == 0) break;
 					dosummary(samplesize, gh.event_id, gh.item_id, gr.sidx, gr.loss, coverages_[gh.item_id]);
@@ -529,11 +530,11 @@ void summarycalc::dosummaryprocessing(int samplesize)
 	bool havedata = false;
 	int i = 1;
 	while (i == 1) {
-		i = fread(&fh, sizeof(fh), 1, stdin);
+		i = (int) fread(&fh, sizeof(fh), 1, stdin);
 		if (i > 0 && havedata == false) havedata = true;
 		while (i != 0) {
 			sampleslevelRec sr;
-			i = fread(&sr, sizeof(sr), 1, stdin);
+			i = (int)fread(&sr, sizeof(sr), 1, stdin);
 			if (i == 0) break;
 			if (sr.sidx == 0) break;
 			if (sr.sidx == -3) {
@@ -551,12 +552,12 @@ void summarycalc::dofmsummary()
 	loadsummaryxref(FMSUMMARYXREF_FILE);
 	outputstreamtype();
 	unsigned int streamtype = 0;
-	int i = fread(&streamtype, sizeof(streamtype), 1, stdin);
+	int i = (int) fread(&streamtype, sizeof(streamtype), 1, stdin);
 	if (i) {
 		if (isFMStream(streamtype) == true) {
 			int stream_type = streamtype & streamno_mask;
 			unsigned int samplesize = 0;
-			i = fread(&samplesize, sizeof(samplesize), 1, stdin);
+			i = (int) fread(&samplesize, sizeof(samplesize), 1, stdin);
 			if (i)	dosummaryprocessing(samplesize);
 			else std::cerr << "summarycalc: Read error on stream\n";
 			return;
@@ -579,12 +580,12 @@ void summarycalc::dogulitemsummary()
 	loadsummaryxref(GULSUMMARYXREF_FILE);
 	outputstreamtype();
 	unsigned int streamtype = 0;
-	int i = fread(&streamtype, sizeof(streamtype), 1, stdin);
+	int i = (int) fread(&streamtype, sizeof(streamtype), 1, stdin);
 	if (i) {
 		if (isFMStream(streamtype) == true) {
 			int stream_type = streamtype & streamno_mask;
 			unsigned int samplesize = 0;
-			i = fread(&samplesize, sizeof(samplesize), 1, stdin);
+			i =(int) fread(&samplesize, sizeof(samplesize), 1, stdin);
 			if (i)	dosummaryprocessing(samplesize);
 			else std::cerr << "summarycalc: Read error on stream\n";
 			return;

@@ -289,27 +289,27 @@ $ itemtocsv < items.bin > items.csv
 <a id="gulsummaryxref"></a>
 ### gul summary xref
 ***
-The gulsummaryxref binary is a cross reference file which determines how coverage losses from gulcalc output are summed together into at various summary levels in summarycalc. It is required by summarycalc and must have the following location and filename;
+The gulsummaryxref binary is a cross reference file which determines how item or coverage losses from gulcalc output are summed together into at various summary levels in summarycalc. It is required by summarycalc and must have the following location and filename;
 
 * input/gulsummaryxref.bin
 
 ##### File format
 The csv file should contain the following fields and include a header row.
 
-| Name             | Type   |  Bytes | Description                                   | Example  |
-|:-----------------|--------|--------|:----------------------------------------------|---------:|
-| coverage_id      | int    |    4   | Identifier of the coverage                    |   3      |
-| summary_id       | int    |    4   | Identifier of the summary level grouping      |   3      |
-| summaryset_id    | int    |    4   | Identifier of the summary set                 |   1      |
+| Name                  | Type   |  Bytes | Description                                   | Example  |
+|:----------------------|--------|--------|:----------------------------------------------|---------:|
+| item_id / coverage_id | int    |    4   | Identifier of the item or coverage            |   3      |
+| summary_id            | int    |    4   | Identifier of the summary level grouping      |   3      |
+| summaryset_id         | int    |    4   | Identifier of the summary set                 |   1      |
 
-
+* The first field must be consistent with the corresponding index in the ground up loss stream. If it is loss stream (stream_id 2/1) then item_id must be used. If it is gulcalc coverage stream (stream_id 1/2) then coverage_id must be used. 
 * The data should not contain nulls and there should be at least one summary set in the file.  
 * Valid entries for summaryset_id is all integers between 0 and 9 inclusive. 
 * Within each summary set, all coverages_id's from the coverages file must be present.
 
-One summary set consists of a common summaryset_id and each coverage_id being assigned a summary_id. An example is as follows.
+One summary set consists of a common summaryset_id and each item_id being assigned a summary_id. An example is as follows.
 
-| coverage_id   | summary_id     | summaryset_id    |
+| item_id       | summary_id     | summaryset_id    |
 |:--------------|----------------|-----------------:|
 | 1             | 1              |    1             | 
 | 2             | 1              |    1             | 
@@ -318,7 +318,7 @@ One summary set consists of a common summaryset_id and each coverage_id being as
 | 5             | 2              |    1             |
 | 6             | 2              |    1             |
 
-This shows, for summaryset_id=1, coverages 1-3 being grouped into summary_id = 1 and coverages 4-6 being grouped into summary_id = 2.  This could be an example of a 'site' level grouping, for example. The summary_ids should be held in a dictionary which contains the description of the ids to make meaning of the output results.  For instance;
+This shows, for summaryset_id=1, items 1-3 being grouped into summary_id = 1 and items 4-6 being grouped into summary_id = 2.  This could be an example of a 'site' level grouping, for example. The summary_ids should be held in a dictionary which contains the description of the ids to make meaning of the output results.  For instance;
 
 | summary_id   | summaryset_id    | summary_desc    |
 |:-------------|------------------|----------------:|
@@ -327,9 +327,9 @@ This shows, for summaryset_id=1, coverages 1-3 being grouped into summary_id = 1
 
 This cross reference information is not required in ktools.
 
-Up to 10 summary sets may be provided in gulsummaryxref, depending on the required summary reporting levels for the analysis. Here is an example of the 'site' summary level with summaryset_id=1, plus an 'account' summary level with summaryset_id = 2. In summary set 2, the account summary level includes both sites because all coverages are assigned a summary_id of 1.
+Up to 10 summary sets may be provided in gulsummaryxref, depending on the required summary reporting levels for the analysis. Here is an example of the 'site' summary level with summaryset_id=1, plus an 'account' summary level with summaryset_id = 2. In summary set 2, the account summary level includes both sites because all items are assigned a summary_id of 1.
 
-| coverage_id   | summary_id   | summaryset_id     |
+| item_id       | summary_id   | summaryset_id     |
 |:--------------|--------------|------------------:|
 | 1             | 1            |    1              | 
 | 2             | 1            |    1              | 
@@ -676,7 +676,7 @@ The csv file should contain the following field and include a header.
 | Name               | Type   |  Bytes | Description                                  | Example     |
 |:----------------------------|--------|--------| :-----------------------------------|------------:|
 | period_no          | int    |    4   | A numbered period in which the event occurs  |   4545      |
-| weigth             | int    |    4   | relative weight to other periods             |   3         |
+| weight             | int    |    4   | relative weight to other periods             |   3         |
 
 
 ##### periodstobin

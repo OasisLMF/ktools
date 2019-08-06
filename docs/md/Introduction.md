@@ -39,7 +39,7 @@ The components in the Reference Model can be summarized as follows;
 Standard piping syntax can be used to invoke the components at the command line. It is the same syntax in Windows DOS, Linux terminal or Cygwin (a Linux emulator for Windows). For example the following command invokes eve, getmodel, gulcalc, fmcalc, summarycalc and eltcalc, and exports an event loss table output to a csv file.
 
 ``` sh
-$ eve 1 1 | getmodel | gulcalc -r –S100 –i - | fmcalc | summarycalc -f -1 - | eltcalc > elt.csv
+$ eve 1 1 | getmodel | gulcalc -r –S100 -a1 –i - | fmcalc | summarycalc -f -1 - | eltcalc > elt.csv
 ```
 
 Example python scripts are provided along with a binary data package in the /examples folder to demonstrate usage of the toolkit. For more guidance on how to use the toolkit, see [Workflows](Workflows.md).

@@ -186,7 +186,7 @@ installertest()
 	 if [ "$?" -ne "0" ]; then
 	   echo "Sorry check failed\n"
 	   cd ../..
-	   return
+	   exit 1
 	 else
 	   echo "All tests passed.\n"
 	  cd ../..

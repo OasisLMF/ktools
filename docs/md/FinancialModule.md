@@ -30,38 +30,7 @@ Profiles are used throughout the Oasis framework and are meta-data definitions w
 
 The FM Profiles form an extensible library of calculations defined within the fmcalc code that can be invoked by specifying a particular **calcrule_id** and providing the required data values such as deductible and limit, as described below.
 
-The Profiles currently supported are as follows;
-
 #### Supported Profiles
-
-| Profile description                               |calcrule_id |
-|:--------------------------------------------------|-----------:|
-|deductible and limit                               |   1        |
-|deductible with attachment, limit and share        |   2        |
-|franchise deductible and limit                     |   3        |
-|deductible % TIV and limit                         |   4        |
-|deductible and limit % loss                        |   5        |
-|deductible % TIV                                   |   6        |
-|limit and maximum deductible                       |   7        |
-|limit and minimum deductible                       |   8        |
-|limit with deductible % limit                      |   9        |
-|maximum deductible                                 |   10       |
-|minimum deductible                                 |   11       |
-|deductible                                         |   12       |
-|minimum and maximum deductible                     |   13       |
-|limit only                                         |   14       |
-|limit % loss                                       |   15       |
-|deductible % loss                                  |   16       |
-|deductible % loss with attachment, limit and share |   17       |
-|deductible % tiv with attachment, limit and share  |   18       |
-|% loss deductible with min and max deductible      |   19       |
-|reverse franchise deductible                       |   20       |
-|% tiv deductible with min and max deductible       |   21       |
-|reinsurance % ceded, limit and % placed            |   22       |
-|reinsurance limit and % placed                     |   23       |
-|reinsurance excess terms		                    |   24       |
-|reinsurance proportional terms                     |   25       |
-
 
 See Appendix [B FM Profiles](fmprofiles.md) for more details. 
 

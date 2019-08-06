@@ -1,0 +1,17 @@
+language: cpp
+sudo: required
+compiler:
+- clang
+os:
+- osx
+script:
+- "./jenkins/travis_osx_build.sh"
+deploy:
+  provider: releases
+  api_key:
+    secure: RXxzqAhXEQbdN5CCvehyjZBL6PpX+R00vT81LevC8FaOIIU6NtozCmv+une8ZvNcVaCFiCivNrDdKvB00pqRkp6PvaARwXtrEK7jDiBVuZLb+HX24ZWeXp2TOwX7d3rgj/SIGwUTGp0q/NdINS8QJ8rNGRmbtcxAizYwjIeVbEf1ihi9tUyZBhAbJO9FgBdN9IH+icp2HmmUHHswIr8FwimSgjO6WBRw0mB08GBOyFNpOmI6i3NjvfBoKZxWejUKCdq6EIKuQO/vFyif4z781eGa77Eg5NiK9xc6MKfCAVtj862umETn+PIkTUjv16zUDGkr9Ti2VkDWBQBhYHgRGeRP80aXhlcCVtfUhhRLizXEPaTx3jO3uqE/fuEfXurgitc+BAHlJE2Sp0EWPTURvhborh6l6LqVCncNaV/eBGrSpRDsi5rL8wsI5C8hc7s2regSwkWiRlOuQqASeZu4BMJ5UfK0Xg8pIugv5wmMjiG+pju/GAVVnA6bmg77qtgUVg/cn8gYM4qsnpMrHxwFYayHljg5LldzxmnJJDvCC9ruhyVPdfgen5/LvdVOOEibUUfRWSop9FYEwf8jn0aURk+vz1S1sCFOpIIoEy1cRCQQY6YL2t88WAsFRPGXpLToD6IYNp00g3O17F+dvP/cOG93qOnnUlPFWXzS28UbqkY=
+  file: Darwin_x86_64.tar.gz
+  skip_cleanup: true
+  on:
+    repo: OasisLMF/ktools
+    tags: true 

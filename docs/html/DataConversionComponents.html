@@ -443,7 +443,7 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <p><a id="gulsummaryxref"></a></p>
 <h3 id="gul-summary-xref">gul summary xref</h3>
 <hr />
-<p>The gulsummaryxref binary is a cross reference file which determines how coverage losses from gulcalc output are summed together into at various summary levels in summarycalc. It is required by summarycalc and must have the following location and filename;</p>
+<p>The gulsummaryxref binary is a cross reference file which determines how item or coverage losses from gulcalc output are summed together into at various summary levels in summarycalc. It is required by summarycalc and must have the following location and filename;</p>
 <ul>
 <li>input/gulsummaryxref.bin</li>
 </ul>
@@ -461,10 +461,10 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">coverage_id</td>
+<td align="left">item_id / coverage_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Identifier of the coverage</td>
+<td align="left">Identifier of the item or coverage</td>
 <td align="right">3</td>
 </tr>
 <tr class="even">
@@ -484,16 +484,17 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 </tbody>
 </table>
 <ul>
+<li>The first field must be consistent with the corresponding index in the ground up loss stream. If it is loss stream (stream_id 2/1) then item_id must be used. If it is gulcalc coverage stream (stream_id 1/2) then coverage_id must be used.</li>
 <li>The data should not contain nulls and there should be at least one summary set in the file.<br />
 </li>
 <li>Valid entries for summaryset_id is all integers between 0 and 9 inclusive.</li>
 <li>Within each summary set, all coverages_id's from the coverages file must be present.</li>
 </ul>
-<p>One summary set consists of a common summaryset_id and each coverage_id being assigned a summary_id. An example is as follows.</p>
+<p>One summary set consists of a common summaryset_id and each item_id being assigned a summary_id. An example is as follows.</p>
 <table>
 <thead>
 <tr class="header">
-<th align="left">coverage_id</th>
+<th align="left">item_id</th>
 <th>summary_id</th>
 <th align="right">summaryset_id</th>
 </tr>
@@ -531,7 +532,7 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 </tr>
 </tbody>
 </table>
-<p>This shows, for summaryset_id=1, coverages 1-3 being grouped into summary_id = 1 and coverages 4-6 being grouped into summary_id = 2. This could be an example of a 'site' level grouping, for example. The summary_ids should be held in a dictionary which contains the description of the ids to make meaning of the output results. For instance;</p>
+<p>This shows, for summaryset_id=1, items 1-3 being grouped into summary_id = 1 and items 4-6 being grouped into summary_id = 2. This could be an example of a 'site' level grouping, for example. The summary_ids should be held in a dictionary which contains the description of the ids to make meaning of the output results. For instance;</p>
 <table>
 <thead>
 <tr class="header">
@@ -554,11 +555,11 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 </tbody>
 </table>
 <p>This cross reference information is not required in ktools.</p>
-<p>Up to 10 summary sets may be provided in gulsummaryxref, depending on the required summary reporting levels for the analysis. Here is an example of the 'site' summary level with summaryset_id=1, plus an 'account' summary level with summaryset_id = 2. In summary set 2, the account summary level includes both sites because all coverages are assigned a summary_id of 1.</p>
+<p>Up to 10 summary sets may be provided in gulsummaryxref, depending on the required summary reporting levels for the analysis. Here is an example of the 'site' summary level with summaryset_id=1, plus an 'account' summary level with summaryset_id = 2. In summary set 2, the account summary level includes both sites because all items are assigned a summary_id of 1.</p>
 <table>
 <thead>
 <tr class="header">
-<th align="left">coverage_id</th>
+<th align="left">item_id</th>
 <th>summary_id</th>
 <th align="right">summaryset_id</th>
 </tr>
@@ -1281,7 +1282,7 @@ $ occurrencetobin -P10000 -D &lt; occurrence.csv &gt; occurrence.bin</code></pre
 <td align="right">4545</td>
 </tr>
 <tr class="even">
-<td align="left">weigth</td>
+<td align="left">weight</td>
 <td>int</td>
 <td>4</td>
 <td align="left">relative weight to other periods</td>

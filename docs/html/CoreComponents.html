@@ -13,19 +13,25 @@
 <p><a id="eve"></a></p>
 <h3 id="eve">eve</h3>
 <hr />
-<p>eve takes as input a list of event ids in binary format and generates a partition of event ids as a binary data stream, according to the parameters supplied.</p>
-<h5 id="stream_id">Stream_id</h5>
-<p>None. The output stream is a simple list of event_ids (4 byte integers).</p>
+<p>eve takes a list of event ids in binary format as input and generates a partition of event ids as a binary data stream, according to the parameters supplied. Events are &quot;shuffled&quot; by being assigned to processes one by one cyclically, rather than being distributed to processes in blocks, in the order they are input. This helps to even the workload by process, in case all the &quot;big&quot; events are together in the same range of the event list.</p>
+<h5 id="output-stream">Output stream</h5>
+<p>The output stream is a simple list of event_ids (4 byte integers).</p>
 <h5 id="parameters">Parameters</h5>
+<p>Required parameters are;</p>
 <ul>
-<li>process number - determines which partition of events to output to a single process</li>
+<li>process number - specifies the process number to receive a partition of events</li>
 <li>number of processes - determines the total number of partitions of events to distribute to processes</li>
+</ul>
+<p>Optional parameters are;</p>
+<ul>
+<li>-n - No shuffled events. Events are split up and distributed in blocks in respect of the order they are input.</li>
 </ul>
 <h5 id="usage">Usage</h5>
 <pre><code>$ eve [parameters] &gt; [output].bin
 $ eve [parameters] | getmodel | gulcalc [parameters] &gt; [stdout].bin</code></pre>
 <h5 id="example">Example</h5>
-<pre><code>$ eve 1 2 &gt; events1_2.bin 
+<pre><code>$ eve 1 2 &gt; events1_2_shuffled.bin 
+$ eve -n 1 2 &gt; events1_2_unshuffled.bin 
 $ eve 1 2 | getmodel | gulcalc -r -S100 -i - &gt; gulcalc1_2.bin</code></pre>
 <p>In this example, the events from the file events.bin will be read into memory and the first half (partition 1 of 2) would be streamed out to binary file, or downstream to a single process calculation workflow.</p>
 <h5 id="internal-data">Internal data</h5>
@@ -40,7 +46,7 @@ $ eve 1 2 | getmodel | gulcalc -r -S100 -i - &gt; gulcalc1_2.bin</code></pre>
 <hr />
 <p>getmodel generates a stream of effective damageability distributions (cdfs) from an input list of events. Specifically, it combines the probability distributions from the model files, footprint.bin and vulnerability.bin, to generate effective damageability cdfs for the subset of exposures contained in the items.bin file and converts them into a binary stream.</p>
 <p>This is reference example of the class of programs which generates the damage distributions for an event set and streams them into memory. It is envisaged that model developers who wish to use the toolkit as a back-end calculator of their existing platforms can write their own version of getmodel, reading in their own source data and converting it into the standard output stream. As long as the standard input and output structures are adhered to, each program can be written in any language and read any input data.</p>
-<h5 id="stream_id-1">Stream_id</h5>
+<h5 id="output-stream-1">Output stream</h5>
 <table>
 <thead>
 <tr class="header">
@@ -53,7 +59,7 @@ $ eve 1 2 | getmodel | gulcalc -r -S100 -i - &gt; gulcalc1_2.bin</code></pre>
 <tr class="odd">
 <td align="left">0</td>
 <td>1</td>
-<td align="left">getmodel reference example</td>
+<td align="left">cdf stream</td>
 </tr>
 </tbody>
 </table>
@@ -84,7 +90,26 @@ $ getmodel &lt; events.bin &gt; getmodel.bin </code></pre>
 <h3 id="gulcalc">gulcalc</h3>
 <hr />
 <p>The gulcalc program performs Monte Carlo sampling of ground up loss using interpolation of uniform random numbers against the effective damage cdf, and calculates mean and standard deviation by numerical integration of the cdfs. The sampling methodology has been extended beyond linear interpolation to include point value sampling and quadratic interpolation. This supports damage bin intervals which represent a single discrete damage value, and damage distributions with cdfs that are described by a piecewise quadratic function.</p>
-<h5 id="stream_id-2">Stream_id</h5>
+<p>Gulcalc also performs back-allocation of total coverage losses to the contributing subperil item losses (for multi-subperil models). This occurs when there are two or more items representing losses from different subperils to the same coverage, such as wind loss and storm surge loss, for example. In these cases, because the subperil losses are generated independently from each other it is possible to result in a total damage ratio of &gt; 1 for the coverage, or a total loss of &gt; TIV. gulcalc provides the following options for summing and back-allocating the total coverage ground up loss;</p>
+<table style="width:100%;">
+<colgroup>
+<col width="16%" />
+<col width="83%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Allocation option</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">1</td>
+<td align="left">Sum damage ratios and cap to 1. Back-allocate in proportion to contributing subperil damage ratio</td>
+</tr>
+</tbody>
+</table>
+<h5 id="stream-output">Stream output</h5>
 <table>
 <thead>
 <tr class="header">
@@ -97,7 +122,17 @@ $ getmodel &lt; events.bin &gt; getmodel.bin </code></pre>
 <tr class="odd">
 <td align="left">1</td>
 <td>1</td>
-<td align="left">gulcalc reference example</td>
+<td align="left">gulcalc item stream <strong>(deprecated)</strong></td>
+</tr>
+<tr class="even">
+<td align="left">1</td>
+<td>2</td>
+<td align="left">gulcalc coverage stream <strong>(deprecated)</strong></td>
+</tr>
+<tr class="odd">
+<td align="left">2</td>
+<td>1</td>
+<td align="left">loss stream</td>
 </tr>
 </tbody>
 </table>
@@ -105,27 +140,35 @@ $ getmodel &lt; events.bin &gt; getmodel.bin </code></pre>
 <p>Required parameters are;</p>
 <ul>
 <li>-S{number}. Number of samples</li>
-<li>-c or -i {destination}. There are two alternative streams, 'coverage' or 'item'.<br />
-The destination is either a filename or named pipe, or use - for standard output.</li>
+<li>-a{number} -i{destination} . Specifies stdout option 2/1 loss stream with an allocation option<br />
+<strong>or</strong></li>
+<li>-c and/or -i {destination}. Specifies stdout option 1/1 gulcalc coverage or 1/2 gulcalc item stream respectively.</li>
 </ul>
+<p>The destination is either a filename or named pipe, or use - for standard output.</p>
 <p>Optional parameters are;</p>
 <ul>
+<li>-L{number} loss threshold (optional) excludes losses below the threshold from the output stream</li>
+<li>-d debug mode - output random numbers rather than losses (optional)</li>
+<li>-A automatically hashed seed driven random number generation (default)</li>
 <li>-R{number} Number of random numbers to generate dynamically</li>
 <li>-s{number} Manual seed for random numbers (to make them repeatable)</li>
 <li>-r Read random numbers from random.bin file</li>
-<li>-L{number} loss threshold (optional) excludes losses below the threshold from the output stream</li>
-<li>-d debug mode - output random numbers rather than losses (optional)</li>
 </ul>
 <h5 id="usage-2">Usage</h5>
 <pre><code>$ [stdin component] | gulcalc [parameters] | [stout component]
 $ [stdin component] | gulcalc [parameters]
 $ gulcalc [parameters] &lt; [stdin].bin </code></pre>
 <h5 id="example-2">Example</h5>
-<pre><code>$ eve 1 1 | getmodel | gulcalc -R1000000 -S100 -i - | fmcalc &gt; fmcalc.bin
+<pre><code>&#39;To stdout loss stream
+$ eve 1 1 | getmodel | gulcalc -R1000000 -S100 -a1 -i - | fmcalc &gt; fmcalc.bin
+$ eve 1 1 | getmodel | gulcalc -R1000000 -S100 -a1 -i - | summarycalc -i -1 summarycalc1.bin
+$ eve 1 1 | getmodel | gulcalc -r -S100 -a1 -i gulcalci.bin
+$ gulcalc -r -S100 -i -a1 gulcalci.bin &lt; getmodel.bin 
+&#39;To stdout gulcalc coverage and item stream (deprecated)
 $ eve 1 1 | getmodel | gulcalc -R1000000 -S100 -c - | summarycalc -g -1 summarycalc1.bin
-$ eve 1 1 | getmodel | gulcalc -r -S100 -i gulcalci.bin
-$ eve 1 1 | getmodel | gulcalc -r -S100 -c gulcalcc.bin
-$ gulcalc -r -S100 -c gulcalcc.bin &lt; getmodel.bin </code></pre>
+$ eve 1 1 | getmodel | gulcalc -R1000000 -S100 -i - | fmcalc &gt; fmcalc.bin
+$ eve 1 1 | getmodel | gulcalc -r -S100 -i gulcalci.bin -c gulcalcc.bin
+$ gulcalc -r -S100 -i gulcalci.bin -c gulcalcc.bin &lt; getmodel.bin </code></pre>
 <h5 id="internal-data-2">Internal data</h5>
 <p>The program requires the damage bin dictionary binary for the static folder and the item and coverage binaries from the input folder. The files are found in the following locations relative to the working directory with the filenames;</p>
 <ul>
@@ -182,18 +225,19 @@ $ gulcalc -r -S100 -c gulcalcc.bin &lt; getmodel.bin </code></pre>
 <p>The default random number behaviour (no additional parameters) is to generate random numbers from a seed determined by a combination of the event_id and group_id, which produces repeatable results. See <a href="RandomNumbers.html">Random Numbers</a> for more details.</p>
 <p>Each sampled damage is multiplied by the item TIV, looked up from the coverage file.</p>
 <p>The mean and standard deviation of ground up loss is also calculated. For each cdf, the mean and standard deviation of damage is calculated by numerical integration of the effective damageability probability distribution and the result is multiplied by the TIV. The results are included in the output to the stdout stream as sidx=-1 (mean) and sidx=-2 (standard deviation), for each event and item (or coverage).</p>
-<p>At this stage, there are two possible output streams, as follows;</p>
+<p>At this stage, there are three possible output streams, as follows;</p>
 <ul>
-<li>stream_id=1: If the -i parameter is specified, then the ground up losses for the items are output to the stream (stream_id 1).</li>
-<li>stream_id=2: If the -c parameter is specified, then the ground up losses for the items are grouped by coverage_id and capped to the coverage TIV, and the ground up losses for the coverages are output to the stream (stream_id 2).</li>
+<li>stream 1/1: If the -i parameter is specified, then the ground up losses for the items are output to the gulcalc item stream.</li>
+<li>stream 1/2: If the -c parameter is specified, then the ground up losses for the items are grouped by coverage_id and capped to the coverage TIV, and the ground up losses for the coverages are output to the stream.</li>
+<li>stream 2/1: If the -i and -a{} parameters are specified, then the ground up losses for the items are capped by coverage and back-allocated to items using the allocation method specified by the number provided to parameter a, and output to the loss stream.</li>
 </ul>
-<p>The purpose of the coverage stream is to cap losses to the coverage TIV where items represent damage to the same coverage from different perils, where overall damage cannot exceed 100% of the TIV.</p>
+<p>Stream 2/1 also contains a loss sample for sidx -3, which is the 100% damage scenario for all items with the specified allocation method applied to it.</p>
 <p><a href="#corecomponents">Return to top</a></p>
 <p><a id="fmcalc"></a></p>
 <h3 id="fmcalc">fmcalc</h3>
 <hr />
-<p>fmcalc is the reference implementation of the Oasis Financial Module. It applies policy terms and conditions to the ground up losses and produces loss sample output. It reads in losses from gulcalc at item level (stream_id = 1) or it can run recursively on losses output from fmcalc and apply several sets of policy terms and conditions.</p>
-<h5 id="stream_id-3">Stream_id</h5>
+<p>fmcalc is the reference implementation of the Oasis Financial Module. It applies policy terms and conditions to the ground up losses and produces loss sample output. It reads in losses from gulcalc at item level (gulcalc item stream 1/1 or loss stream 2/1) and it can run recursively on losses output from fmcalc (loss stream 2/1) and apply several consecutive sets of policy terms and conditions.</p>
+<h5 id="stream-output-1">Stream output</h5>
 <table>
 <thead>
 <tr class="header">
@@ -206,7 +250,7 @@ $ gulcalc -r -S100 -c gulcalcc.bin &lt; getmodel.bin </code></pre>
 <tr class="odd">
 <td align="left">2</td>
 <td>1</td>
-<td align="left">fmcalc reference example</td>
+<td align="left">loss stream</td>
 </tr>
 </tbody>
 </table>
@@ -222,12 +266,12 @@ $ gulcalc -r -S100 -c gulcalcc.bin &lt; getmodel.bin </code></pre>
 $ [stdin component] | fmcalc [parameters] &gt; [stdout].bin
 $ fmcalc [parameters] &lt; [stdin].bin &gt; [stdout].bin</code></pre>
 <h5 id="example-3">Example</h5>
-<pre><code>$ eve 1 1 | getmodel | gulcalc -r -S100 -i - | fmcalc -p direct -a2 | summarycalc -f -2 - | eltcalc &gt; elt.csv
-$ eve 1 1 | getmodel | gulcalc -r -S100 -i - | fmcalc -p direct -a1 &gt; fmcalc.bin
-$ fmcalc -p ri1 -a2 -n &lt; gulcalc.bin &gt; fmcalc.bin
-$ fmcalc -p direct | fmcalc -p ri1 -n | fmcalc -p ri2 -n &lt; gulcalc.bin &gt; fm_ri2_net.bin </code></pre>
+<pre><code>$ eve 1 1 | getmodel | gulcalc -r -S100 -a1 -i - | fmcalc -p direct -a2 | summarycalc -f -2 - | eltcalc &gt; elt.csv
+$ eve 1 1 | getmodel | gulcalc -r -S100 -a1 -i - | fmcalc -p direct -a1 &gt; fmcalc.bin
+$ fmcalc -p ri1 -a2 -n &lt; gulcalci.bin &gt; fmcalc.bin
+$ fmcalc -p direct | fmcalc -p ri1 -n | fmcalc -p ri2 -n &lt; gulcalci.bin &gt; fm_ri2_net.bin </code></pre>
 <h5 id="internal-data-3">Internal data</h5>
-<p>For the gulcalc stream input, the program requires the item, coverage and fm input data files, which are Oasis abstract data objects that describe an insurance or reinsurance programme. This data is picked up from the following files relative to the working directory by default;</p>
+<p>For the gulcalc item stream input, the program requires the item, coverage and fm input data files, which are Oasis abstract data objects that describe an insurance or reinsurance programme. This data is picked up from the following files relative to the working directory by default;</p>
 <ul>
 <li>input/items.bin</li>
 <li>input/coverages.bin</li>
@@ -236,7 +280,7 @@ $ fmcalc -p direct | fmcalc -p ri1 -n | fmcalc -p ri2 -n &lt; gulcalc.bin &gt; f
 <li>input/fm_profile.bin</li>
 <li>input/fm_xref.bin</li>
 </ul>
-<p>For fmcalc stream input, the program requires only the four fm input data files,</p>
+<p>For loss stream input from either gulcalc or fmcalc, the program requires only the four fm input data files,</p>
 <ul>
 <li>input/fm_programme.bin</li>
 <li>input/fm_policytc.bin</li>
@@ -252,7 +296,7 @@ $ fmcalc -p direct | fmcalc -p ri1 -n | fmcalc -p ri2 -n &lt; gulcalc.bin &gt; f
 <hr />
 <p>The purpose of summarycalc is firstly to aggregate the samples of loss to a level of interest for reporting, thereby reducing the volume of data in the stream. This is a generic first step which precedes all of the downstream output calculations. Secondly, it unifies the formats of the gulcalc and fmcalc streams, so that they are transformed into an identical stream type for downstream outputs. Finally, it can generate up to 10 summary level outputs in one go, creating multiple output streams or files.</p>
 <p>The output is similar to the gulcalc or fmcalc input which are losses are by sample index and by event, but the ground up or (re)insurance loss input losses are grouped to an abstract level represented by a summary_id. The relationship between the input identifier and the summary_id are defined in cross reference files called <strong>gulsummaryxref</strong> and <strong>fmsummaryxref</strong>.</p>
-<h5 id="stream_id-4">Stream_id</h5>
+<h5 id="stream-output-2">Stream output</h5>
 <table>
 <thead>
 <tr class="header">
@@ -265,12 +309,12 @@ $ fmcalc -p direct | fmcalc -p ri1 -n | fmcalc -p ri2 -n &lt; gulcalc.bin &gt; f
 <tr class="odd">
 <td align="left">3</td>
 <td>1</td>
-<td align="left">summarycalc reference example</td>
+<td align="left">summary stream</td>
 </tr>
 </tbody>
 </table>
 <h5 id="parameters-4">Parameters</h5>
-<p>The input stream should be identified explicitly as -g for gulcalc stream or -f for fmcalc stream.</p>
+<p>The input stream should be identified explicitly as -g for gulcalc item stream, -i for gulcalc loss stream or -f for fmcalc loss stream.</p>
 <p>summarycalc supports up to 10 concurrent outputs. This is achieved by explictly directing each output to a named pipe, file, or to standard output.</p>
 <p>For each output stream, the following tuple of parameters must be specified for at least one summary set;</p>
 <ul>
@@ -278,11 +322,11 @@ $ fmcalc -p direct | fmcalc -p ri1 -n | fmcalc -p ri2 -n &lt; gulcalc.bin &gt; f
 <li>destination pipe or file. Use either - for standard output, or {name} for a named pipe or file.</li>
 </ul>
 <p>For example the following parameter choices are valid;</p>
-<pre><code>$ summarycalc -g -1 -                                       
+<pre><code>$ summarycalc -i -1 -                                       
 &#39;outputs results for summaryset 1 to standard output
-$ summarycalc -g -1 summarycalc1.bin                        
+$ summarycalc -i -1 summarycalc1.bin                        
 &#39;outputs results for summaryset 1 to a file (or named pipe)
-$ summarycalc -g -1 summarycalc1.bin -2 summarycalc2.bin    
+$ summarycalc -i -1 summarycalc1.bin -2 summarycalc2.bin    
 &#39;outputs results for summaryset 1 and 2 to a file (or named pipe)</code></pre>
 <p>Note that the summaryset_id relates to a summaryset_id in the required input data file <strong>gulsummaryxref.bin</strong> or <strong>fmsummaryxref.bin</strong> for a gulcalc input stream or a fmcalc input stream, respectively, and represents a user specified summary reporting level. For example summaryset_id = 1 represents portfolio level, summaryset_id = 2 represents zipcode level and summaryset_id 3 represents site level.</p>
 <h5 id="usage-4">Usage</h5>
@@ -290,18 +334,19 @@ $ summarycalc -g -1 summarycalc1.bin -2 summarycalc2.bin
 $ [stdin component] | summarycalc [parameters]
 $ summarycalc [parameters] &lt; [stdin].bin</code></pre>
 <h5 id="example-4">Example</h5>
-<pre><code>$ eve 1 1 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - | eltcalc &gt; eltcalc.csv
-$ eve 1 1 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 gulsummarycalc.bin 
+<pre><code>$ eve 1 1 | getmodel | gulcalc -r -S100 -a1 -i - | summarycalc -i -1 - | eltcalc &gt; eltcalc.csv
+$ eve 1 1 | getmodel | gulcalc -r -S100 -a1 -i - | summarycalc -i -1 gulsummarycalc.bin 
+$ eve 1 1 | getmodel | gulcalc -r -S100 -a1 -i - | fmcalc | summarycalc -f -1 fmsummarycalc.bin 
 $ summarycalc -f -1 fmsummarycalc.bin &lt; fmcalc.bin</code></pre>
 <h5 id="internal-data-4">Internal data</h5>
-<p>The program requires the gulsummaryxref file for gulcalc input (-g option), or the fmsummaryxref file for fmcalc input (-f option). This data is picked up from the following files relative to the working directory;</p>
+<p>The program requires the gulsummaryxref file for gulcalc input (-g or -i option), or the fmsummaryxref file for fmcalc input (-f option). This data is picked up from the following files relative to the working directory;</p>
 <ul>
 <li>input/gulsummaryxref.bin</li>
 <li>input/fmsummaryxref.bin</li>
 </ul>
 <h5 id="calculation-3">Calculation</h5>
-<p>summarycalc takes either ground up loss (by coverage) or insured loss samples (by policy) as input and aggregates them to a user-defined summary reporting level. The output is similar to the input which are losses are by sample index and by event, but the ground up or insured losses are grouped to an abstract level represented by a summary_id. The relationship between the input identifier, coverage_id for gulcalc or output_id for fmcalc, and the summary_id are defined in the internal data files.</p>
-<p>summarycalc also calculates the maximum exposure value by summary_id and event_id. This is carried through in the stream header and output by eltcalc, aalcalc and pltcalc. For ground up losses this is the sum of TIV for all coverages which intersect with a given event footprint on the basis of areaperil_id (regardless or not of whether there are any sampled losses). For insured losses, this is the sum of the losses for sample index -3 from the fmcalc stdout stream. Sample index -3 is the ground up exposure values which have been passed through the financial module calculations. Essentially, it is a 100% damage scenario for all coverages affected by the event footprint. Because the event footprints vary geographically, the value can be different for each event.</p>
+<p>summarycalc takes either ground up loss (by coverage_id -g or by item_id -i) or insured loss samples (by output_id -f) as input and aggregates them to a user-defined summary reporting level. The output is similar to the input which are losses are by sample index and by event, but the ground up or insured losses are grouped to an abstract level represented by a summary_id. The relationship between the input identifier, item_id or coverage_id for gulcalc or output_id for fmcalc, and the summary_id are defined in the internal data files.</p>
+<p>For gulcalc coverage stream (1/2) input, summarycalc also calculates the maximum exposure value by summary_id and event_id. This is carried through in the stream header and output by eltcalc, aalcalc and pltcalc. For gulcalc coverage stream this is the sum of TIV for all coverages which intersect with a given event footprint on the basis of areaperil_id (regardless or not of whether there are any sampled losses). For gulcalc or fmcalc loss stream (2/1) input , this is the sum of the losses for sample index -3. Sample index -3 is the 100% loss scenario for all impacted items passed through the financial module calculations. Because the event footprints vary geographically, the value can be different for each event.</p>
 <p><a href="#corecomponents">Return to top</a></p>
 <p><a href="OutputComponents.html">Go to 4.2 Output Components section</a></p>
 <p><a href="Contents.html">Back to Contents</a></p>

@@ -94,6 +94,8 @@ private:
 	void dosummary(int sample_size, int event_id, int coverage_id, int sidx, OASIS_FLOAT gul, OASIS_FLOAT expval);
 	bool loadcoverages();
 	void loaditemtocoverage();
+	bool isGulStream(unsigned int stream_type);
+	bool isFMStream(unsigned int stream_type);
 
 public:
 	summarycalc();

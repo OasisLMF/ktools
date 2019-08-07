@@ -31,7 +31,7 @@
 <h3 id="cdftocsv">cdftocsv</h3>
 <hr />
 <p>A component which converts the getmodel output stream, or binary file with the same structure, to a csv file.</p>
-<h5 id="stdin-stream_id">Stdin stream_id</h5>
+<h5 id="standard-input-stream">Standard input stream</h5>
 <table>
 <thead>
 <tr class="header">
@@ -44,7 +44,7 @@
 <tr class="odd">
 <td align="left">0</td>
 <td>1</td>
-<td align="left">getmodel stdout</td>
+<td align="left">cdf</td>
 </tr>
 </tbody>
 </table>
@@ -123,8 +123,8 @@ $ cdftocsv &lt; getmodel.bin &gt; cdf.csv </code></pre>
 <p><a id="gultocsv"></a></p>
 <h3 id="gultocsv">gultocsv</h3>
 <hr />
-<p>A component which converts the gulcalc output stream, or binary file with the same structure, to a csv file.</p>
-<h5 id="stdin-stream_id-1">Stdin stream_id</h5>
+<p>A component which converts the gulcalc item or coverage stream, or binary file with the same structure, to a csv file.</p>
+<h5 id="standard-input-stream-1">Standard input stream</h5>
 <table>
 <thead>
 <tr class="header">
@@ -137,12 +137,12 @@ $ cdftocsv &lt; getmodel.bin &gt; cdf.csv </code></pre>
 <tr class="odd">
 <td align="left">1</td>
 <td>1</td>
-<td align="left">gulcalc item stdout</td>
+<td align="left">gulcalc item</td>
 </tr>
 <tr class="even">
 <td align="left">1</td>
 <td>2</td>
-<td align="left">gulcalc coverage stdout</td>
+<td align="left">gulcalc coverage</td>
 </tr>
 </tbody>
 </table>
@@ -155,7 +155,7 @@ $ gultocsv &lt; [stdin].bin &gt; [output].csv</code></pre>
 $ gultocsv &lt; gulcalci.bin &gt; gulcalci.csv </code></pre>
 <h5 id="output-1">Output</h5>
 <p>Csv file with the following fields;</p>
-<p>gulcalc stream_id=1</p>
+<p>gulcalc item stream 1/1</p>
 <table>
 <thead>
 <tr class="header">
@@ -197,7 +197,7 @@ $ gultocsv &lt; gulcalci.bin &gt; gulcalci.csv </code></pre>
 </tr>
 </tbody>
 </table>
-<p>gulcalc stream_id=2</p>
+<p>gulcalc coverage stream 1/2</p>
 <table>
 <thead>
 <tr class="header">
@@ -244,7 +244,7 @@ $ gultocsv &lt; gulcalci.bin &gt; gulcalci.csv </code></pre>
 <h3 id="fmtocsv">fmtocsv</h3>
 <hr />
 <p>A component which converts the fmcalc output stream, or binary file with the same structure, to a csv file.</p>
-<h5 id="stdin-stream_id-2">Stdin stream_id</h5>
+<h5 id="standard-input-stream-2">Standard input stream</h5>
 <table>
 <thead>
 <tr class="header">
@@ -257,7 +257,7 @@ $ gultocsv &lt; gulcalci.bin &gt; gulcalci.csv </code></pre>
 <tr class="odd">
 <td align="left">2</td>
 <td>1</td>
-<td align="left">fmcalc stdout</td>
+<td align="left">loss</td>
 </tr>
 </tbody>
 </table>
@@ -266,7 +266,7 @@ $ gultocsv &lt; gulcalci.bin &gt; gulcalci.csv </code></pre>
 <pre><code>$ [stdin component] | fmtocsv &gt; [output].csv
 $ fmtocsv &lt; [stdin].bin &gt; [output].csv</code></pre>
 <h5 id="example-2">Example</h5>
-<pre><code>$ eve 1 1 | getmodel | gulcalc -r -S100 -i - | fmcalc | fmtocsv &gt; fmcalc.csv
+<pre><code>$ eve 1 1 | getmodel | gulcalc -r -S100 -a1 -i - | fmcalc | fmtocsv &gt; fmcalc.csv
 $ fmtocsv &lt; fmcalc.bin &gt; fmcalc.csv </code></pre>
 <h5 id="output-2">Output</h5>
 <p>Csv file with the following fields;</p>
@@ -316,7 +316,7 @@ $ fmtocsv &lt; fmcalc.bin &gt; fmcalc.csv </code></pre>
 <h3 id="summarycalctocsv">summarycalctocsv</h3>
 <hr />
 <p>A component which converts the summarycalc output stream, or binary file with the same structure, to a csv file.</p>
-<h5 id="stdin-stream_id-3">Stdin stream_id</h5>
+<h5 id="standard-input-stream-3">Standard input stream</h5>
 <table>
 <thead>
 <tr class="header">
@@ -329,7 +329,7 @@ $ fmtocsv &lt; fmcalc.bin &gt; fmcalc.csv </code></pre>
 <tr class="odd">
 <td align="left">3</td>
 <td>1</td>
-<td align="left">summarycalc stdout</td>
+<td align="left">summary</td>
 </tr>
 </tbody>
 </table>
@@ -338,7 +338,7 @@ $ fmtocsv &lt; fmcalc.bin &gt; fmcalc.csv </code></pre>
 <pre><code>$ [stdin component] | summarycalctocsv &gt; [output].csv
 $ summarycalctocsv &lt; [stdin].bin &gt; [output].csv</code></pre>
 <h5 id="example-3">Example</h5>
-<pre><code>$ eve 1 1 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -1 - | summarycalctocsv &gt; summarycalc.csv
+<pre><code>$ eve 1 1 | getmodel | gulcalc -r -S100 -a1 -i - | fmcalc | summarycalc -f -1 - | summarycalctocsv &gt; summarycalc.csv
 $ summarycalctocsv &lt; summarycalc.bin &gt; summarycalc.csv </code></pre>
 <h5 id="output-3">Output</h5>
 <p>Csv file with the following fields;</p>
@@ -387,7 +387,7 @@ $ summarycalctocsv &lt; summarycalc.bin &gt; summarycalc.csv </code></pre>
 <p><a id="gultobin"></a></p>
 <h3 id="gultobin">gultobin</h3>
 <hr />
-<p>A component which converts gulcalc data in csv format into gulcalc binary standard output, for stream_id=1 (item stream).</p>
+<p>A component which converts gulcalc data in csv format into gulcalc binary item stream (1/1).</p>
 <h5 id="input-file-format">Input file format</h5>
 <table>
 <thead>
@@ -431,7 +431,7 @@ $ summarycalctocsv &lt; summarycalc.bin &gt; summarycalc.csv </code></pre>
 </tbody>
 </table>
 <ul>
-<li>For each event_id and item_id combination, a record for sidx = -1 (mean) and sidx = -2 (standard deviation) must be included, even if the loss values are zero.</li>
+<li>For each event_id and item_id combination, a record for sidx = -1 (mean) and sidx = -2 (standard deviation) must be included at the top, even if the loss values are zero.</li>
 <li>For each event_id and item_id combination, one or more sampled losses for sidx &gt; 0 may be provided, but records for samples with zero loss may be omitted.</li>
 </ul>
 <h5 id="parameters">Parameters</h5>
@@ -442,7 +442,7 @@ $ gultobin [parameters] &lt; [input].csv &gt; [output].bin</code></pre>
 <h5 id="example-4">Example</h5>
 <pre><code>$ gultobin -S100 &lt; gulcalci.csv | fmcalc &gt; fmcalc.bin
 $ gultobin -S100 &lt; gulcalci.csv &gt; gulcalci.bin</code></pre>
-<h5 id="stdout-stream_id">Stdout stream_id</h5>
+<h5 id="standard-output-stream">Standard output stream</h5>
 <table>
 <thead>
 <tr class="header">
@@ -455,7 +455,7 @@ $ gultobin -S100 &lt; gulcalci.csv &gt; gulcalci.bin</code></pre>
 <tr class="odd">
 <td align="left">1</td>
 <td>1</td>
-<td align="left">gulcalc item stdout</td>
+<td align="left">gulcalc item</td>
 </tr>
 </tbody>
 </table>

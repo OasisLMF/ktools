@@ -11,8 +11,16 @@
 <p><img src="../img/banner.jpg" title="banner" alt="alt text" /></p>
 <h1 id="specification">3. Specification <a id="specification"></a></h1>
 <h3 id="introduction">Introduction</h3>
-<p>This section specifies the core components and data stream structures in the in-memory kernel.<br />
-These components are;</p>
+<p>This section specifies the data stream structures and core components in the in-memory kernel.</p>
+<p>The data stream structures are;</p>
+<ul>
+<li><strong><a href="#cdf">cdf stream</a></strong></li>
+<li><strong><a href="#gulstream">gulcalc stream</a></strong></li>
+<li><strong><a href="#loss">loss stream</a></strong></li>
+<li><strong><a href="#summary">summary stream</a></strong></li>
+</ul>
+<p>The stream data structures have been designed to minimise the volume flowing through the pipeline, using data packet 'headers' to remove redundant data. For example, indexes which are common to a block of data are defined as a header record and then only the variable data records that are relevant to the header key are part of the data stream. The names of the data fields given below are unimportant, only their position in the data stream is important in order to perform the calculations defined in the program.</p>
+<p>The components are;</p>
 <ul>
 <li><strong><a href="#eve">eve</a></strong></li>
 <li><strong><a href="#getmodel">getmodel</a></strong></li>
@@ -21,25 +29,24 @@ These components are;</p>
 <li><strong><a href="#summarycalc">summarycalc</a></strong></li>
 <li><strong><a href="#outputcalc">outputcalc</a></strong></li>
 </ul>
-<p>The components have a standard input (stdin) and/or output (stdout) data stream structure. eve is the stream-initiating component which only has a standard output stream, whereas outputcalc is a stream-terminating component with only a standard input stream.</p>
-<p>The stream data structures have been designed to minimise the volume flowing through the pipeline, using data packet 'headers' to remove redundant data. For example, indexes which are common to a block of data are defined as a header record and then only the variable data records that are relevant to the header key are part of the data stream. The names of the data fields given below are unimportant, only their position in the data stream is important in order to perform the calculations defined in the program.</p>
-<p>An implementation of each of the above components is provided in the <a href="ReferenceModelOverview.html">Reference Model</a>, where usage instructions and command line parameters are provided.</p>
+<p>The components have a standard input (stdin) and/or output (stdout) data stream structure. eve is the stream-initiating component which only has a standard output stream, whereas &quot;outputcalc&quot; (a generic name representing an extendible family of output calculation components) is a stream-terminating component with only a standard input stream.</p>
+<p>An implementation of each of the above components is provided in the <a href="ReferenceModelOverview.html">Reference Model</a>, where usage instructions and command line parameters are provided. A functional overview is given below.</p>
 <h4 id="stream-types">Stream types</h4>
 <p>The architecture supports multiple stream types. Therefore a developer can define a new type of data stream within the framework by specifying a unique stream_id of the stdout of one or more of the components, or even write a new component which performs an intermediate calculation between the existing components.</p>
-<p>The stream_id is the first 4 byte header of the stdout streams. The higher byte is reserved to identify the type of stream (which component), and the 2nd to 4th bytes hold the identifier of the stream. This is used for validation of pipeline commands to report errors if the components are not being used in the correct order.</p>
+<p>The stream_id is the first 4 byte header of the stdout streams. The higher byte is reserved to identify the type of stream, and the 2nd to 4th bytes hold the identifier of the stream. This is used for validation of pipeline commands to report errors if the components are not being used in the correct order.</p>
 <p>The current reserved values are as follows;</p>
 <p>Higher byte;</p>
 <table>
 <thead>
 <tr class="header">
 <th align="left">Byte 1</th>
-<th align="left">Stream type</th>
+<th align="left">Stream name</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">0</td>
-<td align="left">getmodel</td>
+<td align="left">cdf</td>
 </tr>
 <tr class="even">
 <td align="left">1</td>
@@ -47,20 +54,20 @@ These components are;</p>
 </tr>
 <tr class="odd">
 <td align="left">2</td>
-<td align="left">fmcalc</td>
+<td align="left">loss</td>
 </tr>
 <tr class="even">
 <td align="left">3</td>
-<td align="left">summarycalc</td>
+<td align="left">summary</td>
 </tr>
 </tbody>
 </table>
 <p>Reserved stream_ids;</p>
 <table>
 <colgroup>
-<col width="8%" />
-<col width="10%" />
-<col width="81%" />
+<col width="9%" />
+<col width="13%" />
+<col width="76%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -73,71 +80,100 @@ These components are;</p>
 <tr class="odd">
 <td align="left">0</td>
 <td>1</td>
-<td align="left">getmodel - Reference example for Oasis format effective damageability CDF output</td>
+<td align="left">cdf - Oasis format effective damageability CDF output</td>
 </tr>
 <tr class="even">
 <td align="left">1</td>
 <td>1</td>
-<td align="left">gulcalc - Reference example for Oasis format item level ground up loss sample output</td>
+<td align="left">gulcalc - Oasis format item level ground up loss sample output <strong>(deprecated)</strong></td>
 </tr>
 <tr class="odd">
 <td align="left">1</td>
 <td>2</td>
-<td align="left">gulcalc - Reference example for Oasis format coverage level ground up loss sample output</td>
+<td align="left">gulcalc - Oasis format coverage level ground up loss sample output <strong>(deprecated)</strong></td>
 </tr>
 <tr class="even">
 <td align="left">2</td>
 <td>1</td>
-<td align="left">fmcalc - Reference example for Oasis format insured loss sample output</td>
+<td align="left">loss - Oasis format loss sample output (any loss perspective)</td>
 </tr>
 <tr class="odd">
 <td align="left">3</td>
 <td>1</td>
-<td align="left">summarycalc - Reference example for Oasis format summary level loss sample output</td>
+<td align="left">summary - Oasis format summary level loss sample output</td>
 </tr>
 </tbody>
 </table>
-<p>There are rules about which stream types can be accepted as inputs to the components. These are;</p>
-<ul>
-<li>gulcalc can only take stream 0/1 (getmodel output) as input</li>
-<li>fmcalc can only take stream 1/1 (gulcalc item level output) as input</li>
-<li>summarycalc can take either stream 1/2 (gulcalc coverage level output) or 2/1 (fmcalc standard output) as input</li>
-<li>outputcalc can take only stream 3/1 (summarycalc output) as input</li>
-</ul>
-<p><a id="eve"></a></p>
-<h2 id="eve">eve</h2>
-<p>eve is an 'event emitter' and its job is to read a list of events from file and send out a subset of events as a binary data stream. It has no standard input.<br />
-eve is used to partition lists of events such that a workflow can be distributed across multiple processes.</p>
-<h5 id="output">Output</h5>
-<p>Data packet structure</p>
+<p>The supported standard input and output streams of the Reference model components are summarized here;</p>
 <table>
 <thead>
 <tr class="header">
-<th align="left">Name</th>
-<th>Type</th>
-<th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th align="left">Component</th>
+<th align="left">Standard input</th>
+<th align="left">Standard output</th>
+<th align="left">Stream option parameters</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">event_id</td>
-<td>int</td>
-<td>4</td>
-<td align="left">Oasis event_id</td>
-<td align="right">4545</td>
+<td align="left">getmodel</td>
+<td align="left">none</td>
+<td align="left">0/1 cdf</td>
+<td align="left">none</td>
+</tr>
+<tr class="even">
+<td align="left">gulcalc</td>
+<td align="left">0/1 cdf</td>
+<td align="left">1/1 gulcalc item <strong>(deprecated)</strong></td>
+<td align="left">-i</td>
+</tr>
+<tr class="odd">
+<td align="left">gulcalc</td>
+<td align="left">0/1 cdf</td>
+<td align="left">1/2 gulcalc coverage <strong>(deprecated)</strong></td>
+<td align="left">-c</td>
+</tr>
+<tr class="even">
+<td align="left">gulcalc</td>
+<td align="left">0/1 cdf</td>
+<td align="left">2/1 loss</td>
+<td align="left">-i -a{}</td>
+</tr>
+<tr class="odd">
+<td align="left">fmcalc</td>
+<td align="left">1/1 gulcalc item <strong>(deprecated)</strong></td>
+<td align="left">2/1 loss</td>
+<td align="left">none</td>
+</tr>
+<tr class="even">
+<td align="left">fmcalc</td>
+<td align="left">2/1 loss</td>
+<td align="left">2/1 loss</td>
+<td align="left">none</td>
+</tr>
+<tr class="odd">
+<td align="left">summarycalc</td>
+<td align="left">1/2 gulcalc coverage <strong>(deprecated)</strong></td>
+<td align="left">3/1 summary</td>
+<td align="left">-g</td>
+</tr>
+<tr class="even">
+<td align="left">summarycalc</td>
+<td align="left">2/1 loss</td>
+<td align="left">3/1 summary</td>
+<td align="left">-i gulcalc input, -f fmcalc input</td>
+</tr>
+<tr class="odd">
+<td align="left">outputcalc</td>
+<td align="left">3/1 summary</td>
+<td align="left">none</td>
+<td align="left">none</td>
 </tr>
 </tbody>
 </table>
-<p>Note that eve has no stream_id header.</p>
-<p><a href="#specification">Return to top</a></p>
-<p><a id="getmodel"></a></p>
-<h2 id="getmodel">getmodel</h2>
-<p>getmodel is the component which generates a stream of effective damageability cdfs for a given set of event_ids.</p>
-<h5 id="input">Input</h5>
-<p>Same as eve output or a binary file of the same input format can be piped into getmodel.</p>
-<h5 id="output-1">Output</h5>
+<h2 id="stream-structure">Stream structure</h2>
+<p><a id="cdf"></a></p>
+<h3 id="cdf-stream">cdf stream</h3>
 <p>Stream header packet structure</p>
 <table>
 <thead>
@@ -159,7 +195,7 @@ eve is used to partition lists of events such that a workflow can be distributed
 </tr>
 </tbody>
 </table>
-<p>getmodel header packet structure</p>
+<p>Data header packet structure</p>
 <table>
 <thead>
 <tr class="header">
@@ -201,7 +237,7 @@ eve is used to partition lists of events such that a workflow can be distributed
 </tr>
 </tbody>
 </table>
-<p>getmodel data packet structure (record repeated no_of_bin times)</p>
+<p>Data packet structure (record repeated no_of_bin times)</p>
 <table>
 <colgroup>
 <col width="16%" />
@@ -237,13 +273,8 @@ eve is used to partition lists of events such that a workflow can be distributed
 </tbody>
 </table>
 <p><a href="#specification">Return to top</a></p>
-<p><a id="gulcalc"></a></p>
-<h2 id="gulcalc">gulcalc</h2>
-<p>gulcalc is the component which calculates ground up loss. It takes the getmodel output as standard input and based on the sampling parameters specified, performs Monte Carlo sampling and numerical integration. The output is a stream of ground up loss samples in Oasis kernel format, with numerical integration mean (sidx=-1) and standard deviation (sidx=-2).</p>
-<h5 id="input-1">Input</h5>
-<p>Same as getmodel output or a binary file of the same data structure can be piped into gulcalc.</p>
-<h5 id="output-2">Output</h5>
-<h5 id="stream_id-1">stream_id 1</h5>
+<p><a id="gulstream"></a></p>
+<h3 id="gulcalc-item-stream-deprecated">gulcalc item stream (deprecated)</h3>
 <p>Stream header packet structure</p>
 <table>
 <thead>
@@ -272,7 +303,7 @@ eve is used to partition lists of events such that a workflow can be distributed
 </tr>
 </tbody>
 </table>
-<p>gulcalc header packet structure</p>
+<p>Data header packet structure</p>
 <table>
 <thead>
 <tr class="header">
@@ -300,7 +331,7 @@ eve is used to partition lists of events such that a workflow can be distributed
 </tr>
 </tbody>
 </table>
-<p>gulcalc data packet structure</p>
+<p>Data packet structure</p>
 <table>
 <thead>
 <tr class="header">
@@ -335,21 +366,25 @@ eve is used to partition lists of events such that a workflow can be distributed
 <tr class="header">
 <th align="left">sidx</th>
 <th align="left">Meaning</th>
+<th>Required / optional</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">-1</td>
-<td align="left">numerical integration mean</td>
+<td align="left">numerical integration mean loss</td>
+<td>required</td>
 </tr>
 <tr class="even">
 <td align="left">-2</td>
-<td align="left">numerical integration standard deviation</td>
+<td align="left">numerical integration standard deviation loss</td>
+<td>required</td>
 </tr>
 </tbody>
 </table>
-<h5 id="stream_id-2">stream_id 2</h5>
-<p>The main difference here is that the field in the gulcalc header packet structure is coverage_id, representing a grouping of item_id, rather than item_id. The distinction and rationale for having this as a alternative stream is explained in the Reference Model section.</p>
+<p>sidx -1 and -2 must come at the beginning of the data packet before the other samples.</p>
+<h3 id="gulcalc-coverage-stream-deprecated">gulcalc coverage stream (deprecated)</h3>
+<p>The main difference from the gulcalc item stream is that the field in the gulcalc header packet structure is coverage_id, representing a grouping of item_id, rather than item_id. The distinction and rationale for having this as a alternative stream is explained in the Reference Model section.</p>
 <p>Stream header packet structure</p>
 <table>
 <thead>
@@ -378,7 +413,7 @@ eve is used to partition lists of events such that a workflow can be distributed
 </tr>
 </tbody>
 </table>
-<p>gulcalc header packet structure</p>
+<p>Data header packet structure</p>
 <table>
 <thead>
 <tr class="header">
@@ -406,7 +441,7 @@ eve is used to partition lists of events such that a workflow can be distributed
 </tr>
 </tbody>
 </table>
-<p>gulcalc data packet structure</p>
+<p>Data packet structure</p>
 <table>
 <thead>
 <tr class="header">
@@ -434,27 +469,27 @@ eve is used to partition lists of events such that a workflow can be distributed
 </tr>
 </tbody>
 </table>
-<p>The numerical integration standard deviation is not output for stream_id 2 but the numerical integration mean is output.</p>
+<p>Only the numerical integration mean loss is output.</p>
 <table>
 <thead>
 <tr class="header">
 <th align="left">sidx</th>
 <th align="left">Meaning</th>
+<th>Required / optional</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">-1</td>
-<td align="left">numerical integration mean</td>
+<td align="left">numerical integration mean loss</td>
+<td>required</td>
 </tr>
 </tbody>
 </table>
+<p>sidx -1 must come at the beginning of the data packet before the other samples.</p>
 <p><a href="#specification">Return to top</a></p>
-<h2 id="fmcalc">fmcalc <a id="fmcalc"></a></h2>
-<p>fmcalc is the component which takes the gulcalc output stream as standard input and applies the policy terms and conditions to produce insured loss samples. fmcalc can also take the fmcalc output stream as input to perform recursive financial module calculations. The output is a table of loss samples in Oasis kernel format, including the loss for the mean ground up loss (sidx=-1) and the maximum exposed value (sidx=-3).</p>
-<h5 id="input-2">Input</h5>
-<p>Same as gulcalc output or fmcalc output (below) or a binary file of either data structure can be piped into fmcalc.</p>
-<h5 id="output-3">Output</h5>
+<p><a id="loss"></a></p>
+<h3 id="loss-stream">loss stream</h3>
 <p>Stream header packet structure</p>
 <table>
 <thead>
@@ -483,7 +518,7 @@ eve is used to partition lists of events such that a workflow can be distributed
 </tr>
 </tbody>
 </table>
-<p>fmcalc header packet structure</p>
+<p>Data header packet structure</p>
 <table>
 <thead>
 <tr class="header">
@@ -503,15 +538,15 @@ eve is used to partition lists of events such that a workflow can be distributed
 <td align="right">4545</td>
 </tr>
 <tr class="even">
-<td align="left">output_id</td>
+<td align="left">item_id /output_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Oasis output_id</td>
+<td align="left">Oasis item_id (gulcalc) or output_id (fmcalc)</td>
 <td align="right">300</td>
 </tr>
 </tbody>
 </table>
-<p>fmcalc data packet structure</p>
+<p>Data packet structure</p>
 <table>
 <thead>
 <tr class="header">
@@ -534,40 +569,42 @@ eve is used to partition lists of events such that a workflow can be distributed
 <td align="left">loss</td>
 <td>float</td>
 <td>4</td>
-<td align="left">The insured loss for the sample</td>
+<td align="left">The loss for the sample</td>
 <td align="right">5625.675</td>
 </tr>
 </tbody>
 </table>
 <p>The data packet may be a variable length and so a sidx of 0 identifies the end of the data packet.</p>
-<p>There are two values of sidx with special meaning as follows;</p>
+<p>There are three values of sidx with special meaning as follows;</p>
 <table>
 <thead>
 <tr class="header">
 <th align="left">sidx</th>
 <th align="left">Meaning</th>
+<th>Required / optional</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
 <td align="left">-1</td>
-<td align="left">numerical integration mean</td>
+<td align="left">numerical integration mean loss</td>
+<td>required</td>
 </tr>
 <tr class="even">
+<td align="left">-2</td>
+<td align="left">numerical integration standard deviation loss</td>
+<td>optional</td>
+</tr>
+<tr class="odd">
 <td align="left">-3</td>
-<td align="left">maximum exposed value</td>
+<td align="left">maximum exposure value</td>
+<td>required</td>
 </tr>
 </tbody>
 </table>
-<p>In the case of sidx = -1, this is the numerically integrated mean ground up loss passed through the financial terms from gulcalc.</p>
-<p>The maximum exposed value, sidx=-3, is generated by fmcalc and this is the TIV of the items passed through the financial terms. This represents a 100% loss scenario to all exposed items after applying the insurance terms and conditions and is used in outputs that require an exposed value.</p>
-<p>If the stream input is an fmcalc output data structure, then sample -3 losses are present in the data and this is carried forward through the calculations as the 100% loss scenario, rather than the TIV of the original items.</p>
+<p>sidx -1 to -3 must come at the beginning of the data packet before the other samples.</p>
 <p><a href="#specification">Return to top</a></p>
-<h2 id="summarycalc">summarycalc <a id="summarycalc"></a></h2>
-<p>summarycalc is a component which sums the sampled losses from either gulcalc or fmcalc to the users required level(s) for reporting results. This is a simple sum of the loss value by event_id, sidx and summary_id, where summary_id is a grouping of coverage_id for gulcalc or output_id for fmcalc defined in the user's input files.</p>
-<h5 id="input-3">Input</h5>
-<p>Same as gulcalc coverage output (stream_id =2) or fmcalc output. A binary file of either data structure can be piped into summarycalc.</p>
-<h5 id="output-4">Output</h5>
+<h3 id="summary-stream">summary stream <a id="summary"></a></h3>
 <p>Stream header packet structure</p>
 <table>
 <thead>
@@ -596,14 +633,14 @@ eve is used to partition lists of events such that a workflow can be distributed
 </tr>
 </tbody>
 </table>
-<p>summarycalc header packet structure</p>
+<p>Data header packet structure</p>
 <table>
 <colgroup>
 <col width="18%" />
 <col width="8%" />
 <col width="8%" />
-<col width="53%" />
-<col width="12%" />
+<col width="50%" />
+<col width="13%" />
 </colgroup>
 <thead>
 <tr class="header">
@@ -633,12 +670,12 @@ eve is used to partition lists of events such that a workflow can be distributed
 <td align="left">exposure_value</td>
 <td>float</td>
 <td>4</td>
-<td align="left">The TIV (from gulcalc) or maximum exposure value (fmcalc)</td>
-<td align="right">600000</td>
+<td align="left">Exposure value (sum of sidx -3 losses for summary_id)</td>
+<td align="right">987878</td>
 </tr>
 </tbody>
 </table>
-<p>summarycalc data packet structure</p>
+<p>Data packet structure</p>
 <table>
 <thead>
 <tr class="header">
@@ -661,25 +698,59 @@ eve is used to partition lists of events such that a workflow can be distributed
 <td align="left">loss</td>
 <td>float</td>
 <td>4</td>
-<td align="left">The insured loss for the sample</td>
+<td align="left">The loss for the sample</td>
 <td align="right">5625.675</td>
 </tr>
 </tbody>
 </table>
 <p>The data packet may be a variable length and so a sidx of 0 identifies the end of the data packet.</p>
-<h2 id="outputcalc">outputcalc <a id="outputcalc"></a></h2>
+<p>The sidx -1 mean loss may be present (if non-zero)</p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">sidx</th>
+<th align="left">Meaning</th>
+<th>Required / optional</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">-1</td>
+<td align="left">numerical integration mean loss</td>
+<td>optional</td>
+</tr>
+</tbody>
+</table>
+<p><a href="#specification">Return to top</a></p>
+<h2 id="components">Components</h2>
+<p><a id="eve"></a></p>
+<h3 id="eve">eve</h3>
+<p>eve is an 'event emitter' and its job is to read a list of events from file and send out a subset of events as a binary data stream. It has no standard input and emits a list of event_ids, which are 4 byte integers.</p>
+<p>eve is used to partition lists of events such that a workflow can be distributed across multiple processes.</p>
+<p><a id="getmodel"></a></p>
+<h3 id="getmodel">getmodel</h3>
+<p>getmodel is the component which generates a stream of effective damageability cdfs for a given set of event_ids and the impacted exposed items on the basis of their areaperil_ids (location) and vulnerability_ids (damage function).</p>
+<p><a id="gulcalc"></a></p>
+<h3 id="gulcalc">gulcalc</h3>
+<p>gulcalc is the component which calculates ground up loss. It takes the getmodel output as standard input and based on the sampling parameters specified, performs Monte Carlo sampling and numerical integration. The output is a stream of ground up loss samples in Oasis kernel format, with numerical integration mean (sidx=-1), standard deviation (sidx=-2) and exposure_value (sidx =-3).</p>
+<p>The maximum exposed value, sidx=-3 represents the 100% ground up loss scenario to all items impacted by an event and is used by outputs that require an exposure value.</p>
+<p><a id="fmcalc"></a></p>
+<h3 id="fmcalc">fmcalc</h3>
+<p>fmcalc is the component which takes the gulcalc output stream as standard input and applies the policy terms and conditions to produce insured loss samples. fmcalc can also take the fmcalc output stream as input to perform recursive financial module calculations (e.g for the application of reinsurance terms). The output is a table of loss samples in Oasis kernel format, including the (re)insured loss for the numerical integration mean ground up loss (sidx=-1) and the maximum exposed value (sidx=-3).</p>
+<p>The maximum exposed value, sidx=-3 represents the 100% loss scenario to all items impacted by an event after applying the (re)insurance terms and conditions and is used by outputs that require an exposure value.</p>
+<p><a id="summarycalc"></a></p>
+<h3 id="summarycalc">summarycalc</h3>
+<p>summarycalc is a component which sums the sampled losses from either gulcalc or fmcalc to the users required level(s) for reporting results. This is a simple sum of the loss value by event_id, sidx and summary_id, where summary_id is a grouping of coverage_id or item_id for gulcalc or output_id for fmcalc defined in the user's input files.</p>
+<p><a id="outputcalc"></a></p>
+<h3 id="outputcalc">outputcalc</h3>
 <p>Outputcalc is a general term for an end-of-pipeline component which represents one of a potentially unlimited set of output components. Four examples are provided in the Reference Model. These are;</p>
 <ul>
 <li>eltcalc</li>
 <li>leccalc</li>
 <li>aalcalc</li>
-<li>pltcalc.</li>
+<li>pltcalc</li>
 </ul>
 <p>outputcalc performs results analysis such as an event loss table or loss exceedance curve on the sampled output from summarycalc. The output is a results table in csv format.</p>
-<h5 id="input-4">Input</h5>
-<p>summarycalc stdout. Binary files of the same data structures can be piped into the outputcalc component.</p>
-<h5 id="output-5">Output</h5>
-<p>No standard output stream. The results table is exported to a csv file.</p>
 <p><a href="#specification">Return to top</a></p>
 <p><a href="ReferenceModelOverview.html">Go to 4. Reference model</a></p>
 <p><a href="Contents.html">Back to Contents</a></p>

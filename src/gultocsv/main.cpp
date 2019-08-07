@@ -1,5 +1,5 @@
 /*
-* Copyright (c)2015 - 2016 Oasis LMF Limited 
+* Copyright (c)2015 - 2016 Oasis LMF Limited
 * All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without
@@ -32,60 +32,93 @@
 * DAMAGE.
 */
 /*
-Author: Ben Matharu  email : ben.matharu@oasislmf.org
+Author: Ben Matharu  email: ben.matharu@oasislmf.org
 */
+
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "../include/oasis.h"
 #if defined(_MSC_VER)
 #include "../wingetopt/wingetopt.h"
 #else
 #include <unistd.h>
 #endif
 
-using namespace std;
-#include "../include/oasis.h"
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+#include <signal.h>
+#include <string.h>
+#endif
 
+char* progname;
 namespace gultocsv {
-	void doit(bool skipheader, bool fullprecision)
-	{
+	void doit(bool skipheader, bool fullprecision);
+}
 
-		int gulstream_type = 0;
-		int i = (int) fread(&gulstream_type, sizeof(gulstream_type), 1, stdin);
-		int stream_type = gulstream_type & gulstream_id;
-		if (stream_type == 0) {
-			stream_type = gulstream_type & loss_stream_id;
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+void segfault_sigaction(int signal, siginfo_t* si, void* arg)
+{
+	fprintf(stderr, "%s: Segment fault at address: %p\n", progname, si->si_addr);
+	exit(0);
+}
+#endif
+
+void help()
+{
+	fprintf(stderr,
+		"-s skip header\n"
+		"-f full precision\n"
+		"-v version\n"
+		"-h help\n"
+	);
+}
+
+int main(int argc, char* argv[])
+{
+
+	int opt;
+	bool skipheader = false;
+	bool fullprecision = false;
+
+	while ((opt = getopt(argc, argv, "vhfs")) != -1) {
+		switch (opt) {
+		case 's':
+			skipheader = true;
+			break;
+		case 'f':
+			fullprecision = true;
+			break;
+		case 'v':
+			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+			exit(EXIT_FAILURE);
+			break;
+		case 'h':
+		default:
+			help();
+			exit(EXIT_FAILURE);
 		}
-
-		if (stream_type != gulstream_id && stream_type != loss_stream_id) {
-			fprintf(stderr, "gultocsv: %s: Not a gul stream type\n", __func__);
-			exit(-1);
-		}
-		stream_type = streamno_mask & gulstream_type;
-
-		if (stream_type == 1 || stream_type == 2) {
-			if (skipheader == false && stream_type == 1) printf("event_id,item_id,sidx,loss\n");
-			if (skipheader == false && stream_type == 2) printf("event_id,coverage_id,sidx,loss\n");
-			int samplesize = 0;
-			fread(&samplesize, sizeof(samplesize), 1, stdin);
-			while (i != 0) {
-				gulSampleslevelHeader gh;
-				i = (int) fread(&gh, sizeof(gh), 1, stdin);
-				while (i != 0) {
-					gulSampleslevelRec gr;
-					i = (int) fread(&gr, sizeof(gr), 1, stdin);
-					if (i == 0) break;
-					if (gr.sidx == 0) break;
-					if (fullprecision) printf("%d,%d,%d,%f\n", gh.event_id, gh.item_id, gr.sidx, gr.loss);
-					else printf("%d,%d,%d,%.2f\n", gh.event_id, gh.item_id, gr.sidx, gr.loss);
-				}
-			}
-			return;
-		}
-		std::cerr << "Unsupported gul stream type\n";
-
 	}
 
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+	struct sigaction sa;
+
+	memset(&sa, 0, sizeof(struct sigaction));
+	sigemptyset(&sa.sa_mask);
+	sa.sa_sigaction = segfault_sigaction;
+	sa.sa_flags = SA_SIGINFO;
+
+	sigaction(SIGSEGV, &sa, NULL);
+#endif
+
+	try {
+		initstreams("", "");
+		gultocsv::doit(skipheader,fullprecision);
+		return EXIT_SUCCESS;
+	}
+	catch (std::bad_alloc) {
+		fprintf(stderr, "%s: Memory allocation failed\n", progname);
+		exit(EXIT_FAILURE);
+	}
 }
 

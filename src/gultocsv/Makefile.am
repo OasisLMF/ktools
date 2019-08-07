@@ -1,4 +1,4 @@
 # Our binary is produced here
 bin_PROGRAMS = gultocsv 
-gultocsv_SOURCES = gultocsv.cpp
+gultocsv_SOURCES = gultocsv.cpp main.cpp
 

@@ -26,7 +26,7 @@
 <li><strong>fmcalc</strong> performs the insurance and reinsurance loss calculations on the ground up loss samples, mean, and total insured value. The output is a stream of loss samples in one of two financial perspectives: net or gross. The result can be output to a binary file or streamed into summarycalc.</li>
 <li><strong>summarycalc</strong> performs a summing of sampled losses according to the user's reporting requirements. For example this might involve summing coverage losses to regional level, or policy losses to portfolio level. The output is sampled loss by event_id and summary_id, which represents a meaningful group of losses to the user.</li>
 </ul>
-<p>The standard input and standard output data streams for the core components are covered in the Specification.</p>
+<p>The standard input and standard output data streams for the core components are covered in the <a href="Specification.html">Specification</a>.</p>
 <p>Figure 1 shows the core components workflow and the required data input files.</p>
 <h5 id="figure-1.-core-components-workflow-and-required-data">Figure 1. Core components workflow and required data</h5>
 <p><img src="../img/ktoolsrequireddata.jpg" title="Core workflow and required data" alt="alt text" /></p>
@@ -46,7 +46,18 @@
 <p>The <strong><a href="DataConversionComponents.html">data conversion components</a></strong> section covers the formats of all of the required data files and explains how to convert data in csv format into binary format, and vice versa.</p>
 <p>Finally, the <strong><a href="StreamConversionComponents.html">stream conversion components</a></strong> section explains how to convert the binary data stream output to csv, plus how to convert gulcalc data in csv format into binary format. These components are useful when working with individual components at a more detailed level.</p>
 <p>The version of the installed components can be found by using the command line parameter -v. For example;</p>
-<pre><code>$ gulcalc -v</code></pre>
+<pre><code>$ gulcalc -v
+gulcalc : version: 3.0.7</code></pre>
+<p>Component usage guidance is available using the parameter -h</p>
+<pre><code>$ fmcalc -h
+-a set allocrule (default none)
+-M max level (optional)
+-p inputpath (relative or full path)
+-n feed net value (used for reinsurance)
+-O Alloc rule2 optimization off
+-d debug
+-v version
+-h help</code></pre>
 <p>The components have additional command line parameters depending on their particular function. These are described in detail in the following pages.</p>
 <p><a href="#referencemodel">Return to top</a></p>
 <p><a href="CoreComponents.html">Go to 4.1 Core Components section</a></p>

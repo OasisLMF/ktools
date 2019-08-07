@@ -109,6 +109,7 @@ private:
 	std::map<int, int> event_count_;	// count of events in occurrence table used to create cartesian effect on event_id
 	std::map<int, std::vector<int>> event_to_period_;	// Mapping of event to period no
 	int no_of_periods_ = 0;
+	int max_period_no_=0;
 	int samplesize_ = -1;
 	std::map<int, aal_rec> map_analytical_aal_;
 	std::map<int, aal_rec> map_analytical_aal_w_;

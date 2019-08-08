@@ -8,6 +8,7 @@
 #endif
 #include <math.h>
 #include <string.h>
+#include <set>
 
 
 //bool operator<(const period_sidx_map_key& lhs, const period_sidx_map_key& rhs)
@@ -75,9 +76,15 @@ void aalcalc::loadperiodtoweigthing()
 	size_t i = fread(&p, sizeof(Periods), 1, fin);
 	while (i != 0) {
 		total_weighting += p.weighting;
-		periodstoweighting_[p.period_no] = (OASIS_FLOAT)p.weighting;
+		periodstoweighting_[p.period_no] = (OASIS_FLOAT)p.weighting;		
 		i = fread(&p, sizeof(Periods), 1, fin);
 	}
+
+	if (total_weighting != 1.0) {
+		fprintf(stderr, "aalcalc: Period weighting do not sum to 1 in %s\n", PERIODS_FILE);
+		exit(-1);
+	}
+
 	// If we are going to have weightings we should have them for all periods
 	//	if (periodstowighting_.size() != no_of_periods_) {
 	//		fprintf(stderr, "Total number of periods in %s does not match the number of periods in %s\n", PERIODS_FILE, OCCURRENCE_FILE);
@@ -106,7 +113,7 @@ void aalcalc::loadoccurrence()
 		fprintf(stderr, "%s: cannot open %s\n", __func__, OCCURRENCE_FILE);
 		exit(-1);
 	}
-
+	std::set<int>  periods;
 	size_t i = fread(&date_algorithm_, sizeof(date_algorithm_), 1, fin);	// discard date algorithm
 	i = fread(&no_of_periods_, sizeof(no_of_periods_), 1, fin);
 	occurrence occ;
@@ -114,9 +121,21 @@ void aalcalc::loadoccurrence()
 	while (i != 0) {
 		event_count_[occ.event_id] = event_count_[occ.event_id] + 1;
 		event_to_period_[occ.event_id].push_back(occ.period_no);
+		if (max_period_no_ < occ.period_no) max_period_no_ = occ.period_no;
+		periods.insert(occ.period_no);
 		i = fread(&occ, sizeof(occ), 1, fin);
 	}
+	
+	// TODO: fix example and enable this
+	//if (periods.size() != no_of_periods_) {
+	//	fprintf(stderr, "Number of periods found is not equal to the number of periods specified in the header\n");
+	//	exit(-1);
+	//}
 
+	if (max_period_no_ > no_of_periods_) {
+		fprintf(stderr, "Period numbers are not contigious\n");
+		exit(-1);
+	}
 	fclose(fin);
 }
 

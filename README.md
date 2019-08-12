@@ -1,5 +1,9 @@
 <img src="https://oasislmf.org/packages/oasis_theme_package/themes/oasis_theme/assets/src/oasis-lmf-colour.png" alt="Oasis LMF logo" width="250"/>
 
+ [![ktools version](https://img.shields.io/github/tag/Oasislmf/ktools?label=ktools)](https://github.com/OasisLMF/ktools/releases)
+ [![Travis (.com) branch](https://img.shields.io/travis/com/OasisLMF/ktools/master?label=Build%20OSX%20)](https://travis-ci.com/OasisLMF/ktools)
+[![Build Status](https://ci.oasislmfdev.org/buildStatus/icon?job=oasis_ktools/master)](https://ci.oasislmfdev.org/job/oasis_ktools/job/master/)
+
 # ktools
 
 This is the POSIX-compliant Oasis LMF In-Memory Kernel toolkit.

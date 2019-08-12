@@ -29,6 +29,8 @@ fin()
 installertest()
 {
 	CTRL=ctrl
+	SYSTEMNAME="$(uname -s)"
+
 	cd examples
 
 	# test eve
@@ -181,7 +183,11 @@ installertest()
 	../../src/footprinttobin/footprinttobin -i 121 < footprint.csv
 
      # checksums		
-	 sha1sum -c ../$CTRL.sha1
+	if [ "$SYSTEMNAME" == "Darwin" ]; then
+	 	shasum -c ../$CTRL.sha1
+	else
+	 	sha1sum -c ../$CTRL.sha1
+	fi
 
 	 if [ "$?" -ne "0" ]; then
 	   echo "Sorry check failed\n"

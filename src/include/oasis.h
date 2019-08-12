@@ -327,7 +327,10 @@ inline void initstreams(std::string inFile="", std::string outFile="")
 #if defined(_MSC_VER) || defined(__MINGW32__)
 	_setmode(_fileno(stdout), O_BINARY);
 	_setmode(_fileno(stdin), O_BINARY);
-#else
+#elif __APPLE__
+	freopen(NULL, "wb", stdout);
+	freopen(NULL, "rb", stdin);
+#elif __linux
 	freopen(NULL, "a+b", stdout);
 	freopen(NULL, "rb", stdin);
 #endif

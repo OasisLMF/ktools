@@ -94,7 +94,11 @@ void no_occ_doit()
 			return;
 		}
 		else
-		{			
+		{
+			if(number_of_periods_ < p.period_no) {
+				fprintf(stderr, "Period number exceeds maximum supplied\n");
+				exit(EXIT_FAILURE);
+			}
 			fwrite(&p, sizeof(p), 1, stdout);
 		}
 		lineno++;

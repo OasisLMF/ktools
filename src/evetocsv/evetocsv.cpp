@@ -48,7 +48,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 namespace evetocsv {
 	void doit(bool skipheader)
 	{
-		if (skipheader == false) printf("\"event_id\"\n");
+		if (skipheader == false) printf("event_id\n");
 		int eventid;
 		while (fread(&eventid, sizeof(eventid), 1, stdin) == 1) {
 			printf("%d\n", eventid);

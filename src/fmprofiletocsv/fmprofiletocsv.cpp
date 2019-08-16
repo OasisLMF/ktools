@@ -50,37 +50,12 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 using namespace std;
 
 namespace fmprofiletocsv {
-    void doit_old(bool skipheader) {
-        if (skipheader == false) {
-            printf(
-                "\"policytc_id\",\"calcrule_id\",\"allocrule_id\",\"ccy_id\",");
-            printf("\"deductible\",\"limits\",\"share_prop_of_lim\","
-                   "\"deductible_prop_of_loss\",\"limit_prop_of_loss\",");
-            printf("\"deductible_prop_of_tiv\",\"limit_prop_of_tiv\","
-                   "\"deductible_prop_of_limit\"\n");
-        }
-
-        fm_profile_old q;
-        size_t i = fread(&q, sizeof(q), 1, stdin);
-        while (i != 0) {
-            printf("%d, %d, %d, %d, %f, %f, %f, %f, %f, %f, %f, %f\n",
-                   q.policytc_id, q.calcrule_id, q.allocrule_id, q.ccy_id,
-                   q.deductible, q.limits, q.share_prop_of_lim,
-                   q.deductible_prop_of_loss, q.limit_prop_of_loss,
-                   q.deductible_prop_of_tiv, q.limit_prop_of_tiv,
-                   q.deductible_prop_of_limit);
-
-            i = fread(&q, sizeof(q), 1, stdin);
-        }
-    }
-
+    
     void doit(bool skipheader) {
         if (skipheader == false) {
-            printf("\"profile_id\",\"calcrule_id\",\"deductible1\","
-                   "\"deductible2\",");
-            printf("\"deductible3\",\"attachment1\",\"limit1\",\"share1\","
-                   "\"share2\",");
-            printf("\"share3\"\n");
+            printf("profile_id,calcrule_id,deductible1,deductible2,");
+            printf("deductible3,attachment1,limit1,share1,share2,");
+            printf("share3\n");
         }
 
         fm_profile_new q;

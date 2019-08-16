@@ -53,7 +53,7 @@ namespace fmxreftocsv {
 	void doit(bool skipheader)
 	{
 
-		if (skipheader == false) printf("\"output_id\",\"agg_id\",\"layer_id\"\n");
+		if (skipheader == false) printf("output_id,agg_id,layer_id\n");
 
 		fmXref q;
 		size_t i = fread(&q, sizeof(q), 1, stdin);

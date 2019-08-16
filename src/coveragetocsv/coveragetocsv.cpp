@@ -53,7 +53,7 @@ namespace coveragetocsv {
 	void doit(bool skipheader)
 	{
 
-		if(skipheader == false) printf("\"coverage_id\", \"tiv\"\n");
+		if(skipheader == false) printf("coverage_id,tiv\n");
 		
 		OASIS_FLOAT tiv;
 		int id = 0;

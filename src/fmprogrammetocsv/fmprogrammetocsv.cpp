@@ -52,7 +52,7 @@ using namespace std;
 namespace fmprogrammetocsv {
     void doit(bool skipheader) {
         if (skipheader == false)
-            printf("\"from_agg_id\",\"level_id\",\"to_agg_id\"\n");
+            printf("from_agg_id,level_id,to_agg_id\n");
 
         fm_programme q;
         size_t i = fread(&q, sizeof(q), 1, stdin);

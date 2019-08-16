@@ -72,6 +72,7 @@ void help()
 		"-s skip header\n"
 		"-v version\n"
 		"-z zip input\n"
+		"-e [event_id from] [event_id to] extract an inclusive range of events\n"
 		"-h help\n"
 	);
 }
@@ -81,11 +82,14 @@ int main(int argc, char* argv[])
 	int opt;
 	bool skipheader = false;
 	bool zip = false;
-	while ((opt = getopt(argc, argv, "zvhs")) != -1) {
+	while ((opt = getopt(argc, argv, "e:zvhs")) != -1) {
 		switch (opt) {
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
 			exit(EXIT_FAILURE);
+			break;
+		case 'e':
+
 			break;
 		case 'z':
 			zip = true;

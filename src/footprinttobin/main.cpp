@@ -72,7 +72,9 @@ void help() {
 	fprintf(stderr, "-i max intensity bins\n"
 		"-n No intensity uncertainty\n"
 		"-s skip header\n"
-		"-v version\n");
+		"-v version\n"
+		"-z zip footprint data\n"
+	);
 }
 
 int main(int argc, char *argv[]) {

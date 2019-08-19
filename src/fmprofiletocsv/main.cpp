@@ -33,7 +33,6 @@ namespace fmprofiletocsv {
 
 void help() {
     fprintf(stderr, "-s Skip Header\n"
-                    "-o old format\n"
                     "-v version\n"
                     "-h help");
 }
@@ -45,9 +44,6 @@ int main(int argc, char *argv[]) {
 
     while ((opt = getopt(argc, argv, "vhso")) != -1) {
         switch (opt) {
-        case 'o':
-            oldFMProfile = true;
-            break;
         case 's':
             skipheader = true;
             break;
@@ -73,12 +69,8 @@ int main(int argc, char *argv[]) {
     sigaction(SIGSEGV, &sa, NULL);
 #endif
     try {
-        initstreams();
-        if (oldFMProfile == true) {
-            fmprofiletocsv::doit_old(skipheader);
-        } else {
-            fmprofiletocsv::doit(skipheader);
-        }
+        initstreams();        
+        fmprofiletocsv::doit(skipheader);        
     } catch (std::bad_alloc) {
         fprintf(stderr, "%s: Memory allocation failed\n", progname);
         exit(EXIT_FAILURE);

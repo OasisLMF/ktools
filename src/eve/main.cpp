@@ -85,8 +85,15 @@ int main(int argc, char *argv[]) {
         switch (opt) {
         case 'v': {
             fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
-#if !defined(_MSC_VER)
+
+#if defined(__GNUC__) && !defined(__clang_version__)
 			fprintf(stderr, "%s : compiler: gcc %d.%d.%d \n", argv[0], __GNUC__, __GNUC_MINOR__, __GNUC_PATCHLEVEL__);
+#endif
+#if defined(__clang_version__)
+			fprintf(stderr, "%s : compiler: %s \n", argv[0], __clang_version__);
+#endif
+#if defined(_MSC_VER)
+			fprintf(stderr, "%s : compiler: Microsoft version: %d \n", argv[0], _MSC_VER);
 #endif
             ::exit(EXIT_FAILURE);
         } break;

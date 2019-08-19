@@ -62,7 +62,7 @@ namespace fmpolicytctocsv {
 	void doit(bool skipheader)
 	{
 
-		if (skipheader == false)  printf("\"layer_id\",\"level_id\",\"agg_id\",\"policytc_id\"\n");
+		if (skipheader == false)  printf("layer_id,level_id,agg_id,policytc_id\n");
 
 		fm_policyTC q;
 		size_t i = fread(&q, sizeof(q), 1, stdin);

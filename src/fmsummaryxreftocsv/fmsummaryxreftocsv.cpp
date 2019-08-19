@@ -54,7 +54,7 @@ using namespace std;
 void doit(bool skipheader)
 {
 
-	if (skipheader == false)  printf("\"output_id\", \"summary_id\", \"summaryset_id\"\n");
+	if (skipheader == false)  printf("output_id,summary_id,summaryset_id\n");
 
 	fmsummaryxref q;
 	size_t i = fread(&q, sizeof(q), 1, stdin);

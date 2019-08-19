@@ -101,7 +101,7 @@ namespace footprinttocsv {
 
 
 
-	void doitz(bool skipheader)
+	void doitz(bool skipheader,int from_event,int to_event)
 	{
 		if (skipheader == false)  printf("event_id, areaperil_id, intensity_bin_id, probability\n");
 		FILE *finx = fopen("footprint.bin.z", "rb");
@@ -126,8 +126,10 @@ namespace footprinttocsv {
 				long long pos = fltell(finx);
 				compressed_length = pos - current_idx.offset;
 			}
-			flseek(finx, current_idx.offset, SEEK_SET);
-			printrowsz(current_idx.event_id, finx, compressed_length);
+			if (current_idx.event_id >= from_event && current_idx.event_id <= to_event) {
+				flseek(finx, current_idx.offset, SEEK_SET);
+				printrowsz(current_idx.event_id, finx, compressed_length);
+			}
 			if (i != 0) current_idx = next_idx;
 		}
 
@@ -135,7 +137,7 @@ namespace footprinttocsv {
 		fclose(finy);
 	}
 
-	void doit(bool skipheader)
+	void doit(bool skipheader,int from_event, int to_event)
 	{
 		if (skipheader == false)  printf("event_id, areaperil_id, intensity_bin_id, probability\n");
 		FILE *finx = fopen("footprint.bin", "rb");
@@ -149,8 +151,10 @@ namespace footprinttocsv {
 		}
 		size_t i = fread(&idx, sizeof(idx), 1, finy);
 		while (i != 0) {
-			flseek(finx, idx.offset, SEEK_SET);
-			printrows(idx.event_id, finx, idx.size);
+			if (idx.event_id >= from_event && idx.event_id <= to_event) {
+				flseek(finx, idx.offset, SEEK_SET);
+				printrows(idx.event_id, finx, idx.size);
+			}
 			i = fread(&idx, sizeof(idx), 1, finy);
 		}
 

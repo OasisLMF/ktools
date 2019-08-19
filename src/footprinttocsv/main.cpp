@@ -49,10 +49,12 @@ Author: Joh Carter  email: johanna.carter@oasislmf.org
 #include <string.h>
 #endif
 
+#include <regex>
+
 
 namespace footprinttocsv {
-	void doit(bool skipheader);
-	void doitz(bool skipheader);
+	void doit(bool skipheader, int from_event, int to_event);
+	void doitz(bool skipheader,int from_event, int to_event);
 }
 
 #include "../include/oasis.h"
@@ -72,7 +74,7 @@ void help()
 		"-s skip header\n"
 		"-v version\n"
 		"-z zip input\n"
-		"-e [event_id from] [event_id to] extract an inclusive range of events\n"
+		"-e [event_id from]-[event_id to] extract an inclusive range of events\n"
 		"-h help\n"
 	);
 }
@@ -82,6 +84,8 @@ int main(int argc, char* argv[])
 	int opt;
 	bool skipheader = false;
 	bool zip = false;
+	int from_event = 1;
+	int to_event = 999999999;
 	while ((opt = getopt(argc, argv, "e:zvhs")) != -1) {
 		switch (opt) {
 		case 'v':
@@ -89,7 +93,29 @@ int main(int argc, char* argv[])
 			exit(EXIT_FAILURE);
 			break;
 		case 'e':
-
+			{
+				std::string s = optarg;
+				std::regex ws_re("\\-");
+				std::vector<std::string> result{
+					std::sregex_token_iterator(s.begin(), s.end(), ws_re, -1), {}
+				};
+				if (result.size() == 1) {
+					from_event = atoi(result[0].c_str());					
+					to_event = from_event;					
+				}
+				if (result.size() == 2) {
+					from_event = atoi(result[0].c_str());
+					to_event = atoi(result[1].c_str());
+				}
+				if (from_event == 0) {
+					fprintf(stderr, "Invalid from event_id\n");
+					exit(EXIT_FAILURE);
+				}
+				if (to_event == 0) {
+					fprintf(stderr, "Invalid to event_id\n");
+					exit(EXIT_FAILURE);
+				}
+			}
 			break;
 		case 'z':
 			zip = true;
@@ -117,10 +143,10 @@ int main(int argc, char* argv[])
 	try {
 		initstreams();
 		if (zip) {
-			footprinttocsv::doitz(skipheader);
+			footprinttocsv::doitz(skipheader,from_event,to_event);
 		}
 		else {
-			footprinttocsv::doit(skipheader);
+			footprinttocsv::doit(skipheader,from_event, to_event);
 		}
 	}
 	catch (std::bad_alloc) {

@@ -113,6 +113,7 @@ AC_CONFIG_FILES([
 		 ktest/Makefile
 		 src/Makefile
                  src/cdftocsv/Makefile
+		 src/crossvalidation/Makefile
                  src/eve/Makefile
 		 src/damagebintocsv/Makefile
 		 src/damagebintobin/Makefile

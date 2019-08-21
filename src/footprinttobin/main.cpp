@@ -46,8 +46,8 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #endif
 
 namespace footprinttobin {
-	void doit(int intensity_bins, int hasIntensityUncertainty, bool skipheader);
-	void doitz(int intensity_bins, int hasIntensityUncertainty);
+	void doit(int intensity_bins, int hasIntensityUncertainty, bool skipheader, const char * binFileName="footprint.bin", const char * idxFileName="footprint.idx");
+	void doitz(int intensity_bins, int hasIntensityUncertainty, const char * binFileName="footprint.bin", const char * idxFileName="footprint.idx");
 }
 
 #include "../include/oasis.h"
@@ -72,7 +72,9 @@ void help() {
 	fprintf(stderr, "-i max intensity bins\n"
 		"-n No intensity uncertainty\n"
 		"-s skip header\n"
+		"-o output bin file name\n"
 		"-v version\n"
+		"-x output idx file name\n"
 		"-z zip footprint data\n"
 	);
 }
@@ -83,8 +85,12 @@ int main(int argc, char *argv[]) {
 	int intensity_bins = -1;
 	int hasIntensityUncertainty = true;
 	bool skipheader = false;
+	char *binFileName;
+	bool binFileGiven = false;
+	char *idxFileName;
+	bool idxFileGiven = false;
 	progname = argv[0];
-	while ((opt = getopt(argc, argv, "zvshni:")) != -1) {
+	while ((opt = getopt(argc, argv, "zvshni:o:x:")) != -1) {
 		switch (opt) {
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
@@ -96,8 +102,16 @@ int main(int argc, char *argv[]) {
 		case 'n':
 			hasIntensityUncertainty = false;
 			break;
+		case 'o':
+			binFileGiven = true;
+			binFileName = optarg;
+			break;
 		case 's':
 			skipheader = true;
+			break;
+		case 'x':
+			idxFileGiven = true;
+			idxFileName = optarg;
 			break;
 		case 'z':
 			zip = true;
@@ -125,11 +139,27 @@ int main(int argc, char *argv[]) {
 		fprintf(stderr, "Zip not supported in Microsoft build\n");
 		exit(-1);
 #else
-		footprinttobin::doitz(intensity_bins, hasIntensityUncertainty);
+		if(binFileGiven && idxFileGiven) {
+			footprinttobin::doitz(intensity_bins, hasIntensityUncertainty, binFileName, idxFileName);
+		} else if(binFileGiven || idxFileGiven) {
+			fprintf(stderr, "Must specify both bin and idx file names\n");
+			fprintf(stderr, "aborted\n");
+			exit(EXIT_FAILURE);
+		} else {
+			footprinttobin::doitz(intensity_bins, hasIntensityUncertainty);
+		}
 #endif
 	}
 	else {
-		footprinttobin::doit(intensity_bins,hasIntensityUncertainty,skipheader);
+		if(binFileGiven && idxFileGiven) {
+			footprinttobin::doit(intensity_bins, hasIntensityUncertainty, skipheader, binFileName, idxFileName);
+		} else if(binFileGiven || idxFileGiven) {
+			fprintf(stderr, "Must specify both bin and idx file names\n");
+			fprintf(stderr, "aborted\n");
+			exit(EXIT_FAILURE);
+		} else {
+			footprinttobin::doit(intensity_bins, hasIntensityUncertainty, skipheader);
+		}
 	}
 
 	fprintf(stderr, "done...\n");

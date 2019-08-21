@@ -72,9 +72,9 @@ void help() {
 	fprintf(stderr, "-i max intensity bins\n"
 		"-n No intensity uncertainty\n"
 		"-s skip header\n"
-		"-o output bin file name\n"
 		"-v version\n"
-		"-x output idx file name\n"
+		"-b [FILE NAME] output bin file name\n"
+		"-x [FILE NAME] output idx file name\n"
 		"-z zip footprint data\n"
 	);
 }
@@ -90,21 +90,21 @@ int main(int argc, char *argv[]) {
 	char *idxFileName;
 	bool idxFileGiven = false;
 	progname = argv[0];
-	while ((opt = getopt(argc, argv, "zvshni:o:x:")) != -1) {
+	while ((opt = getopt(argc, argv, "zvshni:b:x:")) != -1) {
 		switch (opt) {
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
 			exit(EXIT_FAILURE);
+			break;
+		case 'b':
+			binFileGiven = true;
+			binFileName = optarg;
 			break;
 		case 'i':
 			intensity_bins = atoi(optarg);
 			break;
 		case 'n':
 			hasIntensityUncertainty = false;
-			break;
-		case 'o':
-			binFileGiven = true;
-			binFileName = optarg;
 			break;
 		case 's':
 			skipheader = true;

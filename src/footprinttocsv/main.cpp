@@ -75,6 +75,8 @@ void help()
 		"-v version\n"
 		"-z zip input\n"
 		"-e [event_id from]-[event_id to] extract an inclusive range of events\n"
+		"-b [FILE NAME] input bin file name\n"
+		"-x [FILE NAME] input idx file name\n"
 		"-h help\n"
 	);
 }

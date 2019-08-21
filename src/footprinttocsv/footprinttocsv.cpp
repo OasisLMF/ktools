@@ -101,11 +101,11 @@ namespace footprinttocsv {
 
 
 
-	void doitz(bool skipheader,int from_event,int to_event)
+	void doitz(bool skipheader, int from_event, int to_event, const char * binFileName="footprint.bin.z", const char * idxFileName="footprint.idx.z")
 	{
 		if (skipheader == false)  printf("event_id, areaperil_id, intensity_bin_id, probability\n");
-		FILE *finx = fopen("footprint.bin.z", "rb");
-		FILE *finy = fopen("footprint.idx.z", "rb");
+		FILE *finx = fopen(binFileName, "rb");
+		FILE *finy = fopen(idxFileName, "rb");
 		EventIndex current_idx;
 		EventIndex next_idx;
 
@@ -137,11 +137,11 @@ namespace footprinttocsv {
 		fclose(finy);
 	}
 
-	void doit(bool skipheader,int from_event, int to_event)
+	void doit(bool skipheader, int from_event, int to_event, const char * binFileName="footprint.bin", const char * idxFileName="footprint.idx")
 	{
 		if (skipheader == false)  printf("event_id, areaperil_id, intensity_bin_id, probability\n");
-		FILE *finx = fopen("footprint.bin", "rb");
-		FILE *finy = fopen("footprint.idx", "rb");
+		FILE *finx = fopen(binFileName, "rb");
+		FILE *finy = fopen(idxFileName, "rb");
 
 		EventIndex idx;
 

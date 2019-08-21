@@ -53,8 +53,8 @@ Author: Joh Carter  email: johanna.carter@oasislmf.org
 
 
 namespace footprinttocsv {
-	void doit(bool skipheader, int from_event, int to_event);
-	void doitz(bool skipheader,int from_event, int to_event);
+	void doit(bool skipheader, int from_event, int to_event, const char * binFileName="footprint.bin", const char * idxFileName="footprint.idx");
+	void doitz(bool skipheader,int from_event, int to_event, const char * binFileName="footprint.bin", const char * idxFileName="footprint.idx");
 }
 
 #include "../include/oasis.h"
@@ -86,7 +86,11 @@ int main(int argc, char* argv[])
 	bool zip = false;
 	int from_event = 1;
 	int to_event = 999999999;
-	while ((opt = getopt(argc, argv, "e:zvhs")) != -1) {
+	char *binFileName;
+	bool binFileGiven = false;
+	char *idxFileName;
+	bool idxFileGiven = false;
+	while ((opt = getopt(argc, argv, "e:zvhsb:x:")) != -1) {
 		switch (opt) {
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
@@ -123,6 +127,14 @@ int main(int argc, char* argv[])
 		case 's':
 			skipheader = true;
 			break;
+		case 'b':
+			binFileGiven = true;
+			binFileName = optarg;
+			break;
+		case 'x':
+			idxFileGiven = true;
+			idxFileName = optarg;
+			break;
 		case 'h':
 			help();
 			exit(EXIT_FAILURE);
@@ -143,10 +155,24 @@ int main(int argc, char* argv[])
 	try {
 		initstreams();
 		if (zip) {
-			footprinttocsv::doitz(skipheader,from_event,to_event);
+			if(binFileGiven && idxFileGiven) {
+				footprinttocsv::doitz(skipheader, from_event, to_event, binFileName, idxFileName);
+			} else if(binFileGiven || idxFileGiven) {
+				fprintf(stderr, "Must specify both bin and idx file names\n");
+				exit(EXIT_FAILURE);
+			} else {
+				footprinttocsv::doitz(skipheader, from_event, to_event);
+			}
 		}
 		else {
-			footprinttocsv::doit(skipheader,from_event, to_event);
+			if(binFileGiven && idxFileGiven) {
+				footprinttocsv::doit(skipheader, from_event, to_event, binFileName, idxFileName);
+			} else if(binFileGiven || idxFileGiven) {
+				fprintf(stderr, "Must specify both bin and idx file names\n");
+				exit(EXIT_FAILURE);
+			} else {
+				footprinttocsv::doit(skipheader, from_event, to_event);
+			}
 		}
 	}
 	catch (std::bad_alloc) {

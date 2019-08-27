@@ -409,12 +409,14 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 		
 		for (LossRec &x : agg_vec) {
 			if (netvalue_ && layer == 1) {
-				const std::vector<OASIS_FLOAT> &guls = event_guls[gul_idx];
-				x.item_net = std::make_shared<std::vector<OASIS_FLOAT>>(std::vector<OASIS_FLOAT>());
-				x.item_net->resize(x.item_idx->size(), 0);
-				const std::vector<int> &z = *(x.item_idx);
-				for (int i = 0; i < x.item_net->size(); i++) {					
-					x.item_net->at(i)= guls[z[i]];
+				const std::vector<OASIS_FLOAT> &guls = event_guls[gul_idx];				
+				if (x.item_idx) {
+					x.item_net = std::make_shared<std::vector<OASIS_FLOAT>>(std::vector<OASIS_FLOAT>());
+					x.item_net->resize(x.item_idx->size(), 0);
+					const std::vector<int> &z = *(x.item_idx);
+					for (int i = 0; i < x.item_net->size(); i++) {					
+						x.item_net->at(i)= guls[z[i]];
+					}
 				}								
 			}
 

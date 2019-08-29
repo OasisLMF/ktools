@@ -150,7 +150,7 @@ int main(int argc, char* argv[])
 	}
 	catch (std::bad_alloc) {
 		fprintf(stderr, "%s: Memory allocation failed\n", progname);
-		exit(0);
+		exit(1);
 	}
 
 	return 0;

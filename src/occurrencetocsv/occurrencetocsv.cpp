@@ -140,5 +140,5 @@ int main(int argc, char* argv[])
 	initstreams();
 
 	doit(skipheader);
-	return 0;
+	return EXIT_SUCCESS;
 }

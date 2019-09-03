@@ -145,6 +145,6 @@ int main(int argc, char* argv[])
 	if (noneOutputTrue) return -1; // no output stream so nothing to do...
 	
 	f.doit();
-	return 0;
+	return EXIT_SUCCESS;
 
 }

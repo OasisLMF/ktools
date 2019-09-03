@@ -57,7 +57,7 @@ namespace validateitems {
 void segfault_sigaction(int signal, siginfo_t *si, void *arg)
 {
 	fprintf(stderr, "%s: Segment fault at address: %p\n", progname, si->si_addr);
-	exit(0);
+	exit(EXIT_FAILURE);
 }
 #endif
 
@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
 			break;
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
-			exit(EXIT_FAILURE);
+			exit(EXIT_SUCCESS);
 			break;
 		case 'h':
 		default:

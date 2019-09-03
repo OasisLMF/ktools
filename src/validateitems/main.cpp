@@ -43,6 +43,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include "../wingetopt/wingetopt.h"
 #else
 #include <unistd.h>
+#include <signal.h>
 #endif
 
 #include "../include/oasis.h"

@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
 			break;
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
-			exit(EXIT_SUCCESS);
+			exit(EXIT_FAILURE);
 			break;
 		case 'h':
 		default:

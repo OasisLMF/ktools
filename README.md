@@ -82,7 +82,7 @@ $ cmake .
 ```
 
 ``` sh
-$ cmake all test
+$ make all test
 ```
 
 

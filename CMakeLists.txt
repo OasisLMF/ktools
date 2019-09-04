@@ -5,20 +5,21 @@ project(ktools)
 set(KTOOLS_VERSION "3.1.0")
 configure_file(config.h.cmake_in config.h)
 
+ENABLE_TESTING()
+
 # Turn on C++ 11
 set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(ZLIB REQUIRED)
 
 # Turn on all warnings, for all compiler flavours
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     MESSAGE( STATUS "using clang settings" )
-    add_compile_options( -Wall -Wextra )
-    add_compile_options( -std=c++11 -stdlib=libc++ -Wunused-parameter)
+    add_compile_options( -Wall -Wextra -Wunused-parameter)
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "GNU")
     MESSAGE( STATUS "using gnu settings" )
     add_compile_options( -Wall -Wextra -Wunused-parameter)
-    add_compile_options( -std=c++11 )
 elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     MESSAGE( STATUS "using msvc settings" )
     add_compile_options( /W4 /WX )

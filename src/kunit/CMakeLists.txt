@@ -4,3 +4,4 @@ target_sources(kunit
 		fmcalc_tests.cpp main.cpp ../fmcalc/fmcalcrules.cpp
 )
 
+add_test(kunit kunit)

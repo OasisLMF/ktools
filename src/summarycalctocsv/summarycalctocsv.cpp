@@ -206,5 +206,5 @@ int main(int argc, char* argv[])
 	initstreams();
 	doit(skipheader, fullprecision, show_exposure_value, remove_zero_exposure_records);
 	//fprintf(stderr, "Row count: %d\n", rowcount);
-	return 0;
+	return EXIT_SUCCESS;
 }

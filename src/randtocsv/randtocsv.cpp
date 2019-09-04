@@ -122,7 +122,7 @@ int main(int argc, char *argv[])
 	initstreams("", "");
 	if (bintorand == true) {
 		doit(skipheader);
-		return 0;
+		return EXIT_SUCCESS;
 	}
 
 	if (generaterandno == true) {

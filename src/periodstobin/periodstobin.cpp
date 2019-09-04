@@ -105,5 +105,5 @@ int main(int argc, char *argv[])
 
 	initstreams("", "");
     doit();
-    return 0;
+    return EXIT_SUCCESS;
 }

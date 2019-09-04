@@ -1,6 +1,7 @@
 add_subdirectory(aalcalc)
 add_subdirectory(aalcalctocsv)
 add_subdirectory(cdftocsv)
+add_subdirectory(coveragetobin)
 add_subdirectory(coveragetocsv)
 add_subdirectory(damagebintobin)
 add_subdirectory(damagebintocsv)

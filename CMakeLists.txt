@@ -30,4 +30,8 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     add_definitions( /DUNICODE /D_UNICODE ) # it is a new millenium
 endif()
 
+
+add_test(ktest ./ktest/runtests.sh)
+add_test(ktest-extended ./ktest/runtestsx.sh)
+
 add_subdirectory(src)

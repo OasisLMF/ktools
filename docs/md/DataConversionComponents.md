@@ -117,11 +117,29 @@ $ footprinttobin -i {number of intensity bins} -n < footprint.csv
 ```
 Both parameters -i and -n are held in the header of the footprint.bin and used in getmodel.
 
+The output binary and index file names can be explicitly set using the -b and
+ -x flags respectively:
+
+```
+$ footprinttobin -i {number of intensity bins} -b {output footprint binary file name} -x {output footprint index file name} < footprint.csv
+```
+
+Both output binary and index file names must be given to use this option.
+
 ##### footprinttocsv
 ```
 $ footprinttocsv > footprint.csv
 ```
-footprinttocsv requires a binary file footprint.bin and an index file footprint.idx to be present in the working directory. 
+footprinttocsv requires a binary file footprint.bin and an index file footprint.idx to be present in the working directory.
+
+Input binary andindex file names can be explicitly set using the -b and -x fl
+ags respectively:
+
+```
+$ footprinttocsv -b {input footprint binary file name} -x {input footprint index file name} > footprint.csv
+```
+
+Both input binary and index file name must be given to use this option.
 
 [Return to top](#dataconversioncomponents)
 

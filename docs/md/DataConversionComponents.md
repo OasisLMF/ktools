@@ -132,8 +132,7 @@ $ footprinttocsv > footprint.csv
 ```
 footprinttocsv requires a binary file footprint.bin and an index file footprint.idx to be present in the working directory.
 
-Input binary andindex file names can be explicitly set using the -b and -x fl
-ags respectively:
+Input binary and index file names can be explicitly set using the -b and -x flags respectively:
 
 ```
 $ footprinttocsv -b {input footprint binary file name} -x {input footprint index file name} > footprint.csv

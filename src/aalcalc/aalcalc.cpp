@@ -80,8 +80,8 @@ void aalcalc::loadperiodtoweigthing()
 		i = fread(&p, sizeof(Periods), 1, fin);
 	}
 
-	if (total_weighting != 1.0) {
-		fprintf(stderr, "aalcalc: Period weighting do not sum to 1 in %s\n", PERIODS_FILE);
+	if (total_weighting > 1.00001 || total_weighting < 0.99999) {
+		fprintf(stderr, "aalcalc: Period weighting do not sum to 1 in %s total = %f\n", PERIODS_FILE, total_weighting);
 		exit(-1);
 	}
 

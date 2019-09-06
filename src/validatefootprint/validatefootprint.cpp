@@ -23,7 +23,7 @@ namespace validatefootprint {
 
   inline bool ProbabilityCheck(float prob) {
 
-    return roundf(prob * 100000) / 100000 != 1.0;
+    return roundf(prob * 10000) / 10000 != 1.0;
 
   }
 

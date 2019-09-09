@@ -60,7 +60,7 @@ char *progname;
 void segfault_sigaction(int signal, siginfo_t *si, void *arg)
 {
 	fprintf(stderr, "%s: Segment fault at address: %p\n", progname, si->si_addr);
-	exit(0);
+	exit(EXIT_FAILURE);
 }
 #endif
 
@@ -113,7 +113,7 @@ int main(int argc, char *argv[])
 	}
 	catch (std::bad_alloc) {
 		fprintf(stderr, "%s: Memory allocation failed\n", progname);
-		exit(0);
+		exit(EXIT_FAILURE);
 	}
 	return EXIT_SUCCESS;
 }

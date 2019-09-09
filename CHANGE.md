@@ -1,6 +1,14 @@
 Ktools Changelog
 ================
 
+## [v3.1.1](https://github.com/OasisLMF/ktools/releases/tag/v3.1.1)
+* Fix and binary build for OSX
+* Added check in occurrence data
+* Fix for exitcode 
+* Fix a fmcalc seg fault
+* Added support for CMake builds
+
+
 ## [v3.1.0](https://github.com/OasisLMF/ktools/releases/tag/v3.1.0)
 * New loss stream type for gulcalc added
 * Fix item stream processing

@@ -72,6 +72,20 @@ $ ./autogen.sh
 
 Follow the rest of the process as described above.
 
+
+### Cmake build - Experimental 
+
+Install Cmake from either system packages or [cmake.org](https://cmake.org/download/)
+
+``` sh
+$ cmake .
+```
+
+``` sh
+$ make all test
+```
+
+
 ## Windows Installation
 
 ### Pre-requisites

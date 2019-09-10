@@ -47,7 +47,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 namespace footprinttobin {
 	void doit(int intensity_bins, int hasIntensityUncertainty, bool skipheader, const char * binFileName="footprint.bin", const char * idxFileName="footprint.idx");
-	void doitz(int intensity_bins, int hasIntensityUncertainty, const char * binFileName="footprint.bin", const char * idxFileName="footprint.idx");
+	void doitz(int intensity_bins, int hasIntensityUncertainty, const char * binFileName="footprint.bin.z", const char * idxFileName="footprint.idx.z");
 }
 
 #include "../include/oasis.h"

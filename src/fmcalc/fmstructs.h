@@ -50,8 +50,8 @@ struct LossRec {
 	OASIS_FLOAT effective_deductible = 0;
 	OASIS_FLOAT accumulated_tiv = 0;	// accumulated tiv 
 	OASIS_FLOAT limit_surplus = 0;
-	int agg_id;
-	int policytc_id;
+	int agg_id = 0;
+	int policytc_id = 0;
 	int next_vec_idx = -1;
 	const std::vector<int> *item_idx = 0;
 	std::shared_ptr<std::vector<OASIS_FLOAT>> item_prop;
@@ -59,8 +59,8 @@ struct LossRec {
 };
 
 struct policytcvidx {
-	int policytc_id;
-	int agg_id;
+	int policytc_id = 0;
+	int agg_id = 0;
 	int next_vidx = -1;
 	std::vector<int> item_idx;
 };

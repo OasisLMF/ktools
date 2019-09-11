@@ -75,7 +75,7 @@ namespace eve {
         int end_pos = chunksize * pno_;
         pno_--;
         int start_pos = chunksize * pno_;
-        if (end_pos > events.size())
+        if (end_pos > (int) events.size())
             end_pos = events.size();
         //	fprintf(stderr,"Total events: %d chuck_size: %d start_pos: %d
         //end_pos:%d\n",total_events, chunksize,start_pos,end_pos);

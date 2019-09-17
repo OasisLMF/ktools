@@ -52,8 +52,8 @@ enum rd_option {
 class getRands {
 private:
 	rd_option rndopt_;
-	int rand_vec_size_;
-	OASIS_FLOAT *buf_;
+	int rand_vec_size_ = 0;
+	OASIS_FLOAT *buf_ = nullptr;
 	int base_offset_;
 	unsigned int buffersize_;
 	std::mt19937 gen_;
@@ -64,9 +64,15 @@ private:
 	void userandfile();
 public:
 	getRands(rd_option rndopt,int rand_vec_size, int rand_seed);
+	~getRands() {
+		clearbuff();
+	}
 	void seedRands(int rand_seed) { gen_.seed(rand_seed); }	// used for seeding via group_id and event_id
 	void clearbuff() {
-		delete[]buf_;
+		if (buf_ != nullptr) {
+			delete[]buf_;
+			buf_ = nullptr;
+		}
 	}
     void clearvec()
     {

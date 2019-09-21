@@ -12,7 +12,6 @@ set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 find_package(ZLIB REQUIRED)
-include_directories("G:\\source\\zlib-1.2.11")
 # Turn on all warnings, for all compiler flavours
 if (CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     MESSAGE( STATUS "using clang settings" )

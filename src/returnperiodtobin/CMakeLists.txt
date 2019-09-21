@@ -4,3 +4,6 @@ target_sources(returnperiodtobin
 		returnperiodtobin.cpp
 )
 
+if (WIN32)
+	target_link_libraries(returnperiodtobin wingetopt)
+endif()

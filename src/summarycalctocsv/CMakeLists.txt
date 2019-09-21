@@ -4,3 +4,6 @@ target_sources(summarycalctocsv
 		summarycalctocsv.cpp
 )
 
+if (WIN32)
+	target_link_libraries(summarycalctocsv wingetopt)
+endif()

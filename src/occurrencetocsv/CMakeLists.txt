@@ -4,3 +4,6 @@ target_sources(occurrencetocsv
 		occurrencetocsv.cpp
 )
 
+if (WIN32)
+	target_link_libraries(occurrencetocsv wingetopt)
+endif()

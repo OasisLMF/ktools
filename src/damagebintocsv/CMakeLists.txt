@@ -3,3 +3,6 @@ target_sources(damagebintocsv
 	PRIVATE
 		damagebintocsv.cpp main.cpp
 )
+if (WIN32)
+	target_link_libraries(damagebintocsv wingetopt)
+endif()

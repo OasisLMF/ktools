@@ -4,4 +4,7 @@ target_sources(getmodel
 		getmodel.cpp getmodel.h main.cpp
 )
 
-target_link_libraries(getmodel z)
+target_link_libraries(getmodel ${ZLIB_LIBRARIES})
+if (WIN32)
+	target_link_libraries(getmodel wingetopt ${ZLIB_LIBRARIES})
+endif()

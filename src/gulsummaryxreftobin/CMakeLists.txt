@@ -4,3 +4,6 @@ target_sources(gulsummaryxreftobin
 		gulsummaryxreftobin.cpp main.cpp
 )
 
+if (WIN32)
+	target_link_libraries(gulsummaryxreftobin wingetopt)
+endif()

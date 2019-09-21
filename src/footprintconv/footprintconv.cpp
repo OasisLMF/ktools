@@ -73,7 +73,7 @@ void doit()
     size_t i = fread(&in_idx, sizeof(in_idx), 1, finy);
     std::vector<EventRow> rv;
     std::vector<unsigned char> rvz;
-    int total_insize = 0;
+    size_t total_insize = 0;
     int total_outsize = 0;
     out_idx.offset = 8;
     while (i != 0) {
@@ -83,7 +83,7 @@ void doit()
         fread(&rv[0], sizeof(1), in_idx.size,finx);
         rvz.clear();
         rvz.resize(rv.size() * sizeof(EventRow) + 1024);
-        unsigned long len = rvz.size();
+        uLongf len = (uLongf)rvz.size();
         compress(&rvz[0], &len, (unsigned char *)&rv[0], in_idx.size);
         total_outsize += len;
         fwrite((unsigned char *)&rvz[0], len, 1, foutx);
@@ -107,7 +107,7 @@ void doit()
         i = fread(&in_idx, sizeof(in_idx), 1, finy);
     }
 
-    printf("TODO: expected input size  %d\n",total_insize+8);
+    printf("TODO: expected input size  %zd\n",total_insize+8);
     printf("TODO: expected output size  %d\n",total_outsize+8);
     fclose(foutx);
     fclose(fouty);

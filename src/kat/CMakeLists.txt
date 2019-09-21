@@ -4,3 +4,6 @@ target_sources(kat
 		kat.cpp
 )
 
+if (WIN32)
+	target_link_libraries(kat wingetopt)
+endif()

@@ -4,3 +4,6 @@ target_sources(itemtobin
 		itemtobin.cpp main.cpp
 )
 
+if (WIN32)
+	target_link_libraries(itemtobin wingetopt)
+endif()

@@ -4,3 +4,6 @@ target_sources(summarycalc
 		summarycalc.cpp summarycalc.h main.cpp
 )
 
+if (WIN32)
+	target_link_libraries(summarycalc wingetopt)
+endif()

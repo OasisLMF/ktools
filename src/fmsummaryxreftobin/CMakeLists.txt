@@ -3,3 +3,6 @@ target_sources(fmsummaryxreftobin
 	PRIVATE
 		fmsummaryxreftobin.cpp main.cpp
 )
+if (WIN32)
+	target_link_libraries(fmsummaryxreftobin wingetopt)
+endif()

@@ -3,3 +3,6 @@ target_sources(coveragetobin
 	PRIVATE
 		coveragetobin.cpp main.cpp
 )
+if (WIN32)
+	target_link_libraries(coveragetobin wingetopt)
+endif()

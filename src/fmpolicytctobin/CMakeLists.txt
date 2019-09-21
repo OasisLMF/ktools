@@ -3,3 +3,6 @@ target_sources(fmpolicytctobin
 	PRIVATE
 		fmpolicytctobin.cpp main.cpp
 )
+if (WIN32)
+	target_link_libraries(fmpolicytctobin wingetopt)
+endif()

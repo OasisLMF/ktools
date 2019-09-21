@@ -4,3 +4,6 @@ target_sources(returnperiodtocsv
 		returnperiodtocsv.cpp
 )
 
+if (WIN32)
+	target_link_libraries(returnperiodtocsv wingetopt)
+endif()

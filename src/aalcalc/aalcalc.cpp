@@ -324,7 +324,7 @@ void aalcalc::applyweightingstomap(std::map<int, aal_rec> &m, int i)
 }
 void aalcalc::applyweightingstomaps()
 {
-	int i = periodstoweighting_.size();
+	int i =(int) periodstoweighting_.size();
 	if (i == 0) return;
 	applyweightingstomap(map_analytical_aal_, i);
 	applyweightingstomap(map_sample_aal_, i);
@@ -456,7 +456,7 @@ void aalcalc::do_sample_calc_newx(const summarySampleslevelHeader& sh, const std
 	//	}
 	//}
 	// periodstoweighting_.clear();
-	double factor = periodstoweighting_.size();
+	double factor = (double)periodstoweighting_.size();
 
 	for (auto period_no : p_iter->second) {
 
@@ -808,7 +808,7 @@ void aalcalc::doit(const std::string& subfolder)
 				std::vector<sampleslevelRec> vrec;
 				flseek(summary_fin, file_offset, SEEK_SET);
 				summarySampleslevelHeader sh;
-				int i = fread(&sh, sizeof(sh), 1, summary_fin);
+				size_t i = fread(&sh, sizeof(sh), 1, summary_fin);
 				OASIS_FLOAT mean_loss = 0;
 				while (i != 0) {
 					sampleslevelRec sr;

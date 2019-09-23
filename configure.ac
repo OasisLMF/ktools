@@ -113,6 +113,7 @@ AC_CONFIG_FILES([
 		 ktest/Makefile
 		 src/Makefile
                  src/cdftocsv/Makefile
+		 src/crossvalidation/Makefile
                  src/eve/Makefile
 		 src/damagebintocsv/Makefile
 		 src/damagebintobin/Makefile
@@ -164,6 +165,9 @@ AC_CONFIG_FILES([
 		 src/fmprofilebinconv/Makefile
 		 src/ktgetmem/Makefile
 		 src/validateitems/Makefile
+		 src/validatedamagebin/Makefile
+		 src/validatefootprint/Makefile
+		 src/validatevulnerability/Makefile
 		 src/summarycalctobin/Makefile
 		 src/summaryindex/Makefile
 		 src/kunit/Makefile

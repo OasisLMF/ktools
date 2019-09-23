@@ -672,7 +672,9 @@ void gulcalc::mode0()
 	int max_recsize = (int)(total_bins * sizeof(prob_mean)) + sizeof(damagecdfrec) + sizeof(int);
 	int last_event_id = -1;
 
-	char *rec = new char[max_recsize];
+	//char *rec = new char[max_recsize];
+	char rec[max_recsize];
+	
 	damagecdfrec *d = (damagecdfrec *)rec;
 
 	for (;;)
@@ -700,4 +702,5 @@ void gulcalc::mode0()
 	if (itemWriter_)  itemWriter_(ibuf_, sizeof(unsigned char), itembufoffset_);
 	if (lossWriter_)  lossWriter_(ibuf_, sizeof(unsigned char), itembufoffset_);
 	if (coverageWriter_) coverageWriter_(cbuf_, sizeof(unsigned char), covbufoffset_);
+	
 }

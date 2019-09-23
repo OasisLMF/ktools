@@ -51,7 +51,7 @@ struct fm_policyTC {
   int level_id;
   int agg_id;
   int layer_id;
-  int PolicyTC_id;
+  int profile_id;			// for some strange reason historically this has been named PolicyTC_id it really is the unique identifier of the profile table so I've renamed it!!
 };
 namespace fmpolicytctobin {
 	void doit()
@@ -64,7 +64,7 @@ namespace fmpolicytctobin {
 		lineno++;
 		while (fgets(line, sizeof(line), stdin) != 0)
 		{
-			if (sscanf(line, "%d,%d,%d,%d", &q.layer_id, &q.level_id, &q.agg_id, &q.PolicyTC_id) != 4) {
+			if (sscanf(line, "%d,%d,%d,%d", &q.layer_id, &q.level_id, &q.agg_id, &q.profile_id) != 4) {
 				fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
 				return;
 			}

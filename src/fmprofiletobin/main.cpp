@@ -28,22 +28,18 @@ namespace fmprofiletobin {
     void doit_old();
 } // namespace fmprofiletobin
 
-void help() { fprintf(stderr, "-h help\n - o old format\n-v version\n"); }
+void help() { fprintf(stderr, "-h help\n -v version\n"); }
 
 int main(int argc, char *argv[]) {
 
     int opt;
-    bool oldFMProfile = false;
 
     while ((opt = getopt(argc, argv, "vho")) != -1) {
         switch (opt) {
         case 'v':
             fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
             exit(EXIT_FAILURE);
-            break;
-        case 'o':
-            oldFMProfile = true;
-            break;
+            break;        
         case 'h':
         default:
             help();
@@ -64,13 +60,8 @@ progname = argv[0];
     sigaction(SIGSEGV, &sa, NULL);
 #endif
     try {
-        initstreams();
-        if (oldFMProfile == true) {
-            fmprofiletobin::doit_old();
-        } else {
-            fmprofiletobin::doit();
-        }
-
+        initstreams();        
+        fmprofiletobin::doit();
     } catch (std::bad_alloc) {
         fprintf(stderr, "%s: Memory allocation failed\n", progname);
         exit(EXIT_FAILURE);

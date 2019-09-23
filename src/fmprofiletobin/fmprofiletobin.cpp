@@ -47,33 +47,10 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <unistd.h>
 #endif
 
-namespace fmprofiletobin {
-    void doit_old() {
-
-        fm_profile_old q;
-        char line[4096];
-        int lineno = 0;
-        fgets(line, sizeof(line), stdin);
-        lineno++;
-        while (fgets(line, sizeof(line), stdin) != 0) {
-            if (sscanf(
-                    line, "%d,%d,%d,%d,%f,%f,%f,%f,%f,%f,%f,%f", &q.policytc_id,
-                    &q.calcrule_id, &q.allocrule_id, &q.ccy_id, &q.deductible,
-                    &q.limits, &q.share_prop_of_lim, &q.deductible_prop_of_loss,
-                    &q.limit_prop_of_loss, &q.deductible_prop_of_tiv,
-                    &q.limit_prop_of_tiv, &q.deductible_prop_of_limit) != 12) {
-                fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
-                return;
-            } else {
-                fwrite(&q, sizeof(q), 1, stdout);
-            }
-            lineno++;
-        }
-    }
-
+namespace fmprofiletobin {    
     void doit() {
 
-        fm_profile_new q;
+        fm_profile q;
         char line[4096];
         int lineno = 0;
         fgets(line, sizeof(line), stdin);

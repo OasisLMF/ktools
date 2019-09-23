@@ -58,7 +58,7 @@ namespace fmprofiletocsv {
             printf("share3\n");
         }
 
-        fm_profile_new q;
+        fm_profile q;
         size_t i = fread(&q, sizeof(q), 1, stdin);
         while (i != 0) {
             printf("%d, %d, %f, %f, %f, %f, %f, %f, %f, %f\n", q.profile_id,

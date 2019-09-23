@@ -143,12 +143,6 @@ struct sampleslevelRec {
 };
 
 
-struct fmlevelhdr_old {
-	int event_id;
-	int layer_id;
-	int output_id;
-};
-
 struct fmlevelhdr {
 	int event_id;
 	int output_id;
@@ -183,7 +177,7 @@ struct coverage {
 struct occurrence {
 	int event_id;	// this can occur multiple times - i.e duplicate key
 	int period_no;		// for abstract period definitions
-	int occ_date_id;		// occurence year, month and day	
+	int occ_date_id;		// occurrence year, month and day	
 };
 
 struct gulsummaryxref {
@@ -198,37 +192,8 @@ struct fmsummaryxref {
 	int summaryset_id;
 };
 
+
 struct fm_profile {
-	int policytc_id;
-	int calcrule_id;
-	int allocrule_id;
-	int ccy_id;
-	OASIS_FLOAT deductible;
-	OASIS_FLOAT limits;
-	OASIS_FLOAT share_prop_of_lim;
-	OASIS_FLOAT deductible_prop_of_loss;
-	OASIS_FLOAT limit_prop_of_loss;
-	OASIS_FLOAT deductible_prop_of_tiv;
-	OASIS_FLOAT limit_prop_of_tiv;
-	OASIS_FLOAT deductible_prop_of_limit;
-};
-
-struct fm_profile_old {
-	int policytc_id;
-	int calcrule_id;
-	int allocrule_id;
-	int ccy_id;
-	OASIS_FLOAT deductible;
-	OASIS_FLOAT limits;
-	OASIS_FLOAT share_prop_of_lim;
-	OASIS_FLOAT deductible_prop_of_loss;
-	OASIS_FLOAT limit_prop_of_loss;
-	OASIS_FLOAT deductible_prop_of_tiv;
-	OASIS_FLOAT limit_prop_of_tiv;
-	OASIS_FLOAT deductible_prop_of_limit;
-};
-
-struct fm_profile_new {
 	int profile_id = 0;
 	int calcrule_id = 0;
 	OASIS_FLOAT deductible1 = 0;
@@ -242,6 +207,7 @@ struct fm_profile_new {
 
 };
 
+
 struct fm_programme {
 	int from_agg_id;
 	int level_id;
@@ -254,11 +220,11 @@ struct fmXref {
 	int layer_id;
 };
 
-struct fmxrefxx
-{
-	int item_id;
-	int output_id;
-};
+//struct fmxrefxx
+//{
+//	int item_id;
+//	int output_id;
+//};
 
 
 struct summary_id_type_key {

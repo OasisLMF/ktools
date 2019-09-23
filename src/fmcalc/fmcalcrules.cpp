@@ -774,7 +774,7 @@ void fmcalc::dofmcalc(std::vector <LossRec> &agg_vec, int layer)
 	}
 }
 
-void fmcalc::init_profile_rec(fm_profile_new &f)
+void fmcalc::init_profile_rec(fm_profile &f)
 {
 	profile_rec_new p;
 	p.calcrule_id = f.calcrule_id;
@@ -900,7 +900,7 @@ void fmcalc::init_profile()
 		fprintf(stderr, "%s: cannot open %s\n", __func__, file.c_str());
 		exit(EXIT_FAILURE);
 	}
-	fm_profile_new f;
+	fm_profile f;
 	size_t i = fread(&f, sizeof(f), 1, fin);
 	while (i != 0) {		
 		init_profile_rec(f);
@@ -908,7 +908,7 @@ void fmcalc::init_profile()
 		i = fread(&f, sizeof(f), 1, fin);
 	}
 	noop_profile_id++;
-	fm_profile_new d;	// dummy
+	fm_profile d;	// dummy
 	d.profile_id = noop_profile_id;
 	d.calcrule_id = 14;
 	init_profile_rec(d);

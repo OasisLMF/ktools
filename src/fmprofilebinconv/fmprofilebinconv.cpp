@@ -41,13 +41,28 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 #include "../include/oasis.h"
 
+struct fm_profile_old {
+	int policytc_id;
+	int calcrule_id;
+	int allocrule_id;
+	int ccy_id;
+	OASIS_FLOAT deductible;
+	OASIS_FLOAT limits;
+	OASIS_FLOAT share_prop_of_lim;
+	OASIS_FLOAT deductible_prop_of_loss;
+	OASIS_FLOAT limit_prop_of_loss;
+	OASIS_FLOAT deductible_prop_of_tiv;
+	OASIS_FLOAT limit_prop_of_tiv;
+	OASIS_FLOAT deductible_prop_of_limit;
+};
+
 namespace fmprofilebinconv {
     void doit() {
 
-        fm_profile q;
+        fm_profile_old q;
         size_t i = fread(&q, sizeof(q), 1, stdin);
         while (i != 0) {
-            fm_profile_new f;
+            fm_profile f;
             f.profile_id = q.policytc_id;
             f.calcrule_id = q.calcrule_id;
             switch (f.calcrule_id) {

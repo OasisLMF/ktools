@@ -243,51 +243,53 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 				iter++;
 			}
 			for (int y = 0; y < agg_vecs[level_][layer_].size(); y++) {
-				auto it = agg_vecs[level_][layer_][y].item_idx->begin();
-				// 1 create an item id  to prev_agg_vec index
-				// 2 use below loop to create a set which will then be used to iterate and get previous_gul_total
-				std::unordered_set<int> s;
-				while (it != agg_vecs[level_][layer_][y].item_idx->end()) {
-					s.insert(v[*it]);
-					//prev_gul_total += prev_agg_vec[*it].loss;
-					it++;
-				}
-
-				OASIS_FLOAT prev_gul_total = 0;
-				auto s_iter = s.begin();
-				while (s_iter != s.end()) {
-					prev_gul_total += prev_agg_vec[*s_iter].loss;
-					s_iter++;
-				}
-
-				// agg_vecs[level_][layer_][y].loss = prev_gul_total;
-				it = agg_vecs[level_][layer_][y].item_idx->begin();
-				while (it != agg_vecs[level_][layer_][y].item_idx->end()) {
-					if (agg_vecs[level_][layer_][y].item_prop == nullptr) {
-						agg_vecs[level_][layer_][y].item_prop = std::make_shared<std::vector<OASIS_FLOAT>>(std::vector<OASIS_FLOAT>());
+				if (agg_vecs[level_][layer_][y].item_idx != nullptr) {
+					auto it = agg_vecs[level_][layer_][y].item_idx->begin();
+					// 1 create an item id  to prev_agg_vec index
+					// 2 use below loop to create a set which will then be used to iterate and get previous_gul_total
+					std::unordered_set<int> s;
+					while (it != agg_vecs[level_][layer_][y].item_idx->end()) {
+						s.insert(v[*it]);
+						//prev_gul_total += prev_agg_vec[*it].loss;
+						it++;
 					}
-					if (prev_gul_total > 0) {
-						int j = -1;
-						const std::vector<int> &z = *(prev_agg_vec[v[*it]].item_idx);
-						for (int i = 0; i < z.size(); i++) {							
-							if (z[i] == *it) {
-								j = i;
-								break;
-							}
+
+					OASIS_FLOAT prev_gul_total = 0;
+					auto s_iter = s.begin();
+					while (s_iter != s.end()) {
+						prev_gul_total += prev_agg_vec[*s_iter].loss;
+						s_iter++;
+					}
+
+					// agg_vecs[level_][layer_][y].loss = prev_gul_total;
+					it = agg_vecs[level_][layer_][y].item_idx->begin();
+					while (it != agg_vecs[level_][layer_][y].item_idx->end()) {
+						if (agg_vecs[level_][layer_][y].item_prop == nullptr) {
+							agg_vecs[level_][layer_][y].item_prop = std::make_shared<std::vector<OASIS_FLOAT>>(std::vector<OASIS_FLOAT>());
 						}
-						// this is recomputing the first layers proportions
-						if (j > -1) {
-							agg_vecs[level_][layer_][y].item_prop->push_back(prev_agg_vec[v[*it]].loss * prev_agg_vec[v[*it]].item_prop->at(j) / prev_gul_total);
+						if (prev_gul_total > 0) {
+							int j = -1;
+							const std::vector<int>& z = *(prev_agg_vec[v[*it]].item_idx);
+							for (int i = 0; i < z.size(); i++) {
+								if (z[i] == *it) {
+									j = i;
+									break;
+								}
+							}
+							// this is recomputing the first layers proportions
+							if (j > -1) {
+								agg_vecs[level_][layer_][y].item_prop->push_back(prev_agg_vec[v[*it]].loss * prev_agg_vec[v[*it]].item_prop->at(j) / prev_gul_total);
+							}
+							else {
+								agg_vecs[level_][layer_][y].item_prop->push_back(0);
+							}
+
 						}
 						else {
 							agg_vecs[level_][layer_][y].item_prop->push_back(0);
 						}
-
+						it++;
 					}
-					else {
-						agg_vecs[level_][layer_][y].item_prop->push_back(0);
-					}
-					it++;
 				}
 			}
 		}		

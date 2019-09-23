@@ -87,16 +87,13 @@ int main(int argc, char* argv[])
 	int allocrule = 0;
 	int opt;
 	std::string inputpath;
-	bool oldFMProfile = false;
 	bool debug = false;
 	bool allocruleOptimizationOff = false;
 
 	bool netvalue = false;
-    while ((opt = getopt(argc, argv, "dnvhoOM:p:a:")) != -1) {
+    while ((opt = getopt(argc, argv, "dnvhOM:p:a:")) != -1) {
         switch (opt) {
-		case 'o':
-			oldFMProfile = true;
-			break;
+
 		case 'O':
 			allocruleOptimizationOff = true;
 			break;
@@ -138,6 +135,7 @@ int main(int argc, char* argv[])
 
 	sigaction(SIGSEGV, &sa, NULL);
 #endif
+
 	if (allocrule < 0 || allocrule > 2) {
 		fprintf(stderr, "%s: Invalid allocrule %d\n", progname,allocrule);
 		exit(EXIT_FAILURE);
@@ -145,11 +143,11 @@ int main(int argc, char* argv[])
 
 	try {
 		initstreams("", "");
-		fmcalc fc(new_max, allocrule, inputpath, netvalue, oldFMProfile,debug, allocruleOptimizationOff);
+		fmcalc fc(new_max, allocrule, inputpath, netvalue,debug, allocruleOptimizationOff);
 		fc.doit();
 	}
-	catch (std::bad_alloc) {
-		fprintf(stderr, "%s: Memory allocation failed\n", progname);
+	catch (const std::bad_alloc &a) {
+		fprintf(stderr, "%s: bad_alloc: %s\n", progname, a.what());
 		exit(EXIT_FAILURE);
 	}
 

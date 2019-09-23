@@ -47,9 +47,19 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <unistd.h>
 #endif
 
+char* progname;
+
 namespace itemtobin {
 	void doit();
 }
+
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+void segfault_sigaction(int signal, siginfo_t* si, void* arg)
+{
+	fprintf(stderr, "%s: Segment fault at address: %p\n", progname, si->si_addr);
+	exit(0);
+}
+#endif
 
 void help()
 {
@@ -60,6 +70,7 @@ int main(int argc, char* argv[])
 {
 
 	int opt;
+	progname = argv[0];
 
 	while ((opt = getopt(argc, argv, "vh")) != -1) {
 		switch (opt) {
@@ -73,10 +84,27 @@ int main(int argc, char* argv[])
 			exit(EXIT_FAILURE);
 		}
 	}
-	initstreams();
-	itemtobin::doit();
 
-	return EXIT_SUCCESS;
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+	struct sigaction sa;
+
+	memset(&sa, 0, sizeof(struct sigaction));
+	sigemptyset(&sa.sa_mask);
+	sa.sa_sigaction = segfault_sigaction;
+	sa.sa_flags = SA_SIGINFO;
+
+	sigaction(SIGSEGV, &sa, NULL);
+#endif
+
+	try {
+		initstreams();
+		itemtobin::doit();
+		return EXIT_SUCCESS;
+	}catch (std::bad_alloc) {
+		fprintf(stderr, "%s: Memory allocation failed\n", progname);
+		exit(EXIT_FAILURE);
+	}
+	
 
 }
 

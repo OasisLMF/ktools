@@ -48,13 +48,13 @@ struct fm_policyTC {
 	int level_id;
 	int agg_id;
 	int layer_id;
-	int PolicyTC_id;
+	int profile_id;			// for some strange reason historically this has been named PolicyTC_id it really is the unique identifier of the profile table so I've renamed it!!
 };
 
 
 class fmcalc {
 public:	
-	fmcalc(int maxRunLevel, int allocrule,const std::string &inputpath, bool netvalue, bool oldFMProfile, bool debug, bool allocruleOptimizationOff):
+	fmcalc(int maxRunLevel, int allocrule,const std::string &inputpath, bool netvalue, bool debug, bool allocruleOptimizationOff):
 		inputpath_(inputpath) , netvalue_(netvalue),allocrule_(allocrule), debug_(debug), allocruleOptimizationOff_(allocruleOptimizationOff)
 		{ init(maxRunLevel); }	
 	void doit();
@@ -81,7 +81,7 @@ private:
 	std::vector<OASIS_FLOAT> item_to_tiv_;	
 	void init_programme(int maxrunLevel);
 	void init_profile();
-	void init_profile_rec(fm_profile_new &f);
+	void init_profile_rec(fm_profile &f);
 	void init_itemtotiv();
 	void init_fmxref();
 	void init(int MaxRunLevel);
@@ -90,7 +90,7 @@ private:
 	void addtcrow(const fm_policyTC &f);
 	bool loadcoverages(std::vector<OASIS_FLOAT> &coverages);
 	bool gulhasvalue(const std::vector<OASIS_FLOAT> &gul) const;
-	void compute_item_proportions(std::vector<std::vector<std::vector <LossRec>>> &agg_vecs, const std::vector<OASIS_FLOAT> &guls,int level_, int layer_,int previous_layer_);	
+	void compute_item_proportions(std::vector<std::vector<std::vector <LossRec>>> &agg_vecs, const std::vector<OASIS_FLOAT> &guls,unsigned int level_, unsigned int layer_,unsigned int previous_layer_);	
 	inline void dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlookups_, std::vector<std::vector<std::vector <LossRec>>> &agg_vecs_, 
 		int level_, int max_level_,	std::map<int, std::vector<fmlevelrec> > &outmap_, 
 		int sidx_, const std::vector<std::vector<std::vector<policytcvidx>>> &avxs_, int layer_,

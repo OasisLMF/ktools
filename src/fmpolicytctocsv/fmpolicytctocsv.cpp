@@ -32,7 +32,7 @@
 * DAMAGE.
 */
 /*
-Convert fmpolicttc output to csv
+Convert fmpolicytc output to csv
 Author: Ben Matharu  email: ben.matharu@oasislmf.org
 */
 #include <iostream>
@@ -55,19 +55,19 @@ struct fm_policyTC {
 	int level_id;
 	int agg_id;
 	int layer_id;
-	int PolicyTC_id;
+	int profile_id;			// for some strange reason historically this has been named PolicyTC_id it really is the unique identifier of the profile table so I've renamed it!!
 };
 
 namespace fmpolicytctocsv {
 	void doit(bool skipheader)
 	{
 
-		if (skipheader == false)  printf("layer_id,level_id,agg_id,policytc_id\n");
+		if (skipheader == false)  printf("layer_id,level_id,agg_id,profile_id\n");
 
 		fm_policyTC q;
 		size_t i = fread(&q, sizeof(q), 1, stdin);
 		while (i != 0) {
-			printf(" %d, %d, %d, %d\n", q.layer_id, q.level_id, q.agg_id, q.PolicyTC_id);
+			printf(" %d, %d, %d, %d\n", q.layer_id, q.level_id, q.agg_id, q.profile_id);
 			i = fread(&q, sizeof(q), 1, stdin);
 		}
 	}

@@ -74,7 +74,7 @@ void help()
 
 int main(int argc, char *argv[])
 {
-
+	progname = argv[0];
 	int opt;
 	while ((opt = getopt(argc, argv, "vh")) != -1) {
 		switch (opt) {

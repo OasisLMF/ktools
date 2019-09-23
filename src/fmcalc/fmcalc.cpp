@@ -112,27 +112,13 @@ bool operator<(const fmxref_key& lhs, const fmxref_key& rhs)
 
 //
 // 
-void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossRec>>> &agg_vecs, const std::vector<OASIS_FLOAT> &guls, int level_, int layer_, int previous_layer_)
+void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossRec>>> &agg_vecs, const std::vector<OASIS_FLOAT> &guls, unsigned int level_, unsigned int layer_,unsigned int previous_layer_)
 {
 
 	if (layer_ == 1) {
 		std::vector<OASIS_FLOAT> items_prop (guls.size(), 0);
-		//items_prop.resize(guls.size(), 0);
 
-		//for (int level = 1; level < agg_vecs.size(); level++) {
-		//	vector <LossRec> &agg_vec = agg_vecs[level][layer_];
-		//	auto iter = agg_vec.begin();
-		//	while (iter != agg_vec.end()) {
-		//		if (iter->item_idx) {
-		//			if (iter->item_prop == nullptr) {
-		//				iter->item_prop =  std::make_shared<std::vector<OASIS_FLOAT>>(std::vector<OASIS_FLOAT>());
-		//			}
-		//			(iter->item_prop)->resize((iter->item_idx)->size(), 0);
-		//		}
-		//		iter++;
-		//	}
-		//}
-		for (int level = 1; level < agg_vecs.size(); level++) {
+		for (unsigned int level = 1; level < agg_vecs.size(); level++) {
 			vector <LossRec> &agg_vec = agg_vecs[level][layer_];
 			vector <LossRec>& previous_agg_vec = agg_vecs[level-1][layer_];
 			OASIS_FLOAT loss_total = 0;
@@ -202,7 +188,7 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 				}
 			}
 			else {	
-				// if there is is loss_total loss just copy previous level proportions
+				// if there is loss_total loss just copy previous level proportions
 				auto iter = agg_vec.begin();		// loop thru again to work out proportion
 				auto previous_iter = previous_agg_vec.begin();		// loop thru again to work out proportion
 				while (iter != agg_vec.end()) {
@@ -210,7 +196,6 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 						for (int idx : *(iter->item_idx)) {
 							std::vector<OASIS_FLOAT>& v = *(iter->item_prop);
 							iter->proportion = iter->proportion + items_prop[idx];
-							//fprintf(stderr, "sidx = %d\,", idx);
 						}
 					}
 					iter++;
@@ -393,6 +378,11 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 	
 	dofmcalc(agg_vec, layer);
 
+	if (allocrule_ == 2) {
+		const std::vector<OASIS_FLOAT>& guls = event_guls[gul_idx];
+		compute_item_proportions(agg_vecs, guls, level, layer, previous_layer_id);
+	}
+
 	if (level == max_level) {
 		int sidx = gul_idx - 1;
 		if (sidx == -1) sidx = tiv_idx;
@@ -405,7 +395,6 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 				agg_vec[i].item_net = agg_vec_previous_layer[i].item_net;
 			}
 		}
-		bool item_proportions_computed = false;
 		
 		for (LossRec &x : agg_vec) {
 			if (netvalue_ && layer == 1) {
@@ -442,10 +431,10 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 							else {
 								output_id = it->second;
 								if (netvalue_) {
-									if (layer == max_layer_) outmap[output_id].push_back(rec);			// neglible cost
+									if (layer == max_layer_) outmap[output_id].push_back(rec);			// negligible cost
 								}
 								else {
-									outmap[output_id].push_back(rec);			// neglible cost
+									outmap[output_id].push_back(rec);			// negligible cost
 								}
 							}							
 						}
@@ -492,10 +481,10 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 							else {
 								output_id = it->second;
 								if (netvalue_) {
-									if (layer == max_layer_) outmap[output_id].push_back(rec);			// neglible cost
+									if (layer == max_layer_) outmap[output_id].push_back(rec);			// negligible cost
 								}
 								else {
-									outmap[output_id].push_back(rec);			// neglible cost
+									outmap[output_id].push_back(rec);			// negligible cost
 								}
 							}							
 						}
@@ -503,11 +492,11 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 				}
 
 				if (allocrule_id == 2 && x.agg_id > 0) {		// back allocate as a proportion of the total of the previous losses			
-					if (item_proportions_computed == false) {
-						const std::vector<OASIS_FLOAT> &guls = event_guls[gul_idx];
-						compute_item_proportions(agg_vecs, guls, level, layer, previous_layer_id);
-						if (allocruleOptimizationOff_ == false) item_proportions_computed = true;
-					}
+					//if (item_proportions_computed == false) {
+					//	const std::vector<OASIS_FLOAT> &guls = event_guls[gul_idx];
+					//	compute_item_proportions(agg_vecs, guls, level, layer, previous_layer_id);
+					//	if (allocruleOptimizationOff_ == false) item_proportions_computed = true;
+					//}
 
 					if (x.item_prop && x.item_prop->size() > 0) {
 						int vec_idx = (*aggid_to_vectorlookup)[x.agg_id - 1];
@@ -759,7 +748,7 @@ void fmcalc::addtcrow(const fm_policyTC &f)
 		if (policy_tc_vec_vec_vec_[f.level_id][f.agg_id].size() < f.layer_id + 1) {
 			policy_tc_vec_vec_vec_[f.level_id][f.agg_id].resize(f.layer_id + 1);
 		}
-		policy_tc_vec_vec_vec_[f.level_id][f.agg_id][f.layer_id] = f.PolicyTC_id;
+		policy_tc_vec_vec_vec_[f.level_id][f.agg_id][f.layer_id] = f.profile_id;
 	}
 
 }
@@ -815,7 +804,7 @@ void fmcalc::parse_policytc(std::vector< fm_policyTC> &p)
 				f.agg_id = l.agg_id;
 				f.layer_id = l.layer_id;
 				f.level_id = max_level_id;
-				f.PolicyTC_id = noop_profile_id;
+				f.profile_id = noop_profile_id;
 				p.push_back(f);
 			}
 		}
@@ -835,7 +824,7 @@ void fmcalc::init_policytc(int maxRunLevel)
 	fm_policyTC f;
 	f.layer_id = 1;
 	f.level_id = 0;
-	f.PolicyTC_id = -1;
+	f.profile_id = -1;
 	for (int i = 1; i <= level_to_maxagg_id_[0]; i++) {		
 		f.agg_id = i;		
 		addtcrow(f);
@@ -847,25 +836,6 @@ void fmcalc::init_policytc(int maxRunLevel)
 		addtcrow(*iter);
 		iter++;
 	}
-/*
-	FILE* fin = NULL;
-	std::string file = FMPOLICYTC_FILE;
-	if (inputpath_.length() > 0) {
-		file = inputpath_ + file.substr(5);
-	}
-	fin = fopen(file.c_str(), "rb");
-
-	if (fin == NULL) {
-		fprintf(stderr, "%s: cannot open %s\n", __func__, file.c_str());
-		exit(EXIT_FAILURE);
-	}
-	int i = fread(&f, sizeof(f), 1, fin);
-	while (i != 0) {
-		addtcrow(f);   
-		i = fread(&f, sizeof(f), 1, fin);
-	}
-	fclose(fin);
-*/
 
 }
 

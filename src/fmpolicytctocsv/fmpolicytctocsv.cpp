@@ -51,13 +51,6 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 using namespace std;
 
-struct fm_policyTC {
-	int level_id;
-	int agg_id;
-	int layer_id;
-	int profile_id;			// for some strange reason historically this has been named PolicyTC_id it really is the unique identifier of the profile table so I've renamed it!!
-};
-
 namespace fmpolicytctocsv {
 	void doit(bool skipheader)
 	{

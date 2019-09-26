@@ -16,13 +16,6 @@
 #include <unistd.h>
 #endif
 
-struct fm_policyTC {
-  int level_id;
-  int agg_id;
-  int layer_id;
-  int PolicyTC_id;
-};
-
 namespace validateoasisfiles {
 
   inline void SetPathToFile(char const * oasisFilesDir, char const * fileName,
@@ -231,7 +224,7 @@ namespace validateoasisfiles {
     char line[4096];
     int lineno = 0;
 
-    fm_profile_new fmprof;
+    fm_profile fmprof;
 
     char const * fmprofileFileName = "/fm_profile.csv";
     char fmprofilePath[4096];
@@ -297,7 +290,7 @@ namespace validateoasisfiles {
     while(fgets(line, sizeof(line), fmpolicytcFile) != 0) {
 
       if(sscanf(line, "%d,%d,%d,%d", &fmpol.layer_id, &fmpol.level_id,
-		&fmpol.agg_id, &fmpol.PolicyTC_id) != 4) {
+		&fmpol.agg_id, &fmpol.profile_id) != 4) {
 
 	fprintf(stderr, "File %s\n", fmpolicytcPath);
 	fprintf(stderr, "Invalid data in line %d:\n%s\n", lineno, line);
@@ -316,9 +309,9 @@ namespace validateoasisfiles {
 
 	}
 
-	if(policytcIDs.find(fmpol.PolicyTC_id) == policytcIDs.end()) {
+	if(policytcIDs.find(fmpol.profile_id) == policytcIDs.end()) {
 
-	  fprintf(stderr, "Unknown policytc_id %d", fmpol.PolicyTC_id);
+	  fprintf(stderr, "Unknown policytc_id %d", fmpol.profile_id);
 	  fprintf(stderr, " in fm_policytc.csv on line %d\n%s\n", lineno, line);
 	  dataValid = false;
 

@@ -122,6 +122,13 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 			vector <LossRec> &agg_vec = agg_vecs[level][layer_];
 			vector <LossRec>& previous_agg_vec = agg_vecs[level-1][layer_];
 			OASIS_FLOAT loss_total = 0;
+			OASIS_FLOAT retained_loss_total = 0;
+			OASIS_FLOAT previous_proportions_total = 0;
+			auto p_iter = previous_agg_vec.begin();
+			while (p_iter != previous_agg_vec.end()) {
+				previous_proportions_total += p_iter->proportion;
+				p_iter++;
+			}
 			auto iter = agg_vec.begin();
 			while (iter != agg_vec.end()) {
 				OASIS_FLOAT total = 0;
@@ -137,9 +144,24 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 				}
 				iter->gul_total = total;
 				loss_total += iter->loss;
+				retained_loss_total += iter->retained_loss;
 				iter++;
 			}
-			if (loss_total > 0) {
+			if (loss_total <= 0 && previous_proportions_total > 0.01) {
+				// if there is loss_total loss just copy previous level proportions
+				auto iter = agg_vec.begin();		// loop thru again to work out proportion
+				auto previous_iter = previous_agg_vec.begin();		// loop thru again to work out proportion
+				while (iter != agg_vec.end()) {
+					if (iter->item_idx) {
+						for (int idx : *(iter->item_idx)) {
+							std::vector<OASIS_FLOAT>& v = *(iter->item_prop);
+							iter->proportion = iter->proportion + items_prop[idx];
+						}
+					}
+					iter++;
+				}
+			}
+			else {
 				iter = agg_vec.begin();		// loop thru again to work out proportion
 				while (iter != agg_vec.end()) {
 					if (iter->loss > 0 && loss_total > 0) {
@@ -186,21 +208,7 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 					}
 					iter++;
 				}
-			}
-			else {	
-				// if there is loss_total loss just copy previous level proportions
-				auto iter = agg_vec.begin();		// loop thru again to work out proportion
-				auto previous_iter = previous_agg_vec.begin();		// loop thru again to work out proportion
-				while (iter != agg_vec.end()) {
-					if (iter->item_idx) {
-						for (int idx : *(iter->item_idx)) {
-							std::vector<OASIS_FLOAT>& v = *(iter->item_prop);
-							iter->proportion = iter->proportion + items_prop[idx];
-						}
-					}
-					iter++;
-				}
-			}
+			}			
 		}
 	}
 	else {

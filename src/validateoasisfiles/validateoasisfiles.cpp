@@ -188,7 +188,7 @@ namespace validateoasisfiles {
 
 	  fprintf(stderr, "Item ID %d in line %d", q.id, lineno);
 	  fprintf(stderr, " not present in fm_programme.csv.");
-	  fprintf(stderr, " Possible duplicate?\n%s\n", line);
+	  fprintf(stderr, " Possible duplicate in items.csv?\n%s\n", line);
 	  dataValid = false;
 
 	}
@@ -204,7 +204,8 @@ namespace validateoasisfiles {
     // Display item_id in fm_programme.csv that is not present in items.csv
     if(!fromaggIDs.empty()) {
 
-      fprintf(stderr, "Item IDs not found in items.csv:\n");
+      fprintf(stderr, "Item ID(s) not found in items.csv");
+      fprintf(stderr, " (possible duplicate(s) in fm_programme.csv):\n");
       for(std::vector<int>::const_iterator i=fromaggIDs.begin();
 	  i!=fromaggIDs.end(); ++i) {
         fprintf(stderr, "%d ", *i);

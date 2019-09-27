@@ -11,21 +11,6 @@
 #include <set>
 
 
-//bool operator<(const period_sidx_map_key& lhs, const period_sidx_map_key& rhs)
-//{
-//
-//	if (lhs.period_no != rhs.period_no) {
-//		return lhs.period_no < rhs.period_no;
-//	}
-//	else {
-//
-//		return lhs.sidx < rhs.sidx;
-//
-//	}
-//
-//
-//}
-
 
 namespace summaryindex {
 	void doit(const std::string& subfolder);
@@ -80,10 +65,10 @@ void aalcalc::loadperiodtoweigthing()
 		i = fread(&p, sizeof(Periods), 1, fin);
 	}
 
-	if (total_weighting > 1.00001 || total_weighting < 0.99999) {
-		fprintf(stderr, "aalcalc: Period weighting do not sum to 1 in %s total = %f\n", PERIODS_FILE, total_weighting);
-		exit(-1);
-	}
+	//if (total_weighting > 1.00001 || total_weighting < 0.99999) {
+	//	fprintf(stderr, "aalcalc: Period weighting do not sum to 1 in %s total = %f\n", PERIODS_FILE, total_weighting);
+	//	exit(-1);
+	//}
 
 	// If we are going to have weightings we should have them for all periods
 	//	if (periodstowighting_.size() != no_of_periods_) {
@@ -91,7 +76,7 @@ void aalcalc::loadperiodtoweigthing()
 	//		exit(-1);
 	//	}
 	// Weighting already normalzed just split over samples...
-	return;
+	
 	auto iter = periodstoweighting_.begin();
 	while (iter != periodstoweighting_.end()) {
 		// iter->second = iter->second / total_weighting; // no need sinece already normalized 

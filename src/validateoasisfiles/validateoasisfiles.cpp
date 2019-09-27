@@ -62,16 +62,14 @@ namespace validateoasisfiles {
 
       } else {
 
-	if(fromaggIDs.size() != 0 && firstLevel) {
-	  if(fromaggIDs.rbegin()[0] < fmprog.from_agg_id) {
-	    fromaggIDs.push_back(fmprog.from_agg_id);
-	  } else {
-	    firstLevel = false;
-	  }
-	} else if(fromaggIDs.size() == 0) {
+	// Collect from_agg_id values for first level_id
+	if(fmprog.level_id == 1) {
+
 	  fromaggIDs.push_back(fmprog.from_agg_id);
+
 	}
 
+	// Collect unique (level_id, to_agg_id) pairs
 	level_toaggIDPairs.insert(std::make_pair(fmprog.level_id,
 						 fmprog.to_agg_id));
 
@@ -82,10 +80,6 @@ namespace validateoasisfiles {
     }
 
     fclose(fmprogrammeFile);
-
-    // Debug
-    for(std::vector<int>::const_iterator i=fromaggIDs.begin(); i!=fromaggIDs.end(); ++i) fprintf(stderr, "%d ", *i);
-    fprintf(stderr, "\n");
 
     return true;
 
@@ -124,6 +118,7 @@ namespace validateoasisfiles {
 
       } else {
 
+	// Collect coverage_id values
 	coverageIDs.insert(coverage_id);
 
       }
@@ -133,10 +128,6 @@ namespace validateoasisfiles {
     }
 
     fclose(coveragesFile);
-
-    // Debug
-    for(std::set<int>::const_iterator i=coverageIDs.begin(); i!=coverageIDs.end(); ++i) fprintf(stderr, "%d ", *i);
-    fprintf(stderr, "\n");
 
     return true;
 
@@ -176,14 +167,17 @@ namespace validateoasisfiles {
 
       } else {
 
+	// Determine if coverage_id in items.csv matches those in coverages.csv
 	if(coverageIDs.find(q.coverage_id) == coverageIDs.end()) {
 
 	  fprintf(stderr, "Unknown coverage ID %d", q.coverage_id);
-	  fprintf(stderr, " in items. csv on line %d\n%s\n", lineno, line);
+	  fprintf(stderr, " in items.csv on line %d\n%s\n", lineno, line);
 	  dataValid = false;
 
 	}
 
+	// Determine if item_id in items.csv is present as from_agg_id in
+	// fm_programme.csv
 	std::vector<int>::iterator pos = std::find(fromaggIDs.begin(),
 						   fromaggIDs.end(), q.id);
 	if(pos != fromaggIDs.end()) {
@@ -207,6 +201,7 @@ namespace validateoasisfiles {
 
     fclose(itemsFile);
 
+    // Display item_id in fm_programme.csv that is not present in items.csv
     if(!fromaggIDs.empty()) {
 
       fprintf(stderr, "Item IDs not found in items.csv:\n");
@@ -257,6 +252,7 @@ namespace validateoasisfiles {
 
       } else {
 
+	// Collect policytc_id values
 	policytcIDs.insert(fmprof.profile_id);
 
       }
@@ -305,6 +301,8 @@ namespace validateoasisfiles {
 
       } else {
 
+	// Determine if (level_id, agg_id) pair in fm_policytc.csv is present
+	// as (level_id, to_agg_id) pair in fm_programme.csv
 	std::pair<int, int> level_toagg = std::make_pair(fmpol.level_id,
 							 fmpol.agg_id);
 	if(level_toaggIDPairs.find(level_toagg) == level_toaggIDPairs.end()) {
@@ -316,6 +314,8 @@ namespace validateoasisfiles {
 
 	}
 
+	// Determine if policytc_id in fm_policytc.csv is present in
+	// fm_profile.csv
 	if(policytcIDs.find(fmpol.profile_id) == policytcIDs.end()) {
 
 	  fprintf(stderr, "Unknown policytc_id %d", fmpol.profile_id);
@@ -331,10 +331,6 @@ namespace validateoasisfiles {
     }
 
     fclose(fmpolicytcFile);
-
-    // Debug
-    for(std::set<int>::const_iterator i=policytcIDs.begin(); i!=policytcIDs.end(); ++i) fprintf(stderr, "%d ", *i);
-    fprintf(stderr, "\n");
 
     return dataValid;
 
@@ -358,12 +354,6 @@ namespace validateoasisfiles {
       fprintf(stderr, "Done.\n");
     }
 
-    // Debug
-    for(std::vector<int>::const_iterator i=fromaggIDs.begin(); i!=fromaggIDs.end(); ++i) fprintf(stderr, "%d ", *i);
-    fprintf(stderr, "\n");
-    for(std::set<std::pair<int, int> >::const_iterator i=level_toaggIDPairs.begin(); i!=level_toaggIDPairs.end(); ++i) fprintf(stderr, "(%d,%d) ", (*i).first, (*i).second);
-    fprintf(stderr, "\n");
-
     coverageIDs.clear();
     dataValid = ReadCoveragesFile(oasisFilesDir, coverageIDs);
     if(dataValid == false) {
@@ -371,10 +361,6 @@ namespace validateoasisfiles {
     } else {
       fprintf(stderr, "Done.\n");
     }
-
-    // Debug
-    for(std::set<int>::const_iterator i=coverageIDs.begin(); i!=coverageIDs.end(); ++i) fprintf(stderr, "%d ", *i);
-    fprintf(stderr, "\n");
 
     dataValid = ReadItemsFile(oasisFilesDir, coverageIDs, fromaggIDs);
     if(dataValid == false) {
@@ -399,11 +385,7 @@ namespace validateoasisfiles {
       fprintf(stderr, "Done.\n");
     }
 
-    // Debug
-    for(std::set<int>::const_iterator i=policytcIDs.begin(); i!=policytcIDs.end(); ++i) fprintf(stderr, "%d ", *i);
-    fprintf(stderr, "\n");
-
-    fprintf(stderr, "All checks pass\n");
+    fprintf(stderr, "All checks pass.\n");
     return;
 
   }

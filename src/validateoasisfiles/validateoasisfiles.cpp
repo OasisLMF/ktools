@@ -22,6 +22,7 @@ namespace validateoasisfiles {
 			    char * pathToFile) {
 
     memcpy(pathToFile, oasisFilesDir, strlen(oasisFilesDir)+1);
+    strncat(pathToFile, "/", (sizeof(pathToFile) - strlen(pathToFile)));
     strncat(pathToFile, fileName, (sizeof(pathToFile) - strlen(pathToFile)));
 
   }
@@ -36,7 +37,7 @@ namespace validateoasisfiles {
     fm_programme fmprog;
     bool firstLevel = true;
 
-    char const * fmprogrammeFileName = "/fm_programme.csv";
+    char const * fmprogrammeFileName = "fm_programme.csv";
     char fmprogrammePath[4096];
     SetPathToFile(oasisFilesDir, fmprogrammeFileName, fmprogrammePath);
     FILE * fmprogrammeFile;
@@ -45,6 +46,7 @@ namespace validateoasisfiles {
       fprintf(stderr, "Error opening %s\n", fmprogrammePath);
       return false;
     }
+    fprintf(stderr, "Reading %s...\n", fmprogrammeFileName);
 
     fgets(line, sizeof(line), fmprogrammeFile);   // Skip header
     lineno++;
@@ -55,7 +57,7 @@ namespace validateoasisfiles {
 		&fmprog.to_agg_id) != 3) {
 
 	fprintf(stderr, "File %s\n", fmprogrammePath);
-	fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
+	fprintf(stderr, "Invalid data in line %d:\n%s\n", lineno, line);
 	return false;
 
       } else {
@@ -98,7 +100,7 @@ namespace validateoasisfiles {
     int coverage_id;
     float tiv;
 
-    char const * coveragesFileName = "/coverages.csv";
+    char const * coveragesFileName = "coverages.csv";
     char coveragesPath[4096];
     SetPathToFile(oasisFilesDir, coveragesFileName, coveragesPath);
     FILE * coveragesFile;
@@ -107,6 +109,7 @@ namespace validateoasisfiles {
       fprintf(stderr, "Error opening %s\n", coveragesPath);
       return false;
     }
+    fprintf(stderr, "Reading %s...\n", coveragesFileName);
 
     fgets(line, sizeof(line), coveragesFile);   // Skip header
     lineno++;
@@ -149,7 +152,7 @@ namespace validateoasisfiles {
 
     item q;
  
-    char const * itemsFileName = "/items.csv";
+    char const * itemsFileName = "items.csv";
     char itemsPath[4096];
     SetPathToFile(oasisFilesDir, itemsFileName, itemsPath);
     FILE * itemsFile;
@@ -158,6 +161,7 @@ namespace validateoasisfiles {
       fprintf(stderr, "Error opening %s\n", itemsPath);
       return false;
     }
+    fprintf(stderr, "Reading %s...\n", itemsFileName);
 
     fgets(line, sizeof(line), itemsFile);   // Skip header
     lineno++;
@@ -210,6 +214,7 @@ namespace validateoasisfiles {
 	  i!=fromaggIDs.end(); ++i) {
         fprintf(stderr, "%d ", *i);
       }
+      fprintf(stderr, "\n");
       dataValid = false;
 
     }
@@ -226,7 +231,7 @@ namespace validateoasisfiles {
 
     fm_profile fmprof;
 
-    char const * fmprofileFileName = "/fm_profile.csv";
+    char const * fmprofileFileName = "fm_profile.csv";
     char fmprofilePath[4096];
     SetPathToFile(oasisFilesDir, fmprofileFileName, fmprofilePath);
     FILE * fmprofileFile;
@@ -235,6 +240,7 @@ namespace validateoasisfiles {
       fprintf(stderr, "Error opening %s\n", fmprofilePath);
       return false;
     }
+    fprintf(stderr, "Reading %s...\n", fmprofileFileName);
 
     fgets(line, sizeof(line), fmprofileFile);   // Skip header
     lineno++;
@@ -275,7 +281,7 @@ namespace validateoasisfiles {
 
     fm_policyTC fmpol;
 
-    char const * fmpolicytcFileName = "/fm_policytc.csv";
+    char const * fmpolicytcFileName = "fm_policytc.csv";
     char fmpolicytcPath[4096];
     SetPathToFile(oasisFilesDir, fmpolicytcFileName, fmpolicytcPath);
     FILE * fmpolicytcFile;
@@ -284,6 +290,7 @@ namespace validateoasisfiles {
       fprintf(stderr, "Error opening %s\n", fmpolicytcPath);
       return false;
     }
+    fprintf(stderr, "Reading %s...\n", fmpolicytcFileName);
 
     fgets(line, sizeof(line), fmpolicytcFile);   // Skip header
     lineno++;
@@ -345,7 +352,11 @@ namespace validateoasisfiles {
     level_toaggIDPairs.clear();
     dataValid = ReadFMProgrammeFile(oasisFilesDir, fromaggIDs,
 		    		    level_toaggIDPairs);
-    if(dataValid == false) return;
+    if(dataValid == false) {
+      return;
+    } else {
+      fprintf(stderr, "Done.\n");
+    }
 
     // Debug
     for(std::vector<int>::const_iterator i=fromaggIDs.begin(); i!=fromaggIDs.end(); ++i) fprintf(stderr, "%d ", *i);
@@ -355,26 +366,45 @@ namespace validateoasisfiles {
 
     coverageIDs.clear();
     dataValid = ReadCoveragesFile(oasisFilesDir, coverageIDs);
-    if(dataValid == false) return;
+    if(dataValid == false) {
+      return;
+    } else {
+      fprintf(stderr, "Done.\n");
+    }
 
     // Debug
     for(std::set<int>::const_iterator i=coverageIDs.begin(); i!=coverageIDs.end(); ++i) fprintf(stderr, "%d ", *i);
     fprintf(stderr, "\n");
 
     dataValid = ReadItemsFile(oasisFilesDir, coverageIDs, fromaggIDs);
-    if(dataValid == false) return;
+    if(dataValid == false) {
+      return;
+    } else {
+      fprintf(stderr, "Done.\n");
+    }
 
     policytcIDs.clear();
     dataValid = ReadFMProfileFile(oasisFilesDir, policytcIDs);
-    if(dataValid == false) return;
+    if(dataValid == false) {
+      return;
+    } else {
+      fprintf(stderr, "Done.\n");
+    }
 
     dataValid = ReadFMPolicyTCFile(oasisFilesDir, level_toaggIDPairs,
 		    		   policytcIDs);
-    if(dataValid == false) return;
+    if(dataValid == false) {
+      return;
+    } else {
+      fprintf(stderr, "Done.\n");
+    }
 
     // Debug
     for(std::set<int>::const_iterator i=policytcIDs.begin(); i!=policytcIDs.end(); ++i) fprintf(stderr, "%d ", *i);
     fprintf(stderr, "\n");
+
+    fprintf(stderr, "All checks pass\n");
+    return;
 
   }
 

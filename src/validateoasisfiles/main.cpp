@@ -12,7 +12,7 @@
 #endif
 
 namespace validateoasisfiles {
-  void doit(char const *);
+  void doit(char const *, bool);
 }
 
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
@@ -30,21 +30,29 @@ void segfault_sigaction(int signal, siginfo_t *st, void *arg) {
 #endif
 
 void help() {
-  fprintf(stderr, "-h help\n-d oasis files directory\n");
+  fprintf(stderr, "-h help\n-d [oasis files directory]\n"
+		  "-g GUL files only\n-v version\n");
 }
 
 int main(int argc, char *argv[]) {
 
   progname = argv[0];
   char *oasisFilesDir;
+  bool gulOnly = false;
   int opt;
-  while((opt = getopt(argc, argv, ":d:vh")) != -1) {
+  while((opt = getopt(argc, argv, ":d:gvh")) != -1) {
     switch(opt) {
       case 'd':
 	oasisFilesDir = optarg;
 	break;
       case ':':
-	fprintf(stderr, "option needs a value\n");
+	fprintf(stderr, "option %c needs a value\n", optopt);
+	exit(EXIT_FAILURE);
+      case '?':
+	fprintf(stderr, "unknown option %c\n", optopt);
+	exit(EXIT_FAILURE);
+      case 'g':
+	gulOnly = true;
 	break;
       case 'v':
 	fprintf(stderr, "%s: version: %s\n", argv[0], VERSION);
@@ -70,7 +78,7 @@ int main(int argc, char *argv[]) {
 
   try {
     initstreams();
-    validateoasisfiles::doit(oasisFilesDir);
+    validateoasisfiles::doit(oasisFilesDir, gulOnly);
     return 0;
   }
   catch(std::bad_alloc) {

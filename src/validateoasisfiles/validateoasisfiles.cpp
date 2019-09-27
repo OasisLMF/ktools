@@ -27,7 +27,7 @@ namespace validateoasisfiles {
 
   }
 
-  bool ReadFMProgrammeFile(char const * oasisFilesDir,
+  bool ReadFMProgrammeFile(char const * oasisFilesDir, bool &gulOnly,
 		  	   std::vector<int> &fromaggIDs,
 			   std::set<std::pair<int, int> > &level_toaggIDPairs) {
 
@@ -44,7 +44,11 @@ namespace validateoasisfiles {
     fmprogrammeFile = fopen(fmprogrammePath, "r");
     if(fmprogrammeFile == NULL) {
       fprintf(stderr, "Error opening %s\n", fmprogrammePath);
-      return false;
+      fprintf(stderr, "Assume IL files do not exist.");
+      fprintf(stderr, " Shall check GUL files only instead.\n");
+      fprintf(stderr, "Please use -g option in future for GUL only checks.\n");
+      gulOnly = true;
+      return true;
     }
     fprintf(stderr, "Reading %s...\n", fmprogrammeFileName);
 
@@ -133,7 +137,7 @@ namespace validateoasisfiles {
 
   }
 
-  bool ReadItemsFile(char const * oasisFilesDir,
+  bool ReadItemsFile(char const * oasisFilesDir, bool const gulOnly,
 		     std::set<int> const &coverageIDs,
 		     std::vector<int> &fromaggIDs) {
 
@@ -176,42 +180,48 @@ namespace validateoasisfiles {
 
 	}
 
-	// Determine if item_id in items.csv is present as from_agg_id in
-	// fm_programme.csv
-	std::vector<int>::iterator pos = std::find(fromaggIDs.begin(),
-						   fromaggIDs.end(), q.id);
-	if(pos != fromaggIDs.end()) {
+	if(!gulOnly) {
+	  // Determine if item_id in items.csv is present as from_agg_id in
+	  // fm_programme.csv
+	  std::vector<int>::iterator pos = std::find(fromaggIDs.begin(),
+			  			     fromaggIDs.end(), q.id);
+	  if(pos != fromaggIDs.end()) {
 
-	  fromaggIDs.erase(pos);
+	    fromaggIDs.erase(pos);
 
-	} else {
+	  } else {
 
-	  fprintf(stderr, "Item ID %d in line %d", q.id, lineno);
-	  fprintf(stderr, " not present in fm_programme.csv.");
-	  fprintf(stderr, " Possible duplicate in items.csv?\n%s\n", line);
-	  dataValid = false;
+	    fprintf(stderr, "Item ID %d in line %d", q.id, lineno);
+	    fprintf(stderr, " not present in fm_programme.csv.");
+	    fprintf(stderr, " Possible duplicate in items.csv?\n%s\n", line);
+	    dataValid = false;
 
-	}
+	  }
+
+        }
 
       }
-
+	
       lineno++;
 
     }
 
     fclose(itemsFile);
 
-    // Display item_id in fm_programme.csv that is not present in items.csv
-    if(!fromaggIDs.empty()) {
+    if(!gulOnly) {
+      // Display item_id in fm_programme.csv that is not present in items.csv
+      if(!fromaggIDs.empty()) {
 
-      fprintf(stderr, "Item ID(s) not found in items.csv");
-      fprintf(stderr, " (possible duplicate(s) in fm_programme.csv):\n");
-      for(std::vector<int>::const_iterator i=fromaggIDs.begin();
-	  i!=fromaggIDs.end(); ++i) {
-        fprintf(stderr, "%d ", *i);
+	fprintf(stderr, "Item ID(s) not found in items.csv");
+	fprintf(stderr, " (possible duplicate(s) in fm_programme.csv):\n");
+	for(std::vector<int>::const_iterator i=fromaggIDs.begin();
+	    i!=fromaggIDs.end(); ++i) {
+	  fprintf(stderr, "%d ", *i);
+	}
+        fprintf(stderr, "\n");
+        dataValid = false;
+
       }
-      fprintf(stderr, "\n");
-      dataValid = false;
 
     }
 
@@ -337,7 +347,7 @@ namespace validateoasisfiles {
 
   }
 
-  void doit(char const * oasisFilesDir) {
+  void doit(char const * oasisFilesDir, bool gulOnly) {
 
     bool dataValid = true;
     std::vector<int> fromaggIDs;
@@ -345,14 +355,16 @@ namespace validateoasisfiles {
     std::set<int> coverageIDs;
     std::set<int> policytcIDs;
 
-    fromaggIDs.clear();
-    level_toaggIDPairs.clear();
-    dataValid = ReadFMProgrammeFile(oasisFilesDir, fromaggIDs,
-		    		    level_toaggIDPairs);
-    if(dataValid == false) {
-      return;
-    } else {
-      fprintf(stderr, "Done.\n");
+    if(!gulOnly) {
+      fromaggIDs.clear();
+      level_toaggIDPairs.clear();
+      dataValid = ReadFMProgrammeFile(oasisFilesDir, gulOnly, fromaggIDs,
+		      		      level_toaggIDPairs);
+      if(dataValid == false) {
+	return;
+      } else if(!gulOnly) {
+	fprintf(stderr, "Done.\n");
+      }
     }
 
     coverageIDs.clear();
@@ -363,27 +375,31 @@ namespace validateoasisfiles {
       fprintf(stderr, "Done.\n");
     }
 
-    dataValid = ReadItemsFile(oasisFilesDir, coverageIDs, fromaggIDs);
+    dataValid = ReadItemsFile(oasisFilesDir, gulOnly, coverageIDs, fromaggIDs);
     if(dataValid == false) {
       return;
     } else {
       fprintf(stderr, "Done.\n");
     }
 
-    policytcIDs.clear();
-    dataValid = ReadFMProfileFile(oasisFilesDir, policytcIDs);
-    if(dataValid == false) {
-      return;
-    } else {
-      fprintf(stderr, "Done.\n");
+    if(!gulOnly) {
+      policytcIDs.clear();
+      dataValid = ReadFMProfileFile(oasisFilesDir, policytcIDs);
+      if(dataValid == false) {
+	return;
+      } else {
+	fprintf(stderr, "Done.\n");
+      }
     }
 
-    dataValid = ReadFMPolicyTCFile(oasisFilesDir, level_toaggIDPairs,
-		    		   policytcIDs);
-    if(dataValid == false) {
-      return;
-    } else {
-      fprintf(stderr, "Done.\n");
+    if(!gulOnly) {
+      dataValid = ReadFMPolicyTCFile(oasisFilesDir, level_toaggIDPairs,
+		      		     policytcIDs);
+      if(dataValid == false) {
+	return;
+      } else {
+	fprintf(stderr, "Done.\n");
+      }
     }
 
     fprintf(stderr, "All checks pass.\n");

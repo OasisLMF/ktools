@@ -19,11 +19,11 @@
 namespace validateoasisfiles {
 
   inline void SetPathToFile(char const * oasisFilesDir, char const * fileName,
-			    char * pathToFile) {
+			    char * pathToFile, int const pathLength) {
 
     memcpy(pathToFile, oasisFilesDir, strlen(oasisFilesDir)+1);
-    strncat(pathToFile, "/", (sizeof(pathToFile) - strlen(pathToFile)));
-    strncat(pathToFile, fileName, (sizeof(pathToFile) - strlen(pathToFile)));
+    strncat(pathToFile, "/", (pathLength - strlen(pathToFile)) - 1);
+    strncat(pathToFile, fileName, (pathLength - strlen(pathToFile)) - 1);
 
   }
 
@@ -39,7 +39,8 @@ namespace validateoasisfiles {
 
     char const * fmprogrammeFileName = "fm_programme.csv";
     char fmprogrammePath[4096];
-    SetPathToFile(oasisFilesDir, fmprogrammeFileName, fmprogrammePath);
+    SetPathToFile(oasisFilesDir, fmprogrammeFileName, fmprogrammePath,
+		  sizeof(fmprogrammePath));
     FILE * fmprogrammeFile;
     fmprogrammeFile = fopen(fmprogrammePath, "r");
     if(fmprogrammeFile == NULL) {
@@ -100,7 +101,8 @@ namespace validateoasisfiles {
 
     char const * coveragesFileName = "coverages.csv";
     char coveragesPath[4096];
-    SetPathToFile(oasisFilesDir, coveragesFileName, coveragesPath);
+    SetPathToFile(oasisFilesDir, coveragesFileName, coveragesPath,
+		  sizeof(coveragesPath));
     FILE * coveragesFile;
     coveragesFile = fopen(coveragesPath, "r");
     if(coveragesFile == NULL) {
@@ -149,7 +151,7 @@ namespace validateoasisfiles {
  
     char const * itemsFileName = "items.csv";
     char itemsPath[4096];
-    SetPathToFile(oasisFilesDir, itemsFileName, itemsPath);
+    SetPathToFile(oasisFilesDir, itemsFileName, itemsPath, sizeof(itemsPath));
     FILE * itemsFile;
     itemsFile = fopen(itemsPath, "r");
     if(itemsFile == NULL) {
@@ -239,7 +241,8 @@ namespace validateoasisfiles {
 
     char const * fmprofileFileName = "fm_profile.csv";
     char fmprofilePath[4096];
-    SetPathToFile(oasisFilesDir, fmprofileFileName, fmprofilePath);
+    SetPathToFile(oasisFilesDir, fmprofileFileName, fmprofilePath,
+		  sizeof(fmprofilePath));
     FILE * fmprofileFile;
     fmprofileFile = fopen(fmprofilePath, "r");
     if(fmprofileFile == NULL) {
@@ -290,7 +293,8 @@ namespace validateoasisfiles {
 
     char const * fmpolicytcFileName = "fm_policytc.csv";
     char fmpolicytcPath[4096];
-    SetPathToFile(oasisFilesDir, fmpolicytcFileName, fmpolicytcPath);
+    SetPathToFile(oasisFilesDir, fmpolicytcFileName, fmpolicytcPath,
+		  sizeof(fmpolicytcPath));
     FILE * fmpolicytcFile;
     fmpolicytcFile = fopen(fmpolicytcPath, "r");
     if(fmpolicytcFile == NULL) {

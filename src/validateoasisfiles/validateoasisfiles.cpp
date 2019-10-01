@@ -33,6 +33,7 @@ namespace validateoasisfiles {
 
     char line[4096];
     int lineno = 0;
+    bool dataValid = true;
 
     fm_programme fmprog;
     bool firstLevel = true;
@@ -72,6 +73,23 @@ namespace validateoasisfiles {
 
 	  fromaggIDs.push_back(fmprog.from_agg_id);
 
+	// For susequent level_id n check from_agg_id exists as to_agg_id in
+	// previous level n-1
+	} else {
+
+	  std::pair<int, int> level_fromagg = std::make_pair(fmprog.level_id-1,
+			  				     fmprog.from_agg_id);
+	  if(level_toaggIDPairs.find(level_fromagg) == level_toaggIDPairs.end()) {
+
+      	    fprintf(stderr, "Line %d:", lineno);
+	    fprintf(stderr, " from_agg_id %d in level %d", fmprog.from_agg_id,
+		    fmprog.level_id);
+	    fprintf(stderr, " not present as to_agg_id in level %d:\n%s\n",
+		    fmprog.level_id-1, line);
+	    dataValid = false;
+
+	  }
+
 	}
 
 	// Collect unique (level_id, to_agg_id) pairs
@@ -86,7 +104,7 @@ namespace validateoasisfiles {
 
     fclose(fmprogrammeFile);
 
-    return true;
+    return dataValid;
 
   }
 

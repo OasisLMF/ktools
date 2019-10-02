@@ -34,6 +34,7 @@ namespace validateoasisfiles {
     char line[4096];
     int lineno = 0;
     bool dataValid = true;
+    std::set<std::pair<int, int> > level_fromaggIDPairs;
 
     fm_programme fmprog;
     bool firstLevel = true;
@@ -57,6 +58,7 @@ namespace validateoasisfiles {
     fgets(line, sizeof(line), fmprogrammeFile);   // Skip header
     lineno++;
     fromaggIDs.clear();
+    level_fromaggIDPairs.clear();
     while(fgets(line, sizeof(line), fmprogrammeFile) != 0) {
 
       if(sscanf(line, "%d,%d,%d", &fmprog.from_agg_id, &fmprog.level_id,
@@ -73,22 +75,11 @@ namespace validateoasisfiles {
 
 	  fromaggIDs.push_back(fmprog.from_agg_id);
 
-	// For susequent level_id n check from_agg_id exists as to_agg_id in
-	// previous level n-1
+	// Collect (level_id, from_agg_id) pairs for subsequent level_id
 	} else {
 
-	  std::pair<int, int> level_fromagg = std::make_pair(fmprog.level_id-1,
-			  				     fmprog.from_agg_id);
-	  if(level_toaggIDPairs.find(level_fromagg) == level_toaggIDPairs.end()) {
-
-      	    fprintf(stderr, "Line %d:", lineno);
-	    fprintf(stderr, " from_agg_id %d in level %d", fmprog.from_agg_id,
-		    fmprog.level_id);
-	    fprintf(stderr, " not present as to_agg_id in level %d:\n%s\n",
-		    fmprog.level_id-1, line);
-	    dataValid = false;
-
-	  }
+	  level_fromaggIDPairs.insert(std::make_pair(fmprog.level_id-1,
+				  		     fmprog.from_agg_id));
 
 	}
 
@@ -103,6 +94,23 @@ namespace validateoasisfiles {
     }
 
     fclose(fmprogrammeFile);
+
+    // For level_id n+1 check from_agg_id exists as to_agg_id in
+    // previous level n
+    for(std::set<std::pair<int, int> >::const_iterator
+      i=level_fromaggIDPairs.begin(); i!=level_fromaggIDPairs.end(); i++) {
+
+      if(level_toaggIDPairs.find(*i) == level_toaggIDPairs.end()) {
+
+	fprintf(stderr, "from_agg_id %d in level %d", (*i).second,
+		(*i).first+1);
+	fprintf(stderr, " not present as to_agg_id in level %d\n",
+		(*i).first);
+	dataValid = false;
+
+      }
+
+    }
 
     return dataValid;
 

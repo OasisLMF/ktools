@@ -1,6 +1,14 @@
 Ktools Changelog
 ================
 
+## [v3.1.2](https://github.com/OasisLMF/ktools/releases/tag/v3.1.2)
+* Fixes to CMake build
+* Added validation tools 
+* Fix for compressed footprint filenames
+* fix bug handle loss is zero
+* Fix fmcalc for missing samples
+* Removed aalcalc check for weights sum to 1.00
+
 ## [v3.1.1](https://github.com/OasisLMF/ktools/releases/tag/v3.1.1)
 * Fix and binary build for OSX
 * Added check in occurrence data

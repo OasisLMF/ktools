@@ -4,3 +4,6 @@ target_sources(gultobin
 		gultobin.cpp main.cpp
 )
 
+if (WIN32)
+	target_link_libraries(gultobin wingetopt)
+endif()

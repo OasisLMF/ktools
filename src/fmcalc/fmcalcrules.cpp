@@ -901,7 +901,7 @@ void fmcalc::init_profile()
 		exit(EXIT_FAILURE);
 	}
 	fm_profile f;
-	int i = fread(&f, sizeof(f), 1, fin);
+	size_t i = fread(&f, sizeof(f), 1, fin);
 	while (i != 0) {		
 		init_profile_rec(f);
 		if (noop_profile_id < f.profile_id) noop_profile_id = f.profile_id;

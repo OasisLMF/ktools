@@ -4,3 +4,6 @@ target_sources(gultocsv
 		gultocsv.cpp main.cpp
 )
 
+if (WIN32)
+	target_link_libraries(gultocsv wingetopt)
+endif()

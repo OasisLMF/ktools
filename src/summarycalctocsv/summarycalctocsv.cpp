@@ -57,7 +57,7 @@ int rowcount = 0;
 void doitz(bool skipheader, bool fullprecision, bool show_exposure_value, bool remove_zero_exposure_records)
 {
 	int summarycalcstream_type = 0;
-	int i = fread(&summarycalcstream_type, sizeof(summarycalcstream_type), 1, stdin);
+	size_t i = fread(&summarycalcstream_type, sizeof(summarycalcstream_type), 1, stdin);
 	int stream_type = summarycalcstream_type & summarycalc_id;
 
 	if (stream_type != summarycalc_id) {
@@ -113,7 +113,7 @@ void doit(bool skipheader, bool fullprecision,bool show_exposure_value, bool rem
 		return;
 	}
 	int summarycalcstream_type = 0;
-	int i = fread(&summarycalcstream_type, sizeof(summarycalcstream_type), 1, stdin);
+	size_t i = fread(&summarycalcstream_type, sizeof(summarycalcstream_type), 1, stdin);
 	int stream_type = summarycalcstream_type & summarycalc_id;
 
 	if (stream_type != summarycalc_id) {

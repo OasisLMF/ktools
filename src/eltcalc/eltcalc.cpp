@@ -75,7 +75,7 @@ namespace eltcalc {
 		OASIS_FLOAT sumlosssqr = 0.0;
 		if (skipHeader == false) printf("summary_id,type,event_id,mean,standard_deviation,exposure_value\n");
 		summarySampleslevelHeader sh;
-		int i = fread(&sh, sizeof(sh), 1, stdin);
+		size_t i = fread(&sh, sizeof(sh), 1, stdin);
 		while (i != 0) {
 			sampleslevelRec sr;
 			i = fread(&sr, sizeof(sr), 1, stdin);
@@ -126,7 +126,7 @@ namespace eltcalc {
 	void doit(bool skipHeader)
 	{
 		unsigned int stream_type = 0;
-		int i = fread(&stream_type, sizeof(stream_type), 1, stdin);
+		size_t i = fread(&stream_type, sizeof(stream_type), 1, stdin);
 
 		if (isSummaryCalcStream(stream_type) == true) {
 			unsigned int samplesize;

@@ -4,3 +4,6 @@ target_sources(occurrencetobin
 		occurrencetobin.cpp
 )
 
+if (WIN32)
+	target_link_libraries(occurrencetobin wingetopt)
+endif()

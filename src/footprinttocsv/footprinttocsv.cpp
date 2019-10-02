@@ -80,7 +80,7 @@ namespace footprinttocsv {
 		std::vector<unsigned char > uncompressed_buf;
 		uncompressed_buf.resize(size * 20);
 		fread(&compressed_buf[0], size, 1, finx);
-		uLong dest_length = uncompressed_buf.size();
+		uLongf dest_length = (uLongf)uncompressed_buf.size();
 		int ret = uncompress(&uncompressed_buf[0], &dest_length, &compressed_buf[0], size);
 		if (ret != Z_OK) {
 			fprintf(stderr, "Got bad return code from uncompress %d\n", ret);
@@ -115,7 +115,7 @@ namespace footprinttocsv {
 		}
 
 		size_t i = fread(&current_idx, sizeof(current_idx), 1, finy);
-		int compressed_length = 0;
+		size_t compressed_length = 0;
 		while (i != 0) {
 			i = fread(&next_idx, sizeof(next_idx), 1, finy);
 			if (i != 0) {

@@ -3,3 +3,6 @@ target_sources(evetocsv
 	PRIVATE
 		evetocsv.cpp main.cpp
 )
+if (WIN32)
+	target_link_libraries(evetocsv wingetopt)
+endif()

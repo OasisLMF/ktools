@@ -632,7 +632,7 @@ void gulcalc::mode1()
 	// 
 	init();
 
-	int total_bins = damagebindictionary_vec_->size();
+	size_t total_bins = damagebindictionary_vec_->size();
 	int max_recsize = (int)(total_bins * sizeof(prob_mean)) + sizeof(damagecdfrec) + sizeof(int);
 	int last_event_id = -1;
 
@@ -668,8 +668,8 @@ void gulcalc::mode0()
 {
 	init();
 
-	int total_bins = damagebindictionary_vec_->size();
-	const int max_recsize = (int)(total_bins * sizeof(prob_mean)) + sizeof(damagecdfrec) + sizeof(int);
+	size_t total_bins = damagebindictionary_vec_->size();
+	int max_recsize = (int)(total_bins * sizeof(prob_mean)) + sizeof(damagecdfrec) + sizeof(int);
 	int last_event_id = -1;
 
 	//char *rec = new char[max_recsize];

@@ -4,3 +4,6 @@ target_sources(itemtocsv
 		itemtocsv.cpp
 )
 
+if (WIN32)
+	target_link_libraries(itemtocsv wingetopt)
+endif()

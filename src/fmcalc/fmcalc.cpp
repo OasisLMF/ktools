@@ -661,7 +661,7 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 
 						next[layer].push_back(a);
 						
-						int current_idx = next[layer].size() - 1;
+						size_t current_idx = next[layer].size() - 1;
 						for (int x : prev[previous_layer][i].item_idx) {
 							next[layer][current_idx].item_idx.push_back(x);	
 						}
@@ -779,7 +779,7 @@ void fmcalc::parse_policytc(std::vector< fm_policyTC> &p)
 	
 	int max_layer_id = 0;
 	int max_level_id = 0;
-	int i = fread(&f, sizeof(f), 1, fin);
+	size_t i = fread(&f, sizeof(f), 1, fin);
 	while (i != 0) {
 		p.push_back(f);		
 		if (f.level_id > max_level_id) max_level_id = f.level_id;			
@@ -869,7 +869,7 @@ void fmcalc::init_programme(int maxRunLevel)
 	if (level_to_maxagg_id_.size() == 0) {
 		level_to_maxagg_id_.resize(1, -1);
 	}
-	int i = fread(&f, sizeof(f), 1, fin);
+	size_t i = fread(&f, sizeof(f), 1, fin);
 	while (i != 0) {
         if (f.level_id <= maxRunLevel_){
 			if (maxLevel_ < f.level_id) {
@@ -923,7 +923,7 @@ bool fmcalc::loadcoverages(std::vector<OASIS_FLOAT> &coverages)
 	flseek(fin, 0L, SEEK_SET);
 
 	OASIS_FLOAT tiv;
-	unsigned int nrec = sz / sizeof(tiv);
+	size_t nrec = sz / sizeof(tiv);
 
 	coverages.resize(nrec + 1);
 	int coverage_id = 0;

@@ -4,3 +4,6 @@ target_sources(validateitems
 		validateitems.cpp main.cpp
 )
 
+if (WIN32)
+	target_link_libraries(validateitems wingetopt)
+endif()

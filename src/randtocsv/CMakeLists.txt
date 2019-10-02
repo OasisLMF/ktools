@@ -4,3 +4,6 @@ target_sources(randtocsv
 		randtocsv.cpp
 )
 
+if (WIN32)
+	target_link_libraries(randtocsv wingetopt)
+endif()

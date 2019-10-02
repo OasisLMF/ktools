@@ -4,3 +4,6 @@ target_sources(gulcalc
 		gulcalc.cpp gulcalc.h getrands.cpp getrands.h primetest.cpp main.cpp doit.cpp 
 )
 
+if (WIN32)
+	target_link_libraries(gulcalc wingetopt)
+endif()

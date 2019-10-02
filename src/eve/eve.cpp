@@ -70,9 +70,9 @@ namespace eve {
 
     void emitevents(OASIS_INT pno_, OASIS_INT total_, std::vector<int> &events,
                     bool textmode) {
-        int total_events = events.size();
+        size_t total_events = events.size();
         int chunksize = (int)ceil((OASIS_FLOAT)total_events / total_);
-        int end_pos = chunksize * pno_;
+        size_t end_pos = chunksize * pno_;
         pno_--;
         int start_pos = chunksize * pno_;
         if (end_pos > (int) events.size())

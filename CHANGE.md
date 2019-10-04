@@ -1,6 +1,9 @@
 Ktools Changelog
 ================
 
+## [v3.1.3](https://github.com/OasisLMF/ktools/releases/tag/v3.1.2)
+* fix to reduce Gulcalc memory footprint size 
+
 ## [v3.1.2](https://github.com/OasisLMF/ktools/releases/tag/v3.1.2)
 * Fixes to CMake build
 * Added validation tools 

@@ -202,7 +202,7 @@ bool summarycalc::loadcoverages()
 	}
 	FILE *fin = fopen(file.c_str(), "rb");
 	if (fin == NULL) {
-		fprintf(stderr, "%s: Error opening file %s\n", __func__, COVERAGES_FILE);
+		fprintf(stderr, "%s: Error opening file %s\n", __func__, file.c_str());
 		exit(-1);
 	}
 
@@ -235,7 +235,7 @@ void summarycalc::loadgulsummaryxref()
 	}
 	FILE *fin = fopen(file.c_str(), "rb");
 	if (fin == NULL) {
-		fprintf(stderr, "%s: Error opening file %s\n", __func__, GULSUMMARYXREF_FILE);
+		fprintf(stderr, "%s: Error opening file %s\n", __func__, file.c_str());
 		::exit(-1);
 	}
 
@@ -244,7 +244,7 @@ void summarycalc::loadgulsummaryxref()
 	int i = (int)fread(&s, sizeof(gulsummaryxref), 1, fin);
 	while (i != 0) {
 		if (s.summaryset_id > 9) {
-			fprintf(stderr, "%s: Invalid summaryset id  %d found in %s\n", __func__, s.summaryset_id, GULSUMMARYXREF_FILE);
+			fprintf(stderr, "%s: Invalid summaryset id  %d found in %s\n", __func__, s.summaryset_id, file.c_str());
 			::exit(-1);
 		}
 		if (fout[s.summaryset_id] != nullptr) {
@@ -268,7 +268,7 @@ void summarycalc::loadsummaryxref(const std::string& filename)
 	}
 	FILE *fin = fopen(file.c_str(), "rb");
 	if (fin == NULL) {
-		fprintf(stderr, "%s: Error opening file %s\n", __func__, FMSUMMARYXREF_FILE);
+		fprintf(stderr, "%s: Error opening file %s\n", __func__, file.c_str());
 		::exit(-1);
 	}
 
@@ -278,7 +278,7 @@ void summarycalc::loadsummaryxref(const std::string& filename)
 	int i = (int)fread(&s, sizeof(fmsummaryxref), 1, fin);
 	while (i != 0) {
 		if (s.summaryset_id > 9) {
-			fprintf(stderr, "%s: Invalid summaryset id  %d found in %s\n", __func__, s.summaryset_id, FMSUMMARYXREF_FILE);
+			fprintf(stderr, "%s: Invalid summaryset id  %d found in %s\n", __func__, s.summaryset_id, file.c_str());
 			::exit(-1);
 		}
 		if (fout[s.summaryset_id] != nullptr) {

@@ -182,27 +182,27 @@ void gulcalc::outputmode1data(int event_id)
 			gulitemSampleslevel g;
 			g.event_id = event_id;
 			g.item_id = iter->first;	// thats the coverage id						
-			g.sidx = -3;
-			g.loss = tiv / gxi.size();
-			//gulrows.push_back(g);
-			itemoutputgul(g);
 			auto iter2 = iter->second.begin();
 			while (iter2 != iter->second.end()) {				
 				g.sidx = iter2->sidx;
 				g.loss = iter2->loss;
-				//gulrows.push_back(g);
-				itemoutputgul(g);
+				gulrows.push_back(g);
+				if (g.sidx == -1) {
+					g.sidx = -3;
+					g.loss = tiv / gxi.size();
+					gulrows.push_back(g);
+				}
 				iter2++;
 			}
 			iter++;
 		}
 
 
-		//sort(gulrows.begin(), gulrows.end());
+		sort(gulrows.begin(), gulrows.end());
 		auto v_iter = gulrows.begin();
 		while (v_iter != gulrows.end()) {
-			//itemoutputgul(*v_iter);
-			//v_iter++;
+			itemoutputgul(*v_iter);
+			v_iter++;
 		}
 	}
 	
@@ -256,7 +256,6 @@ void gulcalc::genmode1output(gulitemSampleslevel& gg,int coverage_id)
 	gi.item_id = gg.item_id;
 	gi.loss = gg.loss;
 	mode1_[coverage_id][gg.sidx + 2].push_back(gi);
-	// fprintf(stderr, "coverage_id = %d,sidx= %d\n", coverage_id, gg.sidx + 2);
 }
 
 void gulcalc::covoutputgul(gulcoverageSampleslevel &gg)

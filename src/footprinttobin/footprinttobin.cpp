@@ -75,8 +75,8 @@ namespace footprinttobin {
 
 		while (fgets(line, sizeof(line), stdin) != 0) {
 			lineno++;
-#ifdef AREAPERIL_TYPE_LONG
-			int ret = sscanf(line, "%d,%ld,%d,%f", &event_id, &r.areaperil_id, &r.intensity_bin_id, &r.probability);
+#ifdef AREAPERIL_TYPE_UNSIGNED_LONG_LONG
+			int ret = sscanf(line, "%d,%llu,%d,%f", &event_id, &r.areaperil_id, &r.intensity_bin_id, &r.probability);
 #else
 			int ret = sscanf(line, "%d,%d,%d,%f", &event_id, &r.areaperil_id, &r.intensity_bin_id, &r.probability);
 #endif
@@ -126,8 +126,8 @@ namespace footprinttobin {
 					areaperils.insert(r.areaperil_id);
 				}
 				else {
-#ifdef AREAPERIL_TYPE_LONG
-					fprintf(stderr, "Error (%d): areaperil_id %ld data is not contiguous for event_id %d \n", lineno, r.areaperil_id, event_id);
+#ifdef AREAPERIL_TYPE_UNSIGNED_LONG_LONG
+					fprintf(stderr, "Error (%d): areaperil_id %llu data is not contiguous for event_id %d \n", lineno, r.areaperil_id, event_id);
 #else
 					::fprintf(stderr, "Error (%d): areaperil_id %d data is not contiguous for event_id %d \n", lineno, r.areaperil_id, event_id);
 #endif
@@ -176,8 +176,8 @@ namespace footprinttobin {
 		idx.offset += sizeof(hasIntensityUncertainty);
 		while (fgets(line, sizeof(line), stdin) != 0) {
 			lineno++;
-#ifdef AREAPERIL_TYPE_LONG
-			int ret = sscanf(line, "%d,%ld,%d,%f", &event_id, &r.areaperil_id, &r.intensity_bin_id, &r.probability);
+#ifdef AREAPERIL_TYPE_UNSIGNED_LONG_LONG
+			int ret = sscanf(line, "%d,%llu,%d,%f", &event_id, &r.areaperil_id, &r.intensity_bin_id, &r.probability);
 #else
 			int ret = sscanf(line, "%d,%d,%d,%f", &event_id, &r.areaperil_id, &r.intensity_bin_id, &r.probability);
 #endif
@@ -217,8 +217,8 @@ namespace footprinttobin {
 					areaperils.insert(r.areaperil_id);
 				}
 				else {
-#ifdef AREAPERIL_TYPE_LONG
-					fprintf(stderr, "Error (%d): areaperil_id %ld data is not contiguous for event_id %d \n", lineno, r.areaperil_id, event_id);
+#ifdef AREAPERIL_TYPE_UNSIGNED_LONG_LONG
+					fprintf(stderr, "Error (%d): areaperil_id %llu data is not contiguous for event_id %d \n", lineno, r.areaperil_id, event_id);
 #else
 					fprintf(stderr, "Error (%d): areaperil_id %d data is not contiguous for event_id %d \n", lineno, r.areaperil_id, event_id);
 #endif

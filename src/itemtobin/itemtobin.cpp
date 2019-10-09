@@ -58,8 +58,8 @@ namespace itemtobin {
 		lineno++;
 		while (fgets(line, sizeof(line), stdin) != 0)
 		{
-#ifdef AREAPERIL_TYPE_LONG
-			int ret = sscanf(line, "%d,%d,%ld,%d,%d", &q.id, &q.coverage_id, &q.areaperil_id, &q.vulnerability_id, &q.group_id);
+#ifdef AREAPERIL_TYPE_UNSIGNED_LONG_LONG
+			int ret = sscanf(line, "%d,%d,%llu,%d,%d", &q.id, &q.coverage_id, &q.areaperil_id, &q.vulnerability_id, &q.group_id);
 #else
 			int ret = sscanf(line, "%d,%d,%d,%d,%d", &q.id, &q.coverage_id, &q.areaperil_id, &q.vulnerability_id, &q.group_id);
 #endif 

@@ -55,7 +55,7 @@ namespace itemtobin {
 		char line[4096];
 		int lineno = 0;
 		fgets(line, sizeof(line), stdin); // skip header line
-		lineno++;
+		lineno++;	// line number should match item_id value
 		while (fgets(line, sizeof(line), stdin) != 0)
 		{
 #ifdef AREAPERIL_TYPE_UNSIGNED_LONG_LONG
@@ -70,7 +70,13 @@ namespace itemtobin {
 			}
 			else
 			{
-				fwrite(&q, sizeof(q), 1, stdout);
+				if (q.id == lineno) {
+					fwrite(&q, sizeof(q), 1, stdout);
+				}
+				else {
+					fprintf(stderr, "Item_id is not contiguous expected %d but found %d\n", lineno, q.id);
+					exit(-1);
+				}
 			}
 			lineno++;
 		}

@@ -77,7 +77,6 @@ int main(int argc, char *argv[]) {
 #endif
 
   try {
-    initstreams();
     validateoasisfiles::doit(oasisFilesDir, gulOnly);
     return 0;
   }

@@ -78,7 +78,6 @@ int main(int argc, char *argv[]) {
 #endif
 
   try {
-    initstreams();
     crossvalidation::doit(damagebinFileName, footprintFileName,
 		    	vulnerabilityFileName);
     return 0;

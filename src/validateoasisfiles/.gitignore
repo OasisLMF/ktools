@@ -1,0 +1,10 @@
+validateoasisfiles
+*.exe
+gmon*
+*save
+*save2
+*png
+analysis.txt
+.dirstamp
+g.sh
+

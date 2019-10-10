@@ -63,7 +63,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 typedef int32_t OASIS_INT ;
 typedef float OASIS_FLOAT;
 
-#define AREAPERIL_TYPE_UNSIGNED_LONG_LONG
+// #define AREAPERIL_TYPE_UNSIGNED_LONG_LONG
 #ifdef AREAPERIL_TYPE_UNSIGNED_LONG_LONG
 typedef unsigned long long AREAPERIL_INT;
 #else

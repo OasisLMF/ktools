@@ -405,7 +405,8 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 				agg_vec[i].item_net = agg_vec_previous_layer[i].item_net;
 			}
 		}
-		
+
+		bool item_proportions_computed = false;
 		for (LossRec &x : agg_vec) {
 			if (netvalue_ && layer == 1) {
 				const std::vector<OASIS_FLOAT> &guls = event_guls[gul_idx];				
@@ -545,6 +546,58 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 					}
 					else {
 						fprintf(stderr, "Error: item_prop is zero !! layer = %d agg_id = %d previous_layer_id = %d level = %d\nItem set: \n",layer, x.agg_id, previous_layer_id,level);
+						auto iter = x.item_idx->begin();
+						while (iter != x.item_idx->end()) {
+							fprintf(stderr, "%d ", *iter); iter++;
+						}
+						fprintf(stderr, "\n");
+					}
+
+				}
+				if (allocrule_id == 3 && x.agg_id > 0) {		// back allocate as a proportion of the total of the previous losses			
+					if (item_proportions_computed == false) {
+						const std::vector<OASIS_FLOAT> &guls = event_guls[gul_idx];
+						compute_item_proportions(agg_vecs, guls, level, layer, previous_layer_id);
+						if (allocruleOptimizationOff_ == false) item_proportions_computed = true;
+					}
+
+					if (x.item_prop && x.item_prop->size() > 0) {
+						int vec_idx = (*aggid_to_vectorlookup)[x.agg_id - 1];
+						for (int i = 0; i < avx[layer][vec_idx].item_idx.size(); i++) {
+							int idx = avx[layer][vec_idx].item_idx[i];
+							//for (int idx : avx[layer][vec_idx].item_idx) {
+							OASIS_FLOAT prop = x.item_prop->at(i);
+							if (netvalue_) { // get net gul value							
+								x.item_net->at(i) = x.item_net->at(i) - (x.loss * prop);
+								if (x.item_net->at(i) < 0) x.item_net->at(i) = 0;
+								rec.loss = x.item_net->at(i);
+							}
+							else {
+								rec.loss = x.loss * prop;
+							}
+							if (rec.loss > 0.0 || rec.sidx < 0 || debug_) {
+								fmxref_key k;
+								k.layer_id = layer;
+								k.agg_id = items[idx];
+								auto it = fm_xrefmap.find(k);
+								int output_id = 0;
+								if (it == fm_xrefmap.end()) {
+									output_id = k.agg_id;
+								}
+								else {
+									output_id = it->second;
+									if (netvalue_) {
+										if (layer == max_layer_) outmap[output_id].push_back(rec);			// neglible cost
+									}
+									else {
+										outmap[output_id].push_back(rec);			// neglible cost
+									}
+								}
+							}
+						}
+					}
+					else {
+						fprintf(stderr, "Error: item_prop is zero !! layer = %d agg_id = %d previous_layer_id = %d level = %d\nItem set: \n", layer, x.agg_id, previous_layer_id, level);
 						auto iter = x.item_idx->begin();
 						while (iter != x.item_idx->end()) {
 							fprintf(stderr, "%d ", *iter); iter++;

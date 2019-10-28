@@ -80,6 +80,7 @@ void help()
 {
 	fprintf(stderr,
 		"-P process_id\n"
+		"-p path for concatenation\n"
 		"-h help\n"
 		"-v version\n"
 	);

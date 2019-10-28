@@ -46,7 +46,7 @@ bool operator<(const period_map_key& lhs, const period_map_key& rhs)
 }
 
 
-// Load and normalize weigthting table 
+// Load and normalize weighting table 
 // we must have entry for every return period!!!
 // otherwise no way to pad missing ones
 // Weightings should be between zero and 1 and should sum to one 
@@ -76,7 +76,8 @@ void aalcalc::loadperiodtoweigthing()
 	//		exit(-1);
 	//	}
 	// Weighting already normalzed just split over samples...
-	
+
+/*
 	auto iter = periodstoweighting_.begin();
 	while (iter != periodstoweighting_.end()) {
 		// iter->second = iter->second / total_weighting; // no need sinece already normalized 
@@ -87,6 +88,7 @@ void aalcalc::loadperiodtoweigthing()
 		if (samplesize_) iter->second = iter->second / samplesize_;   // split weighting over samples
 		iter++;
 	}
+*/
 }
 
 void aalcalc::loadoccurrence()
@@ -274,29 +276,7 @@ void aalcalc::load_event_to_summary_index(const std::string& subfolder)
 	savesummaryIndex(subfolder,summary_id_to_event_offset_);	
 	exit(-1);
 }
-void aalcalc::applyweightings(int event_id, const std::map <int, double> &periodstoweighting, std::vector<sampleslevelRec> &vrec)
-{
-	if (periodstoweighting.size() == 0) return;
-	//double factor = periodstoweighting.size();
-	//auto it = event_to_period_.find(event_id);
-	//if (it != event_to_period_.end()) {
-	//	auto iter = periodstoweighting.find(it->second);
-	//	if (iter != periodstoweighting.end()) {
-	//		for (int i = 0; i < vrec.size(); i++) {
-	//			vrec[i].loss = vrec[i].loss * iter->second * factor;
-	//		}
-	//	}
-	//	else {
-	//		// Event not found in periods.bin so no weighting i.e zero 
-	//		for (int i = 0; i < vrec.size(); i++) vrec[i].loss = 0;
-	//		//	fprintf(stderr, "Event %d not found in periods.bin\n", event_id);
-	//		//		exit(-1);
-	//	}
-	//}
-	//else {
-	//	fprintf(stderr, "Event ID %d not found\n", event_id);
-	//}
-}
+
 
 void aalcalc::applyweightingstomap(std::map<int, aal_rec> &m, int i)
 {
@@ -379,38 +359,6 @@ void aalcalc::do_calc_end_new()
 	set_periods_.clear();
 	//set_periods_.reserve(50000);
 }
-void aalcalc::do_calc_end(std::map<period_sidx_map_key, loss_rec >& sum_loss_map, std::map<int, aal_rec> &map_aal,int type)
-{
-	auto iter = sum_loss_map.begin();
-	while (iter != sum_loss_map.end()) {
-		auto a_iter = map_aal.find(iter->first.summary_id);
-		if (a_iter != map_aal.end()) {
-			aal_rec& a = a_iter->second;
-			if (a.max_exposure_value < iter->second.max_exposure_value) a.max_exposure_value = iter->second.max_exposure_value;
-			a.mean += iter->second.sum_of_loss;
-			a.mean_squared += iter->second.sum_of_loss * iter->second.sum_of_loss;
-		}
-		else {
-			aal_rec a;
-			a.summary_id = iter->first.summary_id;
-			a.type = type;
-			a.max_exposure_value = iter->second.max_exposure_value;
-			a.mean = iter->second.sum_of_loss;
-			a.mean_squared = iter->second.sum_of_loss * iter->second.sum_of_loss;
-			map_aal[iter->first.summary_id] = a;
-		}
-		iter++;
-	}
-}
-void aalcalc::do_analytical_calc_end()
-{
-	do_calc_end(map_analytical_sum_loss_,map_analytical_aal_,1);
-}
-void aalcalc::do_sample_calc_end(){
-
-	do_calc_end(map_sample_sum_loss_, map_sample_aal_,2);
-	
-}
 
 void aalcalc::do_sample_calc_newx(const summarySampleslevelHeader& sh, const std::vector<sampleslevelRec>& vrec) {
 
@@ -456,6 +404,11 @@ void aalcalc::do_sample_calc_newx(const summarySampleslevelHeader& sh, const std
 		if (factor > 0 && iter != periodstoweighting_.end()) {
 			weighting = iter->second * factor;
 		}
+		else {
+			if (factor > 0) {
+				weighting = 0;
+			}
+		}
 
 		int vidx = 0;
 		for (auto x : vrec) {
@@ -470,54 +423,11 @@ void aalcalc::do_sample_calc_newx(const summarySampleslevelHeader& sh, const std
 	}
 }
 
-void aalcalc::do_sample_calc(const summarySampleslevelHeader& sh, const std::vector<sampleslevelRec>& vrec, std::map<period_sidx_map_key, loss_rec > &sum_loss_map) {
-	period_sidx_map_key k;
-
-	k.summary_id = sh.summary_id;
-	auto p_iter = event_to_period_.find(sh.event_id);
-	if (p_iter == event_to_period_.end()) return;
-
-	// k.period_no = event_to_period_[sh.event_id];
-	//if (k.period_no == 0) return;
-	for (auto p : p_iter->second) {
-		k.period_no = p;
-		for (auto x : vrec) {
-			if (x.loss > 0) {
-				k.sidx = x.sidx;
-				auto iter = sum_loss_map.find(k);
-				if (iter != sum_loss_map.end()) {
-					loss_rec& a = iter->second;
-					if (a.max_exposure_value < sh.expval) a.max_exposure_value = sh.expval;
-					a.sum_of_loss += x.loss;
-				}
-				else {
-					loss_rec l;
-					l.sum_of_loss = x.loss;
-					l.max_exposure_value = sh.expval;
-					sum_loss_map[k] = l;
-				}
-			}
-		}
-	}
-
-}
 
 void aalcalc::do_sample_calc_new(const summarySampleslevelHeader& sh, const std::vector<sampleslevelRec>& vrec) {
 	do_sample_calc_newx(sh, vrec);
 }
-void aalcalc::do_sample_calc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec){
-	do_sample_calc(sh, vrec, map_sample_sum_loss_);	
-}
-void aalcalc::do_analytical_calc(const summarySampleslevelHeader& sh, double mean_loss) {
-	
-	std::vector<sampleslevelRec> vrec;
-	sampleslevelRec s;
-	s.sidx = -1;
-	s.loss = mean_loss;
-	vrec.push_back(s);
-	do_sample_calc(sh, vrec, map_analytical_sum_loss_);
-	
-}
+
 
 void aalcalc::doaalcalc_new(const summarySampleslevelHeader& sh, const std::vector<sampleslevelRec>& vrec, OASIS_FLOAT mean_loss)
 {
@@ -526,79 +436,6 @@ void aalcalc::doaalcalc_new(const summarySampleslevelHeader& sh, const std::vect
 	do_sample_calc_new(sh, vrec);
 }
 
-void aalcalc::doaalcalc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec, OASIS_FLOAT mean_loss)
-{
-	do_analytical_calc(sh, mean_loss);
-	if (samplesize_) do_sample_calc(sh, vrec);	
-}
-
-void aalcalc::process_summaryfile(const std::string &filename)
-{
-	FILE *fin= fopen(filename.c_str(), "rb");
-	if (fin == NULL) {
-		fprintf(stderr, "%s: cannot open %s\n", __func__, filename.c_str());
-		exit(EXIT_FAILURE);
-	}
-
-	int summarycalcstream_type = 0;
-	size_t i = fread(&summarycalcstream_type, sizeof(summarycalcstream_type), 1, fin);
-	int stream_type = summarycalcstream_type & summarycalc_id;
-
-	if (stream_type != summarycalc_id) {
-		fprintf(stderr, "%s: Not a summarycalc stream type %d\n", __func__, stream_type);
-		exit(-1);
-	}
-	stream_type = streamno_mask & summarycalcstream_type;
-	bool haveData = false;
-
-	if (stream_type == 1) {
-		int summary_set = 0;
-		i = fread(&samplesize_, sizeof(samplesize_), 1, fin);
-		if (i != 0) i = fread(&summary_set, sizeof(summary_set), 1, fin);
-		std::vector<sampleslevelRec> vrec;
-		summarySampleslevelHeader last_sh;
-		last_sh.event_id = 0;
-		last_sh.summary_id = 0;
-
-		summarySampleslevelHeader sh;
-		int j = 0;
-		OASIS_FLOAT mean_loss = 0;
-		while (i != 0) {
-			i = fread(&sh, sizeof(sh), 1, fin);
-			if (sh.event_id != last_sh.event_id || sh.summary_id != last_sh.summary_id) {
-				last_sh.event_id = sh.event_id;
-				last_sh.summary_id = sh.summary_id;
-				mean_loss = 0;
-			}
-			while (i != 0) {
-				haveData = true;
-				sampleslevelRec sr;
-				i = fread(&sr, sizeof(sr), 1, fin);
-				if (i == 0 || sr.sidx == 0) {					
-					auto iter = event_count_.find(sh.event_id);
-					if (iter != event_count_.end()) {
-						//for (int k = 0; k < event_count_[sh.event_id]; k++) {
-							applyweightings(sh.event_id, periodstoweighting_, vrec);
-							doaalcalc(sh, vrec, mean_loss);
-						//}
-					}
-					vrec.clear();
-					break;
-				}
-				if (sr.sidx == -1) mean_loss = sr.loss;
-				if (sr.sidx >= 0) vrec.push_back(sr);
-			}
-			haveData = false;
-			j++;
-		}
-		if (haveData == true) {
-			applyweightings(sh.event_id, periodstoweighting_, vrec);
-			doaalcalc(sh, vrec, mean_loss);
-		}
-	}
-	
-	fclose(fin);
-}
 void aalcalc::outputresultscsv_new(std::vector<aal_rec>& vec_aal, int periods,int sample_size)
 {
 	int p1 = periods * sample_size;
@@ -816,9 +653,7 @@ void aalcalc::doit(const std::string& subfolder)
 	current_summary_id_ = last_summary_id;
 	applyweightingstomaps();
 	do_calc_end_new();
-
-	map_analytical_sum_loss_.clear();
-	map_sample_sum_loss_.clear();
+	
 	outputresultscsv_new();
 	auto iter = filehandles.begin();
 	while (iter != filehandles.end()) {
@@ -828,43 +663,6 @@ void aalcalc::doit(const std::string& subfolder)
 	filehandles.clear();	
 }
 
-void aalcalc::doit_l(const std::string &subfolder)
-{
-	
-	std::string path = "work/" + subfolder;
-	if (path.substr(path.length() - 1, 1) != "/") {
-		path = path + "/";
-	}
-	initsameplsize(path);
-	loadoccurrence();
-	loadperiodtoweigthing();	// move this to after the samplesize_ variable has been set i.e.  after reading the first 8 bytes of the first summary file
-
-	DIR *dir;
-	struct dirent *ent;
-	if ((dir = opendir(path.c_str())) != NULL) {
-		while ((ent = readdir(dir)) != NULL) {
-			std::string s = ent->d_name;
-			if (s.length() > 4 && s.substr(s.length() - 4, 4) == ".bin") {
-				s = path + ent->d_name;				
-				process_summaryfile(s);
-				//setinputstream(s);
-				//processinputfile(samplesize, event_to_periods, maxsummaryid, agg_out_loss, max_out_loss);
-			}
-
-
-		}
-		applyweightingstomaps();
-		do_sample_calc_end();
-		do_analytical_calc_end();
-		//outputsummarybin();
-		//getnumberofperiods();
-		outputresultscsv();
-	}
-	else {
-		fprintf(stderr, "Unable to open directory %s\n", path.c_str());
-		exit(-1);
-	}	
-}
 void aalcalc::debug_process_summaryfile(const std::string &filename)
 {
 	FILE *fin = fopen(filename.c_str(), "rb");

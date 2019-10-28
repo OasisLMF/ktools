@@ -37,14 +37,18 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 */
 #include "../include/oasis.h"
 #include <vector>
+#include <algorithm>
+
 
 #if defined(_MSC_VER)
 #include "../wingetopt/wingetopt.h"
+#include "../include/dirent.h"
 #else
 #include <fcntl.h>
 #include <unistd.h>
+#include <dirent.h>
 #endif
-
+#include <sys/stat.h>
 
 void doit(std::vector <FILE *> &infiles)
 {
@@ -76,6 +80,7 @@ void help()
 {
 	fprintf(stderr,
 		"-P process_id\n"
+		"-p path for concatenation\n"
 		"-h help\n"
 		"-v version\n"
 	);
@@ -88,7 +93,8 @@ int main(int argc, char* argv[])
 
 	int opt;
 	int processid = 0;
-	while ((opt = getopt(argc, argv, "P:vh")) != -1) {
+	std::string path;
+	while ((opt = getopt(argc, argv, "d:P:vh")) != -1) {
 		switch (opt) {
 		case 'P':
 			processid = atoi(optarg);
@@ -96,6 +102,9 @@ int main(int argc, char* argv[])
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
 			::exit(EXIT_FAILURE);
+			break;
+		case 'd':
+			path = optarg;
 			break;
 		case 'h':
 		default:
@@ -106,8 +115,40 @@ int main(int argc, char* argv[])
 	
 	argc -= optind;
 	argv += optind;
+	
+	std::vector<std::string> filelist;
+	if (path.length() > 0) {
+		DIR* dir;
+		if ((dir = opendir(path.c_str())) != NULL) {
+			struct dirent* ent;
+			while ((ent = readdir(dir)) != NULL) {
+				std::string s = ent->d_name;
+				if (s != "." && s != "..") {
+					std::string s2 = path + ent->d_name;					
+					struct stat path_stat;
+					stat(s2.c_str(), &path_stat);
+					if (S_ISREG(path_stat.st_mode)) {
+						filelist.push_back(s2);
+					}
+				}
+			}
+		}
+	}
+	
+	std::vector <FILE*> infiles;
+	// Sorting the string vector
+	sort(filelist.begin(), filelist.end());
+	auto iter = filelist.begin();
+	while (iter != filelist.end()) {
+		FILE* fin = fopen((*iter).c_str(), "rb");
+		if (fin == nullptr) {
+			fprintf(stderr, "kat: Cannot open %s\n", (*iter).c_str());
+			exit(-1);
+		}
+		infiles.push_back(fin);
+		iter++;
+	}
 
-	std::vector <FILE *> infiles;
 	for (int i = 0; i < argc; i++) {
 		FILE *fin = fopen(argv[i], "rb");
 		if (fin == nullptr) {

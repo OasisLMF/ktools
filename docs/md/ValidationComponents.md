@@ -31,7 +31,7 @@ In addition, warnings are issued in the following cases:
 The checks can be performed on `damage_bin_dict.csv` from the command line:
 
 ```
-$ validatedmagebin < damage_bin_dict.csv
+$ validatedamagebin < damage_bin_dict.csv
 ```
 
 <a id="validatefootprint"></a>
@@ -49,7 +49,7 @@ Should all checks pass, the maximum value of `intensity_bin_index` is given, whi
 The checks can be performed on `footprint.csv` from the command line:
 
 ```
-$ footprinttobin < footprint.csv
+$ validatefootprint < footprint.csv
 ```
 
 <a id="validatevulnerability"></a>
@@ -67,7 +67,7 @@ Should all checks pass, the maximum value of `damage_bin_id` is given, which is 
 The checks can be performed on `vulnerability.csv` from the command line:
 
 ```
-$ vulnerabilitytobin < vulnerability.csv
+$ validatevulnerability < vulnerability.csv
 ```
 
 <a id="crossvalidation"></a>

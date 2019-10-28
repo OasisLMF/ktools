@@ -388,7 +388,7 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 	
 	dofmcalc(agg_vec, layer);
 
-	if (allocrule_ == 2) {
+	if (allocrule_ == 3) {
 		const std::vector<OASIS_FLOAT>& guls = event_guls[gul_idx];
 		compute_item_proportions(agg_vecs, guls, level, layer, previous_layer_id);
 	}
@@ -451,8 +451,9 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 						}
 					}
 				}
-				// at level 1 allocrule 2 and 1 are the same
+				// at level 1 allocrule 2 or 3 and 1 are the same
 				if (allocrule_id == 2 && level == 1) allocrule_id = 1;
+				if (allocrule_id == 3 && level == 1) allocrule_id = 1;
 
 				if (allocrule_id == 1 && x.agg_id > 0) {	// back allocate as a proportion of the total of the original guls	
 					OASIS_FLOAT gultotal = 0;
@@ -502,7 +503,7 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 					}
 				}
 
-				if (allocrule_id == 2 && x.agg_id > 0) {		// back allocate as a proportion of the total of the previous losses			
+				if (allocrule_id == 3 && x.agg_id > 0) {		// back allocate as a proportion of the total of the previous losses			
 					//if (item_proportions_computed == false) {
 					//	const std::vector<OASIS_FLOAT> &guls = event_guls[gul_idx];
 					//	compute_item_proportions(agg_vecs, guls, level, layer, previous_layer_id);
@@ -554,7 +555,7 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 					}
 
 				}
-				if (allocrule_id == 3 && x.agg_id > 0) {		// back allocate as a proportion of the total of the previous losses			
+				if (allocrule_id == 2 && x.agg_id > 0) {		// back allocate as a proportion of the total of the previous losses			
 					if (item_proportions_computed == false) {
 						const std::vector<OASIS_FLOAT> &guls = event_guls[gul_idx];
 						compute_item_proportions(agg_vecs, guls, level, layer, previous_layer_id);

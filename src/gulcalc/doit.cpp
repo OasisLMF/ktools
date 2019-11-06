@@ -8,6 +8,7 @@ using namespace std;
 FILE *itemout = stdout;
 FILE *covout = stdout;
 FILE *lossout = stdout;
+FILE *corrout = stdout;
 
 bool getdamagebindictionary(std::vector<damagebindictionary> &damagebindictionary_vec_)
 {
@@ -131,6 +132,10 @@ void lossWriter(const void *ibuf, int size, int count) {
     fwrite(ibuf, size, count, lossout);
 }
 
+void correlatedWriter(const void *ibuf, int size, int count) {
+    fwrite(ibuf, size, count, corrout);
+}
+
 void doit(const gulcalcopts &opt)
 {
 	std::vector<damagebindictionary> damagebindictionary_vec;
@@ -156,17 +161,22 @@ void doit(const gulcalcopts &opt)
 	void(*itmWriter)(const void *ibuf, int size, int count);
 	void(*covWriter)(const void *ibuf, int size, int count);
     void (*lossWriter)(const void *ibuf, int size, int count);
+    	void(*corrWriter)(const void *ibuf, int size, int count);
 	itmWriter = 0;
 	covWriter = 0;
     lossWriter = 0;
+    	corrWriter = 0;
 
 	getRands rnd(opt.rndopt, opt.rand_vector_size, opt.rand_seed);
+	getRands rnd0(opt.rndopt, opt.rand_vector_size, opt.rand_seed);
 	itemout = opt.itemout;
 	covout = opt.covout;
+	corrout = opt.corrout;
 	if (opt.itemLevelOutput == true && opt.mode == 0) itmWriter = itemWriter;
 	if (opt.coverageLevelOutput == true) covWriter = coverageWriter;
     if (opt.itemLevelOutput == true && opt.mode == 1) lossWriter = itemWriter;
-	gulcalc g(damagebindictionary_vec, coverages, item_map, rnd, opt.loss_threshold, opt.rndopt, opt.debug, opt.samplesize, itmWriter, covWriter,lossWriter, iGetrec,opt.rand_seed);
+    	if(opt.correlatedLevelOutput == true) corrWriter = correlatedWriter;
+	gulcalc g(damagebindictionary_vec, coverages, item_map, rnd, rnd0, opt.loss_threshold, opt.rndopt, opt.debug, opt.samplesize, itmWriter, covWriter,lossWriter, corrWriter, iGetrec,opt.rand_seed);
 	if (opt.mode == 0) g.mode0();		// classic gulcalc
 	if (opt.mode == 1) g.mode1();		// first type of back allocation
 

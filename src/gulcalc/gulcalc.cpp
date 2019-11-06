@@ -86,6 +86,7 @@ struct probrec {
 };
 
 gulSampleslevelHeader lastitemheader;
+gulSampleslevelHeader lastcorrelatedheader;
 gulSampleslevelHeader lastcoverageheader;
 
 OASIS_FLOAT gulcalc::getgul(damagebindictionary &b, gulGulSamples &g)
@@ -144,6 +145,18 @@ void gulcalc::clearmode1_data()
 	auto iter = mode1_.begin();
 	while (iter != mode1_.end()) {
 		auto iter2 = iter->begin()	;
+		while (iter2 != iter->end()) {
+			iter2->clear();
+			iter2++;
+		}
+		iter++;
+	}
+}
+void gulcalc::clearfullCorr_data()
+{
+	auto iter = fullCorr_.begin();
+	while (iter != fullCorr_.end()) {
+		auto iter2 = iter->begin();
 		while (iter2 != iter->end()) {
 			iter2->clear();
 			iter2++;
@@ -238,6 +251,66 @@ void gulcalc::outputcoveragedata(int event_id)
 	cov_.resize(coverages_->size());
 }
 
+void gulcalc::outputcorrelateddata(int event_id)
+{
+
+	for (int j = 1; j < fullCorr_.size(); j++) {
+		std::map<int, std::vector<gulSampleslevelRec> > gxi;
+		OASIS_FLOAT tiv =0;
+		if(fullCorr_[j].size() > 0) {
+			tiv = (*coverages_)[j];
+			for (int i = 0; i < fullCorr_[j].size(); i++) {   // sidx loop
+				splittiv(fullCorr_[j][i], tiv);
+				auto iter = fullCorr_[j][i].begin();
+				while (iter != fullCorr_[j][i].end()) {   // valid item_id, losses loop
+					gulSampleslevelRec gg;
+					gg.sidx = i - 2;
+					gg.loss = iter->loss;
+
+					gxi[iter->item_id].push_back(gg);
+					iter++;
+				}
+			}
+		}
+
+		// Output rows here
+
+		auto iter = gxi.begin();
+		std::vector<gulitemSampleslevel> gulrows;
+		while (iter != gxi.end()) {
+			gulitemSampleslevel g;
+			g.event_id = event_id;
+			g.item_id = iter->first;
+
+			auto iter2 = iter->second.begin();
+			while (iter2 != iter->second.end()) {
+
+				g.sidx = iter2->sidx;
+				g.loss = iter2->loss;
+				gulrows.push_back(g);
+				if(g.sidx == -1) {
+					g.sidx = -3;
+					g.loss = tiv / gxi.size();
+					gulrows.push_back(g);
+
+				}
+				iter2++;
+			}
+			iter++;
+		}
+
+		sort(gulrows.begin(), gulrows.end());
+		auto v_iter = gulrows.begin();
+		while (v_iter != gulrows.end()) {
+			correlatedoutputgul(*v_iter);
+			v_iter++;
+		}
+
+	}
+
+	clearfullCorr_data();
+}
+
 void gulcalc::gencovoutput(gulcoverageSampleslevel &gg)
 {
 	if (coverageWriter_ == 0)  return;
@@ -256,6 +329,17 @@ void gulcalc::genmode1output(gulitemSampleslevel& gg,int coverage_id)
 	gi.item_id = gg.item_id;
 	gi.loss = gg.loss;
 	mode1_[coverage_id][gg.sidx + 2].push_back(gi);
+}
+
+void gulcalc::gencorrelatedoutput(gulitemSampleslevel& gg, int coverage_id)
+{
+	if (fullCorr_[coverage_id].size() == 0) {
+		fullCorr_[coverage_id].resize(samplesize_ + 3);
+	}
+	gulItemIDLoss gi;
+	gi.item_id = gg.item_id;
+	gi.loss = gg.loss;
+	fullCorr_[coverage_id][gg.sidx + 2].push_back(gi);
 }
 
 void gulcalc::covoutputgul(gulcoverageSampleslevel &gg)
@@ -325,6 +409,39 @@ void gulcalc::itemoutputgul(gulitemSampleslevel &gg)
 
 }
 
+void gulcalc::correlatedoutputgul(gulitemSampleslevel &gg)
+{
+	if (correlatedWriter_ == 0) return;
+	if (correlatedbufoffset_ >= bufsize) {
+		correlatedWriter_(corrbuf_, sizeof(unsigned char), correlatedbufoffset_);
+		correlatedbufoffset_ = 0;
+	}
+
+	if(gg.event_id != lastcorrelatedheader.event_id || gg.item_id != lastcorrelatedheader.item_id) {
+		if (isFirstCorrelatedEvent_ == false) {
+			gulSampleslevelRec r;
+			r.sidx = 0;
+			r.loss = 0;
+			memcpy(corrbuf_ + correlatedbufoffset_, &r, sizeof(gulSampleslevelRec));
+			correlatedbufoffset_ += sizeof(gulSampleslevelRec);
+		}
+		else {
+			isFirstCorrelatedEvent_ = false;
+		}
+		lastcorrelatedheader.event_id = gg.event_id;
+		lastcorrelatedheader.item_id = gg.item_id;
+		memcpy(corrbuf_ + correlatedbufoffset_, &lastcorrelatedheader, sizeof(lastcorrelatedheader));
+		correlatedbufoffset_ += sizeof(lastcorrelatedheader);
+	}
+
+	gulSampleslevelRec r;
+	r.sidx = gg.sidx;
+	r.loss = gg.loss;
+	memcpy(corrbuf_ + correlatedbufoffset_, &r, sizeof(gulSampleslevelRec));
+	correlatedbufoffset_ += sizeof(gulSampleslevelRec);
+
+}
+
 void gulcalc::output_mean(const item_map_rec &er, OASIS_FLOAT tiv, prob_mean *pp, int bin_count, OASIS_FLOAT &gul_mean,  OASIS_FLOAT &std_dev)
 {
 	OASIS_FLOAT last_prob_to = 0;
@@ -384,12 +501,14 @@ void gulcalc::processrec_mode1(char* rec, int recsize)
 			gc.sidx = mean_idx;
 			// itemoutputgul(gx);
 			genmode1output(gx, gc.coverage_id);
+			if (correlatedWriter_) gencorrelatedoutput(gx, gc.coverage_id);
 			gx.loss = std_dev;
 			gc.loss = std_dev;
 			gx.sidx = std_dev_idx;
 			gc.sidx = std_dev_idx;
 			// itemoutputgul(gx);
 			genmode1output(gx, gc.coverage_id);
+			if (correlatedWriter_) gencorrelatedoutput(gx, gc.coverage_id);
 			int ridx = 0; // dummy value		
 			switch (rndopt_) {
 			case rd_option::userandomnumberfile:
@@ -404,6 +523,10 @@ void gulcalc::processrec_mode1(char* rec, int recsize)
 				unsigned long long s2 = (d->event_id * 1943272559L) % 2147483648L;
 				s1 = (s1 + s2 + rand_seed_) % 2147483648L;
 				rnd_->seedRands(s1);
+				if (correlatedWriter_) {
+					s2 = (s2 + rand_seed_) % 2147483648L;
+					rnd0_->seedRands(s2);
+				}
 			}
 			break;
 			default:
@@ -414,14 +537,29 @@ void gulcalc::processrec_mode1(char* rec, int recsize)
 			prob_mean* pp_max = pp + (*bin_count) - 1;
 			for (int i = 0; i < samplesize_; i++) {
 				OASIS_FLOAT  rval;
-				if (rndopt_ == rd_option::usehashedseed) rval = rnd_->nextrnd();
-				else rval = rnd_->rnd(ridx + i);
+				OASIS_FLOAT rval0;
+				if (rndopt_ == rd_option::usehashedseed) {
+					rval = rnd_->nextrnd();
+					if (correlatedWriter_) rval0 = rnd0_->nextrnd();
+				}
+				else {
+					rval = rnd_->rnd(ridx + i);
+					if (correlatedWriter_) {
+						fprintf(stderr, "Cannot use correlated output option.\n");
+						exit(-1);
+					}
+				}
 				if (rval >= pp_max->prob_to) {
 					rval = pp_max->prob_to - 0.00000003;	// set value to just under max value (which should be 1)
+				}
+				if (correlatedWriter_ && rval0 >= pp_max->prob_to) {
+					rval0 = pp_max->prob_to - 0.00000003;
 				}
 
 				OASIS_FLOAT last_prob_to = 0;
 				pp = (prob_mean*)b;
+				bool hit_rval = false;
+				bool hit_rval0 = false;
 				for (int bin_index = 0; bin_index < *bin_count; bin_index++) {
 					if ((char*)pp > endofRec) {
 						cerr << "Reached end of record"
@@ -435,7 +573,7 @@ void gulcalc::processrec_mode1(char* rec, int recsize)
 					p.prob_to = pp->prob_to;
 					p.bin_mean = pp->bin_mean;
 					last_prob_to = pp->prob_to;
-					if (rval < p.prob_to) {
+					if (rval < p.prob_to && !hit_rval) {
 						gulGulSamples g;
 						g.event_id = d->event_id;
 						g.item_id = iter->item_id;
@@ -463,8 +601,38 @@ void gulcalc::processrec_mode1(char* rec, int recsize)
 							//gencovoutput(ggc);
 							genmode1output(gg,ggc.coverage_id);
 						}
-						break; // break the for loop
+						if (!correlatedWriter_) break; // break the for loop
+						else hit_rval = true;
 					}
+					if (correlatedWriter_ && !hit_rval0 && rval0 < p.prob_to) {
+						gulGulSamples h;
+						h.event_id = d->event_id;
+						h.item_id = iter->item_id;
+						h.tiv = tiv;
+						h.bin_index = bin_index;
+						h.prob_from = p.prob_from;
+						h.prob_to = p.prob_to;
+						h.bin_mean = p.bin_mean;
+						h.rval = rval0;
+						h.sidx = i + 1;
+						gulitemSampleslevel hh;
+						gulcoverageSampleslevel hhc;
+						damagebindictionary b0 = (*damagebindictionary_vec_)[h.bin_index];
+						if (debug_) hh.loss = rval0;
+						else hh.loss = getgul(b0, h);
+						hhc.loss = hh.loss;
+						hh.sidx = h.sidx;
+						hhc.sidx = h.sidx;
+						hh.event_id = h.event_id;
+						hh.item_id = h.item_id;
+						hhc.coverage_id = iter->coverage_id;
+						hhc.event_id = h.event_id;
+						if (hh.loss >= loss_threshold_) {
+							gencorrelatedoutput(hh, hhc.coverage_id);
+						}
+						hit_rval0 = true;
+					}
+					if (hit_rval && hit_rval0) break;   // break the for loop
 
 					pp++;
 				}
@@ -621,6 +789,12 @@ void gulcalc::init()
             lossWriter_(&samplesize_, sizeof(samplesize_), 1);
     }
 
+	if(correlatedWriter_ != 0) {
+	    gulstream_type = gul_item_stream | loss_stream_id;
+	    correlatedWriter_(&gulstream_type, sizeof(gulstream_type), 1);
+	    correlatedWriter_(&samplesize_, sizeof(samplesize_), 1);
+	}
+
 	std::this_thread::sleep_for(std::chrono::milliseconds(PIPE_DELAY));
 }
 void gulcalc::mode1()
@@ -653,7 +827,10 @@ void gulcalc::mode1()
 		bSuccess = iGetrec_(p, recsize);
 		recsize += sizeof(damagecdfrec) + sizeof(int);
 		if (d->event_id != last_event_id) {
-			if (last_event_id > 0) outputmode1data(last_event_id);
+			if (last_event_id > 0) {
+				outputmode1data(last_event_id);
+				if (correlatedWriter_) outputcorrelateddata(last_event_id);
+			}
 			last_event_id = d->event_id;
 			if (rndopt_ == rd_option::usecachedvector) rnd_->clearvec();
 		}
@@ -661,8 +838,11 @@ void gulcalc::mode1()
 		processrec_mode1(rec, recsize);
 	}
 	outputmode1data(d->event_id);
+	if (correlatedWriter_) outputcorrelateddata(d->event_id);
+
 	if (itemWriter_) itemWriter_(ibuf_, sizeof(unsigned char), itembufoffset_);
 	if (lossWriter_) lossWriter_(ibuf_, sizeof(unsigned char), itembufoffset_);
+	if (correlatedWriter_) correlatedWriter_(corrbuf_, sizeof(unsigned char), correlatedbufoffset_);
 	delete[] rec;
 }
 void gulcalc::mode0()

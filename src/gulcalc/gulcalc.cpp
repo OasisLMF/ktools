@@ -530,7 +530,7 @@ void gulcalc::processrec_mode1(char* rec, int recsize)
 			}
 			break;
 			default:
-				fprintf(stderr, "%s: Unknow random number option\n", __func__);
+				fprintf(stderr, "%s: Unknown random number option\n", __func__);
 				exit(-1);
 			}
 
@@ -701,7 +701,7 @@ damagecdfrec *d = (damagecdfrec *)rec;
 				}
 				break;
 			default:
-				fprintf(stderr, "%s: Unknow random number option\n", __func__);
+				fprintf(stderr, "%s: Unknown random number option\n", __func__);
 				exit(-1);
 			}
 

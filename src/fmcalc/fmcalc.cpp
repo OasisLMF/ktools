@@ -138,7 +138,7 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 					}else {
 						(iter->item_prop)->resize((iter->item_idx)->size(), 0);
 					}
-					for (int idx : *(iter->item_idx)) {	// because this is the first level there should only be one item_idx
+					for (int idx : *(iter->item_idx)) {	// if this is the first level there should only be one item_idx
 						total += guls[idx];
 					}
 				}
@@ -148,9 +148,10 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 				iter++;
 			}
 			if (loss_total <= 0 && previous_proportions_total > 0.01) {
-				// if there is loss_total loss just copy previous level proportions
-				auto iter = agg_vec.begin();		// loop thru again to work out proportion
-				auto previous_iter = previous_agg_vec.begin();		// loop thru again to work out proportion
+				// check level and layer_
+				// if there is no loss_total loss just copy previous level proportions
+				auto iter = agg_vec.begin();		// loop through again to work out proportion
+				auto previous_iter = previous_agg_vec.begin();		// loop through again to work out proportion
 				while (iter != agg_vec.end()) {
 					if (iter->item_idx) {
 						for (int idx : *(iter->item_idx)) {
@@ -163,6 +164,7 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 			}
 			else {
 				iter = agg_vec.begin();		// loop thru again to work out proportion
+				int agg_vec_idx = 0;
 				while (iter != agg_vec.end()) {
 					if (iter->loss > 0 && loss_total > 0) {
 						iter->proportion = iter->loss / loss_total;
@@ -205,8 +207,14 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 								}
 							}
 						}
+						else {
+							if (iter->item_idx) {
+								iter->item_prop = previous_agg_vec[agg_vec_idx].item_prop;
+							}
+						}
 					}
 					iter++;
+					agg_vec_idx++;
 				}
 			}			
 		}
@@ -555,19 +563,22 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 					}
 
 				}
-				if (allocrule_id == 2 && x.agg_id > 0) {		// back allocate as a proportion of the total of the previous losses			
+				if (allocrule_id == 2 && x.agg_id > 0) {		// back allocate as a proportion of the total of the previous losses								
 					if (item_proportions_computed == false) {
 						const std::vector<OASIS_FLOAT> &guls = event_guls[gul_idx];
 						compute_item_proportions(agg_vecs, guls, level, layer, previous_layer_id);
 						if (allocruleOptimizationOff_ == false) item_proportions_computed = true;
-					}
-
-					if (x.item_prop && x.item_prop->size() > 0) {
-						int vec_idx = (*aggid_to_vectorlookup)[x.agg_id - 1];
-						for (int i = 0; i < avx[layer][vec_idx].item_idx.size(); i++) {
+					}					
+					
+					int vec_idx = (*aggid_to_vectorlookup)[x.agg_id - 1];
+					int range = avx[layer][vec_idx].item_idx.size();
+					int range2 = x.item_prop->size();
+					if (x.item_prop && range > 0) {						
+						for (int i = 0; i < range; i++) {
 							int idx = avx[layer][vec_idx].item_idx[i];
 							//for (int idx : avx[layer][vec_idx].item_idx) {
-							OASIS_FLOAT prop = x.item_prop->at(i);
+							OASIS_FLOAT prop = 0;
+							if (i < range2 ) prop = x.item_prop->at(i);
 							if (netvalue_) { // get net gul value							
 								x.item_net->at(i) = x.item_net->at(i) - (x.loss * prop);
 								if (x.item_net->at(i) < 0) x.item_net->at(i) = 0;
@@ -588,22 +599,22 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 								else {
 									output_id = it->second;
 									if (netvalue_) {
-										if (layer == max_layer_) outmap[output_id].push_back(rec);			// neglible cost
+										if (layer == max_layer_) outmap[output_id].push_back(rec);			// negligible cost
 									}
 									else {
-										outmap[output_id].push_back(rec);			// neglible cost
+										outmap[output_id].push_back(rec);			// negligible cost **good**
 									}
 								}
 							}
 						}
 					}
 					else {
-						fprintf(stderr, "Error: item_prop is zero !! layer = %d agg_id = %d previous_layer_id = %d level = %d\nItem set: \n", layer, x.agg_id, previous_layer_id, level);
-						auto iter = x.item_idx->begin();
-						while (iter != x.item_idx->end()) {
-							fprintf(stderr, "%d ", *iter); iter++;
-						}
-						fprintf(stderr, "\n");
+						//fprintf(stderr, "Error: item_prop is zero !! layer = %d agg_id = %d previous_layer_id = %d level = %d\nItem set: \n", layer, x.agg_id, previous_layer_id, level);
+						//auto iter = x.item_idx->begin();
+						//while (iter != x.item_idx->end()) {
+						//	fprintf(stderr, "%d ", *iter); iter++;
+						//}
+						//fprintf(stderr, "\n");
 					}
 
 				}

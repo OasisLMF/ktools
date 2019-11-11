@@ -1,7 +1,14 @@
 Ktools Changelog
 ================
 
-## [v3.1.3](https://github.com/OasisLMF/ktools/releases/tag/v3.1.2)
+## [v3.1.4](https://github.com/OasisLMF/ktools/releases/tag/v3.1.4)
+* fix usage of zip file in getmodel
+* fix periods file in aalcalc
+* fix summarycalc error message
+* ensure item\_ids are contigious in itemstobin
+* add alloc rule 3
+
+## [v3.1.3](https://github.com/OasisLMF/ktools/releases/tag/v3.1.3)
 * fix to reduce Gulcalc memory footprint size 
 
 ## [v3.1.2](https://github.com/OasisLMF/ktools/releases/tag/v3.1.2)

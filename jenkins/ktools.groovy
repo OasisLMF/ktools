@@ -107,8 +107,16 @@ node {
         hasFailed = true
         error('Build Failed')
     } finally {
-        dir(ktools_workspace) {
-            //Run house cleaning (if needed)
+        // Run merge back if publish 
+        if (params.PUBLISH){ 
+            dir(ktools_workspace) {
+                sshagent (credentials: [git_creds]) {
+                    sh "git checkout master && git pull"
+                    sh "git merge ${ktools_branch} && git push"
+                    sh "git checkout develop && git pull"
+                    sh "git merge master && git push"
+                }
+            }
         }
     }
 }

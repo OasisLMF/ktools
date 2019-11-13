@@ -79,11 +79,11 @@ bool operator<(const gulitemSampleslevel& lhs, const gulitemSampleslevel& rhs)
 		return lhs.sidx < rhs.sidx;
 	}
 }
-struct probrec {
-	OASIS_FLOAT prob_from;
-	OASIS_FLOAT prob_to;
-	OASIS_FLOAT bin_mean;
-};
+//struct probrec {
+//	OASIS_FLOAT prob_from;
+//	OASIS_FLOAT prob_to;
+//	OASIS_FLOAT bin_mean;
+//};
 
 gulSampleslevelHeader lastitemheader;
 gulSampleslevelHeader lastcorrelatedheader;
@@ -442,6 +442,39 @@ void gulcalc::correlatedoutputgul(gulitemSampleslevel &gg)
 
 }
 
+void gulcalc::setupandgenoutput(const item_map_rec &er, const OASIS_FLOAT tiv,
+				const int event_id, const int bin_index,
+				const OASIS_FLOAT rval, const probrec &p,
+				const int sample_id, const bool correlated=false)
+{
+	gulGulSamples g;
+	g.event_id = event_id;
+	g.item_id = er.item_id;
+	g.tiv = tiv;
+	g.bin_index = bin_index;
+	g.prob_from = p.prob_from;
+	g.prob_to = p.prob_to;
+	g.bin_mean = p.bin_mean;
+	g.rval = rval;
+	g.sidx = sample_id + 1;
+	gulitemSampleslevel gg;
+	gulcoverageSampleslevel ggc;
+	damagebindictionary b = (*damagebindictionary_vec_)[g.bin_index];
+	if (debug_) gg.loss = rval;
+	else gg.loss = getgul(b, g);
+	ggc.loss = gg.loss;
+	gg.sidx = g.sidx;
+	ggc.sidx = g.sidx;
+	gg.event_id = g.event_id;
+	gg.item_id = g.item_id;
+	ggc.coverage_id = er.coverage_id;
+	ggc.event_id = g.event_id;
+	if (gg.loss >= loss_threshold_) {
+		if (correlated) gencorrelatedoutput(gg, ggc.coverage_id);
+		else genmode1output(gg, ggc.coverage_id);
+	}
+}
+
 void gulcalc::output_mean(const item_map_rec &er, OASIS_FLOAT tiv, prob_mean *pp, int bin_count, OASIS_FLOAT &gul_mean,  OASIS_FLOAT &std_dev)
 {
 	OASIS_FLOAT last_prob_to = 0;
@@ -574,62 +607,12 @@ void gulcalc::processrec_mode1(char* rec, int recsize)
 					p.bin_mean = pp->bin_mean;
 					last_prob_to = pp->prob_to;
 					if (rval < p.prob_to && !hit_rval) {
-						gulGulSamples g;
-						g.event_id = d->event_id;
-						g.item_id = iter->item_id;
-						g.tiv = tiv;
-						g.bin_index = bin_index;
-						g.prob_from = p.prob_from;
-						g.prob_to = p.prob_to;
-						g.bin_mean = p.bin_mean;
-						g.rval = rval;
-						g.sidx = i + 1;
-						gulitemSampleslevel gg;
-						gulcoverageSampleslevel ggc;
-						damagebindictionary b = (*damagebindictionary_vec_)[g.bin_index];
-						if (debug_) gg.loss = rval;
-						else gg.loss = getgul(b, g);
-						ggc.loss = gg.loss;
-						gg.sidx = g.sidx;
-						ggc.sidx = g.sidx;
-						gg.event_id = g.event_id;
-						gg.item_id = g.item_id;
-						ggc.coverage_id = iter->coverage_id;
-						ggc.event_id = g.event_id;
-						if (gg.loss >= loss_threshold_) {
-							//itemoutputgul(gg);
-							//gencovoutput(ggc);
-							genmode1output(gg,ggc.coverage_id);
-						}
+						setupandgenoutput(*iter, tiv, d->event_id, bin_index, rval, p, i);
 						if (!correlatedWriter_) break; // break the for loop
 						else hit_rval = true;
 					}
 					if (correlatedWriter_ && !hit_rval0 && rval0 < p.prob_to) {
-						gulGulSamples h;
-						h.event_id = d->event_id;
-						h.item_id = iter->item_id;
-						h.tiv = tiv;
-						h.bin_index = bin_index;
-						h.prob_from = p.prob_from;
-						h.prob_to = p.prob_to;
-						h.bin_mean = p.bin_mean;
-						h.rval = rval0;
-						h.sidx = i + 1;
-						gulitemSampleslevel hh;
-						gulcoverageSampleslevel hhc;
-						damagebindictionary b0 = (*damagebindictionary_vec_)[h.bin_index];
-						if (debug_) hh.loss = rval0;
-						else hh.loss = getgul(b0, h);
-						hhc.loss = hh.loss;
-						hh.sidx = h.sidx;
-						hhc.sidx = h.sidx;
-						hh.event_id = h.event_id;
-						hh.item_id = h.item_id;
-						hhc.coverage_id = iter->coverage_id;
-						hhc.event_id = h.event_id;
-						if (hh.loss >= loss_threshold_) {
-							gencorrelatedoutput(hh, hhc.coverage_id);
-						}
+						setupandgenoutput(*iter, tiv, d->event_id, bin_index, rval0, p, i, true);
 						hit_rval0 = true;
 					}
 					if (hit_rval && hit_rval0) break;   // break the for loop

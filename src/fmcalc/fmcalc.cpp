@@ -517,13 +517,15 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 					//	compute_item_proportions(agg_vecs, guls, level, layer, previous_layer_id);
 					//	if (allocruleOptimizationOff_ == false) item_proportions_computed = true;
 					//}
-
-					if (x.item_prop && x.item_prop->size() > 0) {
-						int vec_idx = (*aggid_to_vectorlookup)[x.agg_id - 1];
+					int vec_idx = (*aggid_to_vectorlookup)[x.agg_id - 1];
+					int range = avx[layer][vec_idx].item_idx.size();
+					int range2 = x.item_prop->size();
+					if (x.item_prop && range > 0) {						
 						for (int i = 0; i < avx[layer][vec_idx].item_idx.size(); i++) {
 							int idx = avx[layer][vec_idx].item_idx[i];
 							//for (int idx : avx[layer][vec_idx].item_idx) {
-							OASIS_FLOAT prop = x.item_prop->at(i);
+							OASIS_FLOAT prop = 0;
+							if (i < range2) prop = x.item_prop->at(i);
 							if (netvalue_) { // get net gul value							
 								x.item_net->at(i) = x.item_net->at(i) - (x.loss * prop);
 								if (x.item_net->at(i) < 0) x.item_net->at(i) = 0;

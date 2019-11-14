@@ -542,13 +542,16 @@ void gulcalc::processrec_mode1(char* rec, int recsize)
 			// itemoutputgul(gx);
 			genmode1output(gx, gc.coverage_id);
 			if (correlatedWriter_) gencorrelatedoutput(gx, gc.coverage_id);
-			int ridx = 0; // dummy value		
+			int ridx = 0; // dummy value
+			int ridx0 = 0;
 			switch (rndopt_) {
 			case rd_option::userandomnumberfile:
 				ridx = ((iter->group_id * p1_ * p3_) + (d->event_id * p2_)) % rnd_count;
+				ridx0 = ((p1_ * p3_) + (d->event_id *p2_)) % rnd_count;
 				break;
 			case rd_option::usecachedvector:
 				ridx = iter->group_id * samplesize_;
+				ridx0 = samplesize_;
 				break;
 			case rd_option::usehashedseed:
 			{
@@ -577,10 +580,7 @@ void gulcalc::processrec_mode1(char* rec, int recsize)
 				}
 				else {
 					rval = rnd_->rnd(ridx + i);
-					if (correlatedWriter_) {
-						fprintf(stderr, "Cannot use correlated output option.\n");
-						exit(-1);
-					}
+					if (correlatedWriter_) rval0 = rnd0_->rnd(ridx0 + i);
 				}
 				if (rval >= pp_max->prob_to) {
 					rval = pp_max->prob_to - 0.00000003;	// set value to just under max value (which should be 1)

@@ -79,11 +79,6 @@ bool operator<(const gulitemSampleslevel& lhs, const gulitemSampleslevel& rhs)
 		return lhs.sidx < rhs.sidx;
 	}
 }
-//struct probrec {
-//	OASIS_FLOAT prob_from;
-//	OASIS_FLOAT prob_to;
-//	OASIS_FLOAT bin_mean;
-//};
 
 gulSampleslevelHeader lastitemheader;
 gulSampleslevelHeader lastcorrelatedheader;

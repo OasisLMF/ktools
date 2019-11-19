@@ -213,6 +213,19 @@ struct fm_profile {
 
 };
 
+struct fm_profile_step {
+	int profile_id = 0;
+	int step_id = 0;
+	int calcrule_id = 0;
+	OASIS_FLOAT trigger_start = 0;
+	OASIS_FLOAT	trigger_end = 0;
+	OASIS_FLOAT payout_start = 0;
+	OASIS_FLOAT payout_end = 0;
+	OASIS_FLOAT limit1 = 0;
+	OASIS_FLOAT limit2 = 0;
+	OASIS_FLOAT scale1 = 0;
+	OASIS_FLOAT scale2 = 0;
+};
 
 struct fm_programme {
 	int from_agg_id;

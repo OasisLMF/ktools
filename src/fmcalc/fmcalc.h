@@ -47,8 +47,9 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 class fmcalc {
 public:	
-	fmcalc(int maxRunLevel, int allocrule,const std::string &inputpath, bool netvalue, bool debug, bool allocruleOptimizationOff):
-		inputpath_(inputpath) , netvalue_(netvalue),allocrule_(allocrule), debug_(debug), allocruleOptimizationOff_(allocruleOptimizationOff)
+	fmcalc(int maxRunLevel, int allocrule,const std::string &inputpath, bool netvalue, bool debug, bool allocruleOptimizationOff,bool stepped):
+		inputpath_(inputpath) , netvalue_(netvalue),allocrule_(allocrule), debug_(debug), allocruleOptimizationOff_(allocruleOptimizationOff),
+		stepped_(stepped)
 		{ init(maxRunLevel); }	
 	void doit();
 private:
@@ -62,6 +63,7 @@ private:
 	int max_agg_id_ = 0;	// initialized from policy_tc
 	bool isGULStreamType_ = true;
 	std::vector <profile_rec_new> profile_vec_new_;
+	std::vector<std::vector <profile_rec_new>> profile_vec_stepped_;
 	int maxLevel_ = -1;
 	int maxRunLevel_ = 10000;
 	int max_level_ = 0;
@@ -74,6 +76,8 @@ private:
 	std::vector<OASIS_FLOAT> item_to_tiv_;	
 	void init_programme(int maxrunLevel);
 	void init_profile();
+	void init_profile_step();
+	void init_profile__stepped_rec(fm_profile_step& f);
 	void init_profile_rec(fm_profile &f);
 	void init_itemtotiv();
 	void init_fmxref();
@@ -90,7 +94,10 @@ private:
 		const std::vector<int> &items_, std::vector<std::vector<OASIS_FLOAT>> &event_guls,
 		int previous_level, int previous_layer);	
 	void dofmcalc(std::vector <LossRec> &agg_vec_, int layer);
+	void dofmcalc_normal(std::vector <LossRec>& agg_vec_, int layer);
+	void dofmcalc_stepped(std::vector <LossRec>& agg_vec, int layer);
 	int noop_profile_id = 0;
+	bool stepped_ = false;
 };
 
 
@@ -103,9 +110,16 @@ enum tc_new {			// tc = terms and conditions
 	deductible_3,
 	attachment_1,
 	limit_1,
+	limit_2,
 	share_1,
 	share_2,
-	share_3
+	share_3,
+	trigger_start,
+	trigger_end,
+	payout_start,
+	payout_end,
+	scale_1,
+	scale_2
 };
 
 

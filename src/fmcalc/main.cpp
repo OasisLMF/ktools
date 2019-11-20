@@ -91,7 +91,8 @@ int main(int argc, char* argv[])
 	bool allocruleOptimizationOff = false;
 
 	bool netvalue = false;
-    while ((opt = getopt(argc, argv, "dnvhOM:p:a:")) != -1) {
+	bool stepped = false;
+    while ((opt = getopt(argc, argv, "SdnvhOM:p:a:")) != -1) {
         switch (opt) {
 
 		case 'O':
@@ -115,6 +116,9 @@ int main(int argc, char* argv[])
 			 break;
 		 case 'n':
 			 netvalue = true;
+			 break;
+		 case 'S':
+			 stepped = true;
 			 break;
         case 'h':
            help();
@@ -143,7 +147,7 @@ int main(int argc, char* argv[])
 
 	try {
 		initstreams("", "");
-		fmcalc fc(new_max, allocrule, inputpath, netvalue,debug, allocruleOptimizationOff);
+		fmcalc fc(new_max, allocrule, inputpath, netvalue,debug, allocruleOptimizationOff,stepped);
 		fc.doit();
 	}
 	catch (const std::bad_alloc &a) {

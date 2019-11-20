@@ -752,6 +752,17 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			}			
 			x.loss = loss;
 		}
+		case 27:
+		case 28:
+		{
+			x.loss = 12345;
+		}
+			break;
+		case 100:	// noop
+		{
+			x.loss = x.loss;
+		}
+		break;
 		default:
 		{
 			fprintf(stderr, "Unknown calc rule %d\n", profile.calcrule_id);
@@ -759,19 +770,81 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 	}
 }
 
-void fmcalc::dofmcalc(std::vector <LossRec> &agg_vec, int layer)
+void fmcalc::dofmcalc_normal(std::vector <LossRec> &agg_vec, int layer)
 {
 	for (LossRec &x : agg_vec) {
 		if (x.agg_id == 0) break;
 		if (x.agg_id > 0) {
 			if (x.loss > 0 || x.retained_loss > 0) {
 				if (x.policytc_id > 0) {
-					const profile_rec_new &profile = profile_vec_new_[x.policytc_id];					
-					applycalcrule(profile, x, layer);
+					const profile_rec_new &profile = profile_vec_new_[x.policytc_id];
+					if (profile.calcrule_id != 100) applycalcrule(profile, x, layer);
 				}
 			}
 		}
 	}
+}
+
+
+void fmcalc::dofmcalc_stepped(std::vector <LossRec>& agg_vec, int layer)
+{
+	for (LossRec& x : agg_vec) {
+		if (x.agg_id == 0) break;
+		if (x.agg_id > 0) {
+			if (x.loss > 0 || x.retained_loss > 0) {
+				if (x.policytc_id > 0) {
+					auto iter = profile_vec_stepped_[x.policytc_id].begin();
+					while (iter != profile_vec_stepped_[x.policytc_id].end()) {
+						const profile_rec_new& profile = *(iter);
+						if (profile.calcrule_id != 100) applycalcrule(profile, x, layer);
+					}
+				}
+			}
+		}
+	}
+}
+
+
+void fmcalc::dofmcalc(std::vector <LossRec>& agg_vec, int layer)
+{
+	if (stepped_ == false) dofmcalc_normal(agg_vec, layer);
+	else dofmcalc_stepped(agg_vec, layer);
+}
+void fmcalc::init_profile__stepped_rec(fm_profile_step& f)
+{
+	profile_rec_new p;
+	p.calcrule_id = f.calcrule_id;
+	switch (p.calcrule_id) {
+		case 27:
+			add_tc(limit_1, f.limit1, p.tc_vec);
+			add_tc(limit_2, f.limit2, p.tc_vec);
+			add_tc(payout_start, f.payout_start, p.tc_vec);
+			add_tc(payout_end, f.payout_end, p.tc_vec);
+			add_tc(scale_1, f.scale1, p.tc_vec);
+			add_tc(scale_2, f.scale2, p.tc_vec);
+			add_tc(trigger_start, f.trigger_start, p.tc_vec);
+			add_tc(trigger_end, f.trigger_end, p.tc_vec);
+			break;
+		case 28:
+			add_tc(limit_1, f.limit1, p.tc_vec);
+			add_tc(limit_2, f.limit2, p.tc_vec);
+			add_tc(payout_start, f.payout_start, p.tc_vec);
+			add_tc(payout_end, f.payout_end, p.tc_vec);
+			add_tc(scale_1, f.scale1, p.tc_vec);
+			add_tc(scale_2, f.scale2, p.tc_vec);
+			add_tc(trigger_start, f.trigger_start, p.tc_vec);
+			add_tc(trigger_end, f.trigger_end, p.tc_vec);
+			break;
+		default:
+		{
+			fprintf(stderr, "Invalid calc rule for stepped policies\n");
+			exit(EXIT_FAILURE);
+		}
+	}
+	if (profile_vec_stepped_.size() < ((size_t) f.profile_id) + 1 ) {
+		profile_vec_stepped_.resize((size_t) f.profile_id + 1);
+	}
+	profile_vec_stepped_[f.profile_id].push_back(p);
 }
 
 void fmcalc::init_profile_rec(fm_profile &f)
@@ -888,6 +961,32 @@ void fmcalc::init_profile_rec(fm_profile &f)
 	profile_vec_new_[f.profile_id] = p;
 }
 
+void fmcalc::init_profile_step()
+{
+	FILE* fin = NULL;
+	std::string file = FMPROFILE_FILE_NEW;
+	if (inputpath_.length() > 0) {
+		file = inputpath_ + file.substr(5);
+	}
+	fin = fopen(file.c_str(), "rb");
+	if (fin == NULL) {
+		fprintf(stderr, "%s: cannot open %s\n", __func__, file.c_str());
+		exit(EXIT_FAILURE);
+	}
+	fm_profile_step f;
+	size_t i = fread(&f, sizeof(f), 1, fin);
+	while (i != 0) {
+		init_profile__stepped_rec(f);
+		if (noop_profile_id < f.profile_id) noop_profile_id = f.profile_id;
+		i = fread(&f, sizeof(f), 1, fin);
+	}
+	noop_profile_id++;
+	fm_profile_step d;	// dummy
+	d.profile_id = noop_profile_id;
+	d.calcrule_id = 100; // noop
+	init_profile__stepped_rec(d);
+	fclose(fin);
+}
 void fmcalc::init_profile()
 {
 	FILE *fin = NULL;
@@ -910,7 +1009,8 @@ void fmcalc::init_profile()
 	noop_profile_id++;
 	fm_profile d;	// dummy
 	d.profile_id = noop_profile_id;
-	d.calcrule_id = 14;
+	//d.calcrule_id = 14;
+	d.calcrule_id = 100; // noop
 	init_profile_rec(d);
 	fclose(fin);
 }

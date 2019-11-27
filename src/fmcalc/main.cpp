@@ -60,7 +60,7 @@ void help()
 
     fprintf(stderr,
 		"-a set allocrule (default none)\n"
-		"-o run old fm_profile\n"
+		"-o general optimization off\n"
         "-M max level (optional)\n"
 		"-p inputpath (relative or full path)\n"
 		"-n feed net value (used for reinsurance)\n"
@@ -89,12 +89,15 @@ int main(int argc, char* argv[])
 	std::string inputpath;
 	bool debug = false;
 	bool allocruleOptimizationOff = false;
+	bool generalOptimization = true;
 
 	bool netvalue = false;
 	bool stepped = false;
-    while ((opt = getopt(argc, argv, "SdnvhOM:p:a:")) != -1) {
+    while ((opt = getopt(argc, argv, "SdnovhOM:p:a:")) != -1) {
         switch (opt) {
-
+		case 'o':
+			generalOptimization = false;
+			break;
 		case 'O':
 			allocruleOptimizationOff = true;
 			break;
@@ -147,7 +150,7 @@ int main(int argc, char* argv[])
 
 	try {
 		initstreams("", "");
-		fmcalc fc(new_max, allocrule, inputpath, netvalue,debug, allocruleOptimizationOff,stepped);
+		fmcalc fc(new_max, allocrule, inputpath, netvalue,debug, allocruleOptimizationOff, generalOptimization,stepped);
 		fc.doit();
 	}
 	catch (const std::bad_alloc &a) {

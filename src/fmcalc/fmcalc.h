@@ -47,8 +47,8 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 class fmcalc {
 public:	
-	fmcalc(int maxRunLevel, int allocrule,const std::string &inputpath, bool netvalue, bool debug, bool allocruleOptimizationOff,bool stepped):
-		inputpath_(inputpath) , netvalue_(netvalue),allocrule_(allocrule), debug_(debug), allocruleOptimizationOff_(allocruleOptimizationOff),
+	fmcalc(int maxRunLevel, int allocrule,const std::string &inputpath, bool netvalue, bool debug, bool allocruleOptimizationOff,bool generalOptimization, bool stepped):
+		inputpath_(inputpath) , netvalue_(netvalue),allocrule_(allocrule), debug_(debug), allocruleOptimizationOff_(allocruleOptimizationOff), generalOptimization_(generalOptimization),
 		stepped_(stepped)
 		{ init(maxRunLevel); }	
 	void doit();
@@ -62,6 +62,7 @@ private:
 	int max_layer_ = 0;		// initialized from policy_tc
 	int max_agg_id_ = 0;	// initialized from policy_tc
 	bool isGULStreamType_ = true;
+	bool generalOptimization_ = true;
 	std::vector <profile_rec_new> profile_vec_new_;
 	std::vector<std::vector <profile_rec_new>> profile_vec_stepped_;
 	int maxLevel_ = -1;
@@ -87,7 +88,7 @@ private:
 	void addtcrow(const fm_policyTC &f);
 	bool loadcoverages(std::vector<OASIS_FLOAT> &coverages);
 	bool gulhasvalue(const std::vector<OASIS_FLOAT> &gul) const;
-	void compute_item_proportions(std::vector<std::vector<std::vector <LossRec>>> &agg_vecs, const std::vector<OASIS_FLOAT> &guls,unsigned int level_, unsigned int layer_,unsigned int previous_layer_);	
+	void compute_item_proportions(std::vector<std::vector<std::vector <LossRec>>> &agg_vecs, const std::vector<OASIS_FLOAT> &guls,unsigned int level_, unsigned int layer_,unsigned int previous_layer_, bool allowzeros);	
 	inline void dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlookups_, std::vector<std::vector<std::vector <LossRec>>> &agg_vecs_, 
 		int level_, int max_level_,	std::map<int, std::vector<fmlevelrec> > &outmap_, 
 		int sidx_, const std::vector<std::vector<std::vector<policytcvidx>>> &avxs_, int layer_,

@@ -1100,9 +1100,14 @@ void fmcalc::init_fmxref()
 }
 
 void fmcalc::init(int MaxRunLevel)
-{    
-    init_programme(MaxRunLevel);
-	init_profile();
+{
+	init_programme(MaxRunLevel);
+	if (stepped_ == true) {
+		init_profile_step();
+	}
+	else {
+		init_profile();
+	}
 	init_policytc(MaxRunLevel);
 	init_fmxref();	
 	

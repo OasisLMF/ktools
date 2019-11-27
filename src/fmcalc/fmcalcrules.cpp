@@ -797,6 +797,7 @@ void fmcalc::dofmcalc_stepped(std::vector <LossRec>& agg_vec, int layer)
 					while (iter != profile_vec_stepped_[x.policytc_id].end()) {
 						const profile_rec_new& profile = *(iter);
 						if (profile.calcrule_id != 100) applycalcrule(profile, x, layer);
+						iter++;
 					}
 				}
 			}
@@ -834,6 +835,8 @@ void fmcalc::init_profile__stepped_rec(fm_profile_step& f)
 			add_tc(scale_2, f.scale2, p.tc_vec);
 			add_tc(trigger_start, f.trigger_start, p.tc_vec);
 			add_tc(trigger_end, f.trigger_end, p.tc_vec);
+			break;
+		case 100:
 			break;
 		default:
 		{
@@ -964,7 +967,7 @@ void fmcalc::init_profile_rec(fm_profile &f)
 void fmcalc::init_profile_step()
 {
 	FILE* fin = NULL;
-	std::string file = FMPROFILE_FILE_NEW;
+	std::string file = FMPROFILE_FILE_STEP;
 	if (inputpath_.length() > 0) {
 		file = inputpath_ + file.substr(5);
 	}
@@ -990,7 +993,7 @@ void fmcalc::init_profile_step()
 void fmcalc::init_profile()
 {
 	FILE *fin = NULL;
-	std::string file = FMPROFILE_FILE_NEW;
+	std::string file = FMPROFILE_FILE;
 	if (inputpath_.length() > 0) {
 		file = inputpath_ + file.substr(5);
 	}

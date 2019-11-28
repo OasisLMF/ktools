@@ -753,9 +753,76 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			x.loss = loss;
 		}
 		case 27:
+		{
+			OASIS_FLOAT tstart = 0;
+			OASIS_FLOAT tend = 0;
+			OASIS_FLOAT payout = 0;
+			OASIS_FLOAT scale1 = 0;
+			OASIS_FLOAT limit1 = 0;
+			for (auto y : profile.tc_vec) {
+				if (y.tc_id == trigger_start) tstart = y.tc_val;
+				if (y.tc_id == trigger_end) tend = y.tc_val;
+				if (y.tc_id == payout_start) payout = y.tc_val;
+				if (y.tc_id == scale_1) scale1 = y.tc_val;
+				if (y.tc_id == limit_1) limit1 = y.tc_val;
+			}
+			// Step policy: single step with % sum insured payout, a limit amount and a flat gross up factor for debris removal
+			OASIS_FLOAT loss = 0;
+			loss = x.loss / x.accumulated_tiv;
+			if (loss < tend ) {
+				if (loss >= tstart) {
+					loss = payout * x.accumulated_tiv;
+					if (loss > limit1) loss = limit1;
+					loss = loss * (1 + scale1);
+				}
+				else loss = 0;
+				}
+			else loss = 0;
+			x.loss = loss;
+		}
+			break;
 		case 28:
 		{
+			OASIS_FLOAT aggsteploss = 0; //need to introduce a variable that sums x.loss only over the steps for a given policytc_id, sidx , agg_id and level_id, and then resets
 			x.loss = 12345;
+		}
+			break;
+		case 29:
+		{
+			OASIS_FLOAT tstart = 0;
+			OASIS_FLOAT tend = 0;
+			OASIS_FLOAT payout = 0;
+			OASIS_FLOAT scale1 = 0;
+			OASIS_FLOAT limit1 = 0;
+			OASIS_FLOAT scale2 = 0;
+			OASIS_FLOAT limit2 = 0;
+
+			for (auto y : profile.tc_vec) {
+				if (y.tc_id == trigger_start) tstart = y.tc_val;
+				if (y.tc_id == trigger_end) tend = y.tc_val;
+				if (y.tc_id == payout_start) payout = y.tc_val;
+				if (y.tc_id == scale_1) scale1 = y.tc_val;
+				if (y.tc_id == limit_1) limit1 = y.tc_val;
+				if (y.tc_id == scale_2) scale2 = y.tc_val;
+				if (y.tc_id == limit_2) limit2 = y.tc_val;				
+			}
+			// Step policy: single (final) step with % loss payout, a limit amount, extra expense payout also with limit amount, and a gross up factor for debris removal
+			OASIS_FLOAT loss = 0;
+			OASIS_FLOAT condloss = 0;
+			loss = x.loss / x.accumulated_tiv;
+			if (loss <= tend ) {
+				if (loss >= tstart) {
+					loss = payout * x.loss; //calculate primary payout
+					if (loss > limit1) loss = limit1; //limit primary payout
+					condloss = loss * scale2; //calculate conditional payout (extra expenses)
+					if (condloss > limit2) condloss = limit2; //limit conditional payout
+					loss = loss + condloss; // main coverage + extra expense payout
+					loss = loss * (1 + scale1 ); // gross up for debris removal
+				}
+				else loss = 0;
+				}
+			else loss = 0;
+			x.loss = loss;
 		}
 			break;
 		case 100:	// noop

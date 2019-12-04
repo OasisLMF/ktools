@@ -88,9 +88,9 @@ int main(int argc, char* argv[])
 	bool zip = false;
 	int from_event = 1;
 	int to_event = 999999999;
-	char *binFileName;
+	char *binFileName = 0;
 	bool binFileGiven = false;
-	char *idxFileName;
+	char *idxFileName = 0;
 	bool idxFileGiven = false;
 	while ((opt = getopt(argc, argv, "e:zvhsb:x:")) != -1) {
 		switch (opt) {

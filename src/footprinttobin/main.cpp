@@ -85,9 +85,9 @@ int main(int argc, char *argv[]) {
 	int intensity_bins = -1;
 	int hasIntensityUncertainty = true;
 	bool skipheader = false;
-	char *binFileName;
+	char *binFileName = 0;
 	bool binFileGiven = false;
-	char *idxFileName;
+	char *idxFileName = 0;
 	bool idxFileGiven = false;
 	progname = argv[0];
 	while ((opt = getopt(argc, argv, "zvshni:b:x:")) != -1) {

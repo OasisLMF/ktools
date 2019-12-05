@@ -117,6 +117,7 @@ private:
 	getRands *rnd_;
 	getRands *rnd0_;
 	int rand_seed_ = 0;
+	gulcalcopts opt_;
 	const std::map<item_map_key, std::vector<item_map_rec> > *item_map_;
 	const std::vector<OASIS_FLOAT> *coverages_;
 	const std::vector<damagebindictionary> *damagebindictionary_vec_;
@@ -159,28 +160,28 @@ private:
 	long long p3_;
 	void clearmode1_data();
 	void clearfullCorr_data();
+
 public:	
 	void processrec(char *rec, int recsize);
 	void processrec_mode1(char* rec, int recsize);
 	 gulcalc(const std::vector<damagebindictionary> &damagebindictionary_vec,const std::vector<OASIS_FLOAT> &tivs,
-		const std::map<item_map_key, std::vector<item_map_rec> > &item_map, getRands &rnd, getRands &rnd0, 
-		double loss_threshold,
-		//bool userandomtable,
-		rd_option rndopt,
-		bool debug,
-		int samplesize,
+		const std::map<item_map_key, std::vector<item_map_rec> > &item_map, getRands &rnd, getRands &rnd0, 		
 		void (*itemWriter)(const void *ibuf,int size, int count),
 		void(*coverageWriter)(const void *ibuf,int size, int count),
         void (*lossWriter)(const void *ibuf, int size, int count),
 		void(*correlatedWriter)(const void *ibuf, int size, int count),
 		bool(*iGetrec)(char *rec, int recsize),
-		int rand_seed
-		) {
+		const gulcalcopts& opt
+		): opt_(opt) {
 		damagebindictionary_vec_ = &damagebindictionary_vec;
 		coverages_ = &tivs;
 		cov_.resize(coverages_->size());
-		mode1_.resize(coverages_->size());
-		fullCorr_.resize(coverages_->size());
+		if (opt.mode == 1) {
+			mode1_.resize(coverages_->size());
+		}
+		if (opt.correlatedLevelOutput == true) {
+			fullCorr_.resize(coverages_->size());
+		}
 		item_map_ = &item_map;
 		rnd_ = &rnd;
 		rnd0_ = &rnd0;
@@ -195,17 +196,17 @@ public:
 		cbuf_ = new unsigned char[bufsize + sizeof(gulitemSampleslevel)]; // make the allocation bigger by 1 record to avoid overrunning
 		//TODO: when using double precision, these buffers above are overflowing,
 		//the hack fix is to replace sizeof(gulitemSampleslevel) with 2*sizeof(gulitemSampleslevel)
-		loss_threshold_ = loss_threshold;
-		rndopt_ = rndopt;				
-		debug_ = debug;
-		samplesize_ = samplesize;
+		loss_threshold_ = opt.loss_threshold;
+		rndopt_ = opt.rndopt;				
+		debug_ = opt.debug;
+		samplesize_ = opt.samplesize;
 		isFirstItemEvent_ = true;
 		isFirstCorrelatedEvent_ = true;
 		isFirstCovEvent_ = true;
 		p1_ = rnd_->getp1();	// prime p1	make these long to force below expression to not have sign problem
 		p2_ = rnd_->getp2((unsigned int)p1_);  // prime no p2
 		p3_ = rnd_->getp2((unsigned int)samplesize_);	// use as additional offset to stop overlapping of random numbers 
-		rand_seed_ = rand_seed;
+		rand_seed_ = opt.rand_seed;
 	}	
 	~gulcalc() {
 		delete [] ibuf_;

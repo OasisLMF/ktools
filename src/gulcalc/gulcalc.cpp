@@ -181,7 +181,7 @@ void gulcalc::outputmode1data(int event_id)
 
 			}
 		}
-		// We have completed the loop on that coverage id so all items assocated with that coverage ID can now be outputted
+		// We have completed the loop on that coverage id so all items associated with that coverage ID can now be outputted
 		// Output the rows here
 		
 		auto iter = gxi.begin();

@@ -51,7 +51,72 @@ void add_tc(unsigned char tc_id, OASIS_FLOAT tc_val, std::vector<tc_rec> &tc_vec
 	}
 }
 
-
+void applycalcrule_stepped(const profile_rec_new& profile, LossRec& x, int layer,bool isLast)
+{
+	switch (profile.calcrule_id) {
+	case 27:
+	{
+		OASIS_FLOAT tstart = 0;
+		OASIS_FLOAT tend = 0;
+		OASIS_FLOAT payout = 0;
+		OASIS_FLOAT scale1 = 0;
+		OASIS_FLOAT limit1 = 0;
+		for (auto y : profile.tc_vec) {
+			if (y.tc_id == trigger_start) tstart = y.tc_val;
+			if (y.tc_id == trigger_end) tend = y.tc_val;
+			if (y.tc_id == payout_start) payout = y.tc_val;
+			if (y.tc_id == scale_1) scale1 = y.tc_val;
+			if (y.tc_id == limit_1) limit1 = y.tc_val;
+		}
+		// Step policy: single step with % sum insured payout, a limit amount and a flat gross up factor for debris removal
+		OASIS_FLOAT loss = 0;
+		loss = x.loss / x.accumulated_tiv;
+		if (loss < tend) {
+			if (loss >= tstart) {
+				loss = payout * x.accumulated_tiv;
+				if (loss > limit1) loss = limit1;
+				loss = loss * (1 + scale1);
+			}
+			else loss = 0;
+		}
+		else loss = 0;
+		if (profile.step_id == 1) {
+			x.step_loss = 0;
+		}
+		
+		if (isLast == true) {
+			x.loss = x.step_loss;
+		}
+		else {
+			x.step_loss = x.step_loss + loss;
+		}
+				
+	}
+	break;
+		case 28:
+		{			
+			if (profile.step_id == 1) {
+				x.step_loss = 0;
+			}			
+			if (isLast == true) {
+				x.loss = x.step_loss;
+			}
+			else {
+				x.step_loss = x.step_loss + x.loss;
+			}					
+		}
+		break;
+		case 100:	// noop
+		{
+			x.loss = x.loss;
+		}
+		break;
+		default:
+		{
+			fprintf(stderr, "Unknown calc rule %d\n", profile.calcrule_id);
+		}
+	}
+}
 void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 {
 	switch (profile.calcrule_id) {
@@ -860,11 +925,16 @@ void fmcalc::dofmcalc_stepped(std::vector <LossRec>& agg_vec, int layer)
 		if (x.agg_id > 0) {
 			if (x.loss > 0 || x.retained_loss > 0) {
 				if (x.policytc_id > 0) {
-					auto iter = profile_vec_stepped_[x.policytc_id].begin();
-					while (iter != profile_vec_stepped_[x.policytc_id].end()) {
-						const profile_rec_new& profile = *(iter);
-						if (profile.calcrule_id != 100) applycalcrule(profile, x, layer);
+					auto iter = profile_vec_stepped_[x.policytc_id].cbegin();
+					while (iter != profile_vec_stepped_[x.policytc_id].cend()) {
+						const profile_rec_new& profile = *(iter);						
 						iter++;
+						if (iter == profile_vec_stepped_[x.policytc_id].cend()) {
+							if (profile.calcrule_id != 100) applycalcrule_stepped(profile, x, layer,true);
+						}
+						else {
+							if (profile.calcrule_id != 100) applycalcrule_stepped(profile, x, layer, false);
+						}
 					}
 				}
 			}
@@ -882,6 +952,7 @@ void fmcalc::init_profile__stepped_rec(fm_profile_step& f)
 {
 	profile_rec_new p;
 	p.calcrule_id = f.calcrule_id;
+	p.step_id = f.step_id;
 	switch (p.calcrule_id) {
 		case 27:
 			add_tc(limit_1, f.limit1, p.tc_vec);

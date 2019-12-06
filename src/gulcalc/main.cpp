@@ -60,6 +60,7 @@ void help()
 		"-R [max random numbers] used to allocate array for random numbers default 1,000,000\n"
 		"-c [output pipe] - coverage output\n"
 		"-i [output pipe] - item output\n"
+		"-j [file name] correlated output\n"
 		"-d debug (output random numbers instead of gul)\n"
 		"-s seed for random number generation (used for debugging)\n"
 		"-A automatically hashed seed driven random number generation (default)\n"
@@ -78,7 +79,7 @@ int main(int argc, char *argv[])
 	gulcalcopts gopt;
 	gopt.loss_threshold = 0.000001;
 	progname = argv[0];
-	while ((opt = getopt(argc, argv, "Alvhdra:L:S:c:i:R:s:m:")) != -1) {
+	while ((opt = getopt(argc, argv, "Alvhdra:L:S:c:i:j:R:s:m:")) != -1) {
 		switch (opt) {
 		case 'S':
 			gopt.samplesize = atoi(optarg);
@@ -104,6 +105,10 @@ int main(int argc, char *argv[])
 		case 'i':
 			gopt.item_output = optarg;
 			gopt.itemLevelOutput = true;
+			break;
+		case 'j':
+			gopt.correlated_output = optarg;
+			gopt.correlatedLevelOutput = true;
 			break;
 		case 'm':
 			gopt.mode = atoi(optarg);
@@ -136,6 +141,13 @@ int main(int argc, char *argv[])
 	if (gopt.coverageLevelOutput == true) {
 		if (gopt.coverage_output == "-") gopt.covout = stdout;
 		else gopt.covout = fopen(gopt.coverage_output.c_str(), "wb");
+	}
+	if(gopt.correlatedLevelOutput == true) {
+		gopt.corrout = fopen(gopt.correlated_output.c_str(), "wb");
+		if(gopt.corrout == NULL) {
+			fprintf(stderr, "Correlated output file name must be specified\n");
+			exit(EXIT_FAILURE);
+		}
 	}
 
 	if (gopt.itemLevelOutput == false && gopt.coverageLevelOutput == false) {

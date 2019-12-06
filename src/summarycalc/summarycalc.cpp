@@ -525,12 +525,12 @@ void summarycalc::dosummaryprocessing(int samplesize)
 	alloc_sse_array();
 	reset_sse_array();
 	outputsamplesize(samplesize);
-	fmlevelhdr fh;
-	OASIS_FLOAT expure_val = 0;
+	fmlevelhdr fh;	
 	bool havedata = false;
 	int i = 1;
 	while (i == 1) {
 		i = (int) fread(&fh, sizeof(fh), 1, stdin);
+		OASIS_FLOAT expure_val = 0;
 		if (i > 0 && havedata == false) havedata = true;
 		while (i != 0) {
 			sampleslevelRec sr;

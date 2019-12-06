@@ -47,13 +47,36 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <unistd.h>
 #endif
 
-namespace fmprofiletobin {    
-    void doit() {
-
+namespace fmprofiletobin {
+	void dostep() {
+		fm_profile_step q;
+		char line[4096];
+		int lineno = 0;
+		fgets(line, sizeof(line), stdin);	// skip header
+		lineno++;
+		while (fgets(line, sizeof(line), stdin) != 0) {
+			if (sscanf(line, "%d,%d,%d,%f,%f,%f,%f,%f,%f,%f,%f", &q.profile_id,
+				&q.step_id,&q.calcrule_id, &q.trigger_start, &q.trigger_end,
+				&q.payout_start, &q.payout_end, &q.limit1, &q.limit2,
+				&q.scale1, &q.scale2) != 11) {
+				fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
+				return;
+			}
+			else {
+				fwrite(&q, sizeof(q), 1, stdout);
+			}
+			lineno++;
+		}
+	}
+    void doit(bool step) {
+		if (step) {
+			dostep();
+			return;
+		}
         fm_profile q;
         char line[4096];
         int lineno = 0;
-        fgets(line, sizeof(line), stdin);
+        fgets(line, sizeof(line), stdin);  // skip header
         lineno++;
         while (fgets(line, sizeof(line), stdin) != 0) {
             if (sscanf(line, "%d,%d,%f,%f,%f,%f,%f,%f,%f,%f", &q.profile_id,

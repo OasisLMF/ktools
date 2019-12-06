@@ -198,11 +198,13 @@ There are three values of sidx with special meaning as follows;
 
 | sidx   |  Meaning                                      | Required / optional|
 |:-------|:----------------------------------------------|--------------------|
-|   -1   | numerical integration mean loss               |   required         |
-|   -2   | numerical integration standard deviation loss |   optional         |
 |   -3   | maximum exposure value                        |   required         |
+|   -2   | numerical integration standard deviation loss |   optional         |
+|   -1   | numerical integration mean loss               |   required         |
 
-sidx -1 to -3 must come at the beginning of the data packet before the other samples.
+sidx -3 to -1 must come at the beginning of the data packet before the other samples.  
+Note: because exposure value (sidx = -3) is state information used by the other samples it must be the first
+sidx in the stream.
 
 [Return to top](#specification)
 

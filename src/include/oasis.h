@@ -213,6 +213,19 @@ struct fm_profile {
 
 };
 
+struct fm_profile_step {
+	int profile_id = 0;
+	int step_id = 0;
+	int calcrule_id = 0;
+	OASIS_FLOAT trigger_start = 0;
+	OASIS_FLOAT	trigger_end = 0;
+	OASIS_FLOAT payout_start = 0;
+	OASIS_FLOAT payout_end = 0;
+	OASIS_FLOAT limit1 = 0;
+	OASIS_FLOAT limit2 = 0;
+	OASIS_FLOAT scale1 = 0;
+	OASIS_FLOAT scale2 = 0;
+};
 
 struct fm_programme {
 	int from_agg_id;
@@ -317,8 +330,8 @@ inline void initstreams(std::string inFile="", std::string outFile="")
 #define FMSUMMARYXREF_FILE "input/fmsummaryxref.bin"
 #define FMPOLICYTC_FILE "input/fm_policytc.bin"
 #define FMPROGRAMME_FILE "input/fm_programme.bin"
-#define FMPROFILE_FILE_OLD "input/fm_profile_old.bin"
-#define FMPROFILE_FILE_NEW "input/fm_profile.bin"
+#define FMPROFILE_FILE_STEP "input/fm_profile_step.bin"
+#define FMPROFILE_FILE "input/fm_profile.bin"
 #define FMXREF_FILE "input/fm_xref.bin"
 #define ITEMS_FILE "input/items.bin"
 #define EVENTS_FILE "input/events.bin"

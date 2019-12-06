@@ -122,15 +122,19 @@ void getmodel::getVulnerabilities(const std::set<int> &v) {
 }
 
 void getmodel::getIntensityInfo() {
-  FILE *fin = fopen(FOOTPRINT_FILE, "rb");
-  if (fin == nullptr) {
-    fprintf(stderr, "%s: cannot open %s\n", __func__, FOOTPRINT_FILE);
-    exit(EXIT_FAILURE);
-  }
-  fread(&_num_intensity_bins, sizeof(_num_intensity_bins), 1, fin);
-  fread(&_has_intensity_uncertainty, sizeof(_has_intensity_uncertainty), 1,
-        fin);
-  fclose(fin);
+	std::string filename = FOOTPRINT_FILE;
+
+	if (_zip) {
+		filename = ZFOOTPRINT_FILE;
+	}
+	FILE *fin = fopen(filename.c_str(), "rb");
+	if (fin == nullptr) {
+		fprintf(stderr, "%s: cannot open %s\n", __func__, filename.c_str());
+		exit(EXIT_FAILURE);
+	}
+	fread(&_num_intensity_bins, sizeof(_num_intensity_bins), 1, fin);
+	fread(&_has_intensity_uncertainty, sizeof(_has_intensity_uncertainty), 1,fin);
+	fclose(fin);
 }
 
 void getmodel::getItems(std::set<int> &v) {
@@ -186,23 +190,25 @@ void getmodel::getDamageBinDictionary() {
 }
 
 void getmodel::getFootPrints(){
-  FILE *fin;
-  if (_zip) {
-    fin = fopen(ZFOOTPRINT_IDX_FILE, "rb");
-  } else {
-    fin = fopen(FOOTPRINT_IDX_FILE, "rb");
-  }
-  if (fin == nullptr) {
-    fprintf(stderr, "%s: cannot open %s\n", __func__, FOOTPRINT_IDX_FILE);
-    exit(EXIT_FAILURE);
-  }
+	FILE *fin;
+	std:: string filename = FOOTPRINT_IDX_FILE;
 
-  EventIndex event_index;
-  while (fread(&event_index, sizeof(event_index), 1, fin) != 0) {
-    _event_index_by_event_id[event_index.event_id] = event_index;
-  }
+	if (_zip) {
+		filename = ZFOOTPRINT_IDX_FILE;
+	}
 
-  fclose(fin);
+	fin = fopen(filename.c_str(), "rb");
+	if (fin == nullptr) {
+		fprintf(stderr, "%s: cannot open %s\n", __func__, filename.c_str());
+		exit(EXIT_FAILURE);
+	}
+
+	EventIndex event_index;
+	while (fread(&event_index, sizeof(event_index), 1, fin) != 0) {
+		_event_index_by_event_id[event_index.event_id] = event_index;
+	}
+
+	fclose(fin);
 }
 
 void getmodel::initOutputStream() {

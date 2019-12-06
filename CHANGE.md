@@ -1,7 +1,23 @@
 Ktools Changelog
 ================
 
-## [v3.1.3](https://github.com/OasisLMF/ktools/releases/tag/v3.1.2)
+## [v3.2.0](https://github.com/OasisLMF/ktools/releases/tag/v3.2.0)
+* Added correlated run feature to Gulcalc
+* Added fmcalc allocation rule 2 and 3
+* #54 - fmcalc allocrule 2 - final losses can be set to zero if prior level losses are zero
+* #57 - Footprint to csv for specific event
+* #80 - add support for back-allocation of multi-level layers
+* #84 - pltcalc output whitespace
+* #86 - first event_id is dropped using summarycalc -i
+
+## [v3.1.4](https://github.com/OasisLMF/ktools/releases/tag/v3.1.4)
+* fix usage of zip file in getmodel
+* fix periods file in aalcalc
+* fix summarycalc error message
+* ensure item\_ids are contigious in itemstobin
+* add alloc rule 3
+
+## [v3.1.3](https://github.com/OasisLMF/ktools/releases/tag/v3.1.3)
 * fix to reduce Gulcalc memory footprint size 
 
 ## [v3.1.2](https://github.com/OasisLMF/ktools/releases/tag/v3.1.2)

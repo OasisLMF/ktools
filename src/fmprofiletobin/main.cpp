@@ -24,22 +24,30 @@ void segfault_sigaction(int signal, siginfo_t *si, void *arg)
 
 
 namespace fmprofiletobin {
-    void doit();
-    void doit_old();
+    void doit(bool step);
 } // namespace fmprofiletobin
 
-void help() { fprintf(stderr, "-h help\n -v version\n"); }
+void help() { 
+	fprintf(stderr, 
+		"-h help\n" 
+		"-v version\n" 
+		"-S step\n"
+	);
+}
 
 int main(int argc, char *argv[]) {
 
     int opt;
-
-    while ((opt = getopt(argc, argv, "vho")) != -1) {
+	bool step = false;
+    while ((opt = getopt(argc, argv, "vhoS")) != -1) {
         switch (opt) {
         case 'v':
             fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
             exit(EXIT_FAILURE);
-            break;        
+            break; 
+		case 'S':
+			step = true;
+			break;
         case 'h':
         default:
             help();
@@ -61,7 +69,7 @@ progname = argv[0];
 #endif
     try {
         initstreams();        
-        fmprofiletobin::doit();
+        fmprofiletobin::doit(step);
     } catch (std::bad_alloc) {
         fprintf(stderr, "%s: Memory allocation failed\n", progname);
         exit(EXIT_FAILURE);

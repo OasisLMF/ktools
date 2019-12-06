@@ -27,26 +27,31 @@ void segfault_sigaction(int signal, siginfo_t *si, void *arg) {
 #endif
 
 namespace fmprofiletocsv {
-    void doit_old(bool skipheader);
-    void doit(bool skipheader);
+    void doit(bool skipheader,bool step);
 } // namespace fmprofiletocsv
 
 void help() {
-    fprintf(stderr, "-s Skip Header\n"
-                    "-v version\n"
-                    "-h help");
+    fprintf(stderr, 
+		"-S step\n"
+		"-s Skip Header\n"
+        "-v version\n"
+        "-h help"
+	);
 }
 
 int main(int argc, char *argv[]) {
     int opt;
     bool skipheader = false;
     bool oldFMProfile = false;
-
-    while ((opt = getopt(argc, argv, "vhso")) != -1) {
+	bool step = false;
+    while ((opt = getopt(argc, argv, "vhsoS")) != -1) {
         switch (opt) {
         case 's':
             skipheader = true;
             break;
+		case 'S':
+			step = true;
+			break;
         case 'v':
             fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
             exit(EXIT_FAILURE);
@@ -70,7 +75,7 @@ int main(int argc, char *argv[]) {
 #endif
     try {
         initstreams();        
-        fmprofiletocsv::doit(skipheader);        
+        fmprofiletocsv::doit(skipheader,step);        
     } catch (std::bad_alloc) {
         fprintf(stderr, "%s: Memory allocation failed\n", progname);
         exit(EXIT_FAILURE);

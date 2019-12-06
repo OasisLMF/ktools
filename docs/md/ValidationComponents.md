@@ -83,7 +83,7 @@ The checks can be performed on `damage_bin_dict.csv`, `footprint.csv` and `vulne
 $ crossvalidation -d damage_bin_dict.csv -f footprint.csv -s vulnerability.csv
 ```
 
-## GUL and IL data files
+## Input oasis files
 
 <a id="validateoasisfiles"></a>
 ### validateoasisfiles
@@ -95,7 +95,7 @@ The following checks are performed across the coverages, items, fm policytc, fm 
 * (`level_id`, `agg_id`) pairs in `fm_policytc.csv` are present as (`level_id`, `to_agg_id`) pairs in `fm_programme.csv`.
 * When `level_id = n > 1`, `from_agg_id` corresponds to a `to_agg_id` from `level_id = n - 1`.
 
-In the case of Insured Losses (IL), the checks can be performed on `coverages.csv`, `items.csv`, `fm_policytc.csv`, `fm_programme.csv` and `fm_profile.csv` from the command line, specifying the directory these files are located in:
+The checks can be performed on `coverages.csv`, `items.csv`, `fm_policytc.csv`, `fm_programme.csv` and `fm_profile.csv` from the command line, specifying the directory these files are located in:
 
 ```
 $ validateoasisfiles -d path/to/output/directory
@@ -106,3 +106,8 @@ The Ground Up Losses (GUL) flag `g` can be specified to only perform checks on `
 ```
 $ validateoasisfiles -g -d /path/to/output/directory
 ```
+[Return to top](#validationcomponents)
+
+[Go to 5. Financial Module](FinancialModule.md)
+
+[Back to Contents](Contents.md)

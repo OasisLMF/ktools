@@ -9,7 +9,7 @@ The following components run validity checks on csv format files:
 * **[validatevulnerability](#validatevulnerability)** checks vulnerability data for validity.
 * **[crossvalidation](#crossvalidation)** performs validation checks across damage bin dictionary, event footprint and vulnerability data.
 
-**GUL and IL data files**
+**Oasis input files**
 * **[validateoasisfiles](#validateoasisfiles)** performs validation checks across coverages, items, fm policytc, fm programme and fm profile data.
 
 ## Model data files
@@ -106,6 +106,7 @@ The Ground Up Losses (GUL) flag `g` can be specified to only perform checks on `
 ```
 $ validateoasisfiles -g -d /path/to/output/directory
 ```
+
 [Return to top](#validationcomponents)
 
 [Go to 5. Financial Module](FinancialModule.md)

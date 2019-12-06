@@ -3,12 +3,13 @@
 
 This section provides an overview of the reference model, which is an implementation of each of the components in the framework. 
 
-There are four sub-sections which cover the usage and internal processes of each of the reference components;
+There are five sub-sections which cover the usage and internal processes of each of the reference components;
 
 * **[4.1 Core components](CoreComponents.md)**
 * **[4.2 Output components](OutputComponents.md)**
 * **[4.3 Data conversion components](DataConversionComponents.md)**
 * **[4.4 Stream conversion components](StreamConversionComponents.md)**
+* **[4.5 Validation components](ValidationComponents.md)**
 
 The set of **[core components](CoreComponents.md)** provided in this release is as follows;
 * **eve** is the event distributing utility. Based on the number of events in the input and the number of processes specified as a parameter, eve outputs subsets of the events as a stream. The output streams into getmodel.
@@ -44,7 +45,9 @@ The files required for the output components are shown in Figure 2.
 
 The **[data conversion components](DataConversionComponents.md)** section covers the formats of all of the required data files and explains how to convert data in csv format into binary format, and vice versa.
 
-Finally, the **[stream conversion components](StreamConversionComponents.md)** section explains how to convert the binary data stream output to csv, plus how to convert gulcalc data in csv format into binary format. These components are useful when working with individual components at a more detailed level.
+The **[stream conversion components](StreamConversionComponents.md)** section explains how to convert the binary data stream output to csv, plus how to convert gulcalc data in csv format into binary format. These components are useful when working with individual components at a more detailed level.
+
+The **[validation components](ValidationComponents.md)** section explains how to use the validation components to check the validity of the static and input files in csv format, before they are converted to binary format. There are both validation checks on individual files and cross checks for consistency across files.
 
 The version of the installed components can be found by using the command line parameter -v. For example;
 

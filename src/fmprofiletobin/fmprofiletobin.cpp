@@ -55,10 +55,12 @@ namespace fmprofiletobin {
 		fgets(line, sizeof(line), stdin);	// skip header
 		lineno++;
 		while (fgets(line, sizeof(line), stdin) != 0) {
-			if (sscanf(line, "%d,%d,%d,%f,%f,%f,%f,%f,%f,%f,%f", &q.profile_id,
-				&q.step_id,&q.calcrule_id, &q.trigger_start, &q.trigger_end,
-				&q.payout_start, &q.payout_end, &q.limit1, &q.limit2,
-				&q.scale1, &q.scale2) != 11) {
+			if (sscanf(line, "%d,%d,%f,%f,%f,%f,%f,%f,%f,%f,%d,%f,%f,%f,%f,%f,%f,%f", &q.profile_id,
+				&q.calcrule_id, &q.deductible1, &q.deductible2,
+                &q.deductible3, &q.attachment, &q.limit1, &q.share1,
+                &q.share2, &q.share3, &q.step_id, &q.trigger_start, &q.trigger_end,
+				&q.payout_start, &q.payout_end, &q.limit2,
+				&q.scale1, &q.scale2) != 18) {
 				fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
 				return;
 			}

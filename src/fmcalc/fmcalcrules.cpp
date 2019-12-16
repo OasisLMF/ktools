@@ -83,12 +83,13 @@ void applycalcrule_stepped(const profile_rec_new& profile, LossRec& x, int layer
 		if (profile.step_id == 1) {
 				x.step_loss = loss;
 			}			
-			if (isLast == true) {
-				x.loss = x.step_loss + loss;
+		else {
+			x.step_loss = x.step_loss + loss;
+		}
+		if (isLast == true) {
+				x.loss = x.step_loss;
 			}
-			else {
-				x.step_loss = x.step_loss + loss;
-			}					
+				
 				
 	}
 	break;
@@ -129,13 +130,13 @@ void applycalcrule_stepped(const profile_rec_new& profile, LossRec& x, int layer
 			else loss = 0;	
 			if (profile.step_id == 1) {
 				x.step_loss = loss;
-			}			
-			if (isLast == true) {
-				x.loss = x.step_loss + loss;
 			}
 			else {
 				x.step_loss = x.step_loss + loss;
-			}					
+			}
+			if (isLast == true) {
+				x.loss = x.step_loss;
+			}
 		}
 		break;
 		case 29:
@@ -143,13 +144,13 @@ void applycalcrule_stepped(const profile_rec_new& profile, LossRec& x, int layer
 			OASIS_FLOAT loss = 0;
 			if (profile.step_id == 1) {
 				x.step_loss = loss;
-			}			
-			if (isLast == true) {
-				x.loss = x.step_loss + loss;
 			}
 			else {
 				x.step_loss = x.step_loss + loss;
-			}					
+			}
+			if (isLast == true) {
+				x.loss = x.step_loss;
+			}
 		}
 		break;
 		case 100:	// noop

@@ -586,8 +586,8 @@
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">-1</td>
-<td align="left">numerical integration mean loss</td>
+<td align="left">-3</td>
+<td align="left">maximum exposure value</td>
 <td>required</td>
 </tr>
 <tr class="even">
@@ -596,13 +596,15 @@
 <td>optional</td>
 </tr>
 <tr class="odd">
-<td align="left">-3</td>
-<td align="left">maximum exposure value</td>
+<td align="left">-1</td>
+<td align="left">numerical integration mean loss</td>
 <td>required</td>
 </tr>
 </tbody>
 </table>
-<p>sidx -1 to -3 must come at the beginning of the data packet before the other samples.</p>
+<p>sidx -3 to -1 must come at the beginning of the data packet before the other samples.<br />
+Note: because exposure value (sidx = -3) is state information used by the other samples it must be the first<br />
+sidx in the stream.</p>
 <p><a href="#specification">Return to top</a></p>
 <h3 id="summary-stream">summary stream <a id="summary"></a></h3>
 <p>Stream header packet structure</p>

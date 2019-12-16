@@ -11,12 +11,13 @@
 <p><img src="../img/banner.jpg" title="banner" alt="alt text" /></p>
 <h1 id="reference-model-overview">4. Reference Model Overview <a id="referencemodel"></a></h1>
 <p>This section provides an overview of the reference model, which is an implementation of each of the components in the framework.</p>
-<p>There are four sub-sections which cover the usage and internal processes of each of the reference components;</p>
+<p>There are five sub-sections which cover the usage and internal processes of each of the reference components;</p>
 <ul>
 <li><strong><a href="CoreComponents.html">4.1 Core components</a></strong></li>
 <li><strong><a href="OutputComponents.html">4.2 Output components</a></strong></li>
 <li><strong><a href="DataConversionComponents.html">4.3 Data conversion components</a></strong></li>
 <li><strong><a href="StreamConversionComponents.html">4.4 Stream conversion components</a></strong></li>
+<li><strong><a href="ValidationComponents.html">4.5 Validation components</a></strong></li>
 </ul>
 <p>The set of <strong><a href="CoreComponents.html">core components</a></strong> provided in this release is as follows;</p>
 <ul>
@@ -44,7 +45,8 @@
 <h5 id="figure-2.-output-workflows-and-required-data">Figure 2. Output workflows and required data</h5>
 <p><img src="../img/outputsrequireddata.jpg" title="Output workflows and required data" alt="alt text" /></p>
 <p>The <strong><a href="DataConversionComponents.html">data conversion components</a></strong> section covers the formats of all of the required data files and explains how to convert data in csv format into binary format, and vice versa.</p>
-<p>Finally, the <strong><a href="StreamConversionComponents.html">stream conversion components</a></strong> section explains how to convert the binary data stream output to csv, plus how to convert gulcalc data in csv format into binary format. These components are useful when working with individual components at a more detailed level.</p>
+<p>The <strong><a href="StreamConversionComponents.html">stream conversion components</a></strong> section explains how to convert the binary data stream output to csv, plus how to convert gulcalc data in csv format into binary format. These components are useful when working with individual components at a more detailed level.</p>
+<p>The <strong><a href="ValidationComponents.html">validation components</a></strong> section explains how to use the validation components to check the validity of the static and input files in csv format, before they are converted to binary format. There are both validation checks on individual files and cross checks for consistency across files.</p>
 <p>The version of the installed components can be found by using the command line parameter -v. For example;</p>
 <pre><code>$ gulcalc -v
 gulcalc : version: 3.0.7</code></pre>

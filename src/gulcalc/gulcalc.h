@@ -127,6 +127,7 @@ private:
 	std::vector<std::vector<OASIS_FLOAT>> cov_;
 	std::vector<std::vector<std::vector<gulItemIDLoss>>> mode1_;
 	std::vector<std::vector<std::vector<gulItemIDLoss>>> fullCorr_;
+	std::vector<int> mode1UsedCoverageIDs_;
 	void covoutputgul(gulcoverageSampleslevel &gc);
 	void outputcoveragedata(int event_id);
 	void outputmode1data(int event_id);

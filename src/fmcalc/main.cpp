@@ -144,17 +144,19 @@ int main(int argc, char* argv[])
 #endif
 
 	if (allocrule < 0 || allocrule > 3) {
-		fprintf(stderr, "%s: Invalid allocrule %d\n", progname,allocrule);
+		fprintf(stderr, "FATAL:%s: Invalid allocrule %d\n", progname,allocrule);
 		exit(EXIT_FAILURE);
 	}
 
 	try {
 		initstreams("", "");
+		fprintf(stderr, "INFO:%s: starting process..\n", progname);
 		fmcalc fc(new_max, allocrule, inputpath, netvalue,debug, allocruleOptimizationOff, generalOptimization,stepped);
 		fc.doit();
+		fprintf(stderr, "INFO:%s: finishing process..\n", progname);
 	}
 	catch (const std::bad_alloc &a) {
-		fprintf(stderr, "%s: bad_alloc: %s\n", progname, a.what());
+		fprintf(stderr, "FATAL:%s: bad_alloc: %s\n", progname, a.what());
 		exit(EXIT_FAILURE);
 	}
 

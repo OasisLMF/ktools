@@ -41,6 +41,8 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include "../wingetopt/wingetopt.h"
 #else
 #include <unistd.h>
+#include <signal.h>
+#include <string.h>
 #endif
 
 #include "gulcalc.h"
@@ -51,6 +53,13 @@ bool verbose = false;
 
 char *progname;
 
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+void segfault_sigaction(int signal, siginfo_t* si, void* arg)
+{
+	fprintf(stderr, "%s: Segment fault at address: %p\n", progname, si->si_addr);
+	exit(EXIT_FAILURE);
+}
+#endif
 
 void help()
 {
@@ -133,12 +142,24 @@ int main(int argc, char *argv[])
 			exit(EXIT_FAILURE);
 		}
 	}
-	
+
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+	struct sigaction sa;
+
+	memset(&sa, 0, sizeof(struct sigaction));
+	sigemptyset(&sa.sa_mask);
+	sa.sa_sigaction = segfault_sigaction;
+	sa.sa_flags = SA_SIGINFO;
+
+	sigaction(SIGSEGV, &sa, NULL);
+#endif
+
 	if (gopt.itemLevelOutput == true) {
 		if (gopt.item_output == "-") gopt.itemout = stdout;
 		else gopt.itemout = fopen(gopt.item_output.c_str(), "wb");
 	}
 	if (gopt.coverageLevelOutput == true) {
+		gopt.mode = 0;	// mode is always zero for coverage level output -c is to be deprecated
 		if (gopt.coverage_output == "-") gopt.covout = stdout;
 		else gopt.covout = fopen(gopt.coverage_output.c_str(), "wb");
 	}
@@ -162,9 +183,11 @@ int main(int argc, char *argv[])
 
 	try {
 		initstreams();
+		fprintf(stderr, "INFO:%s: starting process..\n", progname);
 		doit(gopt);
+		fprintf(stderr, "INFO:%s: finishing process..\n", progname);
 	}catch (std::bad_alloc) {
-			fprintf(stderr, "%s: Memory allocation failed\n", progname);
+			fprintf(stderr, "FATAL:%s: Memory allocation failed\n", progname);
 			exit(EXIT_FAILURE);
 	}
 

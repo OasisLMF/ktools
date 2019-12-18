@@ -50,6 +50,8 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include "summarycalc.h"
 #include <string>
 
+char* progname;
+
 void help()
 {
 
@@ -77,6 +79,7 @@ void help()
 */
 int main(int argc, char* argv[])
 {
+	progname = argv[0];
 	int opt;
 	bool noneOutputTrue = true;
 	int truecount = 0;
@@ -134,17 +137,21 @@ int main(int argc, char* argv[])
 	}
 
 	if (truecount == 0 ) {
-		std::cerr << "no input type selected\n Please use -g or -f or -i or -c\n";
-		return -1;
+		fprintf(stderr, "FATAL:%s No input type selected\n Please use -g or -f or -i or -c\n", progname);
+		return EXIT_FAILURE;
 	}
 	if (truecount > 1) {
-		std::cerr << "Only one input type can be selected from -g or -f or -i or -c\n";
-		return -1;
+		fprintf(stderr, "FATAL:%s Only one input type can be selected from -g or -f or -i or -c\n", progname);
+		return EXIT_FAILURE;
 	}
 
-	if (noneOutputTrue) return -1; // no output stream so nothing to do...
-	
-	f.doit();
-	return EXIT_SUCCESS;
+	if (noneOutputTrue) return EXIT_FAILURE; // no output stream so nothing to do...
+	try {
+		f.doit();
+		return EXIT_SUCCESS;
+	}catch (std::bad_alloc) {
+		fprintf(stderr, "FATAL:%s: Memory allocation failed\n", progname);
+		exit(EXIT_FAILURE);
+	}
 
 }

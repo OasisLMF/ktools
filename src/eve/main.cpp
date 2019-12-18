@@ -144,7 +144,6 @@ int main(int argc, char *argv[]) {
         fprintf(stderr, "INFO:%s: starting part no: %d total: %d shuffle: %d\n", progname, pno, total, shuffle);
         eve::emitevents(pno, total, shuffle, textmode);
         fprintf(stderr, "INFO:%s: finishing part no: %d\n", progname, pno);
-
     } catch (std::bad_alloc) {
         fprintf(stderr, "FATAL:%s: Memory allocation failed\n", progname);
         exit(EXIT_FAILURE);

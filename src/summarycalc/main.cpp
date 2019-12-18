@@ -147,7 +147,9 @@ int main(int argc, char* argv[])
 
 	if (noneOutputTrue) return EXIT_FAILURE; // no output stream so nothing to do...
 	try {
+		fprintf(stderr, "INFO:%s: starting process..\n", progname);
 		f.doit();
+		fprintf(stderr, "INFO:%s: finishing process..\n", progname);
 		return EXIT_SUCCESS;
 	}catch (std::bad_alloc) {
 		fprintf(stderr, "FATAL:%s: Memory allocation failed\n", progname);

@@ -43,7 +43,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <string>
 #include <stdlib.h>
 #include <stdarg.h>
-#include <process.h>
+
 
 #include "../../config.h"
 #ifdef __unix 
@@ -51,13 +51,16 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #endif
 
 #if defined(_MSC_VER) || defined(__MINGW32__)
+#include <process.h>
 #include <fcntl.h>
 #include <io.h>
 #define flseek _fseeki64
 #define fltell _ftelli64
+#define GETPID _getpid
 #else
 #define flseek fseek
 #define fltell ftell
+#define GETPID getpid
 #endif 
 
 // Slowly where applicable we will replace int and OASIS_FLOAT references with
@@ -348,8 +351,8 @@ inline  void logprintf(const std::string &program_name,const std::string &msgtyp
 	
 	std::string base = base_name(program_name);
 	base = remove_extension(base_name(base));
-	std::string b2 = base + ":" + std::to_string(_getpid());
-	base = "log/" + base + "_" + std::to_string(_getpid()) + ".log";
+	std::string b2 = base + ":" + std::to_string(GETPID());
+	base = "log/" + base + "_" + std::to_string(GETPID()) + ".log";
 
 	FILE* fout = fopen(base.c_str(), "a");
 	if (fout != nullptr) {

@@ -42,6 +42,8 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <sstream>
 #include <string>
 #include <stdlib.h>
+#include <stdarg.h>
+#include <process.h>
 
 #include "../../config.h"
 #ifdef __unix 
@@ -327,6 +329,38 @@ inline void initstreams(std::string inFile="", std::string outFile="")
 	freopen(NULL, "rb", stdin);
 #endif
 
+}
+
+template<class T>
+T base_name(T const& path, T const& delims = "/\\")
+{
+	return path.substr(path.find_last_of(delims) + 1);
+}
+template<class T>
+T remove_extension(T const& filename)
+{
+	typename T::size_type const p(filename.find_last_of('.'));
+	return p > 0 && p != T::npos ? filename.substr(0, p) : filename;
+}
+
+inline  void logprintf(const std::string &program_name,const std::string &msgtype,const char* format, ...)
+{
+	
+	std::string base = base_name(program_name);
+	base = remove_extension(base_name(base));
+	std::string b2 = base + ":" + std::to_string(_getpid());
+	base = "log/" + base + "_" + std::to_string(_getpid()) + ".log";
+
+	FILE* fout = fopen(base.c_str(), "a");
+	if (fout != nullptr) {
+		fprintf(fout, "%s:%s:",msgtype.c_str(),b2.c_str());
+		va_list args;
+		va_start(args, format);
+		vfprintf(fout, format, args);
+		va_end(args);
+		fclose(fout);
+	}
+	
 }
 
 #define PIPE_DELAY	1000

@@ -150,10 +150,10 @@ int main(int argc, char* argv[])
 
 	try {
 		initstreams("", "");
-		fprintf(stderr, "INFO:%s: starting process..\n", progname);
+		logprintf(progname, "INFO", "starting process..\n");
 		fmcalc fc(new_max, allocrule, inputpath, netvalue,debug, allocruleOptimizationOff, generalOptimization,stepped);
 		fc.doit();
-		fprintf(stderr, "INFO:%s: finishing process..\n", progname);
+		logprintf(progname, "INFO", "finishing process..\n");
 	}
 	catch (const std::bad_alloc &a) {
 		fprintf(stderr, "FATAL:%s: bad_alloc: %s\n", progname, a.what());

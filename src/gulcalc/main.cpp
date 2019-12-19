@@ -183,9 +183,9 @@ int main(int argc, char *argv[])
 
 	try {
 		initstreams();
-		fprintf(stderr, "INFO:%s: starting process..\n", progname);
+		logprintf(progname, "INFO", "starting process..\n");
 		doit(gopt);
-		fprintf(stderr, "INFO:%s: finishing process..\n", progname);
+		logprintf(progname, "INFO", "finishing process..\n");
 	}catch (std::bad_alloc) {
 			fprintf(stderr, "FATAL:%s: Memory allocation failed\n", progname);
 			exit(EXIT_FAILURE);

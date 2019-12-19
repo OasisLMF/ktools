@@ -1,6 +1,12 @@
 Ktools Changelog
 ================
 
+## [v3.2.1](https://github.com/OasisLMF/ktools/releases/tag/v3.2.1)
+* Added logging for modules to `<run-dir>/log` directory
+* Added deductible to calcrule 28
+* Added stepped calcrules 29, 14, 100
+* Fixes for calcrules 27 and 28
+
 ## [v3.2.0](https://github.com/OasisLMF/ktools/releases/tag/v3.2.0)
 * Added correlated run feature to Gulcalc
 * Added fmcalc allocation rule 2 and 3

@@ -10,7 +10,7 @@ TAR_TARGET='Darwin_x86_64.tar.gz'
 
 # Config
 ./autogen.sh
-./configure --enable-o3 --prefix=$BIN_TARGET 
+./configure --enable-osx --enable-o3 --prefix=$BIN_TARGET 
 
 # Build
 make check

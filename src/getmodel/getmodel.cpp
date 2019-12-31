@@ -343,7 +343,12 @@ void getmodel::doCdf(int event_id) {
 #ifndef _MSC_VER
 void getmodel::doCdfInnerz(int event_id) {
   auto sizeof_EventKey = sizeof(EventRow);
-  auto fin = fopen(ZFOOTPRINT_FILE, "rb");
+  std::string filename = ZFOOTPRINT_FILE;
+  FILE *fin = fopen(filename.c_str(), "rb");
+  if (fin == nullptr) {
+      fprintf(stderr, "%s: cannot open %s\n", __func__, filename.c_str());
+      exit(EXIT_FAILURE);
+  }
   auto intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);   
   bool do_cdf_for_area_peril = false;
   intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);
@@ -395,7 +400,7 @@ void getmodel::doCdfInnerz(int event_id) {
 void getmodel::doCdfInner(int event_id) {
   auto sizeof_EventKey = sizeof(EventRow);
   auto fin = fopen(FOOTPRINT_FILE, "rb");
-  if (fin == NULL){
+  if (fin == nullptr){
       fprintf(stderr,"Error opening footprint file\n");
       exit(-1);
   }
@@ -441,6 +446,10 @@ void getmodel::doCdfInner(int event_id) {
 void getmodel::doCdfInnerNoIntensityUncertaintyz(int event_id) {
   auto sizeof_EventKey = sizeof(EventRow);
   FILE *fin = fopen(ZFOOTPRINT_FILE, "rb");
+  if (fin == NULL) {
+      fprintf(stderr, "Error opening footprint file\n");
+      exit(-1);
+  }
   if (_event_index_by_event_id.count(event_id) == 0)
     return;
   flseek(fin, _event_index_by_event_id[event_id].offset, 0);
@@ -482,7 +491,10 @@ void getmodel::doCdfInnerNoIntensityUncertainty(int event_id) {
     return;
 
   auto fin = fopen(FOOTPRINT_FILE, "rb");
-
+  if (fin == NULL) {
+      fprintf(stderr, "Error opening footprint file\n");
+      exit(-1);
+  }
   flseek(fin, _event_index_by_event_id[event_id].offset, SEEK_SET);
 
   int number_of_event_records = static_cast<int>(

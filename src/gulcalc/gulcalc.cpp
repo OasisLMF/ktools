@@ -229,6 +229,7 @@ void gulcalc::outputmode1data(int event_id)
 }
 void gulcalc::outputcoveragedata(int event_id)
 {
+	if (opt_.coverageLevelOutput == false) return;
 	for (int j = 1; j < cov_.size(); j++) {
 		if (cov_[j].size() > 0) {
 			gulcoverageSampleslevel gc;
@@ -652,17 +653,20 @@ damagecdfrec *d = (damagecdfrec *)rec;
 			OASIS_FLOAT std_dev;
 			OASIS_FLOAT gul_mean;
 			OASIS_FLOAT tiv = (*coverages_)[iter->coverage_id];
-			output_mean(*iter, tiv, pp, *bin_count, gul_mean, std_dev);			
-			gx.loss = gul_mean;
-			gc.loss = gul_mean;
-			gx.sidx = mean_idx;
-			gc.sidx = mean_idx;
-			itemoutputgul(gx);
-			gencovoutput(gc);
+			output_mean(*iter, tiv, pp, *bin_count, gul_mean, std_dev);
+			gx.sidx = tiv_idx;
+			gx.loss = tiv;
+			itemoutputgul(gx);			
 			gx.loss = std_dev;
 			gc.loss = std_dev;
 			gx.sidx = std_dev_idx;
 			gc.sidx = std_dev_idx;
+			itemoutputgul(gx);
+			gencovoutput(gc);
+			gx.loss = gul_mean;
+			gc.loss = gul_mean;
+			gx.sidx = mean_idx;
+			gc.sidx = mean_idx;
 			itemoutputgul(gx);
 			gencovoutput(gc);
 			int ridx = 0; // dummy value		

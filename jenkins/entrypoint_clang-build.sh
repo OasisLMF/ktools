@@ -11,7 +11,7 @@ mkdir -p $(dirname $LOG_BUILD)
 mkdir -p $(dirname $TAR_TARGET)
 
 ./autogen.sh
-./configure --enable-static --prefix=$BIN_TARGET
+./configure --enable-o3 --enable-static --prefix=$BIN_TARGET
 make clean 
 make check | tee /tmp/log/ktools-build.log
 

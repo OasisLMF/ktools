@@ -136,7 +136,7 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 					if (iter->item_idx) {
 						if (iter->item_prop == nullptr) {
 							iter->item_prop = std::make_shared<std::vector<OASIS_FLOAT>>(std::vector<OASIS_FLOAT>((iter->item_idx)->size(), 0));
-							iter->limit_surplus = 567;
+							//iter->limit_surplus = 567;
 						}
 						else {
 							(iter->item_prop)->resize((iter->item_idx)->size(), 0);
@@ -222,7 +222,7 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 						else {
 							if (iter->item_idx) {
 								iter->item_prop = previous_agg_vec[agg_vec_idx].item_prop;
-								iter->limit_surplus = 5678;
+								//iter->limit_surplus = 5678;
 							}
 						}
 					}
@@ -413,7 +413,7 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 	if (allocrule_ == 3) {
 		const std::vector<OASIS_FLOAT>& guls = event_guls[gul_idx];		
 		if (gul_idx == 0) compute_item_proportions(agg_vecs, guls, level, layer, previous_layer_id, true);
-		else compute_item_proportions(agg_vecs, guls, level, layer, previous_layer_id, true);
+		else              compute_item_proportions(agg_vecs, guls, level, layer, previous_layer_id, true);
 	}
 
 	if (level == max_level) {

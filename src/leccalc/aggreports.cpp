@@ -137,7 +137,7 @@ void aggreports::loadreturnperiods()
 
 	FILE *fin = fopen(RETURNPERIODS_FILE, "rb");
 	if (fin == NULL) {
-		fprintf(stderr, "%s: Error opening file %s\n", __func__, RETURNPERIODS_FILE);
+		fprintf(stderr, "FATAL: Error opening file %s\n", RETURNPERIODS_FILE);
 		exit(-1);
 	}
 
@@ -151,7 +151,7 @@ void aggreports::loadreturnperiods()
 
 	if (returnperiods_.size() == 0) {
 		useReturnPeriodFile_ = false;
-		std::cerr << __func__ << ": No return periods loaded - running without defined return periods option\n";
+		// std::cerr << __func__ << ": No return periods loaded - running without defined return periods option\n";
 	}
 }
 

@@ -56,7 +56,7 @@ Author: Ben Matharu  email : ben.matharu@oasislmf.org
 char* progname;
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
 void segfault_sigaction(int signal, siginfo_t* si, void* arg) {
-	fprintf(stderr, "%s: Segment fault at address: %p\n", progname,
+	fprintf(stderr, "FATAL: %s Segment fault at address: %p\n", progname,
 		si->si_addr);
 	exit(EXIT_FAILURE);
 }
@@ -74,7 +74,7 @@ void openpipe(int output_id, const std::string& pipe, FILE** fout)
 		FILE* f = fopen(pipe.c_str(), "wb");
 		if (f != nullptr) fout[output_id] = f;
 		else {
-			fprintf(stderr, "%s: Cannot open %s for output\n", __func__, pipe.c_str());
+			fprintf(stderr, "FATAL: Cannot open %s for output\n", pipe.c_str());
 			::exit(-1);
 		}
 	}
@@ -157,7 +157,7 @@ int main(int argc, char* argv[])
 	}
 
 	if (argc == 1) {
-		fprintf(stderr, "Invalid parameters\n");
+		fprintf(stderr, "FATAL: Invalid parameters\n");
 		help();
 	}
 
@@ -178,7 +178,7 @@ int main(int argc, char* argv[])
 		leccalc::doit(subfolder, fout, useReturnPeriodFile, skipheader);
 		return EXIT_SUCCESS;
 	}catch (std::bad_alloc) {
-		fprintf(stderr, "%s: Memory allocation failed\n", progname);
+		fprintf(stderr, "FATAL:: %s: Memory allocation failed\n", progname);
 		exit(EXIT_FAILURE);
 	}
 	

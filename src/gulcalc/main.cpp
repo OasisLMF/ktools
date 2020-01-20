@@ -56,7 +56,7 @@ char *progname;
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
 void segfault_sigaction(int signal, siginfo_t* si, void* arg)
 {
-	fprintf(stderr, "%s: Segment fault at address: %p\n", progname, si->si_addr);
+	fprintf(stderr, "FATAL: %s: Segment fault at address: %p\n", progname, si->si_addr);
 	exit(EXIT_FAILURE);
 }
 #endif
@@ -166,26 +166,26 @@ int main(int argc, char *argv[])
 	if(gopt.correlatedLevelOutput == true) {
 		gopt.corrout = fopen(gopt.correlated_output.c_str(), "wb");
 		if(gopt.corrout == NULL) {
-			fprintf(stderr, "Correlated output file name must be specified\n");
+			fprintf(stderr, "FATAL: Correlated output file name must be specified\n");
 			exit(EXIT_FAILURE);
 		}
 	}
 
 	if (gopt.itemLevelOutput == false && gopt.coverageLevelOutput == false) {
-		fprintf(stderr, "%s: No output option selected\n", argv[0]);
+		fprintf(stderr, "FATAL: S%s: No output option selected\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}	
 
 	if (gopt.mode > 1 || gopt.mode < 0) {
-		fprintf(stderr, "%s: Invalid mode %d valid modes are 0 and 1\n", argv[0],gopt.mode);
+		fprintf(stderr, "FATAL:%s: Invalid mode %d valid modes are 0 and 1\n", argv[0],gopt.mode);
 		exit(EXIT_FAILURE);
 	}
 
 	try {
 		initstreams();
-		logprintf(progname, "INFO", "starting process..\n");
+		//logprintf(progname, "INFO", "starting process..\n");
 		doit(gopt);
-		logprintf(progname, "INFO", "finishing process..\n");
+		//logprintf(progname, "INFO", "finishing process..\n");
 	}catch (std::bad_alloc) {
 			fprintf(stderr, "FATAL:%s: Memory allocation failed\n", progname);
 			exit(EXIT_FAILURE);

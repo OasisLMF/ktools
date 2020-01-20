@@ -15,7 +15,7 @@ bool getdamagebindictionary(std::vector<damagebindictionary> &damagebindictionar
 
 	FILE *fin = fopen(DAMAGE_BIN_DICT_FILE, "rb");
 	if (fin == NULL) {
-		fprintf(stderr, "%s: cannot open %s\n", __func__, DAMAGE_BIN_DICT_FILE);
+		fprintf(stderr, "FATAL: %s: cannot open %s\n", __func__, DAMAGE_BIN_DICT_FILE);
 		exit(-1);
 	}
 
@@ -26,7 +26,7 @@ bool getdamagebindictionary(std::vector<damagebindictionary> &damagebindictionar
 	unsigned int nrec = static_cast<unsigned int>(sz / sizeof(damagebindictionary));
 	damagebindictionary *s1 = new damagebindictionary[nrec];
 	if (fread(s1, sizeof(damagebindictionary), nrec, fin) != nrec) {
-		fprintf(stderr, "%s: Error reading file %s\n", __func__, DAMAGE_BIN_DICT_FILE);
+		fprintf(stderr, "FATAL: %s: Error reading file %s\n", __func__, DAMAGE_BIN_DICT_FILE);
 		exit(-1);
 	}
 	damagebindictionary_vec_.clear();
@@ -45,7 +45,7 @@ bool getitems(std::map<item_map_key, std::vector<item_map_rec> > &item_map)
 
 	FILE *fin = fopen(ITEMS_FILE, "rb");
 	if (fin == NULL) {
-		fprintf(stderr, "%s: cannot open %s\n", __func__, ITEMS_FILE);
+		fprintf(stderr, "FATAL: %s: cannot open %s\n", __func__, ITEMS_FILE);
 		exit(-1);
 	}
 
@@ -81,7 +81,7 @@ void getcoverages(std::vector<OASIS_FLOAT> &coverages)
 {
 	FILE *fin = fopen(COVERAGES_FILE, "rb");
 	if (fin == NULL) {
-		fprintf(stderr, "%s: Error reading file %s\n", __func__, COVERAGES_FILE);
+		fprintf(stderr, "FATAL: %s: Error reading file %s\n", __func__, COVERAGES_FILE);
 		exit(-1);
 	}
 
@@ -154,7 +154,7 @@ void doit(const gulcalcopts &opt)
 	int stream_type = 0;
 	bool bSuccess = getrec((char *)&stream_type, stdin, sizeof(stream_type));
 	if (bSuccess == false) {
-		cerr << "gulcalc: Error no stream type returned\n";
+		cerr << "FATAL: gulcalc: Error no stream type returned\n";
 		return; // exit thread if failed
 	}
 

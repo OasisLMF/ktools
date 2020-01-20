@@ -128,7 +128,7 @@ int main(int argc, char* argv[])
 		return EXIT_SUCCESS;
 	}
 	catch (std::bad_alloc) {
-		fprintf(stderr, "%s: Memory allocation failed\n", progname);
+		fprintf(stderr, "FATAL: %s: Memory allocation failed\n", progname);
 		exit(EXIT_FAILURE);
 	}
 

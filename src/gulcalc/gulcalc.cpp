@@ -565,7 +565,7 @@ void gulcalc::processrec_mode1(char* rec, int recsize)
 			}
 			break;
 			default:
-				fprintf(stderr, "%s: Unknown random number option\n", __func__);
+				fprintf(stderr, "FATAL: %s: Unknown random number option\n", __func__);
 				exit(-1);
 			}
 
@@ -594,7 +594,7 @@ void gulcalc::processrec_mode1(char* rec, int recsize)
 				bool hit_rval0 = false;
 				for (int bin_index = 0; bin_index < *bin_count; bin_index++) {
 					if ((char*)pp > endofRec) {
-						cerr << "Reached end of record"
+						cerr << "FATAL: Reached end of record"
 							; // this is an error condition
 						pp--;
 					}
@@ -686,7 +686,7 @@ damagecdfrec *d = (damagecdfrec *)rec;
 				}
 				break;
 			default:
-				fprintf(stderr, "%s: Unknown random number option\n", __func__);
+				fprintf(stderr, "FATAL: %s: Unknown random number option\n", __func__);
 				exit(-1);
 			}
 
@@ -703,7 +703,7 @@ damagecdfrec *d = (damagecdfrec *)rec;
 				pp = (prob_mean *)b;
 				for (int bin_index = 0; bin_index < *bin_count; bin_index++){
 					if ((char *)pp > endofRec) {
-						cerr << "Reached end of record"
+						cerr << "FATAL: Reached end of record"
 							; // this is an error condition
 						pp--;
 					}

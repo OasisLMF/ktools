@@ -688,7 +688,7 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 	std::vector<int> &aggid_to_vectorlookup = aggid_to_vectorlookups[level];	
 	int size = level_to_maxagg_id_[level];
 	if (size == -1) {
-		fprintf(stderr, "Error: Possible level %d not initialized\n", level);
+		fprintf(stderr, "FATAL: Error: Possible level %d not initialized\n", level);
 		exit(-1);
 	}
 	else {
@@ -731,7 +731,7 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 			std::vector<int> &zzaggid_to_vectorlookup = aggid_to_vectorlookups[zzlevel]; // 
 			int size = level_to_maxagg_id_[zzlevel];
 			if (size == -1) {
-				fprintf(stderr, "Error: Possible level %d not initialized\n", zzlevel);
+				fprintf(stderr, "FATAL:Error possible level %d not initialized\n", zzlevel);
 				exit(-1);
 			}
 			else {
@@ -866,7 +866,7 @@ void fmcalc::parse_policytc(std::vector< fm_policyTC> &p)
 	fin = fopen(file.c_str(), "rb");
 
 	if (fin == NULL) {
-		fprintf(stderr, "%s: cannot open %s\n", __func__, file.c_str());
+		fprintf(stderr, "FATAL: %s: cannot open %s\n", __func__, file.c_str());
 		exit(EXIT_FAILURE);
 	}
 	fm_policyTC f;
@@ -953,7 +953,7 @@ void fmcalc::init_programme(int maxRunLevel)
 	}
 	fin = fopen(file.c_str(), "rb");
 	if (fin == NULL){
-		fprintf(stderr, "%s: cannot open %s\n", __func__, file.c_str());
+		fprintf(stderr, "FATAL: %s: cannot open %s\n", __func__, file.c_str());
 		exit(EXIT_FAILURE);
 	}
 
@@ -989,7 +989,7 @@ void fmcalc::init_programme(int maxRunLevel)
             }
             pfm_vec_vec_[f.level_id][f.from_agg_id] = f.to_agg_id;
             if (f.to_agg_id == 0) {
-                fprintf(stderr, "Invalid agg id from fm_programme.bin\n");
+                fprintf(stderr, "FATAL: Invalid agg id from fm_programme.bin\n");
             }
         }
 		i = fread(&f, sizeof(f), 1, fin);
@@ -1008,7 +1008,7 @@ bool fmcalc::loadcoverages(std::vector<OASIS_FLOAT> &coverages)
 	}
 	fin = fopen(file.c_str(), "rb");
 	if (fin == NULL) {
-		fprintf(stderr, "%s: cannot open %s\n", __func__, file.c_str());
+		fprintf(stderr, "FATAL: %s: cannot open %s\n", __func__, file.c_str());
 		exit(EXIT_FAILURE);
 	}
 	
@@ -1044,7 +1044,7 @@ void fmcalc::init_itemtotiv()
 	}
 	fin = fopen(file.c_str(), "rb");
 	if (fin == NULL) {
-		fprintf(stderr, "%s: cannot open %s\n", __func__, file.c_str());
+		fprintf(stderr, "FATAL: %s: cannot open %s\n", __func__, file.c_str());
 		exit(EXIT_FAILURE);
 	}
 
@@ -1060,7 +1060,7 @@ void fmcalc::init_itemtotiv()
 	while (i != 0) {
 		last_item_id++;
 		if (itm.id != last_item_id) {
-			fprintf(stderr, "Item ids are not contiguous or do not start from one");
+			fprintf(stderr, "FATAL: Item ids are not contiguous or do not start from one");
 			exit(-1);
 		}
 		last_item_id = itm.id;
@@ -1081,7 +1081,7 @@ void fmcalc::init_fmxref()
 	}
 	fin = fopen(file.c_str(), "rb");
 	if (fin == NULL) {
-		fprintf(stderr, "%s: cannot open %s\n", __func__, file.c_str());
+		fprintf(stderr, "FATAL: %s: cannot open %s\n", __func__, file.c_str());
 		exit(EXIT_FAILURE);
 	}
 

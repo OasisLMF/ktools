@@ -47,7 +47,7 @@ void getRands::userandfile()
 {
 	FILE *fin = fopen(RANDOM_FILE, "rb");
 	if (fin == NULL) {
-		fprintf(stderr, "%s: Error opening file %s\n", __func__, RANDOM_FILE);
+		fprintf(stderr, "FATAL: %s: Error opening file %s\n", __func__, RANDOM_FILE);
 		exit(-1);
 	}
 	flseek(fin, 0L, SEEK_END);
@@ -58,7 +58,7 @@ void getRands::userandfile()
 
 	buf_ = new OASIS_FLOAT[buffersize_];
 	if (fread(buf_, sizeof(OASIS_FLOAT), buffersize_, fin) != buffersize_) {
-		fprintf(stderr, "%s: Error reading random number file\n", __func__);
+		fprintf(stderr, "FATAL: %s: Error reading random number file\n", __func__);
 		exit(-1);
 	}
 	fclose(fin);
@@ -81,7 +81,7 @@ getRands::getRands(rd_option rndopt, int rand_vec_size,int rand_seed) : gen_(tim
 			// nothing to do
 			break;
 		default:
-			fprintf(stderr, "%s: Unknow random number option\n", __func__);
+			fprintf(stderr, "FATAL: %s: Unknow random number option\n", __func__);
 			exit(-1);
 	}
 	

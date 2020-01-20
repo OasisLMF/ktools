@@ -74,7 +74,7 @@ void help()
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
 void segfault_sigaction(int signal, siginfo_t *si, void *arg)
 {
-	fprintf(stderr, "%s: Segment fault at address: %p\n", progname, si->si_addr);
+	fprintf(stderr, "FATAL: %s: Segment fault at address: %p\n", progname, si->si_addr);
 	exit(EXIT_FAILURE);
 }
 #endif
@@ -150,10 +150,8 @@ int main(int argc, char* argv[])
 
 	try {
 		initstreams("", "");
-		logprintf(progname, "INFO", "starting process..\n");
 		fmcalc fc(new_max, allocrule, inputpath, netvalue,debug, allocruleOptimizationOff, generalOptimization,stepped);
 		fc.doit();
-		logprintf(progname, "INFO", "finishing process..\n");
 	}
 	catch (const std::bad_alloc &a) {
 		fprintf(stderr, "FATAL:%s: bad_alloc: %s\n", progname, a.what());

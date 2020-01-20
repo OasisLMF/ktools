@@ -52,7 +52,7 @@ namespace eve {
     void readevents(std::vector<int> &events) {
         FILE *fin = fopen(EVENTS_FILE, "rb");
         if (fin == NULL) {
-            fprintf(stderr, "%s: %s: cannot open %s\n", progname, __func__,
+            fprintf(stderr, "FATAL: %s: %s: cannot open %s\n", progname, __func__,
                     EVENTS_FILE);
             exit(EXIT_FAILURE);
         }

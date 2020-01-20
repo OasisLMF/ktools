@@ -141,8 +141,7 @@ namespace leccalc {
 		unsigned int stream_type = 0;
 		size_t i = fread(&stream_type, sizeof(stream_type), 1, stdin);
 		if (i != 1 || isSummaryCalcStream(stream_type) != true) {
-			std::cerr << "FATAL:: Not a summarycalc stream ";
-			std::cerr << "invalid stream type: " << stream_type << "\n";
+			std::cerr << "FATAL:: Not a summarycalc stream invalid stream type: " << stream_type << "\n";
 			exit(-1);
 		}
 

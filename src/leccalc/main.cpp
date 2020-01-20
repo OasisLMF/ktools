@@ -178,7 +178,7 @@ int main(int argc, char* argv[])
 		leccalc::doit(subfolder, fout, useReturnPeriodFile, skipheader);
 		return EXIT_SUCCESS;
 	}catch (std::bad_alloc) {
-		fprintf(stderr, "FATAL:: %s: Memory allocation failed\n", progname);
+		fprintf(stderr, "FATAL: %s: Memory allocation failed\n", progname);
 		exit(EXIT_FAILURE);
 	}
 	

@@ -414,11 +414,19 @@ $ fmprogrammetocsv < fm_programme.bin > fm_programme.csv
 ***
 The fmprofile binary file contains the list of calculation rules with profile values (policytc_ids) that appear in the policytc file. This is required for fmcalc only. 
 
-This must be in the following location with filename format;
+There are two versions of this file and either one or the other can be used at a time.
+
+* fm_profile - original set of fields
+* fm_profile_step - extended set of fields to include step policy fields
+
+They must be in the following location with filename formats;
 * input/fm_profile.bin
+* input/fm_profile_step.bin
 
 ##### File format
 The csv file should contain the following fields and include a header row.
+
+**fm_profile**
 
 | Name                     | Type   |  Bytes | Description                                    | Example     |
 |:-------------------------|--------|--------| :----------------------------------------------|------------:|
@@ -433,19 +441,43 @@ The csv file should contain the following fields and include a header row.
 | share2                   | float  |    4   | Second proportional share                      |   0.25      |
 | share3                   | float  |    4   | Third proportional share                       |   1         |
 
+**fm_profile_step**
 
-* A reference table listing the valid values for calcrule_id and which of the fields are required is available in FM Profiles
-* All distinct policytc_id values that appear in the policytc table must appear once in the policytc_id field of the profile table. We suggest that policytc_id=1 is included by default using calcrule_id = 12 and deductible1 = 0 as a default 'null' calculation rule whenever no terms and conditions apply to a particular level_id / agg_id in the policytc table.
+| Name                     | Type   |  Bytes | Description                                    | Example     |
+|:-------------------------|--------|--------| :----------------------------------------------|------------:|
+| policytc_id              | int    |    4   | Primary key 						              |     34      |
+| calcrule_id              | int    |    4   | The calculation rule that applies to the terms |     12      |
+| deductible1              | int    |    4   | First deductible                               |    0.03     |
+| deductible2              | float  |    4   | Second deductible                              |   50000     |
+| deductible3              | float  |    4   | Third deductible                               |   100000    |
+| attachment1              | float  |    4   | Attachment point, or excess					  |   1000000   |
+| limit1				   | float  |    4   | First limit                                    |   5000000   |
+| share1                   | float  |    4   | First proportional share                       |   0.8       |
+| share2                   | float  |    4   | Second proportional share                      |   0.25      |
+| share3                   | float  |    4   | Third proportional share                       |   1         |
+| step_id                  | int    |    4   | Step number                                    |   1         |
+| trigger_start            | float  |    4   | Start trigger for payout                       |   0.05      |
+| trigger_end              | float  |    4   | End trigger for payout      		              |   0.15      |
+| payout_start             | float  |    4   | Start payout                                   |   100       |
+| payout_end               | float  |    4   | End payout                                     |   200       |
+| limit2                   | float  |    4   | Second limit                                   |   3000000   |
+| scale1                   | float  |    4   | Scaling (inflation) factor 1                   |   0.03      |
+| scale2                   | float  |    4   | Scaling (inflation) factor 2                   |   0.2       |
+
+* A reference table listing the valid values for calcrule_id and which of the fields are required is available in Appendix [B FM Profiles](fmprofiles.md).
+* All distinct policytc_id values that appear in the policytc table must appear once in the policytc_id field of the profile table. We suggest that policytc_id=1 is included by default using calcrule_id = 100 and all fields = 0 as a default 'null' calculation rule whenever no terms and conditions apply to a particular level_id / agg_id in the policytc table.
 * Any fields that are not required for the profile should be set to zero.
 
 ##### fmprofiletobin
 ```
 $ fmprofiletobin < fm_profile.csv > fm_profile.bin
+$ fmprofiletobin -S < fm_profile_step.csv > fm_profile_step.bin
 ``` 
 
 ##### fmprofiletocsv
 ```
 $ fmprofiletocsv < fm_profile.bin > fm_profile.csv
+$ fmprofiletocsv -S < fm_profile_step.bin > fm_profile_step.csv
 ```
 [Return to top](#dataconversioncomponents)
 

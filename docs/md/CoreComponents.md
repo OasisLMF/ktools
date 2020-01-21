@@ -208,6 +208,7 @@ Optional parameters are;
 * -p {string} The location of the input files. The default location is the 'input' directory in the present working directory
 * -a{integer} The back allocation rule to apply. The options are 0 (no allocation), 1 (ground up loss basis) or 2 (prior level loss basis). The default is 0. 
 * -n Output net losses. Net losses are the difference between the input loss and the calculated loss. The default is to output the calculated loss.
+* -S Use fm_profile_step input file (default is to use fm_profile)
 
 ##### Usage
 ```
@@ -220,7 +221,7 @@ $ fmcalc [parameters] < [stdin].bin > [stdout].bin
 ```
 $ eve 1 1 | getmodel | gulcalc -r -S100 -a1 -i - | fmcalc -p direct -a2 | summarycalc -f -2 - | eltcalc > elt.csv
 $ eve 1 1 | getmodel | gulcalc -r -S100 -a1 -i - | fmcalc -p direct -a1 > fmcalc.bin
-$ fmcalc -p ri1 -a2 -n < gulcalci.bin > fmcalc.bin
+$ fmcalc -p ri1 -a2 -S -n < gulcalci.bin > fmcalc.bin
 $ fmcalc -p direct | fmcalc -p ri1 -n | fmcalc -p ri2 -n < gulcalci.bin > fm_ri2_net.bin 
 ```
 
@@ -231,14 +232,14 @@ For the gulcalc item stream input, the program requires the item, coverage and f
 * input/coverages.bin
 * input/fm_programme.bin
 * input/fm_policytc.bin
-* input/fm_profile.bin
+* input/fm_profile.bin or fm_profile_step.bin
 * input/fm_xref.bin
 
 For loss stream input from either gulcalc or fmcalc, the program requires only the four fm input data files, 
 
 * input/fm_programme.bin
 * input/fm_policytc.bin
-* input/fm_profile.bin
+* input/fm_profile.bin or fm_profile_step.bin
 * input/fm_xref.bin
 
 The location of the files can be changed by using the -p parameter followed by the path location relative to the present working directory. eg -p ri1

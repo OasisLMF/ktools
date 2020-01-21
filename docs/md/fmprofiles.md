@@ -77,24 +77,24 @@ We introduce the following variables;
 
 * **over limit** is the sum of the amount by which limits are exceeded at the prior level calculation (positive measure)
 * **under limit** is the sum of the amount by which losses fall short of limits at the prior level calculation (positive measure)
-* **loss delta** is the amount by which the loss would change due to the enforcement of a minimum or maximum ignoring prior level limits (positive for maximum deductibles and negative for minimum deductibles). The loss is adjusted up to the loss delta depending on the values carried in the under and over limit variables.
+* **loss delta** is the amount by which the loss would change due to the enforcement of a minimum or maximum ignoring prior level limits (positive for loss increase and negative for loss decrease). The loss is adjusted by an amount up to the loss delta depending on the values carried in the under and over limit variables.
 
 ### Scenarios for under and over limit
 
 The over and under limit variables are initialised when there exist prior level limits. The possible cases are;
 
 | Case | Under limit | Over limit  | Meaning                                                          |
-|:-----|-------------|------------:|-----------------------------------------------------------------:|
+|:-----|-------------|-------------|:-----------------------------------------------------------------|
 |   1  |  0          |     0       | All prior level losses are exactly at their limits			      |
-|   2  |  >0         |     0       | Some prior level losses are under limit and none are over limit  |
-|   3  |  0          |     >0      | Some prior level losses are over limit and none are under limit  |
+|   2  |  0          |     >0      | Some prior level losses are over limit and none are under limit  |
+|   3  |  >0         |     0       | Some prior level losses are under limit and none are over limit  |
 |   4  |  >0         |     >0      | Some prior level losses are over limit and some are under limit  |
 
-When the loss delta is positive, in cases 1 and 3 the loss is not adjusted upwards because the prior level losses are already at their limits. The loss delta is added to the carried over limit.
-In cases 2 and 4 the loss is adjusted upwards to a maximum of the under limit. Losses are therefore adjusted up to the prior level limits and any excess loss delta is added to the over limit variable. The loss increase is subtracted from the carried under limit.
+When the loss delta is positive, in cases 1 and 2 the loss is not adjusted upwards because the prior level losses are already at their limits. The loss delta is added to the carried over limit.
+In cases 3 and 4 the loss is adjusted upwards to a maximum of the under limit. Losses are therefore adjusted up to the prior level limits and any excess loss delta is added to the over limit variable. The loss increase is subtracted from the carried under limit.
 
-When the loss delta is negative, in cases 1 and 3 the loss delta is deducted from the over limit under it the over limit is zero and any excess loss delta is used to adjust the loss downwards. Losses that are over limit by more than the loss delta remain at their limits, and decrease only if the over limit is fully eroded by the loss delta.
-In cases 2 and 4 losses are adjusted down fully by the loss delta, or to zero if the loss delta is greater than the original loss. The loss adjustment is added to the carried under limit.
+When the loss delta is negative, in cases 1 and 2 the loss delta is deducted from the over limit under it the over limit is zero and any excess loss delta is used to adjust the loss downwards. Losses that are over limit by more than the loss delta remain at their limits, and decrease only if the over limit is fully eroded by the loss delta.
+In cases 3 and 4 losses are adjusted down fully by the loss delta, or to zero if the loss delta is greater than the original loss. The loss adjustment is added to the carried under limit.
 
 Current calculation level limits may also apply and these are used to update the over limit and under limit measures to carry through to the next level.
 

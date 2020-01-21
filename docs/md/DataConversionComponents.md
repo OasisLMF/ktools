@@ -432,14 +432,14 @@ The csv file should contain the following fields and include a header row.
 |:-------------------------|--------|--------| :----------------------------------------------|------------:|
 | policytc_id              | int    |    4   | Primary key 						              |     34      |
 | calcrule_id              | int    |    4   | The calculation rule that applies to the terms |     12      |
-| deductible1              | int    |    4   | First deductible                               |    0.03     |
-| deductible2              | float  |    4   | Second deductible                              |   50000     |
-| deductible3              | float  |    4   | Third deductible                               |   100000    |
-| attachment1              | float  |    4   | Attachment point, or excess					  |   1000000   |
-| limit1				   | float  |    4   | Limit                                          |   5000000   |
-| share1                   | float  |    4   | First proportional share                       |   0.8       |
-| share2                   | float  |    4   | Second proportional share                      |   0.25      |
-| share3                   | float  |    4   | Third proportional share                       |   1         |
+| deductible_1             | int    |    4   | First deductible                               |    0.03     |
+| deductible_2             | float  |    4   | Second deductible                              |   50000     |
+| deductible_3             | float  |    4   | Third deductible                               |   100000    |
+| attachment_1             | float  |    4   | Attachment point, or excess					  |   1000000   |
+| limit_1				   | float  |    4   | Limit                                          |   5000000   |
+| share_1                  | float  |    4   | First proportional share                       |   0.8       |
+| share_2                  | float  |    4   | Second proportional share                      |   0.25      |
+| share_3                  | float  |    4   | Third proportional share                       |   1         |
 
 **fm_profile_step**
 
@@ -447,22 +447,22 @@ The csv file should contain the following fields and include a header row.
 |:-------------------------|--------|--------| :----------------------------------------------|------------:|
 | policytc_id              | int    |    4   | Primary key 						              |     34      |
 | calcrule_id              | int    |    4   | The calculation rule that applies to the terms |     12      |
-| deductible1              | int    |    4   | First deductible                               |    0.03     |
-| deductible2              | float  |    4   | Second deductible                              |   50000     |
-| deductible3              | float  |    4   | Third deductible                               |   100000    |
-| attachment1              | float  |    4   | Attachment point, or excess					  |   1000000   |
-| limit1				   | float  |    4   | First limit                                    |   5000000   |
-| share1                   | float  |    4   | First proportional share                       |   0.8       |
-| share2                   | float  |    4   | Second proportional share                      |   0.25      |
-| share3                   | float  |    4   | Third proportional share                       |   1         |
+| deductible_1             | int    |    4   | First deductible                               |    0.03     |
+| deductible_2             | float  |    4   | Second deductible                              |   50000     |
+| deductible_3             | float  |    4   | Third deductible                               |   100000    |
+| attachment_1             | float  |    4   | Attachment point, or excess					  |   1000000   |
+| limit_1				   | float  |    4   | First limit                                    |   5000000   |
+| share_1                  | float  |    4   | First proportional share                       |   0.8       |
+| share_2                  | float  |    4   | Second proportional share                      |   0.25      |
+| share_3                  | float  |    4   | Third proportional share                       |   1         |
 | step_id                  | int    |    4   | Step number                                    |   1         |
 | trigger_start            | float  |    4   | Start trigger for payout                       |   0.05      |
 | trigger_end              | float  |    4   | End trigger for payout      		              |   0.15      |
 | payout_start             | float  |    4   | Start payout                                   |   100       |
 | payout_end               | float  |    4   | End payout                                     |   200       |
-| limit2                   | float  |    4   | Second limit                                   |   3000000   |
-| scale1                   | float  |    4   | Scaling (inflation) factor 1                   |   0.03      |
-| scale2                   | float  |    4   | Scaling (inflation) factor 2                   |   0.2       |
+| limit_2                  | float  |    4   | Second limit                                   |   3000000   |
+| scale_1                  | float  |    4   | Scaling (inflation) factor 1                   |   0.03      |
+| scale_2                  | float  |    4   | Scaling (inflation) factor 2                   |   0.2       |
 
 * A reference table listing the valid values for calcrule_id and which of the fields are required is available in Appendix [B FM Profiles](fmprofiles.md).
 * All distinct policytc_id values that appear in the policytc table must appear once in the policytc_id field of the profile table. We suggest that policytc_id=1 is included by default using calcrule_id = 100 and all fields = 0 as a default 'null' calculation rule whenever no terms and conditions apply to a particular level_id / agg_id in the policytc table.

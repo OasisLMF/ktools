@@ -4,41 +4,41 @@
 This section specifies the attributes and rules for the following list of Financial module profiles.
 
 
-| Profile description                               |calcrule_id |d1 |d2 |d3 |a1 |l1 |sh1|sh2|sh3|st |ts |te |ps |pe |l2 |sc1|sc2|  
-|:--------------------------------------------------|------------|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|--:|
-|Do nothing (pass losses through)                   |   100      |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
-|deductible and limit                               |   1        |x  |   |   |   |x  |   |   |   |   |   |   |   |   |   |   |   |
-|deductible with attachment, limit and share        |   2        |x  |   |   |x  |x  |x  |   |   |   |   |   |   |   |   |   |   |
-|franchise deductible and limit                     |   3        |x  |   |   |   |x  |   |   |   |   |   |   |   |   |   |   |   |
-|deductible % TIV and limit                         |   4        |x  |   |   |   |x  |   |   |   |   |   |   |   |   |   |   |   |
-|deductible and limit % loss                        |   5        |x  |   |   |   |x  |   |   |   |   |   |   |   |   |   |   |   |
-|deductible % TIV                                   |   6        |x  |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
-|limit and maximum deductible                       |   7        |   |   |x  |   |x  |   |   |   |   |   |   |   |   |   |   |   |
-|limit and minimum deductible                       |   8        |   |x  |   |   |x  |   |   |   |   |   |   |   |   |   |   |   |
-|limit with deductible % limit                      |   9        |x  |   |   |   |x  |   |   |   |   |   |   |   |   |   |   |   |
-|maximum deductible                                 |   10       |   |   |x  |   |   |   |   |   |   |   |   |   |   |   |   |   |
-|minimum deductible                                 |   11       |   |x  |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
-|deductible                                         |   12       |x  |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
-|minimum and maximum deductible                     |   13       |   |x  |x  |   |   |   |   |   |   |   |   |   |   |   |   |   |
-|limit only                                         |   14       |   |   |   |   |x  |   |   |   |   |   |   |   |   |   |   |   |
-|limit % loss                                       |   15       |   |   |   |   |x  |   |   |   |   |   |   |   |   |   |   |   |
-|deductible % loss                                  |   16       |x  |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
-|deductible % loss with attachment, limit and share |   17       |x  |   |   |x  |x  |x  |   |   |   |   |   |   |   |   |   |   |
-|deductible % tiv with attachment, limit and share  |   18       |x  |   |   |x  |x  |x  |   |   |   |   |   |   |   |   |   |   |
-|% loss deductible with min and max deductible      |   19       |x  |x  |x  |   |   |   |   |   |   |   |   |   |   |   |   |   |
-|reverse franchise deductible                       |   20       |x  |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
-|% tiv deductible with min and max deductible       |   21       |x  |x  |x  |   |   |   |   |   |   |   |   |   |   |   |   |   |
-|reinsurance % ceded, limit and % placed            |   22       |   |   |   |   |x  |x  |x  |x  |   |   |   |   |   |   |   |   |
-|reinsurance limit and % placed                     |   23       |   |   |   |   |x  |   |x  |x  |   |   |   |   |   |   |   |   |
-|reinsurance excess terms                           |   24       |   |   |   |x  |x  |x  |x  |x  |   |   |   |   |   |   |   |   |
-|reinsurance proportional terms                     |   25       |   |   |   |   |   |x  |x  |x  |   |   |   |   |   |   |   |   |
-|deductible amount with min and max deductible      |   26       |x  |   |   |   |   |   |   |   |   |   |   |   |   |   |   |   |
-|% tiv trigger and % tiv step payout with limit     |   27       |x  |   |   |   |x  |   |   |   |x  |x  |x  |x  |   |x  |x  |x  |
-|% tiv trigger and % loss step payout               |   28       |x  |   |   |   |   |   |   |   |x  |x  |x  |x  |   |x  |x  |x  |
-|% tiv trigger and % tiv step payout                |   29       |x  |   |   |   |   |   |   |   |x  |x  |x  |x  |   |x  |x  |x  |
-|% tiv trigger and % limit step payout              |   30       |x  |   |   |   |x  |   |   |   |x  |x  |x  |x  |   |x  |x  |x  |
-|% tiv trigger and monetary amount step payout      |   31       |x  |   |   |   |   |   |   |   |x  |x  |x  |x  |   |x  |x  |x  |
-|monetary amount trigger and % loss step payout     |   32       |   |   |   |   |x  |   |   |   |x  |x  |   |x  |   |x  |x  |x  |
+| Profile description                               |calcrule_id |d1|d2|d3|a1|l1|sh1|sh2|sh3|st|ts|te|ps|pe|l2|sc1|sc2|  
+|:--------------------------------------------------|------------|--|--|--|--|--|---|---|---|--|--|--|--|--|--|---|--:|
+|Do nothing (pass losses through)                   |   100      |  |  |  |  |  |   |   |   |  |  |  |  |  |  |   |   |
+|deductible and limit                               |   1        |x |  |  |  |x |   |   |   |  |  |  |  |  |  |   |   |
+|deductible with attachment, limit and share        |   2        |x |  |  |x |x |x  |   |   |  |  |  |  |  |  |   |   |
+|franchise deductible and limit                     |   3        |x |  |  |  |x |   |   |   |  |  |  |  |  |  |   |   |
+|deductible % TIV and limit                         |   4        |x |  |  |  |x |   |   |   |  |  |  |  |  |  |   |   |
+|deductible and limit % loss                        |   5        |x |  |  |  |x |   |   |   |  |  |  |  |  |  |   |   |
+|deductible % TIV                                   |   6        |x |  |  |  |  |   |   |   |  |  |  |  |  |  |   |   |
+|limit and maximum deductible                       |   7        |  |  |x |  |x |   |   |   |  |  |  |  |  |  |   |   |
+|limit and minimum deductible                       |   8        |  |x |  |  |x |   |   |   |  |  |  |  |  |  |   |   |
+|limit with deductible % limit                      |   9        |x |  |  |  |x |   |   |   |  |  |  |  |  |  |   |   |
+|maximum deductible                                 |   10       |  |  |x |  |  |   |   |   |  |  |  |  |  |  |   |   |
+|minimum deductible                                 |   11       |  |x |  |  |  |   |   |   |  |  |  |  |  |  |   |   |
+|deductible                                         |   12       |x |  |  |  |  |   |   |   |  |  |  |  |  |  |   |   |
+|minimum and maximum deductible                     |   13       |  |x |x |  |  |   |   |   |  |  |  |  |  |  |   |   |
+|limit only                                         |   14       |  |  |  |  |x |   |   |   |  |  |  |  |  |  |   |   |
+|limit % loss                                       |   15       |  |  |  |  |x |   |   |   |  |  |  |  |  |  |   |   |
+|deductible % loss                                  |   16       |x |  |  |  |  |   |   |   |  |  |  |  |  |  |   |   |
+|deductible % loss with attachment, limit and share |   17       |x |  |  |x |x |x  |   |   |  |  |  |  |  |  |   |   |
+|deductible % tiv with attachment, limit and share  |   18       |x |  |  |x |x |x  |   |   |  |  |  |  |  |  |   |   |
+|% loss deductible with min and max deductible      |   19       |x |x |x |  |  |   |   |   |  |  |  |  |  |  |   |   |
+|reverse franchise deductible                       |   20       |x |  |  |  |  |   |   |   |  |  |  |  |  |  |   |   |
+|% tiv deductible with min and max deductible       |   21       |x |x |x |  |  |   |   |   |  |  |  |  |  |  |   |   |
+|reinsurance % ceded, limit and % placed            |   22       |  |  |  |  |x |x  |x  |x  |  |  |  |  |  |  |   |   |
+|reinsurance limit and % placed                     |   23       |  |  |  |  |x |   |x  |x  |  |  |  |  |  |  |   |   |
+|reinsurance excess terms                           |   24       |  |  |  |x |x |x  |x  |x  |  |  |  |  |  |  |   |   |
+|reinsurance proportional terms                     |   25       |  |  |  |  |  |x  |x  |x  |  |  |  |  |  |  |   |   |
+|deductible amount with min and max deductible      |   26       |x |  |  |  |  |   |   |   |  |  |  |  |  |  |   |   |
+|% tiv trigger and % tiv step payout with limit     |   27       |x |  |  |  |x |   |   |   |x |x |x |x |  |x |x  |x  |
+|% tiv trigger and % loss step payout               |   28       |x |  |  |  |  |   |   |   |x |x |x |x |  |x |x  |x  |
+|% tiv trigger and % tiv step payout                |   29       |x |  |  |  |  |   |   |   |x |x |x |x |  |x |x  |x  |
+|% tiv trigger and % limit step payout              |   30       |x |  |  |  |x |   |   |   |x |x |x |x |  |x |x  |x  |
+|% tiv trigger and monetary amount step payout      |   31       |x |  |  |  |  |   |   |   |x |x |x |x |  |x |x  |x  |
+|monetary amount trigger and % loss step payout     |   32       |  |  |  |  |x |   |   |   |x |x |  |x |  |x |x  |x  |
 
 The fields with an x are those which are required by the profile. The full names of the fields are as follows;
 

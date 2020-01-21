@@ -4,41 +4,41 @@
 This section specifies the attributes and rules for the following list of Financial module profiles.
 
 
-| Profile description                               |calcrule_id | 
-|:--------------------------------------------------|-----------:|
-|Do nothing (pass losses through)                   |   100      |
-|deductible and limit                               |   1        |
-|deductible with attachment, limit and share        |   2        |
-|franchise deductible and limit                     |   3        |
-|deductible % TIV and limit                         |   4        |
-|deductible and limit % loss                        |   5        |
-|deductible % TIV                                   |   6        |
-|limit and maximum deductible                       |   7        |
-|limit and minimum deductible                       |   8        |
-|limit with deductible % limit                      |   9        |
-|maximum deductible                                 |   10       |
-|minimum deductible                                 |   11       |
-|deductible                                         |   12       |
-|minimum and maximum deductible                     |   13       |
-|limit only                                         |   14       |
-|limit % loss                                       |   15       |
-|deductible % loss                                  |   16       |
-|deductible % loss with attachment, limit and share |   17       |
-|deductible % tiv with attachment, limit and share  |   18       |
-|% loss deductible with min and max deductible      |   19       |
-|reverse franchise deductible                       |   20       |
-|% tiv deductible with min and max deductible       |   21       |
-|reinsurance % ceded, limit and % placed            |   22       |
-|reinsurance limit and % placed                     |   23       |
-|reinsurance excess terms                           |   24       |
-|reinsurance proportional terms                     |   25       |
-|deductible amount with min and max deductible      |   26       |
-|% tiv trigger and % tiv step payout with limit     |   27       |
-|% tiv trigger and % loss step payout               |   28       |
-|% tiv trigger and % tiv step payout                |   29       |
-|% tiv trigger and % limit step payout              |   30       |
-|% tiv trigger and monetary amount step payout      |   31       |
-|monetary amount trigger and % loss step payout     |   32       |
+| Profile description                                      |calcrule_id | 
+|:---------------------------------------------------------|-----------:|
+|Do nothing (pass losses through)                          |   100      |
+|deductible and limit                                      |   1        |
+|deductible with attachment, limit and share               |   2        |
+|franchise deductible and limit                            |   3        |
+|deductible % TIV and limit                                |   4        |
+|deductible and limit % loss                               |   5        |
+|deductible % TIV                                          |   6        |
+|limit and maximum deductible                              |   7        |
+|limit and minimum deductible                              |   8        |
+|limit with deductible % limit                             |   9        |
+|maximum deductible                                        |   10       |
+|minimum deductible                                        |   11       |
+|deductible                                                |   12       |
+|minimum and maximum deductible                            |   13       |
+|limit only                                                |   14       |
+|limit % loss                                              |   15       |
+|deductible % loss                                         |   16       |
+|deductible % loss with attachment, limit and share        |   17       |
+|deductible % tiv with attachment, limit and share         |   18       |
+|% loss deductible with min and max deductible             |   19       |
+|reverse franchise deductible                              |   20       |
+|% tiv deductible with min and max deductible              |   21       |
+|reinsurance % ceded, limit and % placed                   |   22       |
+|reinsurance limit and % placed                            |   23       |
+|reinsurance excess terms                                  |   24       |
+|reinsurance proportional terms                            |   25       |
+|deductible amount with min and max deductible             |   26       |
+|% tiv trigger and % tiv step payout with limit            |   27       |
+|% tiv trigger and % loss step payout                      |   28       |
+|% tiv trigger and % tiv step payout                       |   29       |
+|% tiv trigger and % limit step payout                     |   30       |
+|% tiv trigger and monetary amount step payout             |   31       |
+|monetary amount trigger and % loss step payout with limit |   32       |
 
 |calcrule_id |d1|d2|d3|a1|l1|sh1|sh2|sh3|st|ts|te|ps|pe|l2|sc1|sc2|  
 |:-----------|--|--|--|--|--|---|---|---|--|--|--|--|--|--|---|--:|

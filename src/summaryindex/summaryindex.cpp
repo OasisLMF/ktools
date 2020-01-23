@@ -71,7 +71,7 @@ namespace summaryindex {
 	void indexevents(const std::string& fullfilename, std::string& filename, std::vector<int> &event_ids, std::map<summary_keyz, std::vector<long long>> &summary_id_file_id_to_offset, int file_id) {
 	FILE* fin = fopen(fullfilename.c_str(), "rb");
 	if (fin == NULL) {
-		fprintf(stderr, "%s: cannot open %s\n", __func__, fullfilename.c_str());
+		fprintf(stderr, "FATAL: cannot open %s\n",  fullfilename.c_str());
 		exit(EXIT_FAILURE);
 	}
 	long long offset = 0;
@@ -81,7 +81,7 @@ namespace summaryindex {
 	int stream_type = summarycalcstream_type & summarycalc_id;
 
 	if (stream_type != summarycalc_id) {
-		fprintf(stderr, "%s: Not a summarycalc stream type %d\n", __func__, stream_type);
+		fprintf(stderr, "FATAL: Not a summarycalc stream type %d\n",  stream_type);
 		exit(-1);
 	}
 
@@ -145,14 +145,14 @@ void doit(const std::string& subfolder)
 		}
 	}
 	else {
-		fprintf(stderr, "Unable to open directory %s\n", path.c_str());
+		fprintf(stderr, "FATAL: Unable to open directory %s\n", path.c_str());
 		exit(-1);
 	}
 
 	std::string filename =  path + "filelist.idx";
 	FILE* fout = fopen(filename.c_str(), "wb");
 	if (fout == NULL) {
-		fprintf(stderr, "%s: cannot open %s\n", __func__, filename.c_str());
+		fprintf(stderr, "FATAL: cannot open %s\n",  filename.c_str());
 		exit(EXIT_FAILURE);
 	}
 	auto iter = files.begin();
@@ -163,26 +163,12 @@ void doit(const std::string& subfolder)
 
 	fclose(fout);
 
-	//filename = path + "events.idx";
-	//fout = fopen(filename.c_str(), "wb");
-	//if (fout == NULL) {
-	//	fprintf(stderr, "%s: cannot open %s\n", __func__, filename.c_str());
-	//	exit(EXIT_FAILURE);
-	//}
-	//
-	//auto e_iter = event_ids.begin();
-	//while (e_iter != event_ids.end()) {
-	//	fprintf(fout, "%d\n", *e_iter);
-	//	e_iter++;
-	//}
-
-	//fclose(fout);
 
 	int max_summary_id = 0;
 	filename = path + "summaries.idx";
 	fout = fopen(filename.c_str(), "wb");
 	if (fout == NULL) {
-		fprintf(stderr, "%s: cannot open %s\n", __func__, filename.c_str());
+		fprintf(stderr, "FATAL: cannot open %s\n", filename.c_str());
 		exit(EXIT_FAILURE);
 	}
 
@@ -201,7 +187,7 @@ void doit(const std::string& subfolder)
 	filename = path + "max_summary_id.idx";
 	fout = fopen(filename.c_str(), "wb");
 	if (fout == NULL) {
-		fprintf(stderr, "%s: cannot open %s\n", __func__, filename.c_str());
+		fprintf(stderr, "FATAL: cannot open %s\n",  filename.c_str());
 		exit(EXIT_FAILURE);
 	}
 	fprintf(fout, "%d", max_summary_id);

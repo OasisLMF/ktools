@@ -142,8 +142,8 @@ namespace eltcalc {
 			return;
 		}
 
-		fprintf(stderr, "%s: Not a gul stream\n", __func__);
-		fprintf(stderr, "%s: invalid stream type %d\n", __func__, stream_type);
+		fprintf(stderr, "FATAL: %s: Not a gul stream\n", __func__);
+		fprintf(stderr, "FATAL: %s: invalid stream type %d\n", __func__, stream_type);
 		exit(-1);
 	}
 

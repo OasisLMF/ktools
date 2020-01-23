@@ -37,87 +37,43 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 */
 #include "../include/oasis.h"
 #include <vector>
+#include <algorithm>
+
 
 #if defined(_MSC_VER)
 #include "../wingetopt/wingetopt.h"
+#include "../include/dirent.h"
 #else
 #include <fcntl.h>
 #include <unistd.h>
+#include <dirent.h>
 #endif
+#include <sys/stat.h>
 
-
-void doit(std::vector <FILE *> &infiles)
-{
-	for (FILE *fin: infiles) {
-		unsigned char buf;
-		size_t bytes = fread(&buf, 1, sizeof (buf), fin);
-		while (bytes) {
-			fwrite(&buf, 1, sizeof(buf), stdout);
-			bytes = fread(&buf, 1, sizeof(buf), fin);
+namespace kat {
+	void doit(std::vector <FILE*>& infiles)
+	{
+		for (FILE* fin : infiles) {
+			unsigned char buf;
+			size_t bytes = fread(&buf, 1, sizeof(buf), fin);
+			while (bytes) {
+				fwrite(&buf, 1, sizeof(buf), stdout);
+				bytes = fread(&buf, 1, sizeof(buf), fin);
+			}
 		}
 	}
-}
 
-void touch(const std::string &filepath)
-{
-	FILE *fout = fopen(filepath.c_str(), "wb");
-	fclose(fout);
-}
-void setinitdone(int processid)
-{
-	if (processid) {
-		std::ostringstream s;
-		s << SEMA_DIR_PREFIX << "_kat/" << processid << ".id";
-		touch(s.str());
+	void touch(const std::string& filepath)
+	{
+		FILE* fout = fopen(filepath.c_str(), "wb");
+		fclose(fout);
 	}
-}
-
-void help()
-{
-	fprintf(stderr,
-		"-P process_id\n"
-		"-h help\n"
-		"-v version\n"
-	);
-}
-
-
-int main(int argc, char* argv[])
-{
-
-
-	int opt;
-	int processid = 0;
-	while ((opt = getopt(argc, argv, "P:vh")) != -1) {
-		switch (opt) {
-		case 'P':
-			processid = atoi(optarg);
-			break;
-		case 'v':
-			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
-			::exit(EXIT_FAILURE);
-			break;
-		case 'h':
-		default:
-			help();
-			::exit(EXIT_FAILURE);
+	void setinitdone(int processid)
+	{
+		if (processid) {
+			std::ostringstream s;
+			s << SEMA_DIR_PREFIX << "_kat/" << processid << ".id";
+			touch(s.str());
 		}
 	}
-	
-	argc -= optind;
-	argv += optind;
-
-	std::vector <FILE *> infiles;
-	for (int i = 0; i < argc; i++) {
-		FILE *fin = fopen(argv[i], "rb");
-		if (fin == nullptr) {
-			fprintf(stderr, "kat: Cannot open %s\n", argv[i]);
-			exit(-1);
-		}
-		infiles.push_back(fin);
-	}
-
-	initstreams();
-	setinitdone(processid);
-	doit(infiles);
 }

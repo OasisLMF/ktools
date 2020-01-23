@@ -70,7 +70,6 @@ struct period_sidx_map_key_new {
 
 struct loss_rec {
 	double sum_of_loss = 0.0;
-	//double sum_of_loss_squared;
 	double max_exposure_value = 0.0;
 };
 
@@ -114,8 +113,6 @@ private:
 	std::map<int, aal_rec> map_analytical_aal_;
 	std::map<int, aal_rec> map_analytical_aal_w_;
 	std::map<int, aal_rec> map_sample_aal_;
-	std::map<period_sidx_map_key, loss_rec > map_sample_sum_loss_;
-	std::map<period_sidx_map_key, loss_rec > map_analytical_sum_loss_;
 	std::vector< loss_rec>  vec_sample_sum_loss_;
 	std::vector<aal_rec> vec_sample_aal_;
 	std::vector<aal_rec> vec_analytical_aal_;
@@ -123,7 +120,6 @@ private:
 
 	std::unordered_set<int> set_periods_;
 	int current_summary_id_ = 0;
-	//std::map<period_map_key, loss_rec > map_analytical_sum_loss_;
 	std::map<period_map_key, loss_rec_w > map_analytical_sum_loss_w_;
 	std::map <int, double> periodstoweighting_;
 	bool skipheader_ = false;
@@ -133,24 +129,15 @@ private:
 	void load_event_to_summary_index(const std::string& subfolder);
 	void initsameplsize(const std::string &path);
 	void loadperiodtoweigthing();
-	void process_summaryfile(const std::string &filename);
 	void process_summaryfilew(const std::string &filename);
 	void debug_process_summaryfile(const std::string &filename);
-	void do_calc_end(std::map<period_sidx_map_key, loss_rec >& sum_loss_map, std::map<int, aal_rec>& map_aal, int type);
 	void do_calc_end_new();
-	void do_analytical_calc(const summarySampleslevelHeader &sh, double mean_loss);
-	//void do_analytical_calc(const summarySampleslevelHeader& sh, const std::vector<sampleslevelRec>& vrec);
 	void do_analytical_calcw(const summarySampleslevelHeader &sh, double mean_loss);
-	void do_analytical_calc_end();	
 	void do_analytical_calc_endw();
 	void do_sample_calcw(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec);
-	void do_sample_calc(const summarySampleslevelHeader& sh, const std::vector<sampleslevelRec>& vrec, std::map<period_sidx_map_key, loss_rec >& sum_loss_map);
 	void do_sample_calc_newx(const summarySampleslevelHeader& sh, const std::vector<sampleslevelRec>& vrec);
-	void do_sample_calc(const summarySampleslevelHeader& sh, const std::vector<sampleslevelRec>& vrec);
 	void do_sample_calc_new(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec);
-	void do_sample_calc_end();
 	void do_sample_calc_endw();
-	void doaalcalc(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec, OASIS_FLOAT mean_loss);
 	void doaalcalc_new(const summarySampleslevelHeader& sh, const std::vector<sampleslevelRec>& vrec, OASIS_FLOAT mean_loss);
 	void doaalcalcw(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec, OASIS_FLOAT mean_loss);
 	void applyweightings(int event_id, const std::map <int, double> &periodstoweighting, std::vector<sampleslevelRec> &vrec) ;
@@ -162,9 +149,8 @@ private:
 	void getmaxsummaryid(std::string& path);
 public:
 	aalcalc(bool skipheader) : skipheader_(skipheader) {};
-	void doit_l(const std::string &subfolder);
-	void doit(const std::string& subfolder);		// exprimental
-	void doitw(const std::string &subfolder);	// calcuate using welford method 
+	void doit(const std::string& subfolder);		// experimental
+	void doitw(const std::string &subfolder);	// calculate using welford method 
 	void debug(const std::string &subfolder);
 };
 

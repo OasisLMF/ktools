@@ -49,6 +49,8 @@ Author: Mark Pinkerton  email: mark.pinkerton@oasislmf.org
 #include <signal.h>
 #include <string.h>
 #endif
+#include <chrono>
+#include <thread>
 
 void doIt(bool zip);
 
@@ -106,9 +108,13 @@ int main(int argc, char** argv)
 
 	try {
 		initstreams();
+		std::this_thread::sleep_for(std::chrono::milliseconds(250));	// time for eve to flush its message	
+		logprintf(progname, "INFO", "starting process..\n");
 		doIt(zip);
+		logprintf(progname, "INFO", "finishing process..\n");
+		fflush(stderr);
 	}catch (std::bad_alloc) {
-		fprintf(stderr, "%s: Memory allocation failed\n", progname);
+		fprintf(stderr, "FATAL:%s: Memory allocation failed\n", progname);
 		exit(EXIT_FAILURE);
 	}
 

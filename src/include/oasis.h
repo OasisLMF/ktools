@@ -42,6 +42,8 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <sstream>
 #include <string>
 #include <stdlib.h>
+#include <stdarg.h>
+
 
 #include "../../config.h"
 #ifdef __unix 
@@ -49,13 +51,16 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #endif
 
 #if defined(_MSC_VER) || defined(__MINGW32__)
+#include <process.h>
 #include <fcntl.h>
 #include <io.h>
 #define flseek _fseeki64
 #define fltell _ftelli64
+#define GETPID _getpid
 #else
 #define flseek fseek
 #define fltell ftell
+#define GETPID getpid
 #endif 
 
 // Slowly where applicable we will replace int and OASIS_FLOAT references with
@@ -213,6 +218,26 @@ struct fm_profile {
 
 };
 
+struct fm_profile_step {
+	int profile_id = 0;
+	int calcrule_id = 0;
+	OASIS_FLOAT deductible1 = 0;
+	OASIS_FLOAT	deductible2 = 0;
+	OASIS_FLOAT deductible3 = 0;
+	OASIS_FLOAT attachment = 0;
+	OASIS_FLOAT limit1 = 0;
+	OASIS_FLOAT share1 = 0;
+	OASIS_FLOAT share2 = 0;
+	OASIS_FLOAT	share3 = 0;
+	int step_id = 0;
+	OASIS_FLOAT trigger_start = 0;
+	OASIS_FLOAT	trigger_end = 0;
+	OASIS_FLOAT payout_start = 0;
+	OASIS_FLOAT payout_end = 0;
+	OASIS_FLOAT limit2 = 0;
+	OASIS_FLOAT scale1 = 0;
+	OASIS_FLOAT scale2 = 0;
+};
 
 struct fm_programme {
 	int from_agg_id;
@@ -309,6 +334,38 @@ inline void initstreams(std::string inFile="", std::string outFile="")
 
 }
 
+template<class T>
+T base_name(T const& path, T const& delims = "/\\")
+{
+	return path.substr(path.find_last_of(delims) + 1);
+}
+template<class T>
+T remove_extension(T const& filename)
+{
+	typename T::size_type const p(filename.find_last_of('.'));
+	return p > 0 && p != T::npos ? filename.substr(0, p) : filename;
+}
+
+inline  void logprintf(const std::string &program_name,const std::string &msgtype,const char* format, ...)
+{
+	
+	std::string base = base_name(program_name);
+	base = remove_extension(base_name(base));
+	std::string b2 = base + ":" + std::to_string(GETPID());
+	base = "log/" + base + "_" + std::to_string(GETPID()) + ".log";
+
+	FILE* fout = fopen(base.c_str(), "a");
+	if (fout != nullptr) {
+		fprintf(fout, "%s:%s:",msgtype.c_str(),b2.c_str());
+		va_list args;
+		va_start(args, format);
+		vfprintf(fout, format, args);
+		va_end(args);
+		fclose(fout);
+	}
+	
+}
+
 #define PIPE_DELAY	1000
 
 // Relative paths for file names
@@ -317,8 +374,8 @@ inline void initstreams(std::string inFile="", std::string outFile="")
 #define FMSUMMARYXREF_FILE "input/fmsummaryxref.bin"
 #define FMPOLICYTC_FILE "input/fm_policytc.bin"
 #define FMPROGRAMME_FILE "input/fm_programme.bin"
-#define FMPROFILE_FILE_OLD "input/fm_profile_old.bin"
-#define FMPROFILE_FILE_NEW "input/fm_profile.bin"
+#define FMPROFILE_FILE_STEP "input/fm_profile_step.bin"
+#define FMPROFILE_FILE "input/fm_profile.bin"
 #define FMXREF_FILE "input/fm_xref.bin"
 #define ITEMS_FILE "input/items.bin"
 #define EVENTS_FILE "input/events.bin"

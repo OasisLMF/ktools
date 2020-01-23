@@ -41,9 +41,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 #include "../include/oasis.h"
 
-#if defined(_MSC_VER)
-#include "../wingetopt/wingetopt.h"
-#else
+#if !defined(_MSC_VER)
 #include <unistd.h>
 #include <signal.h>
 #include <string.h>
@@ -87,10 +85,12 @@ namespace gultobin {
 					fwrite(&gr, sizeof(gr), 1, stdout);
 				}
 				else {
-					gulSampleslevelRec gr;
-					gr.sidx = q.sidx;
-					gr.loss = q.loss;
-					fwrite(&gr, sizeof(gr), 1, stdout);
+					if (q.sidx <= maxsampleindex) {		// skip rows where sample exceeds the max sidx
+						gulSampleslevelRec gr;
+						gr.sidx = q.sidx;
+						gr.loss = q.loss;
+						fwrite(&gr, sizeof(gr), 1, stdout);
+					}
 				}
 
 

@@ -47,8 +47,9 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 class fmcalc {
 public:	
-	fmcalc(int maxRunLevel, int allocrule,const std::string &inputpath, bool netvalue, bool debug, bool allocruleOptimizationOff):
-		inputpath_(inputpath) , netvalue_(netvalue),allocrule_(allocrule), debug_(debug), allocruleOptimizationOff_(allocruleOptimizationOff)
+	fmcalc(int maxRunLevel, int allocrule,const std::string &inputpath, bool netvalue, bool debug, bool allocruleOptimizationOff,bool generalOptimization, bool stepped):
+		inputpath_(inputpath) , netvalue_(netvalue),allocrule_(allocrule), debug_(debug), allocruleOptimizationOff_(allocruleOptimizationOff), generalOptimization_(generalOptimization),
+		stepped_(stepped)
 		{ init(maxRunLevel); }	
 	void doit();
 private:
@@ -61,7 +62,9 @@ private:
 	int max_layer_ = 0;		// initialized from policy_tc
 	int max_agg_id_ = 0;	// initialized from policy_tc
 	bool isGULStreamType_ = true;
+	bool generalOptimization_ = true;
 	std::vector <profile_rec_new> profile_vec_new_;
+	std::vector<std::vector <profile_rec_new>> profile_vec_stepped_;
 	int maxLevel_ = -1;
 	int maxRunLevel_ = 10000;
 	int max_level_ = 0;
@@ -74,6 +77,8 @@ private:
 	std::vector<OASIS_FLOAT> item_to_tiv_;	
 	void init_programme(int maxrunLevel);
 	void init_profile();
+	void init_profile_step();
+	void init_profile__stepped_rec(fm_profile_step& f);
 	void init_profile_rec(fm_profile &f);
 	void init_itemtotiv();
 	void init_fmxref();
@@ -83,14 +88,17 @@ private:
 	void addtcrow(const fm_policyTC &f);
 	bool loadcoverages(std::vector<OASIS_FLOAT> &coverages);
 	bool gulhasvalue(const std::vector<OASIS_FLOAT> &gul) const;
-	void compute_item_proportions(std::vector<std::vector<std::vector <LossRec>>> &agg_vecs, const std::vector<OASIS_FLOAT> &guls,unsigned int level_, unsigned int layer_,unsigned int previous_layer_);	
+	void compute_item_proportions(std::vector<std::vector<std::vector <LossRec>>> &agg_vecs, const std::vector<OASIS_FLOAT> &guls,unsigned int level_, unsigned int layer_,unsigned int previous_layer_, bool allowzeros);	
 	inline void dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlookups_, std::vector<std::vector<std::vector <LossRec>>> &agg_vecs_, 
 		int level_, int max_level_,	std::map<int, std::vector<fmlevelrec> > &outmap_, 
 		int sidx_, const std::vector<std::vector<std::vector<policytcvidx>>> &avxs_, int layer_,
 		const std::vector<int> &items_, std::vector<std::vector<OASIS_FLOAT>> &event_guls,
 		int previous_level, int previous_layer);	
 	void dofmcalc(std::vector <LossRec> &agg_vec_, int layer);
+	void dofmcalc_normal(std::vector <LossRec>& agg_vec_, int layer);
+	void dofmcalc_stepped(std::vector <LossRec>& agg_vec, int layer);
 	int noop_profile_id = 0;
+	bool stepped_ = false;
 };
 
 
@@ -103,9 +111,16 @@ enum tc_new {			// tc = terms and conditions
 	deductible_3,
 	attachment_1,
 	limit_1,
+	limit_2,
 	share_1,
 	share_2,
-	share_3
+	share_3,
+	trigger_start,
+	trigger_end,
+	payout_start,
+	payout_end,
+	scale_1,
+	scale_2
 };
 
 

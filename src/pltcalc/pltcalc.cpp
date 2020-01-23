@@ -200,10 +200,10 @@ namespace pltcalc {
 		}
 		stream_type = streamno_mask & summarycalcstream_type;
 		if (date_algorithm_) {
-			if (skipHeader == false) printf("type, summary_id,period_no,event_id,mean,standard_deviation,exposure_value,occ_year,occ_month,occ_day\n");
+			if (skipHeader == false) printf("type,summary_id,period_no,event_id,mean,standard_deviation,exposure_value,occ_year,occ_month,occ_day\n");
 		}
 		else {
-			if (skipHeader == false) printf("type, summary_id,period_no,event_id,mean,standard_deviation,exposure_value,occ_date_id\n");
+			if (skipHeader == false) printf("type,summary_id,period_no,event_id,mean,standard_deviation,exposure_value,occ_date_id\n");
 		}
 
 		if (firstOutput == true) {

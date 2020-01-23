@@ -1,0 +1,96 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <title></title>
+  <style type="text/css">code{white-space: pre;}</style>
+</head>
+<body>
+<p><img src="../img/banner.jpg" title="banner" alt="alt text" /></p>
+<h1 id="validation-components">Validation components <a id="validationcomponents"></a></h1>
+<p>The following components run validity checks on csv format files:</p>
+<p><strong>Model data files</strong></p>
+<ul>
+<li><strong><a href="#validatedamagebin">validatedamagebin</a></strong> checks damage bin dictionary for validity.</li>
+<li><strong><a href="#validatefootprint">validatefootprint</a></strong> checks event footprint for validity.</li>
+<li><strong><a href="#validatevulnerability">validatevulnerability</a></strong> checks vulnerability data for validity.</li>
+<li><strong><a href="#crossvalidation">crossvalidation</a></strong> performs validation checks across damage bin dictionary, event footprint and vulnerability data.</li>
+</ul>
+<p><strong>Oasis input files</strong></p>
+<ul>
+<li><strong><a href="#validateoasisfiles">validateoasisfiles</a></strong> performs validation checks across coverages, items, fm policytc, fm programme and fm profile data.</li>
+</ul>
+<h2 id="model-data-files">Model data files</h2>
+<p><a id="validatedamagebin"></a></p>
+<h3 id="validatedamagebin">validatedamagebin</h3>
+<p>The following checks are performed on the damage bin dictionary:</p>
+<ul>
+<li>Each line contains 5 values.</li>
+<li>First bin index is 1.</li>
+<li>Bin indices are contiguous.</li>
+<li>Interpolation lies inside range.</li>
+</ul>
+<p>In addition, warnings are issued in the following cases:</p>
+<ul>
+<li>Lower limit of first bin is not 0.</li>
+<li>Upper limit of last bin is not 1.</li>
+</ul>
+<p>The checks can be performed on <code>damage_bin_dict.csv</code> from the command line:</p>
+<pre><code>$ validatedamagebin &lt; damage_bin_dict.csv</code></pre>
+<p><a id="validatefootprint"></a></p>
+<h3 id="validatefootprint">validatefootprint</h3>
+<p>The following checks are performed on the event footprint:</p>
+<ul>
+<li>Each line contains 4 values.</li>
+<li>Total probability for each event-areaperil combination is 1.</li>
+<li>Event IDs listed in ascending order.</li>
+<li>For each event ID, areaperils IDs listed in ascending order.</li>
+<li>No duplicate intensity bin IDs for each event-areaperil combination.</li>
+</ul>
+<p>Should all checks pass, the maximum value of <code>intensity_bin_index</code> is given, which is a required input for <code>footprinttobin</code>.</p>
+<p>The checks can be performed on <code>footprint.csv</code> from the command line:</p>
+<pre><code>$ validatefootprint &lt; footprint.csv</code></pre>
+<p><a id="validatevulnerability"></a></p>
+<h3 id="validatevulnerability">validatevulnerability</h3>
+<p>The following checks are performed on the vulnerability data:</p>
+<ul>
+<li>Each line contains 4 values.</li>
+<li>Total probability for each vulnerability-intensity bin combination is 1.</li>
+<li>Vulnerability IDs listed in ascending order.</li>
+<li>For each vulnerability ID, intensity bin IDs listed in ascending order.</li>
+<li>No duplicate damage bin IDs for each vulnerability-intensity bin combination.</li>
+</ul>
+<p>Should all checks pass, the maximum value of <code>damage_bin_id</code> is given, which is a required input for <code>vulnerabilitytobin</code>.</p>
+<p>The checks can be performed on <code>vulnerability.csv</code> from the command line:</p>
+<pre><code>$ validatevulnerability &lt; vulnerability.csv</code></pre>
+<p><a id="crossvalidation"></a></p>
+<h3 id="crossvalidation">crossvalidation</h3>
+<p>The following checks are performed across the damage bin dictionary, event footprint and vulnerability data:</p>
+<ul>
+<li>Damage bin IDs in the vulnerabilty data are subset of those in the damage bin dictionary.</li>
+<li>Intensity bin IDs in the event footprint are subset of those in the vulnerability data.</li>
+</ul>
+<p>The checks can be performed on <code>damage_bin_dict.csv</code>, <code>footprint.csv</code> and <code>vulnerability.csv</code> from the command line:</p>
+<pre><code>$ crossvalidation -d damage_bin_dict.csv -f footprint.csv -s vulnerability.csv</code></pre>
+<h2 id="input-oasis-files">Input oasis files</h2>
+<p><a id="validateoasisfiles"></a></p>
+<h3 id="validateoasisfiles">validateoasisfiles</h3>
+<p>The following checks are performed across the coverages, items, fm policytc, fm programme and fm profile data:</p>
+<ul>
+<li>1-to-1 relationship between <code>agg_id</code> in <code>fm_programme.csv</code> and <code>item_id</code> in <code>items.csv</code> when <code>level_id = 1</code>.</li>
+<li><code>coverage_id</code> in <code>items.csv</code> matches those in <code>coverages.csv</code>.</li>
+<li><code>policytc_id</code> in <code>fm_policytc.csv</code> matches those in <code>fm_profile.csv</code>.</li>
+<li>(<code>level_id</code>, <code>agg_id</code>) pairs in <code>fm_policytc.csv</code> are present as (<code>level_id</code>, <code>to_agg_id</code>) pairs in <code>fm_programme.csv</code>.</li>
+<li>When <code>level_id = n &gt; 1</code>, <code>from_agg_id</code> corresponds to a <code>to_agg_id</code> from <code>level_id = n - 1</code>.</li>
+</ul>
+<p>The checks can be performed on <code>coverages.csv</code>, <code>items.csv</code>, <code>fm_policytc.csv</code>, <code>fm_programme.csv</code> and <code>fm_profile.csv</code> from the command line, specifying the directory these files are located in:</p>
+<pre><code>$ validateoasisfiles -d path/to/output/directory</code></pre>
+<p>The Ground Up Losses (GUL) flag <code>g</code> can be specified to only perform checks on <code>items.csv</code> and <code>coverages.csv</code>:</p>
+<pre><code>$ validateoasisfiles -g -d /path/to/output/directory</code></pre>
+<p><a href="#validationcomponents">Return to top</a></p>
+<p><a href="FinancialModule.html">Go to 5. Financial Module</a></p>
+<p><a href="Contents.html">Back to Contents</a></p>
+</body>
+</html>

@@ -95,7 +95,7 @@ void getmodel::getVulnerabilities(const std::set<int> &v) {
 
   FILE *fin = fopen(VULNERABILITY_FILE, "rb");
   if (fin == nullptr) {
-    fprintf(stderr, "%s: cannot open %s\n", __func__, VULNERABILITY_FILE);
+    fprintf(stderr, "FATAL: %s: cannot open %s\n", __func__, VULNERABILITY_FILE);
     exit(EXIT_FAILURE);
   }
   int current_vulnerability_id = -1;
@@ -122,15 +122,19 @@ void getmodel::getVulnerabilities(const std::set<int> &v) {
 }
 
 void getmodel::getIntensityInfo() {
-  FILE *fin = fopen(FOOTPRINT_FILE, "rb");
-  if (fin == nullptr) {
-    fprintf(stderr, "%s: cannot open %s\n", __func__, FOOTPRINT_FILE);
-    exit(EXIT_FAILURE);
-  }
-  fread(&_num_intensity_bins, sizeof(_num_intensity_bins), 1, fin);
-  fread(&_has_intensity_uncertainty, sizeof(_has_intensity_uncertainty), 1,
-        fin);
-  fclose(fin);
+	std::string filename = FOOTPRINT_FILE;
+
+	if (_zip) {
+		filename = ZFOOTPRINT_FILE;
+	}
+	FILE *fin = fopen(filename.c_str(), "rb");
+	if (fin == nullptr) {
+		fprintf(stderr, "FATAL: %s: cannot open %s\n", __func__, filename.c_str());
+		exit(EXIT_FAILURE);
+	}
+	fread(&_num_intensity_bins, sizeof(_num_intensity_bins), 1, fin);
+	fread(&_has_intensity_uncertainty, sizeof(_has_intensity_uncertainty), 1,fin);
+	fclose(fin);
 }
 
 void getmodel::getItems(std::set<int> &v) {
@@ -139,7 +143,7 @@ void getmodel::getItems(std::set<int> &v) {
 
   FILE *fin = fopen(ITEMS_FILE, "rb");
   if (fin == nullptr) {
-    fprintf(stderr, "%s: cannot open %s\n", __func__, ITEMS_FILE);
+    fprintf(stderr, "FATAL: %s: cannot open %s\n", __func__, ITEMS_FILE);
     exit(EXIT_FAILURE);
   }
 
@@ -157,7 +161,7 @@ void getmodel::getItems(std::set<int> &v) {
 void getmodel::getDamageBinDictionary() {
   FILE *fin = fopen(DAMAGE_BIN_DICT_FILE, "rb");
   if (fin == nullptr) {
-    fprintf(stderr, "%s: cannot open %s\n", __func__, DAMAGE_BIN_DICT_FILE);
+    fprintf(stderr, "FATAL: %s: cannot open %s\n", __func__, DAMAGE_BIN_DICT_FILE);
     exit(-1);
   }
   flseek(fin, 0L, SEEK_END);
@@ -170,7 +174,7 @@ void getmodel::getDamageBinDictionary() {
   damage_bins.resize(nrec);
   if (fread(&damage_bins[0], sizeof(damagebindictionary), nrec, fin) != nrec) {
     std::ostringstream poss;
-    poss << "Error reading file " << DAMAGE_BIN_DICT_FILE;
+    poss << "FATAL: Error reading file " << DAMAGE_BIN_DICT_FILE;
     perror(poss.str().c_str());
     exit(-1);
   }
@@ -186,23 +190,25 @@ void getmodel::getDamageBinDictionary() {
 }
 
 void getmodel::getFootPrints(){
-  FILE *fin;
-  if (_zip) {
-    fin = fopen(ZFOOTPRINT_IDX_FILE, "rb");
-  } else {
-    fin = fopen(FOOTPRINT_IDX_FILE, "rb");
-  }
-  if (fin == nullptr) {
-    fprintf(stderr, "%s: cannot open %s\n", __func__, FOOTPRINT_IDX_FILE);
-    exit(EXIT_FAILURE);
-  }
+	FILE *fin;
+	std:: string filename = FOOTPRINT_IDX_FILE;
 
-  EventIndex event_index;
-  while (fread(&event_index, sizeof(event_index), 1, fin) != 0) {
-    _event_index_by_event_id[event_index.event_id] = event_index;
-  }
+	if (_zip) {
+		filename = ZFOOTPRINT_IDX_FILE;
+	}
 
-  fclose(fin);
+	fin = fopen(filename.c_str(), "rb");
+	if (fin == nullptr) {
+		fprintf(stderr, "FATAL: %s: cannot open %s\n", __func__, filename.c_str());
+		exit(EXIT_FAILURE);
+	}
+
+	EventIndex event_index;
+	while (fread(&event_index, sizeof(event_index), 1, fin) != 0) {
+		_event_index_by_event_id[event_index.event_id] = event_index;
+	}
+
+	fclose(fin);
 }
 
 void getmodel::initOutputStream() {
@@ -314,7 +320,7 @@ void getmodel::doCdf(int event_id) {
 #ifndef _MSC_VER
 		  doCdfInnerz(event_id);
 #else
-		  fprintf(stderr, "zip not supported with microsoft build\n");
+		  fprintf(stderr, "FATAL: zip not supported with microsoft build\n");
 		  exit(-1);
 #endif
 	  }
@@ -326,7 +332,7 @@ void getmodel::doCdf(int event_id) {
 #ifndef _MSC_VER
 		  doCdfInnerNoIntensityUncertaintyz(event_id);
 #else
-		  fprintf(stderr, "zip not supported with microsft build\n");
+		  fprintf(stderr, "FATAL: zip not supported with microsft build\n");
 		  exit(-1);
 #endif
 	  }else {
@@ -337,7 +343,12 @@ void getmodel::doCdf(int event_id) {
 #ifndef _MSC_VER
 void getmodel::doCdfInnerz(int event_id) {
   auto sizeof_EventKey = sizeof(EventRow);
-  auto fin = fopen(ZFOOTPRINT_FILE, "rb");
+  std::string filename = ZFOOTPRINT_FILE;
+  FILE *fin = fopen(filename.c_str(), "rb");
+  if (fin == nullptr) {
+      fprintf(stderr, "FATAL: %s: cannot open %s\n", __func__, filename.c_str());
+      exit(EXIT_FAILURE);
+  }
   auto intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);   
   bool do_cdf_for_area_peril = false;
   intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);
@@ -352,7 +363,7 @@ void getmodel::doCdfInnerz(int event_id) {
   uLong dest_length = _uncompressed_buf.size();
   int ret = uncompress(&_uncompressed_buf[0], &dest_length, &_compressed_buf[0], size);
   if (ret != Z_OK) {
-    fprintf(stderr, "Got bad return code from uncompress %d\n", ret);
+    fprintf(stderr, "FATAL: Got bad return code from uncompress %d\n", ret);
     exit(-1);
   }
   // we now have the data length
@@ -389,8 +400,8 @@ void getmodel::doCdfInnerz(int event_id) {
 void getmodel::doCdfInner(int event_id) {
   auto sizeof_EventKey = sizeof(EventRow);
   auto fin = fopen(FOOTPRINT_FILE, "rb");
-  if (fin == NULL){
-      fprintf(stderr,"Error opening footprint file\n");
+  if (fin == nullptr){
+      fprintf(stderr,"FATAL: Error opening footprint file\n");
       exit(-1);
   }
   auto intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);
@@ -435,6 +446,10 @@ void getmodel::doCdfInner(int event_id) {
 void getmodel::doCdfInnerNoIntensityUncertaintyz(int event_id) {
   auto sizeof_EventKey = sizeof(EventRow);
   FILE *fin = fopen(ZFOOTPRINT_FILE, "rb");
+  if (fin == NULL) {
+      fprintf(stderr, "FATAL: Error opening footprint file\n");
+      exit(-1);
+  }
   if (_event_index_by_event_id.count(event_id) == 0)
     return;
   flseek(fin, _event_index_by_event_id[event_id].offset, 0);
@@ -446,7 +461,7 @@ void getmodel::doCdfInnerNoIntensityUncertaintyz(int event_id) {
   int ret = uncompress(&_uncompressed_buf[0], &dest_length,
                         &_compressed_buf[0], size);
   if (ret != Z_OK) {
-    fprintf(stderr, "Got bad return code from uncompress %d\n", ret);
+    fprintf(stderr, "FATAL: Got bad return code from uncompress %d\n", ret);
     exit(-1);
   }    
   // we now have the data length
@@ -476,7 +491,10 @@ void getmodel::doCdfInnerNoIntensityUncertainty(int event_id) {
     return;
 
   auto fin = fopen(FOOTPRINT_FILE, "rb");
-
+  if (fin == NULL) {
+      fprintf(stderr, "FATAL: Error opening footprint file\n");
+      exit(-1);
+  }
   flseek(fin, _event_index_by_event_id[event_id].offset, SEEK_SET);
 
   int number_of_event_records = static_cast<int>(

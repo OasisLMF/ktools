@@ -51,7 +51,411 @@ void add_tc(unsigned char tc_id, OASIS_FLOAT tc_val, std::vector<tc_rec> &tc_vec
 	}
 }
 
+void applycalcrule_stepped(const profile_rec_new& profile, LossRec& x, int layer,bool isLast)
+{
+	switch (profile.calcrule_id) {
+	case 14:
+	{
+		OASIS_FLOAT lim = 0;
+		for (auto y : profile.tc_vec) {
+			if (y.tc_id == limit_1) lim = y.tc_val;
+		}
+		//Function14 =  IIf(Loss > lim, Lim, Loss)
+		OASIS_FLOAT loss = x.loss;
+		if (loss > lim) {
+			x.limit_surplus = loss - lim;
+			loss = lim;
+		}
+		//x.retained_loss = x.retained_loss + (x.loss - loss);
+		OASIS_FLOAT net_loss = 0;
+		if (layer > 1)	net_loss = x.previous_layer_retained_loss - loss;
+		else net_loss = x.retained_loss + (x.loss - loss);
+		x.retained_loss = net_loss;
+		x.loss = loss;
+	}
+	break;
+	case 27:
+	{
+		OASIS_FLOAT deductible1 = 0;
+		OASIS_FLOAT tstart = 0;
+		OASIS_FLOAT tend = 0;
+		OASIS_FLOAT payout = 0;
+		OASIS_FLOAT scale1 = 0;
+		OASIS_FLOAT scale2 = 0;
+		OASIS_FLOAT limit1 = 0;
+		OASIS_FLOAT limit2 = 0;
+		for (auto y : profile.tc_vec) {
+			if (y.tc_id == deductible_1) deductible1 = y.tc_val;
+			if (y.tc_id == trigger_start) tstart = y.tc_val;
+			if (y.tc_id == trigger_end) tend = y.tc_val;
+			if (y.tc_id == payout_start) payout = y.tc_val;
+			if (y.tc_id == scale_1) scale1 = y.tc_val;
+			if (y.tc_id == scale_2) scale2 = y.tc_val;
+			if (y.tc_id == limit_1) limit1 = y.tc_val;
+			if (y.tc_id == limit_2) limit2 = y.tc_val;
 
+		}
+		// Step policy: single step with % loss tiv payout and limit, optional deductible, extra expense payout with limit amount, and a gross up factor for debris removal
+		OASIS_FLOAT loss = 0;
+		OASIS_FLOAT condloss = 0;
+		loss = x.loss / x.accumulated_tiv;
+		if (tend == 1) { // if the upper threshold is 100% then include loss = tend in the conditional calculation
+			if (loss <= tend) {
+				if (loss >= tstart) {
+					loss = (payout * x.accumulated_tiv) - deductible1; //calculate primary payout
+					if (loss < 0) loss = 0;
+					if (loss > limit1) loss = limit1;
+					condloss = loss * scale2; //calculate conditional payout based on primary coverage payout (extra expenses)
+					if (condloss > limit2) condloss = limit2; //limit conditional payout
+					loss = loss + condloss; // main coverage + extra expense payout
+					loss = loss * (1 + scale1); // gross up for debris removal
+				}
+				else loss = 0;
+			}
+			else loss = 0;
+		}
+		else { // if the upper threshold is not 100% then do not include loss = tend in the conditional calculation
+			if (loss < tend) {
+				if (loss >= tstart) {
+					loss = (payout * x.accumulated_tiv) - deductible1; //calculate primary payout
+					if (loss < 0) loss = 0;
+					if (loss > limit1) loss = limit1;
+					condloss = loss * scale2; //calculate conditional payout based on primary coverage payout (extra expenses)
+					if (condloss > limit2) condloss = limit2; //limit conditional payout
+					loss = loss + condloss; // main coverage + extra expense payout
+					loss = loss * (1 + scale1); // gross up for debris removal
+				}
+				else loss = 0;
+			}
+			else loss = 0;
+		}
+
+		if (profile.step_id == 1) {
+			x.step_loss = loss;
+		}
+		else {
+			x.step_loss = x.step_loss + loss;
+		}
+		if (isLast == true) {
+			x.loss = x.step_loss;
+		}
+	}
+	break;
+		case 28:
+		{		
+			OASIS_FLOAT deductible1 = 0;
+			OASIS_FLOAT tstart = 0;
+			OASIS_FLOAT tend = 0;
+			OASIS_FLOAT payout = 0;
+			OASIS_FLOAT scale1 = 0;
+			OASIS_FLOAT scale2 = 0;
+			OASIS_FLOAT limit2 = 0;
+			
+
+			for (auto y : profile.tc_vec) {
+				if (y.tc_id == deductible_1) deductible1 = y.tc_val;
+				if (y.tc_id == trigger_start) tstart = y.tc_val;
+				if (y.tc_id == trigger_end) tend = y.tc_val;
+				if (y.tc_id == payout_start) payout = y.tc_val;
+				if (y.tc_id == scale_1) scale1 = y.tc_val;
+				if (y.tc_id == scale_2) scale2 = y.tc_val;
+				if (y.tc_id == limit_2) limit2 = y.tc_val;				
+			}
+			// Step policy: single (final) step with % loss payout, no limit, extra expense payout with limit amount, and a gross up factor for debris removal
+			OASIS_FLOAT loss = 0;
+			OASIS_FLOAT condloss = 0;
+			loss = x.loss / x.accumulated_tiv;
+			if (tend == 1) { // if the upper threshold is 100% then include loss = tend in the conditional calculation
+				if (loss <= tend) {
+					if (loss >= tstart) {
+						loss = (payout * x.loss) - deductible1; //calculate primary payout
+						if (loss < 0) loss = 0;
+						if (payout == 0) { 
+							condloss = x.step_loss * scale2; //special case to calculate only the conditional coverage loss (extra expenses) based on full input loss where there is no primary payout
+						}
+						else condloss = loss * scale2; //calculate conditional payout based on primary coverage payout (extra expenses)
+						if (condloss > limit2) condloss = limit2; //limit conditional payout
+						loss = loss + condloss; // main coverage + extra expense payout
+						loss = loss * (1 + scale1); // gross up for debris removal
+					}
+					else loss = 0;
+				}
+				else loss = 0;
+			}
+			else { // if the upper threshold is not 100% then do not include loss = tend in the conditional calculation
+				if (loss < tend) {
+					if (loss >= tstart) {
+						loss = (payout * x.loss) - deductible1; //calculate primary payout
+						if (loss < 0) loss = 0;
+						if (payout == 0) {
+							condloss = x.step_loss * scale2; //special case to calculate only the conditional coverage loss (extra expenses) based on the step loss brought forward.
+						}
+						else condloss = loss * scale2; //calculate conditional payout (extra expenses)
+						if (condloss > limit2) condloss = limit2; //limit conditional payout
+						loss = loss + condloss; // main coverage + extra expense payout
+						loss = loss * (1 + scale1); // gross up for debris removal
+					}
+					else loss = 0;
+				}
+				else loss = 0;
+			}
+			
+			if (profile.step_id == 1) {
+				x.step_loss = loss;
+			}
+			else {
+				x.step_loss = x.step_loss + loss;
+			}
+			if (isLast == true) {
+				x.loss = x.step_loss;
+			}
+		}
+		break;
+		case 29:
+		{
+			OASIS_FLOAT deductible1 = 0;
+			OASIS_FLOAT tstart = 0;
+			OASIS_FLOAT tend = 0;
+			OASIS_FLOAT payout = 0;
+			OASIS_FLOAT scale1 = 0;
+			OASIS_FLOAT scale2 = 0;
+			OASIS_FLOAT limit2 = 0;
+			for (auto y : profile.tc_vec) {
+				if (y.tc_id == deductible_1) deductible1 = y.tc_val;
+				if (y.tc_id == trigger_start) tstart = y.tc_val;
+				if (y.tc_id == trigger_end) tend = y.tc_val;
+				if (y.tc_id == payout_start) payout = y.tc_val;
+				if (y.tc_id == scale_1) scale1 = y.tc_val;
+				if (y.tc_id == scale_2) scale2 = y.tc_val;
+				if (y.tc_id == limit_2) limit2 = y.tc_val;
+
+			}
+			// Step policy: single step with % loss tiv payout, no limit, optional deductible, extra expense payout with limit amount, and a gross up factor for debris removal
+			OASIS_FLOAT loss = 0;
+			OASIS_FLOAT condloss = 0;
+			loss = x.loss / x.accumulated_tiv;
+			if (tend == 1) { // if the upper threshold is 100% then include loss = tend in the conditional calculation
+				if (loss <= tend) {
+					if (loss >= tstart) {
+						loss = (payout * x.accumulated_tiv) - deductible1; //calculate primary payout
+						if (loss < 0) loss = 0;
+						condloss = loss * scale2; //calculate conditional payout based on primary coverage payout (extra expenses)
+						if (condloss > limit2) condloss = limit2; //limit conditional payout
+						loss = loss + condloss; // main coverage + extra expense payout
+						loss = loss * (1 + scale1); // gross up for debris removal
+					}
+					else loss = 0;
+				}
+				else loss = 0;
+			}
+			else { // if the upper threshold is not 100% then do not include loss = tend in the conditional calculation
+				if (loss < tend) {
+					if (loss >= tstart) {
+						loss = (payout * x.accumulated_tiv) - deductible1; //calculate primary payout
+						if (loss < 0) loss = 0;
+						condloss = loss * scale2; //calculate conditional payout based on primary coverage payout (extra expenses)
+						if (condloss > limit2) condloss = limit2; //limit conditional payout
+						loss = loss + condloss; // main coverage + extra expense payout
+						loss = loss * (1 + scale1); // gross up for debris removal
+					}
+					else loss = 0;
+				}
+				else loss = 0;
+			}
+
+			if (profile.step_id == 1) {
+				x.step_loss = loss;
+			}
+			else {
+				x.step_loss = x.step_loss + loss;
+			}
+			if (isLast == true) {
+				x.loss = x.step_loss;
+			}
+		}
+		break;
+		case 30:
+		{
+			OASIS_FLOAT deductible1 = 0;
+			OASIS_FLOAT tstart = 0;
+			OASIS_FLOAT tend = 0;
+			OASIS_FLOAT payout = 0;
+			OASIS_FLOAT scale1 = 0;
+			OASIS_FLOAT scale2 = 0;
+			OASIS_FLOAT limit1 = 0;
+			OASIS_FLOAT limit2 = 0;
+			for (auto y : profile.tc_vec) {
+				if (y.tc_id == deductible_1) deductible1 = y.tc_val;
+				if (y.tc_id == trigger_start) tstart = y.tc_val;
+				if (y.tc_id == trigger_end) tend = y.tc_val;
+				if (y.tc_id == payout_start) payout = y.tc_val;
+				if (y.tc_id == scale_1) scale1 = y.tc_val;
+				if (y.tc_id == scale_2) scale2 = y.tc_val;
+				if (y.tc_id == limit_1) limit1 = y.tc_val;
+				if (y.tc_id == limit_2) limit2 = y.tc_val;
+
+			}
+			// Step policy: single step with % limit payout, optional deductible, extra expense payout with limit amount, and a gross up factor for debris removal
+			OASIS_FLOAT loss = 0;
+			OASIS_FLOAT condloss = 0;
+			loss = x.loss / x.accumulated_tiv;
+			if (tend == 1) { // if the upper threshold is 100% then include loss = tend in the conditional calculation
+				if (loss <= tend) {
+					if (loss >= tstart) {
+						loss = (payout * limit1) - deductible1; //calculate primary payout
+						if (loss < 0) loss = 0;
+						condloss = loss * scale2; //calculate conditional payout based on primary coverage payout (extra expenses)
+						if (condloss > limit2) condloss = limit2; //limit conditional payout
+						loss = loss + condloss; // main coverage + extra expense payout
+						loss = loss * (1 + scale1); // gross up for debris removal
+					}
+					else loss = 0;
+				}
+				else loss = 0;
+			}
+			else { // if the upper threshold is not 100% then do not include loss = tend in the conditional calculation
+				if (loss < tend) {
+					if (loss >= tstart) {
+						loss = (payout * limit1) - deductible1; //calculate primary payout
+						if (loss < 0) loss = 0;
+						condloss = loss * scale2; //calculate conditional payout based on primary coverage payout (extra expenses)
+						if (condloss > limit2) condloss = limit2; //limit conditional payout
+						loss = loss + condloss; // main coverage + extra expense payout
+						loss = loss * (1 + scale1); // gross up for debris removal
+					}
+					else loss = 0;
+				}
+				else loss = 0;
+			}
+
+			if (profile.step_id == 1) {
+				x.step_loss = loss;
+			}
+			else {
+				x.step_loss = x.step_loss + loss;
+			}
+			if (isLast == true) {
+				x.loss = x.step_loss;
+			}
+		}
+		break;
+		case 31:
+		{
+			OASIS_FLOAT deductible1 = 0;
+			OASIS_FLOAT tstart = 0;
+			OASIS_FLOAT tend = 0;
+			OASIS_FLOAT payout = 0;
+			OASIS_FLOAT scale1 = 0;
+			OASIS_FLOAT scale2 = 0;
+			OASIS_FLOAT limit2 = 0;
+			for (auto y : profile.tc_vec) {
+				if (y.tc_id == deductible_1) deductible1 = y.tc_val;
+				if (y.tc_id == trigger_start) tstart = y.tc_val;
+				if (y.tc_id == trigger_end) tend = y.tc_val;
+				if (y.tc_id == payout_start) payout = y.tc_val;
+				if (y.tc_id == scale_1) scale1 = y.tc_val;
+				if (y.tc_id == scale_2) scale2 = y.tc_val;
+				if (y.tc_id == limit_2) limit2 = y.tc_val;
+
+			}
+			// Step policy: single step with monetary amount payout, optional deductible, extra expense payout with limit amount, and a gross up factor for debris removal
+			OASIS_FLOAT loss = 0;
+			OASIS_FLOAT condloss = 0;
+			loss = x.loss / x.accumulated_tiv;
+			if (tend == 1) { // if the upper threshold is 100% then include loss = tend in the conditional calculation
+				if (loss <= tend) {
+					if (loss >= tstart) {
+						loss = payout - deductible1; //calculate primary payout
+						if (loss < 0) loss = 0;
+						condloss = loss * scale2; //calculate conditional payout based on primary coverage payout (extra expenses)
+						if (condloss > limit2) condloss = limit2; //limit conditional payout
+						loss = loss + condloss; // main coverage + extra expense payout
+						loss = loss * (1 + scale1); // gross up for debris removal
+					}
+					else loss = 0;
+				}
+				else loss = 0;
+			}
+			else { // if the upper threshold is not 100% then do not include loss = tend in the conditional calculation
+				if (loss < tend) {
+					if (loss >= tstart) {
+						loss = payout - deductible1; //calculate primary payout
+						if (loss < 0) loss = 0;
+						condloss = loss * scale2; //calculate conditional payout based on primary coverage payout (extra expenses)
+						if (condloss > limit2) condloss = limit2; //limit conditional payout
+						loss = loss + condloss; // main coverage + extra expense payout
+						loss = loss * (1 + scale1); // gross up for debris removal
+					}
+					else loss = 0;
+				}
+				else loss = 0;
+			}
+
+			if (profile.step_id == 1) {
+				x.step_loss = loss;
+			}
+			else {
+				x.step_loss = x.step_loss + loss;
+			}
+			if (isLast == true) {
+				x.loss = x.step_loss;
+			}
+		}
+		break;
+		case 32:
+		{
+			OASIS_FLOAT tstart = 0;
+			OASIS_FLOAT payout = 0;
+			OASIS_FLOAT scale1 = 0;
+			OASIS_FLOAT limit1 = 0;
+			OASIS_FLOAT scale2 = 0;
+			OASIS_FLOAT limit2 = 0;
+
+			for (auto y : profile.tc_vec) {
+				if (y.tc_id == trigger_start) tstart = y.tc_val;
+				if (y.tc_id == payout_start) payout = y.tc_val;
+				if (y.tc_id == scale_1) scale1 = y.tc_val;
+				if (y.tc_id == limit_1) limit1 = y.tc_val;
+				if (y.tc_id == scale_2) scale2 = y.tc_val;
+				if (y.tc_id == limit_2) limit2 = y.tc_val;
+			}
+			// Step policy: franchise trigger as a monetary amount with % loss payout, a limit amount and optional extra expenses and scale up factor for debris removal
+			OASIS_FLOAT loss = 0;
+			OASIS_FLOAT condloss = 0;
+			if (x.loss >= tstart) {
+				loss = payout * x.loss;
+				if (loss > limit1) loss = limit1;
+				condloss = loss * scale2; //calculate conditional payout based on primary coverage payout (extra expenses)
+				if (condloss > limit2) condloss = limit2; //limit conditional payout
+				loss = loss + condloss; // main coverage + extra expense payout
+				loss = loss * (1 + scale1);
+			}
+			else loss = 0;
+			
+			if (profile.step_id == 1) {
+				x.step_loss = loss;
+			}
+			else {
+				x.step_loss = x.step_loss + loss;
+			}
+			if (isLast == true) {
+				x.loss = x.step_loss;
+			}
+
+
+		}
+		break;
+		case 100:	// noop
+		{
+			x.loss = x.loss;
+		}
+		break;
+		default:
+		{
+			fprintf(stderr, "Unknown calc rule %d\n", profile.calcrule_id);
+		}
+	}
+}
 void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 {
 	switch (profile.calcrule_id) {
@@ -875,6 +1279,12 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			}
 			x.loss = loss;
 		}
+		break;
+		case 100:	// noop
+		{
+			x.loss = x.loss;
+		}
+		break;
 		default:
 		{
 			fprintf(stderr, "Unknown calc rule %d\n", profile.calcrule_id);
@@ -882,19 +1292,128 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 	}
 }
 
-void fmcalc::dofmcalc(std::vector <LossRec> &agg_vec, int layer)
+void fmcalc::dofmcalc_normal(std::vector <LossRec> &agg_vec, int layer)
 {
 	for (LossRec &x : agg_vec) {
 		if (x.agg_id == 0) break;
 		if (x.agg_id > 0) {
 			if (x.loss > 0 || x.retained_loss > 0) {
 				if (x.policytc_id > 0) {
-					const profile_rec_new &profile = profile_vec_new_[x.policytc_id];					
-					applycalcrule(profile, x, layer);
+					const profile_rec_new &profile = profile_vec_new_[x.policytc_id];
+					if (profile.calcrule_id != 100) applycalcrule(profile, x, layer);
 				}
 			}
 		}
 	}
+}
+
+
+void fmcalc::dofmcalc_stepped(std::vector <LossRec>& agg_vec, int layer)
+{
+	for (LossRec& x : agg_vec) {
+		if (x.agg_id == 0) break;
+		if (x.agg_id > 0) {
+			if (x.loss > 0 || x.retained_loss > 0) {
+				if (x.policytc_id > 0) {
+					auto iter = profile_vec_stepped_[x.policytc_id].cbegin();
+					while (iter != profile_vec_stepped_[x.policytc_id].cend()) {
+						const profile_rec_new& profile = *(iter);						
+						iter++;
+						if (iter == profile_vec_stepped_[x.policytc_id].cend()) {
+							if (profile.calcrule_id != 100) applycalcrule_stepped(profile, x, layer,true);
+						}
+						else {
+							if (profile.calcrule_id != 100) applycalcrule_stepped(profile, x, layer, false);
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+
+void fmcalc::dofmcalc(std::vector <LossRec>& agg_vec, int layer)
+{
+	if (stepped_ == false) dofmcalc_normal(agg_vec, layer);
+	else dofmcalc_stepped(agg_vec, layer);
+}
+void fmcalc::init_profile__stepped_rec(fm_profile_step& f)
+{
+	profile_rec_new p;
+	p.calcrule_id = f.calcrule_id;
+	p.step_id = f.step_id;
+	switch (p.calcrule_id) {
+		case 14:
+			add_tc(limit_1, f.limit1, p.tc_vec);
+			break;
+		case 27:
+			add_tc(deductible_1, f.deductible1, p.tc_vec);
+			add_tc(limit_2, f.limit2, p.tc_vec);
+			add_tc(limit_1, f.limit1, p.tc_vec);
+			add_tc(payout_start, f.payout_start, p.tc_vec);
+			add_tc(scale_1, f.scale1, p.tc_vec);
+			add_tc(scale_2, f.scale2, p.tc_vec);
+			add_tc(trigger_start, f.trigger_start, p.tc_vec);
+			add_tc(trigger_end, f.trigger_end, p.tc_vec);
+			break;
+		case 28:
+			add_tc(deductible_1, f.deductible1, p.tc_vec);
+			add_tc(limit_2, f.limit2, p.tc_vec);
+			add_tc(payout_start, f.payout_start, p.tc_vec);
+			add_tc(scale_1, f.scale1, p.tc_vec);
+			add_tc(scale_2, f.scale2, p.tc_vec);
+			add_tc(trigger_start, f.trigger_start, p.tc_vec);
+			add_tc(trigger_end, f.trigger_end, p.tc_vec);
+			break;
+		case 29:
+			add_tc(deductible_1, f.deductible1, p.tc_vec);
+			add_tc(limit_2, f.limit2, p.tc_vec);
+			add_tc(payout_start, f.payout_start, p.tc_vec);
+			add_tc(scale_1, f.scale1, p.tc_vec);
+			add_tc(scale_2, f.scale2, p.tc_vec);
+			add_tc(trigger_start, f.trigger_start, p.tc_vec);
+			add_tc(trigger_end, f.trigger_end, p.tc_vec);
+			break;
+		case 30:
+			add_tc(deductible_1, f.deductible1, p.tc_vec);
+			add_tc(limit_2, f.limit2, p.tc_vec);
+			add_tc(limit_1, f.limit1, p.tc_vec);
+			add_tc(payout_start, f.payout_start, p.tc_vec);
+			add_tc(scale_1, f.scale1, p.tc_vec);
+			add_tc(scale_2, f.scale2, p.tc_vec);
+			add_tc(trigger_start, f.trigger_start, p.tc_vec);
+			add_tc(trigger_end, f.trigger_end, p.tc_vec);
+			break;
+		case 31:
+			add_tc(deductible_1, f.deductible1, p.tc_vec);
+			add_tc(limit_2, f.limit2, p.tc_vec);
+			add_tc(payout_start, f.payout_start, p.tc_vec);
+			add_tc(scale_1, f.scale1, p.tc_vec);
+			add_tc(scale_2, f.scale2, p.tc_vec);
+			add_tc(trigger_start, f.trigger_start, p.tc_vec);
+			add_tc(trigger_end, f.trigger_end, p.tc_vec);
+			break;
+		case 32:
+			add_tc(payout_start, f.payout_start, p.tc_vec);
+			add_tc(scale_1, f.scale1, p.tc_vec);
+			add_tc(trigger_start, f.trigger_start, p.tc_vec);
+			add_tc(limit_1, f.limit1, p.tc_vec);
+			add_tc(limit_2, f.limit2, p.tc_vec);
+			add_tc(scale_2, f.scale2, p.tc_vec);
+			break;
+		case 100:
+			break;
+		default:
+		{
+			fprintf(stderr, "Invalid calc rule for stepped policies\n");
+			exit(EXIT_FAILURE);
+		}
+	}
+	if (profile_vec_stepped_.size() < ((size_t) f.profile_id) + 1 ) {
+		profile_vec_stepped_.resize((size_t) f.profile_id + 1);
+	}
+	profile_vec_stepped_[f.profile_id].push_back(p);
 }
 
 void fmcalc::init_profile_rec(fm_profile &f)
@@ -1011,10 +1530,36 @@ void fmcalc::init_profile_rec(fm_profile &f)
 	profile_vec_new_[f.profile_id] = p;
 }
 
+void fmcalc::init_profile_step()
+{
+	FILE* fin = NULL;
+	std::string file = FMPROFILE_FILE_STEP;
+	if (inputpath_.length() > 0) {
+		file = inputpath_ + file.substr(5);
+	}
+	fin = fopen(file.c_str(), "rb");
+	if (fin == NULL) {
+		fprintf(stderr, "%s: cannot open %s\n", __func__, file.c_str());
+		exit(EXIT_FAILURE);
+	}
+	fm_profile_step f;
+	size_t i = fread(&f, sizeof(f), 1, fin);
+	while (i != 0) {
+		init_profile__stepped_rec(f);
+		if (noop_profile_id < f.profile_id) noop_profile_id = f.profile_id;
+		i = fread(&f, sizeof(f), 1, fin);
+	}
+	noop_profile_id++;
+	fm_profile_step d;	// dummy
+	d.profile_id = noop_profile_id;
+	d.calcrule_id = 100; // noop
+	init_profile__stepped_rec(d);
+	fclose(fin);
+}
 void fmcalc::init_profile()
 {
 	FILE *fin = NULL;
-	std::string file = FMPROFILE_FILE_NEW;
+	std::string file = FMPROFILE_FILE;
 	if (inputpath_.length() > 0) {
 		file = inputpath_ + file.substr(5);
 	}
@@ -1033,7 +1578,8 @@ void fmcalc::init_profile()
 	noop_profile_id++;
 	fm_profile d;	// dummy
 	d.profile_id = noop_profile_id;
-	d.calcrule_id = 14;
+	//d.calcrule_id = 14;
+	d.calcrule_id = 100; // noop
 	init_profile_rec(d);
 	fclose(fin);
 }

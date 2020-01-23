@@ -54,7 +54,8 @@ namespace cdftocsv {
 
 		FILE *fin = fopen(DAMAGE_BIN_DICT_FILE, "rb");
 		if (fin == NULL) {
-			return false;
+			fprintf(stderr, "FATAL: Erroropening %s\n", DAMAGE_BIN_DICT_FILE);
+			exit(-1);
 		}
 		flseek(fin, 0L, SEEK_END);
 		long long sz = fltell(fin);
@@ -62,7 +63,7 @@ namespace cdftocsv {
 		unsigned int nrec = static_cast<unsigned int> (sz / sizeof(damagebindictionary));
 		damagebindictionary *s1 = new damagebindictionary[nrec];
 		if (fread(s1, sizeof(damagebindictionary), nrec, fin) != nrec) {
-			fprintf(stderr, "Error reading file\n");
+			fprintf(stderr, "FATAL: Error reading file\n");
 			exit(-1);
 		}
 
@@ -131,7 +132,7 @@ namespace cdftocsv {
 		bool bSuccess = getrec((char *)&stream_type, stdin, sizeof(stream_type));
 
 		if (stream_type != 1) {
-			fprintf(stderr, "Invalid stream type %d expect stream type 1\n", stream_type);
+			fprintf(stderr, "FATAL: Invalid stream type %d expect stream type 1\n", stream_type);
 			exit(-1);
 		}
 		for (;;) {

@@ -51,6 +51,7 @@ struct LossRec {
 	OASIS_FLOAT accumulated_tiv = 0;	// accumulated tiv 
 	OASIS_FLOAT over_limit = 0;
 	OASIS_FLOAT under_limit = 0;
+	OASIS_FLOAT step_loss = 0;
 	int agg_id = 0;
 	int policytc_id = 0;
 	int next_vec_idx = -1;
@@ -72,7 +73,8 @@ struct tc_rec {
 };
 
 struct profile_rec_new {
-	int calcrule_id;	
+	int calcrule_id;
+	int step_id=-1;
 	std::vector<tc_rec> tc_vec;
 
 };

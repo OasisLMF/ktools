@@ -90,13 +90,16 @@ struct gulcalcopts {
 	int rand_seed = 0;
 	std::string item_output;
 	std::string coverage_output;
+	std::string correlated_output;
 	bool itemLevelOutput = false;
 	bool coverageLevelOutput = false;
+	bool correlatedLevelOutput = false;
 	int samplesize = -1;
 	double loss_threshold = 0.0;
 	bool debug = false;
 	FILE *itemout = stdout;
 	FILE *covout = stdout;
+	FILE *corrout = stdout;
 	int mode = 0;		// default mode = 0 
 };
 
@@ -104,86 +107,111 @@ struct gulItemIDLoss {
 	int item_id;
 	double loss;
 };
+struct probrec {
+      OASIS_FLOAT prob_from;
+      OASIS_FLOAT prob_to;
+      OASIS_FLOAT bin_mean;
+};
 class gulcalc  {
 private:
 	getRands *rnd_;
+	getRands *rnd0_;
 	int rand_seed_ = 0;
+	gulcalcopts opt_;
 	const std::map<item_map_key, std::vector<item_map_rec> > *item_map_;
 	const std::vector<OASIS_FLOAT> *coverages_;
 	const std::vector<damagebindictionary> *damagebindictionary_vec_;
 	void gencovoutput(gulcoverageSampleslevel &gc);
 	void genmode1output(gulitemSampleslevel& gc, int coverage_id);
+	void gencorrelatedoutput(gulitemSampleslevel& gc, int coverage_id);
 	std::vector<std::vector<OASIS_FLOAT>> cov_;
 	std::vector<std::vector<std::vector<gulItemIDLoss>>> mode1_;
+	std::vector<std::vector<std::vector<gulItemIDLoss>>> fullCorr_;
+	std::vector<int> mode1UsedCoverageIDs_;
 	void covoutputgul(gulcoverageSampleslevel &gc);
 	void outputcoveragedata(int event_id);
 	void outputmode1data(int event_id);
+	void outputcorrelateddata(int event_id);
 	void itemoutputgul(gulitemSampleslevel &gg);
+	void correlatedoutputgul(gulitemSampleslevel &gg);
+	void setupandgenoutput(const item_map_rec &er, const OASIS_FLOAT tiv, const int event_id, const int bin_index, const OASIS_FLOAT rval, const probrec &p, const int sample_id, const bool correlated);
 	void(*itemWriter_)(const void *ibuf, int size, int count);
 	void(*coverageWriter_)(const void *ibuf, int size, int count);
     void (*lossWriter_)(const void *ibuf, int size, int count);	// loss stream writer
+    	void(*correlatedWriter_)(const void *ibuf, int size, int count);
 	bool(*iGetrec_)(char *rec, int recsize);
 	OASIS_FLOAT getgul(damagebindictionary &b, gulGulSamples &g);
 	void output_mean(const item_map_rec &er, OASIS_FLOAT tiv, prob_mean *pp, int bin_count, OASIS_FLOAT &gul_mean, OASIS_FLOAT &std_dev);
 	void init();
 	unsigned char *ibuf_;	// item level buffer
+	unsigned char *corrbuf_;   // correlated level buffer
 	unsigned char *cbuf_;	// coverage level buffer
 	int itembufoffset_ = 0;
+	int correlatedbufoffset_ = 0;
 	int covbufoffset_ = 0;
 	double loss_threshold_;
 	rd_option rndopt_;
 	bool debug_;
 	int samplesize_;
 	bool isFirstItemEvent_;
+	bool isFirstCorrelatedEvent_;
 	bool isFirstCovEvent_;
 	long long p1_;
 	long long p2_;
 	long long p3_;
 	void clearmode1_data();
+	void clearfullCorr_data();
+
 public:	
 	void processrec(char *rec, int recsize);
 	void processrec_mode1(char* rec, int recsize);
 	 gulcalc(const std::vector<damagebindictionary> &damagebindictionary_vec,const std::vector<OASIS_FLOAT> &tivs,
-		const std::map<item_map_key, std::vector<item_map_rec> > &item_map, getRands &rnd, 
-		double loss_threshold,
-		//bool userandomtable,
-		rd_option rndopt,
-		bool debug,
-		int samplesize,
+		const std::map<item_map_key, std::vector<item_map_rec> > &item_map, getRands &rnd, getRands &rnd0, 		
 		void (*itemWriter)(const void *ibuf,int size, int count),
 		void(*coverageWriter)(const void *ibuf,int size, int count),
         void (*lossWriter)(const void *ibuf, int size, int count),
+		void(*correlatedWriter)(const void *ibuf, int size, int count),
 		bool(*iGetrec)(char *rec, int recsize),
-		int rand_seed
-		) {
+		const gulcalcopts& opt
+		): opt_(opt) {
 		damagebindictionary_vec_ = &damagebindictionary_vec;
 		coverages_ = &tivs;
 		cov_.resize(coverages_->size());
-		mode1_.resize(coverages_->size());
+		if (opt.mode == 1) {
+			mode1_.resize(coverages_->size());
+		}
+		if (opt.correlatedLevelOutput == true) {
+			fullCorr_.resize(coverages_->size());
+		}
 		item_map_ = &item_map;
 		rnd_ = &rnd;
+		rnd0_ = &rnd0;
 
 		itemWriter_ = itemWriter;
 		coverageWriter_ = coverageWriter;
         lossWriter_ = lossWriter;
+		correlatedWriter_ = correlatedWriter;
 		iGetrec_ = iGetrec;
 		ibuf_ = new unsigned char[bufsize + sizeof(gulitemSampleslevel)]; // make the allocation bigger by 1 record to avoid overrunning
+		corrbuf_ = new unsigned char[bufsize + sizeof(gulitemSampleslevel)];   // make the allocation bigger by 1 record to avoid overrunning
 		cbuf_ = new unsigned char[bufsize + sizeof(gulitemSampleslevel)]; // make the allocation bigger by 1 record to avoid overrunning
 		//TODO: when using double precision, these buffers above are overflowing,
 		//the hack fix is to replace sizeof(gulitemSampleslevel) with 2*sizeof(gulitemSampleslevel)
-		loss_threshold_ = loss_threshold;
-		rndopt_ = rndopt;				
-		debug_ = debug;
-		samplesize_ = samplesize;
+		loss_threshold_ = opt.loss_threshold;
+		rndopt_ = opt.rndopt;				
+		debug_ = opt.debug;
+		samplesize_ = opt.samplesize;
 		isFirstItemEvent_ = true;
+		isFirstCorrelatedEvent_ = true;
 		isFirstCovEvent_ = true;
 		p1_ = rnd_->getp1();	// prime p1	make these long to force below expression to not have sign problem
 		p2_ = rnd_->getp2((unsigned int)p1_);  // prime no p2
 		p3_ = rnd_->getp2((unsigned int)samplesize_);	// use as additional offset to stop overlapping of random numbers 
-		rand_seed_ = rand_seed;
+		rand_seed_ = opt.rand_seed;
 	}	
 	~gulcalc() {
 		delete [] ibuf_;
+		delete [] corrbuf_;
 		delete [] cbuf_;
 	}
 	void mode0();

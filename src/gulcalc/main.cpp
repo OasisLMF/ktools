@@ -41,6 +41,8 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include "../wingetopt/wingetopt.h"
 #else
 #include <unistd.h>
+#include <signal.h>
+#include <string.h>
 #endif
 
 #include "gulcalc.h"
@@ -51,6 +53,13 @@ bool verbose = false;
 
 char *progname;
 
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+void segfault_sigaction(int signal, siginfo_t* si, void* arg)
+{
+	fprintf(stderr, "FATAL: %s: Segment fault at address: %p\n", progname, si->si_addr);
+	exit(EXIT_FAILURE);
+}
+#endif
 
 void help()
 {
@@ -60,6 +69,7 @@ void help()
 		"-R [max random numbers] used to allocate array for random numbers default 1,000,000\n"
 		"-c [output pipe] - coverage output\n"
 		"-i [output pipe] - item output\n"
+		"-j [file name] correlated output\n"
 		"-d debug (output random numbers instead of gul)\n"
 		"-s seed for random number generation (used for debugging)\n"
 		"-A automatically hashed seed driven random number generation (default)\n"
@@ -78,7 +88,7 @@ int main(int argc, char *argv[])
 	gulcalcopts gopt;
 	gopt.loss_threshold = 0.000001;
 	progname = argv[0];
-	while ((opt = getopt(argc, argv, "Alvhdra:L:S:c:i:R:s:m:")) != -1) {
+	while ((opt = getopt(argc, argv, "Alvhdra:L:S:c:i:j:R:s:m:")) != -1) {
 		switch (opt) {
 		case 'S':
 			gopt.samplesize = atoi(optarg);
@@ -105,6 +115,10 @@ int main(int argc, char *argv[])
 			gopt.item_output = optarg;
 			gopt.itemLevelOutput = true;
 			break;
+		case 'j':
+			gopt.correlated_output = optarg;
+			gopt.correlatedLevelOutput = true;
+			break;
 		case 'm':
 			gopt.mode = atoi(optarg);
 			break;
@@ -128,31 +142,52 @@ int main(int argc, char *argv[])
 			exit(EXIT_FAILURE);
 		}
 	}
-	
+
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+	struct sigaction sa;
+
+	memset(&sa, 0, sizeof(struct sigaction));
+	sigemptyset(&sa.sa_mask);
+	sa.sa_sigaction = segfault_sigaction;
+	sa.sa_flags = SA_SIGINFO;
+
+	sigaction(SIGSEGV, &sa, NULL);
+#endif
+
 	if (gopt.itemLevelOutput == true) {
 		if (gopt.item_output == "-") gopt.itemout = stdout;
 		else gopt.itemout = fopen(gopt.item_output.c_str(), "wb");
 	}
 	if (gopt.coverageLevelOutput == true) {
+		gopt.mode = 0;	// mode is always zero for coverage level output -c is to be deprecated
 		if (gopt.coverage_output == "-") gopt.covout = stdout;
 		else gopt.covout = fopen(gopt.coverage_output.c_str(), "wb");
 	}
+	if(gopt.correlatedLevelOutput == true) {
+		gopt.corrout = fopen(gopt.correlated_output.c_str(), "wb");
+		if(gopt.corrout == NULL) {
+			fprintf(stderr, "FATAL: Correlated output file name must be specified\n");
+			exit(EXIT_FAILURE);
+		}
+	}
 
 	if (gopt.itemLevelOutput == false && gopt.coverageLevelOutput == false) {
-		fprintf(stderr, "%s: No output option selected\n", argv[0]);
+		fprintf(stderr, "FATAL: S%s: No output option selected\n", argv[0]);
 		exit(EXIT_FAILURE);
 	}	
 
 	if (gopt.mode > 1 || gopt.mode < 0) {
-		fprintf(stderr, "%s: Invalid mode %d valid modes are 0 and 1\n", argv[0],gopt.mode);
+		fprintf(stderr, "FATAL:%s: Invalid mode %d valid modes are 0 and 1\n", argv[0],gopt.mode);
 		exit(EXIT_FAILURE);
 	}
 
 	try {
 		initstreams();
+		//logprintf(progname, "INFO", "starting process..\n");
 		doit(gopt);
+		//logprintf(progname, "INFO", "finishing process..\n");
 	}catch (std::bad_alloc) {
-			fprintf(stderr, "%s: Memory allocation failed\n", progname);
+			fprintf(stderr, "FATAL:%s: Memory allocation failed\n", progname);
 			exit(EXIT_FAILURE);
 	}
 

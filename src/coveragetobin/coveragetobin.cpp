@@ -55,13 +55,13 @@ namespace coveragetobin {
 			int coverage_id;
 			OASIS_FLOAT tiv;
 			if (sscanf(line, "%d,%f", &coverage_id, &tiv) != 2) {
-				fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
+				fprintf(stderr, "FATAL: Invalid data in line %d:\n%s", lineno, line);
 				return;
 			}
 			else
 			{
 				if ((last_coverage_id + 1) != coverage_id) {
-					fprintf(stderr, "Expecting coverage id %d but got %d\n", (last_coverage_id + 1), coverage_id);
+					fprintf(stderr, "FATAL: Expecting coverage id %d but got %d\n", (last_coverage_id + 1), coverage_id);
 					exit(-1);
 				}
 				fwrite(&tiv, sizeof(tiv), 1, stdout);

@@ -7,4 +7,4 @@ gmon*
 analysis.txt
 .dirstamp
 g.sh
-
+*.bak

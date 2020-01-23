@@ -44,11 +44,24 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include "../wingetopt/wingetopt.h"
 #else
 #include <unistd.h>
+#include <signal.h>
+#include <string.h>
 #endif
 
 #include "../include/oasis.h"
 #include "summarycalc.h"
 #include <string>
+
+char* progname;
+
+
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+void segfault_sigaction(int signal, siginfo_t* si, void* arg)
+{
+	fprintf(stderr, "%s: Segment fault at address: %p\n", progname, si->si_addr);
+	exit(EXIT_FAILURE);
+}
+#endif
 
 void help()
 {
@@ -77,6 +90,7 @@ void help()
 */
 int main(int argc, char* argv[])
 {
+	progname = argv[0];
 	int opt;
 	bool noneOutputTrue = true;
 	int truecount = 0;
@@ -134,17 +148,35 @@ int main(int argc, char* argv[])
 	}
 
 	if (truecount == 0 ) {
-		std::cerr << "no input type selected\n Please use -g or -f or -i or -c\n";
-		return -1;
+		fprintf(stderr, "FATAL:%s No input type selected\n Please use -g or -f or -i or -c\n", progname);
+		return EXIT_FAILURE;
 	}
 	if (truecount > 1) {
-		std::cerr << "Only one input type can be selected from -g or -f or -i or -c\n";
-		return -1;
+		fprintf(stderr, "FATAL:%s Only one input type can be selected from -g or -f or -i or -c\n", progname);
+		return EXIT_FAILURE;
 	}
 
-	if (noneOutputTrue) return -1; // no output stream so nothing to do...
-	
-	f.doit();
-	return EXIT_SUCCESS;
+	if (noneOutputTrue) return EXIT_FAILURE; // no output stream so nothing to do...
+
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+	struct sigaction sa;
+
+	memset(&sa, 0, sizeof(struct sigaction));
+	sigemptyset(&sa.sa_mask);
+	sa.sa_sigaction = segfault_sigaction;
+	sa.sa_flags = SA_SIGINFO;
+
+	sigaction(SIGSEGV, &sa, NULL);
+#endif
+
+	try {
+		logprintf(progname, "INFO", "starting process..\n");
+		f.doit();
+		logprintf(progname, "INFO", "finishing process..\n");
+		return EXIT_SUCCESS;
+	}catch (std::bad_alloc) {
+		fprintf(stderr, "FATAL:%s: Memory allocation failed\n", progname);
+		exit(EXIT_FAILURE);
+	}
 
 }

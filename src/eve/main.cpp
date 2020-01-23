@@ -113,11 +113,11 @@ int main(int argc, char *argv[]) {
     bool parameter_error = false;
 
     if (argv[optind] == NULL) {
-        printf("arguments for processno not supplied\n");
+        fprintf(stderr,"FATAL:%s:arguments for processno not supplied\n", progname);
         parameter_error = true;
     }
     if (argv[optind + 1] == NULL) {
-        printf("totalprocesses not supplied\n");
+        fprintf(stderr,"FATAL:%s: totalprocesses not supplied\n", progname);
         parameter_error = true;
     }
 
@@ -127,8 +127,6 @@ int main(int argc, char *argv[]) {
 
     OASIS_INT pno = atoi(argv[optind]);
     OASIS_INT total = atoi(argv[optind + 1]);
-
-    //	fprintf(stderr,"%d %d %d\n",pno, total, shuffle);
 
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
     struct sigaction sa;
@@ -143,9 +141,11 @@ int main(int argc, char *argv[]) {
 
     try {
         initstreams("", "");
+        logprintf(progname, "INFO","starting part no: %d total: %d shuffle: %d\n",  pno, total, shuffle);
         eve::emitevents(pno, total, shuffle, textmode);
+        logprintf(progname, "INFO","finishing part no: %d\n",pno);
     } catch (std::bad_alloc) {
-        fprintf(stderr, "%s: Memory allocation failed\n", progname);
+        fprintf(stderr, "FATAL:%s: Memory allocation failed\n", progname);
         exit(EXIT_FAILURE);
     }
 

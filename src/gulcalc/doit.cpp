@@ -8,13 +8,14 @@ using namespace std;
 FILE *itemout = stdout;
 FILE *covout = stdout;
 FILE *lossout = stdout;
+FILE *corrout = stdout;
 
 bool getdamagebindictionary(std::vector<damagebindictionary> &damagebindictionary_vec_)
 {
 
 	FILE *fin = fopen(DAMAGE_BIN_DICT_FILE, "rb");
 	if (fin == NULL) {
-		fprintf(stderr, "%s: cannot open %s\n", __func__, DAMAGE_BIN_DICT_FILE);
+		fprintf(stderr, "FATAL: %s: cannot open %s\n", __func__, DAMAGE_BIN_DICT_FILE);
 		exit(-1);
 	}
 
@@ -25,7 +26,7 @@ bool getdamagebindictionary(std::vector<damagebindictionary> &damagebindictionar
 	unsigned int nrec = static_cast<unsigned int>(sz / sizeof(damagebindictionary));
 	damagebindictionary *s1 = new damagebindictionary[nrec];
 	if (fread(s1, sizeof(damagebindictionary), nrec, fin) != nrec) {
-		fprintf(stderr, "%s: Error reading file %s\n", __func__, DAMAGE_BIN_DICT_FILE);
+		fprintf(stderr, "FATAL: %s: Error reading file %s\n", __func__, DAMAGE_BIN_DICT_FILE);
 		exit(-1);
 	}
 	damagebindictionary_vec_.clear();
@@ -44,7 +45,7 @@ bool getitems(std::map<item_map_key, std::vector<item_map_rec> > &item_map)
 
 	FILE *fin = fopen(ITEMS_FILE, "rb");
 	if (fin == NULL) {
-		fprintf(stderr, "%s: cannot open %s\n", __func__, ITEMS_FILE);
+		fprintf(stderr, "FATAL: %s: cannot open %s\n", __func__, ITEMS_FILE);
 		exit(-1);
 	}
 
@@ -80,7 +81,7 @@ void getcoverages(std::vector<OASIS_FLOAT> &coverages)
 {
 	FILE *fin = fopen(COVERAGES_FILE, "rb");
 	if (fin == NULL) {
-		fprintf(stderr, "%s: Error reading file %s\n", __func__, COVERAGES_FILE);
+		fprintf(stderr, "FATAL: %s: Error reading file %s\n", __func__, COVERAGES_FILE);
 		exit(-1);
 	}
 
@@ -131,6 +132,10 @@ void lossWriter(const void *ibuf, int size, int count) {
     fwrite(ibuf, size, count, lossout);
 }
 
+void correlatedWriter(const void *ibuf, int size, int count) {
+    fwrite(ibuf, size, count, corrout);
+}
+
 void doit(const gulcalcopts &opt)
 {
 	std::vector<damagebindictionary> damagebindictionary_vec;
@@ -149,24 +154,30 @@ void doit(const gulcalcopts &opt)
 	int stream_type = 0;
 	bool bSuccess = getrec((char *)&stream_type, stdin, sizeof(stream_type));
 	if (bSuccess == false) {
-		cerr << "gulcalc: Error no stream type returned\n";
+		cerr << "FATAL: gulcalc: Error no stream type returned\n";
 		return; // exit thread if failed
 	}
 
 	void(*itmWriter)(const void *ibuf, int size, int count);
 	void(*covWriter)(const void *ibuf, int size, int count);
     void (*lossWriter)(const void *ibuf, int size, int count);
+    void(*corrWriter)(const void *ibuf, int size, int count);
+
 	itmWriter = 0;
 	covWriter = 0;
     lossWriter = 0;
+    corrWriter = 0;
 
 	getRands rnd(opt.rndopt, opt.rand_vector_size, opt.rand_seed);
+	getRands rnd0(opt.rndopt, opt.rand_vector_size, opt.rand_seed);
 	itemout = opt.itemout;
 	covout = opt.covout;
+	corrout = opt.corrout;
 	if (opt.itemLevelOutput == true && opt.mode == 0) itmWriter = itemWriter;
 	if (opt.coverageLevelOutput == true) covWriter = coverageWriter;
     if (opt.itemLevelOutput == true && opt.mode == 1) lossWriter = itemWriter;
-	gulcalc g(damagebindictionary_vec, coverages, item_map, rnd, opt.loss_threshold, opt.rndopt, opt.debug, opt.samplesize, itmWriter, covWriter,lossWriter, iGetrec,opt.rand_seed);
+    if(opt.correlatedLevelOutput == true) corrWriter = correlatedWriter;
+	gulcalc g(damagebindictionary_vec, coverages, item_map, rnd, rnd0,   itmWriter, covWriter,lossWriter, corrWriter, iGetrec,opt);
 	if (opt.mode == 0) g.mode0();		// classic gulcalc
 	if (opt.mode == 1) g.mode1();		// first type of back allocation
 

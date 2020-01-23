@@ -52,7 +52,7 @@ namespace eve {
     void readevents(std::vector<int> &events) {
         FILE *fin = fopen(EVENTS_FILE, "rb");
         if (fin == NULL) {
-            fprintf(stderr, "%s: %s: cannot open %s\n", progname, __func__,
+            fprintf(stderr, "FATAL: %s: %s: cannot open %s\n", progname, __func__,
                     EVENTS_FILE);
             exit(EXIT_FAILURE);
         }
@@ -77,8 +77,7 @@ namespace eve {
         int start_pos = chunksize * pno_;
         if (end_pos > (int) events.size())
             end_pos = events.size();
-        //	fprintf(stderr,"Total events: %d chuck_size: %d start_pos: %d
-        //end_pos:%d\n",total_events, chunksize,start_pos,end_pos);
+
         while (start_pos < end_pos) {
             int eventid = events[start_pos];
             if (textmode == true)

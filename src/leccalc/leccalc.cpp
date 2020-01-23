@@ -93,7 +93,7 @@ namespace leccalc {
 	{
 		FILE* fin = fopen(OCCURRENCE_FILE, "rb");
 		if (fin == NULL) {
-			fprintf(stderr, "%s: Error reading file %s\n", __func__, OCCURRENCE_FILE);
+			fprintf(stderr, "FATAL: Error reading file %s\n", OCCURRENCE_FILE);
 			exit(-1);
 		}
 		int date_algorithm;
@@ -141,15 +141,14 @@ namespace leccalc {
 		unsigned int stream_type = 0;
 		size_t i = fread(&stream_type, sizeof(stream_type), 1, stdin);
 		if (i != 1 || isSummaryCalcStream(stream_type) != true) {
-			std::cerr << "Not a summarycalc stream\n";
-			std::cerr << "invalid stream type: " << stream_type << "\n";
+			std::cerr << "FATAL:: Not a summarycalc stream invalid stream type: " << stream_type << "\n";
 			exit(-1);
 		}
 
 		// read_sample_size()
 		i = fread(&samplesize, sizeof(samplesize), 1, stdin);
 		if (i != 1) {
-			std::cerr << "Stream read error: samplesize\n";
+			std::cerr << "FATAL: Stream read error: samplesize\n";
 			exit(-1);
 		}
 
@@ -157,7 +156,7 @@ namespace leccalc {
 		unsigned int summaryset_id;
 		i = fread(&summaryset_id, sizeof(summaryset_id), 1, stdin);
 		if (i != 1) {
-			std::cerr << "Stream read error: summaryset_id\n";
+			std::cerr << "FATAL: Stream read error: summaryset_id\n";
 			exit(-1);
 		}
 
@@ -210,7 +209,7 @@ namespace leccalc {
 	void setinputstream(const std::string& inFile)
 	{
 		if (freopen(inFile.c_str(), "rb", stdin) == NULL) {
-			fprintf(stderr, "%s: Error opening  %s\n", __func__, inFile.c_str());
+			fprintf(stderr, "FATAL: Error opening  %s\n", inFile.c_str());
 			exit(-1);
 		}
 
@@ -248,7 +247,7 @@ namespace leccalc {
 				}
 			}
 			else {
-				fprintf(stderr, "Unable to open directory %s\n", path.c_str());
+				fprintf(stderr, "FATAL: Unable to open directory %s\n", path.c_str());
 				exit(-1);
 			}
 		}

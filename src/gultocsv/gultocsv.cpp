@@ -59,7 +59,7 @@ namespace gultocsv {
 		}
 
 		if (stream_type != gulstream_id && stream_type != loss_stream_id) {
-			fprintf(stderr, "gultocsv: %s: Not a gul stream type\n", __func__);
+			fprintf(stderr, "FATAL: gultocsv: %s: Not a gul stream type\n", __func__);
 			exit(-1);
 		}
 		stream_type = streamno_mask & gulstream_type;
@@ -83,7 +83,7 @@ namespace gultocsv {
 			}
 			return;
 		}
-		std::cerr << "Unsupported gul stream type\n";
+		std::cerr << "FATAL: Unsupported gul stream type\n";
 
 	}
 

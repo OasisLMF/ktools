@@ -32,105 +32,130 @@
 * DAMAGE.
 */
 /*
+Used to multiples pipes functionality of simple cat command with multiple inputs
 Author: Ben Matharu  email: ben.matharu@oasislmf.org
 */
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <algorithm>
-#include <fcntl.h>
-#include <assert.h>
-#include "fmcalc.h"
 #include "../include/oasis.h"
+#include <vector>
+#include <algorithm>
+
 
 #if defined(_MSC_VER)
 #include "../wingetopt/wingetopt.h"
+#include "../include/dirent.h"
 #else
+#include <fcntl.h>
 #include <unistd.h>
+#include <dirent.h>
+#endif
+#include <sys/stat.h>
+
+
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
 #include <signal.h>
 #include <string.h>
 #endif
 
-char *progname = 0;
+namespace kat {
+	void doit(std::vector <FILE*>& infiles);
+	void setinitdone(int processid);
+} // namespace kat
 
-void help()
-{
 
-    fprintf(stderr,
-		"-a set allocrule (default none)\n"
-		"-o general optimization off\n"
-        "-M max level (optional)\n"
-		"-p inputpath (relative or full path)\n"
-		"-n feed net value (used for reinsurance)\n"
-		"-O Alloc rule2 optimization off"
-		"-d debug\n"
-		"-v version\n"
-		"-h help\n"
-	);
-}
+
+char* progname = 0;
+
 
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
-void segfault_sigaction(int signal, siginfo_t *si, void *arg)
+void segfault_sigaction(int signal, siginfo_t* si, void* arg)
 {
-	fprintf(stderr, "FATAL: %s: Segment fault at address: %p\n", progname, si->si_addr);
+	fprintf(stderr, "%s: Segment fault at address: %p\n", progname, si->si_addr);
 	exit(EXIT_FAILURE);
 }
 #endif
 
 
+void help()
+{
+	fprintf(stderr,
+		"-P process_id\n"
+		"-p path for concatenation\n"
+		"-h help\n"
+		"-v version\n"
+	);
+}
+
+
 int main(int argc, char* argv[])
 {
-	progname = argv[0];
-    int new_max = -1;
-	int allocrule = 0;
-	int opt;
-	std::string inputpath;
-	bool debug = false;
-	bool allocruleOptimizationOff = false;
-	bool generalOptimization = true;
 
-	bool netvalue = false;
-	bool stepped = false;
-    while ((opt = getopt(argc, argv, "SdnovhOM:p:a:")) != -1) {
-        switch (opt) {
-		case 'o':
-			generalOptimization = false;
+
+	int opt;
+	int processid = 0;
+	std::string path;
+	while ((opt = getopt(argc, argv, "d:P:vh")) != -1) {
+		switch (opt) {
+		case 'P':
+			processid = atoi(optarg);
 			break;
-		case 'O':
-			allocruleOptimizationOff = true;
+		case 'v':
+			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+			::exit(EXIT_FAILURE);
 			break;
 		case 'd':
-			debug = true;
+			path = optarg;
 			break;
-         case 'M':
-            new_max = atoi(optarg);
-            break;
-		 case 'a':
-			 allocrule = atoi(optarg);
-			 break;
-		 case 'v':
-			 fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
-			 exit(EXIT_FAILURE);
-			 break;
-		 case 'p':
-			 inputpath = optarg;
-			 break;
-		 case 'n':
-			 netvalue = true;
-			 break;
-		 case 'S':
-			 stepped = true;
-			 break;
-        case 'h':
-           help();
-           exit(EXIT_FAILURE);
-        default:
-            help();
-            exit(EXIT_FAILURE);
-        }
-    }
+		case 'h':
+		default:
+			help();
+			::exit(EXIT_FAILURE);
+		}
+	}
+
+	argc -= optind;
+	argv += optind;
+
+	std::vector<std::string> filelist;
+	if (path.length() > 0) {
+		DIR* dir;
+		if ((dir = opendir(path.c_str())) != NULL) {
+			struct dirent* ent;
+			while ((ent = readdir(dir)) != NULL) {
+				std::string s = ent->d_name;
+				if (s != "." && s != "..") {
+					std::string s2 = path + ent->d_name;
+					struct stat path_stat;
+					stat(s2.c_str(), &path_stat);
+					if (S_ISREG(path_stat.st_mode)) {
+						filelist.push_back(s2);
+					}
+				}
+			}
+		}
+	}
+
+	std::vector <FILE*> infiles;
+	// Sorting the string vector
+	sort(filelist.begin(), filelist.end());
+	auto iter = filelist.begin();
+	while (iter != filelist.end()) {
+		FILE* fin = fopen((*iter).c_str(), "rb");
+		if (fin == nullptr) {
+			fprintf(stderr, "kat: Cannot open %s\n", (*iter).c_str());
+			exit(-1);
+		}
+		infiles.push_back(fin);
+		iter++;
+	}
+
+	for (int i = 0; i < argc; i++) {
+		FILE* fin = fopen(argv[i], "rb");
+		if (fin == nullptr) {
+			fprintf(stderr, "kat: Cannot open %s\n", argv[i]);
+			exit(-1);
+		}
+		infiles.push_back(fin);
+	}
 
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
 	struct sigaction sa;
@@ -142,21 +167,14 @@ int main(int argc, char* argv[])
 
 	sigaction(SIGSEGV, &sa, NULL);
 #endif
-
-	if (allocrule < 0 || allocrule > 3) {
-		fprintf(stderr, "FATAL:%s: Invalid allocrule %d\n", progname,allocrule);
-		exit(EXIT_FAILURE);
-	}
-
 	try {
-		initstreams("", "");
-		fmcalc fc(new_max, allocrule, inputpath, netvalue,debug, allocruleOptimizationOff, generalOptimization,stepped);
-		fc.doit();
+		initstreams();
+		kat::setinitdone(processid);
+		kat::doit(infiles);
 	}
-	catch (const std::bad_alloc &a) {
-		fprintf(stderr, "FATAL:%s: bad_alloc: %s\n", progname, a.what());
+	catch (std::bad_alloc) {
+		fprintf(stderr, "%s: Memory allocation failed\n", progname);
 		exit(EXIT_FAILURE);
 	}
-
 	return EXIT_SUCCESS;
 }

@@ -9,6 +9,7 @@
 ### 4.2 [Output components](OutputComponents.md)
 ### 4.3 [Data conversion components](DataConversionComponents.md)
 ### 4.4 [Stream conversion components](StreamConversionComponents.md)
+### 4.5 [Validation components](ValidationComponents.md)
 ### 5. [Financial Module](FinancialModule.md)
 ### 6. [Workflows](Workflows.md)
 ### Appendix A [Random numbers](RandomNumbers.md)

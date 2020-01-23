@@ -50,8 +50,32 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 using namespace std;
 
 namespace fmprofiletocsv {
-    
-    void doit(bool skipheader) {
+	void dostep(bool skipheader) {
+		if (skipheader == false) {
+            printf("profile_id,calcrule_id,deductible1,deductible2,");
+            printf("deductible3,attachment1,limit1,share1,share2,");
+            printf("share3,step_id,calcrule_id,trigger_start,trigger_end,");
+			printf("payout_start,payout_end,limit2,scale1,");
+			printf("scale2\n");
+		}
+
+		fm_profile_step q;
+		size_t i = fread(&q, sizeof(q), 1, stdin);
+		while (i != 0) {
+			printf("%d,%d,%f,%f,%f,%f,%f,%f,%f,%f,%d,%f,%f,%f,%f,%f,%f,%f\n", q.profile_id,
+                q.calcrule_id, q.deductible1, q.deductible2, q.deductible3,
+                q.attachment, q.limit1, q.share1, q.share2, q.share3,q.step_id,
+				q.trigger_start, q.trigger_end, q.payout_start,
+				q.payout_end, q.limit2, q.scale1, q.scale2);
+
+			i = fread(&q, sizeof(q), 1, stdin);
+		}
+	}
+    void doit(bool skipheader, bool step) {
+		if (step) {
+			dostep(skipheader);
+			return;
+		}
         if (skipheader == false) {
             printf("profile_id,calcrule_id,deductible1,deductible2,");
             printf("deductible3,attachment1,limit1,share1,share2,");

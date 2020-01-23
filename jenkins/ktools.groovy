@@ -49,10 +49,18 @@ node {
         // Create static build CLANG 
         stage("Ktools Builder: Linux_x86_64") {
             dir(ktools_workspace) {
-                //  Build Static TAR using clang
                 sh "docker build -f $env.KTOOLS_IMAGE_CLANG -t ktools-builder ."
-                sh 'docker run -v $(pwd):/var/ktools ktools-builder'
-                // Archive TAR to CI
+            }
+        }
+        stage("Build: Autotools"){
+            dir(ktools_workspace) {
+                sh 'docker run --entrypoint build-autotools.sh -v $(pwd):/var/ktools ktools-builder'
+                archiveArtifacts artifacts: 'tar/**/*.*'
+            }
+        }
+        stage("Build: Cmake"){
+            dir(ktools_workspace) {
+                sh 'docker run --entrypoint build-cmake.sh -v $(pwd):/var/ktools ktools-builder'
                 archiveArtifacts artifacts: 'tar/**/*.*'
             }
         }

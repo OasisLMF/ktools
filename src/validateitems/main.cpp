@@ -56,7 +56,7 @@ namespace validateitems {
 }
 
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
-void segfault_sigaction(int signal, siginfo_t *si, void *arg)
+void segfault_sigaction(int, siginfo_t *si, void *)
 {
 	fprintf(stderr, "%s: Segment fault at address: %p\n", progname, si->si_addr);
 	exit(EXIT_FAILURE);
@@ -73,12 +73,12 @@ int main(int argc, char* argv[])
 {
 	progname = argv[0];
 	int opt;
-	bool skipheader = false;
+	//bool skipheader = false;
 	while ((opt = getopt(argc, argv, (char *) "svh")) != -1) {
 		switch (opt) {
-		case 's':
-			skipheader = true;
-			break;
+	//	case 's':
+	//		skipheader = true;
+	//		break;
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
 			exit(EXIT_FAILURE);
@@ -105,7 +105,7 @@ int main(int argc, char* argv[])
 		initstreams("", "");
 		validateitems::doit();
 	}
-	catch (std::bad_alloc) {
+	catch (std::bad_alloc&) {
 		fprintf(stderr, "%s: Memory allocation failed\n", progname);
 		exit(EXIT_FAILURE);
 	}

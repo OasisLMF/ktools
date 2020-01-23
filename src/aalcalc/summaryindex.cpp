@@ -68,7 +68,7 @@ bool operator<(const summary_keyz& lhs, const summary_keyz& rhs)
 
 namespace summaryindex {
 
-	void indexevents(const std::string& fullfilename, std::string& filename, std::vector<int> &event_ids, std::map<summary_keyz, std::vector<long long>> &summary_id_file_id_to_offset, int file_id) {
+	void indexevents(const std::string& fullfilename, std::vector<int> &event_ids, std::map<summary_keyz, std::vector<long long>> &summary_id_file_id_to_offset, int file_id) {
 	FILE* fin = fopen(fullfilename.c_str(), "rb");
 	if (fin == NULL) {
 		fprintf(stderr, "%s: cannot open %s\n", __func__, fullfilename.c_str());
@@ -139,7 +139,7 @@ void doit(const std::string& subfolder)
 			if (s.length() > 4 && s.substr(s.length() - 4, 4) == ".bin") {
 				std::string s2 = path + ent->d_name;
 				files.push_back(s);
-				indexevents(s2, s, event_ids, summary_id_file_id_to_offset, file_index);
+				indexevents(s2, event_ids, summary_id_file_id_to_offset, file_index);
 				file_index++;
 			}
 		}

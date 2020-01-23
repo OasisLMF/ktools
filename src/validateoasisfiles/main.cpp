@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
     validateoasisfiles::doit(oasisFilesDir, gulOnly);
     return 0;
   }
-  catch(std::bad_alloc) {
+  catch(std::bad_alloc&) {
     fprintf(stderr, "%s: Memory allocation failed.\n", progname);
     exit(0);
   }

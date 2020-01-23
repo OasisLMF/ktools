@@ -1581,7 +1581,7 @@ void fmcalc::init_profile_rec(fm_profile &f)
 		}
 
 	}
-	if (profile_vec_new_.size() < f.profile_id + 1) {
+	if (profile_vec_new_.size() < (size_t)f.profile_id + 1) {
 		profile_vec_new_.resize(f.profile_id + 1);
 	}
 	profile_vec_new_[f.profile_id] = p;

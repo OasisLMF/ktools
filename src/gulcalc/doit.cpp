@@ -50,10 +50,8 @@ bool getitems(std::map<item_map_key, std::vector<item_map_rec> > &item_map)
 	}
 
 	flseek(fin, 0L, SEEK_END);
-	long long sz = fltell(fin);
+	//long long sz = fltell(fin);
 	flseek(fin, 0L, SEEK_SET);
-
-	unsigned int nrec = static_cast<unsigned int>(sz / sizeof(item));
 
 	item_map.clear();
 
@@ -105,7 +103,7 @@ void getcoverages(std::vector<OASIS_FLOAT> &coverages)
 
 }
 
-inline bool getrec(char *rec_, FILE *stream, int recsize_)
+inline bool getrec(char *rec_, FILE *stream, size_t recsize_)
 {
 	if (fread(rec_, 1, recsize_, stream) == recsize_) return true;
 	return false;
@@ -147,10 +145,10 @@ void doit(const gulcalcopts &opt)
 	std::vector<OASIS_FLOAT> coverages;
 	getcoverages(coverages);
 
-	size_t total_bins = damagebindictionary_vec.size();
-	int max_recsize = (int)(total_bins * sizeof(prob_mean)) + sizeof(damagecdfrec) + sizeof(int);
+	//size_t total_bins = damagebindictionary_vec.size();
+	//int max_recsize = (int)(total_bins * sizeof(prob_mean)) + sizeof(damagecdfrec) + sizeof(int);
+	//int last_event_id = -1;
 
-	int last_event_id = -1;
 	int stream_type = 0;
 	bool bSuccess = getrec((char *)&stream_type, stdin, sizeof(stream_type));
 	if (bSuccess == false) {

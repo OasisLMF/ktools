@@ -141,7 +141,7 @@ private:
     	void(*correlatedWriter_)(const void *ibuf, int size, int count);
 	bool(*iGetrec_)(char *rec, int recsize);
 	OASIS_FLOAT getgul(damagebindictionary &b, gulGulSamples &g);
-	void output_mean(const item_map_rec &er, OASIS_FLOAT tiv, prob_mean *pp, int bin_count, OASIS_FLOAT &gul_mean, OASIS_FLOAT &std_dev);
+	void output_mean(OASIS_FLOAT tiv, prob_mean *pp, int bin_count, OASIS_FLOAT &gul_mean, OASIS_FLOAT &std_dev);
 	void init();
 	unsigned char *ibuf_;	// item level buffer
 	unsigned char *corrbuf_;   // correlated level buffer

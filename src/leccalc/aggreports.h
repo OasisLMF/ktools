@@ -43,11 +43,11 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 class aggreports {
 private:
-	FILE **fout_;
 	int totalperiods_;
 	int maxsummaryid_;
 	std::map<outkey2, OASIS_FLOAT> &agg_out_loss_;
 	std::map<outkey2, OASIS_FLOAT> &max_out_loss_;
+	FILE **fout_;
 	bool useReturnPeriodFile_;
 	int samplesize_ = 0;
 	std::vector<int> returnperiods_;
@@ -66,7 +66,7 @@ private:
 	void loadreturnperiods();
 	OASIS_FLOAT getloss(OASIS_FLOAT nextreturnperiod, OASIS_FLOAT last_return_period, OASIS_FLOAT last_loss, 
 		OASIS_FLOAT current_return_period, OASIS_FLOAT current_loss) const;
-	void doreturnperiodout(int handle, int &nextreturnperiod_index, OASIS_FLOAT &last_return_period, OASIS_FLOAT &last_loss,
+	void doreturnperiodout(int handle, size_t &nextreturnperiod_index, OASIS_FLOAT &last_return_period, OASIS_FLOAT &last_loss,
 		OASIS_FLOAT current_return_period, OASIS_FLOAT current_loss, int summary_id, int type);
 public:
 	void loadperiodtoweigthing();

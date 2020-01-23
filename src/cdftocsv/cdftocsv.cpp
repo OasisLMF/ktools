@@ -99,8 +99,7 @@ namespace cdftocsv {
 		OASIS_FLOAT bin_mean;
 	};
 
-	void processrec(char *rec, int recsize,
-		const std::vector<damagebindictionary> &damagebindictionary_vec_)
+	void processrec(char *rec)
 	{
 		damagecdfrec *d = (damagecdfrec *)rec;
 		char *b = rec + sizeof(damagecdfrec);
@@ -148,7 +147,7 @@ namespace cdftocsv {
 			bSuccess = getrec(p, stdin, recsize);
 			recsize += sizeof(damagecdfrec) + sizeof(int);
 
-			processrec(rec, recsize, damagebindictionary_vec);
+			processrec(rec);
 		}
 	}
 

@@ -46,7 +46,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #endif
 
 namespace footprinttobin {
-	void doit(int intensity_bins, int hasIntensityUncertainty, bool skipheader, const char * binFileName="footprint.bin", const char * idxFileName="footprint.idx");
+	void doit(int intensity_bins, int hasIntensityUncertainty, const char * binFileName="footprint.bin", const char * idxFileName="footprint.idx");
 	void doitz(int intensity_bins, int hasIntensityUncertainty, const char * binFileName="footprint.bin.z", const char * idxFileName="footprint.idx.z");
 }
 
@@ -59,7 +59,7 @@ namespace footprinttobin {
 
 char *progname;
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
-void segfault_sigaction(int signal, siginfo_t *si, void *arg) {
+void segfault_sigaction(int, siginfo_t *si, void *) {
 	fprintf(stderr, "FATAL: %s: Segment fault at address: %p\n", progname,
 		si->si_addr);
 	exit(EXIT_FAILURE);
@@ -84,7 +84,6 @@ int main(int argc, char *argv[]) {
 	bool zip = false;
 	int intensity_bins = -1;
 	int hasIntensityUncertainty = true;
-	bool skipheader = false;
 	char *binFileName = 0;
 	bool binFileGiven = false;
 	char *idxFileName = 0;
@@ -105,9 +104,6 @@ int main(int argc, char *argv[]) {
 			break;
 		case 'n':
 			hasIntensityUncertainty = false;
-			break;
-		case 's':
-			skipheader = true;
 			break;
 		case 'x':
 			idxFileGiven = true;
@@ -149,12 +145,12 @@ int main(int argc, char *argv[]) {
 	}
 	else {
 		if(binFileGiven && idxFileGiven) {
-			footprinttobin::doit(intensity_bins, hasIntensityUncertainty, skipheader, binFileName, idxFileName);
+			footprinttobin::doit(intensity_bins, hasIntensityUncertainty, binFileName, idxFileName);
 		} else if(binFileGiven || idxFileGiven) {
 			fprintf(stderr, "FATAL: Must specify both bin and idx file names - aborted\n");
 			exit(EXIT_FAILURE);
 		} else {
-			footprinttobin::doit(intensity_bins, hasIntensityUncertainty, skipheader);
+			footprinttobin::doit(intensity_bins, hasIntensityUncertainty);
 		}
 	}
 

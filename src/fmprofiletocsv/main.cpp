@@ -19,7 +19,7 @@
 char *progname;
 
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
-void segfault_sigaction(int signal, siginfo_t *si, void *arg) {
+void segfault_sigaction(int, siginfo_t *si, void *) {
     fprintf(stderr, "FATAL: %s: Segment fault at address: %p\n", progname,
             si->si_addr);
     exit(EXIT_FAILURE);
@@ -31,27 +31,26 @@ namespace fmprofiletocsv {
 } // namespace fmprofiletocsv
 
 void help() {
-    fprintf(stderr, 
-		"-S step\n"
-		"-s Skip Header\n"
+    fprintf(stderr,
+        "-S step\n"
+        "-s Skip Header\n"
         "-v version\n"
         "-h help"
-	);
+    );
 }
 
 int main(int argc, char *argv[]) {
     int opt;
     bool skipheader = false;
-    bool oldFMProfile = false;
-	bool step = false;
+    bool step = false;
     while ((opt = getopt(argc, argv, "vhsoS")) != -1) {
         switch (opt) {
         case 's':
             skipheader = true;
             break;
-		case 'S':
-			step = true;
-			break;
+        case 'S':
+            step = true;
+            break;
         case 'v':
             fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
             exit(EXIT_FAILURE);

@@ -176,7 +176,7 @@ void gulcalc::outputmode1data(int event_id)
 		if (mode1_[j].size() > 0) {
 			tiv = (*coverages_)[j];		
 			hasData = true;
-			for (int i = 0; i < mode1_[j].size(); i++) {	// now the sidx loop				
+			for (size_t i = 0; i < mode1_[j].size(); i++) {	// now the sidx loop				
 					splittiv(mode1_[j][i], tiv);
 					auto iter = mode1_[j][i].begin();
 					while (iter != mode1_[j][i].end()) {	// now iterate over valid item_id,losses
@@ -230,12 +230,12 @@ void gulcalc::outputmode1data(int event_id)
 void gulcalc::outputcoveragedata(int event_id)
 {
 	if (opt_.coverageLevelOutput == false) return;
-	for (int j = 1; j < cov_.size(); j++) {
+	for (size_t j = 1; j < cov_.size(); j++) {
 		if (cov_[j].size() > 0) {
 			gulcoverageSampleslevel gc;
 			gc.event_id = event_id;
 			gc.coverage_id = j;
-			for (int i = 1; i < cov_[j].size(); i++) {
+			for (size_t i = 1; i < cov_[j].size(); i++) {
 				gc.sidx = i - 2;
 				gc.loss = cov_[j][i];
 				OASIS_FLOAT tiv = (*coverages_)[gc.coverage_id];
@@ -261,12 +261,12 @@ void gulcalc::outputcoveragedata(int event_id)
 void gulcalc::outputcorrelateddata(int event_id)
 {
 
-	for (int j = 1; j < fullCorr_.size(); j++) {
+	for (size_t j = 1; j < fullCorr_.size(); j++) {
 		std::map<int, std::vector<gulSampleslevelRec> > gxi;
 		OASIS_FLOAT tiv =0;
 		if(fullCorr_[j].size() > 0) {
 			tiv = (*coverages_)[j];
-			for (int i = 0; i < fullCorr_[j].size(); i++) {   // sidx loop
+			for (size_t i = 0; i < fullCorr_[j].size(); i++) {   // sidx loop
 				splittiv(fullCorr_[j][i], tiv);
 				auto iter = fullCorr_[j][i].begin();
 				while (iter != fullCorr_[j][i].end()) {   // valid item_id, losses loop
@@ -483,7 +483,7 @@ void gulcalc::setupandgenoutput(const item_map_rec &er, const OASIS_FLOAT tiv,
 	}
 }
 
-void gulcalc::output_mean(const item_map_rec &er, OASIS_FLOAT tiv, prob_mean *pp, int bin_count, OASIS_FLOAT &gul_mean,  OASIS_FLOAT &std_dev)
+void gulcalc::output_mean(OASIS_FLOAT tiv, prob_mean *pp, int bin_count, OASIS_FLOAT &gul_mean,  OASIS_FLOAT &std_dev)
 {
 	OASIS_FLOAT last_prob_to = 0;
 	gul_mean = 0;
@@ -532,7 +532,7 @@ void gulcalc::processrec_mode1(char* rec, int recsize)
 			OASIS_FLOAT std_dev;
 			OASIS_FLOAT gul_mean;
 			OASIS_FLOAT tiv = (*coverages_)[iter->coverage_id];
-			output_mean(*iter, tiv, pp, *bin_count, gul_mean, std_dev);
+			output_mean(tiv, pp, *bin_count, gul_mean, std_dev);
 			gx.loss = gul_mean;
 			gx.sidx = mean_idx;			
 			genmode1output(gx, iter->coverage_id);
@@ -653,7 +653,7 @@ damagecdfrec *d = (damagecdfrec *)rec;
 			OASIS_FLOAT std_dev;
 			OASIS_FLOAT gul_mean;
 			OASIS_FLOAT tiv = (*coverages_)[iter->coverage_id];
-			output_mean(*iter, tiv, pp, *bin_count, gul_mean, std_dev);
+			output_mean(tiv, pp, *bin_count, gul_mean, std_dev);
 			gx.sidx = tiv_idx;
 			gx.loss = tiv;
 			itemoutputgul(gx);			

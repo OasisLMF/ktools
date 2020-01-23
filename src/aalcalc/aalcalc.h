@@ -73,27 +73,6 @@ struct loss_rec {
 	double max_exposure_value = 0.0;
 };
 
-struct welford_state_info {
-	double total_samples = 0;
-	double I = 0;
-	double K = 0;
-	double L = 0;
-};
-
-struct loss_rec_w {
-	welford_state_info w;
-	double max_exposure_value;
-};
-
-
-struct aal_rec_w {
-	int summary_id;
-	int type;
-	double mean;
-	double mean_squared;
-	double max_exposure_value;
-};
-
 struct event_offset_rec{
 	int event_id;	
 	int fileindex;
@@ -120,7 +99,6 @@ private:
 
 	std::unordered_set<int> set_periods_;
 	int current_summary_id_ = 0;
-	std::map<period_map_key, loss_rec_w > map_analytical_sum_loss_w_;
 	std::map <int, double> periodstoweighting_;
 	bool skipheader_ = false;
 // private functions
@@ -132,16 +110,11 @@ private:
 	void process_summaryfilew(const std::string &filename);
 	void debug_process_summaryfile(const std::string &filename);
 	void do_calc_end_new();
-	void do_analytical_calcw(const summarySampleslevelHeader &sh, double mean_loss);
-	void do_analytical_calc_endw();
-	void do_sample_calcw(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec);
 	void do_sample_calc_newx(const summarySampleslevelHeader& sh, const std::vector<sampleslevelRec>& vrec);
 	void do_sample_calc_new(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec);
-	void do_sample_calc_endw();
-	void doaalcalc_new(const summarySampleslevelHeader& sh, const std::vector<sampleslevelRec>& vrec, OASIS_FLOAT mean_loss);
-	void doaalcalcw(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec, OASIS_FLOAT mean_loss);
+	void doaalcalc_new(const summarySampleslevelHeader& sh, const std::vector<sampleslevelRec>& vrec);
 	void applyweightings(int event_id, const std::map <int, double> &periodstoweighting, std::vector<sampleslevelRec> &vrec) ;
-	void applyweightingstomap(std::map<int, aal_rec> &m, int i);
+	void applyweightingstomap(std::map<int, aal_rec> &m);
 	void applyweightingstomaps();
 	void outputresultscsv();
 	void outputresultscsv_new(std::vector<aal_rec> &vec_aal, int periods, int sample_size);
@@ -150,7 +123,6 @@ private:
 public:
 	aalcalc(bool skipheader) : skipheader_(skipheader) {};
 	void doit(const std::string& subfolder);		// experimental
-	void doitw(const std::string &subfolder);	// calculate using welford method 
 	void debug(const std::string &subfolder);
 };
 

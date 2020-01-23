@@ -52,15 +52,15 @@ enum rd_option {
 class getRands {
 private:
 	rd_option rndopt_;
-	int rand_vec_size_ = 0;
 	OASIS_FLOAT *buf_ = nullptr;
 	int base_offset_;
 	unsigned int buffersize_;
 	std::mt19937 gen_;
 	std::uniform_real_distribution<> dis_;
+	int rand_vec_size_ = 0;
+	int rand_seed_;
     //int _randsamplesize;
     std::vector<OASIS_FLOAT> rnd_;
-	int rand_seed_;
 	void userandfile();
 public:
 	getRands(rd_option rndopt,int rand_vec_size, int rand_seed);

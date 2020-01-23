@@ -167,7 +167,7 @@ void getmodel::getDamageBinDictionary() {
   flseek(fin, 0L, SEEK_END);
   long long sz = fltell(fin);
   flseek(fin, 0L, SEEK_SET);
-  int nrec = static_cast<int>(sz / sizeof(damagebindictionary));
+  size_t nrec = (sz / sizeof(damagebindictionary));
 
   //damagebindictionary *damage_bins = new damagebindictionary[nrec];
   std::vector<damagebindictionary> damage_bins;
@@ -182,7 +182,7 @@ void getmodel::getDamageBinDictionary() {
   fclose(fin);
 
   _mean_damage_bins = std::vector<OASIS_FLOAT>(nrec);
-  for (int i = 0; i < nrec; i++) {
+  for (size_t i = 0; i < nrec; i++) {
     _mean_damage_bins[i] = damage_bins[i].interpolation;
   }
 

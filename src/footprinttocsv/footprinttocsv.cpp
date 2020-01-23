@@ -73,7 +73,7 @@ namespace footprinttocsv {
 
 	void printrowsz(int event_id, FILE *finx, long long size)
 	{
-		long long i = 0;
+		uLongf i = 0;
 		std::vector<unsigned char > compressed_buf;
 		compressed_buf.resize(size + 1);
 

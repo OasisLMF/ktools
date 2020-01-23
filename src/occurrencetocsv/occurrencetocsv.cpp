@@ -78,7 +78,7 @@ void no_occ_doit(bool skipheader)
 	}
 }
 
-void occ_doit(bool skipheader)
+void occ_doit(void)
 {
 	printf("event_id,period_no,occ_year,occ_month,occ_day\n");
 	occurrence q;
@@ -101,9 +101,9 @@ void occ_doit(bool skipheader)
 void doit(bool skipheader)
 {
 	int no_of_periods=0;
-	int i = fread(&date_algorithm_, sizeof(date_algorithm_), 1, stdin);
-	i = fread(&no_of_periods, sizeof(no_of_periods), 1, stdin);
-	if (date_algorithm_) occ_doit(skipheader);
+    fread(&date_algorithm_, sizeof(date_algorithm_), 1, stdin);
+	fread(&no_of_periods, sizeof(no_of_periods), 1, stdin);
+	if (date_algorithm_) occ_doit();
 	else no_occ_doit(skipheader);
 
 }

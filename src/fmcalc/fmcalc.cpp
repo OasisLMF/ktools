@@ -395,7 +395,8 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 				agg_vec[vec_idx].retained_loss += agg_vec_previous_level[i].retained_loss;				
 				agg_vec[vec_idx].accumulated_tiv += agg_vec_previous_level[i].accumulated_tiv;
 				agg_vec[vec_idx].effective_deductible += agg_vec_previous_level[i].effective_deductible;
-				agg_vec[vec_idx].limit_surplus += agg_vec_previous_level[i].limit_surplus;
+				agg_vec[vec_idx].over_limit += agg_vec_previous_level[i].over_limit;
+				agg_vec[vec_idx].under_limit += agg_vec_previous_level[i].under_limit;
 			}	
 		}
 		else {

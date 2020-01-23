@@ -69,7 +69,7 @@ char* progname = 0;
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
 void segfault_sigaction(int signal, siginfo_t* si, void* arg)
 {
-	fprintf(stderr, "%s: Segment fault at address: %p\n", progname, si->si_addr);
+	fprintf(stderr, "FATAL:%s: Segment fault at address: %p\n", progname, si->si_addr);
 	exit(EXIT_FAILURE);
 }
 #endif
@@ -141,7 +141,7 @@ int main(int argc, char* argv[])
 	while (iter != filelist.end()) {
 		FILE* fin = fopen((*iter).c_str(), "rb");
 		if (fin == nullptr) {
-			fprintf(stderr, "kat: Cannot open %s\n", (*iter).c_str());
+			fprintf(stderr, "FATAL: [kat] Cannot open %s\n", (*iter).c_str());
 			exit(-1);
 		}
 		infiles.push_back(fin);
@@ -151,7 +151,7 @@ int main(int argc, char* argv[])
 	for (int i = 0; i < argc; i++) {
 		FILE* fin = fopen(argv[i], "rb");
 		if (fin == nullptr) {
-			fprintf(stderr, "kat: Cannot open %s\n", argv[i]);
+			fprintf(stderr, "FATAL: kat: Cannot open %s\n", argv[i]);
 			exit(-1);
 		}
 		infiles.push_back(fin);
@@ -173,7 +173,7 @@ int main(int argc, char* argv[])
 		kat::doit(infiles);
 	}
 	catch (std::bad_alloc) {
-		fprintf(stderr, "%s: Memory allocation failed\n", progname);
+		fprintf(stderr, "FATAL: %s: Memory allocation failed\n", progname);
 		exit(EXIT_FAILURE);
 	}
 	return EXIT_SUCCESS;

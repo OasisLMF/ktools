@@ -59,14 +59,13 @@ namespace evetobin {
 		while (fgets(line, sizeof(line), stdin) != 0)
 		{
 			if (sscanf(line, "%d", &eventid) != 1) {
-				fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
+				fprintf(stderr, "FATAL: Invalid data in line %d:\n%s", lineno, line);
 				return;
 			}
 			else
 			{
 				if (eventid < 1) {
-					fprintf(stderr, "Invalid event ID: %d on line %d\n", eventid, lineno);
-					fprintf(stderr, "Event ID's must be integers greater than zero\n");
+					fprintf(stderr, "FATAL: Invalid event ID: %d on line %d - Event ID's must be integers greater than zero\n", eventid, lineno);
 				}
 				fwrite(&eventid, sizeof(eventid), 1, stdout);
 			}

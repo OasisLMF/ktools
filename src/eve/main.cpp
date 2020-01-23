@@ -61,7 +61,7 @@ char *progname;
 
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
 void segfault_sigaction(int signal, siginfo_t *si, void *arg) {
-    fprintf(stderr, "%s: Segment fault at address: %p\n", progname,
+    fprintf(stderr, "FATAL: %s: Segment fault at address: %p\n", progname,
             si->si_addr);
     exit(EXIT_FAILURE);
 }
@@ -140,10 +140,8 @@ int main(int argc, char *argv[]) {
 #endif
 
     try {
-        initstreams("", "");
-        logprintf(progname, "INFO","starting part no: %d total: %d shuffle: %d\n",  pno, total, shuffle);
+        initstreams("", "");        
         eve::emitevents(pno, total, shuffle, textmode);
-        logprintf(progname, "INFO","finishing part no: %d\n",pno);
     } catch (std::bad_alloc) {
         fprintf(stderr, "FATAL:%s: Memory allocation failed\n", progname);
         exit(EXIT_FAILURE);

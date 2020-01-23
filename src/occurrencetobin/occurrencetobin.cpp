@@ -90,13 +90,13 @@ void no_occ_doit()
 	{
 		
 		if (sscanf(line, "%d,%d,%d", &p.event_id, &p.period_no, &p.occ_date_id) != 3) {
-			fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
+			fprintf(stderr, "FATAL: Invalid data in line %d:\n%s", lineno, line);
 			return;
 		}
 		else
 		{
 			if(number_of_periods_ < p.period_no) {
-				fprintf(stderr, "Period number exceeds maximum supplied\n");
+				fprintf(stderr, "FATAL: Period number exceeds maximum supplied\n");
 				exit(EXIT_FAILURE);
 			}
 			fwrite(&p, sizeof(p), 1, stdout);
@@ -122,12 +122,12 @@ void occ_doit()
 		int occ_monthx;
 		int occ_dayx;
 		if (sscanf(line, "%d,%d,%d,%d,%d", &p.event_id,&p.period_no,&occ_year,&occ_month,&occ_day) != 5){
-           fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
+           fprintf(stderr, "FATAL: Invalid data in line %d:\n%s", lineno, line);
            return;
        }else
        {
        		if (number_of_periods_ < p.period_no) {
-       			fprintf(stderr,"Period number exceeds maximum supplied\n");
+       			fprintf(stderr,"FATAL: Period number exceeds maximum supplied\n");
        			exit(EXIT_FAILURE);
        		}
 		   switch (date_algorithm_) {
@@ -138,7 +138,7 @@ void occ_doit()
 
 		   d(p.occ_date_id, occ_yearx, occ_monthx, occ_dayx);
 		   if (occ_yearx != occ_year) {
-			   std::cerr << "We have an error";
+			   std::cerr << "FATAL: We have an error";
 		   }
            fwrite(&p, sizeof(p), 1, stdout);
        }
@@ -195,7 +195,7 @@ int main(int argc, char* argv[])
 	}	
 	initstreams();
 	if (number_of_periods_ == 0) {
-		fprintf(stderr, "Number of periods not supplied\n");
+		fprintf(stderr, "FATAL: Number of periods not supplied\n");
 		exit(-1);
 	}
 	doit();

@@ -67,7 +67,7 @@ void doit(int maxsampleindex)
     while (fgets(line, sizeof(line), stdin) != 0)
     {
       if (sscanf(line, "%d,%f,%d,%d,%f", &sh.event_id, &sh.expval, &sh.summary_id, &sr.sidx,&sr.loss) != 5){
-           fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
+           fprintf(stderr, "FATAL: Invalid data in line %d:\n%s", lineno, line);
            return;
        }
       else
@@ -90,29 +90,7 @@ void doit(int maxsampleindex)
           }
 
           fwrite(&sr, sizeof(sr), 1, stdout);
-          
-          // if (gh.event_id != q.event_id || gh.item_id != q.item_id){
-          //   if (gh.event_id != -1){
-          //     gulSampleslevelRec gr;
-          //     gr.sidx =  0;
-          //     gr.loss =  0;
-          //     fwrite(&gr, sizeof(gr), 1, stdout);  
-          //   }
-          //   gh.event_id = q.event_id;
-          //   gh.item_id = q.item_id;  
-          //   fwrite(&gh, sizeof(gh), 1, stdout);
-          //   gulSampleslevelRec gr;
-          //   gr.sidx = q.sidx;
-          //   gr.loss = q.loss;
-          //   fwrite(&gr, sizeof(gr), 1, stdout);
-          // }else {
-          //   gulSampleslevelRec gr;
-          //   gr.sidx = q.sidx;
-          //   gr.loss = q.loss;
-          //   fwrite(&gr, sizeof(gr), 1, stdout);
-          // }
-          
-          
+                                        
        }
        lineno++;
     }
@@ -154,7 +132,7 @@ int main(int argc, char* argv[])
 	}
 	initstreams();
 	if (maxsampleindex == -1) {
-		fprintf(stderr, "Sample size not supplied - please use -s parameter followed by the sample size\n");
+		fprintf(stderr, "FATAL: Sample size not supplied - please use -s parameter followed by the sample size\n");
 			exit(EXIT_FAILURE);
 	}
 

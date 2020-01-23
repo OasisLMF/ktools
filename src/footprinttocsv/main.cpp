@@ -160,7 +160,7 @@ int main(int argc, char* argv[])
 			if(binFileGiven && idxFileGiven) {
 				footprinttocsv::doitz(skipheader, from_event, to_event, binFileName, idxFileName);
 			} else if(binFileGiven || idxFileGiven) {
-				fprintf(stderr, "Must specify both bin and idx file names\n");
+				fprintf(stderr, "FATAL: Must specify both bin and idx file names\n");
 				exit(EXIT_FAILURE);
 			} else {
 				footprinttocsv::doitz(skipheader, from_event, to_event);
@@ -170,7 +170,7 @@ int main(int argc, char* argv[])
 			if(binFileGiven && idxFileGiven) {
 				footprinttocsv::doit(skipheader, from_event, to_event, binFileName, idxFileName);
 			} else if(binFileGiven || idxFileGiven) {
-				fprintf(stderr, "Must specify both bin and idx file names\n");
+				fprintf(stderr, "FATAL: Must specify both bin and idx file names\n");
 				exit(EXIT_FAILURE);
 			} else {
 				footprinttocsv::doit(skipheader, from_event, to_event);
@@ -178,7 +178,7 @@ int main(int argc, char* argv[])
 		}
 	}
 	catch (std::bad_alloc) {
-		fprintf(stderr, "%s: Memory allocation failed\n", progname);
+		fprintf(stderr, "FATAL: %s: Memory allocation failed\n", progname);
 		exit(EXIT_FAILURE);
 	}
 	return EXIT_SUCCESS;

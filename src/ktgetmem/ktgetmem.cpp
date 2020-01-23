@@ -23,7 +23,7 @@ void getcgroupLimit(int core_count)
 	char line[1024];
 	FILE *fin = fopen("/sys/fs/cgroup/memory/memory.limit_in_bytes","rb");
 	if (fin == NULL) {
-		fprintf(stderr,"Open failed");
+		fprintf(stderr,"FATAL: Open failed");
 		return;
 	}	
 	fgets(line, sizeof(line), fin);
@@ -35,7 +35,7 @@ void getcgroupLimit(int core_count)
 	}else {
 		long long int memlimit;
 		if (sscanf(line, "%lld", &memlimit) != 1){
-	           fprintf(stderr, "Invalid data : %s\n", line);
+	           fprintf(stderr, "FATAL: Invalid data : %s\n", line);
 	           return ;
 	    }
 

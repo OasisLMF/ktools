@@ -83,7 +83,7 @@ namespace pltcalc {
 	{
 		FILE* fin = fopen(OCCURRENCE_FILE, "rb");
 		if (fin == NULL) {
-			fprintf(stderr, "%s: Error opening file %s\n", __func__, OCCURRENCE_FILE);
+			fprintf(stderr, "FATAL: %s: Error opening file %s\n", __func__, OCCURRENCE_FILE);
 			exit(-1);
 		}
 

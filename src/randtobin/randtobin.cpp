@@ -57,7 +57,7 @@ void doit()
     while (fgets(line, sizeof(line), stdin) != 0)
     {
        if (sscanf(line, "%f", &randno) != 1){
-           fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
+           fprintf(stderr, "FATAL: Invalid data in line %d:\n%s", lineno, line);
            return;
        }
        else

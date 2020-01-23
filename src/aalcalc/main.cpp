@@ -17,7 +17,7 @@ char *progname = 0;
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
 void segfault_sigaction(int signal, siginfo_t *si, void *arg)
 {
-	fprintf(stderr, "%s: Segment fault at address: %p\n", progname, si->si_addr);
+	fprintf(stderr, "FATAL: %s: Segment fault at address: %p\n", progname, si->si_addr);
 	exit(EXIT_FAILURE);
 }
 #endif
@@ -43,7 +43,7 @@ int main(int argc, char* argv[])
 		switch (opt) {
 		case 'w':
 			welford = true;
-			fprintf(stderr, "Not supported\n");
+			fprintf(stderr, "FATAL: Not supported\n");
 			exit(-1);
 			break;
 		case 'v':
@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
 	}
 
 	if (subfolder.length() == 0) {
-		fprintf(stderr, "No folder supplied for summarycalc files\n");
+		fprintf(stderr, "FATAL: No folder supplied for summarycalc files\n");
 		exit(EXIT_FAILURE);
 	}
 
@@ -99,7 +99,7 @@ int main(int argc, char* argv[])
 		}
 	}
 	catch (std::bad_alloc) {
-		fprintf(stderr, "%s: Memory allocation failed\n", progname);
+		fprintf(stderr, "FATAL: %s: Memory allocation failed\n", progname);
 		exit(EXIT_FAILURE);
 	}
 

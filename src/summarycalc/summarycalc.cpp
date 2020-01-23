@@ -100,7 +100,7 @@ void summarycalc::reset_sssl_array(int sample_size)
 loss_exp **summarycalc::alloc_ssl_arrays(int summary_set, int sample_size)
 {
 	if (min_summary_id_[summary_set] != 1) {
-		fprintf(stderr, "summarycalc: Minimum summary ID is not equal to one\n");
+		fprintf(stderr, "FATAL: summarycalc: Minimum summary ID is not equal to one\n");
 		exit(-1);
 	}
 	int maxsummaryids = max_summary_id_[summary_set] ;
@@ -168,7 +168,7 @@ void summarycalc::loaditemtocoverage()
 	}
 	fin = fopen(file.c_str(), "rb");
 	if (fin == NULL) {
-		fprintf(stderr, "%s: cannot open %s\n", __func__, file.c_str());
+		fprintf(stderr, "FATAL: %s cannot open %s\n", __func__, file.c_str());
 		exit(EXIT_FAILURE);
 	}
 
@@ -184,7 +184,7 @@ void summarycalc::loaditemtocoverage()
 	while (i != 0) {
 		last_item_id++;
 		if (itm.id != last_item_id) {
-			fprintf(stderr, "Item ids are not contiguous or do not start from one");
+			fprintf(stderr, "FATAL: Item ids are not contiguous or do not start from one");
 			exit(-1);
 		}
 		last_item_id = itm.id;
@@ -202,7 +202,7 @@ bool summarycalc::loadcoverages()
 	}
 	FILE *fin = fopen(file.c_str(), "rb");
 	if (fin == NULL) {
-		fprintf(stderr, "%s: Error opening file %s\n", __func__, file.c_str());
+		fprintf(stderr, "FATAL: %s Error opening file %s\n", __func__, file.c_str());
 		exit(-1);
 	}
 
@@ -235,7 +235,7 @@ void summarycalc::loadgulsummaryxref()
 	}
 	FILE *fin = fopen(file.c_str(), "rb");
 	if (fin == NULL) {
-		fprintf(stderr, "%s: Error opening file %s\n", __func__, file.c_str());
+		fprintf(stderr, "FATAL: %s: Error opening file %s\n", __func__, file.c_str());
 		::exit(-1);
 	}
 
@@ -244,7 +244,7 @@ void summarycalc::loadgulsummaryxref()
 	int i = (int)fread(&s, sizeof(gulsummaryxref), 1, fin);
 	while (i != 0) {
 		if (s.summaryset_id > 9) {
-			fprintf(stderr, "%s: Invalid summaryset id  %d found in %s\n", __func__, s.summaryset_id, file.c_str());
+			fprintf(stderr, "FATAL: %s: Invalid summaryset id  %d found in %s\n", __func__, s.summaryset_id, file.c_str());
 			::exit(-1);
 		}
 		if (fout[s.summaryset_id] != nullptr) {
@@ -268,7 +268,7 @@ void summarycalc::loadsummaryxref(const std::string& filename)
 	}
 	FILE *fin = fopen(file.c_str(), "rb");
 	if (fin == NULL) {
-		fprintf(stderr, "%s: Error opening file %s\n", __func__, file.c_str());
+		fprintf(stderr, "FATAL: %s: Error opening file %s\n", __func__, file.c_str());
 		::exit(-1);
 	}
 
@@ -278,7 +278,7 @@ void summarycalc::loadsummaryxref(const std::string& filename)
 	int i = (int)fread(&s, sizeof(fmsummaryxref), 1, fin);
 	while (i != 0) {
 		if (s.summaryset_id > 9) {
-			fprintf(stderr, "%s: Invalid summaryset id  %d found in %s\n", __func__, s.summaryset_id, file.c_str());
+			fprintf(stderr, "FATAL: %s: Invalid summaryset id  %d found in %s\n", __func__, s.summaryset_id, file.c_str());
 			::exit(-1);
 		}
 		if (fout[s.summaryset_id] != nullptr) {
@@ -341,7 +341,7 @@ void summarycalc::openpipe(int summary_id, const std::string &pipe)
 		FILE *f = fopen(pipe.c_str(), "wb");
 		if (f != nullptr) fout[summary_id] = f;
 		else {
-			fprintf(stderr, "%s: Cannot open %s for output\n", __func__, pipe.c_str());
+			fprintf(stderr, "FATAL: %s: Cannot open %s for output\n", __func__, pipe.c_str());
 			::exit(-1);
 		}
 	}
@@ -508,12 +508,11 @@ void summarycalc::dogulcoveragesummary()
 			return;
 		}
 
-		std::cerr << "summarycalc: Gul stream type " << stream_type << " not supported\n";
+		std::cerr << "FATAL: summarycalc: Gul stream type " << stream_type << " not supported\n";
 		::exit(-1);
 	}
 	else {
-		std::cerr << "summarycalc: Not a gul stream\n";
-		std::cerr << "summarycalc: invalid stream type: " << streamtype << "\n";
+		std::cerr << "FATAL: summarycalc: Not a gul stream invalid stream type: " << streamtype << "\n";
 	}
 	
 	::exit(-1);
@@ -559,16 +558,16 @@ void summarycalc::dofmsummary()
 			unsigned int samplesize = 0;
 			i = (int) fread(&samplesize, sizeof(samplesize), 1, stdin);
 			if (i)	dosummaryprocessing(samplesize);
-			else std::cerr << "summarycalc: Read error on stream\n";
+			else std::cerr << "FATAL: summarycalc: Read error on stream\n";
 			return;
 		}
 		else {
-			std::cerr << "summarycalc: Not a fm stream\n";
-			std::cerr << "summarycalc: invalid stream type: " << streamtype << "\n";
+			std::cerr << "FATAL: summarycalc: Not a fm stream\n";
+			std::cerr << "FATAL: summarycalc: invalid stream type: " << streamtype << "\n";
 		}
 	}
 	else {
-		std::cerr << "summarycalc: Read error on stream\n";
+		std::cerr << "FATAL: summarycalc: Read error on stream\n";
 	}
 	::exit(-1);
 
@@ -587,16 +586,16 @@ void summarycalc::dogulitemsummary()
 			unsigned int samplesize = 0;
 			i =(int) fread(&samplesize, sizeof(samplesize), 1, stdin);
 			if (i)	dosummaryprocessing(samplesize);
-			else std::cerr << "summarycalc: Read error on stream\n";
+			else std::cerr << "FATAL: summarycalc: Read error on stream\n";
 			return;
 		}
 		else {
-			std::cerr << "summarycalc: Not a fm stream\n";
-			std::cerr << "summarycalc: invalid stream type: " << streamtype << "\n";
+			std::cerr << "FATAL: summarycalc: Not a fm stream\n";
+			std::cerr << "FATAL: summarycalc: invalid stream type: " << streamtype << "\n";
 		}
 	}
 	else {
-		std::cerr << "summarycalc: Read error on stream\n";
+		std::cerr << "FATAL: summarycalc: Read error on stream\n";
 	}
 	::exit(-1);
 
@@ -604,7 +603,7 @@ void summarycalc::dogulitemsummary()
 void summarycalc::doit()
 {
 	if (inputtype_ == UNKNOWN) {
-		fprintf(stderr,"summarycalc: stream type unknown\n");
+		fprintf(stderr,"FATAL: summarycalc: stream type unknown\n");
 		return;
 	}
 	

@@ -60,7 +60,7 @@ namespace footprinttobin {
 char *progname;
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
 void segfault_sigaction(int signal, siginfo_t *si, void *arg) {
-	fprintf(stderr, "%s: Segment fault at address: %p\n", progname,
+	fprintf(stderr, "FATAL: %s: Segment fault at address: %p\n", progname,
 		si->si_addr);
 	exit(EXIT_FAILURE);
 }
@@ -125,25 +125,22 @@ int main(int argc, char *argv[]) {
 		}
 	}
 	if (intensity_bins == -1) {
-		fprintf(stderr, "%s: Intensity bin parameter not supplied\n", __func__);
+		fprintf(stderr, "FATAL: Intensity bin parameter not supplied\n");
 		help();
 		exit(EXIT_FAILURE);
 	}
 
 	initstreams();
-	fprintf(stderr, "starting...\n");
-
 
 	if (zip) {
 #ifdef _MSC_VER
-		fprintf(stderr, "Zip not supported in Microsoft build\n");
+		fprintf(stderr, "FATAL: Zip not supported in Microsoft build\n");
 		exit(-1);
 #else
 		if(binFileGiven && idxFileGiven) {
 			footprinttobin::doitz(intensity_bins, hasIntensityUncertainty, binFileName, idxFileName);
 		} else if(binFileGiven || idxFileGiven) {
-			fprintf(stderr, "Must specify both bin and idx file names\n");
-			fprintf(stderr, "aborted\n");
+			fprintf(stderr, "FATAL: Must specify both bin and idx file names - aborted\n");
 			exit(EXIT_FAILURE);
 		} else {
 			footprinttobin::doitz(intensity_bins, hasIntensityUncertainty);
@@ -154,14 +151,12 @@ int main(int argc, char *argv[]) {
 		if(binFileGiven && idxFileGiven) {
 			footprinttobin::doit(intensity_bins, hasIntensityUncertainty, skipheader, binFileName, idxFileName);
 		} else if(binFileGiven || idxFileGiven) {
-			fprintf(stderr, "Must specify both bin and idx file names\n");
-			fprintf(stderr, "aborted\n");
+			fprintf(stderr, "FATAL: Must specify both bin and idx file names - aborted\n");
 			exit(EXIT_FAILURE);
 		} else {
 			footprinttobin::doit(intensity_bins, hasIntensityUncertainty, skipheader);
 		}
 	}
 
-	fprintf(stderr, "done...\n");
 	return EXIT_SUCCESS;
 }

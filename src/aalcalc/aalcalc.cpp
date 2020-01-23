@@ -54,8 +54,7 @@ void aalcalc::loadperiodtoweigthing()
 {
 	FILE *fin = fopen(PERIODS_FILE, "rb");
 	if (fin == NULL) return;
-	//fprintf(stderr, "Weighting for period files are not supported in this version - due to changes in the way aalcalc works!\n");
-	//exit(EXIT_FAILURE);
+
 	Periods p;
 	double total_weighting = 0;
 	size_t i = fread(&p, sizeof(Periods), 1, fin);
@@ -65,30 +64,6 @@ void aalcalc::loadperiodtoweigthing()
 		i = fread(&p, sizeof(Periods), 1, fin);
 	}
 
-	//if (total_weighting > 1.00001 || total_weighting < 0.99999) {
-	//	fprintf(stderr, "aalcalc: Period weighting do not sum to 1 in %s total = %f\n", PERIODS_FILE, total_weighting);
-	//	exit(-1);
-	//}
-
-	// If we are going to have weightings we should have them for all periods
-	//	if (periodstowighting_.size() != no_of_periods_) {
-	//		fprintf(stderr, "Total number of periods in %s does not match the number of periods in %s\n", PERIODS_FILE, OCCURRENCE_FILE);
-	//		exit(-1);
-	//	}
-	// Weighting already normalzed just split over samples...
-
-/*
-	auto iter = periodstoweighting_.begin();
-	while (iter != periodstoweighting_.end()) {
-		// iter->second = iter->second / total_weighting; // no need sinece already normalized 
-		if (samplesize_ == -1) { 
-			fprintf(stderr, "Sample size not initialzed\n"); 
-			exit(EXIT_FAILURE);
-		}
-		if (samplesize_) iter->second = iter->second / samplesize_;   // split weighting over samples
-		iter++;
-	}
-*/
 }
 
 void aalcalc::loadoccurrence()
@@ -97,7 +72,7 @@ void aalcalc::loadoccurrence()
 	int date_algorithm_ = 0;
 	FILE *fin = fopen(OCCURRENCE_FILE, "rb");
 	if (fin == NULL) {
-		fprintf(stderr, "%s: cannot open %s\n", __func__, OCCURRENCE_FILE);
+		fprintf(stderr, "FATAL: %s: cannot open %s\n", __func__, OCCURRENCE_FILE);
 		exit(-1);
 	}
 	std::set<int>  periods;
@@ -113,14 +88,8 @@ void aalcalc::loadoccurrence()
 		i = fread(&occ, sizeof(occ), 1, fin);
 	}
 	
-	// TODO: fix example and enable this
-	//if (periods.size() != no_of_periods_) {
-	//	fprintf(stderr, "Number of periods found is not equal to the number of periods specified in the header\n");
-	//	exit(-1);
-	//}
-
 	if (max_period_no_ > no_of_periods_) {
-		fprintf(stderr, "Period numbers are not contigious\n");
+		fprintf(stderr, "FATAL: Period numbers are not contigious\n");
 		exit(-1);
 	}
 	fclose(fin);
@@ -129,7 +98,7 @@ void aalcalc::loadoccurrence()
 void aalcalc::indexevents(const std::string& fullfilename, std::string& filename) {
 	FILE* fin = fopen(fullfilename.c_str(), "rb");
 	if (fin == NULL) {
-		fprintf(stderr, "%s: cannot open %s\n", __func__, fullfilename.c_str());
+		fprintf(stderr, "FATAL: %s: cannot open %s\n", __func__, fullfilename.c_str());
 		exit(EXIT_FAILURE);
 	}
 	std::string ss = filename.substr(1, filename.length() - 5);
@@ -141,7 +110,7 @@ void aalcalc::indexevents(const std::string& fullfilename, std::string& filename
 	int stream_type = summarycalcstream_type & summarycalc_id;
 
 	if (stream_type != summarycalc_id) {
-		fprintf(stderr, "%s: Not a summarycalc stream type %d\n", __func__, stream_type);
+		fprintf(stderr, "FATAL: %s: Not a summarycalc stream type %d\n", __func__, stream_type);
 		exit(-1);
 	}
 
@@ -234,7 +203,7 @@ void loadsummaryindex(const std::string& subfolder, std::map<int, std::vector<ev
 	path = path + "index.idx";
 	FILE* fin = fopen(path.c_str(), "rb");
 	if (fin == nullptr) {
-		fprintf(stderr, "File %s not  found\n", path.c_str());
+		fprintf(stderr, "FATAL: File %s not  found\n", path.c_str());
 		exit(-1);
 	}
 	ind_rec idx;
@@ -269,7 +238,7 @@ void aalcalc::load_event_to_summary_index(const std::string& subfolder)
 		}
 	}
 	else {
-		fprintf(stderr, "Unable to open directory %s\n", path.c_str());
+		fprintf(stderr, "FATAL: Unable to open directory %s\n", path.c_str());
 		exit(-1);
 	}
 	// Save summaryIndex
@@ -308,23 +277,6 @@ void aalcalc::do_calc_end_new()
 				if (a.max_exposure_value < aa.max_exposure_value) a.max_exposure_value = aa.max_exposure_value;
 				a.mean += aa.sum_of_loss;
 				a.mean_squared += aa.sum_of_loss * aa.sum_of_loss;
-
-				//auto a_iter = map_sample_aal_.find(current_summary_id_);
-				//if (a_iter != map_sample_aal_.end()) {
-				//	aal_rec& a = a_iter->second;
-				//	if (a.max_exposure_value < aa.max_exposure_value) a.max_exposure_value = aa.max_exposure_value;
-				//	a.mean += aa.sum_of_loss;
-				//	a.mean_squared += aa.sum_of_loss * aa.sum_of_loss;
-				//}
-				//else {
-				//	aal_rec a;
-				//	a.summary_id = current_summary_id_;
-				//	a.type = 2;
-				//	a.max_exposure_value = aa.max_exposure_value;
-				//	a.mean = aa.sum_of_loss;
-				//	a.mean_squared = aa.sum_of_loss * aa.sum_of_loss;
-				//	map_sample_aal_[current_summary_id_] = a;
-				//}
 			}
 			else {
 				aal_rec& a = vec_analytical_aal_[current_summary_id_];
@@ -333,23 +285,6 @@ void aalcalc::do_calc_end_new()
 				a.mean += aa.sum_of_loss;
 				a.mean_squared += aa.sum_of_loss * aa.sum_of_loss;
 				if (a.summary_id == 0) a.summary_id = current_summary_id_;
-
-				//auto a_iter = map_analytical_aal_.find(current_summary_id_);
-				//if (a_iter != map_analytical_aal_.end()) {
-				//	aal_rec& a = a_iter->second;
-				//	if (a.max_exposure_value < aa.max_exposure_value) a.max_exposure_value = aa.max_exposure_value;
-				//	a.mean += aa.sum_of_loss;
-				//	a.mean_squared += aa.sum_of_loss * aa.sum_of_loss;
-				//}
-				//else {
-				//	aal_rec a;
-				//	a.summary_id = current_summary_id_;
-				//	a.type = 1;
-				//	a.max_exposure_value = aa.max_exposure_value;
-				//	a.mean = aa.sum_of_loss;
-				//	a.mean_squared = aa.sum_of_loss * aa.sum_of_loss;
-				//	map_analytical_aal_[current_summary_id_] = a;
-				//}
 			}
 			aa.max_exposure_value = 0;
 			aa.sum_of_loss = 0;
@@ -357,7 +292,6 @@ void aalcalc::do_calc_end_new()
 		iter++;
 	}
 	set_periods_.clear();
-	//set_periods_.reserve(50000);
 }
 
 void aalcalc::do_sample_calc_newx(const summarySampleslevelHeader& sh, const std::vector<sampleslevelRec>& vrec) {
@@ -366,37 +300,9 @@ void aalcalc::do_sample_calc_newx(const summarySampleslevelHeader& sh, const std
 	auto p_iter = event_to_period_.find(sh.event_id);
 	if (p_iter == event_to_period_.end()) return;
 
-	//k.period_no = event_to_period_[sh.event_id];
-	//if (k.period_no == 0) return;
-	//for (auto p : p_iter->second) {
-	//	k.period_no = p;
-	//	for (auto x : vrec) {
-	//		if (x.loss > 0) {
-	//			k.sidx = x.sidx;
-	//			auto iter = sum_loss_map.find(k);
-	//			if (iter != sum_loss_map.end()) {
-	//				loss_rec& a = iter->second;
-	//				if (a.max_exposure_value < sh.expval) a.max_exposure_value = sh.expval;
-	//				a.sum_of_loss += x.loss;
-	//			}
-	//			else {
-	//				loss_rec l;
-	//				l.sum_of_loss = x.loss;
-	//				l.max_exposure_value = sh.expval;
-	//				sum_loss_map[k] = l;
-	//			}
-	//		}
-	//	}
-	//}
-	// periodstoweighting_.clear();
 	double factor = (double)periodstoweighting_.size();
 
 	for (auto period_no : p_iter->second) {
-
-//		if (max_set_period_size_ < set_periods_.size()) {
-//			max_set_period_size_ = set_periods_.size();
-//			fprintf(stderr, "Max set_period_size: %d\n", max_set_period_size_);
-//		}
 
 		set_periods_.emplace(period_no);
 		double weighting = 1;
@@ -504,7 +410,7 @@ void aalcalc::initsameplsize(const std::string &path)
 				s = path + ent->d_name;
 				FILE *fin = fopen(s.c_str(), "rb");
 				if (fin == NULL) {
-					fprintf(stderr, "%s: cannot open %s\n", __func__, s.c_str());
+					fprintf(stderr, "FATAL:%s: cannot open %s\n", __func__, s.c_str());
 					exit(EXIT_FAILURE);
 				}
 				int summarycalcstream_type = 0;
@@ -536,7 +442,7 @@ void aalcalc::getmaxsummaryid(std::string &path)
 	std::string filename = path + "max_summary_id.idx";
 	FILE *fin = fopen(filename.c_str(), "rb");
 	if (fin == NULL) {
-		fprintf(stderr, "%s: cannot open %s\n", __func__, filename.c_str());
+		fprintf(stderr, "FATAL:%s: cannot open %s\n", __func__, filename.c_str());
 		exit(EXIT_FAILURE);
 	}
 
@@ -545,7 +451,7 @@ void aalcalc::getmaxsummaryid(std::string &path)
 	{
 		int ret = sscanf(line, "%d", &max_summary_id_);
 		if (ret != 1) {
-			fprintf(stderr, "Invalid data in line %d:\n%s %d", 1, line, ret);
+			fprintf(stderr, "FATAL:Invalid data in line %d:\n%s %d", 1, line, ret);
 			exit(-1);
 		}		
 	}
@@ -572,7 +478,7 @@ void aalcalc::doit(const std::string& subfolder)
 	std::string filename = path + "filelist.idx";
 	FILE* fin = fopen(filename.c_str(), "rb");
 	if (fin == NULL) {
-		fprintf(stderr, "%s: cannot open %s\n", __func__, filename.c_str());
+		fprintf(stderr, "FATAL:%s: cannot open %s\n", __func__, filename.c_str());
 		exit(EXIT_FAILURE);
 	}
 	
@@ -583,7 +489,7 @@ void aalcalc::doit(const std::string& subfolder)
 		filename = path + s;
 		FILE* in = fopen(filename.c_str(), "rb");
 		if (in == NULL) {
-			fprintf(stderr, "%s: cannot open %s\n", __func__, s.c_str());
+			fprintf(stderr, "FATAL:%s: cannot open %s\n", __func__, s.c_str());
 			exit(EXIT_FAILURE);
 		}
 		filelist.push_back(s);
@@ -596,7 +502,7 @@ void aalcalc::doit(const std::string& subfolder)
 	filename = path + "summaries.idx";
 	fin = fopen(filename.c_str(), "rb");
 	if (fin == NULL) {
-		fprintf(stderr, "%s: cannot open %s\n", __func__, filename.c_str());
+		fprintf(stderr, "FATAL:%s: cannot open %s\n", __func__, filename.c_str());
 		exit(EXIT_FAILURE);
 	}
 
@@ -610,7 +516,7 @@ void aalcalc::doit(const std::string& subfolder)
 	{
 		int ret = sscanf(line, "%d, %d, %lld", &summary_id, &file_index, &file_offset);
 		if (ret != 3) {
-			fprintf(stderr, "Invalid data in line %d:\n%s %d", lineno, line, ret);
+			fprintf(stderr, "FATAL:Invalid data in line %d:\n%s %d", lineno, line, ret);
 			exit(-1);
 		}
 		else
@@ -641,7 +547,7 @@ void aalcalc::doit(const std::string& subfolder)
 				}
 				doaalcalc_new(sh, vrec, mean_loss);
 			}else {
-				fprintf(stderr, "File handle is a nullptr");
+				fprintf(stderr, "FATAL:File handle is a nullptr");
 				exit(EXIT_FAILURE);
 			}
 
@@ -667,7 +573,7 @@ void aalcalc::debug_process_summaryfile(const std::string &filename)
 {
 	FILE *fin = fopen(filename.c_str(), "rb");
 	if (fin == NULL) {
-		fprintf(stderr, "%s: cannot open %s\n", __func__, filename.c_str());
+		fprintf(stderr, "FATAL:%s: cannot open %s\n", __func__, filename.c_str());
 		exit(EXIT_FAILURE);
 	}
 
@@ -676,7 +582,7 @@ void aalcalc::debug_process_summaryfile(const std::string &filename)
 	int stream_type = summarycalcstream_type & summarycalc_id;
 
 	if (stream_type != summarycalc_id) {
-		fprintf(stderr, "%s: Not a summarycalc stream type %d\n", __func__, stream_type);
+		fprintf(stderr, "FATAL:%s: Not a summarycalc stream type %d\n", __func__, stream_type);
 		exit(-1);
 	}
 	stream_type = streamno_mask & summarycalcstream_type;
@@ -732,7 +638,7 @@ void aalcalc::debug(const std::string &subfolder)
 		}
 	}
 	else {
-		fprintf(stderr, "Unable to open directory %s\n", path.c_str());
+		fprintf(stderr, "FATAL: Unable to open directory %s\n", path.c_str());
 		exit(-1);
 	}
 }

@@ -81,11 +81,11 @@ namespace footprinttobin {
 			int ret = sscanf(line, "%d,%d,%d,%f", &event_id, &r.areaperil_id, &r.intensity_bin_id, &r.probability);
 #endif
 			if (ret != 4) {
-				fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
+				fprintf(stderr, "FATAL: Invalid data in line %d:\n%s", lineno, line);
 				return;
 			}
 			if (r.intensity_bin_id > intensity_bins) {
-				fprintf(stderr, "Intensity bin id %d is greater than the max supplied (%d) in line %d:\n%s", r.intensity_bin_id, intensity_bins, lineno, line);
+				fprintf(stderr, "FATAL: Intensity bin id %d is greater than the max supplied (%d) in line %d:\n%s", r.intensity_bin_id, intensity_bins, lineno, line);
 				return;
 			}
 			if (event_id != last_event_id) {
@@ -96,7 +96,7 @@ namespace footprinttobin {
 					areaperils.insert(r.areaperil_id);
 				}
 				else {
-					fprintf(stderr, "Error (%d):Event_id %d has already been converted - "
+					fprintf(stderr, "FATAL: Error (%d):Event_id %d has already been converted - "
 						"all event data should be contiguous \n",
 						lineno, event_id);
 					exit(-1);
@@ -182,11 +182,11 @@ namespace footprinttobin {
 			int ret = sscanf(line, "%d,%d,%d,%f", &event_id, &r.areaperil_id, &r.intensity_bin_id, &r.probability);
 #endif
 			if (ret != 4) {
-				fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
+				fprintf(stderr, "FATAL: Invalid data in line %d:\n%s", lineno, line);
 				return;
 			}
 			if (r.intensity_bin_id > intensity_bins) {
-				fprintf(stderr, "Intensity bin id %d is greater than the max supplied (%d) in line %d:\n%s", r.intensity_bin_id, intensity_bins, lineno, line);
+				fprintf(stderr, "FATAL: Intensity bin id %d is greater than the max supplied (%d) in line %d:\n%s", r.intensity_bin_id, intensity_bins, lineno, line);
 				return;
 			}
 			if (event_id != last_event_id) {

@@ -137,7 +137,7 @@ namespace eltcalc {
 				doetloutput(samplesize, skipHeader);
 			}
 			else {
-				fprintf(stderr, "Stream read error\n");
+				fprintf(stderr, "FATAL: Stream read error\n");
 			}
 			return;
 		}

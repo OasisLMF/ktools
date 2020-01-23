@@ -61,7 +61,7 @@ void doitz(bool skipheader, bool fullprecision, bool show_exposure_value, bool r
 	int stream_type = summarycalcstream_type & summarycalc_id;
 
 	if (stream_type != summarycalc_id) {
-		std::cerr << "Not a summarycalc stream type\n";
+		std::cerr << "FATAL:Not a summarycalc stream type\n";
 		exit(-1);
 	}
 	stream_type = streamno_mask & summarycalcstream_type;
@@ -104,7 +104,7 @@ void doitz(bool skipheader, bool fullprecision, bool show_exposure_value, bool r
 		}
 		return;
 	}
-	fprintf(stderr, "Unsupported summarycalc stream type\n");
+	fprintf(stderr, "FATAL: Unsupported summarycalc stream type\n");
 }
 void doit(bool skipheader, bool fullprecision,bool show_exposure_value, bool remove_zero_exposure_records)
 {
@@ -117,7 +117,7 @@ void doit(bool skipheader, bool fullprecision,bool show_exposure_value, bool rem
 	int stream_type = summarycalcstream_type & summarycalc_id;
 
 	if (stream_type != summarycalc_id) {
-		std::cerr << "Not a summarycalc stream type\n";
+		std::cerr << "FATAL: Not a summarycalc stream type\n";
 		exit(-1);
 	}
 	stream_type = streamno_mask & summarycalcstream_type;
@@ -137,9 +137,6 @@ void doit(bool skipheader, bool fullprecision,bool show_exposure_value, bool rem
 				sampleslevelRec sr;
 				i = fread(&sr, sizeof(sr), 1, stdin);
 				if (i == 0) break;	
-				//if (last_sidx == 0 && sr.sidx == 0) {
-				//	fprintf(stderr, "We are here\n");
-				//}
 				if (sr.sidx == 0) break;
 				last_sidx = sr.sidx;
 				rowcount++;
@@ -155,7 +152,7 @@ void doit(bool skipheader, bool fullprecision,bool show_exposure_value, bool rem
 		}
 		return;
 	}
-	fprintf(stderr,"Unsupported summarycalc stream type\n");
+	fprintf(stderr,"FATAL: Unsupported summarycalc stream type\n");
 
 }
 
@@ -205,6 +202,5 @@ int main(int argc, char* argv[])
 
 	initstreams();
 	doit(skipheader, fullprecision, show_exposure_value, remove_zero_exposure_records);
-	//fprintf(stderr, "Row count: %d\n", rowcount);
 	return EXIT_SUCCESS;
 }

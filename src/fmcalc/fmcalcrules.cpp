@@ -62,10 +62,11 @@ void applycalcrule_stepped(const profile_rec_new& profile, LossRec& x, int layer
 		}
 		//Function14 =  IIf(Loss > lim, Lim, Loss)
 		OASIS_FLOAT loss = x.loss;
-		if (loss > lim) {
-			x.limit_surplus = loss - lim;
-			loss = lim;
-		}
+			if (loss > lim) {
+				x.over_limit = loss - lim;
+				loss = lim;
+			}
+		x.under_limit = lim - loss;
 		//x.retained_loss = x.retained_loss + (x.loss - loss);
 		OASIS_FLOAT net_loss = 0;
 		if (layer > 1)	net_loss = x.previous_layer_retained_loss - loss;

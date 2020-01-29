@@ -57,7 +57,7 @@ namespace fmprogrammetobin {
         while (fgets(line, sizeof(line), stdin) != 0) {
             if (sscanf(line, "%d,%d,%d", &q.from_agg_id, &q.level_id,
                        &q.to_agg_id) != 3) {
-                fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
+                fprintf(stderr, "FATAL: Invalid data in line %d:\n%s", lineno, line);
                 return;
             } else {
                 fwrite(&q, sizeof(q), 1, stdout);

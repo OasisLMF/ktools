@@ -453,7 +453,7 @@ void applycalcrule_stepped(const profile_rec_new& profile, LossRec& x, int layer
 		break;
 		default:
 		{
-			fprintf(stderr, "Unknown calc rule %d\n", profile.calcrule_id);
+			fprintf(stderr, "FATAL: Unknown calc rule %d\n", profile.calcrule_id);
 		}
 	}
 }
@@ -1288,7 +1288,7 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 		break;
 		default:
 		{
-			fprintf(stderr, "Unknown calc rule %d\n", profile.calcrule_id);
+			fprintf(stderr, "FATAL: Unknown calc rule %d\n", profile.calcrule_id);
 		}
 	}
 }
@@ -1407,7 +1407,7 @@ void fmcalc::init_profile__stepped_rec(fm_profile_step& f)
 			break;
 		default:
 		{
-			fprintf(stderr, "Invalid calc rule for stepped policies\n");
+			fprintf(stderr, "FATAL: Invalid calc rule for stepped policies\n");
 			exit(EXIT_FAILURE);
 		}
 	}

@@ -17,7 +17,7 @@ char *progname;
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
 void segfault_sigaction(int signal, siginfo_t *si, void *arg)
 {
-	fprintf(stderr, "%s: Segment fault at address: %p\n", progname, si->si_addr);
+	fprintf(stderr, "FATAL: %s: Segment fault at address: %p\n", progname, si->si_addr);
 	exit(EXIT_FAILURE);
 }
 #endif
@@ -71,7 +71,7 @@ progname = argv[0];
         initstreams();        
         fmprofiletobin::doit(step);
     } catch (std::bad_alloc) {
-        fprintf(stderr, "%s: Memory allocation failed\n", progname);
+        fprintf(stderr, "FATAL: %s: Memory allocation failed\n", progname);
         exit(EXIT_FAILURE);
     }
     return EXIT_SUCCESS;

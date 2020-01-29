@@ -114,11 +114,11 @@ int main(int argc, char* argv[])
 					to_event = atoi(result[1].c_str());
 				}
 				if (from_event == 0) {
-					fprintf(stderr, "Invalid from event_id\n");
+					fprintf(stderr, "FATAL: Invalid from event_id\n");
 					exit(EXIT_FAILURE);
 				}
 				if (to_event == 0) {
-					fprintf(stderr, "Invalid to event_id\n");
+					fprintf(stderr, "FATAL: Invalid to event_id\n");
 					exit(EXIT_FAILURE);
 				}
 			}

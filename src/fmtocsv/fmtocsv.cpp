@@ -59,12 +59,12 @@ void doit(bool skipheader, bool fullprecision)
 	int stream_type = fmstream_type & fmstream_id ;
 
 	if (stream_type != fmstream_id) {
-		fprintf(stderr, "%s: Not a fm stream type\n",__func__);
+		fprintf(stderr, "FATAL: %s: Not a fm stream type\n",__func__);
 		exit(-1);
 	}
 	stream_type = streamno_mask & fmstream_type;
 	if (stream_type != 1 ) {
-		fprintf(stderr, "%s: Unsupported fm stream type: %d\n", __func__, stream_type);
+		fprintf(stderr, "FATAL: %s: Unsupported fm stream type: %d\n", __func__, stream_type);
 		exit(-1);
 	}
 

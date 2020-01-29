@@ -65,7 +65,7 @@ namespace itemtobin {
 #endif 
 
 			if (ret != 5) {
-				fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
+				fprintf(stderr, "FATAL: Invalid data in line %d:\n%s", lineno, line);
 				return;
 			}
 			else
@@ -74,7 +74,7 @@ namespace itemtobin {
 					fwrite(&q, sizeof(q), 1, stdout);
 				}
 				else {
-					fprintf(stderr, "Item_id is not contiguous expected %d but found %d\n", lineno, q.id);
+					fprintf(stderr, "FATAL: Item_id is not contiguous expected %d but found %d\n", lineno, q.id);
 					exit(-1);
 				}
 			}

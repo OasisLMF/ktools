@@ -127,9 +127,9 @@ namespace footprinttobin {
 				}
 				else {
 #ifdef AREAPERIL_TYPE_UNSIGNED_LONG_LONG
-					fprintf(stderr, "Error (%d): areaperil_id %llu data is not contiguous for event_id %d \n", lineno, r.areaperil_id, event_id);
+					fprintf(stderr, "FATAL: Error (%d): areaperil_id %llu data is not contiguous for event_id %d \n", lineno, r.areaperil_id, event_id);
 #else
-					::fprintf(stderr, "Error (%d): areaperil_id %d data is not contiguous for event_id %d \n", lineno, r.areaperil_id, event_id);
+					::fprintf(stderr, "FATAL: Error (%d): areaperil_id %d data is not contiguous for event_id %d \n", lineno, r.areaperil_id, event_id);
 #endif
 					::exit(-1);
 				}
@@ -197,7 +197,7 @@ namespace footprinttobin {
 					areaperils.insert(r.areaperil_id);
 				}
 				else {
-					fprintf(stderr, "Error (%d):Event_id %d has already been converted - "
+					fprintf(stderr, "FATAL: Error (%d):Event_id %d has already been converted - "
 						"all event data should be contiguous \n",
 						lineno, event_id);
 					exit(-1);
@@ -218,9 +218,9 @@ namespace footprinttobin {
 				}
 				else {
 #ifdef AREAPERIL_TYPE_UNSIGNED_LONG_LONG
-					fprintf(stderr, "Error (%d): areaperil_id %llu data is not contiguous for event_id %d \n", lineno, r.areaperil_id, event_id);
+					fprintf(stderr, "FATAL: Error (%d): areaperil_id %llu data is not contiguous for event_id %d \n", lineno, r.areaperil_id, event_id);
 #else
-					fprintf(stderr, "Error (%d): areaperil_id %d data is not contiguous for event_id %d \n", lineno, r.areaperil_id, event_id);
+					fprintf(stderr, "FATAL: Error (%d): areaperil_id %d data is not contiguous for event_id %d \n", lineno, r.areaperil_id, event_id);
 #endif
 					exit(-1);
 				}

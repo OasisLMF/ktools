@@ -61,7 +61,7 @@ namespace fmprofiletobin {
                 &q.share2, &q.share3, &q.step_id, &q.trigger_start, &q.trigger_end,
 				&q.payout_start, &q.payout_end, &q.limit2,
 				&q.scale1, &q.scale2) != 18) {
-				fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
+				fprintf(stderr, "FATAL: Invalid data in line %d:\n%s", lineno, line);
 				return;
 			}
 			else {
@@ -85,7 +85,7 @@ namespace fmprofiletobin {
                        &q.calcrule_id, &q.deductible1, &q.deductible2,
                        &q.deductible3, &q.attachment, &q.limit, &q.share1,
                        &q.share2, &q.share3) != 10) {
-                fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
+                fprintf(stderr, "FATAL: Invalid data in line %d:\n%s", lineno, line);
                 return;
             } else {
                 fwrite(&q, sizeof(q), 1, stdout);

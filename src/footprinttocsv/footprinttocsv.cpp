@@ -83,7 +83,7 @@ namespace footprinttocsv {
 		uLongf dest_length = (uLongf)uncompressed_buf.size();
 		int ret = uncompress(&uncompressed_buf[0], &dest_length, &compressed_buf[0], size);
 		if (ret != Z_OK) {
-			fprintf(stderr, "Got bad return code from uncompress %d\n", ret);
+			fprintf(stderr, "FATAL: Got bad return code from uncompress %d\n", ret);
 			exit(-1);
 		}
 
@@ -110,7 +110,7 @@ namespace footprinttocsv {
 		EventIndex next_idx;
 
 		if (finy == nullptr) {
-			fprintf(stderr, "Footprint idx open failed\n");
+			fprintf(stderr, "FATAL: Footprint idx open failed\n");
 			exit(3);
 		}
 
@@ -146,7 +146,7 @@ namespace footprinttocsv {
 		EventIndex idx;
 
 		if (finy == nullptr) {
-			fprintf(stderr, "Footprint idx open failed\n");
+			fprintf(stderr, "FATAL: Footprint idx open failed\n");
 			exit(3);
 		}
 		size_t i = fread(&idx, sizeof(idx), 1, finy);

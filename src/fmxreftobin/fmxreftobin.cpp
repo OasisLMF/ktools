@@ -58,7 +58,7 @@ namespace fmxreftobin {
         while (fgets(line, sizeof(line), stdin) != 0) {
             if (sscanf(line, "%d,%d,%d", &q.output_id, &q.agg_id,
                        &q.layer_id) != 3) {
-                fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
+                fprintf(stderr, "FATAL: Invalid data in line %d:\n%s", lineno, line);
                 return;
             } else {
                 fwrite(&q, sizeof(q), 1, stdout);

@@ -64,7 +64,7 @@ namespace gultobin {
 		while (fgets(line, sizeof(line), stdin) != 0)
 		{
 			if (sscanf(line, "%d,%d,%d,%f", &q.event_id, &q.item_id, &q.sidx, &q.loss) != 4) {
-				fprintf(stderr, "Invalid data in line %d:\n%s", lineno, line);
+				fprintf(stderr, "FATAL: Invalid data in line %d:\n%s", lineno, line);
 				return;
 			}
 			else

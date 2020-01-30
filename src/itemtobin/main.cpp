@@ -105,7 +105,7 @@ int main(int argc, char* argv[])
 		initstreams();
 		itemtobin::doit();
 		return EXIT_SUCCESS;
-	}catch (std::bad_alloc) {
+	}catch (std::bad_alloc&) {
 		fprintf(stderr, "FATAL: %s: Memory allocation failed\n", progname);
 		exit(EXIT_FAILURE);
 	}

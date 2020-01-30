@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
     try {
         initstreams();        
         fmprofiletocsv::doit(skipheader,step);        
-    } catch (std::bad_alloc) {
+    } catch (std::bad_alloc&) {
         fprintf(stderr, "FATAL: %s: Memory allocation failed\n", progname);
         exit(EXIT_FAILURE);
     }

@@ -70,10 +70,10 @@ Result::Result(OASIS_FLOAT prob, OASIS_FLOAT damage) : prob(prob), damage(damage
 }
 
 // Is this the number of damage bins?
-const int MAX_RESULTS = 100;
+//const int MAX_RESULTS = 100;
+//const size_t SIZE_OF_OASIS_FLOAT = sizeof(OASIS_FLOAT);
 
 const size_t SIZE_OF_INT = sizeof(int);
-const size_t SIZE_OF_OASIS_FLOAT = sizeof(OASIS_FLOAT);
 const size_t SIZE_OF_RESULT = sizeof(Result);
 
 const unsigned int OUTPUT_STREAM_TYPE = 1;

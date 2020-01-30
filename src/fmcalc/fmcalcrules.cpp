@@ -570,7 +570,7 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			//Function3 = IIf(Loss < Ded, 0, IIf(Loss > Ded, Lim, Loss))
 			OASIS_FLOAT loss = x.loss;
 			if (loss < ded) loss = 0;
-			else loss = loss;
+			//else loss = loss;
 			x.effective_deductible = x.effective_deductible + (x.loss - loss);
 
 			if (loss > lim) {

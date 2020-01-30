@@ -123,7 +123,7 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 			from_level = level_;
 			to_level = from_level + 1;
 		}
-		for (unsigned int level = 1; level < to_level; level++) {
+		for (int level = 1; level < to_level; level++) {
 			vector <LossRec> &agg_vec = agg_vecs[level][layer_];
 			vector <LossRec>& previous_agg_vec = agg_vecs[level-1][layer_];
 			OASIS_FLOAT loss_total = 0;
@@ -164,11 +164,11 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 				// check level and layer_
 				// if there is no loss_total loss just copy previous level proportions
 				auto iter = agg_vec.begin();		// loop through again to work out proportion
-				auto previous_iter = previous_agg_vec.begin();		// loop through again to work out proportion
+				//auto previous_iter = previous_agg_vec.begin();		// loop through again to work out proportion
 				while (iter != agg_vec.end()) {
 					if (iter->item_idx) {
 						for (int idx : *(iter->item_idx)) {
-							std::vector<OASIS_FLOAT>& v = *(iter->item_prop);
+							//std::vector<OASIS_FLOAT>& v = *(iter->item_prop);
 							iter->proportion = iter->proportion + items_prop[idx];
 						}
 					}
@@ -243,7 +243,7 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 			vector <LossRec> &current_agg_vec = agg_vecs[level_][layer_];
 			size_t iMax =  prev_agg_vec.size();
 			if (current_agg_vec.size() > iMax) iMax = current_agg_vec.size();
-			for (int i = 0; i < iMax; i++) {
+			for (size_t i = 0; i < iMax; i++) {
 				current_agg_vec[i].proportion = prev_agg_vec[i].proportion;
 				current_agg_vec[i].item_prop = prev_agg_vec[i].item_prop;
 			}			
@@ -251,7 +251,7 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 		else {			
 			vector <LossRec> &prev_agg_vec = agg_vecs[level_ - 1][previous_layer_];
 			vector <LossRec> &prev_agg_vec_base = agg_vecs[level_ - 1][1];
-			for (int i = 0; i < prev_agg_vec.size(); i++) {
+			for (size_t i = 0; i < prev_agg_vec.size(); i++) {
 				//if (prev_agg_vec[i].item_prop->size() == 0) {
 				if (prev_agg_vec[i].item_prop == nullptr) {
 					//prev_agg_vec[i].loss = prev_agg_vec_base[i].loss;
@@ -276,7 +276,7 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 				j++;
 				iter++;
 			}
-			for (int y = 0; y < agg_vecs[level_][layer_].size(); y++) {
+			for (size_t y = 0; y < agg_vecs[level_][layer_].size(); y++) {
 				if (agg_vecs[level_][layer_][y].item_idx != nullptr) {
 					auto it = agg_vecs[level_][layer_][y].item_idx->begin();
 					// 1 create an item id  to prev_agg_vec index
@@ -304,7 +304,7 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 						if (prev_gul_total > 0) {
 							int j = -1;
 							const std::vector<int>& z = *(prev_agg_vec[v[*it]].item_idx);
-							for (int i = 0; i < z.size(); i++) {
+							for (size_t i = 0; i < z.size(); i++) {
 								if (z[i] == *it) {
 									j = i;
 									break;
@@ -336,7 +336,7 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 
 inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlookups, vector<vector<vector <LossRec>>> &agg_vecs, int level, int max_level,
 	std::map<int, std::vector<fmlevelrec> > &outmap, int gul_idx, const std::vector<std::vector<std::vector<policytcvidx>>> &avxs, int layer, 
-	const std::vector<int> &items, std::vector<vector<OASIS_FLOAT>> &event_guls, int previous_level, int previous_layer)
+	const std::vector<int> &items, std::vector<vector<OASIS_FLOAT>> &event_guls, int previous_layer)
 {
 
 	int previous_layer_id = 1;
@@ -380,7 +380,7 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 	for (unsigned int i = 0;i < agg_vec_previous_level.size();i++){ // loop through previous levels of agg_vec
 		if (agg_vec_previous_level[i].agg_id != 0) {
 			int agg_id = pfm_vec_vec_[level][agg_vec_previous_level[i].agg_id];
-			if (layer < policy_tc_vec_vec_vec_[level][agg_id].size()) {
+			if ((size_t)layer < policy_tc_vec_vec_vec_[level][agg_id].size()) {
 				if (agg_vec_previous_level[i].next_vec_idx == -1) {	// next_vec_idx can be zero
 					agg_vec_previous_level[i].next_vec_idx = (*aggid_to_vectorlookup)[agg_id - 1];
 				}
@@ -430,7 +430,7 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
         rec.loss = 0;
 		rec.sidx = sidx;		
 		if (netvalue_ && layer > 1) {
-			for (int i = 0; i < agg_vec.size(); i++) {
+			for (size_t i = 0; i < agg_vec.size(); i++) {
 				agg_vec[i].item_net = agg_vec_previous_layer[i].item_net;
 			}
 		}
@@ -443,7 +443,7 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 					x.item_net = std::make_shared<std::vector<OASIS_FLOAT>>(std::vector<OASIS_FLOAT>());
 					x.item_net->resize(x.item_idx->size(), 0);
 					const std::vector<int> &z = *(x.item_idx);
-					for (int i = 0; i < x.item_net->size(); i++) {					
+					for (size_t i = 0; i < x.item_net->size(); i++) {					
 						x.item_net->at(i)= guls[z[i]];
 					}
 				}								
@@ -540,9 +540,9 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 					//}
 					int vec_idx = (*aggid_to_vectorlookup)[x.agg_id - 1];
 					int range = avx[layer][vec_idx].item_idx.size();
-					int range2 = x.item_prop->size();
+					size_t range2 = x.item_prop->size();
 					if (x.item_prop && range > 0) {						
-						for (int i = 0; i < avx[layer][vec_idx].item_idx.size(); i++) {
+						for (size_t i = 0; i < avx[layer][vec_idx].item_idx.size(); i++) {
 							int idx = avx[layer][vec_idx].item_idx[i];
 							//for (int idx : avx[layer][vec_idx].item_idx) {
 							OASIS_FLOAT prop = 0;
@@ -601,12 +601,12 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 					}					
 					
 					int vec_idx = (*aggid_to_vectorlookup)[x.agg_id - 1];
-					int range = avx[layer][vec_idx].item_idx.size();					
+					size_t range = avx[layer][vec_idx].item_idx.size();					
 					if (range > 0) {						
-						for (int i = 0; i < range; i++) {
+						for (size_t i = 0; i < range; i++) {
 							int idx = avx[layer][vec_idx].item_idx[i];							
 							OASIS_FLOAT prop = 0;
-							int range2 = 0;
+							size_t range2 = 0;
 							if (x.item_prop) range2 = x.item_prop->size();
 							if (i < range2 ) prop = x.item_prop->at(i);
 							if (netvalue_) { // get net gul value							
@@ -651,25 +651,25 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 			}
 		}
 		if (layer < max_layer_) {
-			int previous_level = level;
+			//int previous_level = level;
 			int previous_layer = layer;
 			layer++;
-			dofmcalc_r(aggid_to_vectorlookups, agg_vecs, level, max_level, outmap, gul_idx, avxs, layer,items, event_guls, previous_level, previous_layer);
+			dofmcalc_r(aggid_to_vectorlookups, agg_vecs, level, max_level, outmap, gul_idx, avxs, layer,items, event_guls, previous_layer);
 		}
 	}
 	else {		
 		if (layer < level_to_max_layer_[level]) {
-			int previous_level = level;
+			//int previous_level = level;
 			int previous_layer = layer;
 			layer++;
-			dofmcalc_r(aggid_to_vectorlookups, agg_vecs, level, max_level, outmap, gul_idx, avxs, layer, items, event_guls, previous_level, previous_layer);
+			dofmcalc_r(aggid_to_vectorlookups, agg_vecs, level, max_level, outmap, gul_idx, avxs, layer, items, event_guls, previous_layer);
 		}
 		else {
-			int previous_level = level;
+			//int previous_level = level;
 			int previous_layer = layer;
 			level++;
 			layer = 1;
-			dofmcalc_r(aggid_to_vectorlookups, agg_vecs, level, max_level, outmap, gul_idx, avxs, layer, items, event_guls, previous_level, previous_layer);
+			dofmcalc_r(aggid_to_vectorlookups, agg_vecs, level, max_level, outmap, gul_idx, avxs, layer, items, event_guls, previous_layer);
 		}		
 	}
 }
@@ -765,7 +765,7 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 				}
 				else {
 					for (unsigned int layer = 1; layer < policy_tc_vec_vec_vec_[zzlevel][agg_id].size(); layer++) { // loop through layers
-						const int policytc_id = policy_tc_vec_vec_vec_[zzlevel][agg_id][layer];
+						//const int policytc_id = policy_tc_vec_vec_vec_[zzlevel][agg_id][layer];
 						for (int x : prev[previous_layer][i].item_idx) {
 							next[layer][current_idx].item_idx.push_back(x);	
 						}
@@ -810,7 +810,7 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 
 //			dofmcalc(agg_vec);					
 			
-			dofmcalc_r(aggid_to_vectorlookups, agg_vecs, level + 1, maxLevel_, outmap, gul_idx, avxs, 1, items, event_guls,0,1);
+			dofmcalc_r(aggid_to_vectorlookups, agg_vecs, level + 1, maxLevel_, outmap, gul_idx, avxs, 1, items, event_guls,1);
 
 			agg_vec.clear();
 		}
@@ -843,14 +843,14 @@ void fmcalc::addtcrow(const fm_policyTC &f)
 
 		if (f.agg_id > max_agg_id_) max_agg_id_ = f.agg_id;
 
-		if (policy_tc_vec_vec_vec_.size() < f.level_id + 1) {
+		if (policy_tc_vec_vec_vec_.size() < (size_t)f.level_id + 1) {
 			policy_tc_vec_vec_vec_.resize(f.level_id + 1);
 		}
-		if (policy_tc_vec_vec_vec_[f.level_id].size() < f.agg_id + 1) {
+		if (policy_tc_vec_vec_vec_[f.level_id].size() < (size_t)f.agg_id + 1) {
 			policy_tc_vec_vec_vec_[f.level_id].resize(f.agg_id + 1);
 		}
 
-		if (policy_tc_vec_vec_vec_[f.level_id][f.agg_id].size() < f.layer_id + 1) {
+		if (policy_tc_vec_vec_vec_[f.level_id][f.agg_id].size() < (size_t)f.layer_id + 1) {
 			policy_tc_vec_vec_vec_[f.level_id][f.agg_id].resize(f.layer_id + 1);
 		}
 		policy_tc_vec_vec_vec_[f.level_id][f.agg_id][f.layer_id] = f.profile_id;
@@ -976,16 +976,16 @@ void fmcalc::init_programme(int maxRunLevel)
 				if (pfm_vec_vec_.size() < 1) {
 					pfm_vec_vec_.resize(1);
 				}
-				if (pfm_vec_vec_[0].size() < f.from_agg_id + 1) {
+				if (pfm_vec_vec_[0].size() < (size_t)f.from_agg_id + 1) {
 					pfm_vec_vec_[0].resize(f.from_agg_id + 1);
 				}
 				pfm_vec_vec_[0][f.from_agg_id] = f.from_agg_id;
 			}					
 			if (f.to_agg_id > level_to_maxagg_id_[f.level_id])level_to_maxagg_id_[f.level_id] = f.to_agg_id;
-            if (pfm_vec_vec_.size() < f.level_id + 1) {
+            if (pfm_vec_vec_.size() < (size_t)f.level_id + 1) {
                 pfm_vec_vec_.resize(f.level_id + 1);
             }
-            if (pfm_vec_vec_[f.level_id].size() < f.from_agg_id + 1) {
+            if (pfm_vec_vec_[f.level_id].size() < (size_t)f.from_agg_id + 1) {
                 pfm_vec_vec_[f.level_id].resize(f.from_agg_id + 1);
             }
             pfm_vec_vec_[f.level_id][f.from_agg_id] = f.to_agg_id;

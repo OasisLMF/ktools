@@ -1,7 +1,7 @@
 add_executable(kat)
 target_sources(kat
 	PRIVATE
-		kat.cpp
+		kat.cpp main.cpp
 )
 
 if (WIN32)

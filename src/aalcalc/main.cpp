@@ -15,7 +15,7 @@
 char *progname = 0;
 
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
-void segfault_sigaction(int signal, siginfo_t *si, void *arg)
+void segfault_sigaction(int, siginfo_t *si, void *)
 {
 	fprintf(stderr, "FATAL: %s: Segment fault at address: %p\n", progname, si->si_addr);
 	exit(EXIT_FAILURE);
@@ -35,17 +35,10 @@ int main(int argc, char* argv[])
 	progname = argv[0];
 	std::string subfolder;
 	int opt;
-	int processid = 0;
 	bool debug = false;
-	bool welford = false;	// Use welford standard deviation
 	bool skipheader = false;
 	while ((opt = getopt(argc, argv, (char *)"swvdhK:")) != -1) {
 		switch (opt) {
-		case 'w':
-			welford = true;
-			fprintf(stderr, "FATAL: Not supported\n");
-			exit(-1);
-			break;
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
 			exit(EXIT_FAILURE);
@@ -90,15 +83,9 @@ int main(int argc, char* argv[])
 		if (debug == true) {
 			a.debug(subfolder);
 		}
-		else {
-			if (welford == true) {
-				a.doitw(subfolder);
-			}else {				
-				a.doit(subfolder);				
-			}
-		}
+        a.doit(subfolder);				
 	}
-	catch (std::bad_alloc) {
+	catch (std::bad_alloc&) {
 		fprintf(stderr, "FATAL: %s: Memory allocation failed\n", progname);
 		exit(EXIT_FAILURE);
 	}

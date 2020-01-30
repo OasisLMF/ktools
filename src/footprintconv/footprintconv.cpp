@@ -114,7 +114,7 @@ void doit()
     fclose(finx);
     fclose(finy);
 }
-int main(int argc, char *argv[]) {
+int main(int, char**) {
     initstreams();
     doit();    
 }

@@ -66,7 +66,6 @@ namespace validateitems {
 
         Vulnerability q;
         int i = fread(&q, sizeof(q), 1, fin);
-        OASIS_FLOAT total = 0;
         while (i != 0) {
             vulnerability_ids.insert(q.vulnerability_id);
             i = fread(&q, sizeof(q), 1, fin);

@@ -285,7 +285,7 @@ void summarycalc::loadsummaryxref(const std::string& filename)
 			if (s.summary_id < min_summary_id_[s.summaryset_id]) min_summary_id_[s.summaryset_id] = s.summary_id;
 			if (s.summary_id > max_summary_id_[s.summaryset_id]) max_summary_id_[s.summaryset_id] = s.summary_id;
 			// co_to_s[s.summaryset_id]->insert({ s.output_id,s.summary_id });
-			if ((*co_to_s_[s.summaryset_id]).size() < (s.output_id + 1)) (*co_to_s_[s.summaryset_id]).resize(s.output_id + 1, 0);
+			if ( (*co_to_s_[s.summaryset_id]).size() < (size_t)(s.output_id + 1)) (*co_to_s_[s.summaryset_id]).resize(s.output_id + 1, 0);
 			(*co_to_s_[s.summaryset_id])[s.output_id] = s.summary_id ;
 		}
 		i = (int) fread(&s, sizeof(fmsummaryxref), 1, fin);
@@ -385,7 +385,7 @@ void summarycalc::outputsummary(int sample_size,int event_id)
 		}
 	}
 }
-void summarycalc::processsummeryset(int summaryset, int event_id, int coverage_id, int sidx, OASIS_FLOAT gul)
+void summarycalc::processsummeryset(int summaryset, int coverage_id, int sidx, OASIS_FLOAT gul)
 {
 	loss_exp **ssl = sssl[summaryset];
 	coverage_id_or_output_id_to_Summary_id &p = *co_to_s_[summaryset];
@@ -431,7 +431,7 @@ void summarycalc::dosummary(int sample_size,int event_id,int coverage_or_output_
 		if (item_to_coverage_.size() > 0) {
 			cov_id = item_to_coverage_[last_coverage_or_output_id];
 		}
-		if (fout[i] != nullptr) processsummeryset(i, event_id, cov_id, sidx, gul);
+		if (fout[i] != nullptr) processsummeryset(i, cov_id, sidx, gul);
 	}
 }
 // item like stream
@@ -554,7 +554,6 @@ void summarycalc::dofmsummary()
 	int i = (int) fread(&streamtype, sizeof(streamtype), 1, stdin);
 	if (i) {
 		if (isFMStream(streamtype) == true) {
-			int stream_type = streamtype & streamno_mask;
 			unsigned int samplesize = 0;
 			i = (int) fread(&samplesize, sizeof(samplesize), 1, stdin);
 			if (i)	dosummaryprocessing(samplesize);
@@ -582,7 +581,6 @@ void summarycalc::dogulitemsummary()
 	int i = (int) fread(&streamtype, sizeof(streamtype), 1, stdin);
 	if (i) {
 		if (isFMStream(streamtype) == true) {
-			int stream_type = streamtype & streamno_mask;
 			unsigned int samplesize = 0;
 			i =(int) fread(&samplesize, sizeof(samplesize), 1, stdin);
 			if (i)	dosummaryprocessing(samplesize);

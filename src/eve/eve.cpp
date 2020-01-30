@@ -74,8 +74,8 @@ namespace eve {
         int chunksize = (int)ceil((OASIS_FLOAT)total_events / total_);
         size_t end_pos = chunksize * pno_;
         pno_--;
-        int start_pos = chunksize * pno_;
-        if (end_pos > (int) events.size())
+        size_t start_pos = chunksize * pno_;
+        if (end_pos > (size_t) events.size())
             end_pos = events.size();
 
         while (start_pos < end_pos) {

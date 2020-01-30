@@ -132,13 +132,11 @@ void doit(bool skipheader, bool fullprecision,bool show_exposure_value, bool rem
 		while (i != 0){
 			summarySampleslevelHeader sh;
 			i = fread(&sh, sizeof(sh), 1, stdin);
-			int last_sidx = 0;
 			while (i != 0){
 				sampleslevelRec sr;
 				i = fread(&sr, sizeof(sr), 1, stdin);
 				if (i == 0) break;	
 				if (sr.sidx == 0) break;
-				last_sidx = sr.sidx;
 				rowcount++;
 				if (fullprecision == true && show_exposure_value == false) printf("%d,%d,%d,%f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);				
 				if (fullprecision == false && show_exposure_value == false) printf("%d,%d,%d,%.2f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);

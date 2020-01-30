@@ -247,12 +247,10 @@ void aalcalc::load_event_to_summary_index(const std::string& subfolder)
 }
 
 
-void aalcalc::applyweightingstomap(std::map<int, aal_rec> &m, int i)
+void aalcalc::applyweightingstomap(std::map<int, aal_rec> &m)
 {
 	auto iter = m.begin();
 	while (iter != m.end()) {
-		//iter->second.mean = iter->second.mean * i;
-		//iter->second.mean_squared = iter->second.mean_squared * i * i;
 		iter++;
 	}
 }
@@ -260,8 +258,8 @@ void aalcalc::applyweightingstomaps()
 {
 	int i =(int) periodstoweighting_.size();
 	if (i == 0) return;
-	applyweightingstomap(map_analytical_aal_, i);
-	applyweightingstomap(map_sample_aal_, i);
+	applyweightingstomap(map_analytical_aal_);
+	applyweightingstomap(map_sample_aal_);
 }
 void aalcalc::do_calc_end_new()
 {
@@ -335,10 +333,8 @@ void aalcalc::do_sample_calc_new(const summarySampleslevelHeader& sh, const std:
 }
 
 
-void aalcalc::doaalcalc_new(const summarySampleslevelHeader& sh, const std::vector<sampleslevelRec>& vrec, OASIS_FLOAT mean_loss)
+void aalcalc::doaalcalc_new(const summarySampleslevelHeader& sh, const std::vector<sampleslevelRec>& vrec)
 {
-	//do_analytical_calc(sh, mean_loss);
-	// if (samplesize_) do_sample_calc(sh, vrec);
 	do_sample_calc_new(sh, vrec);
 }
 
@@ -414,27 +410,14 @@ void aalcalc::initsameplsize(const std::string &path)
 					exit(EXIT_FAILURE);
 				}
 				int summarycalcstream_type = 0;
-				size_t i = fread(&summarycalcstream_type, sizeof(summarycalcstream_type), 1, fin);
-				i = fread(&samplesize_, sizeof(samplesize_), 1, fin);
+				fread(&summarycalcstream_type, sizeof(summarycalcstream_type), 1, fin);
+				fread(&samplesize_, sizeof(samplesize_), 1, fin);
 				fclose(fin);
 				break;
 			}
 
 		}
 	}
-}
-void process_event(const std::string& path,int summary_id, const event_offset_rec &r)
-{
-	char filename[100];
-	sprintf(filename, "P%d.bin", r.fileindex);
-	std::string fullname = path + filename;
-	FILE* fin = fopen(fullname.c_str(), "rb");
-	// do seek and iterate over record
-	summarySampleslevelHeader sh;
-	fread(&sh, sizeof(sh), 1, fin);
-	// now read the associated records
-	// see function process_summaryfile for processing logic
-	fclose(fin);
 }
 
 void aalcalc::getmaxsummaryid(std::string &path)
@@ -537,15 +520,13 @@ void aalcalc::doit(const std::string& subfolder)
 				flseek(summary_fin, file_offset, SEEK_SET);
 				summarySampleslevelHeader sh;
 				size_t i = fread(&sh, sizeof(sh), 1, summary_fin);
-				OASIS_FLOAT mean_loss = 0;
 				while (i != 0) {
 					sampleslevelRec sr;
 					i = fread(&sr, sizeof(sr), 1, summary_fin);
 					if (i == 0 || sr.sidx == 0) break;
-					if (sr.sidx == -1) mean_loss = sr.loss;
 					vrec.push_back(sr);
 				}
-				doaalcalc_new(sh, vrec, mean_loss);
+				doaalcalc_new(sh, vrec);
 			}else {
 				fprintf(stderr, "FATAL:File handle is a nullptr");
 				exit(EXIT_FAILURE);
@@ -586,7 +567,6 @@ void aalcalc::debug_process_summaryfile(const std::string &filename)
 		exit(-1);
 	}
 	stream_type = streamno_mask & summarycalcstream_type;
-	bool haveData = false;
 
 	if (stream_type == 1) {
 		int summary_set = 0;
@@ -595,11 +575,9 @@ void aalcalc::debug_process_summaryfile(const std::string &filename)
 		printf("event_id,period_no,summary_id,sidx,loss\n");
 		summarySampleslevelHeader sh;
 		int j = 0;
-		OASIS_FLOAT mean_loss = 0;
 		while (i != 0) {
 			i = fread(&sh, sizeof(sh), 1, fin);
 			while (i != 0) {
-				haveData = true;
 				sampleslevelRec sr;
 				i = fread(&sr, sizeof(sr), 1, fin);
 				if (i == 0) break;

@@ -53,26 +53,26 @@ public:
 		{ init(maxRunLevel); }	
 	void doit();
 private:
+	std::string inputpath_;
+	bool netvalue_ = false;
+	int allocrule_ = 0;
+	bool debug_ = false;
+	bool allocruleOptimizationOff_ = false;
+	bool generalOptimization_ = true;
 	void setmaxlevel(int maxlevel) { if (maxlevel > -1) maxLevel_ = maxlevel; }
 	void dofm(int event_id_, const std::vector<int> &items_, std::vector<std::vector<OASIS_FLOAT>> &event_guls_);
 	inline OASIS_FLOAT gettiv(int item_id) { return item_to_tiv_[item_id]; }
 	std::vector<std::vector<std::vector<int>>> policy_tc_vec_vec_vec_; // policy_tc_vec_vec_vec_[level][agg_id][layer_id]
 	std::vector<int> level_to_maxagg_id_;
-	int allocrule_ = 0;
 	int max_layer_ = 0;		// initialized from policy_tc
 	int max_agg_id_ = 0;	// initialized from policy_tc
 	bool isGULStreamType_ = true;
-	bool generalOptimization_ = true;
 	std::vector <profile_rec_new> profile_vec_new_;
 	std::vector<std::vector <profile_rec_new>> profile_vec_stepped_;
 	int maxLevel_ = -1;
 	int maxRunLevel_ = 10000;
 	int max_level_ = 0;
 	std::vector<int> level_to_max_layer_;
-	std::string inputpath_;
-	bool netvalue_ = false;
-	bool debug_ = false;
-	bool allocruleOptimizationOff_ = false;
 	std::vector<std::vector<int>> pfm_vec_vec_;  // initialized from fm/programme.bin  pfm_vec_vec[level_id][item_id] returns agg_id 
 	std::vector<OASIS_FLOAT> item_to_tiv_;	
 	void init_programme(int maxrunLevel);
@@ -88,12 +88,11 @@ private:
 	void addtcrow(const fm_policyTC &f);
 	bool loadcoverages(std::vector<OASIS_FLOAT> &coverages);
 	bool gulhasvalue(const std::vector<OASIS_FLOAT> &gul) const;
-	void compute_item_proportions(std::vector<std::vector<std::vector <LossRec>>> &agg_vecs, const std::vector<OASIS_FLOAT> &guls,unsigned int level_, unsigned int layer_,unsigned int previous_layer_, bool allowzeros);	
+	void compute_item_proportions(std::vector<std::vector<std::vector <LossRec>>> &agg_vecs, const std::vector<OASIS_FLOAT> &guls,unsigned int level_, unsigned int layer_, unsigned int previous_layer_, bool allowzeros);	
 	inline void dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlookups_, std::vector<std::vector<std::vector <LossRec>>> &agg_vecs_, 
 		int level_, int max_level_,	std::map<int, std::vector<fmlevelrec> > &outmap_, 
 		int sidx_, const std::vector<std::vector<std::vector<policytcvidx>>> &avxs_, int layer_,
-		const std::vector<int> &items_, std::vector<std::vector<OASIS_FLOAT>> &event_guls,
-		int previous_level, int previous_layer);	
+		const std::vector<int> &items_, std::vector<std::vector<OASIS_FLOAT>> &event_guls, int previous_layer);	
 	void dofmcalc(std::vector <LossRec> &agg_vec_, int layer);
 	void dofmcalc_normal(std::vector <LossRec>& agg_vec_, int layer);
 	void dofmcalc_stepped(std::vector <LossRec>& agg_vec, int layer);

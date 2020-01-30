@@ -570,7 +570,7 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			//Function3 = IIf(Loss < Ded, 0, IIf(Loss > Ded, Lim, Loss))
 			OASIS_FLOAT loss = x.loss;
 			if (loss < ded) loss = 0;
-			else loss = loss;
+			//else loss = loss;
 			x.effective_deductible = x.effective_deductible + (x.loss - loss);
 
 			if (loss > lim) {
@@ -1081,7 +1081,7 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			//Function20 = IIf(Loss > Ded, 0, Loss)
 			OASIS_FLOAT loss = x.loss;
 			if (loss > ded) loss = 0;
-			else loss = loss;
+			//else loss = loss;
 			//x.retained_loss = x.retained_loss + (x.loss - loss);
 			OASIS_FLOAT net_loss = 0;
 			if (layer > 1)	net_loss = x.previous_layer_retained_loss - loss;
@@ -1581,7 +1581,7 @@ void fmcalc::init_profile_rec(fm_profile &f)
 		}
 
 	}
-	if (profile_vec_new_.size() < f.profile_id + 1) {
+	if (profile_vec_new_.size() < (size_t)f.profile_id + 1) {
 		profile_vec_new_.resize(f.profile_id + 1);
 	}
 	profile_vec_new_[f.profile_id] = p;

@@ -92,7 +92,7 @@ bool operator<(const wheatkey& lhs, const wheatkey& rhs)
 	}
 }
 
-aggreports::aggreports(int totalperiods, int maxsummaryid, std::map<outkey2, OASIS_FLOAT> &agg_out_loss, 
+aggreports::aggreports(int totalperiods, int maxsummaryid, std::map<outkey2, OASIS_FLOAT> &agg_out_loss,
 	std::map<outkey2, OASIS_FLOAT> &max_out_loss, FILE **fout, bool useReturnPeriodFile, int samplesize, bool skipheader) :
 	totalperiods_(totalperiods), maxsummaryid_(maxsummaryid), agg_out_loss_(agg_out_loss), max_out_loss_(max_out_loss),
 	fout_(fout), useReturnPeriodFile_(useReturnPeriodFile), samplesize_(samplesize),skipheader_(skipheader)
@@ -100,7 +100,7 @@ aggreports::aggreports(int totalperiods, int maxsummaryid, std::map<outkey2, OAS
 	loadreturnperiods();
 };
 
-// Load and normalize weigthting table 
+// Load and normalize weigthting table
 // we must have entry for every return period!!!
 // otherwise no way to pad missing ones
 // The weighting should already be normalized - i.e range within 0 and 1 and they should total upto one.
@@ -125,7 +125,7 @@ void aggreports::loadperiodtoweigthing()
 	// Now normalize the weigthing ...
 	auto iter = periodstoweighting_.begin();
 	while (iter != periodstoweighting_.end()) {   // weightings already normalized so just split between samples
-	//	iter->second = iter->second / total_weighting;		
+	//	iter->second = iter->second / total_weighting;
 		if (samplesize_) iter->second = iter->second / samplesize_;		// now split them between the samples
 		iter++;
 	}
@@ -155,7 +155,7 @@ void aggreports::loadreturnperiods()
 	}
 }
 
-// this one should run using period table 
+// this one should run using period table
 void aggreports::fulluncertaintywithweighting(int handle, const std::map<outkey2, OASIS_FLOAT> &out_loss)
 {
 	if (fout_[handle] == nullptr) return;
@@ -177,7 +177,7 @@ void aggreports::fulluncertaintywithweighting(int handle, const std::map<outkey2
 		OASIS_FLOAT cummulative_weigthing = 0;
 		lossvec2 &lpv = s.second;
 		std::sort(lpv.rbegin(), lpv.rend());
-		int nextreturnperiodindex = 0;
+		size_t nextreturnperiodindex = 0;
 		OASIS_FLOAT last_computed_rp = 0;
 		OASIS_FLOAT last_computed_loss = 0;
 		for (auto lp : lpv) {
@@ -212,11 +212,11 @@ void aggreports::fulluncertainty(int handle,const std::map<outkey2, OASIS_FLOAT>
 	for (auto s : items) {
 		lossvec &lpv = s.second;
 		std::sort(lpv.rbegin(), lpv.rend());
-		int nextreturnperiodindex = 0;
+		size_t nextreturnperiodindex = 0;
 		OASIS_FLOAT last_computed_rp = 0;
 		OASIS_FLOAT last_computed_loss = 0;
 		int i = 1;
-		OASIS_FLOAT t = (OASIS_FLOAT) totalperiods_;		
+		OASIS_FLOAT t = (OASIS_FLOAT) totalperiods_;
 		for (auto lp : lpv) {
 			OASIS_FLOAT retperiod = t / i;
 			if (useReturnPeriodFile_) {
@@ -244,7 +244,7 @@ void aggreports::fulluncertainty(int handle,const std::map<outkey2, OASIS_FLOAT>
 	for (auto s : items) {
 		lossvec& lpv = s.second;
 		std::sort(lpv.rbegin(), lpv.rend());
-		int nextreturnperiodindex = 0;
+		size_t nextreturnperiodindex = 0;
 		OASIS_FLOAT last_computed_rp = 0;
 		OASIS_FLOAT last_computed_loss = 0;
 		int i = 1;
@@ -278,7 +278,7 @@ void aggreports::outputOccFulluncertainty()
 	else {
 		fulluncertaintywithweighting(OCC_FULL_UNCERTAINTY, max_out_loss_);;
 	}
-	
+
 }
 
 // Full uncertainty output
@@ -289,7 +289,7 @@ void aggreports::outputAggFulluncertainty()
 	}
 	else {
 		fulluncertaintywithweighting(AGG_FULL_UNCERTAINTY, agg_out_loss_);;
-	}	
+	}
 }
 
 // the next_return_period must be between last_return_period and current_return_period
@@ -313,7 +313,7 @@ OASIS_FLOAT aggreports::getloss(OASIS_FLOAT next_return_period, OASIS_FLOAT last
 	return -1;		// we should NOT get HERE hence the -1 !!!
 }
 
-void aggreports::doreturnperiodout(int handle, int &nextreturnperiod_index, OASIS_FLOAT &last_return_period, OASIS_FLOAT &last_loss,
+void aggreports::doreturnperiodout(int handle, size_t &nextreturnperiod_index, OASIS_FLOAT &last_return_period, OASIS_FLOAT &last_loss,
 			OASIS_FLOAT current_return_period, OASIS_FLOAT current_loss, int summary_id, int type)
 {
 	if (nextreturnperiod_index >= returnperiods_.size()) {
@@ -355,7 +355,7 @@ void aggreports::wheatsheaf(int handle, const std::map<outkey2, OASIS_FLOAT> &ou
 		if (s.first.sidx == -1) continue;		// skip -1 from wheatsheaf output
 		lossvec &lpv = s.second;
 		std::sort(lpv.rbegin(), lpv.rend());
-		int nextreturnperiodindex = 0;
+		size_t nextreturnperiodindex = 0;
 		OASIS_FLOAT last_computed_rp = 0;
 		OASIS_FLOAT last_computed_loss = 0;
 		int i = 1;
@@ -367,7 +367,7 @@ void aggreports::wheatsheaf(int handle, const std::map<outkey2, OASIS_FLOAT> &ou
 				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, s.first.summary_id, s.first.sidx);
 			}else {
 				fprintf(fout_[handle],"%d,%d,%f,%f\n", s.first.summary_id, s.first.sidx, t / i, lp);
-			}			
+			}
 			i++;
 		}
 		if (useReturnPeriodFile_) {
@@ -404,7 +404,7 @@ void aggreports::wheatsheafwithweighting(int handle, const std::map<outkey2, OAS
 		lossvec2 &lpv = s.second;
 
 		std::sort(lpv.rbegin(), lpv.rend());
-		int nextreturnperiodindex = 0;
+		size_t nextreturnperiodindex = 0;
 		OASIS_FLOAT last_computed_rp = 0;
 		OASIS_FLOAT last_computed_loss = 0;
 		int i = 1;
@@ -442,7 +442,7 @@ void aggreports::outputOccWheatsheaf()
 	else {
 		wheatsheafwithweighting(OCC_WHEATSHEAF, max_out_loss_);
 	}
-	
+
 }
 void aggreports::outputAggWheatsheaf()
 {
@@ -469,22 +469,22 @@ void aggreports::wheatSheafMeanwithweighting(int samplesize, int handle, const s
 			lv.period_weighting = iter->second;
 			lv.period_no = x.first.period_no;		// for debugging
 			items[wk].push_back(lv);
-		}		
+		}
 	}
 
-	int maxcount = 0;
+	size_t maxcount = 0;
 	for (auto x : items) {
-		if (x.second.size() > maxcount) maxcount = (int) x.second.size();
+		if (x.second.size() > maxcount) maxcount = x.second.size();
 	}
 
 	std::map<int, std::vector<lossval>> mean_map;
-	for (int i = 1; i <= maxsummaryid_; i++) {		
+	for (int i = 1; i <= maxsummaryid_; i++) {
 		mean_map[i] = std::vector<lossval>(maxcount, lossval());
 	}
 	if (skipheader_ == false) fprintf(fout_[handle], "summary_id,type,return_period,loss\n");
 
 	for (auto s : items) {
-		int nextreturnperiodindex = 0;
+		size_t nextreturnperiodindex = 0;
 		OASIS_FLOAT last_computed_rp = 0;
 		OASIS_FLOAT last_computed_loss = 0;
 		lossvec2 &lpv = s.second;
@@ -500,9 +500,8 @@ void aggreports::wheatSheafMeanwithweighting(int samplesize, int handle, const s
 				i++;
 			}
 		}
-		else {			
+		else {
 			int i = 1;
-			OASIS_FLOAT t = (OASIS_FLOAT)totalperiods_;
 			for (auto lp : lpv) {
 				cummulative_weigthing += (OASIS_FLOAT)(lp.period_weighting * samplesize_);
 				if (cummulative_weigthing) {
@@ -525,7 +524,7 @@ void aggreports::wheatSheafMeanwithweighting(int samplesize, int handle, const s
 			}
 		}
 	}
-	
+
 	if (samplesize == 0) return; // avoid divide by zero error
 
 	for (auto m : mean_map) {
@@ -537,13 +536,10 @@ void aggreports::wheatSheafMeanwithweighting(int samplesize, int handle, const s
 			maxindex--;
 			rit++;
 		}
-		int nextreturnperiodindex = 0;
-		int nextreturnperiodvalue = 0;
-		if (useReturnPeriodFile_) nextreturnperiodvalue = returnperiods_[nextreturnperiodindex];
+		size_t nextreturnperiodindex = 0;
 		OASIS_FLOAT last_computed_rp = 0;
 		OASIS_FLOAT last_computed_loss = 0;
 		int i = 1;
-		OASIS_FLOAT t = (OASIS_FLOAT)totalperiods_;
 		OASIS_FLOAT cummulative_weigthing = 0;
 		for (auto lp : lpv) {
 			cummulative_weigthing += (OASIS_FLOAT)(lp.period_weighting * samplesize_);
@@ -580,9 +576,9 @@ void aggreports::wheatSheafMean(int samplesize, int handle, const std::map<outke
 		items[wk].push_back(x.second);
 	}
 
-	int maxcount = 0;
+	size_t maxcount = 0;
 	for (auto x : items) {
-		if (x.second.size() > maxcount) maxcount = (int) x.second.size();
+		if (x.second.size() > maxcount) maxcount = x.second.size();
 	}
 
 	std::map<int, std::vector<OASIS_FLOAT>> mean_map;
@@ -591,8 +587,8 @@ void aggreports::wheatSheafMean(int samplesize, int handle, const std::map<outke
 	}
 	if (skipheader_ == false)  fprintf(fout_[handle],"summary_id,type,return_period,loss\n");
 	for (auto s : items) {
-		int nextreturnperiodindex = 0;
-		OASIS_FLOAT last_computed_rp = 0;	
+		size_t nextreturnperiodindex = 0;
+		OASIS_FLOAT last_computed_rp = 0;
 		OASIS_FLOAT last_computed_loss = 0;
 		lossvec &lpv = s.second;
 		std::sort(lpv.rbegin(), lpv.rend());
@@ -613,12 +609,12 @@ void aggreports::wheatSheafMean(int samplesize, int handle, const std::map<outke
 				}else {
 					fprintf(fout_[handle],"%d,1,%f,%f\n", s.first.summary_id, retperiod, lp);
 				}
-				
+
 				i++;
 			}
 			if (useReturnPeriodFile_) {
 				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id,1);
-				while (nextreturnperiodindex < returnperiods_.size()) {					
+				while (nextreturnperiodindex < returnperiods_.size()) {
 					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id,1);
 				}
 			}
@@ -636,9 +632,7 @@ void aggreports::wheatSheafMean(int samplesize, int handle, const std::map<outke
 			maxindex--;
 			rit++;
 		}
-		int nextreturnperiodindex = 0;
-		int nextreturnperiodvalue = 0;
-		if (useReturnPeriodFile_) nextreturnperiodvalue = returnperiods_[nextreturnperiodindex];
+		size_t nextreturnperiodindex = 0;
 		OASIS_FLOAT last_computed_rp = 0;
 		OASIS_FLOAT last_computed_loss = 0;
 		int i = 1;
@@ -690,8 +684,6 @@ void aggreports::sampleMeanwithweighting(int samplesize, int handle, const std::
 
 	for (auto x : out_loss) {
 		summary_id_period_key sk;
-		lossval lv;
-		lv.value = x.second;
 		auto iter = periodstoweighting_.find(x.first.period_no);	// assume weighting is zero if not supplied
 		sk.period_no = x.first.period_no;
 		sk.summary_id = x.first.summary_id;
@@ -726,7 +718,7 @@ void aggreports::sampleMeanwithweighting(int samplesize, int handle, const std::
 	for (auto m : mean_map) {
 		std::vector<lossval> &lpv = m.second;
 		std::sort(lpv.rbegin(), lpv.rend());
-		int nextreturnperiodindex = 0;
+		size_t nextreturnperiodindex = 0;
 		OASIS_FLOAT last_computed_rp = 0;
 		OASIS_FLOAT last_computed_loss = 0;
 		OASIS_FLOAT cummulative_weigthing = 0;
@@ -785,7 +777,7 @@ void aggreports::sampleMean(int samplesize, int handle, const std::map<outkey2, 
 	for (auto m : mean_map) {
 		std::vector<OASIS_FLOAT> &lpv = m.second;
 		std::sort(lpv.rbegin(), lpv.rend());
-		int nextreturnperiodindex = 0;
+		size_t nextreturnperiodindex = 0;
 		OASIS_FLOAT last_computed_rp = 0;
 		OASIS_FLOAT last_computed_loss = 0;
 		int i = 1;
@@ -809,7 +801,7 @@ void aggreports::sampleMean(int samplesize, int handle, const std::map<outkey2, 
 }
 void aggreports::outputOccSampleMean(int samplesize)
 {
-	
+
 	if (periodstoweighting_.size() == 0) {
 		sampleMean(samplesize, OCC_SAMPLE_MEAN, max_out_loss_);
 	}
@@ -820,7 +812,7 @@ void aggreports::outputOccSampleMean(int samplesize)
 
 void aggreports::outputAggSampleMean(int samplesize)
 {
-	
+
 	if (periodstoweighting_.size() == 0) {
 		sampleMean(samplesize, AGG_SAMPLE_MEAN, agg_out_loss_);
 	}

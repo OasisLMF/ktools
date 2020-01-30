@@ -151,7 +151,7 @@ namespace footprinttobin {
 		fclose(fouty);
 	}
 
-	void doit(int intensity_bins, int hasIntensityUncertainty, bool skipheader, const char * binFileName, const char * idxFileName){
+	void doit(int intensity_bins, int hasIntensityUncertainty, const char * binFileName, const char * idxFileName){
 		FILE *foutx = fopen(binFileName, "wb");
 		FILE *fouty = fopen(idxFileName, "wb");
 

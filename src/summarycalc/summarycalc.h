@@ -90,7 +90,7 @@ private:
 	OASIS_FLOAT *alloc_sse_arrays(int summary_set);
 	void outputsamplesize(int samplesize);
 	void outputsummary(int sample_size, int event_id);
-	void processsummeryset(int summaryset, int event_id, int coverage_id, int sidx, OASIS_FLOAT gul);
+	void processsummeryset(int summaryset, int coverage_id, int sidx, OASIS_FLOAT gul);
 	void dosummary(int sample_size, int event_id, int coverage_id, int sidx, OASIS_FLOAT gul, OASIS_FLOAT expval);
 	bool loadcoverages();
 	void loaditemtocoverage();

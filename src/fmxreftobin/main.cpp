@@ -16,7 +16,7 @@
 char *progname;
 
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
-void segfault_sigaction(int signal, siginfo_t *si, void *arg) {
+void segfault_sigaction(int, siginfo_t *si, void *) {
     fprintf(stderr, "FATAL: %s: Segment fault at address: %p\n", progname,
             si->si_addr);
     exit(EXIT_FAILURE);
@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
     try {
         initstreams();
         fmxreftobin::doit();
-    } catch (std::bad_alloc) {
+    } catch (std::bad_alloc&) {
         fprintf(stderr, "FATAL: %s: Memory allocation failed\n", progname);
         exit(EXIT_FAILURE);
     }

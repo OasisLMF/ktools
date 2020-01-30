@@ -1081,7 +1081,7 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			//Function20 = IIf(Loss > Ded, 0, Loss)
 			OASIS_FLOAT loss = x.loss;
 			if (loss > ded) loss = 0;
-			else loss = loss;
+			//else loss = loss;
 			//x.retained_loss = x.retained_loss + (x.loss - loss);
 			OASIS_FLOAT net_loss = 0;
 			if (layer > 1)	net_loss = x.previous_layer_retained_loss - loss;

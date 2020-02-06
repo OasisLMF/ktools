@@ -3,6 +3,18 @@ Ktools Changelog
 
 .. start_latest_release
 
+`v3.2.2`_
+---------
+* Fixed potential limit_surplus bug
+* Fixed bug in alloc rule 3 and make it a bit faster
+* Fixed issue #55 - fmcalc max deductible not being applied for certain samples
+* Fixed Cmake build issue + gcc warning messages cleanup 
+* Added calcrules 30 and 31 for step policies
+* Added calcrule 32 for franchise policies and updated 28
+* update for Step policies
+
+.. end_latest_release
+
 `v3.2.1`_
 ---------
 
@@ -10,8 +22,6 @@ Ktools Changelog
 * Added deductible to calcrule 28
 * Added stepped calcrules 29, 14, 100
 * Fixes for calcrules 27 and 28
-
-.. end_latest_release
 
 `v3.2.0`_
 ---------
@@ -36,12 +46,12 @@ Ktools Changelog
 `v3.1.3`_
 ---------
 
-* fix to reduce Gulcalc memory footprint size 
+* fix to reduce Gulcalc memory footprint size
 
 `v3.1.2`_
 --------
 * Fixes to CMake build
-* Added validation tools 
+* Added validation tools
 * Fix for compressed footprint filenames
 * fix bug handle loss is zero
 * Fix fmcalc for missing samples
@@ -52,7 +62,7 @@ Ktools Changelog
 
 * Fix and binary build for OSX
 * Added check in occurrence data
-* Fix for exitcode 
+* Fix for exitcode
 * Fix a fmcalc seg fault
 * Added support for CMake builds
 
@@ -63,7 +73,7 @@ Ktools Changelog
 * New loss stream type for gulcalc added
 * Fix item stream processing
 * Added support for back allocation to gulcalc
-* Made fm and gulcalc streams symmetric 
+* Made fm and gulcalc streams symmetric
 
 `v3.0.8`_
 ---------
@@ -83,13 +93,13 @@ Ktools Changelog
 `v3.0.6`_
 ---------
 
-* fmcalc - Fix for Alloc rules 1 & 2: 
+* fmcalc - Fix for Alloc rules 1 & 2:
 
 `v3.0.5`_
 ---------
 
-* Fix for Alloc rules [0,1],  Netloss calculation in Reinsurance 
-* Switch to -O2 compile flag by default, use `./configure --enable-o3` to enable -O3 optimization 
+* Fix for Alloc rules [0,1],  Netloss calculation in Reinsurance
+* Switch to -O2 compile flag by default, use `./configure --enable-o3` to enable -O3 optimization
 
 `v3.0.3`_
 ---------
@@ -98,7 +108,7 @@ Ktools Changelog
 * Fix for aalcalc standard deviation
 * Added summarycalctobin and removed fptofmcache
 * Improved error handling
-* Event shuffling to distribute workload been CPU cores 
+* Event shuffling to distribute workload been CPU cores
 
 
 `v3.0.2`_
@@ -119,7 +129,7 @@ fmcalc supports recursion and extended set of calcrules for reinsurance calculat
 fmcalc allocrule now a command line parameter
 Filtering of zero loss records from fmcalc by default
 aalcalc type 2 standard deviation now represents total sample variance, rather than sample mean variance
-* Bug fixes: aalcalc standard deviation calculation corrected for multiple events within a period 
+* Bug fixes: aalcalc standard deviation calculation corrected for multiple events within a period
 * Data formats: new format of fm_profile to support reinsurance calculations
 * Test: all fm outputs (zeros removed) and aalcalc md5 changes
 * Documentation: Updates for reinsurance
@@ -229,8 +239,9 @@ Release features:
 `v0.0.3-ALPHA`_
 ---------------
 
-* First Alpha release of the kernel toolkit 
+* First Alpha release of the kernel toolkit
 
+.. _`v3.2.2`:  https://github.com/OasisLMF/ktools/compare/v3.2.1...v3.2.2
 .. _`v3.2.1`:  https://github.com/OasisLMF/ktools/compare/v3.2.0...v3.2.1
 .. _`v3.2.0`:  https://github.com/OasisLMF/ktools/compare/v3.1.4...v3.2.0
 .. _`v3.1.4`:  https://github.com/OasisLMF/ktools/compare/v3.1.3...v3.1.4

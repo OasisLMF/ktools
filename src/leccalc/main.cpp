@@ -175,7 +175,9 @@ int main(int argc, char* argv[])
 
 	try {
 		initstreams();
+        logprintf(progname, "INFO", "starting process..\n");
 		leccalc::doit(subfolder, fout, useReturnPeriodFile, skipheader);
+        logprintf(progname, "INFO", "finishing process..\n");
 		return EXIT_SUCCESS;
 	}catch (std::bad_alloc&) {
 		fprintf(stderr, "FATAL: %s: Memory allocation failed\n", progname);

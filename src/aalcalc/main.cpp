@@ -83,7 +83,9 @@ int main(int argc, char* argv[])
 		if (debug == true) {
 			a.debug(subfolder);
 		}
+        logprintf(progname, "INFO", "starting process..\n");
         a.doit(subfolder);				
+        logprintf(progname, "INFO", "finishing process..\n");
 	}
 	catch (std::bad_alloc&) {
 		fprintf(stderr, "FATAL: %s: Memory allocation failed\n", progname);

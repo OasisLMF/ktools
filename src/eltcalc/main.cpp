@@ -124,7 +124,9 @@ int main(int argc, char* argv[])
 	try {
 		initstreams();
 		eltcalc::setinitdone(processid);
+        logprintf(progname, "INFO", "starting process..\n");
 		eltcalc::doit(skipHeader);
+        logprintf(progname, "INFO", "finishing process..\n");
 		return EXIT_SUCCESS;
 	}
 	catch (std::bad_alloc&) {

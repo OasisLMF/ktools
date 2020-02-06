@@ -151,7 +151,9 @@ int main(int argc, char* argv[])
 	try {
 		initstreams("", "");
 		fmcalc fc(new_max, allocrule, inputpath, netvalue,debug, allocruleOptimizationOff, generalOptimization,stepped);
+        logprintf(progname, "INFO", "starting process..\n");
 		fc.doit();
+        logprintf(progname, "INFO", "finishing process..\n");
 	}
 	catch (const std::bad_alloc &a) {
 		fprintf(stderr, "FATAL:%s: bad_alloc: %s\n", progname, a.what());

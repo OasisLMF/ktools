@@ -141,7 +141,9 @@ int main(int argc, char *argv[]) {
 
     try {
         initstreams("", "");        
+        logprintf(progname, "INFO","starting part no: %d total: %d shuffle: %d\n",  pno, total, shuffle);
         eve::emitevents(pno, total, shuffle, textmode);
+        logprintf(progname, "INFO","finishing part no: %d\n",pno);
     } catch (std::bad_alloc&) {
         fprintf(stderr, "FATAL:%s: Memory allocation failed\n", progname);
         exit(EXIT_FAILURE);

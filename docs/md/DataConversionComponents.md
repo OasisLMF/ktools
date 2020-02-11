@@ -21,7 +21,7 @@ The following components convert input data in csv format to the binary format r
 * **[fmxreftobin](#fmxref)** converts the fm xref data.
 * **[occurrencetobin](#occurrence)** converts the event occurrence data.
 * **[returnperiodtobin](#returnperiod)** converts a list of return periods.
-* **[periodstobin](#returnperiod)** converts a list of weighted periods (optional).
+* **[periodstobin](#periods)** converts a list of weighted periods (optional).
 
 These components are intended to allow users to generate the required input binaries from csv independently of the original data store and technical environment. All that needs to be done is first generate the csv files from the data store (SQL Server database, etc).
 
@@ -635,14 +635,12 @@ $ fmxreftocsv < fm_xref.bin > fm_xref.csv
 ***
 The occurrence file is required for certain output components which, in the reference model, are leccalc, pltcalc and aalcalc.  In general, some form of event occurence file is required for any output which involves the calculation of loss metrics over a period of time.  The occurrence file assigns occurrences of the event_ids to numbered periods. A period can represent any length of time, such as a year, or 2 years for instance. The output metrics such as mean, standard deviation or loss exceedance probabilities are with respect to the chosen period length.  Most commonly in catastrophe modelling, the period of interest is a year.
 
-The occurrence file also includes date fields.  There are two formats for providing the date;
+The occurrence file also includes date fields.  
 * occ_year, occ_month, occ_day. These are all integers representing occurrence year, month and day.
-* occ_date_id: An integer representing an offset number of days relative to some arbitrary base date.
+
 
 ##### File format
 The csv file should contain the following fields and include a header row.
-
-Option 1. occ_year, occ_month, occ_day
 
 | Name              | Type   |  Bytes | Description                                                         | Example     |
 |:------------------|--------|--------| :-------------------------------------------------------------------|------------:|
@@ -654,26 +652,12 @@ Option 1. occ_year, occ_month, occ_day
 
 The occurrence year in this example is a scenario numbered year, which cannot be expressed as a real date in a standard calendar.
 
-Option 2. occ_date_id
-
-| Name               | Type   |  Bytes | Description                                                       | Example     |
-|:-------------------|--------|--------| :-----------------------------------------------------------------|------------:|
-| event_id           | int    |    4   | The occurrence event_id                                           |     1       |
-| period_no          | int    |    4   | A numbered period in which the event occurs                       |   4545      |
-| occ_date_id        | int    |    4   | An integer representing an offset number of days to a base date   |    28626    | 
-
-For example, 28626 days relative to a base date of 0/1/1900 is 16/5/1978.
 
 ##### occurrencetobin
 A required parameter is -P, the total number of periods of event occurrences. The total number of periods is held in the header of the binary file and used in output calculations.
 
-Option 2 format should be indicated by using the parameter -D
 ```
-'Option 1 (occurrence files with an occ_year, occ_month, occ_day)
 $ occurrencetobin -P10000 < occurrence.csv > occurrence.bin
-
-'Option 2 (occurrence files with an occ_date_id)
-$ occurrencetobin -P10000 -D < occurrence.csv > occurrence.bin
 ```
 ##### occurrencetocsv
 ```
@@ -713,7 +697,7 @@ $ returnperiodtocsv < returnperiods.bin > returnperiods.csv
 <a id="periods"></a>
 ### periods
 ***
-The periods binary file is a list of all the periods that are in the model and is optional for weigthing the periods in the calculation. The file is used in the calculation of the loss exceedance curve (leccalc) results.
+The periods binary file is a list of all the periods that are in the model and is optional for weighting the periods in the calculation. The file is used in the calculation of the loss exceedance curve (leccalc) and aalcalc results.
 
 This must be in the following location with filename format;
 * input/periods.bin
@@ -725,8 +709,9 @@ The csv file should contain the following field and include a header.
 | Name               | Type   |  Bytes | Description                                  | Example     |
 |:----------------------------|--------|--------| :-----------------------------------|------------:|
 | period_no          | int    |    4   | A numbered period in which the event occurs  |   4545      |
-| weight             | int    |    4   | relative weight to other periods             |   3         |
+| weight             | int    |    4   | relative weight to P, the maximum period_no  |   0.0003    |
 
+All periods must be present in this file (no gaps in period_no from 1 to P).
 
 ##### periodstobin
 ```

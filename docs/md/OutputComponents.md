@@ -150,9 +150,9 @@ csv file with the following fields;
 
 ##### Period weightings
 
-An additional feature of leccalc is available to vary the relative importance of the periods by providing a period weightings file to the calculation. In this file, a weight can be assigned to each period make it more or less important than equal weighting (1 divided by the total number of periods). For example, if the equal weight for period 1 is 1 in 10000 years, or 0.0001, then doubling the weighting to 0.0002 will result in (TODO).
+An additional feature of leccalc is available to vary the relative importance of the period losses by providing a period weightings file to the calculation. In this file, a weight can be assigned to each period make it more or less important than neutral weighting (1 divided by the total number of periods). For example, if the neutral weight for period 1 is 1 in 10000 years, or 0.0001, then doubling the weighting to 0.0002 will mean that period's loss reoccurrence rate would double.  Assuming no other period losses, the return period of the loss of period 1 in this example would be halved.
 
-The sum of weights in the period weightings file must be 1 and missing period numbers are taken to have a weight of 0, meaning that they do not contribute any losses to the loss exceedance curve.
+All period_nos must appear in the file from 1 to P (no gaps). There is no constraint on the sum of weights. Periods with zero weight will not contribute any losses to the loss exceedance curve.
 
 This feature will be invoked automatically if the periods.bin file is present in the input directory.
 
@@ -281,7 +281,7 @@ csv file containing the following fields;
 | type                | int    |    4   | 1 for analytical statistics, 2 for sample statistics                |    1        |
 | mean                | float  |    8   | average annual loss                                                 |    6785.9   |
 | standard_deviation  | float  |    8   | standard deviation of loss                                          |    54657.8  |
-| exposure_value      | float  |    8   | maximum exposure value across all periods                           |    10098730 |
+
 
 ##### Calculation
 
@@ -289,7 +289,14 @@ The occurrence file and summarycalc files from the specified subdirectory are re
 
 For type 1, the mean and standard deviation of numerically integrated mean period losses are calculated across the periods. For type 2 the mean and standard deviation of the sampled period losses are calculated across all samples (sidx > 1) and periods. 
 
-The exposure_value, which is held at an event_id, summary_id in the summarycalc header is also accumulated by summary_id and period, and then across periods. In this case however, it is the maximum exposure value which is carried through the accumulations, not the sum.
+
+##### Period weightings
+
+An additional feature of aalcalc is available to vary the relative importance of the period losses by providing a period weightings file to the calculation. In this file, a weight can be assigned to each period make it more or less important than neutral weighting (1 divided by the total number of periods). For example, if the neutral weight for period 1 is 1 in 10000 years, or 0.0001, then doubling the weighting to 0.0002 will mean that period's loss reoccurrence rate would double and the loss would contribution to the average annual loss would double.  
+
+All period_nos must appear in the file from 1 to P (no gaps). There is no constraint on the sum of weights. Periods with zero weight will not contribute any losses to the AAL.
+
+This feature will be invoked automatically if the periods.bin file is present in the input directory.
 
 [Return to top](#outputcomponents)
 

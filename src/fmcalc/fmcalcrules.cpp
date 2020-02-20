@@ -1271,6 +1271,7 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			}
 			OASIS_FLOAT loss = 0;
 			OASIS_FLOAT loss_delta = 0;
+			if (ded3 = 0) ded3 = 9999999999;
 			// Applies a min and max ded on effective deductible plus a deductible as an amount.
 			if ((ded1 + x.effective_deductible) > ded3) { //If carried + ded > max ded
 				loss_delta = x.effective_deductible - ded3;

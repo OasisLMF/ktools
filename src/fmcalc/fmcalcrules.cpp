@@ -1271,7 +1271,7 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			}
 			OASIS_FLOAT loss = 0;
 			OASIS_FLOAT loss_delta = 0;
-			if (ded3 = 0) ded3 = 9999999999;
+			if (ded3 == 0) ded3 = 9999999999;
 			// Applies a min and max ded on effective deductible plus a deductible as an amount.
 			if ((ded1 + x.effective_deductible) > ded3) { //If carried + ded > max ded
 				loss_delta = x.effective_deductible - ded3;
@@ -1567,6 +1567,11 @@ void fmcalc::init_profile_rec(fm_profile &f)
 			add_tc(share_1, f.share1, p.tc_vec);
 			add_tc(share_2, f.share2, p.tc_vec);
 			add_tc(share_3, f.share3, p.tc_vec);
+			break;
+		case 26:
+			add_tc(deductible_1, f.deductible1, p.tc_vec);
+			add_tc(deductible_2, f.deductible2, p.tc_vec);
+			add_tc(deductible_3, f.deductible3, p.tc_vec);
 			break;
 		default:
 		{

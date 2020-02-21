@@ -2,6 +2,14 @@ Ktools Changelog
 ================
 
 .. start_latest_release
+`v3.2.3`_
+---------
+* Added support for ded and min ded only https://github.com/OasisLMF/OasisPlatform/issues/296 https://github.com/OasisLMF/OasisLMF/issues/480
+* #23 - Weighted periods documentation
+* #99 - Occurrence file format 
+* #101 - Remove exposure value from aalcalc output 
+
+.. end_latest_release
 
 `v3.2.2`_
 ---------
@@ -12,8 +20,6 @@ Ktools Changelog
 * Added calcrules 30 and 31 for step policies
 * Added calcrule 32 for franchise policies and updated 28
 * update for Step policies
-
-.. end_latest_release
 
 `v3.2.1`_
 ---------
@@ -241,6 +247,7 @@ Release features:
 
 * First Alpha release of the kernel toolkit
 
+.. _`v3.2.3`:  https://github.com/OasisLMF/ktools/compare/v3.2.2...v3.2.3
 .. _`v3.2.2`:  https://github.com/OasisLMF/ktools/compare/v3.2.1...v3.2.2
 .. _`v3.2.1`:  https://github.com/OasisLMF/ktools/compare/v3.2.0...v3.2.1
 .. _`v3.2.0`:  https://github.com/OasisLMF/ktools/compare/v3.1.4...v3.2.0

@@ -15,8 +15,8 @@ void fmcalc::doit()
 	// read_gul_stream_type()
 	// >>>>
 	int gulstream_type = 0;
-	size_t i = fread(&gulstream_type, sizeof(gulstream_type), 1, stdin);
-	if (i == 0)
+	size_t n_read = fread(&gulstream_type, sizeof(gulstream_type), 1, stdin);
+	if (n_read == 0)
 	{
 		fprintf(stderr, "%s: Read error on input stream\n", __func__);
 		exit(-1);
@@ -53,7 +53,7 @@ void fmcalc::doit()
 
 	int last_event_id = -1;
 	int samplesize = 0;
-	size_t n_read = fread(&samplesize, sizeof(samplesize), 1, stdin);
+	n_read = fread(&samplesize, sizeof(samplesize), 1, stdin);
 	if (n_read != 1)
 	{
 		fprintf(stderr, "%s: fail to read number of samples\n", __func__);
@@ -71,24 +71,37 @@ void fmcalc::doit()
 	{
 		gulSampleslevelHeader gh;
 		i = fread(&gh, sizeof(gh), 1, stdin);
-		if (gh.event_id != last_event_id && i == 1)
+		if (i != 1 && ferror(stdin) != 0)
+		{
+			fprintf(stderr, "%s: fail to read samples level header\n", __func__);
+			exit(-1);
+		}
+
+		if (i != 1 && feof(stdin) != 0)
 		{
 			if (last_event_id != -1)
 			{
 				dofm(last_event_id, items, event_guls);
 			}
+			break;
+		}
+
+		if (gh.event_id != last_event_id)
+		{
+			if (last_event_id != -1)
+			{
+				dofm(last_event_id, items, event_guls);
+			}
+
 			items.clear();
-			for (unsigned int i = 0; i < event_guls.size(); i++)
-				event_guls[i].clear();
+			for (unsigned int idx = 0; idx < event_guls.size(); idx++)
+			{
+				event_guls[idx].clear();
+			}
+
 			last_event_id = gh.event_id;
 		}
-		if (i == 0)
-		{
-			if (last_event_id != -1)
-			{
-				dofm(last_event_id, items, event_guls);
-			}
-		}
+
 		while (i != 0)
 		{
 			gulSampleslevelRec gr;

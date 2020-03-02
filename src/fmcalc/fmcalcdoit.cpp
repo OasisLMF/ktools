@@ -66,8 +66,8 @@ void fmcalc::doit()
 
 	int current_item_index = 0;
 
-	size_t i = 1;
-	while (i != 0)
+	bool end_of_stream = false;
+	while (!end_of_stream)
 	{
 		gulSampleslevelHeader gh;
 		i = fread(&gh, sizeof(gh), 1, stdin);
@@ -79,6 +79,7 @@ void fmcalc::doit()
 
 		if (i != 1 && feof(stdin) != 0)
 		{
+			end_of_stream = true;
 			if (last_event_id != -1)
 			{
 				dofm(last_event_id, items, event_guls);
@@ -102,17 +103,28 @@ void fmcalc::doit()
 			last_event_id = gh.event_id;
 		}
 
-		while (i != 0)
+		while (!end_of_stream)
 		{
 			gulSampleslevelRec gr;
 			i = fread(&gr, sizeof(gr), 1, stdin);
-			if (i == 0)
+			if (i != 1 && ferror(stdin) != 0)
 			{
+				fprintf(stderr, "%s: fail to read samples level record\n", __func__);
+				exit(-1);
+			}
+
+			if (i != 1 && feof(stdin) != 0)
+			{
+				end_of_stream = true;
 				dofm(last_event_id, items, event_guls);
 				break;
 			}
+
 			if (gr.sidx == 0)
+			{
 				break;
+			}
+
 			gulSampleslevelEventRec gs;
 			gs.item_id = gh.item_id;
 			gs.sidx = gr.sidx;
@@ -120,8 +132,10 @@ void fmcalc::doit()
 			if (isGULStreamType_ == false && gr.sidx == tiv_idx)
 			{
 				items.push_back(gh.item_id);
-				for (unsigned int i = 0; i < event_guls.size(); i++)
-					event_guls[i].resize(items.size());
+				for (unsigned int idx = 0; idx < event_guls.size(); idx++)
+				{
+					event_guls[idx].resize(items.size());
+				}
 				current_item_index = static_cast<int>(items.size() - 1);
 				int sidx = 0;
 				//event_guls[sidx].resize(items.size());
@@ -132,8 +146,10 @@ void fmcalc::doit()
 				if (gr.sidx == mean_idx && isGULStreamType_ == true)
 				{
 					items.push_back(gh.item_id);
-					for (unsigned int i = 0; i < event_guls.size(); i++)
-						event_guls[i].resize(items.size());
+					for (unsigned int idx = 0; idx < event_guls.size(); idx++)
+					{
+						event_guls[idx].resize(items.size());
+					}
 					current_item_index = static_cast<int>(items.size() - 1);
 				}
 				int sidx = gs.sidx + 1;

@@ -67,7 +67,7 @@ void fmcalc::doit()
 	int current_item_index = 0;
 
 	bool end_of_stream = false;
-	while (!end_of_stream)
+	while (!end_of_stream) // for each event
 	{
 		gulSampleslevelHeader gh;
 		i = fread(&gh, sizeof(gh), 1, stdin);
@@ -103,7 +103,7 @@ void fmcalc::doit()
 			last_event_id = gh.event_id;
 		}
 
-		while (!end_of_stream)
+		while (!end_of_stream) // for each item of current event
 		{
 			gulSampleslevelRec gr;
 			i = fread(&gr, sizeof(gr), 1, stdin);
@@ -129,21 +129,10 @@ void fmcalc::doit()
 			gs.item_id = gh.item_id;
 			gs.sidx = gr.sidx;
 			gs.loss = gr.loss;
-			if (isGULStreamType_ == false && gr.sidx == tiv_idx)
+
+			if (isGULStreamType_ == false)
 			{
-				items.push_back(gh.item_id);
-				for (unsigned int idx = 0; idx < event_guls.size(); idx++)
-				{
-					event_guls[idx].resize(items.size());
-				}
-				current_item_index = static_cast<int>(items.size() - 1);
-				int sidx = 0;
-				//event_guls[sidx].resize(items.size());
-				event_guls[sidx][current_item_index] = gs.loss;
-			}
-			if (gr.sidx >= mean_idx)
-			{
-				if (gr.sidx == mean_idx && isGULStreamType_ == true)
+				if (gr.sidx == tiv_idx)
 				{
 					items.push_back(gh.item_id);
 					for (unsigned int idx = 0; idx < event_guls.size(); idx++)
@@ -151,16 +140,49 @@ void fmcalc::doit()
 						event_guls[idx].resize(items.size());
 					}
 					current_item_index = static_cast<int>(items.size() - 1);
-				}
-				int sidx = gs.sidx + 1;
-				if (gs.sidx == mean_idx)
-					sidx = 1;
-				event_guls[sidx][current_item_index] = gs.loss;
-				if (isGULStreamType_ == true && gs.sidx == mean_idx)
-				{ // add additional row for tiv
-					sidx = 0;
-					gs.loss = gettiv(gs.item_id);
+
+					int sidx = 0;
+					//event_guls[sidx].resize(items.size());
 					event_guls[sidx][current_item_index] = gs.loss;
+				}
+
+				if (gr.sidx >= mean_idx)
+				{
+					int sidx = gs.sidx + 1;
+					if (gs.sidx == mean_idx)
+					{
+						sidx = 1;
+					}
+					event_guls[sidx][current_item_index] = gs.loss;
+				}
+			}
+			else // isGULStreamType_ == true
+			{
+				if (gr.sidx >= mean_idx)
+				{
+					if (gr.sidx == mean_idx)
+					{
+						items.push_back(gh.item_id);
+						for (unsigned int idx = 0; idx < event_guls.size(); idx++)
+						{
+							event_guls[idx].resize(items.size());
+						}
+						current_item_index = static_cast<int>(items.size() - 1);
+					}
+
+					int sidx = gs.sidx + 1;
+					if (gs.sidx == mean_idx)
+					{
+						sidx = 1;
+					}
+					event_guls[sidx][current_item_index] = gs.loss;
+
+					if (gs.sidx == mean_idx)
+					{ // add additional row for tiv
+						sidx = 0;
+						gs.loss = gettiv(gs.item_id);
+						event_guls[sidx][current_item_index] = gs.loss;
+					}
 				}
 			}
 		}

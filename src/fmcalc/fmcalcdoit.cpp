@@ -70,7 +70,7 @@ void fmcalc::doit()
 	while (!end_of_stream) // for each event
 	{
 		gulSampleslevelHeader gh;
-		i = fread(&gh, sizeof(gh), 1, stdin);
+		size_t i = fread(&gh, sizeof(gh), 1, stdin);
 		if (i != 1 && ferror(stdin) != 0)
 		{
 			fprintf(stderr, "%s: fail to read samples level header\n", __func__);

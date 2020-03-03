@@ -111,7 +111,7 @@ int main(int argc, char* argv[])
 			 allocrule = atoi(optarg);
 			 break;
 		 case 'v':
-			 fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+			 fprintf(stderr, "%s : version: %s\n", argv[0], "v3.2.2 CDL");
 			 exit(EXIT_FAILURE);
 			 break;
 		 case 'p':

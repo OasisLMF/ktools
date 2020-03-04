@@ -78,7 +78,7 @@ void fmcalc::doit()
 		}
 		// <<<<
 
-		// compute latest event before end
+		// if latest event read
 		if (i != 1 && feof(stdin) != 0)
 		{
 			if (last_event_id == -1)

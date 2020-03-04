@@ -63,11 +63,8 @@ void fmcalc::doit()
 	std::vector<std::vector<OASIS_FLOAT>> event_guls(samplesize + 2); // one additional for mean and tiv
 	std::vector<int> items;											  // item IDs for the current event
 
-	int current_item_index = 0;
-
 	int last_event_id = -1;
-	bool end_of_stream = false;
-	while (!end_of_stream) // for each event
+	while (true) // for each event item
 	{
 		// read_header()
 		// >>>>
@@ -83,15 +80,17 @@ void fmcalc::doit()
 		// compute latest event before end
 		if (i != 1 && feof(stdin) != 0)
 		{
-			end_of_stream = true;
-			if (last_event_id != -1)
+			if (last_event_id == -1)
 			{
-				dofm(last_event_id, items, event_guls);
+				fprintf(stderr, "%s: end of stream reached while reading samples level header\n", __func__);
+				exit(-1);
 			}
+
+			dofm(last_event_id, items, event_guls);
 			break;
 		}
 
-		// next event
+		// if next event
 		if (header.event_id != last_event_id)
 		{
 			if (last_event_id != -1)
@@ -99,16 +98,19 @@ void fmcalc::doit()
 				dofm(last_event_id, items, event_guls);
 			}
 
+			// init
+			// >>>>
 			items.clear();
 			for (unsigned int idx = 0; idx < event_guls.size(); idx++)
 			{
 				event_guls[idx].clear();
 			}
+			// <<<<
 
 			last_event_id = header.event_id;
 		}
 
-		while (!end_of_stream) // for each item of current event
+		while (true) // for each item of current event
 		{
 			// read_sample_loss()
 			// >>>>
@@ -119,14 +121,13 @@ void fmcalc::doit()
 				fprintf(stderr, "%s: fail to read samples level record\n", __func__);
 				exit(-1);
 			}
-			// <<<<
 
 			if (i != 1 && feof(stdin) != 0)
 			{
-				end_of_stream = true;
-				dofm(last_event_id, items, event_guls);
-				break;
+				fprintf(stderr, "%s: end of stream reached while reading samples level record\n", __func__);
+				exit(-1);
 			}
+			// <<<<
 
 			// sample idx == 0 => marker for and of sample stream; dummy sample not used => next item follows
 			if (record.sidx == 0)
@@ -143,7 +144,7 @@ void fmcalc::doit()
 					{
 						event_guls[idx].resize(items.size());
 					}
-					current_item_index = static_cast<int>(items.size() - 1);
+					int current_item_index = static_cast<int>(items.size() - 1);
 
 					int sidx = 0;
 					//event_guls[sidx].resize(items.size());
@@ -171,7 +172,7 @@ void fmcalc::doit()
 						{
 							event_guls[idx].resize(items.size());
 						}
-						current_item_index = static_cast<int>(items.size() - 1);
+						int current_item_index = static_cast<int>(items.size() - 1);
 					}
 
 					int sidx = record.sidx + 1;

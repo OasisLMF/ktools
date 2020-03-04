@@ -63,6 +63,7 @@ void fmcalc::doit()
 	std::vector<std::vector<OASIS_FLOAT>> event_guls(samplesize + 2); // one additional for mean and tiv
 	std::vector<int> items;											  // item IDs for the current event
 
+	size_t current_item_index = 0;
 	int last_event_id = -1;
 	while (true) // for each event item
 	{
@@ -137,57 +138,46 @@ void fmcalc::doit()
 
 			if (isGULStreamType_ == false)
 			{
-				if (record.sidx == tiv_idx)
+				if (record.sidx == tiv_idx) // first record of the current item
 				{
 					items.push_back(header.item_id);
 					for (unsigned int idx = 0; idx < event_guls.size(); idx++)
 					{
 						event_guls[idx].resize(items.size());
 					}
-					int current_item_index = static_cast<int>(items.size() - 1);
+					current_item_index = items.size() - 1;
 
-					int sidx = 0;
-					//event_guls[sidx].resize(items.size());
-					event_guls[sidx][current_item_index] = record.loss;
+					event_guls[0][current_item_index] = record.loss;
 				}
 
-				if (record.sidx >= mean_idx)
+				else if (record.sidx == mean_idx)
 				{
-					int sidx = record.sidx + 1;
-					if (record.sidx == mean_idx)
-					{
-						sidx = 1;
-					}
-					event_guls[sidx][current_item_index] = record.loss;
+					event_guls[1][current_item_index] = record.loss;
+				}
+
+				else if (record.sidx > 0) // other records: last record is sample index 0
+				{
+					event_guls[record.sidx + 1][current_item_index] = record.loss;
 				}
 			}
 			else // isGULStreamType_ == true
 			{
-				if (record.sidx >= mean_idx)
+				if (record.sidx == mean_idx)
 				{
-					if (record.sidx == mean_idx)
+					items.push_back(header.item_id);
+					for (unsigned int idx = 0; idx < event_guls.size(); idx++)
 					{
-						items.push_back(header.item_id);
-						for (unsigned int idx = 0; idx < event_guls.size(); idx++)
-						{
-							event_guls[idx].resize(items.size());
-						}
-						int current_item_index = static_cast<int>(items.size() - 1);
+						event_guls[idx].resize(items.size());
 					}
+					current_item_index = items.size() - 1;
 
-					int sidx = record.sidx + 1;
-					if (record.sidx == mean_idx)
-					{
-						sidx = 1;
-					}
-					event_guls[sidx][current_item_index] = record.loss;
+					event_guls[0][current_item_index] = gettiv(header.item_id);
+					event_guls[1][current_item_index] = record.loss;
+				}
 
-					if (record.sidx == mean_idx)
-					{ // add additional row for tiv
-						sidx = 0;
-						record.loss = gettiv(header.item_id);
-						event_guls[sidx][current_item_index] = record.loss;
-					}
+				else if (record.sidx > 0)
+				{
+					event_guls[record.sidx + 1][current_item_index] = record.loss;
 				}
 			}
 		}

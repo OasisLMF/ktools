@@ -51,7 +51,6 @@ void fmcalc::doit()
 	}
 	// <<<<
 
-	int last_event_id = -1;
 	int samplesize = 0;
 	n_read = fread(&samplesize, sizeof(samplesize), 1, stdin);
 	if (n_read != 1)
@@ -62,10 +61,11 @@ void fmcalc::doit()
 
 	fwrite(&samplesize, sizeof(samplesize), 1, stdout);
 	std::vector<std::vector<OASIS_FLOAT>> event_guls(samplesize + 2); // one additional for mean and tiv
-	std::vector<int> items;
+	std::vector<int> items;											  // item IDs for the current event
 
 	int current_item_index = 0;
 
+	int last_event_id = -1;
 	bool end_of_stream = false;
 	while (!end_of_stream) // for each event
 	{
@@ -77,6 +77,9 @@ void fmcalc::doit()
 			exit(-1);
 		}
 
+		// CDL: UNREACHABLE CODE!?
+		// >>>>
+		// compute latest event before end
 		if (i != 1 && feof(stdin) != 0)
 		{
 			end_of_stream = true;
@@ -86,7 +89,9 @@ void fmcalc::doit()
 			}
 			break;
 		}
+		// <<<<
 
+		// next event
 		if (gh.event_id != last_event_id)
 		{
 			if (last_event_id != -1)
@@ -120,6 +125,7 @@ void fmcalc::doit()
 				break;
 			}
 
+			// End of sample stream marker => next item follows
 			if (gr.sidx == 0)
 			{
 				break;

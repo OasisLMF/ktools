@@ -69,16 +69,17 @@ void fmcalc::doit()
 	bool end_of_stream = false;
 	while (!end_of_stream) // for each event
 	{
-		gulSampleslevelHeader gh;
-		size_t i = fread(&gh, sizeof(gh), 1, stdin);
+		// read_header()
+		// >>>>
+		gulSampleslevelHeader header;
+		size_t i = fread(&header, sizeof(header), 1, stdin);
 		if (i != 1 && ferror(stdin) != 0)
 		{
 			fprintf(stderr, "%s: fail to read samples level header\n", __func__);
 			exit(-1);
 		}
+		// <<<<
 
-		// CDL: UNREACHABLE CODE!?
-		// >>>>
 		// compute latest event before end
 		if (i != 1 && feof(stdin) != 0)
 		{
@@ -89,10 +90,9 @@ void fmcalc::doit()
 			}
 			break;
 		}
-		// <<<<
 
 		// next event
-		if (gh.event_id != last_event_id)
+		if (header.event_id != last_event_id)
 		{
 			if (last_event_id != -1)
 			{
@@ -105,18 +105,21 @@ void fmcalc::doit()
 				event_guls[idx].clear();
 			}
 
-			last_event_id = gh.event_id;
+			last_event_id = header.event_id;
 		}
 
 		while (!end_of_stream) // for each item of current event
 		{
-			gulSampleslevelRec gr;
-			i = fread(&gr, sizeof(gr), 1, stdin);
+			// read_sample_loss()
+			// >>>>
+			gulSampleslevelRec record;
+			i = fread(&record, sizeof(record), 1, stdin);
 			if (i != 1 && ferror(stdin) != 0)
 			{
 				fprintf(stderr, "%s: fail to read samples level record\n", __func__);
 				exit(-1);
 			}
+			// <<<<
 
 			if (i != 1 && feof(stdin) != 0)
 			{
@@ -125,22 +128,17 @@ void fmcalc::doit()
 				break;
 			}
 
-			// End of sample stream marker => next item follows
-			if (gr.sidx == 0)
+			// sample idx == 0 => marker for and of sample stream; dummy sample not used => next item follows
+			if (record.sidx == 0)
 			{
 				break;
 			}
 
-			gulSampleslevelEventRec gs;
-			gs.item_id = gh.item_id;
-			gs.sidx = gr.sidx;
-			gs.loss = gr.loss;
-
 			if (isGULStreamType_ == false)
 			{
-				if (gr.sidx == tiv_idx)
+				if (record.sidx == tiv_idx)
 				{
-					items.push_back(gh.item_id);
+					items.push_back(header.item_id);
 					for (unsigned int idx = 0; idx < event_guls.size(); idx++)
 					{
 						event_guls[idx].resize(items.size());
@@ -149,26 +147,26 @@ void fmcalc::doit()
 
 					int sidx = 0;
 					//event_guls[sidx].resize(items.size());
-					event_guls[sidx][current_item_index] = gs.loss;
+					event_guls[sidx][current_item_index] = record.loss;
 				}
 
-				if (gr.sidx >= mean_idx)
+				if (record.sidx >= mean_idx)
 				{
-					int sidx = gs.sidx + 1;
-					if (gs.sidx == mean_idx)
+					int sidx = record.sidx + 1;
+					if (record.sidx == mean_idx)
 					{
 						sidx = 1;
 					}
-					event_guls[sidx][current_item_index] = gs.loss;
+					event_guls[sidx][current_item_index] = record.loss;
 				}
 			}
 			else // isGULStreamType_ == true
 			{
-				if (gr.sidx >= mean_idx)
+				if (record.sidx >= mean_idx)
 				{
-					if (gr.sidx == mean_idx)
+					if (record.sidx == mean_idx)
 					{
-						items.push_back(gh.item_id);
+						items.push_back(header.item_id);
 						for (unsigned int idx = 0; idx < event_guls.size(); idx++)
 						{
 							event_guls[idx].resize(items.size());
@@ -176,18 +174,18 @@ void fmcalc::doit()
 						current_item_index = static_cast<int>(items.size() - 1);
 					}
 
-					int sidx = gs.sidx + 1;
-					if (gs.sidx == mean_idx)
+					int sidx = record.sidx + 1;
+					if (record.sidx == mean_idx)
 					{
 						sidx = 1;
 					}
-					event_guls[sidx][current_item_index] = gs.loss;
+					event_guls[sidx][current_item_index] = record.loss;
 
-					if (gs.sidx == mean_idx)
+					if (record.sidx == mean_idx)
 					{ // add additional row for tiv
 						sidx = 0;
-						gs.loss = gettiv(gs.item_id);
-						event_guls[sidx][current_item_index] = gs.loss;
+						record.loss = gettiv(header.item_id);
+						event_guls[sidx][current_item_index] = record.loss;
 					}
 				}
 			}

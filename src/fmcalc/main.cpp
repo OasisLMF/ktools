@@ -58,17 +58,16 @@ char *progname = 0;
 void help()
 {
 
-    fprintf(stderr,
-		"-a set allocrule (default none)\n"
-		"-o general optimization off\n"
-        "-M max level (optional)\n"
-		"-p inputpath (relative or full path)\n"
-		"-n feed net value (used for reinsurance)\n"
-		"-O Alloc rule2 optimization off"
-		"-d debug\n"
-		"-v version\n"
-		"-h help\n"
-	);
+	fprintf(stderr,
+			"-a set allocrule (default none)\n"
+			"-o general optimization off\n"
+			"-M max level (optional)\n"
+			"-p inputpath (relative or full path)\n"
+			"-n feed net value (used for reinsurance)\n"
+			"-O Alloc rule2 optimization off"
+			"-d debug\n"
+			"-v version\n"
+			"-h help\n");
 }
 
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
@@ -79,11 +78,10 @@ void segfault_sigaction(int, siginfo_t *si, void *)
 }
 #endif
 
-
-int main(int argc, char* argv[])
+int main(int argc, char *argv[])
 {
 	progname = argv[0];
-    int new_max = -1;
+	int new_max = -1;
 	int allocrule = 0;
 	int opt;
 	std::string inputpath;
@@ -93,8 +91,10 @@ int main(int argc, char* argv[])
 
 	bool netvalue = false;
 	bool stepped = false;
-    while ((opt = getopt(argc, argv, "SdnovhOM:p:a:")) != -1) {
-        switch (opt) {
+	while ((opt = getopt(argc, argv, "SdnovhOM:p:a:")) != -1)
+	{
+		switch (opt)
+		{
 		case 'o':
 			generalOptimization = false;
 			break;
@@ -104,33 +104,33 @@ int main(int argc, char* argv[])
 		case 'd':
 			debug = true;
 			break;
-         case 'M':
-            new_max = atoi(optarg);
-            break;
-		 case 'a':
-			 allocrule = atoi(optarg);
-			 break;
-		 case 'v':
-			 fprintf(stderr, "%s : version: %s\n", argv[0], "v3.2.2 CDL");
-			 exit(EXIT_FAILURE);
-			 break;
-		 case 'p':
-			 inputpath = optarg;
-			 break;
-		 case 'n':
-			 netvalue = true;
-			 break;
-		 case 'S':
-			 stepped = true;
-			 break;
-        case 'h':
-           help();
-           exit(EXIT_FAILURE);
-        default:
-            help();
-            exit(EXIT_FAILURE);
-        }
-    }
+		case 'M':
+			new_max = atoi(optarg);
+			break;
+		case 'a':
+			allocrule = atoi(optarg);
+			break;
+		case 'v':
+			fprintf(stderr, "%s : version: %s\n", argv[0], "v3.2.2 CDL v3");
+			exit(EXIT_FAILURE);
+			break;
+		case 'p':
+			inputpath = optarg;
+			break;
+		case 'n':
+			netvalue = true;
+			break;
+		case 'S':
+			stepped = true;
+			break;
+		case 'h':
+			help();
+			exit(EXIT_FAILURE);
+		default:
+			help();
+			exit(EXIT_FAILURE);
+		}
+	}
 
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
 	struct sigaction sa;
@@ -143,19 +143,22 @@ int main(int argc, char* argv[])
 	sigaction(SIGSEGV, &sa, NULL);
 #endif
 
-	if (allocrule < 0 || allocrule > 3) {
-		fprintf(stderr, "FATAL:%s: Invalid allocrule %d\n", progname,allocrule);
+	if (allocrule < 0 || allocrule > 3)
+	{
+		fprintf(stderr, "FATAL:%s: Invalid allocrule %d\n", progname, allocrule);
 		exit(EXIT_FAILURE);
 	}
 
-	try {
+	try
+	{
 		initstreams("", "");
-		fmcalc fc(new_max, allocrule, inputpath, netvalue,debug, allocruleOptimizationOff, generalOptimization,stepped);
-        logprintf(progname, "INFO", "starting process..\n");
+		fmcalc fc(new_max, allocrule, inputpath, netvalue, debug, allocruleOptimizationOff, generalOptimization, stepped);
+		logprintf(progname, "INFO", "starting process..\n");
 		fc.doit();
-        logprintf(progname, "INFO", "finishing process..\n");
+		logprintf(progname, "INFO", "finishing process..\n");
 	}
-	catch (const std::bad_alloc &a) {
+	catch (const std::bad_alloc &a)
+	{
 		fprintf(stderr, "FATAL:%s: bad_alloc: %s\n", progname, a.what());
 		exit(EXIT_FAILURE);
 	}

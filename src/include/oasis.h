@@ -377,6 +377,7 @@ inline  void logprintf(const std::string &program_name,const std::string &msgtyp
 #define FMPROFILE_FILE_STEP "input/fm_profile_step.bin"
 #define FMPROFILE_FILE "input/fm_profile.bin"
 #define FMXREF_FILE "input/fm_xref.bin"
+#define FMXREF_FILE_A0 "input/fm_xref_a0.bin"
 #define ITEMS_FILE "input/items.bin"
 #define EVENTS_FILE "input/events.bin"
 #define RETURNPERIODS_FILE "input/returnperiods.bin"

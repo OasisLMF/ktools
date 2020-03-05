@@ -48,6 +48,24 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include "../include/oasis.h"
 
 namespace footprinttobin {
+
+	int doscan (char *line, int &event_id, unsigned long long &areaperil_id, int &intensity_bin_id, double &probability) {
+		return sscanf(line, "%d,%llu,%d,%lf", &event_id, &areaperil_id, &intensity_bin_id, &probability);
+	}
+
+	int doscan(char* line, int& event_id, unsigned long long& areaperil_id, int& intensity_bin_id, float &probability) {
+		return sscanf(line, "%d,%llu,%d,%f", &event_id, &areaperil_id, &intensity_bin_id, &probability);
+	}
+
+
+	int doscan(char* line, int& event_id, unsigned int& areaperil_id, int& intensity_bin_id, double &probability) {
+		return sscanf(line, "%d,%u,%d,%lf", &event_id, &areaperil_id, &intensity_bin_id, &probability);
+	}
+
+	int doscan(char* line, int& event_id, unsigned int& areaperil_id, int& intensity_bin_id, float &probability) {
+		return sscanf(line, "%d,%u,%d,%f", &event_id, &areaperil_id, &intensity_bin_id, &probability);
+	}
+
 	void doitz(int intensity_bins, int hasIntensityUncertainty, const char * binFileName, const char * idxFileName) {
 		FILE *foutx = fopen(binFileName, "wb");
 		FILE *fouty = fopen(idxFileName, "wb");
@@ -75,11 +93,9 @@ namespace footprinttobin {
 
 		while (fgets(line, sizeof(line), stdin) != 0) {
 			lineno++;
-#ifdef AREAPERIL_TYPE_UNSIGNED_LONG_LONG
-			int ret = sscanf(line, "%d,%llu,%d,%f", &event_id, &r.areaperil_id, &r.intensity_bin_id, &r.probability);
-#else
-			int ret = sscanf(line, "%d,%d,%d,%f", &event_id, &r.areaperil_id, &r.intensity_bin_id, &r.probability);
-#endif
+			
+			int ret = doscan(line, event_id, r.areaperil_id, r.intensity_bin_id, r.probability);
+	
 			if (ret != 4) {
 				fprintf(stderr, "FATAL: Invalid data in line %d:\n%s", lineno, line);
 				return;
@@ -176,11 +192,7 @@ namespace footprinttobin {
 		idx.offset += sizeof(hasIntensityUncertainty);
 		while (fgets(line, sizeof(line), stdin) != 0) {
 			lineno++;
-#ifdef AREAPERIL_TYPE_UNSIGNED_LONG_LONG
-			int ret = sscanf(line, "%d,%llu,%d,%f", &event_id, &r.areaperil_id, &r.intensity_bin_id, &r.probability);
-#else
-			int ret = sscanf(line, "%d,%d,%d,%f", &event_id, &r.areaperil_id, &r.intensity_bin_id, &r.probability);
-#endif
+			int ret = doscan(line, event_id, r.areaperil_id, r.intensity_bin_id, r.probability);
 			if (ret != 4) {
 				fprintf(stderr, "FATAL: Invalid data in line %d:\n%s", lineno, line);
 				return;

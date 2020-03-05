@@ -47,6 +47,15 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #endif
 
 namespace damagebintobin {
+
+	int doscan(char* line, int& bin_index, float& bin_from, float& bin_to, float& interpolation, int &interval_type) {
+		return sscanf(line, "%d,%f,%f,%f,%d", &bin_index, &bin_from, &bin_to, &interpolation, &interval_type);
+	}
+
+	int doscan(char* line, int& bin_index, double& bin_from, double& bin_to, double& interpolation, int& interval_type) {
+		return sscanf(line, "%d,%lf,%lf,%lf,%d", &bin_index, &bin_from, &bin_to, &interpolation, &interval_type);
+	}
+	
 	void doit()
 	{
 
@@ -57,7 +66,8 @@ namespace damagebintobin {
 		lineno++;
 		while (fgets(line, sizeof(line), stdin) != 0)
 		{
-			if (sscanf(line, "%d,%f,%f,%f,%d", &q.bin_index, &q.bin_from, &q.bin_to, &q.interpolation, &q.interval_type) != 5){
+			int ret = doscan(line, q.bin_index, q.bin_from, q.bin_to, q.interpolation, q.interval_type);
+			if (ret != 5){
 			fprintf(stderr, "FATAL: Invalid data in line %d:\n%s", lineno, line);
 			return;
 		}

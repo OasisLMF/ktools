@@ -1072,15 +1072,33 @@ void fmcalc::init_itemtotiv()
 
 }
 
-
+bool fmcalc::fileexists(const std::string& name) {
+	if (FILE* file = fopen(name.c_str(), "rb")) {
+		fclose(file);
+		return true;
+	}
+	else {
+		return false;
+	}
+}
 void fmcalc::init_fmxref()
 {
 	FILE *fin = NULL;
-	std::string file = FMXREF_FILE;
+	std::string file = FMXREF_FILE_A0;
 	if (inputpath_.length() > 0) {
 		file = inputpath_ + file.substr(5);
 	}
-	fin = fopen(file.c_str(), "rb");
+	if (allocrule_ == 0  && fileexists(file) ) {		
+		fin = fopen(file.c_str(), "rb");
+	}
+	else {
+		file = FMXREF_FILE;
+		if (inputpath_.length() > 0) {
+			file = inputpath_ + file.substr(5);
+		}
+		fin = fopen(file.c_str(), "rb");
+	}
+	
 	if (fin == NULL) {
 		fprintf(stderr, "FATAL: %s: cannot open %s\n", __func__, file.c_str());
 		exit(EXIT_FAILURE);

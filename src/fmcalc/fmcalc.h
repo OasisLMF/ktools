@@ -53,6 +53,7 @@ public:
 		{ init(maxRunLevel); }	
 	void doit();
 private:
+	bool fileexists(const std::string& name);
 	std::string inputpath_;
 	bool netvalue_ = false;
 	int allocrule_ = 0;

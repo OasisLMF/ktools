@@ -41,6 +41,13 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 #include "../include/oasis.h"
 namespace coveragetobin {
+
+	int doscan(char* line, int& coverage_id, float& tiv) {
+		return sscanf(line, "%d,%f", &coverage_id, &tiv);
+	}
+	int doscan(char* line, int& coverage_id, double& tiv) {
+		return sscanf(line, "%d,%lf", &coverage_id, &tiv);
+	}
 	void doit()
 	{
 
@@ -54,7 +61,8 @@ namespace coveragetobin {
 		{
 			int coverage_id;
 			OASIS_FLOAT tiv;
-			if (sscanf(line, "%d,%f", &coverage_id, &tiv) != 2) {
+			int ret = doscan(line, coverage_id, tiv);
+			if (ret != 2) {
 				fprintf(stderr, "FATAL: Invalid data in line %d:\n%s", lineno, line);
 				return;
 			}

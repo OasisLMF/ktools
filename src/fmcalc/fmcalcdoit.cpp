@@ -63,7 +63,7 @@ void fmcalc::doit()
 	std::vector<std::vector<OASIS_FLOAT>> event_guls(samplesize + 2); // one additional for mean and tiv
 	std::vector<int> items;											  // item IDs for the current event
 
-	size_t current_item_index = 0;
+	size_t item_idx = 0;
 	int last_event_id = -1;
 	while (true) // for each event item
 	{
@@ -109,8 +109,10 @@ void fmcalc::doit()
 			// <<<<
 
 			last_event_id = header.event_id;
+			item_idx = -1;
 		}
 
+		item_idx++;
 		while (true) // for each item of current event
 		{
 			// read_sample_loss()
@@ -136,48 +138,43 @@ void fmcalc::doit()
 				break;
 			}
 
+			if (item_idx == 0)
+			{
+				items.push_back(header.item_id);
+				for (size_t idx = 0; idx < event_guls.size(); idx++)
+				{
+					event_guls[idx].push_back(0.0);
+				}
+			}
+
 			if (isGULStreamType_ == false)
 			{
 				if (record.sidx == tiv_idx) // first record of the current item
 				{
-					items.push_back(header.item_id);
-					for (unsigned int idx = 0; idx < event_guls.size(); idx++)
-					{
-						event_guls[idx].resize(items.size());
-					}
-					current_item_index = items.size() - 1;
-
-					event_guls[0][current_item_index] = record.loss;
+					event_guls[0][item_idx] = record.loss;
 				}
 
 				else if (record.sidx == mean_idx)
 				{
-					event_guls[1][current_item_index] = record.loss;
+					event_guls[1][item_idx] = record.loss;
 				}
 
 				else if (record.sidx > 0) // other records: last record is sample index 0
 				{
-					event_guls[record.sidx + 1][current_item_index] = record.loss;
+					event_guls[record.sidx + 1][item_idx] = record.loss;
 				}
 			}
 			else // isGULStreamType_ == true
 			{
 				if (record.sidx == mean_idx)
 				{
-					items.push_back(header.item_id);
-					for (unsigned int idx = 0; idx < event_guls.size(); idx++)
-					{
-						event_guls[idx].resize(items.size());
-					}
-					current_item_index = items.size() - 1;
-
-					event_guls[0][current_item_index] = gettiv(header.item_id);
-					event_guls[1][current_item_index] = record.loss;
+					event_guls[0][item_idx] = gettiv(header.item_id);
+					event_guls[1][item_idx] = record.loss;
 				}
 
 				else if (record.sidx > 0)
 				{
-					event_guls[record.sidx + 1][current_item_index] = record.loss;
+					event_guls[record.sidx + 1][item_idx] = record.loss;
 				}
 			}
 		}

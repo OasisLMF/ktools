@@ -61,9 +61,9 @@ void fmcalc::doit()
 
 	fwrite(&samplesize, sizeof(samplesize), 1, stdout);
 	std::vector<std::vector<OASIS_FLOAT>> event_guls(samplesize + 2); // one additional for mean and tiv
-	std::vector<int> items;											  // item IDs for the current event
+	std::vector<int> items;											  // list of item IDs for the current event
 
-	size_t item_idx = 0;
+	size_t item_index = -1;
 	int last_event_id = -1;
 	while (true) // for each event item
 	{
@@ -81,39 +81,46 @@ void fmcalc::doit()
 		// if latest event read
 		if (i != 1 && feof(stdin) != 0)
 		{
-			if (last_event_id == -1)
+			if (last_event_id != -1)
 			{
-				fprintf(stderr, "%s: end of stream reached while reading samples level header\n", __func__);
-				exit(-1);
+				dofm(last_event_id, items, event_guls);
+				break;
 			}
 
-			dofm(last_event_id, items, event_guls);
-			break;
+			fprintf(stderr, "%s: end of stream reached while reading samples level header\n", __func__);
+			exit(-1);
 		}
 
 		// if next event
 		if (header.event_id != last_event_id)
 		{
-			if (last_event_id != -1)
+			if (last_event_id != -1) // compute previous event
 			{
 				dofm(last_event_id, items, event_guls);
 			}
 
-			// init
+			last_event_id = header.event_id;
+
+			// init data vectors
 			// >>>>
 			items.clear();
-			for (unsigned int idx = 0; idx < event_guls.size(); idx++)
+			for (size_t idx = 0; idx < event_guls.size(); idx++)
 			{
 				event_guls[idx].clear();
 			}
 			// <<<<
-
-			last_event_id = header.event_id;
-			item_idx = -1;
 		}
 
-		item_idx++;
-		while (true) // for each item of current event
+		items.push_back(header.item_id);
+		item_index = items.size() - 1;
+
+		// initialize data
+		for (size_t idx = 0; idx < event_guls.size(); idx++)
+		{
+			event_guls[idx].push_back(0.0);
+		}
+
+		while (true) // for each sample of current event/items
 		{
 			// read_sample_loss()
 			// >>>>
@@ -132,49 +139,40 @@ void fmcalc::doit()
 			}
 			// <<<<
 
-			// sample idx == 0 => marker for and of sample stream; dummy sample not used => next item follows
+			// sample idx == 0 => marker for end of sample stream; dummy sample not used => next item follows
 			if (record.sidx == 0)
 			{
 				break;
-			}
-
-			if (item_idx == 0)
-			{
-				items.push_back(header.item_id);
-				for (size_t idx = 0; idx < event_guls.size(); idx++)
-				{
-					event_guls[idx].push_back(0.0);
-				}
 			}
 
 			if (isGULStreamType_ == false)
 			{
 				if (record.sidx == tiv_idx) // first record of the current item
 				{
-					event_guls[0][item_idx] = record.loss;
+					event_guls[0][item_index] = record.loss;
 				}
 
 				else if (record.sidx == mean_idx)
 				{
-					event_guls[1][item_idx] = record.loss;
+					event_guls[1][item_index] = record.loss;
 				}
 
 				else if (record.sidx > 0) // other records: last record is sample index 0
 				{
-					event_guls[record.sidx + 1][item_idx] = record.loss;
+					event_guls[record.sidx + 1][item_index] = record.loss;
 				}
 			}
 			else // isGULStreamType_ == true
 			{
 				if (record.sidx == mean_idx)
 				{
-					event_guls[0][item_idx] = gettiv(header.item_id);
-					event_guls[1][item_idx] = record.loss;
+					event_guls[0][item_index] = gettiv(header.item_id);
+					event_guls[1][item_index] = record.loss;
 				}
 
 				else if (record.sidx > 0)
 				{
-					event_guls[record.sidx + 1][item_idx] = record.loss;
+					event_guls[record.sidx + 1][item_index] = record.loss;
 				}
 			}
 		}

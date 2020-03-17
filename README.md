@@ -44,6 +44,11 @@ Configure using the following command;
 $ ./configure
 ```
 
+On OS X add an extra flag:
+``` sh
+$ ./configure --enable-osx
+```
+
 Make using the following command;
 ``` sh
 $ make

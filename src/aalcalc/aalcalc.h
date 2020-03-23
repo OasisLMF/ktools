@@ -70,7 +70,9 @@ struct period_sidx_map_key_new {
 
 struct loss_rec {
 	double sum_of_loss = 0.0;
+	double sum_of_loss_no_weighting = 0.0;
 	double max_exposure_value = 0.0;
+	double weighting = 0.0;
 };
 
 struct event_offset_rec{

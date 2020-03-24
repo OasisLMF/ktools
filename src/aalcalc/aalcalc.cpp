@@ -273,19 +273,20 @@ void aalcalc::do_calc_end_new()
 				a.type = 2;
 				if (a.summary_id == 0) a.summary_id = current_summary_id_;
 				if (a.max_exposure_value < aa.max_exposure_value) a.max_exposure_value = aa.max_exposure_value;
-				a.mean += aa.sum_of_loss;
-				a.mean_squared += aa.sum_of_loss * aa.sum_of_loss;
+				a.mean += aa.sum_of_loss * aa.weighting;
+				a.mean_squared += aa.sum_of_loss * aa.sum_of_loss * aa.weighting;
 			}
 			else {
 				aal_rec& a = vec_analytical_aal_[current_summary_id_];
 				a.type = 1;
 				if (a.max_exposure_value < aa.max_exposure_value) a.max_exposure_value = aa.max_exposure_value;
-				a.mean += aa.sum_of_loss;
-				a.mean_squared += aa.sum_of_loss * aa.sum_of_loss;
+				a.mean += aa.sum_of_loss * aa.weighting;
+				a.mean_squared += aa.sum_of_loss * aa.sum_of_loss * aa.weighting;
 				if (a.summary_id == 0) a.summary_id = current_summary_id_;
 			}
 			aa.max_exposure_value = 0;
 			aa.sum_of_loss = 0;
+			aa.weighting = 0;
 		}
 		iter++;
 	}
@@ -321,7 +322,8 @@ void aalcalc::do_sample_calc_newx(const summarySampleslevelHeader& sh, const std
 				vidx = (samplesize_ + 1) * period_no + sidx;
 				loss_rec & a = vec_sample_sum_loss_[vidx];
 				if (a.max_exposure_value < sh.expval) a.max_exposure_value = sh.expval;
-				a.sum_of_loss += (x.loss * weighting);
+				a.sum_of_loss += x.loss;
+				a.weighting = weighting;
 			}
 		}
 	}

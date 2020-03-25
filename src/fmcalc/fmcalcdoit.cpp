@@ -2,18 +2,13 @@
 
 void fmcalc::doit()
 {
-	// fmcalc fc(maxLevel, allocrule, inputpath, netvalue, oldFMProfile);
-
 	isGULStreamType_ = true;
-	// write_stream_type()
-	// >>>>
+
+	// write stream type
 	unsigned int fmstream_type = 1 | fmstream_id;
-
 	fwrite(&fmstream_type, sizeof(fmstream_type), 1, stdout);
-	// <<<<
 
-	// read_gul_stream_type()
-	// >>>>
+	// read GUL stream type
 	int gulstream_type = 0;
 	size_t n_read = fread(&gulstream_type, sizeof(gulstream_type), 1, stdin);
 	if (n_read == 0)
@@ -21,10 +16,8 @@ void fmcalc::doit()
 		fprintf(stderr, "%s: Read error on input stream\n", __func__);
 		exit(-1);
 	}
-	// <<<<
 
-	// get_input_stream_type()
-	// >>>>
+	// get input stream type
 	int stream_type = gulstream_type & gulstream_id;
 	int stream_type2 = gulstream_type & fmstream_id;
 
@@ -49,7 +42,6 @@ void fmcalc::doit()
 		fprintf(stderr, "%s: Unsupported gul stream type %d\n", __func__, stream_type);
 		exit(-1);
 	}
-	// <<<<
 
 	int samplesize = 0;
 	n_read = fread(&samplesize, sizeof(samplesize), 1, stdin);
@@ -67,19 +59,17 @@ void fmcalc::doit()
 	int last_event_id = -1;
 	while (true) // for each event item
 	{
-		// read_header()
-		// >>>>
+		// read header
 		gulSampleslevelHeader header;
-		size_t i = fread(&header, sizeof(header), 1, stdin);
-		if (i != 1 && ferror(stdin) != 0)
+		size_t nread = fread(&header, sizeof(header), 1, stdin);
+		if (nread != 1 && ferror(stdin) != 0)
 		{
 			fprintf(stderr, "%s: fail to read samples level header\n", __func__);
 			exit(-1);
 		}
-		// <<<<
 
-		// if latest event read
-		if (i != 1 && feof(stdin) != 0)
+		// if last event read
+		if (nread != 1 && feof(stdin) != 0)
 		{
 			if (last_event_id != -1)
 			{
@@ -101,20 +91,17 @@ void fmcalc::doit()
 
 			last_event_id = header.event_id;
 
-			// init data vectors
-			// >>>>
 			items.clear();
 			for (size_t idx = 0; idx < event_guls.size(); idx++)
 			{
 				event_guls[idx].clear();
 			}
-			// <<<<
 		}
 
 		items.push_back(header.item_id);
 		item_index = items.size() - 1;
 
-		// initialize data
+		// initialize data for next sample
 		for (size_t idx = 0; idx < event_guls.size(); idx++)
 		{
 			event_guls[idx].push_back(0.0);
@@ -122,22 +109,20 @@ void fmcalc::doit()
 
 		while (true) // for each sample of current event/items
 		{
-			// read_sample_loss()
-			// >>>>
+			// read sample loss
 			gulSampleslevelRec record;
-			i = fread(&record, sizeof(record), 1, stdin);
-			if (i != 1 && ferror(stdin) != 0)
+			nread = fread(&record, sizeof(record), 1, stdin);
+			if (nread != 1 && ferror(stdin) != 0)
 			{
 				fprintf(stderr, "%s: fail to read samples level record\n", __func__);
 				exit(-1);
 			}
 
-			if (i != 1 && feof(stdin) != 0)
+			if (nread != 1 && feof(stdin) != 0)
 			{
 				fprintf(stderr, "%s: end of stream reached while reading samples level record\n", __func__);
 				exit(-1);
 			}
-			// <<<<
 
 			// sample idx == 0 => marker for end of sample stream; dummy sample not used => next item follows
 			if (record.sidx == 0)

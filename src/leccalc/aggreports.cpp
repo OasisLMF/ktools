@@ -414,6 +414,8 @@ void aggreports::wheatsheafwithweighting(int handle, const std::map<outkey2, OAS
 	if (skipheader_ == false) fprintf(fout_[handle], "summary_id,sidx,return_period,loss\n");
 
 	for (auto s : items) {
+		// skip sidx = -1 from wheatsheaf output
+		if (s.first.sidx == -1) continue;
 		OASIS_FLOAT cummulative_weigthing = 0;
 		lossvec2 &lpv = s.second;
 

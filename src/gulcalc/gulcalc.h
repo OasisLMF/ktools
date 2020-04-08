@@ -100,7 +100,8 @@ struct gulcalcopts {
 	FILE *itemout = stdout;
 	FILE *covout = stdout;
 	FILE *corrout = stdout;
-	int mode = 0;		// default mode = 0 
+	int mode = 0;		// default mode = 0
+	int allocRule = -1;   // default is unset
 };
 
 struct gulItemIDLoss {

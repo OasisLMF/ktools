@@ -100,7 +100,8 @@ int main(int argc, char *argv[])
 			gopt.rndopt = rd_option::usehashedseed;
 			break;
 		case 'a':
-			gopt.mode = atoi(optarg);	// alloc rule and mode are the same thing
+			gopt.allocRule = atoi(optarg);
+			gopt.mode = gopt.allocRule;   // set mode to alloc rule
 			break;
 		case 'r':
 			gopt.rndopt = rd_option::userandomnumberfile;

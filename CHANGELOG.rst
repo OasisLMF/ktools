@@ -4,6 +4,8 @@ Ktools Changelog
 .. start_latest_release
 `v3.2.4`_
 ---------
+* #105 - Update readme build instructions for OS X
+* #106 - Fix weighted standard deviation in aalcalc
 * #109 - Fix gulcalc loss stream header for alloc rule 0
 
 .. end_latest_release

@@ -59,7 +59,7 @@ The following checks are performed on the vulnerability data:
 * Each line contains 4 values.
 * Total probability for each vulnerability-intensity bin combination is 1.
 * Vulnerability IDs listed in ascending order.
-* For each vulnerability ID, intensity bin IDs listed in ascending order.
+* For each vulnerability ID, all intensity bin IDs are present and listed in ascending order.
 * No duplicate damage bin IDs for each vulnerability-intensity bin combination.
 
 Should all checks pass, the maximum value of `damage_bin_id` is given, which is a required input for `vulnerabilitytobin`.

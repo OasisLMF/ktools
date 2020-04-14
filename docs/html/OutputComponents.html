@@ -246,8 +246,8 @@ $  leccalc -r -Ksummary1 -F lec_full_uncertainty_agg.csv -f lec_full_uncertainty
 </tbody>
 </table>
 <h5 id="period-weightings">Period weightings</h5>
-<p>An additional feature of leccalc is available to vary the relative importance of the periods by providing a period weightings file to the calculation. In this file, a weight can be assigned to each period make it more or less important than equal weighting (1 divided by the total number of periods). For example, if the equal weight for period 1 is 1 in 10000 years, or 0.0001, then doubling the weighting to 0.0002 will result in (TODO).</p>
-<p>The sum of weights in the period weightings file must be 1 and missing period numbers are taken to have a weight of 0, meaning that they do not contribute any losses to the loss exceedance curve.</p>
+<p>An additional feature of leccalc is available to vary the relative importance of the period losses by providing a period weightings file to the calculation. In this file, a weight can be assigned to each period make it more or less important than neutral weighting (1 divided by the total number of periods). For example, if the neutral weight for period 1 is 1 in 10000 years, or 0.0001, then doubling the weighting to 0.0002 will mean that period's loss reoccurrence rate would double. Assuming no other period losses, the return period of the loss of period 1 in this example would be halved.</p>
+<p>All period_nos must appear in the file from 1 to P (no gaps). There is no constraint on the sum of weights. Periods with zero weight will not contribute any losses to the loss exceedance curve.</p>
 <p>This feature will be invoked automatically if the periods.bin file is present in the input directory.</p>
 <p><a href="#outputcomponents">Return to top</a></p>
 <h3 id="pltcalc">pltcalc <a id="pltcalc"></a></h3>
@@ -501,19 +501,15 @@ $ aalcalc -Ksummary1 &gt; aal.csv  </code></pre>
 <td align="left">standard deviation of loss</td>
 <td align="right">54657.8</td>
 </tr>
-<tr class="odd">
-<td align="left">exposure_value</td>
-<td>float</td>
-<td>8</td>
-<td align="left">maximum exposure value across all periods</td>
-<td align="right">10098730</td>
-</tr>
 </tbody>
 </table>
 <h5 id="calculation-3">Calculation</h5>
 <p>The occurrence file and summarycalc files from the specified subdirectory are read into memory. Event losses are assigned to period according to which period the events occur in and summed by period and by sample.</p>
 <p>For type 1, the mean and standard deviation of numerically integrated mean period losses are calculated across the periods. For type 2 the mean and standard deviation of the sampled period losses are calculated across all samples (sidx &gt; 1) and periods.</p>
-<p>The exposure_value, which is held at an event_id, summary_id in the summarycalc header is also accumulated by summary_id and period, and then across periods. In this case however, it is the maximum exposure value which is carried through the accumulations, not the sum.</p>
+<h5 id="period-weightings-1">Period weightings</h5>
+<p>An additional feature of aalcalc is available to vary the relative importance of the period losses by providing a period weightings file to the calculation. In this file, a weight can be assigned to each period make it more or less important than neutral weighting (1 divided by the total number of periods). For example, if the neutral weight for period 1 is 1 in 10000 years, or 0.0001, then doubling the weighting to 0.0002 will mean that period's loss reoccurrence rate would double and the loss contribution to the average annual loss would double.</p>
+<p>All period_nos must appear in the file from 1 to P (no gaps). There is no constraint on the sum of weights. Periods with zero weight will not contribute any losses to the AAL.</p>
+<p>This feature will be invoked automatically if the periods.bin file is present in the input directory.</p>
 <p><a href="#outputcomponents">Return to top</a></p>
 <p><a href="DataConversionComponents.html">Go to 4.3 Data conversion components section</a></p>
 <p><a href="Contents.html">Back to Contents</a></p>

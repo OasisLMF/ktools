@@ -31,7 +31,7 @@
 <li><strong><a href="#fmxref">fmxreftobin</a></strong> converts the fm xref data.</li>
 <li><strong><a href="#occurrence">occurrencetobin</a></strong> converts the event occurrence data.</li>
 <li><strong><a href="#returnperiod">returnperiodtobin</a></strong> converts a list of return periods.</li>
-<li><strong><a href="#returnperiod">periodstobin</a></strong> converts a list of weighted periods (optional).</li>
+<li><strong><a href="#periods">periodstobin</a></strong> converts a list of weighted periods (optional).</li>
 </ul>
 <p>These components are intended to allow users to generate the required input binaries from csv independently of the original data store and technical environment. All that needs to be done is first generate the csv files from the data store (SQL Server database, etc).</p>
 <p>The following components convert the binary input data required by the calculation components in the reference model into csv format;</p>
@@ -699,12 +699,19 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <h3 id="fm-profile">fm profile</h3>
 <hr />
 <p>The fmprofile binary file contains the list of calculation rules with profile values (policytc_ids) that appear in the policytc file. This is required for fmcalc only.</p>
-<p>This must be in the following location with filename format;</p>
+<p>There are two versions of this file and either one or the other can be used at a time.</p>
+<ul>
+<li>fm_profile - original set of fields</li>
+<li>fm_profile_step - extended set of fields to include step policy fields</li>
+</ul>
+<p>They must be in the following location with filename formats;</p>
 <ul>
 <li>input/fm_profile.bin</li>
+<li>input/fm_profile_step.bin</li>
 </ul>
 <h5 id="file-format-9">File format</h5>
 <p>The csv file should contain the following fields and include a header row.</p>
+<p><strong>fm_profile</strong></p>
 <table>
 <thead>
 <tr class="header">
@@ -731,56 +738,56 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <td align="right">12</td>
 </tr>
 <tr class="odd">
-<td align="left">deductible1</td>
+<td align="left">deductible_1</td>
 <td>int</td>
 <td>4</td>
 <td align="left">First deductible</td>
 <td align="right">0.03</td>
 </tr>
 <tr class="even">
-<td align="left">deductible2</td>
+<td align="left">deductible_2</td>
 <td>float</td>
 <td>4</td>
 <td align="left">Second deductible</td>
 <td align="right">50000</td>
 </tr>
 <tr class="odd">
-<td align="left">deductible3</td>
+<td align="left">deductible_3</td>
 <td>float</td>
 <td>4</td>
 <td align="left">Third deductible</td>
 <td align="right">100000</td>
 </tr>
 <tr class="even">
-<td align="left">attachment1</td>
+<td align="left">attachment_1</td>
 <td>float</td>
 <td>4</td>
 <td align="left">Attachment point, or excess</td>
 <td align="right">1000000</td>
 </tr>
 <tr class="odd">
-<td align="left">limit1</td>
+<td align="left">limit_1</td>
 <td>float</td>
 <td>4</td>
 <td align="left">Limit</td>
 <td align="right">5000000</td>
 </tr>
 <tr class="even">
-<td align="left">share1</td>
+<td align="left">share_1</td>
 <td>float</td>
 <td>4</td>
 <td align="left">First proportional share</td>
 <td align="right">0.8</td>
 </tr>
 <tr class="odd">
-<td align="left">share2</td>
+<td align="left">share_2</td>
 <td>float</td>
 <td>4</td>
 <td align="left">Second proportional share</td>
 <td align="right">0.25</td>
 </tr>
 <tr class="even">
-<td align="left">share3</td>
+<td align="left">share_3</td>
 <td>float</td>
 <td>4</td>
 <td align="left">Third proportional share</td>
@@ -788,15 +795,157 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 </tr>
 </tbody>
 </table>
+<p><strong>fm_profile_step</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">Name</th>
+<th>Type</th>
+<th>Bytes</th>
+<th align="left">Description</th>
+<th align="right">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">policytc_id</td>
+<td>int</td>
+<td>4</td>
+<td align="left">Primary key</td>
+<td align="right">34</td>
+</tr>
+<tr class="even">
+<td align="left">calcrule_id</td>
+<td>int</td>
+<td>4</td>
+<td align="left">The calculation rule that applies to the terms</td>
+<td align="right">12</td>
+</tr>
+<tr class="odd">
+<td align="left">deductible_1</td>
+<td>int</td>
+<td>4</td>
+<td align="left">First deductible</td>
+<td align="right">0.03</td>
+</tr>
+<tr class="even">
+<td align="left">deductible_2</td>
+<td>float</td>
+<td>4</td>
+<td align="left">Second deductible</td>
+<td align="right">50000</td>
+</tr>
+<tr class="odd">
+<td align="left">deductible_3</td>
+<td>float</td>
+<td>4</td>
+<td align="left">Third deductible</td>
+<td align="right">100000</td>
+</tr>
+<tr class="even">
+<td align="left">attachment_1</td>
+<td>float</td>
+<td>4</td>
+<td align="left">Attachment point, or excess</td>
+<td align="right">1000000</td>
+</tr>
+<tr class="odd">
+<td align="left">limit_1</td>
+<td>float</td>
+<td>4</td>
+<td align="left">First limit</td>
+<td align="right">5000000</td>
+</tr>
+<tr class="even">
+<td align="left">share_1</td>
+<td>float</td>
+<td>4</td>
+<td align="left">First proportional share</td>
+<td align="right">0.8</td>
+</tr>
+<tr class="odd">
+<td align="left">share_2</td>
+<td>float</td>
+<td>4</td>
+<td align="left">Second proportional share</td>
+<td align="right">0.25</td>
+</tr>
+<tr class="even">
+<td align="left">share_3</td>
+<td>float</td>
+<td>4</td>
+<td align="left">Third proportional share</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="left">step_id</td>
+<td>int</td>
+<td>4</td>
+<td align="left">Step number</td>
+<td align="right">1</td>
+</tr>
+<tr class="even">
+<td align="left">trigger_start</td>
+<td>float</td>
+<td>4</td>
+<td align="left">Start trigger for payout</td>
+<td align="right">0.05</td>
+</tr>
+<tr class="odd">
+<td align="left">trigger_end</td>
+<td>float</td>
+<td>4</td>
+<td align="left">End trigger for payout</td>
+<td align="right">0.15</td>
+</tr>
+<tr class="even">
+<td align="left">payout_start</td>
+<td>float</td>
+<td>4</td>
+<td align="left">Start payout</td>
+<td align="right">100</td>
+</tr>
+<tr class="odd">
+<td align="left">payout_end</td>
+<td>float</td>
+<td>4</td>
+<td align="left">End payout</td>
+<td align="right">200</td>
+</tr>
+<tr class="even">
+<td align="left">limit_2</td>
+<td>float</td>
+<td>4</td>
+<td align="left">Second limit</td>
+<td align="right">3000000</td>
+</tr>
+<tr class="odd">
+<td align="left">scale_1</td>
+<td>float</td>
+<td>4</td>
+<td align="left">Scaling (inflation) factor 1</td>
+<td align="right">0.03</td>
+</tr>
+<tr class="even">
+<td align="left">scale_2</td>
+<td>float</td>
+<td>4</td>
+<td align="left">Scaling (inflation) factor 2</td>
+<td align="right">0.2</td>
+</tr>
+</tbody>
+</table>
 <ul>
-<li>A reference table listing the valid values for calcrule_id and which of the fields are required is available in FM Profiles</li>
-<li>All distinct policytc_id values that appear in the policytc table must appear once in the policytc_id field of the profile table. We suggest that policytc_id=1 is included by default using calcrule_id = 12 and deductible1 = 0 as a default 'null' calculation rule whenever no terms and conditions apply to a particular level_id / agg_id in the policytc table.</li>
+<li>A reference table listing the valid values for calcrule_id and which of the fields are required is available in Appendix <a href="fmprofiles.html">B FM Profiles</a>.</li>
+<li>All distinct policytc_id values that appear in the policytc table must appear once in the policytc_id field of the profile table. We suggest that policytc_id=1 is included by default using calcrule_id = 100 and all fields = 0 as a default 'null' calculation rule whenever no terms and conditions apply to a particular level_id / agg_id in the policytc table.</li>
 <li>Any fields that are not required for the profile should be set to zero.</li>
 </ul>
 <h5 id="fmprofiletobin">fmprofiletobin</h5>
-<pre><code>$ fmprofiletobin &lt; fm_profile.csv &gt; fm_profile.bin</code></pre>
+<pre><code>$ fmprofiletobin &lt; fm_profile.csv &gt; fm_profile.bin
+$ fmprofiletobin -S &lt; fm_profile_step.csv &gt; fm_profile_step.bin</code></pre>
 <h5 id="fmprofiletocsv">fmprofiletocsv</h5>
-<pre><code>$ fmprofiletocsv &lt; fm_profile.bin &gt; fm_profile.csv</code></pre>
+<pre><code>$ fmprofiletocsv &lt; fm_profile.bin &gt; fm_profile.csv
+$ fmprofiletocsv -S &lt; fm_profile_step.bin &gt; fm_profile_step.csv</code></pre>
 <p><a href="#dataconversioncomponents">Return to top</a></p>
 <p><a id="fmpolicytc"></a></p>
 <h3 id="fm-policytc">fm policytc</h3>
@@ -1114,14 +1263,12 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <h3 id="occurrence">occurrence</h3>
 <hr />
 <p>The occurrence file is required for certain output components which, in the reference model, are leccalc, pltcalc and aalcalc. In general, some form of event occurence file is required for any output which involves the calculation of loss metrics over a period of time. The occurrence file assigns occurrences of the event_ids to numbered periods. A period can represent any length of time, such as a year, or 2 years for instance. The output metrics such as mean, standard deviation or loss exceedance probabilities are with respect to the chosen period length. Most commonly in catastrophe modelling, the period of interest is a year.</p>
-<p>The occurrence file also includes date fields. There are two formats for providing the date;</p>
+<p>The occurrence file also includes date fields.</p>
 <ul>
 <li>occ_year, occ_month, occ_day. These are all integers representing occurrence year, month and day.</li>
-<li>occ_date_id: An integer representing an offset number of days relative to some arbitrary base date.</li>
 </ul>
 <h5 id="file-format-13">File format</h5>
 <p>The csv file should contain the following fields and include a header row.</p>
-<p>Option 1. occ_year, occ_month, occ_day</p>
 <table>
 <thead>
 <tr class="header">
@@ -1171,57 +1318,9 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 </tbody>
 </table>
 <p>The occurrence year in this example is a scenario numbered year, which cannot be expressed as a real date in a standard calendar.</p>
-<p>Option 2. occ_date_id</p>
-<table>
-<colgroup>
-<col width="17%" />
-<col width="7%" />
-<col width="7%" />
-<col width="55%" />
-<col width="11%" />
-</colgroup>
-<thead>
-<tr class="header">
-<th align="left">Name</th>
-<th>Type</th>
-<th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">event_id</td>
-<td>int</td>
-<td>4</td>
-<td align="left">The occurrence event_id</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="left">period_no</td>
-<td>int</td>
-<td>4</td>
-<td align="left">A numbered period in which the event occurs</td>
-<td align="right">4545</td>
-</tr>
-<tr class="odd">
-<td align="left">occ_date_id</td>
-<td>int</td>
-<td>4</td>
-<td align="left">An integer representing an offset number of days to a base date</td>
-<td align="right">28626</td>
-</tr>
-</tbody>
-</table>
-<p>For example, 28626 days relative to a base date of 0/1/1900 is 16/5/1978.</p>
 <h5 id="occurrencetobin">occurrencetobin</h5>
 <p>A required parameter is -P, the total number of periods of event occurrences. The total number of periods is held in the header of the binary file and used in output calculations.</p>
-<p>Option 2 format should be indicated by using the parameter -D</p>
-<pre><code>&#39;Option 1 (occurrence files with an occ_year, occ_month, occ_day)
-$ occurrencetobin -P10000 &lt; occurrence.csv &gt; occurrence.bin
-
-&#39;Option 2 (occurrence files with an occ_date_id)
-$ occurrencetobin -P10000 -D &lt; occurrence.csv &gt; occurrence.bin</code></pre>
+<pre><code>$ occurrencetobin -P10000 &lt; occurrence.csv &gt; occurrence.bin</code></pre>
 <h5 id="occurrencetocsv">occurrencetocsv</h5>
 <pre><code>$ occurrencetocsv &lt; occurrence.bin &gt; occurrence.csv</code></pre>
 <p><a href="#dataconversioncomponents">Return to top</a></p>
@@ -1263,7 +1362,7 @@ $ occurrencetobin -P10000 -D &lt; occurrence.csv &gt; occurrence.bin</code></pre
 <p><a id="periods"></a></p>
 <h3 id="periods">periods</h3>
 <hr />
-<p>The periods binary file is a list of all the periods that are in the model and is optional for weigthing the periods in the calculation. The file is used in the calculation of the loss exceedance curve (leccalc) results.</p>
+<p>The periods binary file is a list of all the periods that are in the model and is optional for weighting the periods in the calculation. The file is used in the calculation of the loss exceedance curve (leccalc) and aalcalc results.</p>
 <p>This must be in the following location with filename format;</p>
 <ul>
 <li>input/periods.bin</li>
@@ -1292,11 +1391,12 @@ $ occurrencetobin -P10000 -D &lt; occurrence.csv &gt; occurrence.bin</code></pre
 <td align="left">weight</td>
 <td>int</td>
 <td>4</td>
-<td align="left">relative weight to other periods</td>
-<td align="right">3</td>
+<td align="left">relative weight to P, the maximum period_no</td>
+<td align="right">0.0003</td>
 </tr>
 </tbody>
 </table>
+<p>All periods must be present in this file (no gaps in period_no from 1 to P).</p>
 <h5 id="periodstobin">periodstobin</h5>
 <pre><code>$ periodstobin &lt; periods.csv &gt; periods.bin</code></pre>
 <h5 id="periodstocsv">periodstocsv</h5>

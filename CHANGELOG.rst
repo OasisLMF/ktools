@@ -2,14 +2,20 @@ Ktools Changelog
 ================
 
 .. start_latest_release
+`v3.2.4`_
+---------
+* #105 - Update readme build instructions for OS X
+* #106 - Fix weighted standard deviation in aalcalc
+* #109 - Fix gulcalc loss stream header for alloc rule 0
+
+.. end_latest_release
+
 `v3.2.3`_
 ---------
 * Added support for ded and min ded only https://github.com/OasisLMF/OasisPlatform/issues/296 https://github.com/OasisLMF/OasisLMF/issues/480
 * #23 - Weighted periods documentation
 * #99 - Occurrence file format 
 * #101 - Remove exposure value from aalcalc output 
-
-.. end_latest_release
 
 `v3.2.2`_
 ---------

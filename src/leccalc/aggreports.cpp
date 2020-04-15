@@ -416,7 +416,7 @@ void aggreports::wheatsheafwithweighting(int handle, const std::map<outkey2, OAS
 	for (auto s : items) {
 		// skip sidx = -1 from wheatsheaf output
 		if (s.first.sidx == -1) continue;
-		OASIS_FLOAT cummulative_weigthing = 0;
+		OASIS_FLOAT cummulative_weighting = 0;
 		lossvec2 &lpv = s.second;
 
 		std::sort(lpv.rbegin(), lpv.rend());
@@ -426,16 +426,18 @@ void aggreports::wheatsheafwithweighting(int handle, const std::map<outkey2, OAS
 		int i = 1;
 		OASIS_FLOAT t = (float)totalperiods_;
 		for (auto lp : lpv) {
-			cummulative_weigthing += (OASIS_FLOAT) lp.period_weighting;
-			OASIS_FLOAT retperiod = 1 / cummulative_weigthing;
-			if (useReturnPeriodFile_) {
-				if (nextreturnperiodindex == returnperiods_.size()) break;
-				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, s.first.summary_id, s.first.sidx);
+			cummulative_weighting += (OASIS_FLOAT) lp.period_weighting;
+			if (lp.period_weighting) {
+				OASIS_FLOAT retperiod = 1 / cummulative_weighting;
+				if (useReturnPeriodFile_) {
+					if (nextreturnperiodindex == returnperiods_.size()) break;
+					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, s.first.summary_id, s.first.sidx);
+				}
+				else {
+					fprintf(fout_[handle], "%d,%d,%f,%f\n", s.first.summary_id, s.first.sidx, t / i, lp.value);
+				}
+				i++;
 			}
-			else {
-				fprintf(fout_[handle], "%d,%d,%f,%f\n", s.first.summary_id, s.first.sidx, t / i, lp.value);
-			}
-			i++;
 		}
 		if (useReturnPeriodFile_) {
 			doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, s.first.sidx);
@@ -505,7 +507,7 @@ void aggreports::wheatSheafMeanwithweighting(int samplesize, int handle, const s
 		OASIS_FLOAT last_computed_loss = 0;
 		lossvec2 &lpv = s.second;
 		std::sort(lpv.rbegin(), lpv.rend());
-		OASIS_FLOAT cummulative_weigthing = 0;
+		OASIS_FLOAT cummulative_weighting = 0;
 		if (s.first.sidx != -1) {
 			int i = 0;
 			for (auto lp : lpv) {
@@ -519,9 +521,9 @@ void aggreports::wheatSheafMeanwithweighting(int samplesize, int handle, const s
 		else {
 			int i = 1;
 			for (auto lp : lpv) {
-				cummulative_weigthing += (OASIS_FLOAT)(lp.period_weighting * samplesize_);
-				if (cummulative_weigthing) {
-					OASIS_FLOAT retperiod = 1 / cummulative_weigthing;
+				cummulative_weighting += (OASIS_FLOAT)(lp.period_weighting * samplesize_);
+				if (lp.period_weighting) {
+					OASIS_FLOAT retperiod = 1 / cummulative_weighting;
 					if (useReturnPeriodFile_) {
 						doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, s.first.summary_id, 1);
 					}
@@ -556,11 +558,11 @@ void aggreports::wheatSheafMeanwithweighting(int samplesize, int handle, const s
 		OASIS_FLOAT last_computed_rp = 0;
 		OASIS_FLOAT last_computed_loss = 0;
 		int i = 1;
-		OASIS_FLOAT cummulative_weigthing = 0;
+		OASIS_FLOAT cummulative_weighting = 0;
 		for (auto lp : lpv) {
-			cummulative_weigthing += (OASIS_FLOAT)(lp.period_weighting * samplesize_);
-			if (cummulative_weigthing) {
-				OASIS_FLOAT retperiod = 1 / cummulative_weigthing;
+			cummulative_weighting += (OASIS_FLOAT)(lp.period_weighting * samplesize_);
+			if (lp.period_weighting) {
+				OASIS_FLOAT retperiod = 1 / cummulative_weighting;
 				if (useReturnPeriodFile_) {
 					OASIS_FLOAT loss = lp.value / samplesize;
 					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, loss, m.first, 2);
@@ -737,11 +739,11 @@ void aggreports::sampleMeanwithweighting(int samplesize, int handle, const std::
 		size_t nextreturnperiodindex = 0;
 		OASIS_FLOAT last_computed_rp = 0;
 		OASIS_FLOAT last_computed_loss = 0;
-		OASIS_FLOAT cummulative_weigthing = 0;
+		OASIS_FLOAT cummulative_weighting = 0;
 		for (auto lp : lpv) {
-			cummulative_weigthing += (OASIS_FLOAT) (lp.period_weighting * samplesize_);
-			if (cummulative_weigthing) {
-				OASIS_FLOAT retperiod = 1 / cummulative_weigthing;
+			cummulative_weighting += (OASIS_FLOAT) (lp.period_weighting * samplesize_);
+			if (lp.period_weighting) {
+				OASIS_FLOAT retperiod = 1 / cummulative_weighting;
 				if (useReturnPeriodFile_) {
 					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, m.first.summary_id, m.first.type);
 				}

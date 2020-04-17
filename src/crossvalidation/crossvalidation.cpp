@@ -128,8 +128,13 @@ namespace crossvalidation {
     lineno++;
     while(fgets(line, sizeof(line), footprintFile) != 0) {
 
-      if(sscanf(line, "%d,%d,%d,%f", &f.event_id, &f.areaperil_id,
+#ifdef AREAPERIL_TYPE_UNSIGNED_LONG_LONG
+      if(sscanf(line, "%d,%llu,%d,%f", &f.event_id, &f.areaperil_id,
 		&f.intensity_bin_id, &f.probability) != 4) {
+#else
+      if(sscanf(line, "%d,%u,%d,%f", &f.event_id, &f.areaperil_id,
+		&f.intensity_bin_id, &f.probability) != 4) {
+#endif
 
 	fprintf(stderr, "File %s\n", footprintFileName);
 	fprintf(stderr, "Invalid data in line %d:\n%s\n", lineno, line);

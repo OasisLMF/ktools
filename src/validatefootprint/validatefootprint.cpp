@@ -30,7 +30,11 @@ namespace validatefootprint {
   inline bool ProbabilityError(FootprintRow r, float prob) {
   
     fprintf(stderr, "Probabilities for event ID %d", r.event_id);
-    fprintf(stderr, " and areaperil ID %d", r.areaperil_id);
+#ifdef AREAPERIL_TYPE_UNSIGNED_LONG_LONG
+    fprintf(stderr, " and areaperil ID %llu", r.areaperil_id);
+#else
+    fprintf(stderr, " and areaperil ID %u", r.areaperil_id);
+#endif
     fprintf(stderr, " do not sum to 1.\n");
     fprintf(stderr, "Probability = %f\n", prob);
     
@@ -59,8 +63,14 @@ namespace validatefootprint {
     char const * sAreaperil = "Areaperil";
     float prob = 0.0;
     char prevLine[4096], line[4096];
-    sprintf(prevLine, "%d, %d, %d, %f", p.event_id, p.areaperil_id,
+
+#ifdef AREAPERIL_TYPE_UNSIGNED_LONG_LONG
+    sprintf(prevLine, "%d, %llu, %d, %f", p.event_id, p.areaperil_id,
 	    p.intensity_bin_id, p.probability);
+#else
+    sprintf(prevLine, "%d, %u, %d, %f", p.event_id, p.areaperil_id,
+	    p.intensity_bin_id, p.probability);
+#endif
     int lineno = 0;
     fgets(line, sizeof(line), stdin);   // Skip header line
     lineno++;
@@ -68,8 +78,13 @@ namespace validatefootprint {
     while(fgets(line, sizeof(line), stdin) != 0) {
 
       // Check for invalid data
-      if(sscanf(line, "%d,%d,%d,%f", &q.event_id, &q.areaperil_id,
+#ifdef AREAPERIL_TYPE_UNSIGNED_LONG_LONG
+      if(sscanf(line, "%d,%llu,%d,%f", &q.event_id, &q.areaperil_id,
 		&q.intensity_bin_id, &q.probability) != 4) {
+#else
+      if(sscanf(line, "%d,%u,%d,%f", &q.event_id, &q.areaperil_id,
+		&q.intensity_bin_id, &q.probability) != 4) {
+#endif
 
 	fprintf(stderr, "Invalid data in line %d:\n%s\n", lineno, line);
 	dataValid = false;

@@ -2,13 +2,19 @@ Ktools Changelog
 ================
 
 .. start_latest_release
+`v3.2.5`_
+---------
+* #111 - Add maximum intensity bin checks to validatevulnerability
+* #115 - Fix integer overflow issue with file validation
+* #116 - Fix full uncertainty and Wheatsheaf with period weighting calculations in leccalc
+
+.. end_latest_release
+
 `v3.2.4`_
 ---------
 * #105 - Update readme build instructions for OS X
 * #106 - Fix weighted standard deviation in aalcalc
 * #109 - Fix gulcalc loss stream header for alloc rule 0
-
-.. end_latest_release
 
 `v3.2.3`_
 ---------

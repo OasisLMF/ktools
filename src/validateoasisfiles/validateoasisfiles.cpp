@@ -194,7 +194,7 @@ namespace validateoasisfiles {
       if(sscanf(line, "%d,%d,%llu,%d,%d", &q.id, &q.coverage_id,
 		&q.areaperil_id, &q.vulnerability_id, &q.group_id) != 5) {
 #else
-      if(sscanf(line, "%d,%d,%d,%d,%d", &q.id, &q.coverage_id, &q.areaperil_id,
+      if(sscanf(line, "%d,%d,%u,%d,%d", &q.id, &q.coverage_id, &q.areaperil_id,
 		&q.vulnerability_id, &q.group_id) != 5) {
 #endif
 

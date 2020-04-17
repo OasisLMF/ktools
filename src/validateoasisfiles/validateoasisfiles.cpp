@@ -190,8 +190,13 @@ namespace validateoasisfiles {
     lineno++;
     while(fgets(line, sizeof(line), itemsFile) != 0) {
 
-      if(sscanf(line, "%d,%d,%d,%d,%d", &q.id, &q.coverage_id, &q.areaperil_id,
+#ifdef AREAPERIL_TYPE_UNSIGNED_LONG_LONG
+      if(sscanf(line, "%d,%d,%llu,%d,%d", &q.id, &q.coverage_id,
+		&q.areaperil_id, &q.vulnerability_id, &q.group_id) != 5) {
+#else
+      if(sscanf(line, "%d,%d,%u,%d,%d", &q.id, &q.coverage_id, &q.areaperil_id,
 		&q.vulnerability_id, &q.group_id) != 5) {
+#endif
 
 	fprintf(stderr, "File %s\n", itemsPath);
 	fprintf(stderr, "Invalid data in line %d:\n%s\n", lineno, line);

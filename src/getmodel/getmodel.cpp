@@ -488,17 +488,6 @@ void getmodel::doCdfInnerNoIntensityUncertainty(FILE* fin, int event_id) {
   }
 }
 
-std:string get_footprint_filename() {
-
-  std::string footprint_filename = FOOTPRINT_FILE;
-
-	if (zip) {
-		footprint_filename = ZFOOTPRINT_FILE;
-	}
-
-  return footprint_filename;  
-}
-
 void doIt(bool zip)
 {
 

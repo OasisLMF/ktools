@@ -56,7 +56,7 @@ public:
     getmodel();
     ~getmodel();
     void init(bool zip);
-	void doCdf(int event_id);
+	void doCdf(FILE* fin, int event_id);
 
 private:
 	
@@ -79,11 +79,11 @@ private:
     void getFootPrints();
     void getItems(std::set<int> &v);
 	void getIntensityInfo();
-    void doCdfInner(int event_id);
-    void doCdfInnerNoIntensityUncertainty(int event_id);
+    void doCdfInner(FILE* fin, int event_id);
+    void doCdfInnerNoIntensityUncertainty(FILE* fin, int event_id);
 #ifndef _MSC_VER
-    void doCdfInnerz(int event_id);
-    void doCdfInnerNoIntensityUncertaintyz(int event_id);
+    void doCdfInnerz(FILE* fin, int event_id);
+    void doCdfInnerNoIntensityUncertaintyz(FILE* fin, int event_id);
 #endif
     void  doResults(
         int &event_id,

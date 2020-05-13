@@ -2,13 +2,18 @@ Ktools Changelog
 ================
 
 .. start_latest_release
+`v3.2.6`_
+---------
+* #121 - Move footprint file open/close to outside of event loop
+
+.. end_latest_release
+
 `v3.2.5`_
 ---------
 * #111 - Add maximum intensity bin checks to validatevulnerability
 * #115 - Fix integer overflow issue with file validation
 * #116 - Fix full uncertainty and Wheatsheaf with period weighting calculations in leccalc
 
-.. end_latest_release
 
 `v3.2.4`_
 ---------
@@ -259,6 +264,9 @@ Release features:
 
 * First Alpha release of the kernel toolkit
 
+.. _`v3.2.6`:  https://github.com/OasisLMF/ktools/compare/v3.2.4...v3.2.6
+.. _`v3.2.5`:  https://github.com/OasisLMF/ktools/compare/v3.2.4...v3.2.5
+.. _`v3.2.4`:  https://github.com/OasisLMF/ktools/compare/v3.2.3...v3.2.4
 .. _`v3.2.3`:  https://github.com/OasisLMF/ktools/compare/v3.2.2...v3.2.3
 .. _`v3.2.2`:  https://github.com/OasisLMF/ktools/compare/v3.2.1...v3.2.2
 .. _`v3.2.1`:  https://github.com/OasisLMF/ktools/compare/v3.2.0...v3.2.1

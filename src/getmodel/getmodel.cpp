@@ -313,42 +313,35 @@ void getmodel::init(bool zip) {
   }
 }
 
-void getmodel::doCdf(int event_id) {
-  
+void getmodel::doCdf(FILE* fin, int event_id) {
   if (_has_intensity_uncertainty) {
 	  if (_zip) {
 #ifndef _MSC_VER
-		  doCdfInnerz(event_id);
+		  doCdfInnerz(fin, event_id);
 #else
 		  fprintf(stderr, "FATAL: zip not supported with microsoft build\n");
 		  exit(-1);
 #endif
 	  }
 	  else {
-		  doCdfInner(event_id);
+		  doCdfInner(fin, event_id);
 	  }
   } else {
 	  if (_zip) {
 #ifndef _MSC_VER
-		  doCdfInnerNoIntensityUncertaintyz(event_id);
+		  doCdfInnerNoIntensityUncertaintyz(fin, event_id);
 #else
 		  fprintf(stderr, "FATAL: zip not supported with microsft build\n");
 		  exit(-1);
 #endif
 	  }else {
-		  doCdfInnerNoIntensityUncertainty(event_id);
+		  doCdfInnerNoIntensityUncertainty(fin, event_id);
 	  }
   }
 }
 #ifndef _MSC_VER
-void getmodel::doCdfInnerz(int event_id) {
+void getmodel::doCdfInnerz(FILE* fin, int event_id) {
   auto sizeof_EventKey = sizeof(EventRow);
-  std::string filename = ZFOOTPRINT_FILE;
-  FILE *fin = fopen(filename.c_str(), "rb");
-  if (fin == nullptr) {
-      fprintf(stderr, "FATAL: %s: cannot open %s\n", __func__, filename.c_str());
-      exit(EXIT_FAILURE);
-  }
   auto intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);   
   bool do_cdf_for_area_peril = false;
   intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);
@@ -394,16 +387,12 @@ void getmodel::doCdfInnerz(int event_id) {
     }
   _compressed_buf.clear();
   _uncompressed_buf.clear();
-  fclose(fin);
 }
 #endif
-void getmodel::doCdfInner(int event_id) {
+void getmodel::doCdfInner(FILE* fin, int event_id) {
+
   auto sizeof_EventKey = sizeof(EventRow);
-  auto fin = fopen(FOOTPRINT_FILE, "rb");
-  if (fin == nullptr){
-      fprintf(stderr,"FATAL: Error opening footprint file\n");
-      exit(-1);
-  }
+
   auto intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);
 
   AREAPERIL_INT current_areaperil_id = -1;
@@ -411,7 +400,6 @@ void getmodel::doCdfInner(int event_id) {
   intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);
 
   if (_event_index_by_event_id.count(event_id) == 0){
-      fclose(fin);
     return;
   }
   flseek(fin, _event_index_by_event_id[event_id].offset, 0);
@@ -438,18 +426,11 @@ void getmodel::doCdfInner(int event_id) {
     // Generate and write the results
     doResults(event_id, current_areaperil_id, _vulnerability_ids_by_area_peril, _vulnerabilities, intensity);
   }
-
-  fclose(fin);
 }
 
 #ifndef _MSC_VER
-void getmodel::doCdfInnerNoIntensityUncertaintyz(int event_id) {
+void getmodel::doCdfInnerNoIntensityUncertaintyz(FILE* fin, int event_id) {
   auto sizeof_EventKey = sizeof(EventRow);
-  FILE *fin = fopen(ZFOOTPRINT_FILE, "rb");
-  if (fin == NULL) {
-      fprintf(stderr, "FATAL: Error opening footprint file\n");
-      exit(-1);
-  }
   if (_event_index_by_event_id.count(event_id) == 0)
     return;
   flseek(fin, _event_index_by_event_id[event_id].offset, 0);
@@ -479,22 +460,15 @@ void getmodel::doCdfInnerNoIntensityUncertaintyz(int event_id) {
     }
     event_key++;
   }
-
-  fclose(fin);
 }
 #endif
 
-void getmodel::doCdfInnerNoIntensityUncertainty(int event_id) {
+void getmodel::doCdfInnerNoIntensityUncertainty(FILE* fin, int event_id) {
   auto sizeof_EventKey = sizeof(EventRow);
-  
+
   if (_event_index_by_event_id.count(event_id) == 0)
     return;
 
-  auto fin = fopen(FOOTPRINT_FILE, "rb");
-  if (fin == NULL) {
-      fprintf(stderr, "FATAL: Error opening footprint file\n");
-      exit(-1);
-  }
   flseek(fin, _event_index_by_event_id[event_id].offset, SEEK_SET);
 
   int number_of_event_records = static_cast<int>(
@@ -512,10 +486,7 @@ void getmodel::doCdfInnerNoIntensityUncertainty(int event_id) {
           _vulnerabilities, event_key.intensity_bin_id);
     }
   }
-
-  fclose(fin);
 }
-
 
 void doIt(bool zip)
 {
@@ -524,9 +495,23 @@ void doIt(bool zip)
 
 	cdf_generator.init(zip);
 
+  std::string footprint_filename = FOOTPRINT_FILE;
+
+	if (zip) {
+		footprint_filename = ZFOOTPRINT_FILE;
+	}
+
+  FILE* fin = fopen(footprint_filename.c_str(), "rb");
+  if (fin == NULL) {
+      fprintf(stderr, "FATAL: Error opening footprint file: %s\n", footprint_filename.c_str());
+      exit(-1);
+  }
+
 	int event_id = -1;
 	while (fread(&event_id, sizeof(event_id), 1, stdin) != 0)
 	{
-		cdf_generator.doCdf(event_id);
+		cdf_generator.doCdf(fin, event_id);
 	}
+
+  fclose(fin);
 }

@@ -1338,8 +1338,6 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 				if (y.tc_id == limit_1) lim = y.tc_val;
 			}
 			//Function33: deductible % loss applies before limit 
-			//IIf(Loss < Ded * loss, 0, Loss - (Ded * loss)
-			// IIf(Loss > Lim, Lim, Loss)	
 			OASIS_FLOAT loss = 0;
 			loss = x.loss - (ded * x.loss);
 			if (loss < 0) loss = 0;

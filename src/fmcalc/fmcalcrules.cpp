@@ -1015,7 +1015,7 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			// Function 19: Applies a min and max deductible on deductible % loss
 			OASIS_FLOAT loss = 0;
 			OASIS_FLOAT loss_delta = 0;
-
+			if (ded3 == 0) ded3 = 9999999999;
 			if ((x.loss * ded1) + x.effective_deductible > ded3) {
 				loss_delta =  x.effective_deductible - ded3; // loss to increase by the loss_delta
 				if (x.over_limit + x.under_limit > 0) { //if there are prior level limits to reapply
@@ -1329,6 +1329,23 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			x.loss = loss;
 		}
 		break;
+		case 33: // insurance only
+		{
+			OASIS_FLOAT ded = 0;
+			OASIS_FLOAT lim = 0;
+			for (auto y : profile.tc_vec) {
+				if (y.tc_id == deductible_1) ded = y.tc_val;
+				if (y.tc_id == limit_1) lim = y.tc_val;
+			}
+			//Function33: deductible % loss applies before limit 
+			OASIS_FLOAT loss = 0;
+			loss = x.loss - (ded * x.loss);
+			if (loss < 0) loss = 0;
+			x.effective_deductible = x.effective_deductible + (x.loss - loss);
+			if (loss > lim) loss = lim;
+			x.loss = loss;
+		}
+		break;
 		case 100:	// noop
 		{
 			x.loss = x.loss;
@@ -1459,6 +1476,9 @@ void fmcalc::init_profile__stepped_rec(fm_profile_step& f)
 			add_tc(limit_1, f.limit1, p.tc_vec);
 			add_tc(limit_2, f.limit2, p.tc_vec);
 			add_tc(scale_2, f.scale2, p.tc_vec);
+		case 33:
+			add_tc(deductible_1, f.deductible1, p.tc_vec);
+			add_tc(limit_1, f.limit1, p.tc_vec);
 			break;
 		case 100:
 			break;

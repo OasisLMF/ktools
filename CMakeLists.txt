@@ -1,9 +1,16 @@
 cmake_minimum_required(VERSION 3.13)
-project(ktools)
+
+set(PROJECT_NAME ktools)
+
+project(${PROJECT_NAME})
 
 # Create the VERSION define
-set(KTOOLS_VERSION "3.1.0")
-configure_file(config.h.cmake_in config.h)
+file(READ "${CMAKE_SOURCE_DIR}/VERSION.in" KTOOLS_VERSION)
+string(REGEX MATCH "([0-9]\.[0-9]\.[0-9])" _ ${KTOOLS_VERSION})
+set(KTOOLS_VERSION ${CMAKE_MATCH_1})
+
+# Should not be done, but it is to maintain compatibility with the autotools build
+configure_file(config.h.cmake_in ${CMAKE_SOURCE_DIR}/config.h)
 
 ENABLE_TESTING()
 
@@ -30,7 +37,13 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
 endif()
 
 
-add_test(ktest ./ktest/runtests.sh)
-add_test(ktest-extended ./ktest/runtestsx.sh)
-
 add_subdirectory(src)
+
+file(COPY ${CMAKE_SOURCE_DIR}/ktest DESTINATION ${CMAKE_BINARY_DIR})
+file(COPY ${CMAKE_SOURCE_DIR}/examples DESTINATION ${CMAKE_BINARY_DIR})
+
+include(CTest) 
+add_test(ktest ${CMAKE_BINARY_DIR}/ktest/runtests.sh WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/ktest)
+add_test(ktest-extended ${CMAKE_BINARY_DIR}/ktest/runtestsx.sh WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/ktest)
+
+

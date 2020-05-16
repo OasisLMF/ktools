@@ -7,3 +7,5 @@ target_sources(gultobin
 if (WIN32)
 	target_link_libraries(gultobin wingetopt)
 endif()
+
+install(TARGETS gultobin RUNTIME DESTINATION bin)

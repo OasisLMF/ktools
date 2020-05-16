@@ -7,3 +7,5 @@ target_sources(leccalc
 if (WIN32)
 	target_link_libraries(leccalc wingetopt)
 endif()
+
+install(TARGETS leccalc RUNTIME DESTINATION bin)

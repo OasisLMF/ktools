@@ -7,3 +7,5 @@ target_sources(returnperiodtocsv
 if (WIN32)
 	target_link_libraries(returnperiodtocsv wingetopt)
 endif()
+
+install(TARGETS returnperiodtocsv RUNTIME DESTINATION bin)

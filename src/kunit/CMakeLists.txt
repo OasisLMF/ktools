@@ -5,3 +5,5 @@ target_sources(kunit
 )
 
 add_test(kunit kunit)
+
+install(TARGETS kunit RUNTIME DESTINATION bin)

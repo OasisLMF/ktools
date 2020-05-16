@@ -6,3 +6,5 @@ target_sources(fmtocsv
 if (WIN32)
 	target_link_libraries(fmtocsv wingetopt)
 endif()
+
+install(TARGETS fmtocsv RUNTIME DESTINATION bin)

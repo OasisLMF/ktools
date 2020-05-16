@@ -8,3 +8,5 @@ target_link_libraries(getmodel ${ZLIB_LIBRARIES})
 if (WIN32)
 	target_link_libraries(getmodel wingetopt ${ZLIB_LIBRARIES})
 endif()
+
+install(TARGETS getmodel RUNTIME DESTINATION bin)

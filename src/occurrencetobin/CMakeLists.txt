@@ -7,3 +7,5 @@ target_sources(occurrencetobin
 if (WIN32)
 	target_link_libraries(occurrencetobin wingetopt)
 endif()
+
+install(TARGETS occurrencetobin RUNTIME DESTINATION bin)

@@ -7,3 +7,5 @@ target_sources(returnperiodtobin
 if (WIN32)
 	target_link_libraries(returnperiodtobin wingetopt)
 endif()
+
+install(TARGETS returnperiodtobin RUNTIME DESTINATION bin)

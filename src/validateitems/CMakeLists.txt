@@ -7,3 +7,5 @@ target_sources(validateitems
 if (WIN32)
 	target_link_libraries(validateitems wingetopt)
 endif()
+
+install(TARGETS validateitems RUNTIME DESTINATION bin)

@@ -7,3 +7,5 @@ target_sources(gultocsv
 if (WIN32)
 	target_link_libraries(gultocsv wingetopt)
 endif()
+
+install(TARGETS gultocsv RUNTIME DESTINATION bin)

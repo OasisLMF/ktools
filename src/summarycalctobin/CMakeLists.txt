@@ -7,3 +7,5 @@ target_sources(summarycalctobin
 if (WIN32)
 	target_link_libraries(summarycalctobin wingetopt)
 endif()
+
+install(TARGETS summarycalctobin RUNTIME DESTINATION bin)

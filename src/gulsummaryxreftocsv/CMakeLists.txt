@@ -7,3 +7,5 @@ target_sources(gulsummaryxreftocsv
 if (WIN32)
 	target_link_libraries(gulsummaryxreftocsv wingetopt)
 endif()
+
+install(TARGETS gulsummaryxreftocsv RUNTIME DESTINATION bin)

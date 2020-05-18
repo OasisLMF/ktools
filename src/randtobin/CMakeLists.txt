@@ -7,3 +7,5 @@ target_sources(randtobin
 if (WIN32)
 	target_link_libraries(randtobin wingetopt)
 endif()
+
+install(TARGETS randtobin RUNTIME DESTINATION bin)

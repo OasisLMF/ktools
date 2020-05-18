@@ -7,3 +7,5 @@ target_sources(periodstocsv
 if (WIN32)
 	target_link_libraries(periodstocsv wingetopt)
 endif()
+
+install(TARGETS periodstocsv RUNTIME DESTINATION bin)

@@ -6,3 +6,5 @@ target_sources(coveragetocsv
 if (WIN32)
 	target_link_libraries(coveragetocsv wingetopt)
 endif()
+
+install(TARGETS coveragetocsv RUNTIME DESTINATION bin)

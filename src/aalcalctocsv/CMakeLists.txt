@@ -1,3 +1,4 @@
+set (target aalcalc)
 add_executable(aalcalctocsv)
 target_sources(aalcalctocsv
 	PRIVATE
@@ -7,3 +8,5 @@ target_sources(aalcalctocsv
 if (WIN32)
 	target_link_libraries(aalcalctocsv wingetopt)
 endif()
+
+install(TARGETS aalcalctocsv RUNTIME DESTINATION bin)

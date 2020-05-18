@@ -7,3 +7,5 @@ target_sources(itemtobin
 if (WIN32)
 	target_link_libraries(itemtobin wingetopt)
 endif()
+
+install(TARGETS itemtobin RUNTIME DESTINATION bin)

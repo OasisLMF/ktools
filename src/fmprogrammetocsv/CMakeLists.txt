@@ -6,3 +6,5 @@ target_sources(fmprogrammetocsv
 if (WIN32)
 	target_link_libraries(fmprogrammetocsv wingetopt)
 endif()
+
+install(TARGETS fmprogrammetocsv RUNTIME DESTINATION bin)

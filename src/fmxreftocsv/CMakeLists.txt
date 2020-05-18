@@ -6,3 +6,5 @@ target_sources(fmxreftocsv
 if (WIN32)
 	target_link_libraries(fmxreftocsv wingetopt)
 endif()
+
+install(TARGETS fmxreftocsv RUNTIME DESTINATION bin)

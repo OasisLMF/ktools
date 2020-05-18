@@ -6,3 +6,5 @@ target_sources(evetobin
 if (WIN32)
 	target_link_libraries(evetobin wingetopt)
 endif()
+
+install(TARGETS evetobin RUNTIME DESTINATION bin)

@@ -6,3 +6,5 @@ target_sources(fmsummaryxreftobin
 if (WIN32)
 	target_link_libraries(fmsummaryxreftobin wingetopt)
 endif()
+
+install(TARGETS fmsummaryxreftobin RUNTIME DESTINATION bin)

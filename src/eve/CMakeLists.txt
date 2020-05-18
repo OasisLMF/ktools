@@ -6,3 +6,5 @@ target_sources(eve
 if (WIN32)
 	target_link_libraries(eve wingetopt)
 endif()
+
+install(TARGETS eve RUNTIME DESTINATION bin)

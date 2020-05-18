@@ -6,3 +6,5 @@ target_sources(evetocsv
 if (WIN32)
 	target_link_libraries(evetocsv wingetopt)
 endif()
+
+install(TARGETS evetocsv RUNTIME DESTINATION bin)

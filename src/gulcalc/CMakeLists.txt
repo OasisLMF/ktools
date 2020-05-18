@@ -7,3 +7,5 @@ target_sources(gulcalc
 if (WIN32)
 	target_link_libraries(gulcalc wingetopt)
 endif()
+
+install(TARGETS gulcalc RUNTIME DESTINATION bin)

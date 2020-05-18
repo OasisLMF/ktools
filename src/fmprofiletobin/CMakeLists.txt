@@ -6,3 +6,5 @@ target_sources(fmprofiletobin
 if (WIN32)
 	target_link_libraries(fmprofiletobin wingetopt)
 endif()
+
+install(TARGETS fmprofiletobin RUNTIME DESTINATION bin)

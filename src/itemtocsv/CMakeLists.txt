@@ -7,3 +7,5 @@ target_sources(itemtocsv
 if (WIN32)
 	target_link_libraries(itemtocsv wingetopt)
 endif()
+
+install(TARGETS itemtocsv RUNTIME DESTINATION bin)

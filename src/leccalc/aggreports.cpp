@@ -476,6 +476,7 @@ void aggreports::wheatSheafMeanwithweighting(int samplesize, int handle, const s
 {
 	if (fout_[handle] == nullptr) return;
 	std::map<wheatkey, lossvec2> items;
+	int maxPeriod = 0;
 	for (auto x : out_loss) {
 		wheatkey wk;;
 		wk.sidx = x.first.sidx;
@@ -485,19 +486,15 @@ void aggreports::wheatSheafMeanwithweighting(int samplesize, int handle, const s
 		auto iter = periodstoweighting_.find(x.first.period_no);	// assume weighting is zero if not supplied
 		if (iter != periodstoweighting_.end()) {
 			lv.period_weighting = iter->second;
-			lv.period_no = x.first.period_no;		// for debugging
+			lv.period_no = x.first.period_no;
+			if (lv.period_no > maxPeriod) maxPeriod = lv.period_no;
 			items[wk].push_back(lv);
 		}
 	}
 
-	size_t maxcount = 0;
-	for (auto x : items) {
-		if (x.second.size() > maxcount) maxcount = x.second.size();
-	}
-
 	std::map<int, std::vector<lossval>> mean_map;
 	for (int i = 1; i <= maxsummaryid_; i++) {
-		mean_map[i] = std::vector<lossval>(maxcount, lossval());
+		mean_map[i] = std::vector<lossval>(maxPeriod, lossval());
 	}
 	if (skipheader_ == false) fprintf(fout_[handle], "summary_id,type,return_period,loss\n");
 
@@ -511,7 +508,7 @@ void aggreports::wheatSheafMeanwithweighting(int samplesize, int handle, const s
 		if (s.first.sidx != -1) {
 			int i = 0;
 			for (auto lp : lpv) {
-				lossval &l = mean_map[s.first.summary_id][i];
+				lossval &l = mean_map[s.first.summary_id][lp.period_no-1];
 				l.period_no = lp.period_no;
 				l.period_weighting = lp.period_weighting;
 				l.value += lp.value;

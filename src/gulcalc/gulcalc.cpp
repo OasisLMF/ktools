@@ -84,6 +84,89 @@ gulSampleslevelHeader lastitemheader;
 gulSampleslevelHeader lastcorrelatedheader;
 gulSampleslevelHeader lastcoverageheader;
 
+// Benchmark memory usage
+void gulcalc::OutputBenchmark(const int event_id, bool header=false) {
+
+	if (header) {
+
+		fprintf(stderr, "event_id,cov,mode1,fullCorr,"
+				"mode1UsedCoverageIDs,damagebindictionary_vec,"
+				"item_map,coverages\n");
+		return;
+	}
+
+	fprintf(stderr, "%d,", event_id);   // event_id
+
+	// vector<vector<OASIS_FLOAT>> cov_
+	size_t vec_size = 0;
+	for (std::vector<std::vector<OASIS_FLOAT>>::const_iterator i = cov_.begin(); i < cov_.end(); i++) {
+		vec_size += (*i).size();
+	}
+	fprintf(stderr, "%lu,",
+		sizeof(std::vector<std::vector<OASIS_FLOAT>>) +
+		  (sizeof(std::vector<OASIS_FLOAT>) * cov_.size()) +
+		  (sizeof(OASIS_FLOAT) * vec_size));
+
+	// vector<vector<vector<gulItemIDLoss>>> mode1_
+	vec_size = 0;
+	size_t vec2_size = 0;
+	for (std::vector<std::vector<std::vector<gulItemIDLoss>>>::const_iterator i = mode1_.begin(); i < mode1_.end(); i++) {
+		vec_size += (*i).size();
+		for (std::vector<std::vector<gulItemIDLoss>>::const_iterator ii = (*i).begin(); ii < (*i).end(); ii++) {
+			vec2_size += (*ii).size();
+		}
+	}
+	fprintf(stderr, "%lu,",
+		sizeof(std::vector<std::vector<std::vector<gulItemIDLoss>>>) +
+		  (sizeof(std::vector<std::vector<gulItemIDLoss>>) * mode1_.size()) +
+		  (sizeof(std::vector<gulItemIDLoss>) * vec_size) +
+		  (sizeof(gulItemIDLoss) * vec2_size));
+
+	// vector<vector<vector<gulItemIDLoss>>> fullCorr_
+	vec_size = 0;
+	vec2_size = 0;
+	for (std::vector<std::vector<std::vector<gulItemIDLoss>>>::const_iterator i = fullCorr_.begin(); i < fullCorr_.end(); i++) {
+		vec_size += (*i).size();
+		for (std::vector<std::vector<gulItemIDLoss>>::const_iterator ii = (*i).begin(); ii < (*i).end(); ii++) {
+			vec2_size += (*ii).size();
+		}
+	}
+	fprintf(stderr, "%lu,",
+		sizeof(std::vector<std::vector<std::vector<gulItemIDLoss>>>) +
+		  (sizeof(std::vector<std::vector<gulItemIDLoss>>) * fullCorr_.size()) +
+		  (sizeof(std::vector<gulItemIDLoss>) * vec_size) +
+		  (sizeof(gulItemIDLoss) * vec2_size));
+
+	// vector<int> mode1UsedCoverageIDs_
+	fprintf(stderr, "%lu,",
+		sizeof(std::vector<int>) +
+		  (sizeof(int) * mode1UsedCoverageIDs_.size()));
+
+	// vector<damagebindictionary> *damagebindictionary_vec_
+	fprintf(stderr, "%lu,",
+		sizeof(std::vector<damagebindictionary>) +
+		  (sizeof(damagebindictionary) * (*damagebindictionary_vec_).size()));
+
+	// map<item_map_key, vector<item_map_rec>> *iutem_map_
+	vec_size = 0;
+	for (std::map<item_map_key, std::vector<item_map_rec>>::const_iterator i = (*item_map_).begin(); i != (*item_map_).end(); i++) {
+		vec_size += i->second.size();
+	}
+	fprintf(stderr, "%lu,",
+		sizeof(std::map<item_map_key, vector<item_map_rec>>) +
+		  (sizeof(item_map_key) * (*item_map_).size()) +
+		  (sizeof(item_map_rec) * vec_size));
+
+	// vector<OASIS_FLOAT> *coverages_
+	fprintf(stderr, "%lu\n",
+		sizeof(std::vector<OASIS_FLOAT>) +
+		  (sizeof(OASIS_FLOAT) * (*coverages_).size()));
+
+	return;
+
+}
+
+
 OASIS_FLOAT gulcalc::getgul(damagebindictionary &b, gulGulSamples &g)
 {
 	OASIS_FLOAT gul = 0;
@@ -793,6 +876,8 @@ void gulcalc::mode1()
 	char* rec = new char[max_recsize];
 	damagecdfrec* d = (damagecdfrec*)rec;
 
+	if (benchmark_) OutputBenchmark(0, true);
+
 	for (;;)
 	{
 		char* p = rec;
@@ -808,6 +893,7 @@ void gulcalc::mode1()
 		recsize += sizeof(damagecdfrec) + sizeof(int);
 		if (d->event_id != last_event_id) {
 			if (last_event_id > 0) {
+				if (benchmark_) OutputBenchmark(last_event_id);
 				outputmode1data(last_event_id);
 				if (correlatedWriter_) outputcorrelateddata(last_event_id);
 			}
@@ -817,6 +903,7 @@ void gulcalc::mode1()
 
 		processrec_mode1(rec, recsize);
 	}
+	if (benchmark_) OutputBenchmark(d->event_id);
 	outputmode1data(d->event_id);
 	if (correlatedWriter_) outputcorrelateddata(d->event_id);
 
@@ -838,6 +925,8 @@ void gulcalc::mode0()
 	
 	damagecdfrec *d = (damagecdfrec *)rec;
 
+	if (benchmark_) OutputBenchmark(0, true);
+
 	for (;;)
 	{
 		char *p = rec;
@@ -852,13 +941,17 @@ void gulcalc::mode0()
 		bSuccess = iGetrec_(p, recsize);
 		recsize += sizeof(damagecdfrec) + sizeof(int);
 		if (d->event_id != last_event_id) {
-			if (last_event_id > 0) outputcoveragedata(last_event_id);
+			if (last_event_id > 0) {
+				if (benchmark_) OutputBenchmark(last_event_id);
+				outputcoveragedata(last_event_id);
+			}
 			last_event_id = d->event_id;						
 			if (rndopt_ == rd_option::usecachedvector) rnd_->clearvec();
 		}
 
 		processrec(rec, recsize);
 	}
+	if (benchmark_) OutputBenchmark(d->event_id);
 	outputcoveragedata(d->event_id);
 	if (itemWriter_)  itemWriter_(ibuf_, sizeof(unsigned char), itembufoffset_);
 	if (lossWriter_)  lossWriter_(ibuf_, sizeof(unsigned char), itembufoffset_);

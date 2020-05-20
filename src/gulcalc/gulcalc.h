@@ -102,6 +102,7 @@ struct gulcalcopts {
 	FILE *corrout = stdout;
 	int mode = 0;		// default mode = 0
 	int allocRule = -1;   // default is unset
+	bool benchmark = false;
 };
 
 struct gulItemIDLoss {
@@ -141,6 +142,7 @@ private:
     void (*lossWriter_)(const void *ibuf, int size, int count);	// loss stream writer
     	void(*correlatedWriter_)(const void *ibuf, int size, int count);
 	bool(*iGetrec_)(char *rec, int recsize);
+	void OutputBenchmark(const int event_id, bool header);
 	OASIS_FLOAT getgul(damagebindictionary &b, gulGulSamples &g);
 	void output_mean(OASIS_FLOAT tiv, prob_mean *pp, int bin_count, OASIS_FLOAT &gul_mean, OASIS_FLOAT &std_dev);
 	void init();
@@ -153,6 +155,7 @@ private:
 	double loss_threshold_;
 	rd_option rndopt_;
 	bool debug_;
+	bool benchmark_;
 	int samplesize_;
 	bool isFirstItemEvent_;
 	bool isFirstCorrelatedEvent_;
@@ -201,6 +204,7 @@ public:
 		loss_threshold_ = opt.loss_threshold;
 		rndopt_ = opt.rndopt;				
 		debug_ = opt.debug;
+		benchmark_ = opt.benchmark;
 		samplesize_ = opt.samplesize;
 		isFirstItemEvent_ = true;
 		isFirstCorrelatedEvent_ = true;

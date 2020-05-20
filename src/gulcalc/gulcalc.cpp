@@ -466,20 +466,15 @@ void gulcalc::setupandgenoutput(const item_map_rec &er, const OASIS_FLOAT tiv,
 	g.rval = rval;
 	g.sidx = sample_id + 1;
 	gulitemSampleslevel gg;
-	gulcoverageSampleslevel ggc;
 	damagebindictionary b = (*damagebindictionary_vec_)[g.bin_index];
 	if (debug_) gg.loss = rval;
 	else gg.loss = getgul(b, g);
-	ggc.loss = gg.loss;
 	gg.sidx = g.sidx;
-	ggc.sidx = g.sidx;
 	gg.event_id = g.event_id;
 	gg.item_id = g.item_id;
-	ggc.coverage_id = er.coverage_id;
-	ggc.event_id = g.event_id;
 	if (gg.loss >= loss_threshold_) {
-		if (correlated) gencorrelatedoutput(gg, ggc.coverage_id);
-		else genmode1output(gg, ggc.coverage_id);
+		if (correlated) gencorrelatedoutput(gg, er.coverage_id);
+		else genmode1output(gg, er.coverage_id);
 	}
 }
 

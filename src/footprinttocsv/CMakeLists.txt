@@ -8,3 +8,5 @@ target_link_libraries(footprinttocsv ${ZLIB_LIBRARIES})
 if (WIN32)
 	target_link_libraries(footprinttocsv wingetopt ${ZLIB_LIBRARIES})
 endif()
+
+install(TARGETS footprinttocsv RUNTIME DESTINATION bin)

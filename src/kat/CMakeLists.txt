@@ -7,3 +7,5 @@ target_sources(kat
 if (WIN32)
 	target_link_libraries(kat wingetopt)
 endif()
+
+install(TARGETS kat RUNTIME DESTINATION bin)

@@ -6,3 +6,5 @@ target_sources(fmsummaryxreftocsv
 if (WIN32)
 	target_link_libraries(fmsummaryxreftocsv wingetopt)
 endif()
+
+install(TARGETS fmsummaryxreftocsv RUNTIME DESTINATION bin)

@@ -7,3 +7,5 @@ target_sources(randtocsv
 if (WIN32)
 	target_link_libraries(randtocsv wingetopt)
 endif()
+
+install(TARGETS randtocsv RUNTIME DESTINATION bin)

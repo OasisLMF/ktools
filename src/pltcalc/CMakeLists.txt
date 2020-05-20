@@ -7,3 +7,5 @@ target_sources(pltcalc
 if (WIN32)
 	target_link_libraries(pltcalc wingetopt)
 endif()
+
+install(TARGETS pltcalc RUNTIME DESTINATION bin)

@@ -7,3 +7,5 @@ target_sources(occurrencetocsv
 if (WIN32)
 	target_link_libraries(occurrencetocsv wingetopt)
 endif()
+
+install(TARGETS occurrencetocsv RUNTIME DESTINATION bin)

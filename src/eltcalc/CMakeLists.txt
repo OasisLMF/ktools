@@ -6,3 +6,5 @@ target_sources(eltcalc
 if (WIN32)
 	target_link_libraries(eltcalc wingetopt)
 endif()
+
+install(TARGETS eltcalc RUNTIME DESTINATION bin)

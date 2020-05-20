@@ -6,3 +6,5 @@ target_sources(fmcalc
 if (WIN32)
 	target_link_libraries(fmcalc wingetopt)
 endif()
+
+install(TARGETS fmcalc RUNTIME DESTINATION bin)

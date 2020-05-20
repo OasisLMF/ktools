@@ -6,3 +6,5 @@ target_sources(fmprofiletocsv
 if (WIN32)
 	target_link_libraries(fmprofiletocsv wingetopt)
 endif()
+
+install(TARGETS fmprofiletocsv RUNTIME DESTINATION bin)

@@ -7,3 +7,5 @@ target_sources(summaryindex
 if (WIN32)
 	target_link_libraries(summaryindex wingetopt)
 endif()
+
+install(TARGETS summaryindex RUNTIME DESTINATION bin)

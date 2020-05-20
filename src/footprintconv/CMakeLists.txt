@@ -5,3 +5,5 @@ target_sources(footprintconv
 )
 
 target_link_libraries(footprintconv ${ZLIB_LIBRARIES})
+
+install(TARGETS footprintconv RUNTIME DESTINATION bin)

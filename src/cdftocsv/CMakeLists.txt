@@ -7,3 +7,5 @@ target_sources(cdftocsv
 if (WIN32)
 	target_link_libraries(cdftocsv wingetopt)
 endif()
+
+install(TARGETS cdftocsv RUNTIME DESTINATION bin)

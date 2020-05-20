@@ -6,3 +6,5 @@ target_sources(fmpolicytctocsv
 if (WIN32)
 	target_link_libraries(fmpolicytctocsv wingetopt)
 endif()
+
+install(TARGETS fmpolicytctocsv RUNTIME DESTINATION bin)

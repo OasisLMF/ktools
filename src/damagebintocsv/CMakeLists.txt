@@ -6,3 +6,5 @@ target_sources(damagebintocsv
 if (WIN32)
 	target_link_libraries(damagebintocsv wingetopt)
 endif()
+
+install(TARGETS damagebintocsv RUNTIME DESTINATION bin)

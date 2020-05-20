@@ -7,3 +7,5 @@ target_sources(summarycalctocsv
 if (WIN32)
 	target_link_libraries(summarycalctocsv wingetopt)
 endif()
+
+install(TARGETS summarycalctocsv RUNTIME DESTINATION bin)

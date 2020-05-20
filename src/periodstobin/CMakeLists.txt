@@ -6,3 +6,5 @@ target_sources(periodstobin
 if (WIN32)
 	target_link_libraries(periodstobin wingetopt)
 endif()
+
+install(TARGETS periodstobin RUNTIME DESTINATION bin)

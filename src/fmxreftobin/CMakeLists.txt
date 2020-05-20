@@ -6,3 +6,5 @@ target_sources(fmxreftobin
 if (WIN32)
 	target_link_libraries(fmxreftobin wingetopt)
 endif()
+
+install(TARGETS fmxreftobin RUNTIME DESTINATION bin)

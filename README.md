@@ -80,16 +80,21 @@ Follow the rest of the process as described above.
 
 ### Cmake build - Experimental 
 
-Install Cmake from either system packages or [cmake.org](https://cmake.org/download/)
+Install Cmake from either system packages or [cmake.org](https://cmake.org/download/).
 
 ``` sh
-$ cmake .
-```
+# create the build directory within ktools directory
+$ mkdir build && cd build
+$ ktools_source_dir=~/ktools
+# Generate files and specify destination (here is in ./local/bin)
+$ cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=~/.local $ktools_source_dir
 
-``` sh
+# Build
 $ make all test
-```
 
+# If all is OK, install to bin subdir of the specified install prefix
+$ make install
+```
 
 ## Windows Installation
 

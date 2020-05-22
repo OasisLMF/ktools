@@ -476,6 +476,7 @@ void aggreports::wheatSheafMeanwithweighting(int samplesize, int handle, const s
 {
 	if (fout_[handle] == nullptr) return;
 	std::map<wheatkey, lossvec2> items;
+	int maxPeriod = 0;
 	for (auto x : out_loss) {
 		wheatkey wk;;
 		wk.sidx = x.first.sidx;
@@ -485,19 +486,15 @@ void aggreports::wheatSheafMeanwithweighting(int samplesize, int handle, const s
 		auto iter = periodstoweighting_.find(x.first.period_no);	// assume weighting is zero if not supplied
 		if (iter != periodstoweighting_.end()) {
 			lv.period_weighting = iter->second;
-			lv.period_no = x.first.period_no;		// for debugging
+			lv.period_no = x.first.period_no;
+			if (lv.period_no > maxPeriod) maxPeriod = lv.period_no;
 			items[wk].push_back(lv);
 		}
 	}
 
-	size_t maxcount = 0;
-	for (auto x : items) {
-		if (x.second.size() > maxcount) maxcount = x.second.size();
-	}
-
 	std::map<int, std::vector<lossval>> mean_map;
 	for (int i = 1; i <= maxsummaryid_; i++) {
-		mean_map[i] = std::vector<lossval>(maxcount, lossval());
+		mean_map[i] = std::vector<lossval>(maxPeriod, lossval());
 	}
 	if (skipheader_ == false) fprintf(fout_[handle], "summary_id,type,return_period,loss\n");
 
@@ -509,17 +506,14 @@ void aggreports::wheatSheafMeanwithweighting(int samplesize, int handle, const s
 		std::sort(lpv.rbegin(), lpv.rend());
 		OASIS_FLOAT cummulative_weighting = 0;
 		if (s.first.sidx != -1) {
-			int i = 0;
 			for (auto lp : lpv) {
-				lossval &l = mean_map[s.first.summary_id][i];
+				lossval &l = mean_map[s.first.summary_id][lp.period_no-1];
 				l.period_no = lp.period_no;
 				l.period_weighting = lp.period_weighting;
 				l.value += lp.value;
-				i++;
 			}
 		}
 		else {
-			int i = 1;
 			for (auto lp : lpv) {
 				cummulative_weighting += (OASIS_FLOAT)(lp.period_weighting * samplesize_);
 				if (lp.period_weighting) {
@@ -532,7 +526,6 @@ void aggreports::wheatSheafMeanwithweighting(int samplesize, int handle, const s
 					}
 				}
 
-				i++;
 			}
 			if (useReturnPeriodFile_) {
 				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, 1);
@@ -695,42 +688,13 @@ void aggreports::outputAggWheatSheafMean(int samplesize)
 }
 
 
-void aggreports::sampleMeanwithweighting(int samplesize, int handle, const std::map<outkey2, OASIS_FLOAT> &out_loss)
-{
-	if (fout_[handle] == nullptr) return;
-	std::map<summary_id_period_key,lossval> items;
+inline void aggreports::writeSampleMean(const int handle, const int type,
+	const std::map<summary_id_period_key, lossval> &items) {
 
-	for (auto x : out_loss) {
-		summary_id_period_key sk;
-		auto iter = periodstoweighting_.find(x.first.period_no);	// assume weighting is zero if not supplied
-		sk.period_no = x.first.period_no;
-		sk.summary_id = x.first.summary_id;
-		if (iter != periodstoweighting_.end()) {
-			if (x.first.sidx == -1) {
-				sk.type = 1;
-				items[sk].period_weighting = iter->second;
-				items[sk].period_no = x.first.period_no;		// for debugging
-				items[sk].value += x.second;
-			}
-			else {
-				if (samplesize > 0) {
-					sk.type = 2;
-					items[sk].period_no = x.first.period_no;		// for debugging
-					items[sk].period_weighting = iter->second;
-					items[sk].value += (x.second / samplesize);
-				}
-			}
-		}
-	}
+	std::map<int, std::vector<lossval>> mean_map;
 
-	std::map<summary_id_type_key, std::vector<lossval>> mean_map;
-
-	if (skipheader_ == false) fprintf(fout_[handle], "summary_id,type,return_period,loss\n");
 	for (auto s : items) {
-		summary_id_type_key st;
-		st.summary_id = s.first.summary_id;
-		st.type = s.first.type;
-		mean_map[st].push_back(s.second);
+		mean_map[s.first.summary_id].push_back(s.second);
 	}
 
 	for (auto m : mean_map) {
@@ -745,20 +709,57 @@ void aggreports::sampleMeanwithweighting(int samplesize, int handle, const std::
 			if (lp.period_weighting) {
 				OASIS_FLOAT retperiod = 1 / cummulative_weighting;
 				if (useReturnPeriodFile_) {
-					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, m.first.summary_id, m.first.type);
+					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, m.first, type);
 				}
 				else {
-					fprintf(fout_[handle], "%d,%d,%f,%f\n", m.first.summary_id, m.first.type, retperiod, lp.value);
+					fprintf(fout_[handle], "%d,%d,%f,%f\n", m.first, type, retperiod, lp.value);
 				}
 			}
 		}
 		if (useReturnPeriodFile_) {
-			doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first.summary_id, m.first.type);
+			doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first, type);
 			while (nextreturnperiodindex < returnperiods_.size()) {
-				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first.summary_id, m.first.type);
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first, type);
 			}
 		}
 	}
+
+}
+
+
+void aggreports::sampleMeanwithweighting(int samplesize, int handle, const std::map<outkey2, OASIS_FLOAT> &out_loss)
+{
+	if (fout_[handle] == nullptr) return;
+	std::map<summary_id_period_key, lossval> itemsType1;
+	std::map<summary_id_period_key, lossval> itemsType2;
+
+	for (auto x : out_loss) {
+		summary_id_period_key sk;
+		auto iter = periodstoweighting_.find(x.first.period_no);	// assume weighting is zero if not supplied
+		sk.period_no = x.first.period_no;
+		sk.summary_id = x.first.summary_id;
+		if (iter != periodstoweighting_.end()) {
+			if (x.first.sidx == -1) {
+				sk.type = 1;
+				itemsType1[sk].period_weighting = iter->second;
+				// For debugging
+				itemsType1[sk].period_no = x.first.period_no;
+				itemsType1[sk].value += x.second;
+			}
+			else if (samplesize > 0) {
+				sk.type = 2;
+				itemsType2[sk].period_weighting = iter->second;
+				// For debugging
+				itemsType2[sk].period_no = x.first.period_no;
+				itemsType2[sk].value += (x.second / samplesize);
+			}
+		}
+	}
+	
+	if (skipheader_ == false) fprintf(fout_[handle], "summary_id,type,return_period,loss\n");
+	writeSampleMean(handle, 1, itemsType1);   // sidx = -1
+	writeSampleMean(handle, 2, itemsType2);   // sidx > 0
+
 }
 
 void aggreports::sampleMean(int samplesize, int handle, const std::map<outkey2, OASIS_FLOAT> &out_loss)

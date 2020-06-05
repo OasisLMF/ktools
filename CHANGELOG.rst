@@ -1,12 +1,22 @@
 Ktools Changelog
 ================
 
-.. start_latest_release
+.. * [#_](https://github.com/OasisLMF/OasisLMF/issues/_) -  
+
+`v3.3.0`_
+---------
+.. start_latest_release 
+
+* [#124](https://github.com/OasisLMF/OasisLMF/issues/124) - Update CMake build files   
+* [#103](https://github.com/OasisLMF/OasisLMF/issues/103) - Fixed issue with leccalc and the periods file
+* [#120](https://github.com/OasisLMF/OasisLMF/issues/120) - Add calcrule for ded % loss and normal limit
+
+.. end_latest_release
+
 `v3.2.6`_
 ---------
 * #121 - Move footprint file open/close to outside of event loop
 
-.. end_latest_release
 
 `v3.2.5`_
 ---------
@@ -72,7 +82,7 @@ Ktools Changelog
 * fix to reduce Gulcalc memory footprint size
 
 `v3.1.2`_
---------
+---------
 * Fixes to CMake build
 * Added validation tools
 * Fix for compressed footprint filenames
@@ -264,6 +274,7 @@ Release features:
 
 * First Alpha release of the kernel toolkit
 
+.. _`v3.3.0`:  https://github.com/OasisLMF/ktools/compare/v3.2.6...v3.3.0
 .. _`v3.2.6`:  https://github.com/OasisLMF/ktools/compare/v3.2.4...v3.2.6
 .. _`v3.2.5`:  https://github.com/OasisLMF/ktools/compare/v3.2.4...v3.2.5
 .. _`v3.2.4`:  https://github.com/OasisLMF/ktools/compare/v3.2.3...v3.2.4

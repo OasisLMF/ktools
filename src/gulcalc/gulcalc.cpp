@@ -864,8 +864,7 @@ damagecdfrec *d = (damagecdfrec *)rec;
 					}
 
 					probrec p;
-					if (bin_index == 0) p.prob_from = 0;
-					else p.prob_from = last_prob_to;
+					p.prob_from = last_prob_to;
 					p.prob_to = pp->prob_to;
 					p.bin_mean = pp->bin_mean;
 					last_prob_to = pp->prob_to;

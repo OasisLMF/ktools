@@ -3,15 +3,23 @@ Ktools Changelog
 
 .. * [#_](https://github.com/OasisLMF/OasisLMF/issues/_) -  
 
-`v3.3.0`_
+
+`v3.3.1`_
 ---------
 .. start_latest_release 
 
+* [#117](https://github.com/OasisLMF/ktools/issues/117) - Reduced gulcalc memory use for gul alloc rule 1
+* [#127](https://github.com/OasisLMF/ktools/issues/127) - Introduce support for full correlation output for gul alloc rule 0
+
+.. end_latest_release
+
+
+`v3.3.0`_
+---------
 * [#124](https://github.com/OasisLMF/OasisLMF/issues/124) - Update CMake build files   
 * [#103](https://github.com/OasisLMF/OasisLMF/issues/103) - Fixed issue with leccalc and the periods file
 * [#120](https://github.com/OasisLMF/OasisLMF/issues/120) - Add calcrule for ded % loss and normal limit
 
-.. end_latest_release
 
 `v3.2.6`_
 ---------

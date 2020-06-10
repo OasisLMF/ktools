@@ -227,6 +227,49 @@ void splittiv(std::vector<gulItemIDLoss> &gulitems, OASIS_FLOAT tiv)
 	}
 }
 
+void gulcalc::writemode0output(const item_map_rec &er, const OASIS_FLOAT tiv,
+			       const int event_id, const int bin_index,
+			       const OASIS_FLOAT rval, const probrec &p,
+			       const int sample_id,
+			       const bool correlated=false) {
+
+	gulGulSamples g;
+	g.event_id = event_id;
+	g.item_id = er.item_id;
+	g.tiv = tiv;
+	g.bin_index = bin_index;
+	g.prob_from = p.prob_from;
+	g.prob_to = p.prob_to;
+	g.bin_mean = p.bin_mean;
+	g.rval = rval;
+	g.sidx = sample_id + 1;
+
+	gulitemSampleslevel gg;
+	damagebindictionary b = (*damagebindictionary_vec_)[g.bin_index];
+	if (debug_) gg.loss = rval;
+	else gg.loss = getgul(b, g);
+
+	gg.sidx = g.sidx;
+	gg.event_id = g.event_id;
+	gg.item_id = g.item_id;
+	if (gg.loss >= loss_threshold_) {
+
+		if (correlated) correlatedoutputgul(gg);
+		else itemoutputgul(gg);
+
+		if (!correlatedWriter_) {
+			gulcoverageSampleslevel ggc;
+			ggc.loss = gg.loss;
+			ggc.sidx = g.sidx;
+			ggc.coverage_id = er.coverage_id;
+			ggc.event_id = g.event_id;
+			gencovoutput(ggc);
+		}
+
+	}
+
+}
+
 // As this is sparsely populated, if we keep a list of the populated fields in
 // another vector then we do not need to iterate all the rows to clear it
 void gulcalc::clearmode1_data() {
@@ -743,26 +786,33 @@ damagecdfrec *d = (damagecdfrec *)rec;
 			output_mean(tiv, pp, *bin_count, gul_mean, std_dev);
 			gx.sidx = tiv_idx;
 			gx.loss = tiv;
-			itemoutputgul(gx);			
+			itemoutputgul(gx);
+			if (correlatedWriter_) correlatedoutputgul(gx);
 			gx.loss = std_dev;
 			gc.loss = std_dev;
 			gx.sidx = std_dev_idx;
 			gc.sidx = std_dev_idx;
 			itemoutputgul(gx);
+			if (correlatedWriter_) correlatedoutputgul(gx);
 			gencovoutput(gc);
 			gx.loss = gul_mean;
 			gc.loss = gul_mean;
 			gx.sidx = mean_idx;
 			gc.sidx = mean_idx;
 			itemoutputgul(gx);
+			if (correlatedWriter_) correlatedoutputgul(gx);
 			gencovoutput(gc);
-			int ridx = 0; // dummy value		
+
+			int ridx = 0; // dummy value
+			int ridx0 = 0;
 			switch (rndopt_) {
 			case rd_option::userandomnumberfile:
 				ridx = ((iter->group_id * p1_*p3_) + (d->event_id * p2_)) % rnd_count;
+				ridx0 = ((p1_ * p3_) + (d->event_id * p2_)) % rnd_count;
 				break;
 			case rd_option::usecachedvector:
 				ridx = iter->group_id * samplesize_;
+				ridx0 = samplesize_;
 				break;
 			case rd_option::usehashedseed:
 				{
@@ -770,6 +820,10 @@ damagecdfrec *d = (damagecdfrec *)rec;
 					unsigned long long s2 = (d->event_id * 1943272559L) % 2147483648L;
 					s1 = (s1 + s2 + rand_seed_) % 2147483648L;
 					rnd_->seedRands(s1);
+					if (correlatedWriter_) {
+						s2 = (s2 + rand_seed_) % 2147483648L;
+						rnd0_->seedRands(s2);
+					}
 				}
 				break;
 			default:
@@ -778,15 +832,29 @@ damagecdfrec *d = (damagecdfrec *)rec;
 			}
 
 			prob_mean *pp_max = pp + (*bin_count) -1;
-			for (int i = 0; i < samplesize_; i++){
+			for (int i = 0; i < samplesize_; i++) {
+
 				OASIS_FLOAT  rval;
-				if (rndopt_ == rd_option::usehashedseed) rval = rnd_->nextrnd();
-				else rval = rnd_->rnd(ridx + i);
+				OASIS_FLOAT rval0;
+
+				if (rndopt_ == rd_option::usehashedseed) {
+					rval = rnd_->nextrnd();
+					if (correlatedWriter_) rval0 = rnd0_->nextrnd();
+				} else {
+					rval = rnd_->rnd(ridx + i);
+					if (correlatedWriter_) rval0 = rnd0_->rnd(ridx0 + i);
+				}
+
 				if (rval >= pp_max->prob_to) {
 					rval = pp_max->prob_to - 0.00000003;	// set value to just under max value (which should be 1)
 				}
-				
-                OASIS_FLOAT last_prob_to = 0;
+				if (correlatedWriter_ && rval0 >= pp_max->prob_to) {
+					rval0 = pp_max->prob_to - 0.00000003;
+				}
+
+                		OASIS_FLOAT last_prob_to = 0;
+				bool hit_rval = false;
+				bool hit_rval0 = false;
 				pp = (prob_mean *)b;
 				for (int bin_index = 0; bin_index < *bin_count; bin_index++){
 					if ((char *)pp > endofRec) {
@@ -796,42 +864,21 @@ damagecdfrec *d = (damagecdfrec *)rec;
 					}
 
 					probrec p;
-					if (bin_index == 0) p.prob_from = 0;
-					else p.prob_from = last_prob_to;
+					p.prob_from = last_prob_to;
 					p.prob_to = pp->prob_to;
 					p.bin_mean = pp->bin_mean;
 					last_prob_to = pp->prob_to;
-					if (rval < p.prob_to){
-						gulGulSamples g;
-						g.event_id = d->event_id;
-						g.item_id = iter->item_id;
-						g.tiv = tiv;
-						g.bin_index = bin_index;
-						g.prob_from = p.prob_from;
-						g.prob_to = p.prob_to;
-						g.bin_mean = p.bin_mean;
-						g.rval = rval;
-						g.sidx = i + 1;
-						gulitemSampleslevel gg;
-						gulcoverageSampleslevel ggc;
-						damagebindictionary b = (*damagebindictionary_vec_)[g.bin_index];
-                        if (debug_) gg.loss = rval;
-                        else gg.loss = getgul(b, g);
-						ggc.loss = gg.loss;
-						gg.sidx = g.sidx;
-						ggc.sidx = g.sidx;
-						gg.event_id = g.event_id;
-						gg.item_id = g.item_id;
-						ggc.coverage_id = iter->coverage_id;
-						ggc.event_id = g.event_id;
-						if (gg.loss >= loss_threshold_) {
-							itemoutputgul(gg);
-							//covoutputgul(ggc);
-							gencovoutput(ggc);
-						}
-						break; // break the for loop
-					}
 
+					if (rval < p.prob_to && !hit_rval) {
+						writemode0output(*iter, tiv, d->event_id, bin_index, rval, p, i);
+						if (!correlatedWriter_) break;
+						else hit_rval = true;
+					}
+					if (correlatedWriter_ && rval0 < p.prob_to && !hit_rval0) {
+						writemode0output(*iter, tiv, d->event_id, bin_index, rval0, p, i, true);
+						hit_rval0 = true;
+					}
+					if (hit_rval && hit_rval0) break;
 					pp++;
 				}
 			}

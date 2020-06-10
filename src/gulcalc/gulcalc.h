@@ -146,6 +146,7 @@ private:
 	void itemoutputgul(gulitemSampleslevel &gg);
 	void correlatedoutputgul(gulitemSampleslevel &gg);
 	void fillgulitemloss(const int item_id, const OASIS_FLOAT tiv, const int event_id, const int bin_index, const OASIS_FLOAT rval, const probrec &p, const int sample_id, std::vector<std::vector<gulItemIDLoss>> &gilv);
+	void writemode0output(const item_map_rec &er, const OASIS_FLOAT tiv, const int event_id, const int bin_index, const OASIS_FLOAT rval, const probrec &p, const int sample_id, const bool correlated);
 	void writemode1output(const int event_id, const OASIS_FLOAT tiv, std::vector<std::vector<gulItemIDLoss>> &gilv, const bool correlated);
 	void(*itemWriter_)(const void *ibuf, int size, int count);
 	void(*coverageWriter_)(const void *ibuf, int size, int count);

@@ -880,38 +880,6 @@ damagecdfrec *d = (damagecdfrec *)rec;
 						hit_rval0 = true;
 					}
 					if (hit_rval && hit_rval0) break;
-/*
-					if (rval < p.prob_to){
-						gulGulSamples g;
-						g.event_id = d->event_id;
-						g.item_id = iter->item_id;
-						g.tiv = tiv;
-						g.bin_index = bin_index;
-						g.prob_from = p.prob_from;
-						g.prob_to = p.prob_to;
-						g.bin_mean = p.bin_mean;
-						g.rval = rval;
-						g.sidx = i + 1;
-						gulitemSampleslevel gg;
-						gulcoverageSampleslevel ggc;
-						damagebindictionary b = (*damagebindictionary_vec_)[g.bin_index];
-                        if (debug_) gg.loss = rval;
-                        else gg.loss = getgul(b, g);
-						ggc.loss = gg.loss;
-						gg.sidx = g.sidx;
-						ggc.sidx = g.sidx;
-						gg.event_id = g.event_id;
-						gg.item_id = g.item_id;
-						ggc.coverage_id = iter->coverage_id;
-						ggc.event_id = g.event_id;
-						if (gg.loss >= loss_threshold_) {
-							itemoutputgul(gg);
-							//covoutputgul(ggc);
-							gencovoutput(ggc);
-						}
-						break; // break the for loop
-					}
-*/
 					pp++;
 				}
 			}

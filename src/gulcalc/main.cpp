@@ -77,6 +77,7 @@ void help()
 		"-L Loss threshold (default 0)\n"
 		"-a alloc rule (default 0)\n"
 		"-m execution mode (default 0) mode 1\n"
+		"-b benchmark (in development)\n"
 		"-v version\n"
 		"-h help\n"
 		);
@@ -88,7 +89,7 @@ int main(int argc, char *argv[])
 	gulcalcopts gopt;
 	gopt.loss_threshold = 0.000001;
 	progname = argv[0];
-	while ((opt = getopt(argc, argv, "Alvhdra:L:S:c:i:j:R:s:m:")) != -1) {
+	while ((opt = getopt(argc, argv, "Alvhdrba:L:S:c:i:j:R:s:m:")) != -1) {
 		switch (opt) {
 		case 'S':
 			gopt.samplesize = atoi(optarg);
@@ -102,6 +103,9 @@ int main(int argc, char *argv[])
 		case 'a':
 			gopt.allocRule = atoi(optarg);
 			gopt.mode = gopt.allocRule;   // set mode to alloc rule
+			break;
+		case 'b':
+			gopt.benchmark = true;
 			break;
 		case 'r':
 			gopt.rndopt = rd_option::userandomnumberfile;

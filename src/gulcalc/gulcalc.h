@@ -81,6 +81,14 @@ struct gulGulSamples {
 	double rval;
 };
 
+struct processrecData {
+	OASIS_FLOAT gul_mean;
+	OASIS_FLOAT std_dev;
+	int item_id;
+	int group_id;
+	std::vector<int> bin_map_ids;
+};
+
 const int gularraysize = 1000;
 const int bufsize = sizeof(gulitemSampleslevel)* gularraysize;
 
@@ -102,6 +110,7 @@ struct gulcalcopts {
 	FILE *corrout = stdout;
 	int mode = 0;		// default mode = 0
 	int allocRule = -1;   // default is unset
+	bool benchmark = false;
 };
 
 struct gulItemIDLoss {
@@ -123,26 +132,30 @@ private:
 	const std::vector<OASIS_FLOAT> *coverages_;
 	const std::vector<damagebindictionary> *damagebindictionary_vec_;
 	void gencovoutput(gulcoverageSampleslevel &gc);
-	void genmode1output(gulitemSampleslevel& gc, int coverage_id);
-	void gencorrelatedoutput(gulitemSampleslevel& gc, int coverage_id);
 	std::vector<std::vector<OASIS_FLOAT>> cov_;
+	// TODO: Remove mode1_ and fullCorr_ when benchmarking progresses
 	std::vector<std::vector<std::vector<gulItemIDLoss>>> mode1_;
 	std::vector<std::vector<std::vector<gulItemIDLoss>>> fullCorr_;
+	std::vector<std::vector<processrecData>> mode1_stats_;
+	std::map<prob_mean, int> bin_map_;
+	std::map<int, prob_mean> bin_lookup_;
 	std::vector<int> mode1UsedCoverageIDs_;
 	void covoutputgul(gulcoverageSampleslevel &gc);
 	void outputcoveragedata(int event_id);
 	void outputmode1data(int event_id);
-	void outputcorrelateddata(int event_id);
 	void itemoutputgul(gulitemSampleslevel &gg);
 	void correlatedoutputgul(gulitemSampleslevel &gg);
-	void setupandgenoutput(const item_map_rec &er, const OASIS_FLOAT tiv, const int event_id, const int bin_index, const OASIS_FLOAT rval, const probrec &p, const int sample_id, const bool correlated);
+	void fillgulitemloss(const int item_id, const OASIS_FLOAT tiv, const int event_id, const int bin_index, const OASIS_FLOAT rval, const probrec &p, const int sample_id, std::vector<std::vector<gulItemIDLoss>> &gilv);
+	void writemode1output(const int event_id, const OASIS_FLOAT tiv, std::vector<std::vector<gulItemIDLoss>> &gilv, const bool correlated);
 	void(*itemWriter_)(const void *ibuf, int size, int count);
 	void(*coverageWriter_)(const void *ibuf, int size, int count);
     void (*lossWriter_)(const void *ibuf, int size, int count);	// loss stream writer
     	void(*correlatedWriter_)(const void *ibuf, int size, int count);
 	bool(*iGetrec_)(char *rec, int recsize);
+	void outputbenchmark(const int event_id, bool header);
 	OASIS_FLOAT getgul(damagebindictionary &b, gulGulSamples &g);
 	void output_mean(OASIS_FLOAT tiv, prob_mean *pp, int bin_count, OASIS_FLOAT &gul_mean, OASIS_FLOAT &std_dev);
+	void output_mean_mode1(const OASIS_FLOAT tiv, prob_mean *pp, const int bin_count, OASIS_FLOAT &gul_mean, OASIS_FLOAT &std_dev, std::vector<int> &bin_ids);
 	void init();
 	unsigned char *ibuf_;	// item level buffer
 	unsigned char *corrbuf_;   // correlated level buffer
@@ -153,6 +166,7 @@ private:
 	double loss_threshold_;
 	rd_option rndopt_;
 	bool debug_;
+	bool benchmark_;
 	int samplesize_;
 	bool isFirstItemEvent_;
 	bool isFirstCorrelatedEvent_;
@@ -180,6 +194,7 @@ public:
 		cov_.resize(coverages_->size());
 		if (opt.mode == 1) {
 			mode1_.resize(coverages_->size());
+			mode1_stats_.resize(coverages_->size());
 		}
 		if (opt.correlatedLevelOutput == true) {
 			fullCorr_.resize(coverages_->size());
@@ -201,6 +216,7 @@ public:
 		loss_threshold_ = opt.loss_threshold;
 		rndopt_ = opt.rndopt;				
 		debug_ = opt.debug;
+		benchmark_ = opt.benchmark;
 		samplesize_ = opt.samplesize;
 		isFirstItemEvent_ = true;
 		isFirstCorrelatedEvent_ = true;

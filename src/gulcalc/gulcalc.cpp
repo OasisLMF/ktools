@@ -96,7 +96,7 @@ gulSampleslevelHeader lastcorrelatedheader;
 gulSampleslevelHeader lastcoverageheader;
 
 // Benchmark memory usage
-void gulcalc::OutputBenchmark(const int event_id, bool header=false) {
+void gulcalc::outputbenchmark(const int event_id, bool header=false) {
 
 	if (header) {
 
@@ -239,7 +239,7 @@ void gulcalc::clearmode1_data() {
 	mode1UsedCoverageIDs_.clear();
 }
 
-void gulcalc::WriteMode1Output(const int event_id, const OASIS_FLOAT tiv,
+void gulcalc::writemode1output(const int event_id, const OASIS_FLOAT tiv,
 			       std::vector<std::vector<gulItemIDLoss>> &gilv,
 			       const bool correlated=false) {
 
@@ -392,12 +392,12 @@ void gulcalc::outputmode1data(int event_id) {
 					last_prob_to = pp.prob_to;
 
 					if (rval < p.prob_to && !hit_rval) {
-						FillGulItemIDLoss(gi.item_id, tiv, event_id, bin_index, rval, p, k+1, gilv);
+						fillgulitemloss(gi.item_id, tiv, event_id, bin_index, rval, p, k+1, gilv);
 						if (!correlatedWriter_) break;
 						else hit_rval = true;
 					}
 					if (correlatedWriter_ && rval0 < p.prob_to && !hit_rval0) {
-						FillGulItemIDLoss(gi.item_id, tiv, event_id, bin_index, rval0, p, k+1, gilv0);
+						fillgulitemloss(gi.item_id, tiv, event_id, bin_index, rval0, p, k+1, gilv0);
 						hit_rval0 = true;
 					}
 					if (hit_rval && hit_rval0) break;
@@ -410,9 +410,9 @@ void gulcalc::outputmode1data(int event_id) {
 
 		if (hasData) {
 
-			WriteMode1Output(event_id, tiv, gilv);
+			writemode1output(event_id, tiv, gilv);
 			if (correlatedWriter_) {
-				WriteMode1Output(event_id, tiv, gilv0, true);
+				writemode1output(event_id, tiv, gilv0, true);
 			}
 
 		}
@@ -565,11 +565,11 @@ void gulcalc::correlatedoutputgul(gulitemSampleslevel &gg)
 
 }
 
-void gulcalc::FillGulItemIDLoss(const int item_id, const OASIS_FLOAT tiv,
-				const int event_id, const int bin_index,
-				const OASIS_FLOAT rval, const probrec &p,
-				const int sample_id,
-				std::vector<std::vector<gulItemIDLoss>> &gilv) {
+void gulcalc::fillgulitemloss(const int item_id, const OASIS_FLOAT tiv,
+			      const int event_id, const int bin_index,
+			      const OASIS_FLOAT rval, const probrec &p,
+			      const int sample_id,
+			      std::vector<std::vector<gulItemIDLoss>> &gilv) {
 
 	gulGulSamples g;
 	g.event_id = event_id;
@@ -885,7 +885,7 @@ void gulcalc::mode1()
 	char* rec = new char[max_recsize];
 	damagecdfrec* d = (damagecdfrec*)rec;
 
-	if (benchmark_) OutputBenchmark(0, true);
+	if (benchmark_) outputbenchmark(0, true);
 
 	for (;;)
 	{
@@ -902,7 +902,7 @@ void gulcalc::mode1()
 		recsize += sizeof(damagecdfrec) + sizeof(int);
 		if (d->event_id != last_event_id) {
 			if (last_event_id > 0) {
-				if (benchmark_) OutputBenchmark(last_event_id);
+				if (benchmark_) outputbenchmark(last_event_id);
 				outputmode1data(last_event_id);
 			}
 			last_event_id = d->event_id;
@@ -911,7 +911,7 @@ void gulcalc::mode1()
 
 		processrec_mode1(rec, recsize);
 	}
-	if (benchmark_) OutputBenchmark(d->event_id);
+	if (benchmark_) outputbenchmark(d->event_id);
 	outputmode1data(d->event_id);
 
 	if (itemWriter_) itemWriter_(ibuf_, sizeof(unsigned char), itembufoffset_);
@@ -932,7 +932,7 @@ void gulcalc::mode0()
 	
 	damagecdfrec *d = (damagecdfrec *)rec;
 
-	if (benchmark_) OutputBenchmark(0, true);
+	if (benchmark_) outputbenchmark(0, true);
 
 	for (;;)
 	{
@@ -949,7 +949,7 @@ void gulcalc::mode0()
 		recsize += sizeof(damagecdfrec) + sizeof(int);
 		if (d->event_id != last_event_id) {
 			if (last_event_id > 0) {
-				if (benchmark_) OutputBenchmark(last_event_id);
+				if (benchmark_) outputbenchmark(last_event_id);
 				outputcoveragedata(last_event_id);
 			}
 			last_event_id = d->event_id;						
@@ -958,7 +958,7 @@ void gulcalc::mode0()
 
 		processrec(rec, recsize);
 	}
-	if (benchmark_) OutputBenchmark(d->event_id);
+	if (benchmark_) outputbenchmark(d->event_id);
 	outputcoveragedata(d->event_id);
 	if (itemWriter_)  itemWriter_(ibuf_, sizeof(unsigned char), itembufoffset_);
 	if (lossWriter_)  lossWriter_(ibuf_, sizeof(unsigned char), itembufoffset_);

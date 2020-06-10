@@ -145,14 +145,14 @@ private:
 	void outputmode1data(int event_id);
 	void itemoutputgul(gulitemSampleslevel &gg);
 	void correlatedoutputgul(gulitemSampleslevel &gg);
-	void FillGulItemIDLoss(const int item_id, const OASIS_FLOAT tiv, const int event_id, const int bin_index, const OASIS_FLOAT rval, const probrec &p, const int sample_id, std::vector<std::vector<gulItemIDLoss>> &gilv);
-	void WriteMode1Output(const int event_id, const OASIS_FLOAT tiv, std::vector<std::vector<gulItemIDLoss>> &gilv, const bool correlated);
+	void fillgulitemloss(const int item_id, const OASIS_FLOAT tiv, const int event_id, const int bin_index, const OASIS_FLOAT rval, const probrec &p, const int sample_id, std::vector<std::vector<gulItemIDLoss>> &gilv);
+	void writemode1output(const int event_id, const OASIS_FLOAT tiv, std::vector<std::vector<gulItemIDLoss>> &gilv, const bool correlated);
 	void(*itemWriter_)(const void *ibuf, int size, int count);
 	void(*coverageWriter_)(const void *ibuf, int size, int count);
     void (*lossWriter_)(const void *ibuf, int size, int count);	// loss stream writer
     	void(*correlatedWriter_)(const void *ibuf, int size, int count);
 	bool(*iGetrec_)(char *rec, int recsize);
-	void OutputBenchmark(const int event_id, bool header);
+	void outputbenchmark(const int event_id, bool header);
 	OASIS_FLOAT getgul(damagebindictionary &b, gulGulSamples &g);
 	void output_mean(OASIS_FLOAT tiv, prob_mean *pp, int bin_count, OASIS_FLOAT &gul_mean, OASIS_FLOAT &std_dev);
 	void output_mean_mode1(const OASIS_FLOAT tiv, prob_mean *pp, const int bin_count, OASIS_FLOAT &gul_mean, OASIS_FLOAT &std_dev, std::vector<int> &bin_ids);

@@ -77,7 +77,7 @@ void help()
 		"-L Loss threshold (default 0)\n"
 		"-a alloc rule (default 0)\n"
 		"-m execution mode (default 0) mode 1\n"
-		"-b benchmark\n"
+		"-b benchmark (in development)\n"
 		"-v version\n"
 		"-h help\n"
 		);

@@ -796,7 +796,7 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			// Function 10: Applies a cap on retained loss (maximum deductible)
 			OASIS_FLOAT loss = 0;
 			OASIS_FLOAT loss_delta = 0;
-			if (x.effective_deductible + ded1 > ded3) { //If effective deductible is more than the maximum, deductible will be reduced to the maximum
+			if ((x.effective_deductible + ded1) > ded3) { //If effective deductible is more than the maximum, deductible will be reduced to the maximum
 				loss_delta = x.effective_deductible - ded3; // loss to increase by the loss_delta
 				if (x.over_limit + x.under_limit > 0) { //if there are prior level limits to reapply
 					if (loss_delta > x.under_limit) { // if loss will increase beyond limit
@@ -828,11 +828,12 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			OASIS_FLOAT ded1 = 0;
 			OASIS_FLOAT ded2 = 0;
 			for (auto y : profile.tc_vec) {
+				if (y.tc_id == deductible_1) ded1 = y.tc_val;
 				if (y.tc_id == deductible_2) ded2 = y.tc_val;
 			}
 			OASIS_FLOAT loss = 0;
 			OASIS_FLOAT loss_delta = 0;
-			if (x.effective_deductible < ded2) { // If effective deductible is less than the minimum, deductible will be increased to the minimum
+			if ((x.effective_deductible + ded1) < ded2) { // If effective deductible is less than the minimum, deductible will be increased to the minimum
 				loss_delta = x.effective_deductible - ded2; // negative loss change
 				if (x.over_limit + x.under_limit > 0) { // If there are prior level limits to reapply
 					if (x.under_limit == 0) { // If carried loss is at a prior level limit
@@ -1432,6 +1433,56 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			if (layer > 1)	net_loss = x.previous_layer_retained_loss - loss;
 			else net_loss = x.retained_loss + (x.loss - loss);
 			x.retained_loss = net_loss;
+			x.loss = loss;
+		}
+		break;
+		case 35:// insurance only
+		{
+			OASIS_FLOAT ded1 = 0;
+			OASIS_FLOAT ded2 = 0;
+			OASIS_FLOAT lim = 0;
+			for (auto y : profile.tc_vec) {
+				if (y.tc_id == deductible_1) ded1 = y.tc_val;
+				if (y.tc_id == deductible_2) ded2 = y.tc_val;
+				if (y.tc_id == limit_1) lim = y.tc_val;
+			}
+			OASIS_FLOAT loss = 0;
+			OASIS_FLOAT loss_delta = 0;
+			if ((x.effective_deductible + (ded1 * x.loss)) < ded2) { // If effective deductible is less than the minimum, deductible will be increased to the minimum
+				loss_delta = x.effective_deductible - ded2; // negative loss change
+				if (x.over_limit + x.under_limit > 0) { // If there are prior level limits to reapply
+					if (x.under_limit == 0) { // If carried loss is at a prior level limit
+						if (-loss_delta > x.over_limit) { // if the loss decrease will take the loss back through the prior level limits
+							loss = x.loss + x.over_limit + x.effective_deductible - ded2; //let the loss decrease by the difference between the overlimit and the loss delta
+							x.over_limit = 0; //update the overlimit
+						}
+						else {
+							loss = x.loss; // no change to the loss because the adjusted loss is still overlimit
+							x.over_limit = x.over_limit + loss_delta; // reduce the overlimit by the loss delta
+						}
+					}
+					else {
+						loss = x.loss + loss_delta; // loss decreases by the full difference between effective deductible and min deductible
+						if (loss < 0) loss = 0; //loss can't go negative
+						x.under_limit = x.under_limit + (x.loss - loss); // underlimit increases by the change in loss
+					}
+				}
+
+				else {
+					loss = x.loss + loss_delta; // loss decreases by the full difference between effective deductible and min deductible
+				}
+				if (loss < 0) loss = 0; //loss can't go negative
+				x.effective_deductible = x.effective_deductible + (x.loss - loss); //update the deductible to carry forward
+			}
+			else {
+				loss = x.loss - (ded1 * x.loss); //no change to loss if carried deductible is more than the min ded.
+				if (loss < 0) loss = 0;
+			}
+			if (loss > lim) {
+				x.over_limit = loss - lim;
+				loss = lim;
+			}
+			x.under_limit = lim - loss;
 			x.loss = loss;
 		}
 		break;

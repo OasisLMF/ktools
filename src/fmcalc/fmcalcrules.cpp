@@ -825,7 +825,6 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 					if (z.tc_id == deductible_1) {
 						OASIS_FLOAT loss = x.loss - z.tc_val;
 						if (loss < 0) loss = 0;
-						x.under_limit = loss;
 						x.effective_deductible = x.effective_deductible + (x.loss - loss);
 						x.retained_loss = x.retained_loss + (x.loss - loss);
 						x.loss = loss;

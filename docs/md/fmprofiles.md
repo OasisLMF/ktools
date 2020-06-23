@@ -21,7 +21,7 @@ This section specifies the attributes and rules for the following list of Financ
 |deductible                                                |   12       |
 |minimum and maximum deductible                            |   13       |
 |limit only                                                |   14       |
-|limit % loss                                              |   15       |
+|deductible and limit % loss                               |   15       |
 |deductible % loss                                         |   16       |
 |deductible % loss with attachment, limit and share        |   17       |
 |deductible % tiv with attachment, limit and share         |   18       |
@@ -39,6 +39,8 @@ This section specifies the attributes and rules for the following list of Financ
 |% tiv trigger and % limit step payout                     |   30       |
 |% tiv trigger and monetary amount step payout             |   31       |
 |monetary amount trigger and % loss step payout with limit |   32       |
+|deductible % loss with limit                              |   33       |
+|deductible with attachment and share                      |   34       |
 
 |calcrule_id |d1|d2|d3|a1|l1|sh1|sh2|sh3|st|ts|te|ps|pe|l2|sc1|sc2|  
 |:-----------|--|--|--|--|--|---|---|---|--|--|--|--|--|--|---|--:|
@@ -57,7 +59,7 @@ This section specifies the attributes and rules for the following list of Financ
 |   12       |x |  |  |  |  |   |   |   |  |  |  |  |  |  |   |   |
 |   13       |  |x |x |  |  |   |   |   |  |  |  |  |  |  |   |   |
 |   14       |  |  |  |  |x |   |   |   |  |  |  |  |  |  |   |   |
-|   15       |  |  |  |  |x |   |   |   |  |  |  |  |  |  |   |   |
+|   15       |x |  |  |  |x |   |   |   |  |  |  |  |  |  |   |   |
 |   16       |x |  |  |  |  |   |   |   |  |  |  |  |  |  |   |   |
 |   17       |x |  |  |x |x |x  |   |   |  |  |  |  |  |  |   |   |
 |   18       |x |  |  |x |x |x  |   |   |  |  |  |  |  |  |   |   |
@@ -75,6 +77,8 @@ This section specifies the attributes and rules for the following list of Financ
 |   30       |x |  |  |  |x |   |   |   |x |x |x |x |  |x |x  |x  |
 |   31       |x |  |  |  |  |   |   |   |x |x |x |x |  |x |x  |x  |
 |   32       |  |  |  |  |x |   |   |   |x |x |  |x |  |x |x  |x  |
+|   33       |x |  |  |  |x |   |   |   |  |  |  |  |  |  |   |   |
+|   34       |x |  |  |x |  |x  |   |   |  |  |  |  |  |  |   |   |
 
 The fields with an x are those which are required by the profile. The full names of the fields are as follows;
 

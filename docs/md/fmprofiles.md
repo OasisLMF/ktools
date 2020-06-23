@@ -13,8 +13,8 @@ This section specifies the attributes and rules for the following list of Financ
 |deductible % TIV and limit                                |   4        |
 |deductible and limit % loss                               |   5        |
 |deductible % TIV                                          |   6        |
-|limit and maximum deductible                              |   7        |
-|limit and minimum deductible                              |   8        |
+|deductible, minimum and maximum deductible, with limit    |   7        |
+|deductible and minimum deductible, with limit             |   8        |
 |limit with deductible % limit                             |   9        |
 |maximum deductible                                        |   10       |
 |minimum deductible                                        |   11       |
@@ -51,8 +51,8 @@ This section specifies the attributes and rules for the following list of Financ
 |   4        |x |  |  |  |x |   |   |   |  |  |  |  |  |  |   |   |
 |   5        |x |  |  |  |x |   |   |   |  |  |  |  |  |  |   |   |
 |   6        |x |  |  |  |  |   |   |   |  |  |  |  |  |  |   |   |
-|   7        |  |  |x |  |x |   |   |   |  |  |  |  |  |  |   |   |
-|   8        |  |x |  |  |x |   |   |   |  |  |  |  |  |  |   |   |
+|   7        |x |x |x |  |x |   |   |   |  |  |  |  |  |  |   |   |
+|   8        |x |x |  |  |x |   |   |   |  |  |  |  |  |  |   |   |
 |   9        |x |  |  |  |x |   |   |   |  |  |  |  |  |  |   |   |
 |   10       |  |  |x |  |  |   |   |   |  |  |  |  |  |  |   |   |
 |   11       |  |x |  |  |  |   |   |   |  |  |  |  |  |  |   |   |

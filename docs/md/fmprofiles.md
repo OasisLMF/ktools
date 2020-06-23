@@ -16,10 +16,10 @@ This section specifies the attributes and rules for the following list of Financ
 |deductible, minimum and maximum deductible, with limit    |   7        |
 |deductible and minimum deductible, with limit             |   8        |
 |limit with deductible % limit                             |   9        |
-|maximum deductible                                        |   10       |
-|minimum deductible                                        |   11       |
+|deductible and maximum deductible                         |   10       |
+|deductible and minimum deductible                         |   11       |
 |deductible                                                |   12       |
-|minimum and maximum deductible                            |   13       |
+|deducitble, minimum and maximum deductible                |   13       |
 |limit only                                                |   14       |
 |deductible and limit % loss                               |   15       |
 |deductible % loss                                         |   16       |
@@ -54,10 +54,10 @@ This section specifies the attributes and rules for the following list of Financ
 |   7        |x |x |x |  |x |   |   |   |  |  |  |  |  |  |   |   |
 |   8        |x |x |  |  |x |   |   |   |  |  |  |  |  |  |   |   |
 |   9        |x |  |  |  |x |   |   |   |  |  |  |  |  |  |   |   |
-|   10       |  |  |x |  |  |   |   |   |  |  |  |  |  |  |   |   |
-|   11       |  |x |  |  |  |   |   |   |  |  |  |  |  |  |   |   |
+|   10       |x |  |x |  |  |   |   |   |  |  |  |  |  |  |   |   |
+|   11       |x |x |  |  |  |   |   |   |  |  |  |  |  |  |   |   |
 |   12       |x |  |  |  |  |   |   |   |  |  |  |  |  |  |   |   |
-|   13       |  |x |x |  |  |   |   |   |  |  |  |  |  |  |   |   |
+|   13       |x |x |x |  |  |   |   |   |  |  |  |  |  |  |   |   |
 |   14       |  |  |  |  |x |   |   |   |  |  |  |  |  |  |   |   |
 |   15       |x |  |  |  |x |   |   |   |  |  |  |  |  |  |   |   |
 |   16       |x |  |  |  |  |   |   |   |  |  |  |  |  |  |   |   |

@@ -1318,16 +1318,17 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			OASIS_FLOAT ded1 = 0;
 			OASIS_FLOAT ded2 = 0;
 			OASIS_FLOAT ded3 = 0;
+			OASIS_FLOAT lim = 0;
 			for (auto y : profile.tc_vec) {
 				if (y.tc_id == deductible_1) ded1 = y.tc_val;
 				if (y.tc_id == deductible_2) ded2 = y.tc_val;
 				if (y.tc_id == deductible_3) ded3 = y.tc_val;
+				if (y.tc_id == limit_1) lim = y.tc_val;
 			}
 			OASIS_FLOAT loss = 0;
 			OASIS_FLOAT loss_delta = 0;
-			if (ded3 == 0) ded3 = 9999999999;
 			// Applies a min and max ded on effective deductible plus a deductible as an amount.
-			if ((ded1 + x.effective_deductible) > ded3) { //If carried + ded > max ded
+			if (((x.loss * ded1) + x.effective_deductible) > ded3) { //If carried + ded > max ded
 				loss_delta = x.effective_deductible - ded3;
 				if (x.over_limit + x.under_limit > 0) { //if there are prior level limits to reapply
 					if (loss_delta > x.under_limit) { // if loss will increase beyond limit
@@ -1348,7 +1349,7 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 				}
 			}
 			else {
-				if ((ded1 + x.effective_deductible) < ded2) { //If carried + ded < min ded
+				if (((x.loss * ded1) + x.effective_deductible) < ded2) { //If carried + ded < min ded
 					loss_delta = x.effective_deductible - ded2;
 					if (x.over_limit + x.under_limit > 0) { // If there are prior level limits to reapply
 						if (x.under_limit == 0) { // If carried loss is at a prior level limit
@@ -1374,11 +1375,17 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 					x.effective_deductible = x.effective_deductible + (x.loss - loss); //update the deductible to carry forward
 				}
 				else { // min ded < carried ded + ded < max ded
-					loss = x.loss - ded1;
+					loss = x.loss - (x.loss * ded1);
 					if (loss < 0) loss = 0;
 					x.effective_deductible = x.effective_deductible + (x.loss - loss);
 					//x.retained_loss = x.retained_loss + (x.loss - loss);		
 				}
+			if (loss > lim) {
+				x.over_limit = loss - lim;
+				loss = lim;
+			}
+			x.under_limit = lim - loss;
+			x.loss = loss;
 			}
 			x.loss = loss;
 		}
@@ -1690,6 +1697,7 @@ void fmcalc::init_profile_rec(fm_profile &f)
 			add_tc(deductible_1, f.deductible1, p.tc_vec);
 			add_tc(deductible_2, f.deductible2, p.tc_vec);
 			add_tc(deductible_3, f.deductible3, p.tc_vec);
+			add_tc(limit_1, f.limit, p.tc_vec);
 			break;
 		case 33:
 			add_tc(deductible_1, f.deductible1, p.tc_vec);

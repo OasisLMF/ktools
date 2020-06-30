@@ -9,6 +9,8 @@ The following components convert input data in csv format to the binary format r
 * **[randtobin](#rand)** converts a list of random numbers. 
 * **[vulnerabilitytobin](#vulnerability)** converts the vulnerability data.
 
+A reference [intensity bin dictionary](#intensitybins) csv should also exist, although there is no conversion component for this file because it is not needed for calculation purposes. 
+
 **Input data**
 * **[coveragetobin](#coverages)** converts the coverages data.
 * **[evetobin](#events)** converts a list of event_ids.
@@ -84,6 +86,27 @@ $ damagebintocsv < damage_bin_dict.bin > damage_bin_dict.csv
 ```
 [Return to top](#dataconversioncomponents)
 
+ <a id="intensitybins"></a>
+#### intensity bin dictionary
+
+The intensity bin dictionary defines the meaning of the bins of the hazard intensity measure. The hazard intensity measure could be flood depth, windspeed, peak ground acceleration etc, depending on the type of peril. The range of hazard intensity values in the model is discretized into bins, each with a unique and contiguous bin_index listed in the intensity bin dictionary. The bin_index is used as a reference in the footprint file (field intensity_bin_index) to specify the hazard intensity for each event and areaperil.
+
+This file is for reference only as it is not used in the calculation so there is no component to convert it to binary format.
+
+The csv file should contain the following fields and include a header row.
+
+| Name              | Type   |  Bytes | Description                                                   | Example     |
+|:------------------|--------|--------| :-------------------------------------------------------------|------------:|
+| bin_index         | int    |    4   | Identifier of the intensity bin                               |     1       |
+| bin_from          | float  |    4   | Lower intensity threshold for the bin                         |   56        |
+| bin_to            | float  |    4   | Upper intensity threshold for the bin                         |   57        |
+| interpolation     | float  |    4   | Mid-point intensity value for the bin                         |   0.015     |
+| interval_type     | int    |    4   | Identifier of the interval type, e.g. closed, open            |   1         | 
+
+The data should be ordered by bin_index ascending and not contain nulls. The bin_index should be a contiguous sequence of integers starting from 1.
+
+[Return to top](#dataconversioncomponents)
+
 <a id="footprint"></a>
 ### footprint
 ***
@@ -99,9 +122,8 @@ The csv file should contain the following fields and include a header row.
 |:-------------------|--------|--------| :-------------------------------------------------------------|------------:|
 | event_id           | int    |    4   | Oasis event_id                                                |     1       |
 | areaperil_id       | int    |    4   | Oasis areaperil_id                                            |   4545      |
-| intensity_bin_index| int    |    4   | Identifier of the intensity damage bin                        |     10      |
+| intensity_bin_index| int    |    4   | Identifier of the intensity bin                               |     10      |
 | prob               | float  |    4   | The probability mass for the intensity bin between 0 and 1    |    0.765    | 
-
 The data should be ordered by event_id, areaperil_id and not contain nulls. 
 
 ##### footprinttobin

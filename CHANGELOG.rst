@@ -3,15 +3,20 @@ Ktools Changelog
 
 .. * [#_](https://github.com/OasisLMF/OasisLMF/issues/_) -  
 
-
-`v3.3.1`_
+`v3.3.2`_
 ---------
 .. start_latest_release 
 
-* [#117](https://github.com/OasisLMF/ktools/issues/117) - Reduced gulcalc memory use for gul alloc rule 1
-* [#127](https://github.com/OasisLMF/ktools/issues/127) - Introduce support for full correlation output for gul alloc rule 0
+* [#566](https://github.com/OasisLMF/OasisLMF/issues/566) - Handle unlimited LayerLimit without large default value
+* [#578](https://github.com/OasisLMF/OasisLMF/issues/578) - Missing combination of terms in calcrules to add
 
 .. end_latest_release
+
+`v3.3.1`_
+---------
+
+* [#117](https://github.com/OasisLMF/ktools/issues/117) - Reduced gulcalc memory use for gul alloc rule 1
+* [#127](https://github.com/OasisLMF/ktools/issues/127) - Introduce support for full correlation output for gul alloc rule 0
 
 
 `v3.3.0`_

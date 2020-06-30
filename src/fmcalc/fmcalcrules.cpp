@@ -493,6 +493,34 @@ void applycalcrule_stepped(const profile_rec_new& profile, LossRec& x, int layer
 
 		}
 		break;
+		case 34:
+		{
+			OASIS_FLOAT ded = 0;
+			OASIS_FLOAT share = 0;
+			OASIS_FLOAT att = 0;
+			for (auto y : profile.tc_vec) {
+				if (y.tc_id == deductible_1) ded = y.tc_val;
+				if (y.tc_id == share_1) share = y.tc_val;
+				if (y.tc_id == attachment_1) att = y.tc_val;
+			}
+			//Function2: deductible applies before attachment limit share
+			//IIf(Loss < Ded, 0, Loss - Ded)
+			//IIf(Loss < Att, 0, IIf(Loss > Att + Lim, Lim, Loss - Att)) * Share	
+			OASIS_FLOAT loss = 0;
+			loss = x.loss - ded;
+			if (loss < 0) loss = 0;
+			x.effective_deductible = x.effective_deductible + (x.loss - loss);
+			loss = loss - att;
+			if (loss < 0) loss = 0;
+			loss = loss * share;
+			//x.retained_loss = x.retained_loss + (x.loss - loss);
+			OASIS_FLOAT net_loss = 0;
+			if (layer > 1)	net_loss = x.previous_layer_retained_loss - loss;
+			else net_loss = x.retained_loss + (x.loss - loss);
+			x.retained_loss = net_loss;
+			x.loss = loss;
+		}
+		break;
 		case 100:	// noop
 		{
 			x.loss = x.loss;
@@ -1616,6 +1644,11 @@ void fmcalc::init_profile__stepped_rec(fm_profile_step& f)
 			add_tc(limit_1, f.limit1, p.tc_vec);
 			add_tc(limit_2, f.limit2, p.tc_vec);
 			add_tc(scale_2, f.scale2, p.tc_vec);
+			break;
+		case 34:
+			add_tc(deductible_1, f.deductible1, p.tc_vec);
+			add_tc(share_1, f.share1, p.tc_vec);
+			add_tc(attachment_1, f.attachment, p.tc_vec);
 			break;
 		case 100:
 			break;

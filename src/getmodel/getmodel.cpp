@@ -225,7 +225,15 @@ void getmodel::doResults(
     std::vector<Result> results;
     results.resize(_num_damage_bins);
     int result_index = 0;
-    auto vulnerability = vulnerabilities[vulnerability_id];
+    std::vector<OASIS_FLOAT> vulnerability;
+    try {
+      vulnerability = vulnerabilities.at(vulnerability_id);
+    } catch (const std::out_of_range) {
+      fprintf(stderr, "FATAL: %s: ulnerability ID %d is out of range. "
+		      "Check items and vulnerability files.",
+	      __func__, vulnerability_id);
+      exit(-1);
+    }
     int vulnerability_index = 0;
     double cumulative_prob = 0;
     for (int damage_bin_index = 0; damage_bin_index < _num_damage_bins;

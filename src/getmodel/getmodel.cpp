@@ -216,14 +216,14 @@ void getmodel::initOutputStream() {
 }
 
 void getmodel::doResults(
-    int &event_id, AREAPERIL_INT &areaperil_id,
-    std::map<AREAPERIL_INT, std::set<int>> &vulnerabilities_by_area_peril,
-    std::map<int, std::vector<OASIS_FLOAT>> &vulnerabilities,
-    std::vector<OASIS_FLOAT> intensity) const {
+  int &event_id, AREAPERIL_INT &areaperil_id,
+  std::map<AREAPERIL_INT, std::set<int>> &vulnerabilities_by_area_peril,
+  std::map<int, std::vector<OASIS_FLOAT>> &vulnerabilities,
+  std::vector<OASIS_FLOAT> intensity) const {
+
   for (int vulnerability_id : vulnerabilities_by_area_peril[areaperil_id]) {
-    //Result *results = new Result[_num_damage_bins];
-	std::vector<Result> results;
-	results.resize(_num_damage_bins);
+    std::vector<Result> results;
+    results.resize(_num_damage_bins);
     int result_index = 0;
     auto vulnerability = vulnerabilities[vulnerability_id];
     int vulnerability_index = 0;
@@ -233,16 +233,14 @@ void getmodel::doResults(
       double prob = 0.0f;
       for (int intensity_bin_index = 0;
            intensity_bin_index < _num_intensity_bins; intensity_bin_index++) {
-        prob += vulnerability[vulnerability_index++] *
+	prob += vulnerability[vulnerability_index++] *
                 intensity[intensity_bin_index];
       }
 
-      // if (prob > 0 || damage_bin_index == 0)
-      //{
       cumulative_prob += prob;
       results[result_index++] = Result(static_cast<OASIS_FLOAT>(cumulative_prob),
                                        _mean_damage_bins[damage_bin_index]);
-      //}
+
       if (cumulative_prob > 0.999999940)
         break; // single precision value approx 1
     }
@@ -253,8 +251,8 @@ void getmodel::doResults(
     fwrite(&vulnerability_id, SIZE_OF_INT, 1, stdout);
     fwrite(&num_results, SIZE_OF_INT, 1, stdout);
     fwrite(&results[0], SIZE_OF_RESULT, num_results, stdout);
-    //delete[] results;
   }
+
 }
 
 void getmodel::doResultsNoIntensityUncertainty(

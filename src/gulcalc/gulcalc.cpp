@@ -1010,6 +1010,7 @@ void gulcalc::mode0()
 	if (itemWriter_)  itemWriter_(ibuf_, sizeof(unsigned char), itembufoffset_);
 	if (lossWriter_)  lossWriter_(ibuf_, sizeof(unsigned char), itembufoffset_);
 	if (coverageWriter_) coverageWriter_(cbuf_, sizeof(unsigned char), covbufoffset_);
+	if (correlatedWriter_) correlatedWriter_(corrbuf_, sizeof(unsigned char), correlatedbufoffset_);
 
 	delete[] rec;
 }

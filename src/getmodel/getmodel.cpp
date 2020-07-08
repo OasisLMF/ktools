@@ -229,8 +229,8 @@ void getmodel::doResults(
     try {
       vulnerability = vulnerabilities.at(vulnerability_id);
     } catch (const std::out_of_range) {
-      fprintf(stderr, "FATAL: %s: ulnerability ID %d is out of range. "
-		      "Check items and vulnerability files.",
+      fprintf(stderr, "FATAL: %s: vulnerability ID %d is out of range. "
+		      "Check items and vulnerability files.\n",
 	      __func__, vulnerability_id);
       exit(-1);
     }

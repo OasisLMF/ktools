@@ -21,9 +21,9 @@ Ktools Changelog
 
 `v3.3.0`_
 ---------
-* [#124](https://github.com/OasisLMF/OasisLMF/issues/124) - Update CMake build files   
-* [#103](https://github.com/OasisLMF/OasisLMF/issues/103) - Fixed issue with leccalc and the periods file
-* [#120](https://github.com/OasisLMF/OasisLMF/issues/120) - Add calcrule for ded % loss and normal limit
+* [#124](https://github.com/OasisLMF/ktools/issues/124) - Update CMake build files   
+* [#103](https://github.com/OasisLMF/ktools/issues/103) - Fixed issue with leccalc and the periods file
+* [#120](https://github.com/OasisLMF/ktools/issues/120) - Add calcrule for ded % loss and normal limit
 
 
 `v3.2.6`_

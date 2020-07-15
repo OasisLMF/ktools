@@ -3,14 +3,20 @@ Ktools Changelog
 
 .. * [#_](https://github.com/OasisLMF/OasisLMF/issues/_) -  
 
-`v3.3.2`_
+`v3.3.3`_
 ---------
-.. start_latest_release 
+.. start_latest_release
 
-* [#566](https://github.com/OasisLMF/OasisLMF/issues/566) - Handle unlimited LayerLimit without large default value
-* [#578](https://github.com/OasisLMF/OasisLMF/issues/578) - Missing combination of terms in calcrules to add
+* [#131](https://github.com/OasisLMF/ktools/issues/131) - Changed missing intensity bins error to warning in validatevulnerability
+* [#133](https://github.com/OasisLMF/ktools/issues/133) - Better handling of invalid vulnerability IDs in getmodel
+* [#134](https://github.com/OasisLMF/ktools/issues/134) - Fixed issue with fully correlated output in gulcalc when using alloc rule 0
 
 .. end_latest_release
+
+`v3.3.2`_
+---------
+* [#566](https://github.com/OasisLMF/OasisLMF/issues/566) - Handle unlimited LayerLimit without large default value
+* [#578](https://github.com/OasisLMF/OasisLMF/issues/578) - Missing combination of terms in calcrules to add
 
 `v3.3.1`_
 ---------

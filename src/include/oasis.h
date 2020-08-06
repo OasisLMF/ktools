@@ -271,6 +271,10 @@ struct aal_rec {
 	double max_exposure_value;
 };
 
+struct aal_rec_ensemble : aal_rec {
+	int ensemble_id;
+};
+
 struct Vulnerability
 {
 	int vulnerability_id;

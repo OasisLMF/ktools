@@ -6,6 +6,7 @@
 #else
 #include <dirent.h>
 #endif
+#include <algorithm>
 #include <math.h>
 #include <string.h>
 #include <set>
@@ -41,6 +42,40 @@ bool operator<(const period_map_key& lhs, const period_map_key& rhs)
 	}
 	else {
 		return lhs.period_no < rhs.period_no;
+	}
+
+}
+
+
+void aalcalc::loadensemblemapping()
+{
+	FILE *fin = fopen(ENSEMBLE_FILE, "rb");
+	if (fin == NULL) return;
+
+	Ensemble e;
+	sidxtoensemble_.resize(samplesize_ + 1, 0);
+	std::fill(sidxtoensemble_.begin(), sidxtoensemble_.end(), 0);
+	size_t i = fread(&e, sizeof(Ensemble), 1, fin);
+	while (i != 0) {
+		sidxtoensemble_[e.sidx] = e.ensemble_id;
+		if (e.ensemble_id > max_ensemble_id_) {
+			max_ensemble_id_ = e.ensemble_id;
+		}
+
+		i = fread(&e, sizeof(Ensemble), 1, fin);
+
+	}
+
+	// Check all sidx have ensemble IDs
+	// Count how many sidx are associated with each ensemble ID
+	ensemblecount_.resize(max_ensemble_id_ + 1, 0);
+	for (std::vector<int>::const_iterator it = std::next(sidxtoensemble_.begin());
+	     it != sidxtoensemble_.end(); it++) {
+		if (*it == 0) {
+			fprintf(stderr, "FATAL: All sidx must have associated ensemble IDs\n");
+			exit(-1);
+		}
+		ensemblecount_[*it]++;
 	}
 
 }
@@ -275,6 +310,17 @@ void aalcalc::do_calc_end_new()
 				if (a.max_exposure_value < aa.max_exposure_value) a.max_exposure_value = aa.max_exposure_value;
 				a.mean += aa.sum_of_loss * aa.weighting;
 				a.mean_squared += aa.sum_of_loss * aa.sum_of_loss * aa.weighting;
+				// By ensemble ID
+				if (sidxtoensemble_.size() > 0) {
+					int current_ensemble_id = sidxtoensemble_[sidx];
+					aal_rec_ensemble& ea = vec_ensemble_aal_[max_ensemble_id_ * (current_summary_id_ - 1) + current_ensemble_id];
+					ea.summary_id = current_summary_id_;
+					ea.type = 2;
+					ea.ensemble_id = current_ensemble_id;
+					if (ea.max_exposure_value < aa.max_exposure_value) ea.max_exposure_value = aa.max_exposure_value;
+					ea.mean += aa.sum_of_loss * aa.weighting;
+					ea.mean_squared += aa.sum_of_loss * aa.sum_of_loss * aa.weighting;
+				}
 			}
 			else {
 				aal_rec& a = vec_analytical_aal_[current_summary_id_];
@@ -340,6 +386,46 @@ void aalcalc::doaalcalc_new(const summarySampleslevelHeader& sh, const std::vect
 	do_sample_calc_new(sh, vrec);
 }
 
+inline void aalcalc::calculatemeansddev(const aal_rec_ensemble &record,
+					const int sample_size, const int p1,
+					const int p2, const int periods,
+					double &mean, double &sd_dev) {
+
+	mean = record.mean / sample_size;
+	double mean_squared = record.mean * record.mean;
+	double s1 = record.mean_squared - mean_squared / p1;
+	double s2 = s1 / p2;
+	sd_dev = sqrt(s2);
+	mean = mean / periods;
+
+}
+
+void aalcalc::outputresultscsv_new(const std::vector<aal_rec_ensemble> &vec_aal,
+				   const int periods) {
+
+	auto v_iter = vec_aal.begin();
+	while (v_iter != vec_aal.end()) {
+
+		if(v_iter->summary_id > 0) {
+
+			int sample_size = ensemblecount_[v_iter->ensemble_id];
+			int p1 = periods * sample_size;
+			int p2 = p1 - 1;
+			double mean, sd_dev;
+			calculatemeansddev(*v_iter, sample_size, p1, p2,
+					   periods, mean, sd_dev);
+			printf("%d,%d,%f,%f,%f,%d\n", v_iter->summary_id,
+			       v_iter->type, mean, sd_dev,
+			       v_iter->max_exposure_value, v_iter->ensemble_id);
+
+		}
+
+		v_iter++;
+
+	}
+
+}
+
 void aalcalc::outputresultscsv_new(std::vector<aal_rec>& vec_aal, int periods,int sample_size)
 {
 	int p1 = periods * sample_size;
@@ -354,17 +440,29 @@ void aalcalc::outputresultscsv_new(std::vector<aal_rec>& vec_aal, int periods,in
 			double s2 = s1 / p2;
 			double sd_dev = sqrt(s2);
 			mean = mean / periods;
-			printf("%d,%d,%f,%f,%f\n", v_iter->summary_id, v_iter->type, mean, sd_dev, v_iter->max_exposure_value);
+			printf("%d,%d,%f,%f,%f", v_iter->summary_id, v_iter->type, mean, sd_dev, v_iter->max_exposure_value);
+			// If relevant use ensemble ID = 0 for calculations
+			// across all ensembles
+			if (sidxtoensemble_.size() > 0) printf(",0");
+			printf("\n");
 		}
 		v_iter++;
 	}
 }
 void aalcalc::outputresultscsv_new()
 {
-	if (skipheader_ == false) printf("summary_id,type,mean,standard_deviation,exposure_value\n");
+	if (skipheader_ == false) {
+		printf("summary_id,type,mean,standard_deviation,exposure_value");
+		if (sidxtoensemble_.size() > 0) printf(",ensemble_id");
+		printf("\n");
+	}
 
 	outputresultscsv_new(vec_analytical_aal_, no_of_periods_,1);
 	outputresultscsv_new(vec_sample_aal_, no_of_periods_ , samplesize_);
+
+	if (sidxtoensemble_.size() > 0) {
+		outputresultscsv_new(vec_ensemble_aal_, no_of_periods_);
+	}
 
 }
 void aalcalc::outputresultscsv()
@@ -454,9 +552,11 @@ void aalcalc::doit(const std::string& subfolder)
 	getmaxsummaryid(path);
 	loadoccurrence();
 	loadperiodtoweigthing();	// move this to after the samplesize_ variable has been set i.e.  after reading the first 8 bytes of the first summary file
+	loadensemblemapping();
 	char line[4096];
 	vec_sample_sum_loss_.resize(((no_of_periods_+1) * (samplesize_+1)) + 1);
 	vec_sample_aal_.resize(max_summary_id_ + 1);
+	vec_ensemble_aal_.resize(max_summary_id_ * max_ensemble_id_ + 1);
 	vec_analytical_aal_.resize(max_summary_id_ + 1);
 	std::vector<std::string> filelist;
 	std::vector<FILE *> filehandles;

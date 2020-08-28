@@ -3,15 +3,20 @@ Ktools Changelog
 
 .. * [#_](https://github.com/OasisLMF/OasisLMF/issues/_) -  
 
-`v3.3.3`_
+`v3.3.4`_
 ---------
 .. start_latest_release
 
+* [#397](https://github.com/OasisLMF/OasisPlatform/issues/397) - Calculate metrics by ensemble ID in aalcalc and leccalc
+* Add ensembletobin and ensembletocsv executables to convert file containing ensemble IDs between csv and binary formats
+
+.. end_latest_release
+
+`v3.3.3`_
+---------
 * [#131](https://github.com/OasisLMF/ktools/issues/131) - Changed missing intensity bins error to warning in validatevulnerability
 * [#133](https://github.com/OasisLMF/ktools/issues/133) - Better handling of invalid vulnerability IDs in getmodel
 * [#134](https://github.com/OasisLMF/ktools/issues/134) - Fixed issue with fully correlated output in gulcalc when using alloc rule 0
-
-.. end_latest_release
 
 `v3.3.2`_
 ---------

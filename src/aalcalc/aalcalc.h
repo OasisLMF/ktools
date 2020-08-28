@@ -88,6 +88,7 @@ private:
 	std::map<int, int> event_count_;	// count of events in occurrence table used to create cartesian effect on event_id
 	std::map<int, std::vector<int>> event_to_period_;	// Mapping of event to period no
 	int no_of_periods_ = 0;
+	int max_ensemble_id_ = 0;
 	int max_period_no_=0;
 	int samplesize_ = -1;
 	std::map<int, aal_rec> map_analytical_aal_;
@@ -95,12 +96,15 @@ private:
 	std::map<int, aal_rec> map_sample_aal_;
 	std::vector< loss_rec>  vec_sample_sum_loss_;
 	std::vector<aal_rec> vec_sample_aal_;
+	std::vector<aal_rec_ensemble> vec_ensemble_aal_;
 	std::vector<aal_rec> vec_analytical_aal_;
 	int max_summary_id_ = 0;
 
 	std::unordered_set<int> set_periods_;
 	int current_summary_id_ = 0;
 	std::map <int, double> periodstoweighting_;
+	std::vector<int> sidxtoensemble_;
+	std::vector<int> ensemblecount_;
 	bool skipheader_ = false;
 // private functions
 	void loadoccurrence();
@@ -108,6 +112,7 @@ private:
 	void load_event_to_summary_index(const std::string& subfolder);
 	void initsameplsize(const std::string &path);
 	void loadperiodtoweigthing();
+	void loadensemblemapping();
 	void process_summaryfilew(const std::string &filename);
 	void debug_process_summaryfile(const std::string &filename);
 	void do_calc_end_new();
@@ -117,8 +122,13 @@ private:
 	void applyweightings(int event_id, const std::map <int, double> &periodstoweighting, std::vector<sampleslevelRec> &vrec) ;
 	void applyweightingstomap(std::map<int, aal_rec> &m);
 	void applyweightingstomaps();
+	inline void calculatemeansddev(const aal_rec_ensemble &record,
+				       const int sample_size, const int p1,
+				       const int p2, const int periods,
+				       double &mean, double &sd_dev);
 	void outputresultscsv();
 	void outputresultscsv_new(std::vector<aal_rec> &vec_aal, int periods, int sample_size);
+	void outputresultscsv_new(const std::vector<aal_rec_ensemble> &vec_aal, const int periods);
 	void outputresultscsv_new();
 	void getmaxsummaryid(std::string& path);
 public:

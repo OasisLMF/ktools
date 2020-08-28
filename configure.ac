@@ -117,6 +117,8 @@ AC_CONFIG_FILES([
                  src/eve/Makefile
 		 src/damagebintocsv/Makefile
 		 src/damagebintobin/Makefile
+		 src/ensembletobin/Makefile
+		 src/ensembletocsv/Makefile
                  src/fmcalc/Makefile
                  src/fmprofiletocsv/Makefile
                  src/fmprofiletobin/Makefile

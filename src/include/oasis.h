@@ -271,6 +271,10 @@ struct aal_rec {
 	double max_exposure_value;
 };
 
+struct aal_rec_ensemble : aal_rec {
+	int ensemble_id;
+};
+
 struct Vulnerability
 {
 	int vulnerability_id;
@@ -296,6 +300,13 @@ struct EventIndex
 	int event_id;
 	long long offset;
 	long long size;
+};
+
+struct Ensemble
+{
+	int sidx;
+	int ensemble_id;
+	int sample_id;
 };
 
 #pragma pack(pop)
@@ -389,6 +400,7 @@ inline  void logprintf(const std::string &program_name,const std::string &msgtyp
 #define DAMAGE_CDF_IDX_FILE "static/damage_cdf.idx"
 #define RANDOM_FILE "static/random.bin"
 #define VULNERABILITY_FILE  "static/vulnerability.bin"
+#define ENSEMBLE_FILE "static/ensemble.bin"
 #define FOOTPRINT_FILE  "static/footprint.bin"
 #define FOOTPRINT_IDX_FILE  "static/footprint.idx"
 // compressed variant of footprint

@@ -49,9 +49,11 @@ private:
 	std::map<outkey2, OASIS_FLOAT> &max_out_loss_;
 	FILE **fout_;
 	bool useReturnPeriodFile_;
+	int max_ensemble_id_ = 0;
 	int samplesize_ = 0;
 	std::vector<int> returnperiods_;
 	std::map <int, double> periodstoweighting_;
+	std::map<int, std::vector<int>> ensembletosidx_;
 	bool skipheader_ = false;
 
 //
@@ -69,9 +71,10 @@ private:
 	OASIS_FLOAT getloss(OASIS_FLOAT nextreturnperiod, OASIS_FLOAT last_return_period, OASIS_FLOAT last_loss, 
 		OASIS_FLOAT current_return_period, OASIS_FLOAT current_loss) const;
 	void doreturnperiodout(int handle, size_t &nextreturnperiod_index, OASIS_FLOAT &last_return_period, OASIS_FLOAT &last_loss,
-		OASIS_FLOAT current_return_period, OASIS_FLOAT current_loss, int summary_id, int type);
+		OASIS_FLOAT current_return_period, OASIS_FLOAT current_loss, int summary_id, int type, int ensemble_id=0);
 public:
 	void loadperiodtoweigthing();
+	void loadensemblemapping();
 	void outputOccFulluncertainty();
 	void outputAggFulluncertainty();
 	void outputOccWheatsheaf();

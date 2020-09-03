@@ -1033,6 +1033,7 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			loss = loss - (loss * ded);
 			if (loss < 0) loss = 0;
 			x.effective_deductible = x.effective_deductible + (x.loss - loss);
+			x.under_limit = x.under_limit + x.loss - loss;
 			x.loss = loss;
 		}
 		break;

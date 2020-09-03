@@ -82,6 +82,7 @@ void applycalcrule_stepped(const profile_rec_new& profile, LossRec& x, int layer
 		if (layer > 1)	net_loss = x.previous_layer_retained_loss - loss;
 		else net_loss = x.retained_loss + (x.loss - loss);
 		x.retained_loss = net_loss;
+
 		x.loss = loss;
 	}
 	break;
@@ -663,6 +664,7 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			OASIS_FLOAT loss = x.loss - (ded * x.accumulated_tiv);
 			if (loss < 0) loss = 0;
 			x.effective_deductible = x.effective_deductible + (x.loss - loss);
+			x.under_limit = x.under_limit + x.loss - loss;
 			x.loss = loss;
 		}
 		break;
@@ -903,6 +905,7 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 						if (loss < 0) loss = 0;
 						x.effective_deductible = x.effective_deductible + (x.loss - loss);
 						x.retained_loss = x.retained_loss + (x.loss - loss);
+						x.under_limit = x.under_limit + x.loss - loss;
 						x.loss = loss;
 						break;
 					}

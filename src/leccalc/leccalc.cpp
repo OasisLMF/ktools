@@ -254,6 +254,7 @@ namespace leccalc {
 
 		aggreports agg(totalperiods, maxsummaryid, agg_out_loss, max_out_loss, fout, useReturnPeriodFile, samplesize, skipheader);
 		agg.loadperiodtoweigthing();
+		agg.loadensemblemapping();
 		agg.outputAggWheatsheaf();
 		agg.outputAggFulluncertainty();
 		agg.outputAggWheatSheafMean(samplesize);

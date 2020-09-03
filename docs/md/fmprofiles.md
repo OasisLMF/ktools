@@ -13,32 +13,35 @@ This section specifies the attributes and rules for the following list of Financ
 |deductible % TIV and limit                                |   4        |
 |deductible and limit % loss                               |   5        |
 |deductible % TIV                                          |   6        |
-|limit and maximum deductible                              |   7        |
-|limit and minimum deductible                              |   8        |
+|deductible, minimum and maximum deductible, with limit    |   7        |
+|deductible and minimum deductible, with limit             |   8        |
 |limit with deductible % limit                             |   9        |
-|maximum deductible                                        |   10       |
-|minimum deductible                                        |   11       |
+|deductible and maximum deductible                         |   10       |
+|deductible and minimum deductible                         |   11       |
 |deductible                                                |   12       |
-|minimum and maximum deductible                            |   13       |
+|deductible, minimum and maximum deductible                |   13       |
 |limit only                                                |   14       |
-|limit % loss                                              |   15       |
+|deductible and limit % loss                               |   15       |
 |deductible % loss                                         |   16       |
 |deductible % loss with attachment, limit and share        |   17       |
 |deductible % tiv with attachment, limit and share         |   18       |
-|% loss deductible with min and max deductible             |   19       |
+|deductible % loss with min and max deductible             |   19       |
 |reverse franchise deductible                              |   20       |
-|% tiv deductible with min and max deductible              |   21       |
+|deductible % tiv with min and max deductible              |   21       |
 |reinsurance % ceded, limit and % placed                   |   22       |
 |reinsurance limit and % placed                            |   23       |
 |reinsurance excess terms                                  |   24       |
 |reinsurance proportional terms                            |   25       |
-|deductible amount with min and max deductible             |   26       |
+|deductible % loss with min and max deductible and limit   |   26       |
 |% tiv trigger and % tiv step payout with limit            |   27       |
 |% tiv trigger and % loss step payout                      |   28       |
 |% tiv trigger and % tiv step payout                       |   29       |
 |% tiv trigger and % limit step payout                     |   30       |
 |% tiv trigger and monetary amount step payout             |   31       |
 |monetary amount trigger and % loss step payout with limit |   32       |
+|deductible % loss with limit                              |   33       |
+|deductible with attachment and share                      |   34       |
+|deductible % loss with min deductible and limit           |   35       |
 
 |calcrule_id |d1|d2|d3|a1|l1|sh1|sh2|sh3|st|ts|te|ps|pe|l2|sc1|sc2|  
 |:-----------|--|--|--|--|--|---|---|---|--|--|--|--|--|--|---|--:|
@@ -49,15 +52,15 @@ This section specifies the attributes and rules for the following list of Financ
 |   4        |x |  |  |  |x |   |   |   |  |  |  |  |  |  |   |   |
 |   5        |x |  |  |  |x |   |   |   |  |  |  |  |  |  |   |   |
 |   6        |x |  |  |  |  |   |   |   |  |  |  |  |  |  |   |   |
-|   7        |  |  |x |  |x |   |   |   |  |  |  |  |  |  |   |   |
-|   8        |  |x |  |  |x |   |   |   |  |  |  |  |  |  |   |   |
+|   7        |x |x |x |  |x |   |   |   |  |  |  |  |  |  |   |   |
+|   8        |x |x |  |  |x |   |   |   |  |  |  |  |  |  |   |   |
 |   9        |x |  |  |  |x |   |   |   |  |  |  |  |  |  |   |   |
-|   10       |  |  |x |  |  |   |   |   |  |  |  |  |  |  |   |   |
-|   11       |  |x |  |  |  |   |   |   |  |  |  |  |  |  |   |   |
+|   10       |x |  |x |  |  |   |   |   |  |  |  |  |  |  |   |   |
+|   11       |x |x |  |  |  |   |   |   |  |  |  |  |  |  |   |   |
 |   12       |x |  |  |  |  |   |   |   |  |  |  |  |  |  |   |   |
-|   13       |  |x |x |  |  |   |   |   |  |  |  |  |  |  |   |   |
+|   13       |x |x |x |  |  |   |   |   |  |  |  |  |  |  |   |   |
 |   14       |  |  |  |  |x |   |   |   |  |  |  |  |  |  |   |   |
-|   15       |  |  |  |  |x |   |   |   |  |  |  |  |  |  |   |   |
+|   15       |x |  |  |  |x |   |   |   |  |  |  |  |  |  |   |   |
 |   16       |x |  |  |  |  |   |   |   |  |  |  |  |  |  |   |   |
 |   17       |x |  |  |x |x |x  |   |   |  |  |  |  |  |  |   |   |
 |   18       |x |  |  |x |x |x  |   |   |  |  |  |  |  |  |   |   |
@@ -68,13 +71,16 @@ This section specifies the attributes and rules for the following list of Financ
 |   23       |  |  |  |  |x |   |x  |x  |  |  |  |  |  |  |   |   |
 |   24       |  |  |  |x |x |x  |x  |x  |  |  |  |  |  |  |   |   |
 |   25       |  |  |  |  |  |x  |x  |x  |  |  |  |  |  |  |   |   |
-|   26       |x |  |  |  |  |   |   |   |  |  |  |  |  |  |   |   |
+|   26       |x |x |x |  |x |   |   |   |  |  |  |  |  |  |   |   |
 |   27       |x |  |  |  |x |   |   |   |x |x |x |x |  |x |x  |x  |
 |   28       |x |  |  |  |  |   |   |   |x |x |x |x |  |x |x  |x  |
 |   29       |x |  |  |  |  |   |   |   |x |x |x |x |  |x |x  |x  |
 |   30       |x |  |  |  |x |   |   |   |x |x |x |x |  |x |x  |x  |
 |   31       |x |  |  |  |  |   |   |   |x |x |x |x |  |x |x  |x  |
 |   32       |  |  |  |  |x |   |   |   |x |x |  |x |  |x |x  |x  |
+|   33       |x |  |  |  |x |   |   |   |  |  |  |  |  |  |   |   |
+|   34       |x |  |  |x |  |x  |   |   |  |  |  |  |  |  |   |   |
+|   35       |x |x |  |x |  |   |   |   |  |  |  |  |  |  |   |   |
 
 The fields with an x are those which are required by the profile. The full names of the fields are as follows;
 

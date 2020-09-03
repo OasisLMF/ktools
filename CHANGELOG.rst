@@ -1,12 +1,46 @@
 Ktools Changelog
 ================
 
+.. * [#_](https://github.com/OasisLMF/OasisLMF/issues/_) -  
+
+`v3.3.4`_
+---------
 .. start_latest_release
+
+* [#397](https://github.com/OasisLMF/OasisPlatform/issues/397) - Calculate metrics by ensemble ID in aalcalc and leccalc
+* Add ensembletobin and ensembletocsv executables to convert file containing ensemble IDs between csv and binary formats
+
+.. end_latest_release
+
+`v3.3.3`_
+---------
+* [#131](https://github.com/OasisLMF/ktools/issues/131) - Changed missing intensity bins error to warning in validatevulnerability
+* [#133](https://github.com/OasisLMF/ktools/issues/133) - Better handling of invalid vulnerability IDs in getmodel
+* [#134](https://github.com/OasisLMF/ktools/issues/134) - Fixed issue with fully correlated output in gulcalc when using alloc rule 0
+
+`v3.3.2`_
+---------
+* [#566](https://github.com/OasisLMF/OasisLMF/issues/566) - Handle unlimited LayerLimit without large default value
+* [#578](https://github.com/OasisLMF/OasisLMF/issues/578) - Missing combination of terms in calcrules to add
+
+`v3.3.1`_
+---------
+
+* [#117](https://github.com/OasisLMF/ktools/issues/117) - Reduced gulcalc memory use for gul alloc rule 1
+* [#127](https://github.com/OasisLMF/ktools/issues/127) - Introduce support for full correlation output for gul alloc rule 0
+
+
+`v3.3.0`_
+---------
+* [#124](https://github.com/OasisLMF/ktools/issues/124) - Update CMake build files   
+* [#103](https://github.com/OasisLMF/ktools/issues/103) - Fixed issue with leccalc and the periods file
+* [#120](https://github.com/OasisLMF/ktools/issues/120) - Add calcrule for ded % loss and normal limit
+
+
 `v3.2.6`_
 ---------
 * #121 - Move footprint file open/close to outside of event loop
 
-.. end_latest_release
 
 `v3.2.5`_
 ---------
@@ -72,7 +106,7 @@ Ktools Changelog
 * fix to reduce Gulcalc memory footprint size
 
 `v3.1.2`_
---------
+---------
 * Fixes to CMake build
 * Added validation tools
 * Fix for compressed footprint filenames
@@ -264,6 +298,7 @@ Release features:
 
 * First Alpha release of the kernel toolkit
 
+.. _`v3.3.0`:  https://github.com/OasisLMF/ktools/compare/v3.2.6...v3.3.0
 .. _`v3.2.6`:  https://github.com/OasisLMF/ktools/compare/v3.2.4...v3.2.6
 .. _`v3.2.5`:  https://github.com/OasisLMF/ktools/compare/v3.2.4...v3.2.5
 .. _`v3.2.4`:  https://github.com/OasisLMF/ktools/compare/v3.2.3...v3.2.4

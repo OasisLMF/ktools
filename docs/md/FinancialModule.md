@@ -61,7 +61,7 @@ Groups are defined within levels and they represent aggregations of losses on wh
 
 Each level calculation applies to the to_agg_id groupings in the heirarchy. There is no calculation applied to the from_agg_id groupings at level 1 - these ids directly correspond to the ids in the loss input. 
 
-#### Figure 2. Example level 1 grouping
+#### Figure 2. Example level 2 grouping
 ![alt text](../img/fm2.jpg "Example level 1 grouping")
 
 ### Loss values

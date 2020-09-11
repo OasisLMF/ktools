@@ -59,7 +59,9 @@ There are many ways an insurance loss can be calculated with many different term
 
 Groups are defined within levels and they represent aggregations of losses on which to perform the financial calculations.  The grouping fields are called from_agg_id and to_agg_id which represent a grouping of losses at the previous level and the present level of the hierarchy, respectively.  
 
-#### Figure 2. Example level 1 grouping
+Each level calculation applies to the to_agg_id groupings in the heirarchy. There is no calculation applied to the from_agg_id groupings at level 1 - these ids directly correspond to the ids in the loss input. 
+
+#### Figure 2. Example level 2 grouping
 ![alt text](../img/fm2.jpg "Example level 1 grouping")
 
 ### Loss values

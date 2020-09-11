@@ -2,15 +2,20 @@ Ktools Changelog
 ================
 
 .. * [#_](https://github.com/OasisLMF/OasisLMF/issues/_) -  
-
-`v3.3.4`_
+`v3.3.5`_
 ---------
 .. start_latest_release
 
-* [#397](https://github.com/OasisLMF/OasisPlatform/issues/397) - Calculate metrics by ensemble ID in aalcalc and leccalc
-* Add ensembletobin and ensembletocsv executables to convert file containing ensemble IDs between csv and binary formats
+* [#123](https://github.com/OasisLMF/ktools/issues/123) - handle over limit - under limit when some prior losses are unlimited
+* Updated FM diagrams and clarified hierarchy in Financial Module documentation
 
 .. end_latest_release
+
+`v3.3.4`_
+---------
+
+* [#397](https://github.com/OasisLMF/OasisPlatform/issues/397) - Calculate metrics by ensemble ID in aalcalc and leccalc
+* Add ensembletobin and ensembletocsv executables to convert file containing ensemble IDs between csv and binary formats
 
 `v3.3.3`_
 ---------

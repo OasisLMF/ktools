@@ -172,7 +172,7 @@ void doit(const gulcalcopts &opt)
 	covout = opt.covout;
 	corrout = opt.corrout;
 	if (opt.itemLevelOutput == true) {
-		if (opt.allocRule == 0 || opt.allocRule == 1) lossWriter = itemWriter;   // If alloc rule has been specified
+		if (opt.allocRule == 0 || opt.allocRule == 1 || opt.allocRule == 2) lossWriter = itemWriter;   // If alloc rule has been specified
 		else if (opt.mode == 0) itmWriter = itemWriter;
 		else {
 			fprintf(stderr, "FATAL: gulcalc: Invalid combination of alloc rule %d and mode %d\n", opt.allocRule, opt.mode);

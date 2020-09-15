@@ -102,7 +102,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'a':
 			gopt.allocRule = atoi(optarg);
-			gopt.mode = gopt.allocRule;   // set mode to alloc rule
+			// Set mode according to alloc rule
+			if (gopt.allocRule > 0) gopt.mode = 1;
+			else gopt.mode = 0;   // alloc rule = 0 loss stream is equivalent to deprecated item stream
 			break;
 		case 'b':
 			gopt.benchmark = true;

@@ -148,6 +148,7 @@ private:
 	void fillgulitemloss(const int item_id, const OASIS_FLOAT tiv, const int event_id, const int bin_index, const OASIS_FLOAT rval, const probrec &p, const int sample_id, std::vector<std::vector<gulItemIDLoss>> &gilv);
 	void writemode0output(const item_map_rec &er, const OASIS_FLOAT tiv, const int event_id, const int bin_index, const OASIS_FLOAT rval, const probrec &p, const int sample_id, const bool correlated);
 	void writemode1output(const int event_id, const OASIS_FLOAT tiv, std::vector<std::vector<gulItemIDLoss>> &gilv, const bool correlated);
+	void setmaxloss(std::vector<std::vector<gulItemIDLoss>> &gilv);
 	void(*itemWriter_)(const void *ibuf, int size, int count);
 	void(*coverageWriter_)(const void *ibuf, int size, int count);
     void (*lossWriter_)(const void *ibuf, int size, int count);	// loss stream writer
@@ -164,6 +165,7 @@ private:
 	int itembufoffset_ = 0;
 	int correlatedbufoffset_ = 0;
 	int covbufoffset_ = 0;
+	int alloc_rule_;
 	double loss_threshold_;
 	rd_option rndopt_;
 	bool debug_;
@@ -214,6 +216,7 @@ public:
 		cbuf_ = new unsigned char[bufsize + sizeof(gulitemSampleslevel)]; // make the allocation bigger by 1 record to avoid overrunning
 		//TODO: when using double precision, these buffers above are overflowing,
 		//the hack fix is to replace sizeof(gulitemSampleslevel) with 2*sizeof(gulitemSampleslevel)
+		alloc_rule_ = opt.allocRule;
 		loss_threshold_ = opt.loss_threshold;
 		rndopt_ = opt.rndopt;				
 		debug_ = opt.debug;

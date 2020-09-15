@@ -282,10 +282,47 @@ void gulcalc::clearmode1_data() {
 	mode1UsedCoverageIDs_.clear();
 }
 
+
+// Set losses for alloc rule where total peril loss = maximum subperil loss
+void gulcalc::setmaxloss(std::vector<std::vector<gulItemIDLoss>> &gilv) {
+
+	for (size_t i = 3; i < gilv.size(); i++) {
+
+		OASIS_FLOAT max_loss = 0.0;
+		int max_loss_count = 0;
+
+		// First loop: find maximum loss and count occurrences
+		auto iter = gilv[i].begin();
+		while (iter != gilv[i].end()) {
+			if (iter->loss > max_loss) {
+				max_loss = iter->loss;
+				max_loss_count = 0;
+			}
+			if (iter->loss == max_loss) max_loss_count++;
+			iter++;
+		}
+
+		// Second loop: distribute maximum losses evenly among highest
+		// contributing subperils and set other losses to 0
+		iter = gilv[i].begin();
+		while (iter != gilv[i].end()) {
+			if (iter->loss == max_loss) iter->loss /= max_loss_count;
+			else iter->loss = 0;
+			iter++;
+		}
+
+	}
+
+}
+
+
 void gulcalc::writemode1output(const int event_id, const OASIS_FLOAT tiv,
 			       std::vector<std::vector<gulItemIDLoss>> &gilv,
 			       const bool correlated=false) {
 
+	// Set losses for alloc rule where
+	// total peril loss = maximum subperil loss
+	if (alloc_rule_ == 2) setmaxloss(gilv);
 
 	std::map<int, std::vector<gulSampleslevelRec>> gxi;
 

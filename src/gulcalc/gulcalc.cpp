@@ -286,7 +286,7 @@ void gulcalc::clearmode1_data() {
 // Set losses for alloc rule where total peril loss = maximum subperil loss
 void gulcalc::setmaxloss(std::vector<std::vector<gulItemIDLoss>> &gilv) {
 
-	for (size_t i = 3; i < gilv.size(); i++) {
+	for (size_t i = 1; i < gilv.size(); i++) {
 
 		OASIS_FLOAT max_loss = 0.0;
 		int max_loss_count = 0;

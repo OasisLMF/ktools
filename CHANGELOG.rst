@@ -2,18 +2,21 @@ Ktools Changelog
 ================
 
 .. * [#_](https://github.com/OasisLMF/OasisLMF/issues/_) -  
-`v3.3.5`_
+
+`v3.3.6`_
 ---------
 .. start_latest_release
+* [#91](https://github.com/OasisLMF/ktools/issues/91) - Add gulcalc alloc rule 2 where total peril loss = maximum subperil loss
+* [#606](https://github.com/OasisLMF/OasisLMF/issues/606) - Add calcrules 19, 26, 35 and 36
+.. end_latest_release
 
+`v3.3.5`_
+---------
 * [#123](https://github.com/OasisLMF/ktools/issues/123) - handle over limit - under limit when some prior losses are unlimited
 * Updated FM diagrams and clarified hierarchy in Financial Module documentation
 
-.. end_latest_release
-
 `v3.3.4`_
 ---------
-
 * [#397](https://github.com/OasisLMF/OasisPlatform/issues/397) - Calculate metrics by ensemble ID in aalcalc and leccalc
 * Add ensembletobin and ensembletocsv executables to convert file containing ensemble IDs between csv and binary formats
 

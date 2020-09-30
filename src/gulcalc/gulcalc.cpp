@@ -689,6 +689,7 @@ void gulcalc::output_mean_mode1(const OASIS_FLOAT tiv, prob_mean *pp,
 		auto pos = bin_map_.find(*pp);
 		if (pos == bin_map_.end()) {
 			bin_map_[*pp] = bin_map_.size();
+			bin_lookup_.push_back(*pp);
 		}
 		bin_ids.push_back(bin_map_[*pp]);
 
@@ -773,19 +774,6 @@ void gulcalc::processrec_mode1(char* rec, int recsize) {
 
 			iter++;
 
-		}
-
-	}
-
-	// Should be able to reuse damage bin map in most cases so only remake
-	// inverted lookup map if additional bins encountered
-	if (bin_map_.size() > bin_lookup_.size()) {
-
-		bin_lookup_.clear();
-		auto iter = bin_map_.begin();
-		while (iter != bin_map_.end()) {
-			bin_lookup_[iter->second] = iter->first;
-			iter++;
 		}
 
 	}

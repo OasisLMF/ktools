@@ -138,7 +138,7 @@ private:
 	std::vector<std::vector<std::vector<gulItemIDLoss>>> fullCorr_;
 	std::vector<std::vector<processrecData>> mode1_stats_;
 	std::map<prob_mean, int> bin_map_;
-	std::map<int, prob_mean> bin_lookup_;
+	std::vector<prob_mean> bin_lookup_;
 	std::vector<int> mode1UsedCoverageIDs_;
 	void covoutputgul(gulcoverageSampleslevel &gc);
 	void outputcoveragedata(int event_id);

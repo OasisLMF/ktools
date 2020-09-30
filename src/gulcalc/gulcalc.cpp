@@ -689,7 +689,7 @@ void gulcalc::output_mean_mode1(const OASIS_FLOAT tiv, prob_mean *pp,
 		auto pos = bin_map_.find(*pp);
 		if (pos == bin_map_.end()) {
 			bin_map_[*pp] = bin_map_.size();
-			bin_lookup_[bin_map_[*pp]] = *pp;
+			bin_lookup_.push_back(*pp);
 		}
 		bin_ids.push_back(bin_map_[*pp]);
 

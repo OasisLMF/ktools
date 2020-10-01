@@ -3,12 +3,16 @@ Ktools Changelog
 
 .. * [#_](https://github.com/OasisLMF/OasisLMF/issues/_) -  
 
-`v3.3.6`_
+`v3.3.7`_
 ---------
 .. start_latest_release
+* [#148](https://github.com/OasisLMF/ktools/issues/148) - Fix gulcalc performance issues
+.. end_latest_release
+
+`v3.3.6`_
+---------
 * [#91](https://github.com/OasisLMF/ktools/issues/91) - Add gulcalc alloc rule 2 where total peril loss = maximum subperil loss
 * [#606](https://github.com/OasisLMF/OasisLMF/issues/606) - Add calcrules 19, 26, 35 and 36
-.. end_latest_release
 
 `v3.3.5`_
 ---------

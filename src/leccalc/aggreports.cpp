@@ -301,7 +301,7 @@ void aggreports::fulluncertainty(int handle,const std::map<outkey2, OASIS_FLOAT>
 		OASIS_FLOAT last_computed_loss = 0;
 		int i = 1;
 		OASIS_FLOAT t = (OASIS_FLOAT)totalperiods_;
-		if (samplesize_) t = (OASIS_FLOAT)(totalperiods_ * samplesize_);
+		if (samplesize_) t *= samplesize_;
 		for (auto lp : lpv) {
 			OASIS_FLOAT retperiod = t / i;
 			if (useReturnPeriodFile_) {
@@ -340,7 +340,7 @@ void aggreports::fulluncertainty(int handle,const std::map<outkey2, OASIS_FLOAT>
 				OASIS_FLOAT last_computed_loss = 0;
 				int i = 1;
 				OASIS_FLOAT t = (OASIS_FLOAT)totalperiods_;
-				if (ensemble.second.size() > 0) t = (OASIS_FLOAT)(totalperiods_ * ensemble.second.size());
+				if (ensemble.second.size() > 0) t *= ensemble.second.size();
 				for (auto lp : lpv) {
 					OASIS_FLOAT retperiod = t / i;
 					if (useReturnPeriodFile_) {
@@ -554,9 +554,9 @@ void aggreports::wheatsheafwithweighting(int handle, const std::map<outkey2, OAS
 		OASIS_FLOAT last_computed_rp = 0;
 		OASIS_FLOAT last_computed_loss = 0;
 		int i = 1;
-		OASIS_FLOAT t = (float)totalperiods_;
+		OASIS_FLOAT t = (OASIS_FLOAT)totalperiods_;
 		for (auto lp : lpv) {
-			cummulative_weighting += (OASIS_FLOAT)(lp.period_weighting * samplesize_);
+			cummulative_weighting += (OASIS_FLOAT)lp.period_weighting * samplesize_;
 			if (lp.period_weighting) {
 				OASIS_FLOAT retperiod = 1 / cummulative_weighting;
 				if (useReturnPeriodFile_) {

@@ -39,6 +39,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <algorithm>    // std::sort
 #include <assert.h>
 #include "aggreports.h"
+#include "leccalc.h"
 #include "../include/oasis.h"
 
 struct line_points {
@@ -185,8 +186,8 @@ void aggreports::loadensemblemapping() {
 }
 
 
-inline void aggreports::writefulluncertainty(const int handle, const int type,
-	const std::map<outkey2, OASIS_FLOAT> &out_loss) {
+void aggreports::writefulluncertainty(const int handle, const int type,
+	const std::map<outkey2, OASIS_FLOAT> &out_loss, const int ensemble_id) {
 
 	std::map<int, lossvec2> items;
 	for (auto x : out_loss) {
@@ -221,14 +222,33 @@ inline void aggreports::writefulluncertainty(const int handle, const int type,
 			if (lp.period_weighting) {
 				OASIS_FLOAT retperiod = 1 / cummulative_weighting;
 				if (useReturnPeriodFile_) {
-					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, s.first, type);
+					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, s.first, type, ensemble_id);
 				}
 				else {
-					fprintf(fout_[handle], "%d,%d,%f,%f\n", s.first, type, retperiod, lp.value);
+					fprintf(fout_[handle], "%d,%d,%f,%f", s.first, type, retperiod, lp.value);
+					if (ensembletosidx_.size() > 0) fprintf(fout_[handle], ",%d", ensemble_id);
+					fprintf(fout_[handle], "\n");
 				}
 			}
 		}
 	}
+
+	// By ensemble ID
+	if (ensembletosidx_.size() > 0 && type == 2 && ensemble_id == 0) {
+		std::map<outkey2, OASIS_FLOAT> out_loss_by_ensemble_id;
+		out_loss_by_ensemble_id.clear();
+		for (auto ensemble : ensembletosidx_) {
+			for (auto sidx : ensemble.second) {
+				for (auto x : out_loss) {
+					if (x.first.sidx == sidx) out_loss_by_ensemble_id[x.first] = x.second;
+				}
+			}
+			writefulluncertainty(handle, type, 
+					     out_loss_by_ensemble_id,
+					     ensemble.first);
+		}
+	}
+
 }
 
 // this one should run using period table
@@ -237,7 +257,12 @@ void aggreports::fulluncertaintywithweighting(int handle,
 
 	if (fout_[handle] == nullptr) return;
 
-	if (skipheader_ == false) fprintf(fout_[handle], "summary_id,type,return_period,loss\n");
+	if (skipheader_ == false) {
+		fprintf(fout_[handle], "summary_id,type,return_period,loss");
+		if (ensembletosidx_.size() > 0)
+			fprintf(fout_[handle], ",ensemble_id");
+		fprintf(fout_[handle], "\n");
+	}
 	writefulluncertainty(handle, 1, out_loss);   // sidx = -1
 	writefulluncertainty(handle, 2, out_loss);   // sidx > 0
 

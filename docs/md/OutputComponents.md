@@ -88,7 +88,7 @@ $  leccalc -r -Ksummary1 -F lec_full_uncertainty_agg.csv -f lec_full_uncertainty
 
 leccalc requires the occurrence.bin file
 
-* static/occurrence.bin
+* input/occurrence.bin
 
 and will optionally use the following additional files if present
 
@@ -185,7 +185,7 @@ $ pltcalc < summarycalc.bin > plt.csv
 
 pltcalc requires the occurrence.bin file
 
-* static/occurrence.bin
+* input/occurrence.bin
 
 ##### Calculation
 
@@ -235,7 +235,7 @@ Two types of aal and standard deviation of loss are calculated; analytical (type
 
 aalcalc requires the occurrence.bin file 
 
-* static/occurrence.bin
+* input/occurrence.bin
 
 aalcalc does not have a standard input that can be streamed in. Instead, it reads in summarycalc binary data from a file in a fixed location.  The format of the binaries must match summarycalc standard output. The location is in the 'work' subdirectory of the present working directory. For example;
 

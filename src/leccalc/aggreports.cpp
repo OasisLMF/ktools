@@ -39,7 +39,6 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <algorithm>    // std::sort
 #include <assert.h>
 #include "aggreports.h"
-#include "leccalc.h"
 #include "../include/oasis.h"
 
 struct line_points {
@@ -566,7 +565,13 @@ void aggreports::wheatsheafwithweighting(int handle, const std::map<outkey2, OAS
 		}
 	}
 
-	if (skipheader_ == false) fprintf(fout_[handle], "summary_id,sidx,return_period,loss\n");
+	if (skipheader_ == false) {
+		fprintf(fout_[handle], "summary_id,sidx,return_period,loss");
+		if (ensembletosidx_.size() > 0) {
+			fprintf(fout_[handle], ",ensemble_id");
+		}
+		fprintf(fout_[handle], "\n");
+	}
 
 	for (auto s : items) {
 		// skip sidx = -1 from wheatsheaf output
@@ -587,9 +592,10 @@ void aggreports::wheatsheafwithweighting(int handle, const std::map<outkey2, OAS
 				if (useReturnPeriodFile_) {
 					if (nextreturnperiodindex == returnperiods_.size()) break;
 					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, s.first.summary_id, s.first.sidx);
-				}
-				else {
-					fprintf(fout_[handle], "%d,%d,%f,%f\n", s.first.summary_id, s.first.sidx, retperiod, lp.value);
+				} else {
+					fprintf(fout_[handle], "%d,%d,%f,%f", s.first.summary_id, s.first.sidx, retperiod, lp.value);
+					if (ensembletosidx_.size() > 0) fprintf(fout_[handle], ",0");
+					fprintf(fout_[handle], "\n");
 				}
 				i++;
 			}
@@ -603,7 +609,39 @@ void aggreports::wheatsheafwithweighting(int handle, const std::map<outkey2, OAS
 
 	}
 
-
+	// By ensemble ID
+	if (ensembletosidx_.size() > 0) {
+		for (auto ensemble : ensembletosidx_) {
+			for (auto s : items) {
+				if (std::find(ensemble.second.begin(), ensemble.second.end(), s.first.sidx) == ensemble.second.end()) continue;
+				OASIS_FLOAT cummulative_weighting = 0;
+				lossvec2 &lpv = s.second;
+				std::sort(lpv.rbegin(), lpv.rend());
+				size_t nextreturnperiodindex = 0;
+				OASIS_FLOAT last_computed_rp = 0;
+				OASIS_FLOAT last_computed_loss = 0;
+				OASIS_FLOAT t = (OASIS_FLOAT)totalperiods_;
+				for (auto lp : lpv) {
+					cummulative_weighting += (OASIS_FLOAT)lp.period_weighting * samplesize_;
+					if (lp.period_weighting) {
+						OASIS_FLOAT retperiod = 1 / cummulative_weighting;
+						if (useReturnPeriodFile_) {
+							if (nextreturnperiodindex == returnperiods_.size()) break;
+							doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, s.first.summary_id, s.first.sidx, ensemble.first);
+						} else {
+							fprintf(fout_[handle], "%d,%d,%f,%f,%d\n", s.first.summary_id, s.first.sidx, retperiod, lp.value, ensemble.first);
+						}
+					}
+				}
+				if (useReturnPeriodFile_) {
+					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, s.first.sidx, ensemble.first);
+					while (nextreturnperiodindex < returnperiods_.size()) {
+						doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, s.first.sidx, ensemble.first);
+					}
+				}
+			}
+		}
+	}
 
 }
 

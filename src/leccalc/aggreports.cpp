@@ -583,7 +583,6 @@ void aggreports::wheatsheafwithweighting(int handle, const std::map<outkey2, OAS
 		size_t nextreturnperiodindex = 0;
 		OASIS_FLOAT last_computed_rp = 0;
 		OASIS_FLOAT last_computed_loss = 0;
-		int i = 1;
 		OASIS_FLOAT t = (OASIS_FLOAT)totalperiods_;
 		for (auto lp : lpv) {
 			cummulative_weighting += (OASIS_FLOAT)lp.period_weighting * samplesize_;
@@ -597,7 +596,6 @@ void aggreports::wheatsheafwithweighting(int handle, const std::map<outkey2, OAS
 					if (ensembletosidx_.size() > 0) fprintf(fout_[handle], ",0");
 					fprintf(fout_[handle], "\n");
 				}
-				i++;
 			}
 		}
 		if (useReturnPeriodFile_) {
@@ -956,9 +954,6 @@ void aggreports::wheatSheafMean(int samplesize, int handle, const std::map<outke
 
 			for (auto s : items) {
 				if (std::find(ensemble.second.begin(), ensemble.second.end(), s.first.sidx) == ensemble.second.end()) continue;
-				size_t nextreturnperiodindex = 0;
-				OASIS_FLOAT last_computed_rp = 0;
-				OASIS_FLOAT last_computed_loss = 0;
 				lossvec &lpv = s.second;
 				std::sort(lpv.rbegin(), lpv.rend());
 				int i = 0;

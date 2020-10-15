@@ -1029,7 +1029,8 @@ void aggreports::outputAggWheatSheafMean(int samplesize)
 
 
 inline void aggreports::writeSampleMean(const int handle, const int type,
-	const std::map<summary_id_period_key, lossval> &items) {
+	const std::map<summary_id_period_key, lossval> &items,
+	const int ensemble_id) {
 
 	std::map<int, std::vector<lossval>> mean_map;
 
@@ -1049,17 +1050,19 @@ inline void aggreports::writeSampleMean(const int handle, const int type,
 			if (lp.period_weighting) {
 				OASIS_FLOAT retperiod = 1 / cummulative_weighting;
 				if (useReturnPeriodFile_) {
-					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, m.first, type);
+					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, m.first, type, ensemble_id);
 				}
 				else {
-					fprintf(fout_[handle], "%d,%d,%f,%f\n", m.first, type, retperiod, lp.value);
+					fprintf(fout_[handle], "%d,%d,%f,%f", m.first, type, retperiod, lp.value);
+					if (ensembletosidx_.size() > 0) fprintf(fout_[handle], ",%d", ensemble_id);
+					fprintf(fout_[handle], "\n");
 				}
 			}
 		}
 		if (useReturnPeriodFile_) {
-			doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first, type);
+			doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first, type, ensemble_id);
 			while (nextreturnperiodindex < returnperiods_.size()) {
-				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first, type);
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first, type, ensemble_id);
 			}
 		}
 	}
@@ -1096,9 +1099,35 @@ void aggreports::sampleMeanwithweighting(int samplesize, int handle, const std::
 		}
 	}
 	
-	if (skipheader_ == false) fprintf(fout_[handle], "summary_id,type,return_period,loss\n");
+	if (skipheader_ == false) {
+		fprintf(fout_[handle], "summary_id,type,return_period,loss");
+		if (ensembletosidx_.size() > 0) fprintf(fout_[handle], ",ensemble_id");
+		fprintf(fout_[handle], "\n");
+	}
 	writeSampleMean(handle, 1, itemsType1);   // sidx = -1
 	writeSampleMean(handle, 2, itemsType2);   // sidx > 0
+
+	// By ensemble ID
+	if (ensembletosidx_.size() > 0) {
+		for (auto ensemble : ensembletosidx_) {
+			itemsType2.clear();
+			for (auto sidx : ensemble.second) {
+				for (auto x : out_loss) {
+					summary_id_period_key sk;
+					auto iter = periodstoweighting_.find(x.first.period_no);
+					sk.period_no = x.first.period_no;
+					sk.summary_id = x.first.summary_id;
+					sk.type = 2;
+					if (iter != periodstoweighting_.end() && x.first.sidx == sidx) {
+						itemsType2[sk].period_weighting = iter->second;
+						itemsType2[sk].period_no = x.first.period_no;   // For debugging
+						itemsType2[sk].value += (x.second / samplesize);
+					}
+				}
+			}
+			writeSampleMean(handle, 2, itemsType2, ensemble.first);
+		}
+	}
 
 }
 

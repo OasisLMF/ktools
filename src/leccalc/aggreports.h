@@ -66,7 +66,7 @@ private:
 	void wheatSheafMeanwithweighting(int samplesize, int handle, const std::map<outkey2, OASIS_FLOAT> &out_loss);
 	void sampleMean(int samplesize, int handle, const std::map<outkey2, OASIS_FLOAT> &out_loss);
 	void sampleMeanwithweighting(int samplesize, int handle, const std::map<outkey2, OASIS_FLOAT> &out_loss);
-	inline void writeSampleMean(const int handle, const int type, const std::map<summary_id_period_key, lossval> &items);
+	inline void writeSampleMean(const int handle, const int type, const std::map<summary_id_period_key, lossval> &items, const int ensemble_id=0);
 	void loadreturnperiods();
 	OASIS_FLOAT getloss(OASIS_FLOAT nextreturnperiod, OASIS_FLOAT last_return_period, OASIS_FLOAT last_loss, 
 		OASIS_FLOAT current_return_period, OASIS_FLOAT current_loss) const;

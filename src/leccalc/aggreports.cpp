@@ -577,8 +577,6 @@ void aggreports::wheatsheafwithweighting(int handle, const std::map<outkey2, OAS
 		size_t nextreturnperiodindex = 0;
 		OASIS_FLOAT last_computed_rp = 0;
 		OASIS_FLOAT last_computed_loss = 0;
-		int i = 1;
-		OASIS_FLOAT t = (OASIS_FLOAT)totalperiods_;
 		OASIS_FLOAT max_retperiod = 0;
 		bool largest_loss = false;
 		for (auto lp : lpv) {
@@ -596,7 +594,6 @@ void aggreports::wheatsheafwithweighting(int handle, const std::map<outkey2, OAS
 				else {
 					fprintf(fout_[handle], "%d,%d,%f,%f\n", s.first.summary_id, s.first.sidx, retperiod, lp.value);
 				}
-				i++;
 			}
 		}
 		if (useReturnPeriodFile_) {

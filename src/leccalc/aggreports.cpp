@@ -434,7 +434,13 @@ void aggreports::doreturnperiodout(int handle, size_t &nextreturnperiod_index,
 		// maximum return period
 		OASIS_FLOAT loss;
 		if (max_retperiod < nextreturnperiod_value) {
-			loss = getloss(max_retperiod, last_return_period, last_loss, current_return_period, current_loss);
+			nextreturnperiod_index++;
+			if (nextreturnperiod_index < returnperiods_.size()) {
+				nextreturnperiod_value = (OASIS_FLOAT)returnperiods_[nextreturnperiod_index];
+			} else {
+				break;
+			}
+			continue;
 		} else {
 			loss = getloss(nextreturnperiod_value, last_return_period, last_loss, current_return_period, current_loss);
 		}

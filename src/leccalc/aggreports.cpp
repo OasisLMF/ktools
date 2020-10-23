@@ -211,6 +211,8 @@ void aggreports::writefulluncertainty(const int handle, const int type,
 		size_t nextreturnperiodindex = 0;
 		OASIS_FLOAT last_computed_rp = 0;
 		OASIS_FLOAT last_computed_loss = 0;
+		OASIS_FLOAT max_retperiod = 0;
+		bool largest_loss = false;
 		for (auto lp : lpv) {
 			if (type == 1) {
 				cummulative_weighting += (lp.period_weighting * samplesize_);
@@ -220,8 +222,12 @@ void aggreports::writefulluncertainty(const int handle, const int type,
 
 			if (lp.period_weighting) {
 				OASIS_FLOAT retperiod = 1 / cummulative_weighting;
+				if (!largest_loss) {
+					max_retperiod = retperiod;
+					largest_loss = true;
+				}
 				if (useReturnPeriodFile_) {
-					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, s.first, type, ensemble_id);
+					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, s.first, type, max_retperiod, ensemble_id);
 				}
 				else {
 					fprintf(fout_[handle], "%d,%d,%f,%f", s.first, type, retperiod, lp.value);
@@ -283,6 +289,8 @@ void aggreports::fulluncertainty(int handle,const std::map<outkey2, OASIS_FLOAT>
 		fprintf(fout_[handle], "\n");
 	}
 
+	OASIS_FLOAT max_retperiod = (OASIS_FLOAT)totalperiods_;
+
 	for (auto s : items) {
 		lossvec &lpv = s.second;
 		std::sort(lpv.rbegin(), lpv.rend());
@@ -294,7 +302,7 @@ void aggreports::fulluncertainty(int handle,const std::map<outkey2, OASIS_FLOAT>
 		for (auto lp : lpv) {
 			OASIS_FLOAT retperiod = t / i;
 			if (useReturnPeriodFile_) {
-				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, s.first, 1);
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, s.first, 1, max_retperiod);
 			}else{
 				fprintf(fout_[handle],"%d,1,%f,%f", s.first, retperiod, lp);
 				if (ensembletosidx_.size() > 0) fprintf(fout_[handle], ",0");
@@ -303,9 +311,9 @@ void aggreports::fulluncertainty(int handle,const std::map<outkey2, OASIS_FLOAT>
 			i++;
 		}
 		if (useReturnPeriodFile_) {
-			doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first, 1);
+			doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first, 1, max_retperiod);
 			while (nextreturnperiodindex < returnperiods_.size()) {
-				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first, 1);
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first, 1, max_retperiod);
 			}
 		}
 
@@ -326,10 +334,11 @@ void aggreports::fulluncertainty(int handle,const std::map<outkey2, OASIS_FLOAT>
 		int i = 1;
 		OASIS_FLOAT t = (OASIS_FLOAT)totalperiods_;
 		if (samplesize_) t *= samplesize_;
+		max_retperiod = t;
 		for (auto lp : lpv) {
 			OASIS_FLOAT retperiod = t / i;
 			if (useReturnPeriodFile_) {
-				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, s.first, 2);
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, s.first, 2, max_retperiod);
 			}
 			else {
 				fprintf(fout_[handle], "%d,2,%f,%f", s.first, retperiod, lp);
@@ -339,9 +348,9 @@ void aggreports::fulluncertainty(int handle,const std::map<outkey2, OASIS_FLOAT>
 			i++;
 		}
 		if (useReturnPeriodFile_) {
-			doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first, 2);
+			doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first, 2, max_retperiod);
 			while (nextreturnperiodindex < returnperiods_.size()) {
-				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first, 2);
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first, 2, max_retperiod);
 			}
 		}
 
@@ -365,19 +374,20 @@ void aggreports::fulluncertainty(int handle,const std::map<outkey2, OASIS_FLOAT>
 				int i = 1;
 				OASIS_FLOAT t = (OASIS_FLOAT)totalperiods_;
 				if (ensemble.second.size() > 0) t *= ensemble.second.size();
+				max_retperiod = t;
 				for (auto lp : lpv) {
 					OASIS_FLOAT retperiod = t / i;
 					if (useReturnPeriodFile_) {
-						doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, s.first, 2, ensemble.first);
+						doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, s.first, 2, max_retperiod, ensemble.first);
 					} else {
 						fprintf(fout_[handle], "%d,2,%f,%f,%d\n", s.first, retperiod, lp, ensemble.first);
 					}
 					i++;
 				}
 				if (useReturnPeriodFile_) {
-					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first, 2, ensemble.first);
+					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first, 2, max_retperiod, ensemble.first);
 					while (nextreturnperiodindex < returnperiods_.size()) {
-						doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first, 2, ensemble.first);
+						doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first, 2, max_retperiod, ensemble.first);
 					}
 				}
 
@@ -431,15 +441,33 @@ OASIS_FLOAT aggreports::getloss(OASIS_FLOAT next_return_period, OASIS_FLOAT last
 	return -1;		// we should NOT get HERE hence the -1 !!!
 }
 
-void aggreports::doreturnperiodout(int handle, size_t &nextreturnperiod_index, OASIS_FLOAT &last_return_period, OASIS_FLOAT &last_loss,
-			OASIS_FLOAT current_return_period, OASIS_FLOAT current_loss, int summary_id, int type, int ensemble_id)
+void aggreports::doreturnperiodout(int handle, size_t &nextreturnperiod_index,
+				   OASIS_FLOAT &last_return_period,
+				   OASIS_FLOAT &last_loss,
+				   OASIS_FLOAT current_return_period,
+				   OASIS_FLOAT current_loss, int summary_id,
+				   int type, OASIS_FLOAT max_retperiod,
+				   int ensemble_id)
 {
 	if (nextreturnperiod_index >= returnperiods_.size()) {
 		return;
 	}
 	OASIS_FLOAT nextreturnperiod_value = returnperiods_[nextreturnperiod_index];
 	while (current_return_period <= nextreturnperiod_value) {
-		OASIS_FLOAT loss = getloss(nextreturnperiod_value, last_return_period, last_loss, current_return_period, current_loss);
+		// Interpolated return period loss should not exceed that for
+		// maximum return period
+		OASIS_FLOAT loss;
+		if (max_retperiod < nextreturnperiod_value) {
+			nextreturnperiod_index++;
+			if (nextreturnperiod_index < returnperiods_.size()) {
+				nextreturnperiod_value = (OASIS_FLOAT)returnperiods_[nextreturnperiod_index];
+			} else {
+				break;
+			}
+			continue;
+		} else {
+			loss = getloss(nextreturnperiod_value, last_return_period, last_loss, current_return_period, current_loss);
+		}
 		if(type) {
 			fprintf(fout_[handle],"%d,%d,%f,%f", summary_id, type, (OASIS_FLOAT)nextreturnperiod_value, loss);
 			if (ensembletosidx_.size() > 0) fprintf(fout_[handle], ",%d", ensemble_id);
@@ -481,6 +509,8 @@ void aggreports::wheatsheaf(int handle, const std::map<outkey2, OASIS_FLOAT> &ou
 		fprintf(fout_[handle], "\n");
 	}
 
+	OASIS_FLOAT max_retperiod = (OASIS_FLOAT)totalperiods_;
+
 	for (auto s : items) {
 		if (s.first.sidx == -1) continue;		// skip -1 from wheatsheaf output
 		lossvec &lpv = s.second;
@@ -494,7 +524,7 @@ void aggreports::wheatsheaf(int handle, const std::map<outkey2, OASIS_FLOAT> &ou
 			OASIS_FLOAT retperiod = t / i;
 			if (useReturnPeriodFile_) {
 				if (nextreturnperiodindex == returnperiods_.size()) break;
-				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, s.first.summary_id, s.first.sidx);
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, s.first.summary_id, s.first.sidx, max_retperiod);
 			}else {
 				fprintf(fout_[handle],"%d,%d,%f,%f", s.first.summary_id, s.first.sidx, t / i, lp);
 				if (ensembletosidx_.size() > 0) fprintf(fout_[handle], ",0");
@@ -503,9 +533,9 @@ void aggreports::wheatsheaf(int handle, const std::map<outkey2, OASIS_FLOAT> &ou
 			i++;
 		}
 		if (useReturnPeriodFile_) {
-			doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, s.first.sidx);
+			doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, s.first.sidx, max_retperiod);
 			while (nextreturnperiodindex < returnperiods_.size()) {
-				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, s.first.sidx);
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, s.first.sidx, max_retperiod);
 			}
 		}
 
@@ -527,16 +557,16 @@ void aggreports::wheatsheaf(int handle, const std::map<outkey2, OASIS_FLOAT> &ou
 					OASIS_FLOAT retperiod = t / i;
 					if (useReturnPeriodFile_) {
 						if (nextreturnperiodindex == returnperiods_.size()) break;
-						doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, s.first.summary_id, s.first.sidx, ensemble.first);
+						doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, s.first.summary_id, s.first.sidx, max_retperiod, ensemble.first);
 					}else {
 						fprintf(fout_[handle],"%d,%d,%f,%f,%d\n", s.first.summary_id, s.first.sidx, t / i, lp, ensemble.first);
 					}
 					i++;
 				}
 				if (useReturnPeriodFile_) {
-					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, s.first.sidx, ensemble.first);
+					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, s.first.sidx, max_retperiod, ensemble.first);
 					while (nextreturnperiodindex < returnperiods_.size()) {
-						doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, s.first.sidx, ensemble.first);
+						doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, s.first.sidx, max_retperiod, ensemble.first);
 					}
 				}
 
@@ -583,14 +613,19 @@ void aggreports::wheatsheafwithweighting(int handle, const std::map<outkey2, OAS
 		size_t nextreturnperiodindex = 0;
 		OASIS_FLOAT last_computed_rp = 0;
 		OASIS_FLOAT last_computed_loss = 0;
-		OASIS_FLOAT t = (OASIS_FLOAT)totalperiods_;
+		OASIS_FLOAT max_retperiod = 0;
+		bool largest_loss = false;
 		for (auto lp : lpv) {
 			cummulative_weighting += (OASIS_FLOAT)lp.period_weighting * samplesize_;
 			if (lp.period_weighting) {
 				OASIS_FLOAT retperiod = 1 / cummulative_weighting;
+				if (!largest_loss) {
+					max_retperiod = retperiod;
+					largest_loss = true;
+				}
 				if (useReturnPeriodFile_) {
 					if (nextreturnperiodindex == returnperiods_.size()) break;
-					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, s.first.summary_id, s.first.sidx);
+					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, s.first.summary_id, s.first.sidx, max_retperiod);
 				} else {
 					fprintf(fout_[handle], "%d,%d,%f,%f", s.first.summary_id, s.first.sidx, retperiod, lp.value);
 					if (ensembletosidx_.size() > 0) fprintf(fout_[handle], ",0");
@@ -599,9 +634,9 @@ void aggreports::wheatsheafwithweighting(int handle, const std::map<outkey2, OAS
 			}
 		}
 		if (useReturnPeriodFile_) {
-			doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, s.first.sidx);
+			doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, s.first.sidx, max_retperiod);
 			while (nextreturnperiodindex < returnperiods_.size()) {
-				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, s.first.sidx);
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, s.first.sidx, max_retperiod);
 			}
 		}
 
@@ -618,23 +653,28 @@ void aggreports::wheatsheafwithweighting(int handle, const std::map<outkey2, OAS
 				size_t nextreturnperiodindex = 0;
 				OASIS_FLOAT last_computed_rp = 0;
 				OASIS_FLOAT last_computed_loss = 0;
-				OASIS_FLOAT t = (OASIS_FLOAT)totalperiods_;
+				OASIS_FLOAT max_retperiod = 0;
+				bool largest_loss = false;
 				for (auto lp : lpv) {
 					cummulative_weighting += (OASIS_FLOAT)lp.period_weighting * samplesize_;
 					if (lp.period_weighting) {
 						OASIS_FLOAT retperiod = 1 / cummulative_weighting;
+						if (!largest_loss) {
+							max_retperiod = retperiod;
+							largest_loss = true;
+						}
 						if (useReturnPeriodFile_) {
 							if (nextreturnperiodindex == returnperiods_.size()) break;
-							doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, s.first.summary_id, s.first.sidx, ensemble.first);
+							doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, s.first.summary_id, s.first.sidx, max_retperiod, ensemble.first);
 						} else {
 							fprintf(fout_[handle], "%d,%d,%f,%f,%d\n", s.first.summary_id, s.first.sidx, retperiod, lp.value, ensemble.first);
 						}
 					}
 				}
 				if (useReturnPeriodFile_) {
-					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, s.first.sidx, ensemble.first);
+					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, s.first.sidx, max_retperiod, ensemble.first);
 					while (nextreturnperiodindex < returnperiods_.size()) {
-						doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, s.first.sidx, ensemble.first);
+						doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, s.first.sidx, max_retperiod, ensemble.first);
 					}
 				}
 			}
@@ -700,6 +740,8 @@ void aggreports::wheatSheafMeanwithweighting(int samplesize, int handle, const s
 		lossvec2 &lpv = s.second;
 		std::sort(lpv.rbegin(), lpv.rend());
 		OASIS_FLOAT cummulative_weighting = 0;
+		OASIS_FLOAT max_retperiod = 0;
+		bool largest_loss = false;
 		if (s.first.sidx != -1) {
 			for (auto lp : lpv) {
 				lossval &l = mean_map[s.first.summary_id][lp.period_no-1];
@@ -713,20 +755,23 @@ void aggreports::wheatSheafMeanwithweighting(int samplesize, int handle, const s
 				cummulative_weighting += (OASIS_FLOAT)(lp.period_weighting * samplesize_);
 				if (lp.period_weighting) {
 					OASIS_FLOAT retperiod = 1 / cummulative_weighting;
+					if (!largest_loss) {
+						max_retperiod = retperiod;
+						largest_loss = true;
+					}
 					if (useReturnPeriodFile_) {
-						doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, s.first.summary_id, 1);
+						doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, s.first.summary_id, 1, max_retperiod);
 					} else {
 						fprintf(fout_[handle], "%d,1,%f,%f", s.first.summary_id, retperiod, lp.value);
 						if (ensembletosidx_.size() > 0) fprintf(fout_[handle], ",0");
 						fprintf(fout_[handle], "\n");
 					}
 				}
-
 			}
 			if (useReturnPeriodFile_) {
-				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, 1);
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, 1, max_retperiod);
 				while (nextreturnperiodindex < returnperiods_.size()) {
-					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, 1);
+					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, 1, max_retperiod);
 				}
 			}
 		}
@@ -748,13 +793,19 @@ void aggreports::wheatSheafMeanwithweighting(int samplesize, int handle, const s
 		OASIS_FLOAT last_computed_loss = 0;
 		int i = 1;
 		OASIS_FLOAT cummulative_weighting = 0;
+		OASIS_FLOAT max_retperiod = 0;
+		bool largest_loss = false;
 		for (auto lp : lpv) {
 			cummulative_weighting += (OASIS_FLOAT)(lp.period_weighting * samplesize_);
 			if (lp.period_weighting) {
 				OASIS_FLOAT retperiod = 1 / cummulative_weighting;
+				if (!largest_loss) {
+					max_retperiod = retperiod;
+					largest_loss = true;
+				}
 				if (useReturnPeriodFile_) {
 					OASIS_FLOAT loss = lp.value / samplesize;
-					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, loss, m.first, 2);
+					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, loss, m.first, 2, max_retperiod);
 				} else {
 					fprintf(fout_[handle], "%d,2,%f,%f", m.first, retperiod, lp.value / samplesize);
 					if (ensembletosidx_.size() > 0) fprintf(fout_[handle], ",0");
@@ -765,9 +816,9 @@ void aggreports::wheatSheafMeanwithweighting(int samplesize, int handle, const s
 			if (i > maxindex) break;
 		}
 		if (useReturnPeriodFile_) {
-			doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first, 2);
+			doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first, 2, max_retperiod);
 			while (nextreturnperiodindex < returnperiods_.size()) {
-				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first, 2);
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first, 2, max_retperiod);
 			}
 		}
 	}
@@ -816,13 +867,19 @@ void aggreports::wheatSheafMeanwithweighting(int samplesize, int handle, const s
 				OASIS_FLOAT last_computed_loss = 0;
 				int i = 1;
 				OASIS_FLOAT cummulative_weighting = 0;
+				OASIS_FLOAT max_retperiod = 0;
+				bool largest_loss = false;
 				for (auto lp : lpv) {
 					cummulative_weighting += (OASIS_FLOAT)(lp.period_weighting * samplesize_);
 					if (lp.period_weighting) {
 						OASIS_FLOAT retperiod = 1 / cummulative_weighting;
+						if (!largest_loss) {
+							max_retperiod = retperiod;
+							largest_loss = true;
+						}
 						if (useReturnPeriodFile_) {
 							OASIS_FLOAT loss = lp.value / samplesize;
-							doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, loss, m.first, 2, ensemble.first);
+							doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, loss, m.first, 2, max_retperiod, ensemble.first);
 						} else {
 							fprintf(fout_[handle], "%d,2,%f,%f,%d\n", m.first, retperiod, lp.value / samplesize, ensemble.first);
 						}
@@ -831,9 +888,9 @@ void aggreports::wheatSheafMeanwithweighting(int samplesize, int handle, const s
 					if (i > maxindex) break;
 				}
 				if (useReturnPeriodFile_) {
-					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first, 2, ensemble.first);
+					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first, 2, max_retperiod, ensemble.first);
 					while (nextreturnperiodindex < returnperiods_.size()) {
-						doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first, 2, ensemble.first);
+						doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first, 2, max_retperiod, ensemble.first);
 					}
 				}
 			}
@@ -867,6 +924,9 @@ void aggreports::wheatSheafMean(int samplesize, int handle, const std::map<outke
 		if (ensembletosidx_.size() > 0) fprintf(fout_[handle], ",ensemble_id");
 		fprintf(fout_[handle], "\n");
 	}
+
+	OASIS_FLOAT max_retperiod = (OASIS_FLOAT)totalperiods_;
+
 	for (auto s : items) {
 		size_t nextreturnperiodindex = 0;
 		OASIS_FLOAT last_computed_rp = 0;
@@ -886,7 +946,7 @@ void aggreports::wheatSheafMean(int samplesize, int handle, const std::map<outke
 			for (auto lp : lpv) {
 				OASIS_FLOAT retperiod = t / i;
 				if (useReturnPeriodFile_) {
-					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, s.first.summary_id,1);
+					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, s.first.summary_id, 1, max_retperiod);
 				}else {
 					fprintf(fout_[handle],"%d,1,%f,%f\n", s.first.summary_id, retperiod, lp);
 				}
@@ -894,9 +954,9 @@ void aggreports::wheatSheafMean(int samplesize, int handle, const std::map<outke
 				i++;
 			}
 			if (useReturnPeriodFile_) {
-				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id,1);
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, 1, max_retperiod);
 				while (nextreturnperiodindex < returnperiods_.size()) {
-					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id,1);
+					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, 1, max_retperiod);
 				}
 			}
 		}
@@ -922,7 +982,7 @@ void aggreports::wheatSheafMean(int samplesize, int handle, const std::map<outke
 			OASIS_FLOAT retperiod = t / i;
 			if (useReturnPeriodFile_) {
 				OASIS_FLOAT loss = lp / samplesize;
-				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, loss, m.first,2);
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, loss, m.first, 2, max_retperiod);
 			}else {
 				fprintf(fout_[handle],"%d,2,%f,%f\n", m.first, retperiod, lp / samplesize);
 			}
@@ -930,9 +990,9 @@ void aggreports::wheatSheafMean(int samplesize, int handle, const std::map<outke
 			if (i > maxindex) break;
 		}
 		if (useReturnPeriodFile_) {
-			doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first, 2);
+			doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first, 2, max_retperiod);
 			while (nextreturnperiodindex < returnperiods_.size()) {
-				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first, 2);
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first, 2, max_retperiod);
 			}
 		}
 	}
@@ -981,7 +1041,7 @@ void aggreports::wheatSheafMean(int samplesize, int handle, const std::map<outke
 					OASIS_FLOAT retperiod = t / i;
 					if (useReturnPeriodFile_) {
 						OASIS_FLOAT loss = lp / ensemble.second.size();
-						doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, loss, m.first,2, ensemble.first);
+						doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, loss, m.first,2, max_retperiod, ensemble.first);
 					} else {
 						fprintf(fout_[handle],"%d,2,%f,%f,%d\n", m.first, retperiod, lp / ensemble.second.size(), ensemble.first);
 					}
@@ -989,9 +1049,9 @@ void aggreports::wheatSheafMean(int samplesize, int handle, const std::map<outke
 					if (i > maxindex) break;
 				}
 				if (useReturnPeriodFile_) {
-					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first, 2, ensemble.first);
+					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first, 2, max_retperiod, ensemble.first);
 					while (nextreturnperiodindex < returnperiods_.size()) {
-						doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first, 2, ensemble.first);
+						doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first, 2, max_retperiod, ensemble.first);
 					}
 				}
 			}
@@ -1040,12 +1100,18 @@ inline void aggreports::writeSampleMean(const int handle, const int type,
 		OASIS_FLOAT last_computed_rp = 0;
 		OASIS_FLOAT last_computed_loss = 0;
 		OASIS_FLOAT cummulative_weighting = 0;
+		OASIS_FLOAT max_retperiod = 0;
+		bool largest_loss = false;
 		for (auto lp : lpv) {
 			cummulative_weighting += (OASIS_FLOAT) (lp.period_weighting * samplesize_);
 			if (lp.period_weighting) {
 				OASIS_FLOAT retperiod = 1 / cummulative_weighting;
+				if (!largest_loss) {
+					max_retperiod = retperiod;
+					largest_loss = true;
+				}
 				if (useReturnPeriodFile_) {
-					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, m.first, type, ensemble_id);
+					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, m.first, type, max_retperiod, ensemble_id);
 				}
 				else {
 					fprintf(fout_[handle], "%d,%d,%f,%f", m.first, type, retperiod, lp.value);
@@ -1055,9 +1121,9 @@ inline void aggreports::writeSampleMean(const int handle, const int type,
 			}
 		}
 		if (useReturnPeriodFile_) {
-			doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first, type, ensemble_id);
+			doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first, type, max_retperiod, ensemble_id);
 			while (nextreturnperiodindex < returnperiods_.size()) {
-				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first, type, ensemble_id);
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first, type, max_retperiod, ensemble_id);
 			}
 		}
 	}
@@ -1163,6 +1229,8 @@ void aggreports::sampleMean(int samplesize, int handle, const std::map<outkey2, 
 		mean_map[st].push_back(s.second);
 	}
 
+	OASIS_FLOAT max_retperiod = (OASIS_FLOAT)totalperiods_;
+
 	for (auto m : mean_map) {
 		std::vector<OASIS_FLOAT> &lpv = m.second;
 		std::sort(lpv.rbegin(), lpv.rend());
@@ -1174,7 +1242,7 @@ void aggreports::sampleMean(int samplesize, int handle, const std::map<outkey2, 
 		for (auto lp : lpv) {
 			OASIS_FLOAT retperiod = t / i;
 			if (useReturnPeriodFile_) {
-				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, m.first.summary_id, m.first.type);
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, m.first.summary_id, m.first.type, max_retperiod);
 			}else {
 				fprintf(fout_[handle],"%d,%d,%f,%f", m.first.summary_id, m.first.type, retperiod, lp);
 				if (ensembletosidx_.size() > 0) fprintf(fout_[handle], ",0");
@@ -1183,9 +1251,9 @@ void aggreports::sampleMean(int samplesize, int handle, const std::map<outkey2, 
 			i++;
 		}
 		if (useReturnPeriodFile_) {
-			doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first.summary_id, m.first.type);
+			doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first.summary_id, m.first.type, max_retperiod);
 			while (nextreturnperiodindex < returnperiods_.size()) {
-				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first.summary_id, m.first.type);
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first.summary_id, m.first.type, max_retperiod);
 			}
 		}
 	}
@@ -1225,16 +1293,16 @@ void aggreports::sampleMean(int samplesize, int handle, const std::map<outkey2, 
 				for (auto lp : lpv) {
 					OASIS_FLOAT retperiod = t / i;
 					if (useReturnPeriodFile_) {
-						doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, m.first.summary_id, m.first.type, ensemble.first);
+						doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, m.first.summary_id, m.first.type, max_retperiod, ensemble.first);
 					} else {
 						fprintf(fout_[handle],"%d,%d,%f,%f,%d\n", m.first.summary_id, m.first.type, retperiod, lp, ensemble.first);
 					}
 					i++;
 				}
 				if (useReturnPeriodFile_) {
-					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first.summary_id, m.first.type, ensemble.first);
+					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first.summary_id, m.first.type, max_retperiod, ensemble.first);
 					while (nextreturnperiodindex < returnperiods_.size()) {
-						doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first.summary_id, m.first.type, ensemble.first);
+						doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first.summary_id, m.first.type, max_retperiod, ensemble.first);
 					}
 				}
 			}

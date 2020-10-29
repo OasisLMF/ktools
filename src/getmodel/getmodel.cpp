@@ -219,7 +219,7 @@ void getmodel::doResults(
   int &event_id, AREAPERIL_INT &areaperil_id,
   std::map<AREAPERIL_INT, std::set<int>> &vulnerabilities_by_area_peril,
   std::map<int, std::vector<OASIS_FLOAT>> &vulnerabilities,
-  std::vector<OASIS_FLOAT> intensity) const {
+  std::map<int, OASIS_FLOAT> intensity) const {
 
   for (int vulnerability_id : vulnerabilities_by_area_peril[areaperil_id]) {
     std::vector<Result> results;
@@ -234,20 +234,18 @@ void getmodel::doResults(
 	      __func__, vulnerability_id);
       exit(-1);
     }
-    int vulnerability_index = 0;
     double cumulative_prob = 0;
-    for (int damage_bin_index = 0; damage_bin_index < _num_damage_bins;
+    for (int damage_bin_index = 1; damage_bin_index <= _num_damage_bins;
          damage_bin_index++) {
       double prob = 0.0f;
-      for (int intensity_bin_index = 0;
-           intensity_bin_index < _num_intensity_bins; intensity_bin_index++) {
-	prob += vulnerability[vulnerability_index++] *
-                intensity[intensity_bin_index];
+      for (auto i : intensity) {
+	prob += vulnerability[getVulnerabilityIndex(i.first, damage_bin_index)] *
+		i.second;
       }
 
       cumulative_prob += prob;
       results[result_index++] = Result(static_cast<OASIS_FLOAT>(cumulative_prob),
-                                       _mean_damage_bins[damage_bin_index]);
+                                       _mean_damage_bins[damage_bin_index-1]);
 
       if (cumulative_prob > 0.999999940)
         break; // single precision value approx 1
@@ -348,9 +346,8 @@ void getmodel::doCdf(FILE* fin, int event_id) {
 #ifndef _MSC_VER
 void getmodel::doCdfInnerz(FILE* fin, int event_id) {
   auto sizeof_EventKey = sizeof(EventRow);
-  auto intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);   
+  std::map<int, OASIS_FLOAT> intensity;
   bool do_cdf_for_area_peril = false;
-  intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);
   if (_event_index_by_event_id.count(event_id) == 0)
     return;
   flseek(fin, _event_index_by_event_id[event_id].offset, 0);
@@ -376,13 +373,15 @@ void getmodel::doCdfInnerz(FILE* fin, int event_id) {
         doResults(event_id, current_areaperil_id,
                   _vulnerability_ids_by_area_peril, _vulnerabilities,
                   intensity);
-        intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);
+	intensity.clear();
       }
       current_areaperil_id = event_key->areaperil_id;
       do_cdf_for_area_peril = (_area_perils.count(current_areaperil_id) == 1);
     }
     if (do_cdf_for_area_peril) {
-      intensity[event_key->intensity_bin_id - 1] = event_key->probability;
+      if (event_key->probability > 0) {
+	intensity[event_key->intensity_bin_id] = event_key->probability;
+      }
     }      
     event_key++;
   }
@@ -399,11 +398,10 @@ void getmodel::doCdfInner(FILE* fin, int event_id) {
 
   auto sizeof_EventKey = sizeof(EventRow);
 
-  auto intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);
+  std::map<int, OASIS_FLOAT> intensity;
 
   AREAPERIL_INT current_areaperil_id = -1;
   bool do_cdf_for_area_peril = false;
-  intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);
 
   if (_event_index_by_event_id.count(event_id) == 0){
     return;
@@ -418,13 +416,15 @@ void getmodel::doCdfInner(FILE* fin, int event_id) {
       if (do_cdf_for_area_peril) {
         // Generate and write the results
         doResults(event_id, current_areaperil_id, _vulnerability_ids_by_area_peril, _vulnerabilities, intensity);
-        intensity = std::vector<OASIS_FLOAT>(_num_intensity_bins, 0.0f);
+	intensity.clear();
       }
       current_areaperil_id = event_key.areaperil_id;
       do_cdf_for_area_peril = (_area_perils.count(current_areaperil_id) == 1);
     }
     if (do_cdf_for_area_peril) {
-      intensity[event_key.intensity_bin_id - 1] = event_key.probability;
+      if (event_key.probability > 0) {
+	intensity[event_key.intensity_bin_id] = event_key.probability;
+      }
     }
   }
   // Write out results for last event record

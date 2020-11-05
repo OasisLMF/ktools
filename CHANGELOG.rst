@@ -3,11 +3,16 @@ Ktools Changelog
 
 .. * [#_](https://github.com/OasisLMF/OasisLMF/issues/_) -  
 
+`v.3.3.8`_
+----------
+.. start_latest_release
+* [#98](https://github.com/OasisLMF/ktools/issues/98) - Fix integer overflow problem in leccalc
+* [#114](https://github.com/OasisLMF/ktools/issues/114) - Remove records where interpolated return period loss runs of bounds in leccalc
+.. end_latest_release
+
 `v3.3.7`_
 ---------
-.. start_latest_release
 * [#148](https://github.com/OasisLMF/ktools/issues/148) - Fix gulcalc performance issues
-.. end_latest_release
 
 `v3.3.6`_
 ---------

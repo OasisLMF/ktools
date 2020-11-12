@@ -90,7 +90,7 @@ private:
 		AREAPERIL_INT &areaperil_id,
         std::map<AREAPERIL_INT, std::set<int> > &vulnerabilities_by_area_peril,
         std::map<int, std::vector<OASIS_FLOAT> > &vulnerabilities,
-        std::vector<OASIS_FLOAT> intensity) const;
+	std::map<int, OASIS_FLOAT> intensity) const;
 
 	void  doResultsNoIntensityUncertainty(
 		int &event_id,

@@ -803,8 +803,9 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 				int vid = aggid_to_vectorlookup[agg_id - 1];
 				agg_vec[vec_idx].agg_id = avx[1][vid].agg_id;
 				agg_vec[vec_idx].item_idx = &avx[1][vid].item_idx;
-				if (isGULStreamType_ == true)	agg_vec[vec_idx].accumulated_tiv = item_to_tiv_[avx[1][vid].item_idx[0]+1];
-				else agg_vec[vec_idx].accumulated_tiv = 0;
+				if (isGULStreamType_ == true || stepped_ == true) {
+					agg_vec[vec_idx].accumulated_tiv = item_to_tiv_[avx[1][vid].item_idx[0]+1];
+				} else agg_vec[vec_idx].accumulated_tiv = 0;
 				agg_vec[vec_idx].policytc_id = avx[1][vid].policytc_id;
 			}
 

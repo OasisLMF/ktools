@@ -201,6 +201,7 @@ A component which converts gulcalc data in csv format into gulcalc binary item s
 
 ##### Parameters
 -S, the number of samples must be provided.  This can be equal to or greater than maximum sample index value that appears in the csv data.
+-t, the stream type of either 1 for the deprecated item stream or 2 for the loss stream. This is an optional parameter with default value 2.
 
 ##### Usage
 ```
@@ -212,6 +213,8 @@ $ gultobin [parameters] < [input].csv > [output].bin
 ```
 $ gultobin -S100 < gulcalci.csv | fmcalc > fmcalc.bin
 $ gultobin -S100 < gulcalci.csv > gulcalci.bin
+$ gultobin -S100 -t1 < gulcalci.csv > gulcalci.bin
+$ gultobin -S100 -t2 < gulcalci.csv > gulcalci.bin
 ```
 
 ##### Standard output stream
@@ -219,6 +222,7 @@ $ gultobin -S100 < gulcalci.csv > gulcalci.bin
 | Byte 1 | Bytes 2-4 |  Description             |
 |:-------|-----------|:-------------------------|
 |    1   |     1     |  gulcalc item            |
+|    2   |     1     |  gulcalc loss            |
 
 [Return to top](#streamconversioncomponents)
 

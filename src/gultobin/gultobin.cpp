@@ -48,7 +48,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #endif
 
 namespace gultobin {
-	void doit(int maxsampleindex)
+	void doit(int maxsampleindex, int streamType)
 	{
 
 		gulitemSampleslevel q;
@@ -56,7 +56,12 @@ namespace gultobin {
 		int lineno = 0;
 		fgets(line, sizeof(line), stdin);
 		lineno++;
-		int gulstream_type = gulstream_id | 1;
+		int gulstream_type;
+		if (streamType == 1) {
+			gulstream_type = gulstream_id | 1;
+		} else {
+			gulstream_type = loss_stream_id | 1;
+		}
 		fwrite(&gulstream_type, sizeof(int), 1, stdout);
 		fwrite(&maxsampleindex, sizeof(int), 1, stdout);
 		gulSampleslevelHeader gh;

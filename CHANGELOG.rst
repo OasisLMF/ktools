@@ -3,12 +3,18 @@ Ktools Changelog
 
 .. * [#_](https://github.com/OasisLMF/OasisLMF/issues/_) -  
 
-`v.3.3.8`_
-----------
+`v3.4.0`_
+---------
 .. start_latest_release
+* [#154](https://github.com/OasisLMF/ktools/issues/154) - Improve performance of getmodel when there is uncertainty in the footprint file
+* [#160](https://github.com/OasisLMF/ktools/issues/160) - Add stream type argument to gultobin
+* Implement step policies from loss stream in fmcalc
+.. end_latest_release
+
+`v3.3.8`_
+---------
 * [#98](https://github.com/OasisLMF/ktools/issues/98) - Fix integer overflow problem in leccalc
 * [#114](https://github.com/OasisLMF/ktools/issues/114) - Remove records where interpolated return period loss runs of bounds in leccalc
-.. end_latest_release
 
 `v3.3.7`_
 ---------

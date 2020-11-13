@@ -57,11 +57,11 @@ namespace gultobin {
 		fgets(line, sizeof(line), stdin);
 		lineno++;
 		int gulstream_type;
-		if (streamType == 1) {
+//		if (streamType == 1) {
 			gulstream_type = gulstream_id | 1;
-		} else {
-			gulstream_type = loss_stream_id | 1;
-		}
+//		} else {
+//			gulstream_type = loss_stream_id | 1;
+//		}
 		fwrite(&gulstream_type, sizeof(int), 1, stdout);
 		fwrite(&maxsampleindex, sizeof(int), 1, stdout);
 		gulSampleslevelHeader gh;

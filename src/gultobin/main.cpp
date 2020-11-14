@@ -55,7 +55,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 char* progname;
 namespace gultobin {
-	void doit(int maxsampleindex);
+	void doit(int maxsampleindex, int streamType);
 }
 
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
@@ -70,6 +70,7 @@ void help()
 {
 	fprintf(stderr,
 		"-S maximum sample index\n"
+		"-t stream type (default 2 = loss stream)\n"
 		"-h help\n"
 		"-v version\n");
 }
@@ -79,10 +80,14 @@ int main(int argc, char* argv[])
 
 	int opt;
 	int maxsampleindex = -1;
-	while ((opt = getopt(argc, argv, "vhS:")) != -1) {
+	int streamType = 2;
+	while ((opt = getopt(argc, argv, "vhS:t:")) != -1) {
 		switch (opt) {
 		case 'S':
 			maxsampleindex = atoi(optarg);
+			break;
+		case 't':
+			streamType = atoi(optarg);
 			break;
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
@@ -112,7 +117,11 @@ int main(int argc, char* argv[])
 			fprintf(stderr, "FATAL: Sample size not supplied - please use -S parameter followed by the sample size\n");
 			exit(EXIT_FAILURE);
 		}
-		gultobin::doit(maxsampleindex);
+		if (streamType != 1 && streamType != 2) {
+			fprintf(stderr, "FATAL: Unknown stream type %d - please use 1 for item stream or 2 for loss stream\n", streamType);
+			exit(EXIT_FAILURE);
+		}
+		gultobin::doit(maxsampleindex, streamType);
 
 		return EXIT_SUCCESS;
 	}catch (std::bad_alloc&) {

@@ -31,7 +31,7 @@ void fmcalc::doit()
 		isGULStreamType_ = false;
 		stream_type = streamno_mask & fmstream_type;
 	}
-	if (isGULStreamType_ == true) init_itemtotiv();
+	if (isGULStreamType_ == true || stepped_ == true) init_itemtotiv();
 	if (stream_type != 1) {
 		fprintf(stderr, "%s: Unsupported gul stream type %d\n", __func__, stream_type);
 		exit(-1);

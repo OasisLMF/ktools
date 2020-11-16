@@ -67,16 +67,13 @@ namespace damagebintobin {
 		while (fgets(line, sizeof(line), stdin) != 0)
 		{
 			int ret = doscan(line, q.bin_index, q.bin_from, q.bin_to, q.interpolation);
-			if (ret != 4){
-			fprintf(stderr, "FATAL: Invalid data in line %d:\n%s", lineno, line);
-			return;
-		}
-
-			else
-		{
-			fwrite(&q, sizeof(q), 1, stdout);
-		}
-		lineno++;
+			if (ret != 4) {
+				fprintf(stderr, "FATAL: Invalid data in line %d:\n%s", lineno, line);
+				return;
+			} else {
+				fwrite(&q, sizeof(q), 1, stdout);
+			}
+			lineno++;
 		}
 
 	}

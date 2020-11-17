@@ -18,7 +18,7 @@ The following components run validity checks on csv format files:
 ### validatedamagebin
 The following checks are performed on the damage bin dictionary:
 
-* Each line contains 5 values.
+* Each line contains 4 or 5 values.
 * First bin index is 1.
 * Bin indices are contiguous.
 * Interpolation lies inside range.
@@ -27,6 +27,7 @@ In addition, warnings are issued in the following cases:
 
 * Lower limit of first bin is not 0.
 * Upper limit of last bin is not 1.
+* Deprecated `interval_type` column included.
 
 The checks can be performed on `damage_bin_dict.csv` from the command line:
 

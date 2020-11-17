@@ -48,7 +48,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #endif
 
 namespace damagebintocsv {
-	void doit();
+	void doit(bool intervalType);
 }
 
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
@@ -69,15 +69,21 @@ void segfault_sigaction(int, siginfo_t *si, void *)
 
 void help()
 {
-	fprintf(stderr, "-h help\n-v version\n");
+	fprintf(stderr, "-i include deprecated interval_type column\n"
+			"-h help\n"
+			"-v version\n");
 }
 
 int main(int argc, char *argv[])
 {
 	progname = argv[0];
 	int opt;
-	while ((opt = getopt(argc, argv, "vh")) != -1) {
+	bool intervalType = false;
+	while ((opt = getopt(argc, argv, "ivh")) != -1) {
 		switch (opt) {
+		case 'i':
+			intervalType = true;
+			break;
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
 			::exit(EXIT_FAILURE);
@@ -101,7 +107,7 @@ int main(int argc, char *argv[])
 #endif
 	try {
 		initstreams();
-		damagebintocsv::doit();
+		damagebintocsv::doit(intervalType);
 		return EXIT_SUCCESS;
 	}
 	catch (std::bad_alloc&) {

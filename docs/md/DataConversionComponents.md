@@ -71,7 +71,12 @@ The csv file should contain the following fields and include a header row.
 | bin_from          | float  |    4   | Lower damage threshold for the bin                            |   0.01      |
 | bin_to            | float  |    4   | Upper damage threshold for the bin                            |   0.02      |
 | interpolation     | float  |    4   | Interpolation damage value for the bin (usually the mid-point)|   0.015     |
-| interval_type     | int    |    4   | Identifier of the interval type, e.g. closed, open            |   1201      | 
+
+The interval_type field has been deprecated and will be filled with zeros in the binary file. It does not need to be included as the final column in the csv file:
+
+| Name              | Type   |  Bytes | Description                                                    | Example     |
+|:------------------|--------|--------| :--------------------------------------------------------------|------------:|
+| interval_type     | int    |    4   | Identifier of the interval type, e.g. closed, open (deprecated)|    0        | 
 
 The data should be ordered by bin_index ascending and not contain nulls. The bin_index should be a contiguous sequence of integers starting from 1.
 
@@ -84,6 +89,11 @@ $ damagebintobin < damage_bin_dict.csv > damage_bin_dict.bin
 ```
 $ damagebintocsv < damage_bin_dict.bin > damage_bin_dict.csv
 ```
+The deprecated interval_type field can be sent to the output using the -i argument:
+```
+$ damagebintocsv -i < damage_bin_dict.bin > damage_bin_dict.csv
+```
+
 [Return to top](#dataconversioncomponents)
 
  <a id="intensitybins"></a>

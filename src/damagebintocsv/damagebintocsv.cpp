@@ -47,15 +47,19 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #endif
 
 namespace damagebintocsv {
-	void doit()
+	void doit(bool intervalType)
 	{
-		printf("\"bin_index\", \"bin_from\", \"bin_to\", \"interpolation\", \"interval_type\"\n");
+		printf("\"bin_index\", \"bin_from\", \"bin_to\", \"interpolation\"");
+		if (intervalType) printf(", \"interval_type\"");
+		printf("\n");
 
 		damagebindictionary q;
 		size_t i = fread(&q, sizeof(q), 1, stdin);
 		while (i != 0) {
-			printf("%d, %f, %f, %f, %d\n",
-				q.bin_index, q.bin_from, q.bin_to, q.interpolation, q.interval_type);
+			printf("%d, %f, %f, %f",
+				q.bin_index, q.bin_from, q.bin_to, q.interpolation);
+			if (intervalType) printf(", %d", q.interval_type);
+			printf("\n");
 
 			i = fread(&q, sizeof(q), 1, stdin);
 		}

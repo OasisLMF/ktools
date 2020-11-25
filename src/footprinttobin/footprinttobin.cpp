@@ -66,7 +66,10 @@ namespace footprinttobin {
 		return sscanf(line, "%d,%u,%d,%f", &event_id, &areaperil_id, &intensity_bin_id, &probability);
 	}
 
-	void doitz(int intensity_bins, int hasIntensityUncertainty, const char * binFileName, const char * idxFileName) {
+	void doitz(int intensity_bins, int hasIntensityUncertainty,
+		   int uncompressedSize, const char * binFileName,
+		   const char * idxFileName) {
+
 		FILE *foutx = fopen(binFileName, "wb");
 		FILE *fouty = fopen(idxFileName, "wb");
 
@@ -81,13 +84,15 @@ namespace footprinttobin {
 		idx.event_id = 0;
 		idx.offset = 0;
 		idx.size = 0;
+		long long originalSize = 0;
 		int event_id = 0;
 		std::set<int> events;
 		std::set<AREAPERIL_INT> areaperils;
 		fwrite(&intensity_bins, sizeof(intensity_bins), 1, foutx);
 		idx.offset += sizeof(intensity_bins);
-		fwrite(&hasIntensityUncertainty, sizeof(hasIntensityUncertainty), 1, foutx);
-		idx.offset += sizeof(hasIntensityUncertainty);
+		int zipOpts = uncompressedSize << 1 | hasIntensityUncertainty;
+		fwrite(&zipOpts, sizeof(zipOpts), 1, foutx);
+		idx.offset += sizeof(zipOpts);
 		std::vector<EventRow> rv;
 		std::vector<unsigned char> rvz;
 
@@ -126,13 +131,17 @@ namespace footprinttobin {
 					rvz.clear();
 					//len = sizeof(r) * rv.size();
 					//fwrite((unsigned char *)&rv[0], len, 1, foutx);
-					rv.clear();
 					if (last_event_id) {
 						idx.event_id = last_event_id;
 						idx.size = len;
 						fwrite(&idx, sizeof(idx), 1, fouty);
+						if (uncompressedSize) {
+							originalSize = rv.size() * sizeof(r);
+							fwrite(&originalSize, sizeof(originalSize), 1, fouty);
+						}
 						idx.offset += idx.size; // offset incremented for the next one
 					}
+					rv.clear();
 				}
 				last_event_id = event_id;
 			}
@@ -163,6 +172,10 @@ namespace footprinttobin {
 		idx.event_id = last_event_id;
 		idx.size = len;
 		fwrite(&idx, sizeof(idx), 1, fouty);
+		if (uncompressedSize) {
+			originalSize = rv.size() * sizeof(r);
+			fwrite(&originalSize, sizeof(originalSize), 1, fouty);
+		}
 		fclose(foutx);
 		fclose(fouty);
 	}

@@ -47,7 +47,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 namespace footprinttobin {
 	void doit(int intensity_bins, int hasIntensityUncertainty, const char * binFileName="footprint.bin", const char * idxFileName="footprint.idx");
-	void doitz(int intensity_bins, int hasIntensityUncertainty, const char * binFileName="footprint.bin.z", const char * idxFileName="footprint.idx.z");
+	void doitz(int intensity_bins, int hasIntensityUncertainty, int uncompressedSize, const char * binFileName="footprint.bin.z", const char * idxFileName="footprint.idx.z");
 }
 
 #include "../include/oasis.h"
@@ -76,12 +76,14 @@ void help() {
 		"-b [FILE NAME] output bin file name\n"
 		"-x [FILE NAME] output idx file name\n"
 		"-z zip footprint data\n"
+		"-u index file includes uncompressed data size\n"
 	);
 }
 
 int main(int argc, char *argv[]) {
 	int opt;
 	bool zip = false;
+	int uncompressedSize = false;
 	int intensity_bins = -1;
 	int hasIntensityUncertainty = true;
 	char *binFileName = 0;
@@ -89,7 +91,7 @@ int main(int argc, char *argv[]) {
 	char *idxFileName = 0;
 	bool idxFileGiven = false;
 	progname = argv[0];
-	while ((opt = getopt(argc, argv, "zvshni:b:x:")) != -1) {
+	while ((opt = getopt(argc, argv, "zuvshni:b:x:")) != -1) {
 		switch (opt) {
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
@@ -112,6 +114,9 @@ int main(int argc, char *argv[]) {
 		case 'z':
 			zip = true;
 			break;
+		case 'u':
+			uncompressedSize = true;
+			break;
 		case 'h':
 			help();
 			exit(EXIT_FAILURE);
@@ -125,6 +130,11 @@ int main(int argc, char *argv[]) {
 		help();
 		exit(EXIT_FAILURE);
 	}
+	if (uncompressedSize && !zip) {
+		fprintf(stderr, "WARNING: No request to zip footprint data\n"
+			"         Ignoring request to include uncompressed data size in index file\n");
+		uncompressedSize = false;
+	}
 
 	initstreams();
 
@@ -134,12 +144,12 @@ int main(int argc, char *argv[]) {
 		exit(-1);
 #else
 		if(binFileGiven && idxFileGiven) {
-			footprinttobin::doitz(intensity_bins, hasIntensityUncertainty, binFileName, idxFileName);
+			footprinttobin::doitz(intensity_bins, hasIntensityUncertainty, uncompressedSize, binFileName, idxFileName);
 		} else if(binFileGiven || idxFileGiven) {
 			fprintf(stderr, "FATAL: Must specify both bin and idx file names - aborted\n");
 			exit(EXIT_FAILURE);
 		} else {
-			footprinttobin::doitz(intensity_bins, hasIntensityUncertainty);
+			footprinttobin::doitz(intensity_bins, hasIntensityUncertainty, uncompressedSize);
 		}
 #endif
 	}

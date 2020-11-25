@@ -71,14 +71,19 @@ namespace footprinttocsv {
 		}
 	}
 
-	void printrowsz(int event_id, FILE *finx, long long size)
+	void printrowsz(int event_id, FILE *finx, long long size,
+			long long uncompressed_length)
 	{
 		uLongf i = 0;
 		std::vector<unsigned char > compressed_buf;
 		compressed_buf.resize(size + 1);
 
 		std::vector<unsigned char > uncompressed_buf;
-		uncompressed_buf.resize(size * 20);
+		if (uncompressed_length > 0) {
+			uncompressed_buf.resize(uncompressed_length);
+		} else {
+			uncompressed_buf.resize(size * 20);
+		}
 		fread(&compressed_buf[0], size, 1, finx);
 		uLongf dest_length = (uLongf)uncompressed_buf.size();
 		int ret = uncompress(&uncompressed_buf[0], &dest_length, &compressed_buf[0], size);
@@ -109,12 +114,24 @@ namespace footprinttocsv {
 		EventIndex current_idx;
 		EventIndex next_idx;
 
+		// Establish whether uncompressed data size is in index file
+		int zipOpts;
+		int uncompressedMask = 1 << 1;
+		flseek(finx, sizeof(int), SEEK_SET);
+		fread(&zipOpts, sizeof(zipOpts), 1, finx);
+		bool uncompressedSize = (zipOpts & uncompressedMask) >> 1;
+
 		if (finy == nullptr) {
 			fprintf(stderr, "FATAL: Footprint idx open failed\n");
 			exit(3);
 		}
 
 		size_t i = fread(&current_idx, sizeof(current_idx), 1, finy);
+		long long uncompressed_length = 0;
+		if (uncompressedSize) {
+			fread(&uncompressed_length, sizeof(uncompressed_length),
+			      1, finy);
+		}
 		size_t compressed_length = 0;
 		while (i != 0) {
 			i = fread(&next_idx, sizeof(next_idx), 1, finy);
@@ -128,7 +145,11 @@ namespace footprinttocsv {
 			}
 			if (current_idx.event_id >= from_event && current_idx.event_id <= to_event) {
 				flseek(finx, current_idx.offset, SEEK_SET);
-				printrowsz(current_idx.event_id, finx, compressed_length);
+				printrowsz(current_idx.event_id, finx, compressed_length, uncompressed_length);
+			}
+			if (uncompressedSize) {
+				fread(&uncompressed_length,
+				      sizeof(uncompressed_length), 1, finy);
 			}
 			if (i != 0) current_idx = next_idx;
 		}

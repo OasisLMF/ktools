@@ -122,6 +122,7 @@ void getmodel::getVulnerabilities(const std::set<int> &v) {
 }
 
 void getmodel::getIntensityInfo() {
+
 	std::string filename = FOOTPRINT_FILE;
 
 	if (_zip) {
@@ -135,6 +136,19 @@ void getmodel::getIntensityInfo() {
 	fread(&_num_intensity_bins, sizeof(_num_intensity_bins), 1, fin);
 	fread(&_has_intensity_uncertainty, sizeof(_has_intensity_uncertainty), 1,fin);
 	fclose(fin);
+
+	if (_zip) {
+		// Establish whether uncompressed data size is in index file
+		int uncompressedMask = 1 << 1;
+		_uncompressed_size =
+		    (_has_intensity_uncertainty & uncompressedMask) >> 1;
+
+		// Establish whether data has intensity uncertainty
+		int intensityMask = 1;
+		_has_intensity_uncertainty =
+		    (_has_intensity_uncertainty & intensityMask);
+	}
+
 }
 
 void getmodel::getItems(std::set<int> &v) {
@@ -206,6 +220,13 @@ void getmodel::getFootPrints(){
 	EventIndex event_index;
 	while (fread(&event_index, sizeof(event_index), 1, fin) != 0) {
 		_event_index_by_event_id[event_index.event_id] = event_index;
+		if (_uncompressed_size) {
+			long long uncompressedSize;
+			fread(&uncompressedSize, sizeof(uncompressedSize),
+			      1, fin);
+			_uncompressed_size_by_event_id[event_index.event_id] =
+			    uncompressedSize;
+		}
 	}
 
 	fclose(fin);
@@ -354,7 +375,12 @@ void getmodel::doCdfInnerz(FILE* fin, int event_id) {
 
   int size = _event_index_by_event_id[event_id].size;
   _compressed_buf.resize(size + 1);
-  _uncompressed_buf.resize(size * 20);
+  // If uncompressed size available, use that for length of destination buffer
+  if (_uncompressed_size) {
+    _uncompressed_buf.resize(_uncompressed_size_by_event_id[event_id]);
+  } else {   // Otherwise assume compression ratio no greater than 20:1
+    _uncompressed_buf.resize(size * 20);
+  }
   fread(&_compressed_buf[0], size, 1, fin);
   uLong dest_length = _uncompressed_buf.size();
   int ret = uncompress(&_uncompressed_buf[0], &dest_length, &_compressed_buf[0], size);

@@ -71,7 +71,6 @@ void segfault_sigaction(int, siginfo_t *si, void *) {
 void help() {
 	fprintf(stderr, "-i max intensity bins\n"
 		"-n No intensity uncertainty\n"
-		"-s skip header\n"
 		"-v version\n"
 		"-b [FILE NAME] output bin file name\n"
 		"-x [FILE NAME] output idx file name\n"
@@ -91,7 +90,7 @@ int main(int argc, char *argv[]) {
 	char *idxFileName = 0;
 	bool idxFileGiven = false;
 	progname = argv[0];
-	while ((opt = getopt(argc, argv, "zuvshni:b:x:")) != -1) {
+	while ((opt = getopt(argc, argv, "zuvhni:b:x:")) != -1) {
 		switch (opt) {
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);

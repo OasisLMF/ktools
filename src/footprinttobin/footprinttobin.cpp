@@ -129,18 +129,14 @@ namespace footprinttobin {
 					compress(&rvz[0], &len, (unsigned char *)&rv[0], rv.size() * sizeof(r));
 					fwrite((unsigned char *)&rvz[0], len, 1, foutx);
 					rvz.clear();
-					//len = sizeof(r) * rv.size();
-					//fwrite((unsigned char *)&rv[0], len, 1, foutx);
-					if (last_event_id) {
-						idx.event_id = last_event_id;
-						idx.size = len;
-						fwrite(&idx, sizeof(idx), 1, fouty);
-						if (uncompressedSize) {
-							originalSize = rv.size() * sizeof(r);
-							fwrite(&originalSize, sizeof(originalSize), 1, fouty);
-						}
-						idx.offset += idx.size; // offset incremented for the next one
+					idx.event_id = last_event_id;
+					idx.size = len;
+					fwrite(&idx, sizeof(idx), 1, fouty);
+					if (uncompressedSize) {
+						originalSize = rv.size() * sizeof(r);
+						fwrite(&originalSize, sizeof(originalSize), 1, fouty);
 					}
+					idx.offset += idx.size; // offset incremented for the next one
 					rv.clear();
 				}
 				last_event_id = event_id;

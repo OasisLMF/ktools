@@ -289,11 +289,13 @@ struct VulnerabilityRow
 	int damage_bin_id;
 	OASIS_FLOAT probability;
 };
+
 struct VulnerabilityIndex
 {
 	int vulnerability_id;
 	long long offset;
 	long long size;
+	long long original_size;
 };
 
 struct Periods

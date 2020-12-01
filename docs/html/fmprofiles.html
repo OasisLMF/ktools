@@ -1,199 +1,535 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <meta http-equiv="Content-Style-Type" content="text/css" />
-  <meta name="generator" content="pandoc" />
-  <title></title>
-  <style type="text/css">code{white-space: pre;}</style>
-  <style type="text/css">
-div.sourceCode { overflow-x: auto; }
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code > span.dt { color: #902000; } /* DataType */
-code > span.dv { color: #40a070; } /* DecVal */
-code > span.bn { color: #40a070; } /* BaseN */
-code > span.fl { color: #40a070; } /* Float */
-code > span.ch { color: #4070a0; } /* Char */
-code > span.st { color: #4070a0; } /* String */
-code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code > span.ot { color: #007020; } /* Other */
-code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code > span.fu { color: #06287e; } /* Function */
-code > span.er { color: #ff0000; font-weight: bold; } /* Error */
-code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-code > span.cn { color: #880000; } /* Constant */
-code > span.sc { color: #4070a0; } /* SpecialChar */
-code > span.vs { color: #4070a0; } /* VerbatimString */
-code > span.ss { color: #bb6688; } /* SpecialString */
-code > span.im { } /* Import */
-code > span.va { color: #19177c; } /* Variable */
-code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code > span.op { color: #666666; } /* Operator */
-code > span.bu { } /* BuiltIn */
-code > span.ex { } /* Extension */
-code > span.pp { color: #bc7a00; } /* Preprocessor */
-code > span.at { color: #7d9029; } /* Attribute */
-code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-  </style>
+<title>fmprofiles.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
 </head>
 <body>
-<p><img src="../img/banner.jpg" title="banner" alt="alt text" /></p>
-<h1 id="appendix-b-fm-profiles">Appendix B: FM Profiles <a id="fmprofiles"></a></h1>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<p><img src="../img/banner.jpg" alt="alt text" title="banner"></p>
+<h1 id="appendix-b-fm-profiles-a-id%22fmprofiles%22a">Appendix B: FM Profiles <a id="fmprofiles"></a></h1>
 <p>This section specifies the attributes and rules for the following list of Financial module profiles.</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Profile description</th>
-<th align="right">calcrule_id</th>
+<tr>
+<th style="text-align:left">Profile description</th>
+<th style="text-align:right">calcrule_id</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">Do nothing (pass losses through)</td>
-<td align="right">100</td>
+<tr>
+<td style="text-align:left">Do nothing (pass losses through)</td>
+<td style="text-align:right">100</td>
 </tr>
-<tr class="even">
-<td align="left">deductible and limit</td>
-<td align="right">1</td>
+<tr>
+<td style="text-align:left">deductible and limit</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="odd">
-<td align="left">deductible with attachment, limit and share</td>
-<td align="right">2</td>
+<tr>
+<td style="text-align:left">deductible with attachment, limit and share</td>
+<td style="text-align:right">2</td>
 </tr>
-<tr class="even">
-<td align="left">franchise deductible and limit</td>
-<td align="right">3</td>
+<tr>
+<td style="text-align:left">franchise deductible and limit</td>
+<td style="text-align:right">3</td>
 </tr>
-<tr class="odd">
-<td align="left">deductible % TIV and limit</td>
-<td align="right">4</td>
+<tr>
+<td style="text-align:left">deductible % TIV and limit</td>
+<td style="text-align:right">4</td>
 </tr>
-<tr class="even">
-<td align="left">deductible and limit % loss</td>
-<td align="right">5</td>
+<tr>
+<td style="text-align:left">deductible and limit % loss</td>
+<td style="text-align:right">5</td>
 </tr>
-<tr class="odd">
-<td align="left">deductible % TIV</td>
-<td align="right">6</td>
+<tr>
+<td style="text-align:left">deductible % TIV</td>
+<td style="text-align:right">6</td>
 </tr>
-<tr class="even">
-<td align="left">limit and maximum deductible</td>
-<td align="right">7</td>
+<tr>
+<td style="text-align:left">deductible, minimum and maximum deductible, with limit</td>
+<td style="text-align:right">7</td>
 </tr>
-<tr class="odd">
-<td align="left">limit and minimum deductible</td>
-<td align="right">8</td>
+<tr>
+<td style="text-align:left">deductible and minimum deductible, with limit</td>
+<td style="text-align:right">8</td>
 </tr>
-<tr class="even">
-<td align="left">limit with deductible % limit</td>
-<td align="right">9</td>
+<tr>
+<td style="text-align:left">limit with deductible % limit</td>
+<td style="text-align:right">9</td>
 </tr>
-<tr class="odd">
-<td align="left">maximum deductible</td>
-<td align="right">10</td>
+<tr>
+<td style="text-align:left">deductible and maximum deductible</td>
+<td style="text-align:right">10</td>
 </tr>
-<tr class="even">
-<td align="left">minimum deductible</td>
-<td align="right">11</td>
+<tr>
+<td style="text-align:left">deductible and minimum deductible</td>
+<td style="text-align:right">11</td>
 </tr>
-<tr class="odd">
-<td align="left">deductible</td>
-<td align="right">12</td>
+<tr>
+<td style="text-align:left">deductible</td>
+<td style="text-align:right">12</td>
 </tr>
-<tr class="even">
-<td align="left">minimum and maximum deductible</td>
-<td align="right">13</td>
+<tr>
+<td style="text-align:left">deductible, minimum and maximum deductible</td>
+<td style="text-align:right">13</td>
 </tr>
-<tr class="odd">
-<td align="left">limit only</td>
-<td align="right">14</td>
+<tr>
+<td style="text-align:left">limit only</td>
+<td style="text-align:right">14</td>
 </tr>
-<tr class="even">
-<td align="left">limit % loss</td>
-<td align="right">15</td>
+<tr>
+<td style="text-align:left">deductible and limit % loss</td>
+<td style="text-align:right">15</td>
 </tr>
-<tr class="odd">
-<td align="left">deductible % loss</td>
-<td align="right">16</td>
+<tr>
+<td style="text-align:left">deductible % loss</td>
+<td style="text-align:right">16</td>
 </tr>
-<tr class="even">
-<td align="left">deductible % loss with attachment, limit and share</td>
-<td align="right">17</td>
+<tr>
+<td style="text-align:left">deductible % loss with attachment, limit and share</td>
+<td style="text-align:right">17</td>
 </tr>
-<tr class="odd">
-<td align="left">deductible % tiv with attachment, limit and share</td>
-<td align="right">18</td>
+<tr>
+<td style="text-align:left">deductible % tiv with attachment, limit and share</td>
+<td style="text-align:right">18</td>
 </tr>
-<tr class="even">
-<td align="left">% loss deductible with min and max deductible</td>
-<td align="right">19</td>
+<tr>
+<td style="text-align:left">deductible % loss with min and/or max deductible</td>
+<td style="text-align:right">19</td>
 </tr>
-<tr class="odd">
-<td align="left">reverse franchise deductible</td>
-<td align="right">20</td>
+<tr>
+<td style="text-align:left">reverse franchise deductible</td>
+<td style="text-align:right">20</td>
 </tr>
-<tr class="even">
-<td align="left">% tiv deductible with min and max deductible</td>
-<td align="right">21</td>
+<tr>
+<td style="text-align:left">deductible % tiv with min and max deductible</td>
+<td style="text-align:right">21</td>
 </tr>
-<tr class="odd">
-<td align="left">reinsurance % ceded, limit and % placed</td>
-<td align="right">22</td>
+<tr>
+<td style="text-align:left">reinsurance % ceded, limit and % placed</td>
+<td style="text-align:right">22</td>
 </tr>
-<tr class="even">
-<td align="left">reinsurance limit and % placed</td>
-<td align="right">23</td>
+<tr>
+<td style="text-align:left">reinsurance limit and % placed</td>
+<td style="text-align:right">23</td>
 </tr>
-<tr class="odd">
-<td align="left">reinsurance excess terms</td>
-<td align="right">24</td>
+<tr>
+<td style="text-align:left">reinsurance excess terms</td>
+<td style="text-align:right">24</td>
 </tr>
-<tr class="even">
-<td align="left">reinsurance proportional terms</td>
-<td align="right">25</td>
+<tr>
+<td style="text-align:left">reinsurance proportional terms</td>
+<td style="text-align:right">25</td>
 </tr>
-<tr class="odd">
-<td align="left">deductible amount with min and max deductible</td>
-<td align="right">26</td>
+<tr>
+<td style="text-align:left">deductible % loss with min and/or max deductible and limit</td>
+<td style="text-align:right">26</td>
 </tr>
-<tr class="even">
-<td align="left">% tiv trigger and % tiv step payout with limit</td>
-<td align="right">27</td>
+<tr>
+<td style="text-align:left">% tiv trigger and % tiv step payout with limit</td>
+<td style="text-align:right">27</td>
 </tr>
-<tr class="odd">
-<td align="left">% tiv trigger and % loss step payout</td>
-<td align="right">28</td>
+<tr>
+<td style="text-align:left">% tiv trigger and % loss step payout</td>
+<td style="text-align:right">28</td>
 </tr>
-<tr class="even">
-<td align="left">% tiv trigger and % tiv step payout</td>
-<td align="right">29</td>
+<tr>
+<td style="text-align:left">% tiv trigger and % tiv step payout</td>
+<td style="text-align:right">29</td>
 </tr>
-<tr class="odd">
-<td align="left">% tiv trigger and % limit step payout</td>
-<td align="right">30</td>
+<tr>
+<td style="text-align:left">% tiv trigger and % limit step payout</td>
+<td style="text-align:right">30</td>
 </tr>
-<tr class="even">
-<td align="left">% tiv trigger and monetary amount step payout</td>
-<td align="right">31</td>
+<tr>
+<td style="text-align:left">% tiv trigger and monetary amount step payout</td>
+<td style="text-align:right">31</td>
 </tr>
-<tr class="odd">
-<td align="left">monetary amount trigger and % loss step payout with limit</td>
-<td align="right">32</td>
+<tr>
+<td style="text-align:left">monetary amount trigger and % loss step payout with limit</td>
+<td style="text-align:right">32</td>
+</tr>
+<tr>
+<td style="text-align:left">deductible % loss with limit</td>
+<td style="text-align:right">33</td>
+</tr>
+<tr>
+<td style="text-align:left">deductible with attachment and share</td>
+<td style="text-align:right">34</td>
+</tr>
+<tr>
+<td style="text-align:left">deductible % loss with min and/or max deductible and limit % loss</td>
+<td style="text-align:right">35</td>
+</tr>
+<tr>
+<td style="text-align:left">deductible with min and/or max deductible and limit % loss</td>
+<td style="text-align:right">36</td>
 </tr>
 </tbody>
 </table>
 <table>
 <thead>
-<tr class="header">
-<th align="left">calcrule_id</th>
+<tr>
+<th style="text-align:left">calcrule_id</th>
 <th>d1</th>
 <th>d2</th>
 <th>d3</th>
@@ -209,12 +545,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <th>pe</th>
 <th>l2</th>
 <th>sc1</th>
-<th align="right">sc2</th>
+<th style="text-align:right">sc2</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">100</td>
+<tr>
+<td style="text-align:left">100</td>
 <td></td>
 <td></td>
 <td></td>
@@ -230,10 +566,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <td></td>
 <td></td>
 <td></td>
-<td align="right"></td>
+<td style="text-align:right"></td>
 </tr>
-<tr class="even">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -249,10 +585,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <td></td>
 <td></td>
 <td></td>
-<td align="right"></td>
+<td style="text-align:right"></td>
 </tr>
-<tr class="odd">
-<td align="left">2</td>
+<tr>
+<td style="text-align:left">2</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -268,10 +604,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <td></td>
 <td></td>
 <td></td>
-<td align="right"></td>
+<td style="text-align:right"></td>
 </tr>
-<tr class="even">
-<td align="left">3</td>
+<tr>
+<td style="text-align:left">3</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -287,10 +623,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <td></td>
 <td></td>
 <td></td>
-<td align="right"></td>
+<td style="text-align:right"></td>
 </tr>
-<tr class="odd">
-<td align="left">4</td>
+<tr>
+<td style="text-align:left">4</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -306,10 +642,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <td></td>
 <td></td>
 <td></td>
-<td align="right"></td>
+<td style="text-align:right"></td>
 </tr>
-<tr class="even">
-<td align="left">5</td>
+<tr>
+<td style="text-align:left">5</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -325,10 +661,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <td></td>
 <td></td>
 <td></td>
-<td align="right"></td>
+<td style="text-align:right"></td>
 </tr>
-<tr class="odd">
-<td align="left">6</td>
+<tr>
+<td style="text-align:left">6</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -344,12 +680,12 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <td></td>
 <td></td>
 <td></td>
-<td align="right"></td>
+<td style="text-align:right"></td>
 </tr>
-<tr class="even">
-<td align="left">7</td>
-<td></td>
-<td></td>
+<tr>
+<td style="text-align:left">7</td>
+<td>x</td>
+<td>x</td>
 <td>x</td>
 <td></td>
 <td>x</td>
@@ -363,11 +699,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <td></td>
 <td></td>
 <td></td>
-<td align="right"></td>
+<td style="text-align:right"></td>
 </tr>
-<tr class="odd">
-<td align="left">8</td>
-<td></td>
+<tr>
+<td style="text-align:left">8</td>
+<td>x</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -382,10 +718,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <td></td>
 <td></td>
 <td></td>
-<td align="right"></td>
+<td style="text-align:right"></td>
 </tr>
-<tr class="even">
-<td align="left">9</td>
+<tr>
+<td style="text-align:left">9</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -401,11 +737,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <td></td>
 <td></td>
 <td></td>
-<td align="right"></td>
+<td style="text-align:right"></td>
 </tr>
-<tr class="odd">
-<td align="left">10</td>
-<td></td>
+<tr>
+<td style="text-align:left">10</td>
+<td>x</td>
 <td></td>
 <td>x</td>
 <td></td>
@@ -420,11 +756,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <td></td>
 <td></td>
 <td></td>
-<td align="right"></td>
+<td style="text-align:right"></td>
 </tr>
-<tr class="even">
-<td align="left">11</td>
-<td></td>
+<tr>
+<td style="text-align:left">11</td>
+<td>x</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -439,10 +775,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <td></td>
 <td></td>
 <td></td>
-<td align="right"></td>
+<td style="text-align:right"></td>
 </tr>
-<tr class="odd">
-<td align="left">12</td>
+<tr>
+<td style="text-align:left">12</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -458,13 +794,13 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <td></td>
 <td></td>
 <td></td>
-<td align="right"></td>
+<td style="text-align:right"></td>
 </tr>
-<tr class="even">
-<td align="left">13</td>
-<td></td>
+<tr>
+<td style="text-align:left">13</td>
 <td>x</td>
 <td>x</td>
+<td>x</td>
 <td></td>
 <td></td>
 <td></td>
@@ -477,10 +813,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <td></td>
 <td></td>
 <td></td>
-<td align="right"></td>
+<td style="text-align:right"></td>
 </tr>
-<tr class="odd">
-<td align="left">14</td>
+<tr>
+<td style="text-align:left">14</td>
 <td></td>
 <td></td>
 <td></td>
@@ -496,11 +832,11 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <td></td>
 <td></td>
 <td></td>
-<td align="right"></td>
+<td style="text-align:right"></td>
 </tr>
-<tr class="even">
-<td align="left">15</td>
-<td></td>
+<tr>
+<td style="text-align:left">15</td>
+<td>x</td>
 <td></td>
 <td></td>
 <td></td>
@@ -515,10 +851,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <td></td>
 <td></td>
 <td></td>
-<td align="right"></td>
+<td style="text-align:right"></td>
 </tr>
-<tr class="odd">
-<td align="left">16</td>
+<tr>
+<td style="text-align:left">16</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -534,10 +870,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <td></td>
 <td></td>
 <td></td>
-<td align="right"></td>
+<td style="text-align:right"></td>
 </tr>
-<tr class="even">
-<td align="left">17</td>
+<tr>
+<td style="text-align:left">17</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -553,10 +889,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <td></td>
 <td></td>
 <td></td>
-<td align="right"></td>
+<td style="text-align:right"></td>
 </tr>
-<tr class="odd">
-<td align="left">18</td>
+<tr>
+<td style="text-align:left">18</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -572,10 +908,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <td></td>
 <td></td>
 <td></td>
-<td align="right"></td>
+<td style="text-align:right"></td>
 </tr>
-<tr class="even">
-<td align="left">19</td>
+<tr>
+<td style="text-align:left">19</td>
 <td>x</td>
 <td>x</td>
 <td>x</td>
@@ -591,10 +927,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <td></td>
 <td></td>
 <td></td>
-<td align="right"></td>
+<td style="text-align:right"></td>
 </tr>
-<tr class="odd">
-<td align="left">20</td>
+<tr>
+<td style="text-align:left">20</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -610,10 +946,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <td></td>
 <td></td>
 <td></td>
-<td align="right"></td>
+<td style="text-align:right"></td>
 </tr>
-<tr class="even">
-<td align="left">21</td>
+<tr>
+<td style="text-align:left">21</td>
 <td>x</td>
 <td>x</td>
 <td>x</td>
@@ -629,10 +965,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <td></td>
 <td></td>
 <td></td>
-<td align="right"></td>
+<td style="text-align:right"></td>
 </tr>
-<tr class="odd">
-<td align="left">22</td>
+<tr>
+<td style="text-align:left">22</td>
 <td></td>
 <td></td>
 <td></td>
@@ -648,10 +984,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <td></td>
 <td></td>
 <td></td>
-<td align="right"></td>
+<td style="text-align:right"></td>
 </tr>
-<tr class="even">
-<td align="left">23</td>
+<tr>
+<td style="text-align:left">23</td>
 <td></td>
 <td></td>
 <td></td>
@@ -667,10 +1003,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <td></td>
 <td></td>
 <td></td>
-<td align="right"></td>
+<td style="text-align:right"></td>
 </tr>
-<tr class="odd">
-<td align="left">24</td>
+<tr>
+<td style="text-align:left">24</td>
 <td></td>
 <td></td>
 <td></td>
@@ -686,10 +1022,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <td></td>
 <td></td>
 <td></td>
-<td align="right"></td>
+<td style="text-align:right"></td>
 </tr>
-<tr class="even">
-<td align="left">25</td>
+<tr>
+<td style="text-align:left">25</td>
 <td></td>
 <td></td>
 <td></td>
@@ -705,10 +1041,14 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <td></td>
 <td></td>
 <td></td>
-<td align="right"></td>
+<td style="text-align:right"></td>
 </tr>
-<tr class="odd">
-<td align="left">26</td>
+<tr>
+<td style="text-align:left">26</td>
+<td>x</td>
+<td>x</td>
+<td>x</td>
+<td></td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -720,14 +1060,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <td></td>
 <td></td>
 <td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td align="right"></td>
+<td style="text-align:right"></td>
 </tr>
-<tr class="even">
-<td align="left">27</td>
+<tr>
+<td style="text-align:left">27</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -743,10 +1079,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <td></td>
 <td>x</td>
 <td>x</td>
-<td align="right">x</td>
+<td style="text-align:right">x</td>
 </tr>
-<tr class="odd">
-<td align="left">28</td>
+<tr>
+<td style="text-align:left">28</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -762,10 +1098,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <td></td>
 <td>x</td>
 <td>x</td>
-<td align="right">x</td>
+<td style="text-align:right">x</td>
 </tr>
-<tr class="even">
-<td align="left">29</td>
+<tr>
+<td style="text-align:left">29</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -781,10 +1117,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <td></td>
 <td>x</td>
 <td>x</td>
-<td align="right">x</td>
+<td style="text-align:right">x</td>
 </tr>
-<tr class="odd">
-<td align="left">30</td>
+<tr>
+<td style="text-align:left">30</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -800,10 +1136,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <td></td>
 <td>x</td>
 <td>x</td>
-<td align="right">x</td>
+<td style="text-align:right">x</td>
 </tr>
-<tr class="even">
-<td align="left">31</td>
+<tr>
+<td style="text-align:left">31</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -819,10 +1155,10 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <td></td>
 <td>x</td>
 <td>x</td>
-<td align="right">x</td>
+<td style="text-align:right">x</td>
 </tr>
-<tr class="odd">
-<td align="left">32</td>
+<tr>
+<td style="text-align:left">32</td>
 <td></td>
 <td></td>
 <td></td>
@@ -838,114 +1174,186 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <td></td>
 <td>x</td>
 <td>x</td>
-<td align="right">x</td>
+<td style="text-align:right">x</td>
+</tr>
+<tr>
+<td style="text-align:left">33</td>
+<td>x</td>
+<td></td>
+<td></td>
+<td></td>
+<td>x</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left">34</td>
+<td>x</td>
+<td></td>
+<td></td>
+<td>x</td>
+<td></td>
+<td>x</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left">35</td>
+<td>x</td>
+<td>x</td>
+<td>x</td>
+<td></td>
+<td>x</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td style="text-align:right"></td>
+</tr>
+<tr>
+<td style="text-align:left">36</td>
+<td>x</td>
+<td>x</td>
+<td>x</td>
+<td></td>
+<td>x</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td style="text-align:right"></td>
 </tr>
 </tbody>
 </table>
 <p>The fields with an x are those which are required by the profile. The full names of the fields are as follows;</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Short name</th>
-<th align="right">Profile field name</th>
+<tr>
+<th style="text-align:left">Short name</th>
+<th style="text-align:right">Profile field name</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">d1</td>
-<td align="right">deductible_1</td>
+<tr>
+<td style="text-align:left">d1</td>
+<td style="text-align:right">deductible_1</td>
 </tr>
-<tr class="even">
-<td align="left">d2</td>
-<td align="right">deductible_2</td>
+<tr>
+<td style="text-align:left">d2</td>
+<td style="text-align:right">deductible_2</td>
 </tr>
-<tr class="odd">
-<td align="left">d3</td>
-<td align="right">deductible_3</td>
+<tr>
+<td style="text-align:left">d3</td>
+<td style="text-align:right">deductible_3</td>
 </tr>
-<tr class="even">
-<td align="left">a1</td>
-<td align="right">attachment_1</td>
+<tr>
+<td style="text-align:left">a1</td>
+<td style="text-align:right">attachment_1</td>
 </tr>
-<tr class="odd">
-<td align="left">l1</td>
-<td align="right">limit_1</td>
+<tr>
+<td style="text-align:left">l1</td>
+<td style="text-align:right">limit_1</td>
 </tr>
-<tr class="even">
-<td align="left">sh1</td>
-<td align="right">share_1</td>
+<tr>
+<td style="text-align:left">sh1</td>
+<td style="text-align:right">share_1</td>
 </tr>
-<tr class="odd">
-<td align="left">sh2</td>
-<td align="right">share_2</td>
+<tr>
+<td style="text-align:left">sh2</td>
+<td style="text-align:right">share_2</td>
 </tr>
-<tr class="even">
-<td align="left">sh3</td>
-<td align="right">share_3</td>
+<tr>
+<td style="text-align:left">sh3</td>
+<td style="text-align:right">share_3</td>
 </tr>
-<tr class="odd">
-<td align="left">st</td>
-<td align="right">step_id</td>
+<tr>
+<td style="text-align:left">st</td>
+<td style="text-align:right">step_id</td>
 </tr>
-<tr class="even">
-<td align="left">ts</td>
-<td align="right">trigger_start</td>
+<tr>
+<td style="text-align:left">ts</td>
+<td style="text-align:right">trigger_start</td>
 </tr>
-<tr class="odd">
-<td align="left">te</td>
-<td align="right">trigger_end</td>
+<tr>
+<td style="text-align:left">te</td>
+<td style="text-align:right">trigger_end</td>
 </tr>
-<tr class="even">
-<td align="left">ps</td>
-<td align="right">payout_start</td>
+<tr>
+<td style="text-align:left">ps</td>
+<td style="text-align:right">payout_start</td>
 </tr>
-<tr class="odd">
-<td align="left">pe</td>
-<td align="right">payout_end</td>
+<tr>
+<td style="text-align:left">pe</td>
+<td style="text-align:right">payout_end</td>
 </tr>
-<tr class="even">
-<td align="left">l2</td>
-<td align="right">limit_2</td>
+<tr>
+<td style="text-align:left">l2</td>
+<td style="text-align:right">limit_2</td>
 </tr>
-<tr class="odd">
-<td align="left">sc1</td>
-<td align="right">scale_1</td>
+<tr>
+<td style="text-align:left">sc1</td>
+<td style="text-align:right">scale_1</td>
 </tr>
-<tr class="even">
-<td align="left">sc2</td>
-<td align="right">scale_2</td>
+<tr>
+<td style="text-align:left">sc2</td>
+<td style="text-align:right">scale_2</td>
 </tr>
 </tbody>
 </table>
 <p>An allocation rule can be assigned to each call of fmcalc, which determines whether calculated losses should be back-allocated to the contributing items, and if so how. This is specified via the command line parameter -a.</p>
 <p>The choices are as follows;</p>
 <table>
-<colgroup>
-<col width="84%" />
-<col width="15%" />
-</colgroup>
 <thead>
-<tr class="header">
-<th align="left">Allocrule description</th>
-<th align="right">allocrule_id</th>
+<tr>
+<th style="text-align:left">Allocrule description</th>
+<th style="text-align:right">allocrule_id</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">Don't back-allocate losses (default if no parameter supplied)</td>
-<td align="right">0</td>
+<tr>
+<td style="text-align:left">Don't back-allocate losses (default if no parameter supplied)</td>
+<td style="text-align:right">0</td>
 </tr>
-<tr class="even">
-<td align="left">Back allocate losses to items in proportion to input loss</td>
-<td align="right">1</td>
+<tr>
+<td style="text-align:left">Back allocate losses to items in proportion to input loss</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="odd">
-<td align="left">Back-allocate losses to items in proportion to prior level loss</td>
-<td align="right">2</td>
+<tr>
+<td style="text-align:left">Back-allocate losses to items in proportion to prior level loss</td>
+<td style="text-align:right">2</td>
 </tr>
-<tr class="even">
-<td align="left">Back-allocate losses to items in proportion to prior level loss (reinsurance)</td>
-<td align="right">3</td>
+<tr>
+<td style="text-align:left">Back-allocate losses to items in proportion to prior level loss (reinsurance)</td>
+<td style="text-align:right">3</td>
 </tr>
 </tbody>
 </table>
@@ -967,37 +1375,37 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <p>The over and under limit variables are initialised when there exist prior level limits. The possible cases are;</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Case</th>
+<tr>
+<th style="text-align:left">Case</th>
 <th>Under limit</th>
 <th>Over limit</th>
-<th align="left">Meaning</th>
+<th style="text-align:left">Meaning</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>0</td>
 <td>0</td>
-<td align="left">All prior level losses are exactly at their limits</td>
+<td style="text-align:left">All prior level losses are exactly at their limits</td>
 </tr>
-<tr class="even">
-<td align="left">2</td>
+<tr>
+<td style="text-align:left">2</td>
 <td>0</td>
 <td>&gt;0</td>
-<td align="left">Some prior level losses are over limit and none are under limit</td>
+<td style="text-align:left">Some prior level losses are over limit and none are under limit</td>
 </tr>
-<tr class="odd">
-<td align="left">3</td>
+<tr>
+<td style="text-align:left">3</td>
 <td>&gt;0</td>
 <td>0</td>
-<td align="left">Some prior level losses are under limit and none are over limit</td>
+<td style="text-align:left">Some prior level losses are under limit and none are over limit</td>
 </tr>
-<tr class="even">
-<td align="left">4</td>
+<tr>
+<td style="text-align:left">4</td>
 <td>&gt;0</td>
 <td>&gt;0</td>
-<td align="left">Some prior level losses are over limit and some are under limit</td>
+<td style="text-align:left">Some prior level losses are over limit and some are under limit</td>
 </tr>
 </tbody>
 </table>
@@ -1019,340 +1427,352 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li>x.effective_deductible is the input effective deductible to the calculation (where required)</li>
 <li>loss is the calculated loss</li>
 </ul>
-<h3 id="deductible-and-limit">1. Deductible and limit</h3>
+<h3 id="1-deductible-and-limit">1. Deductible and limit</h3>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Attributes</th>
-<th align="right">Example</th>
+<tr>
+<th style="text-align:left">Attributes</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">policytc_id</td>
-<td align="right">1</td>
+<tr>
+<td style="text-align:left">policytc_id</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">calcrule_id</td>
-<td align="right">1</td>
+<tr>
+<td style="text-align:left">calcrule_id</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="odd">
-<td align="left">deductible_1</td>
-<td align="right">50000</td>
+<tr>
+<td style="text-align:left">deductible_1</td>
+<td style="text-align:right">50000</td>
 </tr>
-<tr class="even">
-<td align="left">limit_1</td>
-<td align="right">900000</td>
+<tr>
+<td style="text-align:left">limit_1</td>
+<td style="text-align:right">900000</td>
 </tr>
 </tbody>
 </table>
 <h5 id="calculation-logic">Calculation logic</h5>
-<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash"><span class="ex">loss</span> = x.loss - deductible_1<span class="kw">;</span>
-<span class="kw">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&lt;</span> 0<span class="kw">)</span> <span class="ex">loss</span> = 0<span class="kw">;</span>
-<span class="kw">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&gt;</span> limit_1<span class="kw">)</span> <span class="ex">loss</span> = limit_1<span class="kw">;</span></code></pre></div>
-<h3 id="deductible-attachment-limit-and-share">2. Deductible, attachment, limit and share</h3>
+<pre class="hljs"><code><div>loss = x.loss - deductible_1;
+<span class="hljs-keyword">if</span> (loss &lt; 0) loss = 0;
+<span class="hljs-keyword">if</span> (loss &gt; limit_1) loss = limit_1;
+</div></code></pre>
+<h3 id="2-deductible-attachment-limit-and-share">2. Deductible, attachment, limit and share</h3>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Attributes</th>
-<th align="right">Example</th>
+<tr>
+<th style="text-align:left">Attributes</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">policytc_id</td>
-<td align="right">1</td>
+<tr>
+<td style="text-align:left">policytc_id</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">calcrule_id</td>
-<td align="right">2</td>
+<tr>
+<td style="text-align:left">calcrule_id</td>
+<td style="text-align:right">2</td>
 </tr>
-<tr class="odd">
-<td align="left">deductible_1</td>
-<td align="right">70000</td>
+<tr>
+<td style="text-align:left">deductible_1</td>
+<td style="text-align:right">70000</td>
 </tr>
-<tr class="even">
-<td align="left">attachment_1</td>
-<td align="right">0</td>
+<tr>
+<td style="text-align:left">attachment_1</td>
+<td style="text-align:right">0</td>
 </tr>
-<tr class="odd">
-<td align="left">limit_1</td>
-<td align="right">1000000</td>
+<tr>
+<td style="text-align:left">limit_1</td>
+<td style="text-align:right">1000000</td>
 </tr>
-<tr class="even">
-<td align="left">share_1</td>
-<td align="right">0.1</td>
+<tr>
+<td style="text-align:left">share_1</td>
+<td style="text-align:right">0.1</td>
 </tr>
 </tbody>
 </table>
-<h5 id="calculation-logic-1">Calculation logic</h5>
-<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash"><span class="ex">loss</span> = x.loss - deductible_1
-<span class="kw">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&lt;</span> 0<span class="kw">)</span> <span class="ex">loss</span> = 0<span class="kw">;</span>
-<span class="kw">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&gt;</span> (attachment_1 + limit_1<span class="kw">)</span>) <span class="ex">loss</span> = limit_1<span class="kw">;</span>
-    <span class="kw">else</span> <span class="ex">loss</span> = loss - attachment_1<span class="kw">;</span>
-<span class="kw">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&lt;</span> 0<span class="kw">)</span> <span class="ex">loss</span> = 0<span class="kw">;</span>
-<span class="ex">loss</span> = loss * share_1<span class="kw">;</span></code></pre></div>
-<h3 id="franchise-deductible-and-limit">3. Franchise deductible and limit</h3>
+<h5 id="calculation-logic">Calculation logic</h5>
+<pre class="hljs"><code><div>loss = x.loss - deductible_1
+<span class="hljs-keyword">if</span> (loss &lt; 0) loss = 0;
+<span class="hljs-keyword">if</span> (loss &gt; (attachment_1 + limit_1)) loss = limit_1;
+	<span class="hljs-keyword">else</span> loss = loss - attachment_1;
+<span class="hljs-keyword">if</span> (loss &lt; 0) loss = 0;
+loss = loss * share_1;
+</div></code></pre>
+<h3 id="3-franchise-deductible-and-limit">3. Franchise deductible and limit</h3>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Attributes</th>
-<th align="right">Example</th>
+<tr>
+<th style="text-align:left">Attributes</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">policytc_id</td>
-<td align="right">1</td>
+<tr>
+<td style="text-align:left">policytc_id</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">calcrule_id</td>
-<td align="right">3</td>
+<tr>
+<td style="text-align:left">calcrule_id</td>
+<td style="text-align:right">3</td>
 </tr>
-<tr class="odd">
-<td align="left">deductible_1</td>
-<td align="right">100000</td>
+<tr>
+<td style="text-align:left">deductible_1</td>
+<td style="text-align:right">100000</td>
 </tr>
-<tr class="even">
-<td align="left">limit_1</td>
-<td align="right">1000000</td>
+<tr>
+<td style="text-align:left">limit_1</td>
+<td style="text-align:right">1000000</td>
 </tr>
 </tbody>
 </table>
-<h5 id="calculation-logic-2">Calculation logic</h5>
-<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash"><span class="kw">if</span> <span class="kw">(</span><span class="ex">x.loss</span> <span class="op">&lt;</span> deductible_1<span class="kw">)</span> <span class="ex">loss</span> = 0<span class="kw">;</span>
-    <span class="kw">else</span> <span class="ex">loss</span> = x.loss<span class="kw">;</span>
-<span class="kw">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&gt;</span> limit_1<span class="kw">)</span> <span class="ex">loss</span> = limit_1<span class="kw">;</span></code></pre></div>
-<h3 id="deductible-and-limit-as-a-proportion-of-loss">5. Deductible and limit as a proportion of loss</h3>
+<h5 id="calculation-logic">Calculation logic</h5>
+<pre class="hljs"><code><div><span class="hljs-keyword">if</span> (x.loss &lt; deductible_1) loss = 0;
+	<span class="hljs-keyword">else</span> loss = x.loss;
+<span class="hljs-keyword">if</span> (loss &gt; limit_1) loss = limit_1;
+</div></code></pre>
+<h3 id="5-deductible-and-limit-as-a-proportion-of-loss">5. Deductible and limit as a proportion of loss</h3>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Attributes</th>
-<th align="right">Example</th>
+<tr>
+<th style="text-align:left">Attributes</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">policytc_id</td>
-<td align="right">1</td>
+<tr>
+<td style="text-align:left">policytc_id</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">calcrule_id</td>
-<td align="right">5</td>
+<tr>
+<td style="text-align:left">calcrule_id</td>
+<td style="text-align:right">5</td>
 </tr>
-<tr class="odd">
-<td align="left">deductible_1</td>
-<td align="right">0.05</td>
+<tr>
+<td style="text-align:left">deductible_1</td>
+<td style="text-align:right">0.05</td>
 </tr>
-<tr class="even">
-<td align="left">limit_1</td>
-<td align="right">0.3</td>
+<tr>
+<td style="text-align:left">limit_1</td>
+<td style="text-align:right">0.3</td>
 </tr>
 </tbody>
 </table>
-<h5 id="calculation-logic-3">Calculation logic</h5>
-<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash"><span class="ex">loss</span> = x.loss - (x.loss * deductible_1);
-<span class="kw">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&gt;</span> (x.loss * limit_1<span class="kw">)</span>) <span class="ex">loss</span> = x.loss * lim<span class="kw">;</span></code></pre></div>
-<h3 id="limit-with-deductible-as-a-proportion-of-limit">9. Limit with deductible as a proportion of limit</h3>
+<h5 id="calculation-logic">Calculation logic</h5>
+<pre class="hljs"><code><div>loss = x.loss - (x.loss * deductible_1);
+<span class="hljs-keyword">if</span> (loss &gt; (x.loss * limit_1)) loss = x.loss * lim;
+</div></code></pre>
+<h3 id="9-limit-with-deductible-as-a-proportion-of-limit">9. Limit with deductible as a proportion of limit</h3>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Attributes</th>
-<th align="right">Example</th>
+<tr>
+<th style="text-align:left">Attributes</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">policytc_id</td>
-<td align="right">1</td>
+<tr>
+<td style="text-align:left">policytc_id</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">calcrule_id</td>
-<td align="right">9</td>
+<tr>
+<td style="text-align:left">calcrule_id</td>
+<td style="text-align:right">9</td>
 </tr>
-<tr class="odd">
-<td align="left">deductible_1</td>
-<td align="right">0.05</td>
+<tr>
+<td style="text-align:left">deductible_1</td>
+<td style="text-align:right">0.05</td>
 </tr>
-<tr class="even">
-<td align="left">limit_1</td>
-<td align="right">100000</td>
+<tr>
+<td style="text-align:left">limit_1</td>
+<td style="text-align:right">100000</td>
 </tr>
 </tbody>
 </table>
-<h5 id="calculation-logic-4">Calculation logic</h5>
-<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash"><span class="ex">loss</span> = x.loss - (deductible_1 * limit_1);
-<span class="kw">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&lt;</span> 0<span class="kw">)</span> <span class="ex">loss</span> = 0<span class="kw">;</span>
-<span class="kw">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&gt;</span> limit_1<span class="kw">)</span> <span class="ex">loss</span> = limit_1<span class="kw">;</span></code></pre></div>
-<h3 id="maximum-deductible">10. Maximum deductible</h3>
+<h5 id="calculation-logic">Calculation logic</h5>
+<pre class="hljs"><code><div>loss = x.loss - (deductible_1 * limit_1);
+<span class="hljs-keyword">if</span> (loss &lt; 0) loss = 0;
+<span class="hljs-keyword">if</span> (loss &gt; limit_1) loss = limit_1;
+</div></code></pre>
+<h3 id="10-maximum-deductible">10. Maximum deductible</h3>
 <p>If the effective deductible carried forward from the previous level exceeds the maximum deductible, the effective deductible is decreased to the maximum deductible value</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Attributes</th>
-<th align="right">Example</th>
+<tr>
+<th style="text-align:left">Attributes</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">policytc_id</td>
-<td align="right">1</td>
+<tr>
+<td style="text-align:left">policytc_id</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">calcrule_id</td>
-<td align="right">10</td>
+<tr>
+<td style="text-align:left">calcrule_id</td>
+<td style="text-align:right">10</td>
 </tr>
-<tr class="odd">
-<td align="left">deductible_3</td>
-<td align="right">40000</td>
+<tr>
+<td style="text-align:left">deductible_3</td>
+<td style="text-align:right">40000</td>
 </tr>
 </tbody>
 </table>
-<h5 id="calculation-logic-5">Calculation logic</h5>
-<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash"><span class="kw">if</span> <span class="kw">(</span><span class="ex">x.effective_deductible</span> <span class="op">&gt;</span> deductible_3<span class="kw">)</span> <span class="kw">{</span> 
-    <span class="ex">loss</span> = x.loss + x.effective_deductible - deductible_3<span class="kw">;</span>
-    <span class="kw">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&lt;</span> 0<span class="kw">)</span> <span class="ex">loss</span> = 0<span class="kw">;</span>
-    <span class="kw">}</span>
-<span class="kw">else</span> <span class="kw">{</span>
-    <span class="ex">loss</span> = x.loss<span class="kw">;</span>
-     <span class="kw">}</span></code></pre></div>
-<h3 id="minimum-deductible">11. Minimum deductible</h3>
+<h5 id="calculation-logic">Calculation logic</h5>
+<pre class="hljs"><code><div><span class="hljs-keyword">if</span> (x.effective_deductible &gt; deductible_3) { 
+	loss = x.loss + x.effective_deductible - deductible_3;
+	<span class="hljs-keyword">if</span> (loss &lt; 0) loss = 0;
+	}
+<span class="hljs-keyword">else</span> {
+	loss = x.loss;
+     }
+</div></code></pre>
+<h3 id="11-minimum-deductible">11. Minimum deductible</h3>
 <p>If the effective deductible carried forward from the previous level is less than the minimum deductible, the deductible is increased to the total loss or the minimum deductible value, whichever is greater.</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Attributes</th>
-<th align="right">Example</th>
+<tr>
+<th style="text-align:left">Attributes</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">policytc_id</td>
-<td align="right">1</td>
+<tr>
+<td style="text-align:left">policytc_id</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">calcrule_id</td>
-<td align="right">11</td>
+<tr>
+<td style="text-align:left">calcrule_id</td>
+<td style="text-align:right">11</td>
 </tr>
-<tr class="odd">
-<td align="left">deductible_2</td>
-<td align="right">70000</td>
+<tr>
+<td style="text-align:left">deductible_2</td>
+<td style="text-align:right">70000</td>
 </tr>
 </tbody>
 </table>
-<h5 id="calculation-logic-6">Calculation logic</h5>
-<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash"><span class="kw">if</span> <span class="kw">(</span><span class="ex">x.effective_deductible</span> <span class="op">&lt;</span> deductible_2<span class="kw">)</span> <span class="kw">{</span> 
-    <span class="ex">loss</span> = x.loss + x.effective_deductible - deductible_2<span class="kw">;</span>
-    <span class="kw">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&lt;</span> 0<span class="kw">)</span> <span class="ex">loss</span> = 0<span class="kw">;</span>
-    <span class="kw">}</span>
-<span class="kw">else</span> <span class="kw">{</span>
-    <span class="ex">loss</span> = x.loss<span class="kw">;</span>
-     <span class="kw">}</span></code></pre></div>
-<h3 id="deductible-only">12. Deductible only</h3>
+<h5 id="calculation-logic">Calculation logic</h5>
+<pre class="hljs"><code><div><span class="hljs-keyword">if</span> (x.effective_deductible &lt; deductible_2) { 
+	loss = x.loss + x.effective_deductible - deductible_2;
+	<span class="hljs-keyword">if</span> (loss &lt; 0) loss = 0;
+	}
+<span class="hljs-keyword">else</span> {
+	loss = x.loss;
+     }
+</div></code></pre>
+<h3 id="12-deductible-only">12. Deductible only</h3>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Attributes</th>
-<th align="right">Example</th>
+<tr>
+<th style="text-align:left">Attributes</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">policytc_id</td>
-<td align="right">1</td>
+<tr>
+<td style="text-align:left">policytc_id</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">calcrule_id</td>
-<td align="right">12</td>
+<tr>
+<td style="text-align:left">calcrule_id</td>
+<td style="text-align:right">12</td>
 </tr>
-<tr class="odd">
-<td align="left">deductible_1</td>
-<td align="right">100000</td>
+<tr>
+<td style="text-align:left">deductible_1</td>
+<td style="text-align:right">100000</td>
 </tr>
 </tbody>
 </table>
-<h5 id="calculation-logic-7">Calculation logic</h5>
-<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash"><span class="ex">loss</span> = x.loss - deductible_1<span class="kw">;</span>
-<span class="kw">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&lt;</span> 0<span class="kw">)</span> <span class="ex">loss</span> = 0<span class="kw">;</span></code></pre></div>
-<h3 id="limit-only">14. Limit only</h3>
+<h5 id="calculation-logic">Calculation logic</h5>
+<pre class="hljs"><code><div>loss = x.loss - deductible_1;
+<span class="hljs-keyword">if</span> (loss &lt; 0) loss = 0;
+</div></code></pre>
+<h3 id="14-limit-only">14. Limit only</h3>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Attributes</th>
-<th align="right">Example</th>
+<tr>
+<th style="text-align:left">Attributes</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">policytc_id</td>
-<td align="right">1</td>
+<tr>
+<td style="text-align:left">policytc_id</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">calcrule_id</td>
-<td align="right">14</td>
+<tr>
+<td style="text-align:left">calcrule_id</td>
+<td style="text-align:right">14</td>
 </tr>
-<tr class="odd">
-<td align="left">limit</td>
-<td align="right">100000</td>
+<tr>
+<td style="text-align:left">limit</td>
+<td style="text-align:right">100000</td>
 </tr>
 </tbody>
 </table>
-<h5 id="calculation-logic-8">Calculation logic</h5>
-<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash"><span class="ex">loss</span> = x.loss<span class="kw">;</span>
-<span class="kw">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&gt;</span> limit_1<span class="kw">)</span> <span class="ex">loss</span> = limit_1<span class="kw">;</span></code></pre></div>
-<h3 id="limit-as-a-proportion-of-loss">15. Limit as a proportion of loss</h3>
+<h5 id="calculation-logic">Calculation logic</h5>
+<pre class="hljs"><code><div>loss = x.loss;
+<span class="hljs-keyword">if</span> (loss &gt; limit_1) loss = limit_1;
+</div></code></pre>
+<h3 id="15-limit-as-a-proportion-of-loss">15. Limit as a proportion of loss</h3>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Attributes</th>
-<th align="right">Example</th>
+<tr>
+<th style="text-align:left">Attributes</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">policytc_id</td>
-<td align="right">1</td>
+<tr>
+<td style="text-align:left">policytc_id</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">calcrule_id</td>
-<td align="right">15</td>
+<tr>
+<td style="text-align:left">calcrule_id</td>
+<td style="text-align:right">15</td>
 </tr>
-<tr class="odd">
-<td align="left">limit_1</td>
-<td align="right">0.3</td>
+<tr>
+<td style="text-align:left">limit_1</td>
+<td style="text-align:right">0.3</td>
 </tr>
 </tbody>
 </table>
-<h5 id="calculation-logic-9">Calculation logic</h5>
-<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash"><span class="ex">loss</span> = x.loss * limit_1<span class="kw">;</span></code></pre></div>
-<h3 id="deductible-as-a-proportion-of-loss">16. Deductible as a proportion of loss</h3>
+<h5 id="calculation-logic">Calculation logic</h5>
+<pre class="hljs"><code><div>loss = x.loss * limit_1;
+</div></code></pre>
+<h3 id="16-deductible-as-a-proportion-of-loss">16. Deductible as a proportion of loss</h3>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Attributes</th>
-<th align="right">Example</th>
+<tr>
+<th style="text-align:left">Attributes</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">policytc_id</td>
-<td align="right">1</td>
+<tr>
+<td style="text-align:left">policytc_id</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">calcrule_id</td>
-<td align="right">16</td>
+<tr>
+<td style="text-align:left">calcrule_id</td>
+<td style="text-align:right">16</td>
 </tr>
-<tr class="odd">
-<td align="left">deductible_1</td>
-<td align="right">0.05</td>
+<tr>
+<td style="text-align:left">deductible_1</td>
+<td style="text-align:right">0.05</td>
 </tr>
 </tbody>
 </table>
-<h5 id="calculation-logic-10">Calculation logic</h5>
-<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash"><span class="ex">loss</span> = x.loss - (x.loss * deductible_1);
-<span class="kw">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&lt;</span> 0<span class="kw">)</span> <span class="ex">loss</span> = 0<span class="kw">;</span></code></pre></div>
+<h5 id="calculation-logic">Calculation logic</h5>
+<pre class="hljs"><code><div>loss = x.loss - (x.loss * deductible_1);
+<span class="hljs-keyword">if</span> (loss &lt; 0) loss = 0;
+</div></code></pre>
 <p><a href="#fmprofiles">Return to top</a></p>
-<p><a href="MultiPeril.html">Go to Appendix C Multi-peril model support</a></p>
-<p><a href="Contents.html">Back to Contents</a></p>
+<p><a href="MultiPeril.md">Go to Appendix C Multi-peril model support</a></p>
+<p><a href="Contents.md">Back to Contents</a></p>
+
 </body>
 </html>

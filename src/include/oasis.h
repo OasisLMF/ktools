@@ -415,6 +415,10 @@ inline  void logprintf(const std::string &program_name,const std::string &msgtyp
 #define DAMAGE_CDF_IDX_FILE "static/damage_cdf.idx"
 #define RANDOM_FILE "static/random.bin"
 #define VULNERABILITY_FILE  "static/vulnerability.bin"
+#define VULNERABILITY_IDX_FILE "static/vulnerability.idx"
+// compressed variant of vulnerabilities
+#define ZVULNERABILITY_FILE "static/vulnerability.bin.z"
+#define ZVULNERABILITY_IDX_FILE "static/vulnerability.idx.z"
 #define ENSEMBLE_FILE "static/ensemble.bin"
 #define FOOTPRINT_FILE  "static/footprint.bin"
 #define FOOTPRINT_IDX_FILE  "static/footprint.idx"

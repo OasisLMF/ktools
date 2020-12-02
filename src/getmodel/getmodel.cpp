@@ -87,38 +87,124 @@ getmodel::~getmodel() {
     //delete _temp_results;
 }
 
+inline void getmodel::assignProbabilities(const int vulnerability_id,
+  int& current_vulnerability_id, const int intensity_bin_id,
+  const int damage_bin_id, OASIS_FLOAT probability) {
+
+  if (_num_intensity_bins >= intensity_bin_id) {
+
+    if (vulnerability_id != current_vulnerability_id) {
+      _vulnerabilities[vulnerability_id] =
+	std::vector<OASIS_FLOAT>(_num_intensity_bins * _num_damage_bins, 0.0);
+      current_vulnerability_id = vulnerability_id;
+    }
+
+    int vulnerabilityIndex = getVulnerabilityIndex(intensity_bin_id,
+		    				   damage_bin_id);
+    _vulnerabilities[vulnerability_id][vulnerabilityIndex] = probability;
+
+  }
+
+}
+
 // only get those vulnerabilities that exist in the items file - so reduce
 // memory footprint
 void getmodel::getVulnerabilities(const std::set<int> &v) {
   // Read the vulnerabilities
-  Vulnerability vulnerability;
 
-  FILE *fin = fopen(VULNERABILITY_FILE, "rb");
+  char vulnerabilityFilename[4096];
+  // Determine whether an index file exists
+  FILE *fidx = 0;
+  bool zip = false;
+  fidx = fopen(ZVULNERABILITY_IDX_FILE, "rb");   // zip
+  if (fidx != nullptr) {
+    strcpy(vulnerabilityFilename, ZVULNERABILITY_FILE);
+    zip = true;
+  } else {
+    strcpy(vulnerabilityFilename, VULNERABILITY_FILE);
+    fidx = fopen(VULNERABILITY_IDX_FILE, "rb");   // uncompressed index
+  }
+
+  FILE *fin = fopen(vulnerabilityFilename, "rb");
   if (fin == nullptr) {
-    fprintf(stderr, "FATAL: %s: cannot open %s\n", __func__, VULNERABILITY_FILE);
+    fprintf(stderr, "FATAL: %s: cannot open %s\n", __func__, vulnerabilityFilename);
     exit(EXIT_FAILURE);
   }
   int current_vulnerability_id = -1;
   fread(&_num_damage_bins, sizeof(_num_damage_bins), 1, fin);
 
-  while (fread(&vulnerability, sizeof(vulnerability), 1, fin) != 0) {
-    if (v.find(vulnerability.vulnerability_id) !=
-        v.end()) { // only process those vulnerabilities that are in the item
-                   // file
-      if (_num_intensity_bins >= vulnerability.intensity_bin_id) {
-        if (vulnerability.vulnerability_id != current_vulnerability_id) {
-          _vulnerabilities[vulnerability.vulnerability_id] =
-              std::vector<OASIS_FLOAT>(_num_intensity_bins * _num_damage_bins, 0.0);
-          current_vulnerability_id = vulnerability.vulnerability_id;
-        }
-        int vulnerabilityIndex = getVulnerabilityIndex(
-            vulnerability.intensity_bin_id, vulnerability.damage_bin_id);
-        _vulnerabilities[vulnerability.vulnerability_id][vulnerabilityIndex] =
-            vulnerability.probability;
+  if (fidx == nullptr) {   // no index file
+    Vulnerability vulnerability;
+
+    while (fread(&vulnerability, sizeof(vulnerability), 1, fin) != 0) {
+      if (v.find(vulnerability.vulnerability_id) !=
+	  v.end()) { // only process those vulnerabilities that are in the item
+		     // file
+	assignProbabilities(vulnerability.vulnerability_id,
+			    current_vulnerability_id,
+			    vulnerability.intensity_bin_id,
+			    vulnerability.damage_bin_id,
+			    vulnerability.probability);
       }
     }
+
+  } else if (!zip) {   // index file, no compression
+    VulnerabilityIndex idx;
+    VulnerabilityRow row;
+
+    while (fread(&idx, sizeof(idx), 1, fidx) != 0) {
+      if (v.find(idx.vulnerability_id) != v.end()) {
+	flseek(fin, idx.offset, SEEK_SET);
+	long long i = 0;
+	while (i < idx.size) {
+	  fread(&row, sizeof(row), 1, fin);
+	  assignProbabilities(idx.vulnerability_id, current_vulnerability_id,
+			      row.intensity_bin_id, row.damage_bin_id,
+			      row.probability);
+	  i += sizeof(row);
+	}
+      }
+    }
+    fclose(fidx);
+
+  } else {   // compressed vulnerability file
+    VulnerabilityIndex idx;
+
+    while (fread(&idx, sizeof(idx), 1, fidx) != 0) {
+      if (v.find(idx.vulnerability_id) != v.end()) {
+	flseek(fin, idx.offset, SEEK_SET);
+
+	std::vector<unsigned char> compressedBuffer;
+	compressedBuffer.resize(idx.size + 1);
+	fread(&compressedBuffer[0], idx.size, 1, fin);
+
+	std::vector<unsigned char> uncompressedBuffer;
+	uncompressedBuffer.resize(idx.original_size);
+	uLongf destLen = (uLongf)uncompressedBuffer.size();
+
+	int ret = uncompress(&uncompressedBuffer[0], &destLen,
+			     &compressedBuffer[0], idx.size);
+	if (ret != Z_OK) {
+	  fprintf(stderr, "FATAL: Got bad return code from uncompress %d\n", ret);
+	  exit(EXIT_FAILURE);
+	}
+
+	VulnerabilityRow *row = (VulnerabilityRow*)&uncompressedBuffer[0];
+	uLongf i = 0;
+	while (i < idx.original_size) {
+	  assignProbabilities(idx.vulnerability_id, current_vulnerability_id,
+			      row->intensity_bin_id, row->damage_bin_id,
+			      row->probability);
+	  row++;
+	  i += sizeof(VulnerabilityRow);
+	}
+      }
+    }
+    fclose(fidx);
+
   }
   fclose(fin);
+
 }
 
 void getmodel::getIntensityInfo() {

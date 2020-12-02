@@ -1,15 +1,372 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <meta http-equiv="Content-Style-Type" content="text/css" />
-  <meta name="generator" content="pandoc" />
-  <title></title>
-  <style type="text/css">code{white-space: pre;}</style>
+<title>DataConversionComponents.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
 </head>
 <body>
-<p><img src="../img/banner.jpg" title="banner" alt="alt text" /></p>
-<h1 id="data-conversion-components">4.3 Data conversion components <a id="dataconversioncomponents"></a></h1>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<p><img src="../img/banner.jpg" alt="alt text" title="banner"></p>
+<h1 id="43-data-conversion-components-a-id%22dataconversioncomponents%22a">4.3 Data conversion components <a id="dataconversioncomponents"></a></h1>
 <p>The following components convert input data in csv format to the binary format required by the calculation components in the reference model;</p>
 <p><strong>Static data</strong></p>
 <ul>
@@ -18,6 +375,7 @@
 <li><strong><a href="#rand">randtobin</a></strong> converts a list of random numbers.</li>
 <li><strong><a href="#vulnerability">vulnerabilitytobin</a></strong> converts the vulnerability data.</li>
 </ul>
+<p>A reference <a href="#intensitybins">intensity bin dictionary</a> csv should also exist, although there is no conversion component for this file because it is not needed for calculation purposes.</p>
 <p><strong>Input data</strong></p>
 <ul>
 <li><strong><a href="#coverages">coveragetobin</a></strong> converts the coverages data.</li>
@@ -61,7 +419,7 @@
 <h2 id="static-data">Static data</h2>
 <p><a id="damagebins"></a></p>
 <h3 id="damage-bin-dictionary">damage bin dictionary</h3>
-<hr />
+<hr>
 <p>The damage bin dictionary is a reference table in Oasis which defines how the effective damageability cdfs are discretized on a relative damage scale (normally between 0 and 1). It is required by getmodel and gulcalc and must have the following location and filename;</p>
 <ul>
 <li>static/damage_bin_dict.bin</li>
@@ -69,175 +427,249 @@
 <h5 id="file-format">File format</h5>
 <p>The csv file should contain the following fields and include a header row.</p>
 <table>
-<colgroup>
-<col width="17%" />
-<col width="7%" />
-<col width="7%" />
-<col width="54%" />
-<col width="12%" />
-</colgroup>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">bin_index</td>
+<tr>
+<td style="text-align:left">bin_index</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Identifier of the damage bin</td>
-<td align="right">1</td>
+<td style="text-align:left">Identifier of the damage bin</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">bin_from</td>
+<tr>
+<td style="text-align:left">bin_from</td>
 <td>float</td>
 <td>4</td>
-<td align="left">Lower damage threshold for the bin</td>
-<td align="right">0.01</td>
+<td style="text-align:left">Lower damage threshold for the bin</td>
+<td style="text-align:right">0.01</td>
 </tr>
-<tr class="odd">
-<td align="left">bin_to</td>
+<tr>
+<td style="text-align:left">bin_to</td>
 <td>float</td>
 <td>4</td>
-<td align="left">Upper damage threshold for the bin</td>
-<td align="right">0.02</td>
+<td style="text-align:left">Upper damage threshold for the bin</td>
+<td style="text-align:right">0.02</td>
 </tr>
-<tr class="even">
-<td align="left">interpolation</td>
+<tr>
+<td style="text-align:left">interpolation</td>
 <td>float</td>
 <td>4</td>
-<td align="left">Interpolation damage value for the bin (usually the mid-point)</td>
-<td align="right">0.015</td>
+<td style="text-align:left">Interpolation damage value for the bin (usually the mid-point)</td>
+<td style="text-align:right">0.015</td>
 </tr>
-<tr class="odd">
-<td align="left">interval_type</td>
+</tbody>
+</table>
+<p>The interval_type field has been deprecated and will be filled with zeros in the binary file. It does not need to be included as the final column in the csv file:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Name</th>
+<th>Type</th>
+<th>Bytes</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">interval_type</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Identifier of the interval type, e.g. closed, open</td>
-<td align="right">1201</td>
+<td style="text-align:left">Identifier of the interval type, e.g. closed, open (deprecated)</td>
+<td style="text-align:right">0</td>
 </tr>
 </tbody>
 </table>
 <p>The data should be ordered by bin_index ascending and not contain nulls. The bin_index should be a contiguous sequence of integers starting from 1.</p>
 <h5 id="damagebintobin">damagebintobin</h5>
-<pre><code>$ damagebintobin &lt; damage_bin_dict.csv &gt; damage_bin_dict.bin</code></pre>
+<pre class="hljs"><code><div>$ damagebintobin &lt; damage_bin_dict.csv &gt; damage_bin_dict.bin
+</div></code></pre>
 <h5 id="damagebintocsv">damagebintocsv</h5>
-<pre><code>$ damagebintocsv &lt; damage_bin_dict.bin &gt; damage_bin_dict.csv</code></pre>
+<pre class="hljs"><code><div>$ damagebintocsv &lt; damage_bin_dict.bin &gt; damage_bin_dict.csv
+</div></code></pre>
+<p>The deprecated interval_type field can be sent to the output using the -i argument:</p>
+<pre class="hljs"><code><div>$ damagebintocsv -i &lt; damage_bin_dict.bin &gt; damage_bin_dict.csv
+</div></code></pre>
+<p><a href="#dataconversioncomponents">Return to top</a></p>
+<p><a id="intensitybins"></a></p>
+<h4 id="intensity-bin-dictionary">intensity bin dictionary</h4>
+<p>The intensity bin dictionary defines the meaning of the bins of the hazard intensity measure. The hazard intensity measure could be flood depth, windspeed, peak ground acceleration etc, depending on the type of peril. The range of hazard intensity values in the model is discretized into bins, each with a unique and contiguous bin_index listed in the intensity bin dictionary. The bin_index is used as a reference in the footprint file (field intensity_bin_index) to specify the hazard intensity for each event and areaperil.</p>
+<p>This file is for reference only as it is not used in the calculation so there is no component to convert it to binary format.</p>
+<p>The csv file should contain the following fields and include a header row.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Name</th>
+<th>Type</th>
+<th>Bytes</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">bin_index</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align:left">Identifier of the intensity bin</td>
+<td style="text-align:right">1</td>
+</tr>
+<tr>
+<td style="text-align:left">bin_from</td>
+<td>float</td>
+<td>4</td>
+<td style="text-align:left">Lower intensity threshold for the bin</td>
+<td style="text-align:right">56</td>
+</tr>
+<tr>
+<td style="text-align:left">bin_to</td>
+<td>float</td>
+<td>4</td>
+<td style="text-align:left">Upper intensity threshold for the bin</td>
+<td style="text-align:right">57</td>
+</tr>
+<tr>
+<td style="text-align:left">interpolation</td>
+<td>float</td>
+<td>4</td>
+<td style="text-align:left">Mid-point intensity value for the bin</td>
+<td style="text-align:right">0.015</td>
+</tr>
+<tr>
+<td style="text-align:left">interval_type</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align:left">Identifier of the interval type, e.g. closed, open</td>
+<td style="text-align:right">1</td>
+</tr>
+</tbody>
+</table>
+<p>The data should be ordered by bin_index ascending and not contain nulls. The bin_index should be a contiguous sequence of integers starting from 1.</p>
 <p><a href="#dataconversioncomponents">Return to top</a></p>
 <p><a id="footprint"></a></p>
 <h3 id="footprint">footprint</h3>
-<hr />
+<hr>
 <p>The event footprint is required for the getmodel component, as well as an index file containing the starting positions of each event block. These must have the following location and filenames;</p>
 <ul>
 <li>static/footprint.bin</li>
 <li>static/footprint.idx</li>
 </ul>
-<h5 id="file-format-1">File format</h5>
+<h5 id="file-format">File format</h5>
 <p>The csv file should contain the following fields and include a header row.</p>
 <table>
-<colgroup>
-<col width="18%" />
-<col width="7%" />
-<col width="7%" />
-<col width="54%" />
-<col width="12%" />
-</colgroup>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">event_id</td>
+<tr>
+<td style="text-align:left">event_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Oasis event_id</td>
-<td align="right">1</td>
+<td style="text-align:left">Oasis event_id</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">areaperil_id</td>
+<tr>
+<td style="text-align:left">areaperil_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Oasis areaperil_id</td>
-<td align="right">4545</td>
+<td style="text-align:left">Oasis areaperil_id</td>
+<td style="text-align:right">4545</td>
 </tr>
-<tr class="odd">
-<td align="left">intensity_bin_index</td>
+<tr>
+<td style="text-align:left">intensity_bin_index</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Identifier of the intensity damage bin</td>
-<td align="right">10</td>
+<td style="text-align:left">Identifier of the intensity bin</td>
+<td style="text-align:right">10</td>
 </tr>
-<tr class="even">
-<td align="left">prob</td>
+<tr>
+<td style="text-align:left">prob</td>
 <td>float</td>
 <td>4</td>
-<td align="left">The probability mass for the intensity bin between 0 and 1</td>
-<td align="right">0.765</td>
+<td style="text-align:left">The probability mass for the intensity bin between 0 and 1</td>
+<td style="text-align:right">0.765</td>
 </tr>
 </tbody>
 </table>
 <p>The data should be ordered by event_id, areaperil_id and not contain nulls.</p>
 <h5 id="footprinttobin">footprinttobin</h5>
-<pre><code>$ footprinttobin -i {number of intensity bins} &lt; footprint.csv</code></pre>
+<pre class="hljs"><code><div>$ footprinttobin -i {number of intensity bins} &lt; footprint.csv
+</div></code></pre>
 <p>This command will create a binary file footprint.bin and an index file footprint.idx in the working directory. The number of intensity bins is the maximum value of intensity_bin_index.</p>
 <p>There is an additional parameter -n, which should be used when there is only one record per event_id and areaperil_id, with a single intensity_bin_index value and prob = 1. This is the special case 'no hazard intensity uncertainty'. In this case, the usage is as follows.</p>
-<pre><code>$ footprinttobin -i {number of intensity bins} -n &lt; footprint.csv</code></pre>
+<pre class="hljs"><code><div>$ footprinttobin -i {number of intensity bins} -n &lt; footprint.csv
+</div></code></pre>
 <p>Both parameters -i and -n are held in the header of the footprint.bin and used in getmodel.</p>
-<p>The output binary and index file names can be explicitly set using the -b and<br />
+<p>The output binary and index file names can be explicitly set using the -b and
 -x flags respectively:</p>
-<pre><code>$ footprinttobin -i {number of intensity bins} -b {output footprint binary file name} -x {output footprint index file name} &lt; footprint.csv</code></pre>
+<pre class="hljs"><code><div>$ footprinttobin -i {number of intensity bins} -b {output footprint binary file name} -x {output footprint index file name} &lt; footprint.csv
+</div></code></pre>
 <p>Both output binary and index file names must be given to use this option.</p>
+<p>In the case of very large footprint files, it may be preferrable to compress the data as it is written to the binary file. Compression is performed using <a href="https://zlib.net/">zlib</a> by issuing the -z flag. If the -u flag is used in addition, the index file will include the uncompressed data size. It is recommended to use the -u flag to prevent any memory issues during decompression with getmodel or footprinttocsv:</p>
+<pre class="hljs"><code><div>$ footprinttobin -i {number of intensity bins} -z &lt; footprint.csv
+$ footprinttobin -i {number of intensity bins} -z -u &lt; footprint.csv
+</div></code></pre>
+<p>The value of the -u parameter is held in the same location as -n in the header of the footprint.bin file, left-shifted by 1.</p>
 <h5 id="footprinttocsv">footprinttocsv</h5>
-<pre><code>$ footprinttocsv &gt; footprint.csv</code></pre>
+<pre class="hljs"><code><div>$ footprinttocsv &gt; footprint.csv
+</div></code></pre>
 <p>footprinttocsv requires a binary file footprint.bin and an index file footprint.idx to be present in the working directory.</p>
 <p>Input binary and index file names can be explicitly set using the -b and -x flags respectively:</p>
-<pre><code>$ footprinttocsv -b {input footprint binary file name} -x {input footprint index file name} &gt; footprint.csv</code></pre>
+<pre class="hljs"><code><div>$ footprinttocsv -b {input footprint binary file name} -x {input footprint index file name} &gt; footprint.csv
+</div></code></pre>
 <p>Both input binary and index file name must be given to use this option.</p>
+<p>Footprint binary files that contain compressed data require the -z argument to be issued:</p>
+<pre class="hljs"><code><div>$ footprinttocsv -z &gt; footprint.csv
+</div></code></pre>
 <p><a href="#dataconversioncomponents">Return to top</a></p>
 <p><a id="rand"></a></p>
 <h3 id="random-numbers">Random numbers</h3>
-<hr />
+<hr>
 <p>A random number file may be provided for the gulcalc component as an option (using gulcalc -r parameter) The random number binary contains a list of random numbers used for ground up loss sampling in the kernel calculation. It must have the following location and filename;</p>
 <ul>
 <li>static/random.bin</li>
 </ul>
 <p>If the gulcalc -r parameter is not used, the random number binary is not required and random numbers are instead generated dynamically during the calculation, using the -R parameter to specify how many should be generated.</p>
 <p>The random numbers can be imported from a csv file using the component randtobin.</p>
-<h5 id="file-format-2">File format</h5>
+<h5 id="file-format">File format</h5>
 <p>The csv file should contain a simple list of random numbers and include a header row.</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">rand</td>
+<tr>
+<td style="text-align:left">rand</td>
 <td>float</td>
 <td>4</td>
-<td align="left">Number between 0 and 1</td>
-<td align="right">0.75875</td>
+<td style="text-align:left">Number between 0 and 1</td>
+<td style="text-align:right">0.75875</td>
 </tr>
 </tbody>
 </table>
 <h5 id="randtobin">randtobin</h5>
-<pre><code>$ randtobin &lt; random.csv &gt; random.bin</code></pre>
+<pre class="hljs"><code><div>$ randtobin &lt; random.csv &gt; random.bin
+</div></code></pre>
 <h5 id="randtocsv">randtocsv</h5>
 <p>There are a few parameters available which allow the generation of a random number csv file as follows;</p>
 <ul>
@@ -245,319 +677,327 @@
 <li>-g generate random numbers {number of random numbers}</li>
 <li>-S seed value {seed value}</li>
 </ul>
-<pre><code>$ randtocsv -r &lt; random.bin &gt; random.csv
+<pre class="hljs"><code><div>$ randtocsv -r &lt; random.bin &gt; random.csv
 $ randtocsv -g 1000000 &gt; random.csv
-$ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
+$ randtocsv -g 1000000 -S 1234 &gt; random.csv
+</div></code></pre>
 <p>The -S {seed value} option produces repeatable random numbers, whereas usage of -g alone will generate a different set every time.</p>
 <p><a href="#dataconversioncomponents">Return to top</a></p>
 <p><a id="vulnerability"></a></p>
 <h3 id="vulnerability">vulnerability</h3>
-<hr />
-<p>The vulnerability file is required for the getmodel component. It contains the conditional distributions of damage for each intensity bin and for each vulnerability_id. This file must have the following location and filename;</p>
+<hr>
+<p>The vulnerability file is  required for the getmodel component. It contains the conditional distributions of damage for each intensity bin and for each vulnerability_id. This file must have the following location and filename;</p>
 <ul>
 <li>static/vulnerability.bin</li>
 </ul>
-<h5 id="file-format-3">File format</h5>
+<h5 id="file-format">File format</h5>
 <p>The csv file should contain the following fields and include a header row.</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">vulnerability_id</td>
+<tr>
+<td style="text-align:left">vulnerability_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Oasis vulnerability_id</td>
-<td align="right">45</td>
+<td style="text-align:left">Oasis vulnerability_id</td>
+<td style="text-align:right">45</td>
 </tr>
-<tr class="even">
-<td align="left">intensity_bin_index</td>
+<tr>
+<td style="text-align:left">intensity_bin_index</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Identifier of the hazard intensity bin</td>
-<td align="right">10</td>
+<td style="text-align:left">Identifier of the hazard intensity bin</td>
+<td style="text-align:right">10</td>
 </tr>
-<tr class="odd">
-<td align="left">damage_bin_index</td>
+<tr>
+<td style="text-align:left">damage_bin_index</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Identifier of the damage bin</td>
-<td align="right">20</td>
+<td style="text-align:left">Identifier of the damage bin</td>
+<td style="text-align:right">20</td>
 </tr>
-<tr class="even">
-<td align="left">prob</td>
+<tr>
+<td style="text-align:left">prob</td>
 <td>float</td>
 <td>4</td>
-<td align="left">The probability mass for the damage bin</td>
-<td align="right">0.186</td>
+<td style="text-align:left">The probability mass for the damage bin</td>
+<td style="text-align:right">0.186</td>
 </tr>
 </tbody>
 </table>
 <p>The data should be ordered by vulnerability_id, intensity_bin_index and not contain nulls.</p>
 <h5 id="vulnerabilitytobin">vulnerabilitytobin</h5>
-<pre><code>$ vulnerabilitytobin -d {number of damage bins} &lt; vulnerability.csv &gt; vulnerability.bin</code></pre>
+<pre class="hljs"><code><div>$ vulnerabilitytobin -d {number of damage bins} &lt; vulnerability.csv &gt; vulnerability.bin
+</div></code></pre>
 <p>The parameter -d number of damage bins is the maximum value of damage_bin_index. This is held in the header of vulnerability.bin and used by getmodel.</p>
 <h5 id="vulnerabilitytocsv">vulnerabilitytocsv</h5>
-<pre><code>$ vulnerabilitytocsv &lt; vulnerability.bin &gt; vulnerability.csv</code></pre>
+<pre class="hljs"><code><div>$ vulnerabilitytocsv &lt; vulnerability.bin &gt; vulnerability.csv
+</div></code></pre>
 <p><a href="#dataconversioncomponents">Return to top</a></p>
 <h2 id="input-data">Input data</h2>
 <p><a id="coverages"></a></p>
 <h3 id="coverages">Coverages</h3>
-<hr />
+<hr>
 <p>The coverages binary contains the list of coverages and the coverage TIVs. The data format is as follows. It is required by gulcalc and fmcalc and must have the following location and filename;</p>
 <ul>
 <li>input/coverages.bin</li>
 </ul>
-<h4 id="file-format-4">File format</h4>
+<h4 id="file-format">File format</h4>
 <p>The csv file should contain the following fields and include a header row.</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">coverage_id</td>
+<tr>
+<td style="text-align:left">coverage_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Identifier of the coverage</td>
-<td align="right">1</td>
+<td style="text-align:left">Identifier of the coverage</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">tiv</td>
+<tr>
+<td style="text-align:left">tiv</td>
 <td>float</td>
 <td>4</td>
-<td align="left">The total insured value of the coverage</td>
-<td align="right">200000</td>
+<td style="text-align:left">The total insured value of the coverage</td>
+<td style="text-align:right">200000</td>
 </tr>
 </tbody>
 </table>
 <p>Coverage_id must be an ordered contiguous sequence of numbers starting at 1.</p>
 <h5 id="coveragetobin">coveragetobin</h5>
-<pre><code>$ coveragetobin &lt; coverages.csv &gt; coverages.bin</code></pre>
+<pre class="hljs"><code><div>$ coveragetobin &lt; coverages.csv &gt; coverages.bin
+</div></code></pre>
 <h5 id="coveragetocsv">coveragetocsv</h5>
-<pre><code>$ coveragetocsv &lt; coverages.bin &gt; coverages.csv</code></pre>
+<pre class="hljs"><code><div>$ coveragetocsv &lt; coverages.bin &gt; coverages.csv
+</div></code></pre>
 <p><a href="#dataconversioncomponents">Return to top</a></p>
 <p><a id="events"></a></p>
 <h3 id="events">events</h3>
-<hr />
+<hr>
 <p>One or more event binaries are required by eve. It must have the following location and filename;</p>
 <ul>
 <li>input/events.bin</li>
 </ul>
-<h5 id="file-format-5">File format</h5>
+<h5 id="file-format">File format</h5>
 <p>The csv file should contain a list of event_ids (integers) and include a header.</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">event_id</td>
+<tr>
+<td style="text-align:left">event_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Oasis event_id</td>
-<td align="right">4545</td>
+<td style="text-align:left">Oasis event_id</td>
+<td style="text-align:right">4545</td>
 </tr>
 </tbody>
 </table>
 <h5 id="evetobin">evetobin</h5>
-<pre><code>$ evetobin &lt; events.csv &gt; events.bin</code></pre>
+<pre class="hljs"><code><div>$ evetobin &lt; events.csv &gt; events.bin
+</div></code></pre>
 <h5 id="evetocsv">evetocsv</h5>
-<pre><code>$ evetocsv &lt; events.bin &gt; events.csv</code></pre>
+<pre class="hljs"><code><div>$ evetocsv &lt; events.bin &gt; events.csv
+</div></code></pre>
 <p><a href="#dataconversioncomponents">Return to top</a></p>
 <p><a id="items"></a></p>
 <h3 id="items">items</h3>
-<hr />
+<hr>
 <p>The items binary contains the list of exposure items for which ground up loss will be sampled in the kernel calculations. The data format is as follows. It is required by gulcalc and outputcalc and must have the following location and filename;</p>
 <ul>
 <li>input/items.bin</li>
 </ul>
-<h5 id="file-format-6">File format</h5>
+<h5 id="file-format">File format</h5>
 <p>The csv file should contain the following fields and include a header row.</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">item_id</td>
+<tr>
+<td style="text-align:left">item_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Identifier of the exposure item</td>
-<td align="right">1</td>
+<td style="text-align:left">Identifier of the exposure item</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">coverage_id</td>
+<tr>
+<td style="text-align:left">coverage_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Identifier of the coverage</td>
-<td align="right">3</td>
+<td style="text-align:left">Identifier of the coverage</td>
+<td style="text-align:right">3</td>
 </tr>
-<tr class="odd">
-<td align="left">areaperil_id</td>
+<tr>
+<td style="text-align:left">areaperil_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Identifier of the locator and peril</td>
-<td align="right">4545</td>
+<td style="text-align:left">Identifier of the locator and peril</td>
+<td style="text-align:right">4545</td>
 </tr>
-<tr class="even">
-<td align="left">vulnerability_id</td>
+<tr>
+<td style="text-align:left">vulnerability_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Identifier of the vulnerability distribution</td>
-<td align="right">645</td>
+<td style="text-align:left">Identifier of the vulnerability distribution</td>
+<td style="text-align:right">645</td>
 </tr>
-<tr class="odd">
-<td align="left">group_id</td>
+<tr>
+<td style="text-align:left">group_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Identifier of the correlaton group</td>
-<td align="right">3</td>
+<td style="text-align:left">Identifier of the correlaton group</td>
+<td style="text-align:right">3</td>
 </tr>
 </tbody>
 </table>
 <p>The data should be ordered by areaperil_id, vulnerability_id ascending and not contain nulls. item_id must be a contiguous sequence of numbers starting from 1.</p>
 <h5 id="itemtobin">itemtobin</h5>
-<pre><code>$ itemtobin &lt; items.csv &gt; items.bin</code></pre>
+<pre class="hljs"><code><div>$ itemtobin &lt; items.csv &gt; items.bin
+</div></code></pre>
 <h5 id="itemtocsv">itemtocsv</h5>
-<pre><code>$ itemtocsv &lt; items.bin &gt; items.csv</code></pre>
+<pre class="hljs"><code><div>$ itemtocsv &lt; items.bin &gt; items.csv
+</div></code></pre>
 <p><a href="#dataconversioncomponents">Return to top</a></p>
 <p><a id="gulsummaryxref"></a></p>
 <h3 id="gul-summary-xref">gul summary xref</h3>
-<hr />
+<hr>
 <p>The gulsummaryxref binary is a cross reference file which determines how item or coverage losses from gulcalc output are summed together into at various summary levels in summarycalc. It is required by summarycalc and must have the following location and filename;</p>
 <ul>
 <li>input/gulsummaryxref.bin</li>
 </ul>
-<h5 id="file-format-7">File format</h5>
+<h5 id="file-format">File format</h5>
 <p>The csv file should contain the following fields and include a header row.</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">item_id / coverage_id</td>
+<tr>
+<td style="text-align:left">item_id / coverage_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Identifier of the item or coverage</td>
-<td align="right">3</td>
+<td style="text-align:left">Identifier of the item or coverage</td>
+<td style="text-align:right">3</td>
 </tr>
-<tr class="even">
-<td align="left">summary_id</td>
+<tr>
+<td style="text-align:left">summary_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Identifier of the summary level grouping</td>
-<td align="right">3</td>
+<td style="text-align:left">Identifier of the summary level grouping</td>
+<td style="text-align:right">3</td>
 </tr>
-<tr class="odd">
-<td align="left">summaryset_id</td>
+<tr>
+<td style="text-align:left">summaryset_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Identifier of the summary set</td>
-<td align="right">1</td>
+<td style="text-align:left">Identifier of the summary set</td>
+<td style="text-align:right">1</td>
 </tr>
 </tbody>
 </table>
 <ul>
 <li>The first field must be consistent with the corresponding index in the ground up loss stream. If it is loss stream (stream_id 2/1) then item_id must be used. If it is gulcalc coverage stream (stream_id 1/2) then coverage_id must be used.</li>
-<li>The data should not contain nulls and there should be at least one summary set in the file.<br />
-</li>
+<li>The data should not contain nulls and there should be at least one summary set in the file.</li>
 <li>Valid entries for summaryset_id is all integers between 0 and 9 inclusive.</li>
 <li>Within each summary set, all coverages_id's from the coverages file must be present.</li>
 </ul>
 <p>One summary set consists of a common summaryset_id and each item_id being assigned a summary_id. An example is as follows.</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">item_id</th>
+<tr>
+<th style="text-align:left">item_id</th>
 <th>summary_id</th>
-<th align="right">summaryset_id</th>
+<th style="text-align:right">summaryset_id</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>1</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">2</td>
+<tr>
+<td style="text-align:left">2</td>
 <td>1</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="odd">
-<td align="left">3</td>
+<tr>
+<td style="text-align:left">3</td>
 <td>1</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">4</td>
+<tr>
+<td style="text-align:left">4</td>
 <td>2</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="odd">
-<td align="left">5</td>
+<tr>
+<td style="text-align:left">5</td>
 <td>2</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">6</td>
+<tr>
+<td style="text-align:left">6</td>
 <td>2</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
 </tbody>
 </table>
-<p>This shows, for summaryset_id=1, items 1-3 being grouped into summary_id = 1 and items 4-6 being grouped into summary_id = 2. This could be an example of a 'site' level grouping, for example. The summary_ids should be held in a dictionary which contains the description of the ids to make meaning of the output results. For instance;</p>
+<p>This shows, for summaryset_id=1, items 1-3 being grouped into summary_id = 1 and items 4-6 being grouped into summary_id = 2.  This could be an example of a 'site' level grouping, for example. The summary_ids should be held in a dictionary which contains the description of the ids to make meaning of the output results.  For instance;</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">summary_id</th>
+<tr>
+<th style="text-align:left">summary_id</th>
 <th>summaryset_id</th>
-<th align="right">summary_desc</th>
+<th style="text-align:right">summary_desc</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>1</td>
-<td align="right">site_435</td>
+<td style="text-align:right">site_435</td>
 </tr>
-<tr class="even">
-<td align="left">2</td>
+<tr>
+<td style="text-align:left">2</td>
 <td>1</td>
-<td align="right">site_958</td>
+<td style="text-align:right">site_958</td>
 </tr>
 </tbody>
 </table>
@@ -565,139 +1005,143 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <p>Up to 10 summary sets may be provided in gulsummaryxref, depending on the required summary reporting levels for the analysis. Here is an example of the 'site' summary level with summaryset_id=1, plus an 'account' summary level with summaryset_id = 2. In summary set 2, the account summary level includes both sites because all items are assigned a summary_id of 1.</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">item_id</th>
+<tr>
+<th style="text-align:left">item_id</th>
 <th>summary_id</th>
-<th align="right">summaryset_id</th>
+<th style="text-align:right">summaryset_id</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>1</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">2</td>
+<tr>
+<td style="text-align:left">2</td>
 <td>1</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="odd">
-<td align="left">3</td>
+<tr>
+<td style="text-align:left">3</td>
 <td>1</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">4</td>
+<tr>
+<td style="text-align:left">4</td>
 <td>2</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="odd">
-<td align="left">5</td>
+<tr>
+<td style="text-align:left">5</td>
 <td>2</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">6</td>
+<tr>
+<td style="text-align:left">6</td>
 <td>2</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="odd">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>1</td>
-<td align="right">2</td>
+<td style="text-align:right">2</td>
 </tr>
-<tr class="even">
-<td align="left">2</td>
+<tr>
+<td style="text-align:left">2</td>
 <td>1</td>
-<td align="right">2</td>
+<td style="text-align:right">2</td>
 </tr>
-<tr class="odd">
-<td align="left">3</td>
+<tr>
+<td style="text-align:left">3</td>
 <td>1</td>
-<td align="right">2</td>
+<td style="text-align:right">2</td>
 </tr>
-<tr class="even">
-<td align="left">4</td>
+<tr>
+<td style="text-align:left">4</td>
 <td>1</td>
-<td align="right">2</td>
+<td style="text-align:right">2</td>
 </tr>
-<tr class="odd">
-<td align="left">5</td>
+<tr>
+<td style="text-align:left">5</td>
 <td>1</td>
-<td align="right">2</td>
+<td style="text-align:right">2</td>
 </tr>
-<tr class="even">
-<td align="left">6</td>
+<tr>
+<td style="text-align:left">6</td>
 <td>1</td>
-<td align="right">2</td>
+<td style="text-align:right">2</td>
 </tr>
 </tbody>
 </table>
 <h5 id="gulsummaryxreftobin">gulsummaryxreftobin</h5>
-<pre><code>$ gulsummaryxreftobin &lt; gulsummaryxref.csv &gt; gulsummaryxref.bin</code></pre>
+<pre class="hljs"><code><div>$ gulsummaryxreftobin &lt; gulsummaryxref.csv &gt; gulsummaryxref.bin
+</div></code></pre>
 <h5 id="gulsummaryxreftocsv">gulsummaryxreftocsv</h5>
-<pre><code>$ gulsummaryxreftocsv &lt; gulsummaryxref.bin &gt; gulsummaryxref.csv</code></pre>
+<pre class="hljs"><code><div>$ gulsummaryxreftocsv &lt; gulsummaryxref.bin &gt; gulsummaryxref.csv
+</div></code></pre>
 <p><a href="#dataconversioncomponents">Return to top</a></p>
 <p><a id="fmprogramme"></a></p>
 <h3 id="fm-programme">fm programme</h3>
-<hr />
+<hr>
 <p>The fm programme binary file contains the level heirarchy and defines aggregations of losses required to perform a loss calculation, and is required for fmcalc only.</p>
 <p>This must have the following location and filename;</p>
 <ul>
 <li>input/fm_programme.bin</li>
 </ul>
-<h5 id="file-format-8">File format</h5>
+<h5 id="file-format">File format</h5>
 <p>The csv file should contain the following fields and include a header row.</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">from_agg_id</td>
+<tr>
+<td style="text-align:left">from_agg_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Oasis Financial Module from_agg_id</td>
-<td align="right">1</td>
+<td style="text-align:left">Oasis Financial Module from_agg_id</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">level_id</td>
+<tr>
+<td style="text-align:left">level_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Oasis Financial Module level_id</td>
-<td align="right">1</td>
+<td style="text-align:left">Oasis Financial Module level_id</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="odd">
-<td align="left">to_agg_id</td>
+<tr>
+<td style="text-align:left">to_agg_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Oasis Financial Module to_agg_id</td>
-<td align="right">1</td>
+<td style="text-align:left">Oasis Financial Module to_agg_id</td>
+<td style="text-align:right">1</td>
 </tr>
 </tbody>
 </table>
 <ul>
 <li>All fields must have integer values and no nulls</li>
 <li>Must have at least one level, starting from level_id = 1, 2 3 ...</li>
-<li>For level_id = 1, the set of values in from_agg_id must be equal to the set of item_ids in the input ground up loss stream (which has fields event_id, item_id, idx, gul). Therefore level 1 always defines a group of items.</li>
+<li>For level_id = 1, the set of values in from_agg_id must be equal to the set of item_ids in the input ground up loss stream (which has fields event_id, item_id, idx, gul).  Therefore level 1 always defines a group of items.</li>
 <li>For subsequent levels, the from_agg_id must be the distinct values from the previous level to_agg_id field.</li>
-<li>The from_agg_id and to_agg_id values, for each level, should be a contiguous block of integers (a sequence with no gaps). This is not a strict rule in this version and it will work with non-contiguous integers, but it is recommended as best practice.</li>
+<li>The from_agg_id and to_agg_id values, for each level, should be a contiguous block of integers (a sequence with no gaps).  This is not a strict rule in this version and it will work with non-contiguous integers, but it is recommended as best practice.</li>
 </ul>
 <h5 id="fmprogrammetobin">fmprogrammetobin</h5>
-<pre><code>$ fmprogrammetobin &lt; fm_programme.csv &gt; fm_programme.bin</code></pre>
+<pre class="hljs"><code><div>$ fmprogrammetobin &lt; fm_programme.csv &gt; fm_programme.bin
+</div></code></pre>
 <h5 id="fmprogrammetocsv">fmprogrammetocsv</h5>
-<pre><code>$ fmprogrammetocsv &lt; fm_programme.bin &gt; fm_programme.csv</code></pre>
+<pre class="hljs"><code><div>$ fmprogrammetocsv &lt; fm_programme.bin &gt; fm_programme.csv
+</div></code></pre>
 <p><a href="#dataconversioncomponents">Return to top</a></p>
 <p><a id="fmprofile"></a></p>
 <h3 id="fm-profile">fm profile</h3>
-<hr />
+<hr>
 <p>The fmprofile binary file contains the list of calculation rules with profile values (policytc_ids) that appear in the policytc file. This is required for fmcalc only.</p>
 <p>There are two versions of this file and either one or the other can be used at a time.</p>
 <ul>
@@ -709,382 +1153,377 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv</code></pre>
 <li>input/fm_profile.bin</li>
 <li>input/fm_profile_step.bin</li>
 </ul>
-<h5 id="file-format-9">File format</h5>
+<h5 id="file-format">File format</h5>
 <p>The csv file should contain the following fields and include a header row.</p>
 <p><strong>fm_profile</strong></p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">policytc_id</td>
+<tr>
+<td style="text-align:left">policytc_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Primary key</td>
-<td align="right">34</td>
+<td style="text-align:left">Primary key</td>
+<td style="text-align:right">34</td>
 </tr>
-<tr class="even">
-<td align="left">calcrule_id</td>
+<tr>
+<td style="text-align:left">calcrule_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">The calculation rule that applies to the terms</td>
-<td align="right">12</td>
+<td style="text-align:left">The calculation rule that applies to the terms</td>
+<td style="text-align:right">12</td>
 </tr>
-<tr class="odd">
-<td align="left">deductible_1</td>
+<tr>
+<td style="text-align:left">deductible_1</td>
 <td>int</td>
 <td>4</td>
-<td align="left">First deductible</td>
-<td align="right">0.03</td>
+<td style="text-align:left">First deductible</td>
+<td style="text-align:right">0.03</td>
 </tr>
-<tr class="even">
-<td align="left">deductible_2</td>
+<tr>
+<td style="text-align:left">deductible_2</td>
 <td>float</td>
 <td>4</td>
-<td align="left">Second deductible</td>
-<td align="right">50000</td>
+<td style="text-align:left">Second deductible</td>
+<td style="text-align:right">50000</td>
 </tr>
-<tr class="odd">
-<td align="left">deductible_3</td>
+<tr>
+<td style="text-align:left">deductible_3</td>
 <td>float</td>
 <td>4</td>
-<td align="left">Third deductible</td>
-<td align="right">100000</td>
+<td style="text-align:left">Third deductible</td>
+<td style="text-align:right">100000</td>
 </tr>
-<tr class="even">
-<td align="left">attachment_1</td>
+<tr>
+<td style="text-align:left">attachment_1</td>
 <td>float</td>
 <td>4</td>
-<td align="left">Attachment point, or excess</td>
-<td align="right">1000000</td>
+<td style="text-align:left">Attachment point, or excess</td>
+<td style="text-align:right">1000000</td>
 </tr>
-<tr class="odd">
-<td align="left">limit_1</td>
+<tr>
+<td style="text-align:left">limit_1</td>
 <td>float</td>
 <td>4</td>
-<td align="left">Limit</td>
-<td align="right">5000000</td>
+<td style="text-align:left">Limit</td>
+<td style="text-align:right">5000000</td>
 </tr>
-<tr class="even">
-<td align="left">share_1</td>
+<tr>
+<td style="text-align:left">share_1</td>
 <td>float</td>
 <td>4</td>
-<td align="left">First proportional share</td>
-<td align="right">0.8</td>
+<td style="text-align:left">First proportional share</td>
+<td style="text-align:right">0.8</td>
 </tr>
-<tr class="odd">
-<td align="left">share_2</td>
+<tr>
+<td style="text-align:left">share_2</td>
 <td>float</td>
 <td>4</td>
-<td align="left">Second proportional share</td>
-<td align="right">0.25</td>
+<td style="text-align:left">Second proportional share</td>
+<td style="text-align:right">0.25</td>
 </tr>
-<tr class="even">
-<td align="left">share_3</td>
+<tr>
+<td style="text-align:left">share_3</td>
 <td>float</td>
 <td>4</td>
-<td align="left">Third proportional share</td>
-<td align="right">1</td>
+<td style="text-align:left">Third proportional share</td>
+<td style="text-align:right">1</td>
 </tr>
 </tbody>
 </table>
 <p><strong>fm_profile_step</strong></p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">policytc_id</td>
+<tr>
+<td style="text-align:left">policytc_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Primary key</td>
-<td align="right">34</td>
+<td style="text-align:left">Primary key</td>
+<td style="text-align:right">34</td>
 </tr>
-<tr class="even">
-<td align="left">calcrule_id</td>
+<tr>
+<td style="text-align:left">calcrule_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">The calculation rule that applies to the terms</td>
-<td align="right">12</td>
+<td style="text-align:left">The calculation rule that applies to the terms</td>
+<td style="text-align:right">12</td>
 </tr>
-<tr class="odd">
-<td align="left">deductible_1</td>
+<tr>
+<td style="text-align:left">deductible_1</td>
 <td>int</td>
 <td>4</td>
-<td align="left">First deductible</td>
-<td align="right">0.03</td>
+<td style="text-align:left">First deductible</td>
+<td style="text-align:right">0.03</td>
 </tr>
-<tr class="even">
-<td align="left">deductible_2</td>
+<tr>
+<td style="text-align:left">deductible_2</td>
 <td>float</td>
 <td>4</td>
-<td align="left">Second deductible</td>
-<td align="right">50000</td>
+<td style="text-align:left">Second deductible</td>
+<td style="text-align:right">50000</td>
 </tr>
-<tr class="odd">
-<td align="left">deductible_3</td>
+<tr>
+<td style="text-align:left">deductible_3</td>
 <td>float</td>
 <td>4</td>
-<td align="left">Third deductible</td>
-<td align="right">100000</td>
+<td style="text-align:left">Third deductible</td>
+<td style="text-align:right">100000</td>
 </tr>
-<tr class="even">
-<td align="left">attachment_1</td>
+<tr>
+<td style="text-align:left">attachment_1</td>
 <td>float</td>
 <td>4</td>
-<td align="left">Attachment point, or excess</td>
-<td align="right">1000000</td>
+<td style="text-align:left">Attachment point, or excess</td>
+<td style="text-align:right">1000000</td>
 </tr>
-<tr class="odd">
-<td align="left">limit_1</td>
+<tr>
+<td style="text-align:left">limit_1</td>
 <td>float</td>
 <td>4</td>
-<td align="left">First limit</td>
-<td align="right">5000000</td>
+<td style="text-align:left">First limit</td>
+<td style="text-align:right">5000000</td>
 </tr>
-<tr class="even">
-<td align="left">share_1</td>
+<tr>
+<td style="text-align:left">share_1</td>
 <td>float</td>
 <td>4</td>
-<td align="left">First proportional share</td>
-<td align="right">0.8</td>
+<td style="text-align:left">First proportional share</td>
+<td style="text-align:right">0.8</td>
 </tr>
-<tr class="odd">
-<td align="left">share_2</td>
+<tr>
+<td style="text-align:left">share_2</td>
 <td>float</td>
 <td>4</td>
-<td align="left">Second proportional share</td>
-<td align="right">0.25</td>
+<td style="text-align:left">Second proportional share</td>
+<td style="text-align:right">0.25</td>
 </tr>
-<tr class="even">
-<td align="left">share_3</td>
+<tr>
+<td style="text-align:left">share_3</td>
 <td>float</td>
 <td>4</td>
-<td align="left">Third proportional share</td>
-<td align="right">1</td>
+<td style="text-align:left">Third proportional share</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="odd">
-<td align="left">step_id</td>
+<tr>
+<td style="text-align:left">step_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Step number</td>
-<td align="right">1</td>
+<td style="text-align:left">Step number</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">trigger_start</td>
+<tr>
+<td style="text-align:left">trigger_start</td>
 <td>float</td>
 <td>4</td>
-<td align="left">Start trigger for payout</td>
-<td align="right">0.05</td>
+<td style="text-align:left">Start trigger for payout</td>
+<td style="text-align:right">0.05</td>
 </tr>
-<tr class="odd">
-<td align="left">trigger_end</td>
+<tr>
+<td style="text-align:left">trigger_end</td>
 <td>float</td>
 <td>4</td>
-<td align="left">End trigger for payout</td>
-<td align="right">0.15</td>
+<td style="text-align:left">End trigger for payout</td>
+<td style="text-align:right">0.15</td>
 </tr>
-<tr class="even">
-<td align="left">payout_start</td>
+<tr>
+<td style="text-align:left">payout_start</td>
 <td>float</td>
 <td>4</td>
-<td align="left">Start payout</td>
-<td align="right">100</td>
+<td style="text-align:left">Start payout</td>
+<td style="text-align:right">100</td>
 </tr>
-<tr class="odd">
-<td align="left">payout_end</td>
+<tr>
+<td style="text-align:left">payout_end</td>
 <td>float</td>
 <td>4</td>
-<td align="left">End payout</td>
-<td align="right">200</td>
+<td style="text-align:left">End payout</td>
+<td style="text-align:right">200</td>
 </tr>
-<tr class="even">
-<td align="left">limit_2</td>
+<tr>
+<td style="text-align:left">limit_2</td>
 <td>float</td>
 <td>4</td>
-<td align="left">Second limit</td>
-<td align="right">3000000</td>
+<td style="text-align:left">Second limit</td>
+<td style="text-align:right">3000000</td>
 </tr>
-<tr class="odd">
-<td align="left">scale_1</td>
+<tr>
+<td style="text-align:left">scale_1</td>
 <td>float</td>
 <td>4</td>
-<td align="left">Scaling (inflation) factor 1</td>
-<td align="right">0.03</td>
+<td style="text-align:left">Scaling (inflation) factor 1</td>
+<td style="text-align:right">0.03</td>
 </tr>
-<tr class="even">
-<td align="left">scale_2</td>
+<tr>
+<td style="text-align:left">scale_2</td>
 <td>float</td>
 <td>4</td>
-<td align="left">Scaling (inflation) factor 2</td>
-<td align="right">0.2</td>
+<td style="text-align:left">Scaling (inflation) factor 2</td>
+<td style="text-align:right">0.2</td>
 </tr>
 </tbody>
 </table>
 <ul>
-<li>A reference table listing the valid values for calcrule_id and which of the fields are required is available in Appendix <a href="fmprofiles.html">B FM Profiles</a>.</li>
+<li>A reference table listing the valid values for calcrule_id and which of the fields are required is available in Appendix <a href="fmprofiles.md">B FM Profiles</a>.</li>
 <li>All distinct policytc_id values that appear in the policytc table must appear once in the policytc_id field of the profile table. We suggest that policytc_id=1 is included by default using calcrule_id = 100 and all fields = 0 as a default 'null' calculation rule whenever no terms and conditions apply to a particular level_id / agg_id in the policytc table.</li>
 <li>Any fields that are not required for the profile should be set to zero.</li>
 </ul>
 <h5 id="fmprofiletobin">fmprofiletobin</h5>
-<pre><code>$ fmprofiletobin &lt; fm_profile.csv &gt; fm_profile.bin
-$ fmprofiletobin -S &lt; fm_profile_step.csv &gt; fm_profile_step.bin</code></pre>
+<pre class="hljs"><code><div>$ fmprofiletobin &lt; fm_profile.csv &gt; fm_profile.bin
+$ fmprofiletobin -S &lt; fm_profile_step.csv &gt; fm_profile_step.bin
+</div></code></pre>
 <h5 id="fmprofiletocsv">fmprofiletocsv</h5>
-<pre><code>$ fmprofiletocsv &lt; fm_profile.bin &gt; fm_profile.csv
-$ fmprofiletocsv -S &lt; fm_profile_step.bin &gt; fm_profile_step.csv</code></pre>
+<pre class="hljs"><code><div>$ fmprofiletocsv &lt; fm_profile.bin &gt; fm_profile.csv
+$ fmprofiletocsv -S &lt; fm_profile_step.bin &gt; fm_profile_step.csv
+</div></code></pre>
 <p><a href="#dataconversioncomponents">Return to top</a></p>
 <p><a id="fmpolicytc"></a></p>
 <h3 id="fm-policytc">fm policytc</h3>
-<hr />
+<hr>
 <p>The fm policytc binary file contains the cross reference between the aggregations of losses defined in the fm programme file at a particular level and the calculation rule that should be applied as defined in the fm profile file. This file is required for fmcalc only.</p>
-<p>This must have the following location and filename;</p>
+<p>This  must have the following location and filename;</p>
 <ul>
 <li>input/fm_policytc.bin</li>
 </ul>
-<h5 id="file-format-10">File format</h5>
+<h5 id="file-format">File format</h5>
 <p>The csv file should contain the following fields and include a header row.</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">layer_id</td>
+<tr>
+<td style="text-align:left">layer_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Oasis Financial Module layer_id</td>
-<td align="right">1</td>
+<td style="text-align:left">Oasis Financial Module layer_id</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">level_id</td>
+<tr>
+<td style="text-align:left">level_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Oasis Financial Module level_id</td>
-<td align="right">1</td>
+<td style="text-align:left">Oasis Financial Module level_id</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="odd">
-<td align="left">agg_id</td>
+<tr>
+<td style="text-align:left">agg_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Oasis Financial Module agg_id</td>
-<td align="right">1</td>
+<td style="text-align:left">Oasis Financial Module agg_id</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">policytc_id</td>
+<tr>
+<td style="text-align:left">policytc_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Oasis Financial Module policytc_id</td>
-<td align="right">1</td>
+<td style="text-align:left">Oasis Financial Module policytc_id</td>
+<td style="text-align:right">1</td>
 </tr>
 </tbody>
 </table>
 <ul>
 <li>All fields must have integer values and no nulls</li>
 <li>Must contain the same levels as the fm programme where level_id = 1, 2, 3 ...</li>
-<li>For every distinct combination of to_agg_id and level_id in the programme table, there must be a corresponding record matching level_id and agg_id values in the policytc table with a valid value in the policytc_id field.<br />
-</li>
+<li>For every distinct combination of to_agg_id and level_id in the programme table, there must be a corresponding record matching level_id and agg_id values in the policytc table with a valid value in the policytc_id field.</li>
 <li>layer_id = 1 at all levels except the last where there may be multiple layers, with layer_id = 1, 2, 3 ... This allows for the specification of several policy contracts applied to the same aggregation of losses defined in the programme table.</li>
 </ul>
 <h5 id="fmpolicytctobin">fmpolicytctobin</h5>
-<pre><code>$ fmpolicytctobin &lt; fm_policytc.csv &gt; fm_policytc.bin</code></pre>
+<pre class="hljs"><code><div>$ fmpolicytctobin &lt; fm_policytc.csv &gt; fm_policytc.bin
+</div></code></pre>
 <h5 id="fmpolicytctocsv">fmpolicytctocsv</h5>
-<pre><code>$ fmpolicytctocsv &lt; fm_policytc.bin &gt; fm_policytc.csv</code></pre>
+<pre class="hljs"><code><div>$ fmpolicytctocsv &lt; fm_policytc.bin &gt; fm_policytc.csv
+</div></code></pre>
 <p><a href="#dataconversioncomponents">Return to top</a></p>
 <p><a id="fmsummaryxref"></a></p>
 <h3 id="fm-summary-xref">fm summary xref</h3>
-<hr />
+<hr>
 <p>The fm summary xref binary is a cross reference file which determines how losses from fmcalc output are summed together at various summary levels by summarycalc. It is required by summarycalc and must have the following location and filename;</p>
 <ul>
 <li>input/fmsummaryxref.bin</li>
 </ul>
-<h5 id="file-format-11">File format</h5>
+<h5 id="file-format">File format</h5>
 <p>The csv file should contain the following fields and include a header row.</p>
 <table>
-<colgroup>
-<col width="16%" />
-<col width="7%" />
-<col width="7%" />
-<col width="56%" />
-<col width="11%" />
-</colgroup>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">output_id</td>
+<tr>
+<td style="text-align:left">output_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Identifier of the coverage</td>
-<td align="right">3</td>
+<td style="text-align:left">Identifier of the coverage</td>
+<td style="text-align:right">3</td>
 </tr>
-<tr class="even">
-<td align="left">summary_id</td>
+<tr>
+<td style="text-align:left">summary_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Identifier of the summary level group for one or more output losses</td>
-<td align="right">1</td>
+<td style="text-align:left">Identifier of the summary level group for one or more output losses</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="odd">
-<td align="left">summaryset_id</td>
+<tr>
+<td style="text-align:left">summaryset_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Identifier of the summary set (0 to 9 inclusive)</td>
-<td align="right">1</td>
+<td style="text-align:left">Identifier of the summary set (0 to 9 inclusive)</td>
+<td style="text-align:right">1</td>
 </tr>
 </tbody>
 </table>
 <ul>
-<li>The data should not contain nulls and there should be at least one summary set in the file.<br />
-</li>
+<li>The data should not contain nulls and there should be at least one summary set in the file.</li>
 <li>Valid entries for summaryset_id is all integers between 0 and 9 inclusive.</li>
 <li>Within each summary set, all output_id's from the fm xref file must be present.</li>
 </ul>
 <p>One summary set consists of a common summaryset_id and each output_id being assigned a summary_id. An example is as follows.</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">output_id</th>
+<tr>
+<th style="text-align:left">output_id</th>
 <th>summary_id</th>
-<th align="right">summaryset_id</th>
+<th style="text-align:right">summaryset_id</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>1</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">2</td>
+<tr>
+<td style="text-align:left">2</td>
 <td>2</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
 </tbody>
 </table>
@@ -1093,82 +1532,84 @@ $ fmprofiletocsv -S &lt; fm_profile_step.bin &gt; fm_profile_step.csv</code></pr
 <p>Up to 10 summary sets may be provided in this file, depending on the required summary reporting levels for the analysis. Here is an example of the 'policy' summary level with summaryset_id=1, plus an 'account' summary level with summaryset_id = 2. In summary set 2, the 'account' summary level includes both policy's because both output_id's are assigned a summary_id of 1.</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">output_id</th>
+<tr>
+<th style="text-align:left">output_id</th>
 <th>summary_id</th>
-<th align="right">summaryset_id</th>
+<th style="text-align:right">summaryset_id</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>1</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">2</td>
+<tr>
+<td style="text-align:left">2</td>
 <td>2</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="odd">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>1</td>
-<td align="right">2</td>
+<td style="text-align:right">2</td>
 </tr>
-<tr class="even">
-<td align="left">2</td>
+<tr>
+<td style="text-align:left">2</td>
 <td>1</td>
-<td align="right">2</td>
+<td style="text-align:right">2</td>
 </tr>
 </tbody>
 </table>
 <p>If a more detailed summary level than policy is required for insured losses, then the user should specify in the fm profile file to back-allocate fmcalc losses to items. Then the output_id represents back-allocated policy losses to item, and in the fmsummaryxref file these can be grouped into any summary level, such as site, zipcode, line of business or region, for example. The user needs to define output_id in the fm xref file, and group them together into meaningful summary levels in the fm summary xref file, hence these two files must be consistent with respect to the meaning of output_id.</p>
 <h5 id="fmsummaryxreftobin">fmsummaryxreftobin</h5>
-<pre><code>$ fmsummaryxreftobin &lt; fmsummaryxref.csv &gt; fmsummaryxref.bin</code></pre>
+<pre class="hljs"><code><div>$ fmsummaryxreftobin &lt; fmsummaryxref.csv &gt; fmsummaryxref.bin
+</div></code></pre>
 <h5 id="fmsummaryxreftocsv">fmsummaryxreftocsv</h5>
-<pre><code>$ fmsummaryxreftocsv &lt; fmsummaryxref.bin &gt; fmsummaryxref.csv</code></pre>
+<pre class="hljs"><code><div>$ fmsummaryxreftocsv &lt; fmsummaryxref.bin &gt; fmsummaryxref.csv
+</div></code></pre>
 <p><a href="#dataconversioncomponents">Return to top</a></p>
 <p><a id="fmxref"></a></p>
 <h3 id="fm-xref">fm xref</h3>
-<hr />
+<hr>
 <p>The fmxref binary file contains cross reference data specifying the output_id in the fmcalc as a combination of agg_id and layer_id, and is required by fmcalc.</p>
 <p>This must be in the following location with filename format;</p>
 <ul>
 <li>input/fm_xref.bin</li>
 </ul>
-<h5 id="file-format-12">File format</h5>
+<h5 id="file-format">File format</h5>
 <p>The csv file should contain the following fields and include a header row.</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">output_id</td>
+<tr>
+<td style="text-align:left">output_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Identifier of the output group of losses</td>
-<td align="right">1</td>
+<td style="text-align:left">Identifier of the output group of losses</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">agg_id</td>
+<tr>
+<td style="text-align:left">agg_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Identifier of the agg_id to output</td>
-<td align="right">1</td>
+<td style="text-align:left">Identifier of the agg_id to output</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="odd">
-<td align="left">layer_id</td>
+<tr>
+<td style="text-align:left">layer_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Identifier of the layer_id to output</td>
-<td align="right">1</td>
+<td style="text-align:left">Identifier of the layer_id to output</td>
+<td style="text-align:right">1</td>
 </tr>
 </tbody>
 </table>
@@ -1182,227 +1623,236 @@ $ fmprofiletocsv -S &lt; fm_profile_step.bin &gt; fm_profile_step.csv</code></pr
 <p>For example, say there are two policy layers (with layer_ids=1 and 2) which applies to the sum of losses from 4 items (the summary level represented by agg_id=1). Without back-allocation, the policy summary level of losses can be represented as two output_id's as follows;</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">output_id</th>
+<tr>
+<th style="text-align:left">output_id</th>
 <th>agg_id</th>
-<th align="right">layer_id</th>
+<th style="text-align:right">layer_id</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>1</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">2</td>
+<tr>
+<td style="text-align:left">2</td>
 <td>1</td>
-<td align="right">2</td>
+<td style="text-align:right">2</td>
 </tr>
 </tbody>
 </table>
 <p>If the user wants to back-allocate policy losses to the items and output the losses by item and policy, then the item-policy summary level of losses would be represented by 8 output_id's, as follows;</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">output_id</th>
+<tr>
+<th style="text-align:left">output_id</th>
 <th>agg_id</th>
-<th align="right">layer_id</th>
+<th style="text-align:right">layer_id</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>1</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">2</td>
+<tr>
+<td style="text-align:left">2</td>
 <td>2</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="odd">
-<td align="left">3</td>
+<tr>
+<td style="text-align:left">3</td>
 <td>3</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">4</td>
+<tr>
+<td style="text-align:left">4</td>
 <td>4</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="odd">
-<td align="left">5</td>
+<tr>
+<td style="text-align:left">5</td>
 <td>1</td>
-<td align="right">2</td>
+<td style="text-align:right">2</td>
 </tr>
-<tr class="even">
-<td align="left">6</td>
+<tr>
+<td style="text-align:left">6</td>
 <td>2</td>
-<td align="right">2</td>
+<td style="text-align:right">2</td>
 </tr>
-<tr class="odd">
-<td align="left">7</td>
+<tr>
+<td style="text-align:left">7</td>
 <td>3</td>
-<td align="right">2</td>
+<td style="text-align:right">2</td>
 </tr>
-<tr class="even">
-<td align="left">8</td>
+<tr>
+<td style="text-align:left">8</td>
 <td>4</td>
-<td align="right">2</td>
+<td style="text-align:right">2</td>
 </tr>
 </tbody>
 </table>
 <p>The fm summary xref file must be consistent with respect to the meaning of output_id in the fmxref file.</p>
 <h5 id="fmxreftobin">fmxreftobin</h5>
-<pre><code>$ fmxreftobin &lt; fm_xref.csv &gt; fm_xref.bin</code></pre>
+<pre class="hljs"><code><div>$ fmxreftobin &lt; fm_xref.csv &gt; fm_xref.bin
+</div></code></pre>
 <h5 id="fmxreftocsv">fmxreftocsv</h5>
-<pre><code>$ fmxreftocsv &lt; fm_xref.bin &gt; fm_xref.csv</code></pre>
+<pre class="hljs"><code><div>$ fmxreftocsv &lt; fm_xref.bin &gt; fm_xref.csv
+</div></code></pre>
 <p><a href="#dataconversioncomponents">Return to top</a></p>
 <p><a id="occurrence"></a></p>
 <h3 id="occurrence">occurrence</h3>
-<hr />
-<p>The occurrence file is required for certain output components which, in the reference model, are leccalc, pltcalc and aalcalc. In general, some form of event occurence file is required for any output which involves the calculation of loss metrics over a period of time. The occurrence file assigns occurrences of the event_ids to numbered periods. A period can represent any length of time, such as a year, or 2 years for instance. The output metrics such as mean, standard deviation or loss exceedance probabilities are with respect to the chosen period length. Most commonly in catastrophe modelling, the period of interest is a year.</p>
+<hr>
+<p>The occurrence file is required for certain output components which, in the reference model, are leccalc, pltcalc and aalcalc.  In general, some form of event occurence file is required for any output which involves the calculation of loss metrics over a period of time.  The occurrence file assigns occurrences of the event_ids to numbered periods. A period can represent any length of time, such as a year, or 2 years for instance. The output metrics such as mean, standard deviation or loss exceedance probabilities are with respect to the chosen period length.  Most commonly in catastrophe modelling, the period of interest is a year.</p>
 <p>The occurrence file also includes date fields.</p>
 <ul>
 <li>occ_year, occ_month, occ_day. These are all integers representing occurrence year, month and day.</li>
 </ul>
-<h5 id="file-format-13">File format</h5>
+<h5 id="file-format">File format</h5>
 <p>The csv file should contain the following fields and include a header row.</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">event_id</td>
+<tr>
+<td style="text-align:left">event_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">The occurrence event_id</td>
-<td align="right">45567</td>
+<td style="text-align:left">The occurrence event_id</td>
+<td style="text-align:right">45567</td>
 </tr>
-<tr class="even">
-<td align="left">period_no</td>
+<tr>
+<td style="text-align:left">period_no</td>
 <td>int</td>
 <td>4</td>
-<td align="left">A numbered period in which the event occurs</td>
-<td align="right">56876</td>
+<td style="text-align:left">A numbered period in which the event occurs</td>
+<td style="text-align:right">56876</td>
 </tr>
-<tr class="odd">
-<td align="left">occ_year</td>
+<tr>
+<td style="text-align:left">occ_year</td>
 <td>int</td>
 <td>4</td>
-<td align="left">the year number of the event occurrence</td>
-<td align="right">56876</td>
+<td style="text-align:left">the year number of the event occurrence</td>
+<td style="text-align:right">56876</td>
 </tr>
-<tr class="even">
-<td align="left">occ_month</td>
+<tr>
+<td style="text-align:left">occ_month</td>
 <td>int</td>
 <td>4</td>
-<td align="left">the month of the event occurrence</td>
-<td align="right">5</td>
+<td style="text-align:left">the month of the event occurrence</td>
+<td style="text-align:right">5</td>
 </tr>
-<tr class="odd">
-<td align="left">occ_day</td>
+<tr>
+<td style="text-align:left">occ_day</td>
 <td>int</td>
 <td>4</td>
-<td align="left">the day of the event occurrence</td>
-<td align="right">16</td>
+<td style="text-align:left">the day of the event occurrence</td>
+<td style="text-align:right">16</td>
 </tr>
 </tbody>
 </table>
 <p>The occurrence year in this example is a scenario numbered year, which cannot be expressed as a real date in a standard calendar.</p>
 <h5 id="occurrencetobin">occurrencetobin</h5>
 <p>A required parameter is -P, the total number of periods of event occurrences. The total number of periods is held in the header of the binary file and used in output calculations.</p>
-<pre><code>$ occurrencetobin -P10000 &lt; occurrence.csv &gt; occurrence.bin</code></pre>
+<pre class="hljs"><code><div>$ occurrencetobin -P10000 &lt; occurrence.csv &gt; occurrence.bin
+</div></code></pre>
 <h5 id="occurrencetocsv">occurrencetocsv</h5>
-<pre><code>$ occurrencetocsv &lt; occurrence.bin &gt; occurrence.csv</code></pre>
+<pre class="hljs"><code><div>$ occurrencetocsv &lt; occurrence.bin &gt; occurrence.csv
+</div></code></pre>
 <p><a href="#dataconversioncomponents">Return to top</a></p>
 <p><a id="returnperiod"></a></p>
 <h3 id="return-period">return period</h3>
-<hr />
+<hr>
 <p>The returnperiods binary file is a list of return periods that the user requires to be included in loss exceedance curve (leccalc) results.</p>
 <p>This must be in the following location with filename format;</p>
 <ul>
 <li>input/returnperiods.bin</li>
 </ul>
-<h5 id="file-format-14">File format</h5>
+<h5 id="file-format">File format</h5>
 <p>The csv file should contain the following field and include a header.</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">return_period</td>
+<tr>
+<td style="text-align:left">return_period</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Return period</td>
-<td align="right">250</td>
+<td style="text-align:left">Return period</td>
+<td style="text-align:right">250</td>
 </tr>
 </tbody>
 </table>
 <h5 id="returnperiodtobin">returnperiodtobin</h5>
-<pre><code>$ returnperiodtobin &lt; returnperiods.csv &gt; returnperiods.bin</code></pre>
+<pre class="hljs"><code><div>$ returnperiodtobin &lt; returnperiods.csv &gt; returnperiods.bin
+</div></code></pre>
 <h5 id="returnperiodtocsv">returnperiodtocsv</h5>
-<pre><code>$ returnperiodtocsv &lt; returnperiods.bin &gt; returnperiods.csv</code></pre>
+<pre class="hljs"><code><div>$ returnperiodtocsv &lt; returnperiods.bin &gt; returnperiods.csv
+</div></code></pre>
 <p><a href="#dataconversioncomponents">Return to top</a></p>
 <p><a id="periods"></a></p>
 <h3 id="periods">periods</h3>
-<hr />
+<hr>
 <p>The periods binary file is a list of all the periods that are in the model and is optional for weighting the periods in the calculation. The file is used in the calculation of the loss exceedance curve (leccalc) and aalcalc results.</p>
 <p>This must be in the following location with filename format;</p>
 <ul>
 <li>input/periods.bin</li>
 </ul>
-<h5 id="file-format-15">File format</h5>
+<h5 id="file-format">File format</h5>
 <p>The csv file should contain the following field and include a header.</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">period_no</td>
+<tr>
+<td style="text-align:left">period_no</td>
 <td>int</td>
 <td>4</td>
-<td align="left">A numbered period in which the event occurs</td>
-<td align="right">4545</td>
+<td style="text-align:left">A numbered period in which the event occurs</td>
+<td style="text-align:right">4545</td>
 </tr>
-<tr class="even">
-<td align="left">weight</td>
+<tr>
+<td style="text-align:left">weight</td>
 <td>int</td>
 <td>4</td>
-<td align="left">relative weight to P, the maximum period_no</td>
-<td align="right">0.0003</td>
+<td style="text-align:left">relative weight to P, the maximum period_no</td>
+<td style="text-align:right">0.0003</td>
 </tr>
 </tbody>
 </table>
 <p>All periods must be present in this file (no gaps in period_no from 1 to P).</p>
 <h5 id="periodstobin">periodstobin</h5>
-<pre><code>$ periodstobin &lt; periods.csv &gt; periods.bin</code></pre>
+<pre class="hljs"><code><div>$ periodstobin &lt; periods.csv &gt; periods.bin
+</div></code></pre>
 <h5 id="periodstocsv">periodstocsv</h5>
-<pre><code>$ periodstocsv &lt; periods.bin &gt; periods.csv</code></pre>
+<pre class="hljs"><code><div>$ periodstocsv &lt; periods.bin &gt; periods.csv
+</div></code></pre>
 <p><a href="#dataconversioncomponents">Return to top</a></p>
-<p><a href="StreamConversionComponents.html">Go to 4.4 Stream conversion components section</a></p>
-<p><a href="Contents.html">Back to Contents</a></p>
+<p><a href="StreamConversionComponents.md">Go to 4.4 Stream conversion components section</a></p>
+<p><a href="Contents.md">Back to Contents</a></p>
+
 </body>
 </html>

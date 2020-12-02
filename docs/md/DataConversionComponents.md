@@ -158,6 +158,14 @@ $ footprinttobin -i {number of intensity bins} -b {output footprint binary file 
 
 Both output binary and index file names must be given to use this option.
 
+In the case of very large footprint files, it may be preferrable to compress the data as it is written to the binary file. Compression is performed using [zlib](https://zlib.net/) by issuing the -z flag. If the -u flag is used in addition, the index file will include the uncompressed data size. It is recommended to use the -u flag to prevent any memory issues during decompression with getmodel or footprinttocsv:
+
+```
+$ footprinttobin -i {number of intensity bins} -z < footprint.csv
+$ footprinttobin -i {number of intensity bins} -z -u < footprint.csv
+```
+The value of the -u parameter is held in the same location as -n in the header of the footprint.bin file, left-shifted by 1.
+
 ##### footprinttocsv
 ```
 $ footprinttocsv > footprint.csv
@@ -171,6 +179,12 @@ $ footprinttocsv -b {input footprint binary file name} -x {input footprint index
 ```
 
 Both input binary and index file name must be given to use this option.
+
+Footprint binary files that contain compressed data require the -z argument to be issued:
+
+```
+$ footprinttocsv -z > footprint.csv
+```
 
 [Return to top](#dataconversioncomponents)
 

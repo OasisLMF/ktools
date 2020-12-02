@@ -1,15 +1,372 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <meta http-equiv="Content-Style-Type" content="text/css" />
-  <meta name="generator" content="pandoc" />
-  <title></title>
-  <style type="text/css">code{white-space: pre;}</style>
+<title>FinancialModule.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
 </head>
 <body>
-<p><img src="../img/banner.jpg" title="banner" alt="alt text" /></p>
-<h1 id="financial-module">5. Financial Module <a id="financialmodule"></a></h1>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<p><img src="../img/banner.jpg" alt="alt text" title="banner"></p>
+<h1 id="5-financial-module-a-id%22financialmodule%22a">5. Financial Module  <a id="financialmodule"></a></h1>
 <p>The Oasis Financial Module is a data-driven process design for calculating the losses on (re)insurance contracts. It has an abstract design in order to cater for the many variations in contract structures and terms. The way Oasis works is to be fed data in order to execute calculations, so for the insurance calculations it needs to know the structure, parameters and calculation rules to be used. This data must be provided in the files used by the Oasis Financial Module:</p>
 <ul>
 <li><strong>fm_programme</strong>: defines how coverages are grouped into accounts and programmes</li>
@@ -19,20 +376,20 @@
 </ul>
 <p>This section explains the design of the Financial Module which has been implemented in the <strong>fmcalc</strong> component.</p>
 <ul>
-<li>Runtime parameters and usage instructions for fmcalc are covered in <a href="CoreComponents.html">4.1 Core Components</a>.</li>
-<li>The formats of the input files are covered in <a href="DataConversionComponents.html">4.3 Data Conversion Components</a>.</li>
+<li>Runtime parameters and usage instructions for fmcalc are covered in <a href="CoreComponents.md">4.1 Core Components</a>.</li>
+<li>The formats of the input files are covered in <a href="DataConversionComponents.md">4.3 Data Conversion Components</a>.</li>
 </ul>
 <p>In addition, there is a separate github repository <a href="https://github.com/OasisLMF/ktest">ktest</a> which is an extended test suite for ktools and contains a library of financial module worked examples provided by Oasis Members with a full set of input and output files.</p>
-<p>Note that other reference tables are referred to below that do not appear explicitly in the kernel as they are not directly required for calculation. It is expected that a front end system will hold all of the exposure and policy data and generate the above four input files required for the kernel calculation.</p>
+<p>Note that other reference tables are referred to below that do not appear explicitly in the kernel as they are not directly required for calculation.  It is expected that a front end system will hold all of the exposure and policy data and generate the above four input files required for the kernel calculation.</p>
 <h2 id="scope">Scope</h2>
-<p>The Financial Module outputs sample by sample losses by (re)insurance contract, or by item, which represents the individual coverage subject to economic loss from a particular peril. In the latter case, it is necessary to ‘back-allocate’ losses when they are calculated at a higher policy level. The Financial Module can output retained loss or ultimate net loss (UNL) perspectives as an option, and at any stage in the calculation.</p>
-<p>The output contains anonymous keys representing the (re)insurance policy (agg_id and layer_id) at the chosen output level (output_id) and a loss value. Losses by sample number (idx) and event (event_id) are produced. To make sense of the output, this output must be cross-referenced with Oasis dictionaries which contain the meaningful business information.</p>
+<p>The Financial Module outputs sample by sample losses by (re)insurance contract, or by item, which represents the individual coverage subject to economic loss from a particular peril. In the latter case, it is necessary to ‘back-allocate’ losses when they are calculated at a higher policy level.  The Financial Module can output retained loss or ultimate net loss (UNL) perspectives as an option, and at any stage in the calculation.</p>
+<p>The output contains anonymous keys representing the (re)insurance policy (agg_id and layer_id) at the chosen output level (output_id) and a loss value. Losses by sample number (idx) and event (event_id) are produced.  To make sense of the output, this output must be cross-referenced with Oasis dictionaries which contain the meaningful business information.</p>
 <p>The Financial Module does not support multi-currency calculations.</p>
 <h2 id="profiles">Profiles</h2>
-<p>Profiles are used throughout the Oasis framework and are meta-data definitions with their associated data types and rules. Profiles are used in the Financial Module to perform the elements of financial calculations used to calculate losses to (re)insurance policies. For anything other than the most simple policy which has a blanket deductible and limit, say, a profile do not represent a policy structure on its own, but rather is to be used as a building block which can be combined with other building blocks to model a particular financial contract. In this way it is possible to model an unlimited range of structures with a limited number of profiles.</p>
+<p>Profiles are used throughout the Oasis framework and are meta-data definitions with their associated data types and rules.  Profiles are used in the Financial Module to perform the elements of financial calculations used to calculate losses to (re)insurance policies.  For anything other than the most simple policy which has a blanket deductible and limit, say, a profile do not represent a policy structure on its own, but rather is to be used as a building block which can be combined with other building blocks to model a particular financial contract. In this way it is possible to model an unlimited range of structures with a limited number of profiles.</p>
 <p>The FM Profiles form an extensible library of calculations defined within the fmcalc code that can be invoked by specifying a particular <strong>calcrule_id</strong> and providing the required data values such as deductible and limit, as described below.</p>
 <h4 id="supported-profiles">Supported Profiles</h4>
-<p>See Appendix <a href="fmprofiles.html">B FM Profiles</a> for more details.</p>
+<p>See Appendix <a href="fmprofiles.md">B FM Profiles</a> for more details.</p>
 <h2 id="design">Design</h2>
 <p>The Oasis Financial Module is a data-driven process design for calculating the losses on insurance policies. It is an abstract design in order to cater for the many variations and has four basic concepts:</p>
 <ol>
@@ -49,89 +406,90 @@
 <li>Loss values of items.</li>
 <li>Policy profiles and profile values.</li>
 </ul>
-<p>There are many ways an insurance loss can be calculated with many different terms and conditions. For instance, there may be deductibles applied to each element of coverage (e.g. a buildings damage deductible), some site-specific deductibles or limits, and some overall policy deductibles and limits and share. To undertake the calculation in the correct order and using the correct items (and their values) the structure and sequence of calculations must be defined. This is done in the <strong>programme</strong> file which defines a heirarchy of groups across a number of <strong>levels</strong>. Levels drive the sequence of calculation. A financial calculation is performed at successive levels, depending on the structure of policy terms and conditions. For example there might be 3 levels representing coverage, site and policy terms and conditions.</p>
-<h4 id="figure-1.-example-3-level-programme-hierarchy">Figure 1. Example 3-level programme hierarchy</h4>
-<p><img src="../img/fm1.jpg" title="3-level programme hierarchy" alt="alt text" /></p>
-<p>Groups are defined within levels and they represent aggregations of losses on which to perform the financial calculations. The grouping fields are called from_agg_id and to_agg_id which represent a grouping of losses at the previous level and the present level of the hierarchy, respectively.</p>
-<h4 id="figure-2.-example-level-1-grouping">Figure 2. Example level 1 grouping</h4>
-<p><img src="../img/fm2.jpg" title="Example level 1 grouping" alt="alt text" /></p>
+<p>There are many ways an insurance loss can be calculated with many different terms and conditions. For instance, there may be deductibles applied to each element of coverage (e.g. a buildings damage deductible), some site-specific deductibles or limits, and some overall policy deductibles and limits and share. To undertake the calculation in the correct order and using the correct items (and their values) the structure and sequence of calculations must be defined. This is done in the <strong>programme</strong> file which defines a heirarchy of groups across a number of <strong>levels</strong>.  Levels drive the sequence of calculation. A financial calculation is performed at successive levels, depending on the structure of policy terms and conditions. For example there might be 3 levels representing coverage, site and policy terms and conditions.</p>
+<h4 id="figure-1-example-3-level-programme-hierarchy">Figure 1. Example 3-level programme hierarchy</h4>
+<p><img src="../img/fm1.jpg" alt="alt text" title="3-level programme hierarchy"></p>
+<p>Groups are defined within levels and they represent aggregations of losses on which to perform the financial calculations.  The grouping fields are called from_agg_id and to_agg_id which represent a grouping of losses at the previous level and the present level of the hierarchy, respectively.</p>
+<p>Each level calculation applies to the to_agg_id groupings in the heirarchy. There is no calculation applied to the from_agg_id groupings at level 1 - these ids directly correspond to the ids in the loss input.</p>
+<h4 id="figure-2-example-level-2-grouping">Figure 2. Example level 2 grouping</h4>
+<p><img src="../img/fm2.jpg" alt="alt text" title="Example level 1 grouping"></p>
 <h3 id="loss-values">Loss values</h3>
 <p>The initial input is the ground-up loss (GUL) table, generally coming from the main Oasis calculation of ground-up losses. Here is an example, for a two events and 1 sample (idx=1):</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">event_id</th>
+<tr>
+<th style="text-align:left">event_id</th>
 <th>item_id</th>
 <th>sidx</th>
-<th align="right">loss</th>
+<th style="text-align:right">loss</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>1</td>
 <td>1</td>
-<td align="right">100,000</td>
+<td style="text-align:right">100,000</td>
 </tr>
-<tr class="even">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>2</td>
 <td>1</td>
-<td align="right">10,000</td>
+<td style="text-align:right">10,000</td>
 </tr>
-<tr class="odd">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>3</td>
 <td>1</td>
-<td align="right">2,500</td>
+<td style="text-align:right">2,500</td>
 </tr>
-<tr class="even">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>4</td>
 <td>1</td>
-<td align="right">400</td>
+<td style="text-align:right">400</td>
 </tr>
-<tr class="odd">
-<td align="left">2</td>
+<tr>
+<td style="text-align:left">2</td>
 <td>1</td>
 <td>1</td>
-<td align="right">90,000</td>
+<td style="text-align:right">90,000</td>
 </tr>
-<tr class="even">
-<td align="left">2</td>
+<tr>
+<td style="text-align:left">2</td>
 <td>2</td>
 <td>1</td>
-<td align="right">15,000</td>
+<td style="text-align:right">15,000</td>
 </tr>
-<tr class="odd">
-<td align="left">2</td>
+<tr>
+<td style="text-align:left">2</td>
 <td>3</td>
 <td>1</td>
-<td align="right">3,000</td>
+<td style="text-align:right">3,000</td>
 </tr>
-<tr class="even">
-<td align="left">2</td>
+<tr>
+<td style="text-align:left">2</td>
 <td>4</td>
 <td>1</td>
-<td align="right">500</td>
+<td style="text-align:right">500</td>
 </tr>
 </tbody>
 </table>
-<p>The values represent a single ground-up loss sample for items belonging to an account. We use “programme” rather than &quot;account&quot; as it is more general characteristic of a client’s exposure protection needs and allows a client to have multiple programmes active for a given period.<br />
+<p>The values represent a single ground-up loss sample for items belonging to an account. We use “programme” rather than &quot;account&quot; as it is more general characteristic of a client’s exposure protection needs and allows a client to have multiple programmes active for a given period.
 The linkage between account and programme can be provided by a user defined <strong>prog</strong> dictionary, for example;</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">prog_id</th>
+<tr>
+<th style="text-align:left">prog_id</th>
 <th>account_id</th>
-<th align="right">prog_name</th>
+<th style="text-align:right">prog_name</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>1</td>
-<td align="right">ABC Insurance Co. 2016 renewal</td>
+<td style="text-align:right">ABC Insurance Co. 2016 renewal</td>
 </tr>
 </tbody>
 </table>
@@ -140,42 +498,42 @@ The linkage between account and programme can be provided by a user defined <str
 <p>The actual items falling into the programme are specified in the <strong>programme</strong> table together with the aggregation groupings that go into a given level calculation:</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">from_agg_id</th>
+<tr>
+<th style="text-align:left">from_agg_id</th>
 <th>level_id</th>
-<th align="right">to_agg_id</th>
+<th style="text-align:right">to_agg_id</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>1</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">2</td>
+<tr>
+<td style="text-align:left">2</td>
 <td>1</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="odd">
-<td align="left">3</td>
+<tr>
+<td style="text-align:left">3</td>
 <td>1</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">4</td>
+<tr>
+<td style="text-align:left">4</td>
 <td>1</td>
-<td align="right">2</td>
+<td style="text-align:right">2</td>
 </tr>
-<tr class="odd">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>2</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">2</td>
+<tr>
+<td style="text-align:left">2</td>
 <td>2</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
 </tbody>
 </table>
@@ -185,39 +543,39 @@ The linkage between account and programme can be provided by a user defined <str
 <p>Next we have the profile description table, which list the profiles representing general policy types. Our example is represented by two general profiles which specify the input fields and mathematical operations to perform. In this example, the profile for the combined coverages and time is the same (albeit with different values) and requires a limit, a deductible, and an associated calculation rule, whereas the profile for the policy requires a limit, attachment, and share, and an associated calculation rule.</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Profile description</th>
-<th align="right">calcrule_id</th>
+<tr>
+<th style="text-align:left">Profile description</th>
+<th style="text-align:right">calcrule_id</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">deductible and limit</td>
-<td align="right">1</td>
+<tr>
+<td style="text-align:left">deductible and limit</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">deductible and/or attachment, limit and share</td>
-<td align="right">2</td>
+<tr>
+<td style="text-align:left">deductible and/or attachment, limit and share</td>
+<td style="text-align:right">2</td>
 </tr>
 </tbody>
 </table>
 <p>There is a “profile value” table for each profile containing the applicable policy terms, each identified by a policytc_id. The table below shows the list of policy terms for calcrule_id 1.</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">policytc_id</th>
+<tr>
+<th style="text-align:left">policytc_id</th>
 <th>deductible1</th>
 <th>limit1</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>1,000</td>
 <td>1,000,000</td>
 </tr>
-<tr class="even">
-<td align="left">2</td>
+<tr>
+<td style="text-align:left">2</td>
 <td>2,000</td>
 <td>18,000</td>
 </tr>
@@ -226,8 +584,8 @@ The linkage between account and programme can be provided by a user defined <str
 <p>And next, for calcrule_id 2, the values for the overall policy attachment, limit and share</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">policytc_id</th>
+<tr>
+<th style="text-align:left">policytc_id</th>
 <th>deductible1</th>
 <th>attachment1</th>
 <th>limit1</th>
@@ -235,8 +593,8 @@ The linkage between account and programme can be provided by a user defined <str
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">3</td>
+<tr>
+<td style="text-align:left">3</td>
 <td>0</td>
 <td>1,000</td>
 <td>1,000,000</td>
@@ -244,25 +602,13 @@ The linkage between account and programme can be provided by a user defined <str
 </tr>
 </tbody>
 </table>
-<p>In practice, all profile values are stored in a single flattened format which contains all supported profile fields (see fm profile in <a href="DataConversionComponents.html">4.3 Data Conversion Components</a>), but conceptually they belong in separate profile value tables.</p>
+<p>In practice, all profile values are stored in a single flattened format which contains all supported profile fields (see fm profile in <a href="DataConversionComponents.md">4.3 Data Conversion Components</a>), but conceptually they belong in separate profile value tables.</p>
 <p>The flattened file is;</p>
 <p>fm_profile</p>
-<table style="width:100%;">
-<colgroup>
-<col width="11%" />
-<col width="11%" />
-<col width="11%" />
-<col width="10%" />
-<col width="11%" />
-<col width="11%" />
-<col width="9%" />
-<col width="7%" />
-<col width="7%" />
-<col width="7%" />
-</colgroup>
+<table>
 <thead>
-<tr class="header">
-<th align="left">policytc_id</th>
+<tr>
+<th style="text-align:left">policytc_id</th>
 <th>calcrule_id</th>
 <th>deductible1</th>
 <th>deductible2</th>
@@ -271,12 +617,12 @@ The linkage between account and programme can be provided by a user defined <str
 <th>limit1</th>
 <th>share1</th>
 <th>share2</th>
-<th align="right">share3</th>
+<th style="text-align:right">share3</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>1</td>
 <td>1,000</td>
 <td>0</td>
@@ -285,10 +631,10 @@ The linkage between account and programme can be provided by a user defined <str
 <td>1,000,000</td>
 <td>0</td>
 <td>0</td>
-<td align="right">0</td>
+<td style="text-align:right">0</td>
 </tr>
-<tr class="even">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>1</td>
 <td>2,000</td>
 <td>0</td>
@@ -297,10 +643,10 @@ The linkage between account and programme can be provided by a user defined <str
 <td>18,000</td>
 <td>0</td>
 <td>0</td>
-<td align="right">0</td>
+<td style="text-align:right">0</td>
 </tr>
-<tr class="odd">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>2</td>
 <td>0</td>
 <td>0</td>
@@ -309,40 +655,40 @@ The linkage between account and programme can be provided by a user defined <str
 <td>1,000,000</td>
 <td>0.1</td>
 <td>0</td>
-<td align="right">0</td>
+<td style="text-align:right">0</td>
 </tr>
 </tbody>
 </table>
-<p>For any given profile we have one standard rule <strong>calcrule_id</strong>, being the mathematical function used to calculate the losses from the given profile’s fields. More information about the functions can be found in <a href="fmprofiles.html">FM Profiles</a>.</p>
+<p>For any given profile we have one standard rule <strong>calcrule_id</strong>, being the mathematical function used to calculate the losses from the given profile’s fields. More information about the functions can be found in <a href="fmprofiles.md">FM Profiles</a>.</p>
 <h3 id="policytc">Policytc</h3>
 <p>The <strong>policytc</strong> table specifies the (re)insurance contracts (this is a combination of agg_id and layer_id) and the separate terms and conditions which will be applied to each layer_id/agg_id for a given level. In our example, we have a limit and deductible with the same value applicable to the combination of the first three items, a limit and deductible for the fourth item (time) in level 1, and then a limit, attachment, and share applicable at level 2 covering all items. We’d represent this in terms of the distinct agg_ids as follows:</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">layer_id</th>
+<tr>
+<th style="text-align:left">layer_id</th>
 <th>level_id</th>
 <th>agg_id</th>
-<th align="right">policytc_id</th>
+<th style="text-align:right">policytc_id</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>1</td>
 <td>1</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>1</td>
 <td>2</td>
-<td align="right">2</td>
+<td style="text-align:right">2</td>
 </tr>
-<tr class="odd">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>2</td>
 <td>1</td>
-<td align="right">3</td>
+<td style="text-align:right">3</td>
 </tr>
 </tbody>
 </table>
@@ -355,85 +701,86 @@ The linkage between account and programme can be provided by a user defined <str
 <p>Levels are processed in ascending order and the calculated losses from a previous level are summed according to the groupings defined in the programme table which become the input losses to the next level.</p>
 <h4 id="layers">Layers</h4>
 <p>Layers can be used to model multiple sets of terms and conditions applied to the same losses, such as excess policies. For the lower level calculations and in the general case where there is a single contract, layer_id should be set to 1. For a given level_id and agg_id, multiple layers can be defined by setting layer_id =1,2,3 etc, and assigning a different calculation policytc_id to each.</p>
-<h4 id="figure-3.-example-of-multiple-layers">Figure 3. Example of multiple layers</h4>
-<p><img src="../img/fm3.jpg" title="Example layers" alt="alt text" /></p>
+<h4 id="figure-3-example-of-multiple-layers">Figure 3. Example of multiple layers</h4>
+<p><img src="../img/fm3.jpg" alt="alt text" title="Example layers"></p>
 <p>For this example at level 3, the policytc data might look as follows;</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">layer_id</th>
+<tr>
+<th style="text-align:left">layer_id</th>
 <th>level_id</th>
 <th>agg_id</th>
-<th align="right">policytc_id</th>
+<th style="text-align:right">policytc_id</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>3</td>
 <td>1</td>
-<td align="right">22</td>
+<td style="text-align:right">22</td>
 </tr>
-<tr class="even">
-<td align="left">2</td>
+<tr>
+<td style="text-align:left">2</td>
 <td>3</td>
 <td>1</td>
-<td align="right">23</td>
+<td style="text-align:right">23</td>
 </tr>
 </tbody>
 </table>
 <h3 id="output-and-back-allocation">Output and back-allocation</h3>
-<p>Losses are output by event, output_id and sample. The table looks like this;</p>
+<p>Losses are output by event, output_id and sample.  The table looks like this;</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">event_id</th>
+<tr>
+<th style="text-align:left">event_id</th>
 <th>output_id</th>
 <th>sidx</th>
-<th align="right">loss</th>
+<th style="text-align:right">loss</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>1</td>
 <td>1</td>
-<td align="right">455.24</td>
+<td style="text-align:right">455.24</td>
 </tr>
-<tr class="even">
-<td align="left">2</td>
+<tr>
+<td style="text-align:left">2</td>
 <td>1</td>
 <td>1</td>
-<td align="right">345.6</td>
+<td style="text-align:right">345.6</td>
 </tr>
 </tbody>
 </table>
 <p>The output_id is specified by the user in the <strong>xref</strong> table, and is a unique combination of agg_id and layer_id. For instance;</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">output_id</th>
+<tr>
+<th style="text-align:left">output_id</th>
 <th>agg_id</th>
-<th align="right">layer_id</th>
+<th style="text-align:right">layer_id</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>1</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">2</td>
+<tr>
+<td style="text-align:left">2</td>
 <td>1</td>
-<td align="right">2</td>
+<td style="text-align:right">2</td>
 </tr>
 </tbody>
 </table>
 <p>The output_id must be specified consistently with the back-allocation rule. Losses can either output at the contract level or back-allocated to the lowest level, which is item_id, using one of three command line options. There are three meaningful values here – don’t allocate (0) used typically for all levels where a breakdown of losses is not required in output, allocate back to items (1) in proportion to the input (ground up) losses, or allocate back to items (2) in proportion to the losses from the prior level calculation.</p>
-<pre><code>$ fmcalc -a0 # Losses are output at the contract level and not back-allocated
+<pre class="hljs"><code><div>$ fmcalc -a0 # Losses are output at the contract level and not back-allocated
 $ fmcalc -a1 # Losses are back-allocated to items on the basis of the input losses (e.g. ground up loss)
-$ fmcalc -a2 # Losses are back-allocated to items on the basis of the prior level losses</code></pre>
+$ fmcalc -a2 # Losses are back-allocated to items on the basis of the prior level losses
+</div></code></pre>
 <p>The rules for specifying the output_ids in the xref table are as follows;</p>
 <ul>
 <li>Rule 0: there is an output_id for every agg_id and layer_id of the final level in the <strong>policytc</strong> table</li>
@@ -443,7 +790,7 @@ $ fmcalc -a2 # Losses are back-allocated to items on the basis of the prior leve
 <p>To make sense of this, if there is more than one output at the contract level, then each one must be back-allocated to all of the items, with each individual loss represented by a unique output_id.</p>
 <p>To avoid unnecessary computation, it is recommended not to back-allocate unless losses are required to be reported at a more detailed level than the contract level (site or zip code, for example). In this case, losses are re-aggregated up from item level (represented by output_id in fmcalc output) in summarycalc, using the fmsummaryxref table.</p>
 <h2 id="reinsurance">Reinsurance</h2>
-<p>The first run of fmcalc is designed to calculate the primary or direct insurance losses from the ground up losses of an exposure portfolio. fmcalc has been designed to be recursive, so that the 'gross' losses from the first run can be streamed back in to second and subsequent runs of fmcalc, each time with a different set of input files representing reinsurance contracts, and can output either the reinsurance gross loss, or net loss. There are two modes of output;</p>
+<p>The first run of fmcalc is designed to calculate the primary or direct insurance losses from the ground up losses of an exposure portfolio. fmcalc has been designed to be recursive, so that the 'gross' losses from the first run can be streamed back in to second and subsequent runs of fmcalc, each time with a different set of input files representing reinsurance contracts, and can output either the reinsurance gross loss, or net loss.  There are two modes of output;</p>
 <ul>
 <li><strong>gross</strong> meaning the loss to the policies or reinsurance contracts, and</li>
 <li><strong>net</strong> being the difference between the input loss and the policy/contract losses</li>
@@ -465,54 +812,54 @@ $ fmcalc -a2 # Losses are back-allocated to items on the basis of the prior leve
 <p>fm_xref (iteration 1)</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">output_id</th>
+<tr>
+<th style="text-align:left">output_id</th>
 <th>agg_id</th>
-<th align="right">layer_id</th>
+<th style="text-align:right">layer_id</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>1</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">2</td>
+<tr>
+<td style="text-align:left">2</td>
 <td>1</td>
-<td align="right">2</td>
+<td style="text-align:right">2</td>
 </tr>
 </tbody>
 </table>
 <p>fm_programme (iteration 2)</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">from_agg_id</th>
+<tr>
+<th style="text-align:left">from_agg_id</th>
 <th>level_id</th>
-<th align="right">to_agg_id</th>
+<th style="text-align:right">to_agg_id</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>1</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">2</td>
+<tr>
+<td style="text-align:left">2</td>
 <td>1</td>
-<td align="right">2</td>
+<td style="text-align:right">2</td>
 </tr>
-<tr class="odd">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>2</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">2</td>
+<tr>
+<td style="text-align:left">2</td>
 <td>2</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
 </tbody>
 </table>
@@ -520,28 +867,29 @@ $ fmcalc -a2 # Losses are back-allocated to items on the basis of the prior leve
 <h3 id="example---quota-share-reinsurance">Example - Quota share reinsurance</h3>
 <p>Using the two layer example from above, here's an example of the fm files for a simple quota share treaty with 50% ceded and 90% placed covering both policy layers.</p>
 <p>The command to run the direct insurance followed by reinsurance might look like this;</p>
-<pre><code>$ fmcalc -p direct &lt; guls.bin | fmcalc -p ri1 -n &gt; ri1_net.bin</code></pre>
+<pre class="hljs"><code><div>$ fmcalc -p direct &lt; guls.bin | fmcalc -p ri1 -n &gt; ri1_net.bin
+</div></code></pre>
 <p>In this command, ground up losses are being streamed into fmcalc to calculate the insurance losses, which are streamed into fmcalc again to calculate the reinsurance net loss. The direct insurance fm files would be located in the folder 'direct' and the reinsurance fm files in the folder 'ri1'. The -n flag in the second call of fmcalc results in net losses being output to the file 'ri1_net.bin'. These are the losses to the insurer net of recoveries from the quota share treaty.</p>
 <p>The fm_xref file from the direct insurance (first) iteration is</p>
 <p>fm_xref</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">output_id</th>
+<tr>
+<th style="text-align:left">output_id</th>
 <th>agg_id</th>
-<th align="right">layer_id</th>
+<th style="text-align:right">layer_id</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>1</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">2</td>
+<tr>
+<td style="text-align:left">2</td>
 <td>1</td>
-<td align="right">2</td>
+<td style="text-align:right">2</td>
 </tr>
 </tbody>
 </table>
@@ -549,61 +897,49 @@ $ fmcalc -a2 # Losses are back-allocated to items on the basis of the prior leve
 <p>fm_programme</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">from_agg_id</th>
+<tr>
+<th style="text-align:left">from_agg_id</th>
 <th>level_id</th>
-<th align="right">to_agg_id</th>
+<th style="text-align:right">to_agg_id</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>1</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
-<tr class="even">
-<td align="left">2</td>
+<tr>
+<td style="text-align:left">2</td>
 <td>1</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
 </tbody>
 </table>
 <p>fm_policytc</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">layer_id</th>
+<tr>
+<th style="text-align:left">layer_id</th>
 <th>level_id</th>
 <th>agg_id</th>
-<th align="right">policytc_id</th>
+<th style="text-align:right">policytc_id</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>1</td>
 <td>1</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
 </tbody>
 </table>
 <p>fm_profile</p>
-<table style="width:100%;">
-<colgroup>
-<col width="11%" />
-<col width="11%" />
-<col width="11%" />
-<col width="10%" />
-<col width="11%" />
-<col width="11%" />
-<col width="9%" />
-<col width="7%" />
-<col width="7%" />
-<col width="7%" />
-</colgroup>
+<table>
 <thead>
-<tr class="header">
-<th align="left">policytc_id</th>
+<tr>
+<th style="text-align:left">policytc_id</th>
 <th>calcrule_id</th>
 <th>deductible1</th>
 <th>deductible2</th>
@@ -612,12 +948,12 @@ $ fmcalc -a2 # Losses are back-allocated to items on the basis of the prior leve
 <th>limit1</th>
 <th>share1</th>
 <th>share2</th>
-<th align="right">share3</th>
+<th style="text-align:right">share3</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>25</td>
 <td>0</td>
 <td>0</td>
@@ -626,24 +962,24 @@ $ fmcalc -a2 # Losses are back-allocated to items on the basis of the prior leve
 <td>0</td>
 <td>0.5</td>
 <td>0.9</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
 </tbody>
 </table>
 <p>fm_xref</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">output_id</th>
+<tr>
+<th style="text-align:left">output_id</th>
 <th>agg_id</th>
-<th align="right">layer_id</th>
+<th style="text-align:right">layer_id</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>1</td>
-<td align="right">1</td>
+<td style="text-align:right">1</td>
 </tr>
 </tbody>
 </table>
@@ -653,7 +989,8 @@ $ fmcalc -a2 # Losses are back-allocated to items on the basis of the prior leve
 <p>The net calculation for iterations with multiple layers is;</p>
 <p>net loss = max(0, input loss - layer1 loss - layer2 loss - ... - layer n loss)</p>
 <p><a href="#financialmodule">Return to top</a></p>
-<p><a href="Workflows.html">Go to 6. Workflows</a></p>
-<p><a href="Contents.html">Back to Contents</a></p>
+<p><a href="Workflows.md">Go to 6. Workflows</a></p>
+<p><a href="Contents.md">Back to Contents</a></p>
+
 </body>
 </html>

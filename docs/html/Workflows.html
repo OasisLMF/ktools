@@ -1,92 +1,457 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <meta http-equiv="Content-Style-Type" content="text/css" />
-  <meta name="generator" content="pandoc" />
-  <title></title>
-  <style type="text/css">code{white-space: pre;}</style>
+<title>Workflows.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
 </head>
 <body>
-<p><img src="../img/banner.jpg" title="banner" alt="alt text" /></p>
-<h1 id="workflows">6. Workflows <a id="workflows"></a></h1>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<p><img src="../img/banner.jpg" alt="alt text" title="banner"></p>
+<h1 id="6-workflows-a-id%22workflows%22a">6. Workflows <a id="workflows"></a></h1>
 <p>ktools is capable of multiple output workflows. This brings much greater flexibility, but also more complexity for users of the toolkit.</p>
-<p>This section presents some example workflows, starting with single output workflows and then moving onto more complex multi-output workflows. There are some python scripts provided which execute some of the illustrative workflows using the example data in the repository. It is assumed that workflows will generally be run across multiple processes, with the number of processes being specified by the user.</p>
-<h3 id="portfolio-summary-level-insured-loss-event-loss-table">1. Portfolio summary level insured loss event loss table</h3>
-<p>In this example, the core workflow is run through fmcalc into summarycalc and then the losses are summarized by summary set 2, which is &quot;portfolio&quot; summary level.<br />
-This produces multiple output files when run with multiple processes, each containing a subset of the event set. The output files can be concatinated together at the end.</p>
-<pre><code>eve 1 2 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -2 - | eltcalc &gt; elt_p1.csv
-eve 2 2 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -2 - | eltcalc &gt; elt_p2.csv</code></pre>
-<h5 id="figure-1.-eltcalc-workflow">Figure 1. eltcalc workflow</h5>
-<p><img src="../img/eltcalc.jpg" title="eltcalc workflow" alt="alt text" /></p>
-<p>See example script <a href="../../examples/eltcalc_example.py">eltcalc_example.py</a><br />
-***</p>
-<h3 id="portfolio-summary-level-insured-loss-period-loss-table">2. Portfolio summary level insured loss period loss table</h3>
-<p>This is very similar to the first example, except the summary samples are run through pltcalc instead. The output files can be concatinated together at the end.</p>
-<pre><code>eve 1 2 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -2 - | pltcalc &gt; plt_p1.csv
-eve 2 2 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -2 - | pltcalc &gt; plt_p2.csv</code></pre>
-<h5 id="figure-2.-pltcalc-workflow">Figure 2. pltcalc workflow</h5>
-<p><img src="../img/pltcalc.jpg" title="eltcalc workflow" alt="alt text" /></p>
-<p>See example script <a href="../../examples/eltcalc_example.py">pltcalc_example.py</a><br />
-***</p>
-<h3 id="portfolio-summary-level-full-uncertainty-aggregate-and-occurrence-loss-exceedance-curves">3. Portfolio summary level full uncertainty aggregate and occurrence loss exceedance curves</h3>
-<p>In this example, the summary samples are calculated as in the first two examples, but the results are output to the work folder. Until this stage the calculation is run over multiple processes. Then, in a single process, leccalc reads the summarycalc binaries from the work folder and computes two loss exceedance curves in a single process. Note that you can output all eight loss exceedance curve variants in a single leccalc command.</p>
-<pre><code>eve 1 2 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -2 - &gt; work/summary2/p1.bin
+<p>This section presents some example workflows, starting with single output workflows and then moving onto more complex multi-output workflows. There are some python scripts provided which execute some of the illustrative workflows using the example data in the repository.  It is assumed that workflows will generally be run across multiple processes, with the number of processes being specified by the user.</p>
+<h3 id="1-portfolio-summary-level-insured-loss-event-loss-table">1. Portfolio summary level insured loss event loss table</h3>
+<p>In this example, the core workflow is run through fmcalc into summarycalc and then the losses are summarized by summary set 2, which is &quot;portfolio&quot; summary level.
+This produces multiple output files when run with multiple processes, each containing a subset of the event set.  The output files can be concatinated together at the end.</p>
+<pre class="hljs"><code><div>eve 1 2 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -2 - | eltcalc &gt; elt_p1.csv
+eve 2 2 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -2 - | eltcalc &gt; elt_p2.csv
+</div></code></pre>
+<h5 id="figure-1-eltcalc-workflow">Figure 1. eltcalc workflow</h5>
+<p><img src="../img/eltcalc.jpg" alt="alt text" title="eltcalc workflow"></p>
+<p>See example script <a href="../../examples/eltcalc_example.py">eltcalc_example.py</a></p>
+<hr>
+<h3 id="2-portfolio-summary-level-insured-loss-period-loss-table">2. Portfolio summary level insured loss period loss table</h3>
+<p>This is very similar to the first example, except the summary samples are run through pltcalc instead.  The output files can be concatinated together at the end.</p>
+<pre class="hljs"><code><div>eve 1 2 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -2 - | pltcalc &gt; plt_p1.csv
+eve 2 2 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -2 - | pltcalc &gt; plt_p2.csv
+</div></code></pre>
+<h5 id="figure-2-pltcalc-workflow">Figure 2. pltcalc workflow</h5>
+<p><img src="../img/pltcalc.jpg" alt="alt text" title="eltcalc workflow"></p>
+<p>See example script <a href="../../examples/eltcalc_example.py">pltcalc_example.py</a></p>
+<hr>
+<h3 id="3-portfolio-summary-level-full-uncertainty-aggregate-and-occurrence-loss-exceedance-curves">3. Portfolio summary level full uncertainty aggregate and occurrence loss exceedance curves</h3>
+<p>In this example, the summary samples are calculated as in the first two examples, but the results are output to the work folder.  Until this stage the calculation is run over multiple processes. Then, in a single process, leccalc reads the summarycalc binaries from the work folder and computes two loss exceedance curves in a single process. Note that you can output all eight loss exceedance curve variants in a single leccalc command.</p>
+<pre class="hljs"><code><div>eve 1 2 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -2 - &gt; work/summary2/p1.bin
 eve 2 2 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -2 - &gt; work/summary2/p1.bin
-leccalc -Ksummary2 -F lec_full_uncertainty_agg.csv -f lec_full_uncertainty_occ.csv</code></pre>
-<h5 id="figure-3.-leccalc-workflow">Figure 3. leccalc workflow</h5>
-<p><img src="../img/leccalc.jpg" title="leccalc workflow" alt="alt text" /></p>
-<p>See example script <a href="../../examples/leccalc_example.py">leccalc_example.py</a><br />
-***</p>
-<h3 id="portfolio-summary-level-average-annual-loss">4. Portfolio summary level average annual loss</h3>
-<p>Similarly to lec curves, the samples are run through to summarycalc, and the summarycalc binaries are output to the work folder. Until this stage the calculation is run over multiple processes. Then, in a single process, aalcalc reads the summarycalc binaries from the work folder and computes the aal output.</p>
-<pre><code>eve 1 2 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -2 work/summary2/p1.bin
+leccalc -Ksummary2 -F lec_full_uncertainty_agg.csv -f lec_full_uncertainty_occ.csv
+</div></code></pre>
+<h5 id="figure-3-leccalc-workflow">Figure 3. leccalc workflow</h5>
+<p><img src="../img/leccalc.jpg" alt="alt text" title="leccalc workflow"></p>
+<p>See example script <a href="../../examples/leccalc_example.py">leccalc_example.py</a></p>
+<hr>
+<h3 id="4-portfolio-summary-level-average-annual-loss">4. Portfolio summary level average annual loss</h3>
+<p>Similarly to lec curves, the samples are run through to summarycalc, and the summarycalc binaries are output to the work folder.  Until this stage the calculation is run over multiple processes. Then, in a single process, aalcalc reads the summarycalc binaries from the work folder and computes the aal output.</p>
+<pre class="hljs"><code><div>eve 1 2 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -2 work/summary2/p1.bin
 eve 2 2 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -2 work/summary2/p2.bin
-aalcalc -Ksummary2 &gt; aal.csv</code></pre>
-<h5 id="figure-4.-aalcalc-workflow">Figure 4. aalcalc workflow</h5>
-<p><img src="../img/aalcalc.jpg" title="aalcalc workflow" alt="alt text" /></p>
-<p>See example script <a href="../../examples/aalcalc_example.py">aalcalc_example.py</a><br />
-***</p>
+aalcalc -Ksummary2 &gt; aal.csv
+</div></code></pre>
+<h5 id="figure-4-aalcalc-workflow">Figure 4. aalcalc workflow</h5>
+<p><img src="../img/aalcalc.jpg" alt="alt text" title="aalcalc workflow"></p>
+<p>See example script <a href="../../examples/aalcalc_example.py">aalcalc_example.py</a></p>
+<hr>
 <h2 id="multiple-output-workflows">Multiple output workflows</h2>
-<h3 id="ground-up-and-insured-loss-workflows">5. Ground up and insured loss workflows</h3>
-<p>gulcalc can generate two output streams at once: item level samples to pipe into fmcalc, and coverage level samples to pipe into summarycalc. This means that outputs for both ground up loss and insured loss can be generated in one workflow.<br />
+<h3 id="5-ground-up-and-insured-loss-workflows">5. Ground up and insured loss workflows</h3>
+<p>gulcalc can generate two output streams at once: item level samples to pipe into fmcalc, and coverage level samples to pipe into summarycalc. This means that outputs for both ground up loss and insured loss can be generated in one workflow.<br>
 This is done by writing one stream to a file or named pipe, while streaming the other to standard output down the pipeline.</p>
-<pre><code>eve 1 2 | getmodel | gulcalc -r -S100 -i gulcalci1.bin -c - | summarycalc -g -2 - | eltcalc &gt; gul_elt_p1.csv
+<pre class="hljs"><code><div>eve 1 2 | getmodel | gulcalc -r -S100 -i gulcalci1.bin -c - | summarycalc -g -2 - | eltcalc &gt; gul_elt_p1.csv
 eve 2 2 | getmodel | gulcalc -r -S100 -i gulcalci2.bin -c - | summarycalc -g -2 - | eltcalc &gt; gul_elt_p2.csv
 fmcalc &lt; gulcalci1.bin | summarycalc -f -2 - | eltcalc &gt; fm_elt_p1.csv
-fmcalc &lt; gulcalci2.bin | summarycalc -f -2 - | eltcalc &gt; fm_elt_p2.csv</code></pre>
-<p>Note that the gulcalc item stream does not need to be written off to disk, as it can be sent to a 'named pipe', which keeps the data in-memory and kicks off a new process. This is easy to do in Linux (but harder in Windows).</p>
+fmcalc &lt; gulcalci2.bin | summarycalc -f -2 - | eltcalc &gt; fm_elt_p2.csv
+</div></code></pre>
+<p>Note that the gulcalc item stream does not need to be written off to disk, as it can be sent to a 'named pipe', which keeps the data in-memory and kicks off a new process.  This is easy to do in Linux (but harder in Windows).</p>
 <p>Figure 5 illustrates an example workflow.</p>
-<h5 id="figure-5.-ground-up-and-insured-loss-example-workflow">Figure 5. Ground up and insured loss example workflow</h5>
-<p><img src="../img/gulandfm.jpg" title="Ground up and insured loss workflow" alt="alt text" /></p>
-<p>See example script <a href="../../examples/gulandfm_example.py">gulandfm_example.py</a><br />
-***</p>
-<h3 id="multiple-summary-level-workflows">6. Multiple summary level workflows</h3>
-<p>Summarycalc is capable of summarizing samples to up to 10 different user-defined levels for ground up loss and insured loss. This means that different outputs can be run on different summary levels. In this example, event loss tables for two different summary levels are generated.</p>
-<pre><code>eve 1 2 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -1 s1/p1.bin -2 s2/p1.bin
+<h5 id="figure-5-ground-up-and-insured-loss-example-workflow">Figure 5. Ground up and insured loss example workflow</h5>
+<p><img src="../img/gulandfm.jpg" alt="alt text" title="Ground up and insured loss workflow"></p>
+<p>See example script <a href="../../examples/gulandfm_example.py">gulandfm_example.py</a></p>
+<hr>
+<h3 id="6-multiple-summary-level-workflows">6. Multiple summary level workflows</h3>
+<p>Summarycalc is capable of summarizing samples to up to 10 different user-defined levels for ground up loss and insured loss. This means that different outputs can be run on different summary levels.  In this example, event loss tables for two different summary levels are generated.</p>
+<pre class="hljs"><code><div>eve 1 2 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -1 s1/p1.bin -2 s2/p1.bin
 eve 2 2 | getmodel | gulcalc -r -S100 -i - | fmcalc | summarycalc -f -1 s1/p2.bin -2 s2/p2.bin
 eltcalc &lt; s1/p1.bin &gt; elt_s1_p1.csv
 eltcalc &lt; s1/p2.bin &gt; elt_s1_p2.csv
 eltcalc &lt; s2/p1.bin &gt; elt_s2_p1.csv
-eltcalc &lt; s2/p2.bin &gt; elt_s2_p2.csv</code></pre>
+eltcalc &lt; s2/p2.bin &gt; elt_s2_p2.csv
+</div></code></pre>
 <p>Again, the summarycalc streams can be sent to named pipes rather than written off to disk.</p>
 <p>Figure 6 illustrates multiple summary level streams, each of which can go to different output calculations.</p>
-<h5 id="figure-6.-multiple-summary-level-workflows">Figure 6. Multiple summary level workflows</h5>
-<p><img src="../img/summarycalc.jpg" title="Ground up and insured loss workflow" alt="alt text" /></p>
+<h5 id="figure-6-multiple-summary-level-workflows">Figure 6. Multiple summary level workflows</h5>
+<p><img src="../img/summarycalc.jpg" alt="alt text" title="Ground up and insured loss workflow"></p>
 <h2 id="financial-module-workflows">Financial Module workflows</h2>
 <p>The fmcalc component can be used recursively in order to apply multiple sets of policy terms and conditions, in order to support reinsurance. Figure 7 shows a simple example workflow of a direct insurance calculation followed by a reinsurance calculation.</p>
-<pre><code>eve 1 2 | getmodel | gulcalc -r -S100 -i - | fmcalc -p direct | fmcalc -p ri1 -n &gt; fmcalc_1.bin
-eve 2 2 | getmodel | gulcalc -r -S100 -i - | fmcalc -p direct | fmcalc -p ri1 -n &gt; fmcalc_2.bin</code></pre>
-<h5 id="figure-7.-multiple-fmcalc-workflow">Figure 7. Multiple fmcalc workflow</h5>
-<p><img src="../img/fmcalc.jpg" title="Multiple fmcalc workflow" alt="alt text" /></p>
+<pre class="hljs"><code><div>eve 1 2 | getmodel | gulcalc -r -S100 -i - | fmcalc -p direct | fmcalc -p ri1 -n &gt; fmcalc_1.bin
+eve 2 2 | getmodel | gulcalc -r -S100 -i - | fmcalc -p direct | fmcalc -p ri1 -n &gt; fmcalc_2.bin
+</div></code></pre>
+<h5 id="figure-7-multiple-fmcalc-workflow">Figure 7. Multiple fmcalc workflow</h5>
+<p><img src="../img/fmcalc.jpg" alt="alt text" title="Multiple fmcalc workflow"></p>
 <p>Each call of fmcalc requires the same input files, so it is necessary to specify the location of the files for each call using the command line parameter -p and the relative folder path. Figure 8 demonstrates the required files for three consecutive calls of fmcalc.</p>
-<h5 id="figure-8.-multiple-fmcalc-workflow">Figure 8. Multiple fmcalc workflow</h5>
-<p><img src="../img/fmcalcrequireddata.jpg" title="Required files for multiple fmcalc calls" alt="alt text" /></p>
+<h5 id="figure-8-multiple-fmcalc-workflow">Figure 8. Multiple fmcalc workflow</h5>
+<p><img src="../img/fmcalcrequireddata.jpg" alt="alt text" title="Required files for multiple fmcalc calls"></p>
 <p>It is possible to generate all of the outputs for each call of fmcalc in the same workflow, enabling multiple financial perspective reports, as shown in Figure 9.</p>
-<h5 id="figure-9.-multiple-fmcalc-outputs-workflow">Figure 9. Multiple fmcalc outputs workflow</h5>
-<p><img src="../img/multiplefmcalc.jpg" title="Multiple fmcalc outputs workflow" alt="alt text" /></p>
+<h5 id="figure-9-multiple-fmcalc-outputs-workflow">Figure 9. Multiple fmcalc outputs workflow</h5>
+<p><img src="../img/multiplefmcalc.jpg" alt="alt text" title="Multiple fmcalc outputs workflow"></p>
 <p><a href="#workflows">Return to top</a></p>
-<p><a href="RandomNumbers.html">Go to Appendix A Random numbers</a></p>
-<p><a href="Contents.html">Back to Contents</a></p>
+<p><a href="RandomNumbers.md">Go to Appendix A Random numbers</a></p>
+<p><a href="Contents.md">Back to Contents</a></p>
+
 </body>
 </html>

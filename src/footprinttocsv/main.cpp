@@ -54,7 +54,7 @@ Author: Joh Carter  email: johanna.carter@oasislmf.org
 
 namespace footprinttocsv {
 	void doit(bool skipheader, int from_event, int to_event, const char * binFileName="footprint.bin", const char * idxFileName="footprint.idx");
-	void doitz(bool skipheader,int from_event, int to_event, const char * binFileName="footprint.bin", const char * idxFileName="footprint.idx");
+	void doitz(bool skipheader,int from_event, int to_event, const char * binFileName="footprint.bin.z", const char * idxFileName="footprint.idx.z");
 }
 
 #include "../include/oasis.h"

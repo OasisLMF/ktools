@@ -63,6 +63,7 @@ private:
 	std::map<int, std::vector<OASIS_FLOAT> > _vulnerabilities;	
     std::map<AREAPERIL_INT, std::set<int> > _vulnerability_ids_by_area_peril;
     std::map<int, EventIndex> _event_index_by_event_id;
+    std::map<int, long long> _uncompressed_size_by_event_id;
 	std::set<int> _area_perils;
 	std::vector<OASIS_FLOAT> _mean_damage_bins;
     std::vector<unsigned char > _compressed_buf;
@@ -71,6 +72,7 @@ private:
     int _num_intensity_bins = -1;
     int _num_damage_bins = -1;
     int _has_intensity_uncertainty = false;
+    bool _uncompressed_size = false;
 	std::vector<Result> _temp_results;
     //Result* _temp_results;
     bool _zip = false;

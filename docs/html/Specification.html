@@ -1,15 +1,372 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <meta http-equiv="Content-Style-Type" content="text/css" />
-  <meta name="generator" content="pandoc" />
-  <title></title>
-  <style type="text/css">code{white-space: pre;}</style>
+<title>Specification.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
 </head>
 <body>
-<p><img src="../img/banner.jpg" title="banner" alt="alt text" /></p>
-<h1 id="specification">3. Specification <a id="specification"></a></h1>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<p><img src="../img/banner.jpg" alt="alt text" title="banner"></p>
+<h1 id="3-specification-a-id%22specification%22a">3. Specification <a id="specification"></a></h1>
 <h3 id="introduction">Introduction</h3>
 <p>This section specifies the data stream structures and core components in the in-memory kernel.</p>
 <p>The data stream structures are;</p>
@@ -30,7 +387,7 @@
 <li><strong><a href="#outputcalc">outputcalc</a></strong></li>
 </ul>
 <p>The components have a standard input (stdin) and/or output (stdout) data stream structure. eve is the stream-initiating component which only has a standard output stream, whereas &quot;outputcalc&quot; (a generic name representing an extendible family of output calculation components) is a stream-terminating component with only a standard input stream.</p>
-<p>An implementation of each of the above components is provided in the <a href="ReferenceModelOverview.html">Reference Model</a>, where usage instructions and command line parameters are provided. A functional overview is given below.</p>
+<p>An implementation of each of the above components is provided in the <a href="ReferenceModelOverview.md">Reference Model</a>, where usage instructions and command line parameters are provided. A functional overview is given below.</p>
 <h4 id="stream-types">Stream types</h4>
 <p>The architecture supports multiple stream types. Therefore a developer can define a new type of data stream within the framework by specifying a unique stream_id of the stdout of one or more of the components, or even write a new component which performs an intermediate calculation between the existing components.</p>
 <p>The stream_id is the first 4 byte header of the stdout streams. The higher byte is reserved to identify the type of stream, and the 2nd to 4th bytes hold the identifier of the stream. This is used for validation of pipeline commands to report errors if the components are not being used in the correct order.</p>
@@ -38,136 +395,131 @@
 <p>Higher byte;</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Byte 1</th>
-<th align="left">Stream name</th>
+<tr>
+<th style="text-align:left">Byte 1</th>
+<th style="text-align:left">Stream name</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">0</td>
-<td align="left">cdf</td>
+<tr>
+<td style="text-align:left">0</td>
+<td style="text-align:left">cdf</td>
 </tr>
-<tr class="even">
-<td align="left">1</td>
-<td align="left">gulcalc</td>
+<tr>
+<td style="text-align:left">1</td>
+<td style="text-align:left">gulcalc</td>
 </tr>
-<tr class="odd">
-<td align="left">2</td>
-<td align="left">loss</td>
+<tr>
+<td style="text-align:left">2</td>
+<td style="text-align:left">loss</td>
 </tr>
-<tr class="even">
-<td align="left">3</td>
-<td align="left">summary</td>
+<tr>
+<td style="text-align:left">3</td>
+<td style="text-align:left">summary</td>
 </tr>
 </tbody>
 </table>
 <p>Reserved stream_ids;</p>
 <table>
-<colgroup>
-<col width="9%" />
-<col width="13%" />
-<col width="76%" />
-</colgroup>
 <thead>
-<tr class="header">
-<th align="left">Byte 1</th>
+<tr>
+<th style="text-align:left">Byte 1</th>
 <th>Bytes 2-4</th>
-<th align="left">Description</th>
+<th style="text-align:left">Description</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">0</td>
+<tr>
+<td style="text-align:left">0</td>
 <td>1</td>
-<td align="left">cdf - Oasis format effective damageability CDF output</td>
+<td style="text-align:left">cdf - Oasis format effective damageability CDF output</td>
 </tr>
-<tr class="even">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>1</td>
-<td align="left">gulcalc - Oasis format item level ground up loss sample output <strong>(deprecated)</strong></td>
+<td style="text-align:left">gulcalc -  Oasis format item level ground up loss sample output <strong>(deprecated)</strong></td>
 </tr>
-<tr class="odd">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>2</td>
-<td align="left">gulcalc - Oasis format coverage level ground up loss sample output <strong>(deprecated)</strong></td>
+<td style="text-align:left">gulcalc - Oasis format coverage level ground up loss sample output <strong>(deprecated)</strong></td>
 </tr>
-<tr class="even">
-<td align="left">2</td>
+<tr>
+<td style="text-align:left">2</td>
 <td>1</td>
-<td align="left">loss - Oasis format loss sample output (any loss perspective)</td>
+<td style="text-align:left">loss -  Oasis format loss sample output (any loss perspective)</td>
 </tr>
-<tr class="odd">
-<td align="left">3</td>
+<tr>
+<td style="text-align:left">3</td>
 <td>1</td>
-<td align="left">summary - Oasis format summary level loss sample output</td>
+<td style="text-align:left">summary - Oasis format summary level loss sample output</td>
 </tr>
 </tbody>
 </table>
 <p>The supported standard input and output streams of the Reference model components are summarized here;</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Component</th>
-<th align="left">Standard input</th>
-<th align="left">Standard output</th>
-<th align="left">Stream option parameters</th>
+<tr>
+<th style="text-align:left">Component</th>
+<th style="text-align:left">Standard input</th>
+<th style="text-align:left">Standard output</th>
+<th style="text-align:left">Stream option parameters</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">getmodel</td>
-<td align="left">none</td>
-<td align="left">0/1 cdf</td>
-<td align="left">none</td>
+<tr>
+<td style="text-align:left">getmodel</td>
+<td style="text-align:left">none</td>
+<td style="text-align:left">0/1 cdf</td>
+<td style="text-align:left">none</td>
 </tr>
-<tr class="even">
-<td align="left">gulcalc</td>
-<td align="left">0/1 cdf</td>
-<td align="left">1/1 gulcalc item <strong>(deprecated)</strong></td>
-<td align="left">-i</td>
+<tr>
+<td style="text-align:left">gulcalc</td>
+<td style="text-align:left">0/1 cdf</td>
+<td style="text-align:left">1/1 gulcalc item <strong>(deprecated)</strong></td>
+<td style="text-align:left">-i</td>
 </tr>
-<tr class="odd">
-<td align="left">gulcalc</td>
-<td align="left">0/1 cdf</td>
-<td align="left">1/2 gulcalc coverage <strong>(deprecated)</strong></td>
-<td align="left">-c</td>
+<tr>
+<td style="text-align:left">gulcalc</td>
+<td style="text-align:left">0/1 cdf</td>
+<td style="text-align:left">1/2 gulcalc coverage <strong>(deprecated)</strong></td>
+<td style="text-align:left">-c</td>
 </tr>
-<tr class="even">
-<td align="left">gulcalc</td>
-<td align="left">0/1 cdf</td>
-<td align="left">2/1 loss</td>
-<td align="left">-i -a{}</td>
+<tr>
+<td style="text-align:left">gulcalc</td>
+<td style="text-align:left">0/1 cdf</td>
+<td style="text-align:left">2/1 loss</td>
+<td style="text-align:left">-i -a{}</td>
 </tr>
-<tr class="odd">
-<td align="left">fmcalc</td>
-<td align="left">1/1 gulcalc item <strong>(deprecated)</strong></td>
-<td align="left">2/1 loss</td>
-<td align="left">none</td>
+<tr>
+<td style="text-align:left">fmcalc</td>
+<td style="text-align:left">1/1 gulcalc item  <strong>(deprecated)</strong></td>
+<td style="text-align:left">2/1 loss</td>
+<td style="text-align:left">none</td>
 </tr>
-<tr class="even">
-<td align="left">fmcalc</td>
-<td align="left">2/1 loss</td>
-<td align="left">2/1 loss</td>
-<td align="left">none</td>
+<tr>
+<td style="text-align:left">fmcalc</td>
+<td style="text-align:left">2/1 loss</td>
+<td style="text-align:left">2/1 loss</td>
+<td style="text-align:left">none</td>
 </tr>
-<tr class="odd">
-<td align="left">summarycalc</td>
-<td align="left">1/2 gulcalc coverage <strong>(deprecated)</strong></td>
-<td align="left">3/1 summary</td>
-<td align="left">-g</td>
+<tr>
+<td style="text-align:left">summarycalc</td>
+<td style="text-align:left">1/2 gulcalc coverage  <strong>(deprecated)</strong></td>
+<td style="text-align:left">3/1 summary</td>
+<td style="text-align:left">-g</td>
 </tr>
-<tr class="even">
-<td align="left">summarycalc</td>
-<td align="left">2/1 loss</td>
-<td align="left">3/1 summary</td>
-<td align="left">-i gulcalc input, -f fmcalc input</td>
+<tr>
+<td style="text-align:left">summarycalc</td>
+<td style="text-align:left">2/1 loss</td>
+<td style="text-align:left">3/1 summary</td>
+<td style="text-align:left">-i gulcalc input, -f fmcalc input</td>
 </tr>
-<tr class="odd">
-<td align="left">outputcalc</td>
-<td align="left">3/1 summary</td>
-<td align="left">none</td>
-<td align="left">none</td>
+<tr>
+<td style="text-align:left">outputcalc</td>
+<td style="text-align:left">3/1 summary</td>
+<td style="text-align:left">none</td>
+<td style="text-align:left">none</td>
 </tr>
 </tbody>
 </table>
@@ -177,98 +529,91 @@
 <p>Stream header packet structure</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">stream_id</td>
+<tr>
+<td style="text-align:left">stream_id</td>
 <td>int</td>
 <td>1/3</td>
-<td align="left">Identifier of the data stream type.</td>
-<td align="right">0/1</td>
+<td style="text-align:left">Identifier of the data stream type.</td>
+<td style="text-align:right">0/1</td>
 </tr>
 </tbody>
 </table>
 <p>Data header packet structure</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">event_id</td>
+<tr>
+<td style="text-align:left">event_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Oasis event_id</td>
-<td align="right">4545</td>
+<td style="text-align:left">Oasis event_id</td>
+<td style="text-align:right">4545</td>
 </tr>
-<tr class="even">
-<td align="left">areaperil_id</td>
+<tr>
+<td style="text-align:left">areaperil_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Oasis areaperil_id</td>
-<td align="right">345456</td>
+<td style="text-align:left">Oasis areaperil_id</td>
+<td style="text-align:right">345456</td>
 </tr>
-<tr class="odd">
-<td align="left">vulnerability_id</td>
+<tr>
+<td style="text-align:left">vulnerability_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Oasis vulnerability_id</td>
-<td align="right">345</td>
+<td style="text-align:left">Oasis vulnerability_id</td>
+<td style="text-align:right">345</td>
 </tr>
-<tr class="even">
-<td align="left">no_of_bins</td>
+<tr>
+<td style="text-align:left">no_of_bins</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Number of records (bins) in the data package</td>
-<td align="right">20</td>
+<td style="text-align:left">Number of records (bins) in the data package</td>
+<td style="text-align:right">20</td>
 </tr>
 </tbody>
 </table>
 <p>Data packet structure (record repeated no_of_bin times)</p>
 <table>
-<colgroup>
-<col width="16%" />
-<col width="7%" />
-<col width="7%" />
-<col width="57%" />
-<col width="11%" />
-</colgroup>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">prob_to</td>
+<tr>
+<td style="text-align:left">prob_to</td>
 <td>float</td>
 <td>4</td>
-<td align="left">The cumulative probability at the upper damage bin threshold</td>
-<td align="right">0.765</td>
+<td style="text-align:left">The cumulative probability at the upper damage bin threshold</td>
+<td style="text-align:right">0.765</td>
 </tr>
-<tr class="even">
-<td align="left">bin_mean</td>
+<tr>
+<td style="text-align:left">bin_mean</td>
 <td>float</td>
 <td>4</td>
-<td align="left">The conditional mean of the damage bin</td>
-<td align="right">0.45</td>
+<td style="text-align:left">The conditional mean of the damage bin</td>
+<td style="text-align:right">0.45</td>
 </tr>
 </tbody>
 </table>
@@ -278,84 +623,84 @@
 <p>Stream header packet structure</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">stream_id</td>
+<tr>
+<td style="text-align:left">stream_id</td>
 <td>int</td>
 <td>1/3</td>
-<td align="left">Identifier of the data stream type.</td>
-<td align="right">1/1</td>
+<td style="text-align:left">Identifier of the data stream type.</td>
+<td style="text-align:right">1/1</td>
 </tr>
-<tr class="even">
-<td align="left">no_of_samples</td>
+<tr>
+<td style="text-align:left">no_of_samples</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Number of samples</td>
-<td align="right">100</td>
+<td style="text-align:left">Number of samples</td>
+<td style="text-align:right">100</td>
 </tr>
 </tbody>
 </table>
 <p>Data header packet structure</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">event_id</td>
+<tr>
+<td style="text-align:left">event_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Oasis event_id</td>
-<td align="right">4545</td>
+<td style="text-align:left">Oasis event_id</td>
+<td style="text-align:right">4545</td>
 </tr>
-<tr class="even">
-<td align="left">item_id</td>
+<tr>
+<td style="text-align:left">item_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Oasis item_id</td>
-<td align="right">300</td>
+<td style="text-align:left">Oasis item_id</td>
+<td style="text-align:right">300</td>
 </tr>
 </tbody>
 </table>
 <p>Data packet structure</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">sidx</td>
+<tr>
+<td style="text-align:left">sidx</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Sample index</td>
-<td align="right">10</td>
+<td style="text-align:left">Sample index</td>
+<td style="text-align:right">10</td>
 </tr>
-<tr class="even">
-<td align="left">loss</td>
+<tr>
+<td style="text-align:left">loss</td>
 <td>float</td>
 <td>4</td>
-<td align="left">The ground up loss for the sample</td>
-<td align="right">5675.675</td>
+<td style="text-align:left">The ground up loss for the sample</td>
+<td style="text-align:right">5675.675</td>
 </tr>
 </tbody>
 </table>
@@ -363,21 +708,21 @@
 <p>There are two values of sidx with special meaning as follows;</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">sidx</th>
-<th align="left">Meaning</th>
+<tr>
+<th style="text-align:left">sidx</th>
+<th style="text-align:left">Meaning</th>
 <th>Required / optional</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">-1</td>
-<td align="left">numerical integration mean loss</td>
+<tr>
+<td style="text-align:left">-1</td>
+<td style="text-align:left">numerical integration mean loss</td>
 <td>required</td>
 </tr>
-<tr class="even">
-<td align="left">-2</td>
-<td align="left">numerical integration standard deviation loss</td>
+<tr>
+<td style="text-align:left">-2</td>
+<td style="text-align:left">numerical integration standard deviation loss</td>
 <td>required</td>
 </tr>
 </tbody>
@@ -388,100 +733,100 @@
 <p>Stream header packet structure</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">stream_id</td>
+<tr>
+<td style="text-align:left">stream_id</td>
 <td>int</td>
 <td>1/3</td>
-<td align="left">Identifier of the data stream type.</td>
-<td align="right">1/2</td>
+<td style="text-align:left">Identifier of the data stream type.</td>
+<td style="text-align:right">1/2</td>
 </tr>
-<tr class="even">
-<td align="left">no_of_samples</td>
+<tr>
+<td style="text-align:left">no_of_samples</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Number of samples</td>
-<td align="right">100</td>
+<td style="text-align:left">Number of samples</td>
+<td style="text-align:right">100</td>
 </tr>
 </tbody>
 </table>
 <p>Data header packet structure</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">event_id</td>
+<tr>
+<td style="text-align:left">event_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Oasis event_id</td>
-<td align="right">4545</td>
+<td style="text-align:left">Oasis event_id</td>
+<td style="text-align:right">4545</td>
 </tr>
-<tr class="even">
-<td align="left">coverage_id</td>
+<tr>
+<td style="text-align:left">coverage_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Oasis coverage_id</td>
-<td align="right">150</td>
+<td style="text-align:left">Oasis coverage_id</td>
+<td style="text-align:right">150</td>
 </tr>
 </tbody>
 </table>
 <p>Data packet structure</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">sidx</td>
+<tr>
+<td style="text-align:left">sidx</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Sample index</td>
-<td align="right">10</td>
+<td style="text-align:left">Sample index</td>
+<td style="text-align:right">10</td>
 </tr>
-<tr class="even">
-<td align="left">loss</td>
+<tr>
+<td style="text-align:left">loss</td>
 <td>float</td>
 <td>4</td>
-<td align="left">The ground up loss for the sample</td>
-<td align="right">5675.675</td>
+<td style="text-align:left">The ground up loss for the sample</td>
+<td style="text-align:right">5675.675</td>
 </tr>
 </tbody>
 </table>
 <p>Only the numerical integration mean loss is output.</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">sidx</th>
-<th align="left">Meaning</th>
+<tr>
+<th style="text-align:left">sidx</th>
+<th style="text-align:left">Meaning</th>
 <th>Required / optional</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">-1</td>
-<td align="left">numerical integration mean loss</td>
+<tr>
+<td style="text-align:left">-1</td>
+<td style="text-align:left">numerical integration mean loss</td>
 <td>required</td>
 </tr>
 </tbody>
@@ -493,84 +838,84 @@
 <p>Stream header packet structure</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">stream_id</td>
+<tr>
+<td style="text-align:left">stream_id</td>
 <td>int</td>
 <td>1/3</td>
-<td align="left">Identifier of the data stream type.</td>
-<td align="right">2/1</td>
+<td style="text-align:left">Identifier of the data stream type.</td>
+<td style="text-align:right">2/1</td>
 </tr>
-<tr class="even">
-<td align="left">no_of_samples</td>
+<tr>
+<td style="text-align:left">no_of_samples</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Number of samples</td>
-<td align="right">100</td>
+<td style="text-align:left">Number of samples</td>
+<td style="text-align:right">100</td>
 </tr>
 </tbody>
 </table>
 <p>Data header packet structure</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">event_id</td>
+<tr>
+<td style="text-align:left">event_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Oasis event_id</td>
-<td align="right">4545</td>
+<td style="text-align:left">Oasis event_id</td>
+<td style="text-align:right">4545</td>
 </tr>
-<tr class="even">
-<td align="left">item_id /output_id</td>
+<tr>
+<td style="text-align:left">item_id /output_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Oasis item_id (gulcalc) or output_id (fmcalc)</td>
-<td align="right">300</td>
+<td style="text-align:left">Oasis item_id (gulcalc) or output_id (fmcalc)</td>
+<td style="text-align:right">300</td>
 </tr>
 </tbody>
 </table>
 <p>Data packet structure</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">sidx</td>
+<tr>
+<td style="text-align:left">sidx</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Sample index</td>
-<td align="right">10</td>
+<td style="text-align:left">Sample index</td>
+<td style="text-align:right">10</td>
 </tr>
-<tr class="even">
-<td align="left">loss</td>
+<tr>
+<td style="text-align:left">loss</td>
 <td>float</td>
 <td>4</td>
-<td align="left">The loss for the sample</td>
-<td align="right">5625.675</td>
+<td style="text-align:left">The  loss for the sample</td>
+<td style="text-align:right">5625.675</td>
 </tr>
 </tbody>
 </table>
@@ -578,130 +923,123 @@
 <p>There are three values of sidx with special meaning as follows;</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">sidx</th>
-<th align="left">Meaning</th>
+<tr>
+<th style="text-align:left">sidx</th>
+<th style="text-align:left">Meaning</th>
 <th>Required / optional</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">-3</td>
-<td align="left">maximum exposure value</td>
+<tr>
+<td style="text-align:left">-3</td>
+<td style="text-align:left">maximum exposure value</td>
 <td>required</td>
 </tr>
-<tr class="even">
-<td align="left">-2</td>
-<td align="left">numerical integration standard deviation loss</td>
+<tr>
+<td style="text-align:left">-2</td>
+<td style="text-align:left">numerical integration standard deviation loss</td>
 <td>optional</td>
 </tr>
-<tr class="odd">
-<td align="left">-1</td>
-<td align="left">numerical integration mean loss</td>
+<tr>
+<td style="text-align:left">-1</td>
+<td style="text-align:left">numerical integration mean loss</td>
 <td>required</td>
 </tr>
 </tbody>
 </table>
-<p>sidx -3 to -1 must come at the beginning of the data packet before the other samples.<br />
-Note: because exposure value (sidx = -3) is state information used by the other samples it must be the first<br />
+<p>sidx -3 to -1 must come at the beginning of the data packet before the other samples.<br>
+Note: because exposure value (sidx = -3) is state information used by the other samples it must be the first
 sidx in the stream.</p>
 <p><a href="#specification">Return to top</a></p>
-<h3 id="summary-stream">summary stream <a id="summary"></a></h3>
+<h3 id="summary-stream-a-id%22summary%22a">summary stream <a id="summary"></a></h3>
 <p>Stream header packet structure</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">stream_id</td>
+<tr>
+<td style="text-align:left">stream_id</td>
 <td>int</td>
 <td>1/3</td>
-<td align="left">Identifier of the data stream type.</td>
-<td align="right">3/1</td>
+<td style="text-align:left">Identifier of the data stream type.</td>
+<td style="text-align:right">3/1</td>
 </tr>
-<tr class="even">
-<td align="left">no_of_samples</td>
+<tr>
+<td style="text-align:left">no_of_samples</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Number of samples</td>
-<td align="right">100</td>
+<td style="text-align:left">Number of samples</td>
+<td style="text-align:right">100</td>
 </tr>
 </tbody>
 </table>
 <p>Data header packet structure</p>
 <table>
-<colgroup>
-<col width="18%" />
-<col width="8%" />
-<col width="8%" />
-<col width="50%" />
-<col width="13%" />
-</colgroup>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">event_id</td>
+<tr>
+<td style="text-align:left">event_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Oasis event_id</td>
-<td align="right">4545</td>
+<td style="text-align:left">Oasis event_id</td>
+<td style="text-align:right">4545</td>
 </tr>
-<tr class="even">
-<td align="left">summary_id</td>
+<tr>
+<td style="text-align:left">summary_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Oasis summary_id</td>
-<td align="right">300</td>
+<td style="text-align:left">Oasis summary_id</td>
+<td style="text-align:right">300</td>
 </tr>
-<tr class="odd">
-<td align="left">exposure_value</td>
+<tr>
+<td style="text-align:left">exposure_value</td>
 <td>float</td>
 <td>4</td>
-<td align="left">Exposure value (sum of sidx -3 losses for summary_id)</td>
-<td align="right">987878</td>
+<td style="text-align:left">Exposure value (sum of sidx -3 losses for summary_id)</td>
+<td style="text-align:right">987878</td>
 </tr>
 </tbody>
 </table>
 <p>Data packet structure</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">sidx</td>
+<tr>
+<td style="text-align:left">sidx</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Sample index</td>
-<td align="right">10</td>
+<td style="text-align:left">Sample index</td>
+<td style="text-align:right">10</td>
 </tr>
-<tr class="even">
-<td align="left">loss</td>
+<tr>
+<td style="text-align:left">loss</td>
 <td>float</td>
 <td>4</td>
-<td align="left">The loss for the sample</td>
-<td align="right">5625.675</td>
+<td style="text-align:left">The loss for the sample</td>
+<td style="text-align:right">5625.675</td>
 </tr>
 </tbody>
 </table>
@@ -709,16 +1047,16 @@ sidx in the stream.</p>
 <p>The sidx -1 mean loss may be present (if non-zero)</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">sidx</th>
-<th align="left">Meaning</th>
+<tr>
+<th style="text-align:left">sidx</th>
+<th style="text-align:left">Meaning</th>
 <th>Required / optional</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">-1</td>
-<td align="left">numerical integration mean loss</td>
+<tr>
+<td style="text-align:left">-1</td>
+<td style="text-align:left">numerical integration mean loss</td>
 <td>optional</td>
 </tr>
 </tbody>
@@ -742,7 +1080,7 @@ sidx in the stream.</p>
 <p>The maximum exposed value, sidx=-3 represents the 100% loss scenario to all items impacted by an event after applying the (re)insurance terms and conditions and is used by outputs that require an exposure value.</p>
 <p><a id="summarycalc"></a></p>
 <h3 id="summarycalc">summarycalc</h3>
-<p>summarycalc is a component which sums the sampled losses from either gulcalc or fmcalc to the users required level(s) for reporting results. This is a simple sum of the loss value by event_id, sidx and summary_id, where summary_id is a grouping of coverage_id or item_id for gulcalc or output_id for fmcalc defined in the user's input files.</p>
+<p>summarycalc is a component which sums the sampled losses from either gulcalc or fmcalc to the users required level(s) for reporting results.  This is a simple sum of the loss value by event_id, sidx and summary_id, where summary_id is a grouping of coverage_id or item_id for gulcalc or output_id for fmcalc defined in the user's input files.</p>
 <p><a id="outputcalc"></a></p>
 <h3 id="outputcalc">outputcalc</h3>
 <p>Outputcalc is a general term for an end-of-pipeline component which represents one of a potentially unlimited set of output components. Four examples are provided in the Reference Model. These are;</p>
@@ -752,9 +1090,10 @@ sidx in the stream.</p>
 <li>aalcalc</li>
 <li>pltcalc</li>
 </ul>
-<p>outputcalc performs results analysis such as an event loss table or loss exceedance curve on the sampled output from summarycalc. The output is a results table in csv format.</p>
+<p>outputcalc performs results analysis such as an event loss table or loss exceedance curve on the sampled output from summarycalc.  The output is a results table in csv format.</p>
 <p><a href="#specification">Return to top</a></p>
-<p><a href="ReferenceModelOverview.html">Go to 4. Reference model</a></p>
-<p><a href="Contents.html">Back to Contents</a></p>
+<p><a href="ReferenceModelOverview.md">Go to 4. Reference model</a></p>
+<p><a href="Contents.md">Back to Contents</a></p>
+
 </body>
 </html>

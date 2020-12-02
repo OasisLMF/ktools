@@ -1,57 +1,415 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <meta http-equiv="Content-Style-Type" content="text/css" />
-  <meta name="generator" content="pandoc" />
-  <title></title>
-  <style type="text/css">code{white-space: pre;}</style>
+<title>ReferenceModelOverview.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
 </head>
 <body>
-<p><img src="../img/banner.jpg" title="banner" alt="alt text" /></p>
-<h1 id="reference-model-overview">4. Reference Model Overview <a id="referencemodel"></a></h1>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<p><img src="../img/banner.jpg" alt="alt text" title="banner"></p>
+<h1 id="4-reference-model-overview-a-id%22referencemodel%22a">4. Reference Model Overview <a id="referencemodel"></a></h1>
 <p>This section provides an overview of the reference model, which is an implementation of each of the components in the framework.</p>
 <p>There are five sub-sections which cover the usage and internal processes of each of the reference components;</p>
 <ul>
-<li><strong><a href="CoreComponents.html">4.1 Core components</a></strong></li>
-<li><strong><a href="OutputComponents.html">4.2 Output components</a></strong></li>
-<li><strong><a href="DataConversionComponents.html">4.3 Data conversion components</a></strong></li>
-<li><strong><a href="StreamConversionComponents.html">4.4 Stream conversion components</a></strong></li>
-<li><strong><a href="ValidationComponents.html">4.5 Validation components</a></strong></li>
+<li><strong><a href="CoreComponents.md">4.1 Core components</a></strong></li>
+<li><strong><a href="OutputComponents.md">4.2 Output components</a></strong></li>
+<li><strong><a href="DataConversionComponents.md">4.3 Data conversion components</a></strong></li>
+<li><strong><a href="StreamConversionComponents.md">4.4 Stream conversion components</a></strong></li>
+<li><strong><a href="ValidationComponents.md">4.5 Validation components</a></strong></li>
 </ul>
-<p>The set of <strong><a href="CoreComponents.html">core components</a></strong> provided in this release is as follows;</p>
+<p>The set of <strong><a href="CoreComponents.md">core components</a></strong> provided in this release is as follows;</p>
 <ul>
 <li><strong>eve</strong> is the event distributing utility. Based on the number of events in the input and the number of processes specified as a parameter, eve outputs subsets of the events as a stream. The output streams into getmodel.</li>
 <li><strong>getmodel</strong> generates a stream of effective damageability cdfs for the input stream of events. It generates cdfs from the model files footprint.bin and vulnerability.bin, and the user's exposures file which is called items.bin. getmodel streams into gulcalc or can be output to a binary file.</li>
-<li><strong>gulcalc</strong> performs the ground up loss sampling calculations and numerical integration. The output is a stream of sampled ground up losses. This can be output to a binary file or streamed into fmcalc or summarycalc.</li>
+<li><strong>gulcalc</strong> performs the ground up loss sampling calculations and numerical integration. The output is a stream of sampled ground up losses. This can be output to a binary file or streamed into  fmcalc or summarycalc.</li>
 <li><strong>fmcalc</strong> performs the insurance and reinsurance loss calculations on the ground up loss samples, mean, and total insured value. The output is a stream of loss samples in one of two financial perspectives: net or gross. The result can be output to a binary file or streamed into summarycalc.</li>
-<li><strong>summarycalc</strong> performs a summing of sampled losses according to the user's reporting requirements. For example this might involve summing coverage losses to regional level, or policy losses to portfolio level. The output is sampled loss by event_id and summary_id, which represents a meaningful group of losses to the user.</li>
+<li><strong>summarycalc</strong> performs a summing of sampled losses according to the user's reporting requirements.  For example this might involve summing coverage losses to regional level, or policy losses to portfolio level.  The output is sampled loss by event_id and summary_id, which represents a meaningful group of losses to the user.</li>
 </ul>
-<p>The standard input and standard output data streams for the core components are covered in the <a href="Specification.html">Specification</a>.</p>
+<p>The standard input and standard output data streams for the core components are covered in the <a href="Specification.md">Specification</a>.</p>
 <p>Figure 1 shows the core components workflow and the required data input files.</p>
-<h5 id="figure-1.-core-components-workflow-and-required-data">Figure 1. Core components workflow and required data</h5>
-<p><img src="../img/ktoolsrequireddata.jpg" title="Core workflow and required data" alt="alt text" /></p>
-<p>The model <strong>static</strong> data for the core workflow, shown as red source files, are the event footprint, vulnerability, damage bin dictionary and random number file. These are stored in the <strong>'static'</strong> sub-directory of the working folder.</p>
+<h5 id="figure-1-core-components-workflow-and-required-data">Figure 1. Core components workflow and required data</h5>
+<p><img src="../img/ktoolsrequireddata.jpg" alt="alt text" title="Core workflow and required data"></p>
+<p>The model <strong>static</strong> data for the core workflow, shown as red source files, are the event footprint, vulnerability, damage bin dictionary and random number file.  These are stored in the <strong>'static'</strong> sub-directory of the working folder.</p>
 <p>The user / analysis <strong>input</strong> data for the core workflow, shown as blue source files, are the events, items, coverages, fm programme, fm policytc, fm profile, fm xref, fm summary xref and gul summary xref files. These are stored in the <strong>'input'</strong> sub-directory of the working folder.</p>
 <p>These are all Oasis kernel format data objects with prescribed formats. Note that the events are a user input rather than a static input because the user could choose to run a subset of the full list of events, or even just one event. Usually, though, the whole event set will be run.</p>
-<p>The <strong><a href="OutputComponents.html">output components</a></strong> are various implementations of outputcalc, as described in general terms in the <a href="Specification.html">Specification</a>. The results are written directly into csv file as there is no downstream processing.</p>
+<p>The <strong><a href="OutputComponents.md">output components</a></strong> are various implementations of outputcalc, as described in general terms in the <a href="Specification.md">Specification</a>. The results are written directly into csv file as there is no downstream processing.</p>
 <ul>
-<li><strong>eltcalc</strong> generates an event loss table from the sampled losses from summarycalc. It contains sample mean and standard deviation, and total exposed value for each event at the given summary level.</li>
-<li><strong>leccalc</strong> generates loss exceedance curve from the sampled losses from summarycalc. There are 8 variants of curves with small differences in the output format but the common output fields are summary_id, return period, and loss exceedance threshold. This output is only available for models which provide an occurrence file.</li>
-<li><strong>pltcalc</strong> generates a period loss table from the sampled losses from summarycalc. It contains sample mean and standard deviation, and total exposed value for each event and each period (for example a year) at the given summary level. It also contains a date field, corresponding to the date of the event occurrence. This output is only available for models which provide an occurrence file.</li>
-<li><strong>aalcalc</strong> generates the average annual loss and standard deviation of loss from the sampled losses from summarycalc, for each summary_id. The output also contains total exposed value for each summary level, which is the maximum of the total exposed value across all simulated periods. This output is only available for models which provide an occurrence file.</li>
+<li><strong>eltcalc</strong>  generates an event loss table from the sampled losses from summarycalc. It contains sample mean and standard deviation, and total exposed value for each event at the given summary level.</li>
+<li><strong>leccalc</strong>  generates loss exceedance curve from the sampled losses from summarycalc. There are 8 variants of curves with small differences in the output format but the common output fields are summary_id, return period, and loss exceedance threshold. This output is only available for models which provide an occurrence file.</li>
+<li><strong>pltcalc</strong>  generates a period loss table from the sampled losses from summarycalc. It contains sample mean and standard deviation, and total exposed value for each event and each period (for example a year) at the given summary level. It also contains a date field, corresponding to the date of the event occurrence. This output is only available for models which provide an occurrence file.</li>
+<li><strong>aalcalc</strong>  generates the average annual loss and standard deviation of loss from the sampled losses from summarycalc, for each summary_id. The output also contains total exposed value for each summary level, which is the maximum of the total exposed value across all simulated periods. This output is only available for models which provide an occurrence file.</li>
 </ul>
 <p>The files required for the output components are shown in Figure 2.</p>
-<h5 id="figure-2.-output-workflows-and-required-data">Figure 2. Output workflows and required data</h5>
-<p><img src="../img/outputsrequireddata.jpg" title="Output workflows and required data" alt="alt text" /></p>
-<p>The <strong><a href="DataConversionComponents.html">data conversion components</a></strong> section covers the formats of all of the required data files and explains how to convert data in csv format into binary format, and vice versa.</p>
-<p>The <strong><a href="StreamConversionComponents.html">stream conversion components</a></strong> section explains how to convert the binary data stream output to csv, plus how to convert gulcalc data in csv format into binary format. These components are useful when working with individual components at a more detailed level.</p>
-<p>The <strong><a href="ValidationComponents.html">validation components</a></strong> section explains how to use the validation components to check the validity of the static and input files in csv format, before they are converted to binary format. There are both validation checks on individual files and cross checks for consistency across files.</p>
+<h5 id="figure-2-output-workflows-and-required-data">Figure 2. Output workflows and required data</h5>
+<p><img src="../img/outputsrequireddata.jpg" alt="alt text" title="Output workflows and required data"></p>
+<p>The <strong><a href="DataConversionComponents.md">data conversion components</a></strong> section covers the formats of all of the required data files and explains how to convert data in csv format into binary format, and vice versa.</p>
+<p>The <strong><a href="StreamConversionComponents.md">stream conversion components</a></strong> section explains how to convert the binary data stream output to csv, plus how to convert gulcalc data in csv format into binary format. These components are useful when working with individual components at a more detailed level.</p>
+<p>The <strong><a href="ValidationComponents.md">validation components</a></strong> section explains how to use the validation components to check the validity of the static and input files in csv format, before they are converted to binary format. There are both validation checks on individual files and cross checks for consistency across files.</p>
 <p>The version of the installed components can be found by using the command line parameter -v. For example;</p>
-<pre><code>$ gulcalc -v
-gulcalc : version: 3.0.7</code></pre>
+<pre class="hljs"><code><div>$ gulcalc -v
+gulcalc : version: 3.0.7
+</div></code></pre>
 <p>Component usage guidance is available using the parameter -h</p>
-<pre><code>$ fmcalc -h
+<pre class="hljs"><code><div>$ fmcalc -h
 -a set allocrule (default none)
 -M max level (optional)
 -p inputpath (relative or full path)
@@ -59,10 +417,12 @@ gulcalc : version: 3.0.7</code></pre>
 -O Alloc rule2 optimization off
 -d debug
 -v version
--h help</code></pre>
-<p>The components have additional command line parameters depending on their particular function. These are described in detail in the following pages.</p>
+-h help
+</div></code></pre>
+<p>The components have additional command line parameters depending on their particular function.  These are described in detail in the following pages.</p>
 <p><a href="#referencemodel">Return to top</a></p>
-<p><a href="CoreComponents.html">Go to 4.1 Core Components section</a></p>
-<p><a href="Contents.html">Back to Contents</a></p>
+<p><a href="CoreComponents.md">Go to 4.1 Core Components section</a></p>
+<p><a href="Contents.md">Back to Contents</a></p>
+
 </body>
 </html>

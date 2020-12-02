@@ -1,15 +1,372 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <meta http-equiv="Content-Style-Type" content="text/css" />
-  <meta name="generator" content="pandoc" />
-  <title></title>
-  <style type="text/css">code{white-space: pre;}</style>
+<title>StreamConversionComponents.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
 </head>
 <body>
-<p><img src="../img/banner.jpg" title="banner" alt="alt text" /></p>
-<h1 id="stream-conversion-components">4.4 Stream conversion components <a id="streamconversioncomponents"></a></h1>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<p><img src="../img/banner.jpg" alt="alt text" title="banner"></p>
+<h1 id="44-stream-conversion-components-a-id%22streamconversioncomponents%22a">4.4 Stream conversion components <a id="streamconversioncomponents"></a></h1>
 <p>The following components convert the binary output of each calculation component to csv format;</p>
 <ul>
 <li><strong><a href="#cdftocsv">cdftocsv</a></strong> is a utility to convert binary format CDFs to a csv. getmodel standard output can be streamed directly into cdftocsv, or a binary file of the same format can be piped in.</li>
@@ -22,411 +379,412 @@
 <li><strong><a href="#gultobin">gultobin</a></strong> is a utility to convert gulcalc data in csv format into binary format such that it can be piped into fmcalc.</li>
 </ul>
 <p>Figure 1 shows the workflows for the binary stream to csv conversions.</p>
-<h5 id="figure-1.-stream-conversion-workflows">Figure 1. Stream conversion workflows</h5>
-<p><img src="../img/streamtocsv.jpg" title="Stream conversion workflows" alt="alt text" /></p>
+<h5 id="figure-1-stream-conversion-workflows">Figure 1. Stream conversion workflows</h5>
+<p><img src="../img/streamtocsv.jpg" alt="alt text" title="Stream conversion workflows"></p>
 <p>Figure 2 shows the workflows for the gultobin component.</p>
-<h5 id="figure-2.-gultobin-workflows">Figure 2. gultobin workflows</h5>
-<p><img src="../img/gultobin.jpg" title="gultobin workflows" alt="alt text" /></p>
+<h5 id="figure-2-gultobin-workflows">Figure 2. gultobin workflows</h5>
+<p><img src="../img/gultobin.jpg" alt="alt text" title="gultobin workflows"></p>
 <p><a id="cdftocsv"></a></p>
 <h3 id="cdftocsv">cdftocsv</h3>
-<hr />
+<hr>
 <p>A component which converts the getmodel output stream, or binary file with the same structure, to a csv file.</p>
 <h5 id="standard-input-stream">Standard input stream</h5>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Byte 1</th>
+<tr>
+<th style="text-align:left">Byte 1</th>
 <th>Bytes 2-4</th>
-<th align="left">Description</th>
+<th style="text-align:left">Description</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">0</td>
+<tr>
+<td style="text-align:left">0</td>
 <td>1</td>
-<td align="left">cdf</td>
+<td style="text-align:left">cdf</td>
 </tr>
 </tbody>
 </table>
 <p>A binary file of the same format can be piped into cdftocsv.</p>
 <h5 id="usage">Usage</h5>
-<pre><code>$ [stdin component] | cdftocsv &gt; [output].csv
-$ cdftocsv &lt; [stdin].bin &gt; [output].csv</code></pre>
+<pre class="hljs"><code><div>$ [stdin component] | cdftocsv &gt; [output].csv
+$ cdftocsv &lt; [stdin].bin &gt; [output].csv
+</div></code></pre>
 <h5 id="example">Example</h5>
-<pre><code>$ eve 1 1 | getmodel | cdftocsv &gt; cdf.csv
-$ cdftocsv &lt; getmodel.bin &gt; cdf.csv </code></pre>
+<pre class="hljs"><code><div>$ eve 1 1 | getmodel | cdftocsv &gt; cdf.csv
+$ cdftocsv &lt; getmodel.bin &gt; cdf.csv 
+</div></code></pre>
 <h5 id="output">Output</h5>
 <p>Csv file with the following fields;</p>
 <table>
-<colgroup>
-<col width="16%" />
-<col width="7%" />
-<col width="7%" />
-<col width="57%" />
-<col width="11%" />
-</colgroup>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">event_id</td>
+<tr>
+<td style="text-align:left">event_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Oasis event_id</td>
-<td align="right">4545</td>
+<td style="text-align:left">Oasis event_id</td>
+<td style="text-align:right">4545</td>
 </tr>
-<tr class="even">
-<td align="left">areaperil_id</td>
+<tr>
+<td style="text-align:left">areaperil_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Oasis areaperil_id</td>
-<td align="right">345456</td>
+<td style="text-align:left">Oasis areaperil_id</td>
+<td style="text-align:right">345456</td>
 </tr>
-<tr class="odd">
-<td align="left">vulnerability_id</td>
+<tr>
+<td style="text-align:left">vulnerability_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Oasis vulnerability_id</td>
-<td align="right">345</td>
+<td style="text-align:left">Oasis vulnerability_id</td>
+<td style="text-align:right">345</td>
 </tr>
-<tr class="even">
-<td align="left">bin_index</td>
+<tr>
+<td style="text-align:left">bin_index</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Damage bin index</td>
-<td align="right">20</td>
+<td style="text-align:left">Damage bin index</td>
+<td style="text-align:right">20</td>
 </tr>
-<tr class="odd">
-<td align="left">prob_to</td>
+<tr>
+<td style="text-align:left">prob_to</td>
 <td>float</td>
 <td>4</td>
-<td align="left">The cumulative probability at the upper damage bin threshold</td>
-<td align="right">0.765</td>
+<td style="text-align:left">The cumulative probability at the upper damage bin threshold</td>
+<td style="text-align:right">0.765</td>
 </tr>
-<tr class="even">
-<td align="left">bin_mean</td>
+<tr>
+<td style="text-align:left">bin_mean</td>
 <td>float</td>
 <td>4</td>
-<td align="left">The conditional mean of the damage bin</td>
-<td align="right">0.45</td>
+<td style="text-align:left">The conditional mean of the damage bin</td>
+<td style="text-align:right">0.45</td>
 </tr>
 </tbody>
 </table>
 <p><a href="#streamconversioncomponents">Return to top</a></p>
 <p><a id="gultocsv"></a></p>
 <h3 id="gultocsv">gultocsv</h3>
-<hr />
+<hr>
 <p>A component which converts the gulcalc item or coverage stream, or binary file with the same structure, to a csv file.</p>
-<h5 id="standard-input-stream-1">Standard input stream</h5>
+<h5 id="standard-input-stream">Standard input stream</h5>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Byte 1</th>
+<tr>
+<th style="text-align:left">Byte 1</th>
 <th>Bytes 2-4</th>
-<th align="left">Description</th>
+<th style="text-align:left">Description</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>1</td>
-<td align="left">gulcalc item</td>
+<td style="text-align:left">gulcalc item</td>
 </tr>
-<tr class="even">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>2</td>
-<td align="left">gulcalc coverage</td>
+<td style="text-align:left">gulcalc coverage</td>
 </tr>
 </tbody>
 </table>
 <p>A binary file of the same format can be piped into gultocsv.</p>
-<h5 id="usage-1">Usage</h5>
-<pre><code>$ [stdin component] | gultocsv &gt; [output].csv
-$ gultocsv &lt; [stdin].bin &gt; [output].csv</code></pre>
-<h5 id="example-1">Example</h5>
-<pre><code>$ eve 1 1 | getmodel | gulcalc -r -S100 -c - | gultocsv &gt; gulcalcc.csv
-$ gultocsv &lt; gulcalci.bin &gt; gulcalci.csv </code></pre>
-<h5 id="output-1">Output</h5>
+<h5 id="usage">Usage</h5>
+<pre class="hljs"><code><div>$ [stdin component] | gultocsv &gt; [output].csv
+$ gultocsv &lt; [stdin].bin &gt; [output].csv
+</div></code></pre>
+<h5 id="example">Example</h5>
+<pre class="hljs"><code><div>$ eve 1 1 | getmodel | gulcalc -r -S100 -c - | gultocsv &gt; gulcalcc.csv
+$ gultocsv &lt; gulcalci.bin &gt; gulcalci.csv 
+</div></code></pre>
+<h5 id="output">Output</h5>
 <p>Csv file with the following fields;</p>
 <p>gulcalc item stream 1/1</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">event_id</td>
+<tr>
+<td style="text-align:left">event_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Oasis event_id</td>
-<td align="right">4545</td>
+<td style="text-align:left">Oasis event_id</td>
+<td style="text-align:right">4545</td>
 </tr>
-<tr class="even">
-<td align="left">item_id</td>
+<tr>
+<td style="text-align:left">item_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Oasis item_id</td>
-<td align="right">300</td>
+<td style="text-align:left">Oasis item_id</td>
+<td style="text-align:right">300</td>
 </tr>
-<tr class="odd">
-<td align="left">sidx</td>
+<tr>
+<td style="text-align:left">sidx</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Sample index</td>
-<td align="right">10</td>
+<td style="text-align:left">Sample index</td>
+<td style="text-align:right">10</td>
 </tr>
-<tr class="even">
-<td align="left">loss</td>
+<tr>
+<td style="text-align:left">loss</td>
 <td>float</td>
 <td>4</td>
-<td align="left">The ground up loss value</td>
-<td align="right">5675.675</td>
+<td style="text-align:left">The ground up loss value</td>
+<td style="text-align:right">5675.675</td>
 </tr>
 </tbody>
 </table>
 <p>gulcalc coverage stream 1/2</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">event_id</td>
+<tr>
+<td style="text-align:left">event_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Oasis event_id</td>
-<td align="right">4545</td>
+<td style="text-align:left">Oasis event_id</td>
+<td style="text-align:right">4545</td>
 </tr>
-<tr class="even">
-<td align="left">coverage_id</td>
+<tr>
+<td style="text-align:left">coverage_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Oasis coverage_id</td>
-<td align="right">150</td>
+<td style="text-align:left">Oasis coverage_id</td>
+<td style="text-align:right">150</td>
 </tr>
-<tr class="odd">
-<td align="left">sidx</td>
+<tr>
+<td style="text-align:left">sidx</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Sample index</td>
-<td align="right">10</td>
+<td style="text-align:left">Sample index</td>
+<td style="text-align:right">10</td>
 </tr>
-<tr class="even">
-<td align="left">loss</td>
+<tr>
+<td style="text-align:left">loss</td>
 <td>float</td>
 <td>4</td>
-<td align="left">The ground up loss value</td>
-<td align="right">5675.675</td>
+<td style="text-align:left">The ground up loss value</td>
+<td style="text-align:right">5675.675</td>
 </tr>
 </tbody>
 </table>
 <p><a href="#streamconversioncomponents">Return to top</a></p>
 <p><a id="fmtocsv"></a></p>
 <h3 id="fmtocsv">fmtocsv</h3>
-<hr />
+<hr>
 <p>A component which converts the fmcalc output stream, or binary file with the same structure, to a csv file.</p>
-<h5 id="standard-input-stream-2">Standard input stream</h5>
+<h5 id="standard-input-stream">Standard input stream</h5>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Byte 1</th>
+<tr>
+<th style="text-align:left">Byte 1</th>
 <th>Bytes 2-4</th>
-<th align="left">Description</th>
+<th style="text-align:left">Description</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">2</td>
+<tr>
+<td style="text-align:left">2</td>
 <td>1</td>
-<td align="left">loss</td>
+<td style="text-align:left">loss</td>
 </tr>
 </tbody>
 </table>
 <p>A binary file of the same format can be piped into fmtocsv.</p>
-<h5 id="usage-2">Usage</h5>
-<pre><code>$ [stdin component] | fmtocsv &gt; [output].csv
-$ fmtocsv &lt; [stdin].bin &gt; [output].csv</code></pre>
-<h5 id="example-2">Example</h5>
-<pre><code>$ eve 1 1 | getmodel | gulcalc -r -S100 -a1 -i - | fmcalc | fmtocsv &gt; fmcalc.csv
-$ fmtocsv &lt; fmcalc.bin &gt; fmcalc.csv </code></pre>
-<h5 id="output-2">Output</h5>
+<h5 id="usage">Usage</h5>
+<pre class="hljs"><code><div>$ [stdin component] | fmtocsv &gt; [output].csv
+$ fmtocsv &lt; [stdin].bin &gt; [output].csv
+</div></code></pre>
+<h5 id="example">Example</h5>
+<pre class="hljs"><code><div>$ eve 1 1 | getmodel | gulcalc -r -S100 -a1 -i - | fmcalc | fmtocsv &gt; fmcalc.csv
+$ fmtocsv &lt; fmcalc.bin &gt; fmcalc.csv 
+</div></code></pre>
+<h5 id="output">Output</h5>
 <p>Csv file with the following fields;</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">event_id</td>
+<tr>
+<td style="text-align:left">event_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Oasis event_id</td>
-<td align="right">4545</td>
+<td style="text-align:left">Oasis event_id</td>
+<td style="text-align:right">4545</td>
 </tr>
-<tr class="even">
-<td align="left">output_id</td>
+<tr>
+<td style="text-align:left">output_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Oasis output_id</td>
-<td align="right">5</td>
+<td style="text-align:left">Oasis output_id</td>
+<td style="text-align:right">5</td>
 </tr>
-<tr class="odd">
-<td align="left">sidx</td>
+<tr>
+<td style="text-align:left">sidx</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Sample index</td>
-<td align="right">10</td>
+<td style="text-align:left">Sample index</td>
+<td style="text-align:right">10</td>
 </tr>
-<tr class="even">
-<td align="left">loss</td>
+<tr>
+<td style="text-align:left">loss</td>
 <td>float</td>
 <td>4</td>
-<td align="left">The insured loss value</td>
-<td align="right">5375.675</td>
+<td style="text-align:left">The insured loss value</td>
+<td style="text-align:right">5375.675</td>
 </tr>
 </tbody>
 </table>
 <p><a href="#streamconversioncomponents">Return to top</a></p>
 <p><a id="summarycalctocsv"></a></p>
 <h3 id="summarycalctocsv">summarycalctocsv</h3>
-<hr />
+<hr>
 <p>A component which converts the summarycalc output stream, or binary file with the same structure, to a csv file.</p>
-<h5 id="standard-input-stream-3">Standard input stream</h5>
+<h5 id="standard-input-stream">Standard input stream</h5>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Byte 1</th>
+<tr>
+<th style="text-align:left">Byte 1</th>
 <th>Bytes 2-4</th>
-<th align="left">Description</th>
+<th style="text-align:left">Description</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">3</td>
+<tr>
+<td style="text-align:left">3</td>
 <td>1</td>
-<td align="left">summary</td>
+<td style="text-align:left">summary</td>
 </tr>
 </tbody>
 </table>
 <p>A binary file of the same format can be piped into summarycalctocsv.</p>
-<h5 id="usage-3">Usage</h5>
-<pre><code>$ [stdin component] | summarycalctocsv &gt; [output].csv
-$ summarycalctocsv &lt; [stdin].bin &gt; [output].csv</code></pre>
-<h5 id="example-3">Example</h5>
-<pre><code>$ eve 1 1 | getmodel | gulcalc -r -S100 -a1 -i - | fmcalc | summarycalc -f -1 - | summarycalctocsv &gt; summarycalc.csv
-$ summarycalctocsv &lt; summarycalc.bin &gt; summarycalc.csv </code></pre>
-<h5 id="output-3">Output</h5>
+<h5 id="usage">Usage</h5>
+<pre class="hljs"><code><div>$ [stdin component] | summarycalctocsv &gt; [output].csv
+$ summarycalctocsv &lt; [stdin].bin &gt; [output].csv
+</div></code></pre>
+<h5 id="example">Example</h5>
+<pre class="hljs"><code><div>$ eve 1 1 | getmodel | gulcalc -r -S100 -a1 -i - | fmcalc | summarycalc -f -1 - | summarycalctocsv &gt; summarycalc.csv
+$ summarycalctocsv &lt; summarycalc.bin &gt; summarycalc.csv 
+</div></code></pre>
+<h5 id="output">Output</h5>
 <p>Csv file with the following fields;</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">event_id</td>
+<tr>
+<td style="text-align:left">event_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Oasis event_id</td>
-<td align="right">4545</td>
+<td style="text-align:left">Oasis event_id</td>
+<td style="text-align:right">4545</td>
 </tr>
-<tr class="even">
-<td align="left">summary_id</td>
+<tr>
+<td style="text-align:left">summary_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Oasis summary_id</td>
-<td align="right">3</td>
+<td style="text-align:left">Oasis summary_id</td>
+<td style="text-align:right">3</td>
 </tr>
-<tr class="odd">
-<td align="left">sidx</td>
+<tr>
+<td style="text-align:left">sidx</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Sample index</td>
-<td align="right">10</td>
+<td style="text-align:left">Sample index</td>
+<td style="text-align:right">10</td>
 </tr>
-<tr class="even">
-<td align="left">loss</td>
+<tr>
+<td style="text-align:left">loss</td>
 <td>float</td>
 <td>4</td>
-<td align="left">The insured loss value</td>
-<td align="right">5375.675</td>
+<td style="text-align:left">The insured loss value</td>
+<td style="text-align:right">5375.675</td>
 </tr>
 </tbody>
 </table>
 <p><a href="#streamconversioncomponents">Return to top</a></p>
 <p><a id="gultobin"></a></p>
 <h3 id="gultobin">gultobin</h3>
-<hr />
+<hr>
 <p>A component which converts gulcalc data in csv format into gulcalc binary item stream (1/1).</p>
 <h5 id="input-file-format">Input file format</h5>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Name</th>
+<tr>
+<th style="text-align:left">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th align="left">Description</th>
-<th align="right">Example</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">event_id</td>
+<tr>
+<td style="text-align:left">event_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Oasis event_id</td>
-<td align="right">4545</td>
+<td style="text-align:left">Oasis event_id</td>
+<td style="text-align:right">4545</td>
 </tr>
-<tr class="even">
-<td align="left">item_id</td>
+<tr>
+<td style="text-align:left">item_id</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Oasis item_id</td>
-<td align="right">300</td>
+<td style="text-align:left">Oasis item_id</td>
+<td style="text-align:right">300</td>
 </tr>
-<tr class="odd">
-<td align="left">sidx</td>
+<tr>
+<td style="text-align:left">sidx</td>
 <td>int</td>
 <td>4</td>
-<td align="left">Sample index</td>
-<td align="right">10</td>
+<td style="text-align:left">Sample index</td>
+<td style="text-align:right">10</td>
 </tr>
-<tr class="even">
-<td align="left">loss</td>
+<tr>
+<td style="text-align:left">loss</td>
 <td>float</td>
 <td>4</td>
-<td align="left">The ground up loss value</td>
-<td align="right">5675.675</td>
+<td style="text-align:left">The ground up loss value</td>
+<td style="text-align:right">5675.675</td>
 </tr>
 </tbody>
 </table>
@@ -435,32 +793,43 @@ $ summarycalctocsv &lt; summarycalc.bin &gt; summarycalc.csv </code></pre>
 <li>For each event_id and item_id combination, one or more sampled losses for sidx &gt; 0 may be provided, but records for samples with zero loss may be omitted.</li>
 </ul>
 <h5 id="parameters">Parameters</h5>
-<p>-S, the number of samples must be provided. This can be equal to or greater than maximum sample index value that appears in the csv data.</p>
-<h5 id="usage-4">Usage</h5>
-<pre><code>$ gultobin [parameters] &lt; [input].csv | [stdin component]
-$ gultobin [parameters] &lt; [input].csv &gt; [output].bin</code></pre>
-<h5 id="example-4">Example</h5>
-<pre><code>$ gultobin -S100 &lt; gulcalci.csv | fmcalc &gt; fmcalc.bin
-$ gultobin -S100 &lt; gulcalci.csv &gt; gulcalci.bin</code></pre>
+<p>-S, the number of samples must be provided.  This can be equal to or greater than maximum sample index value that appears in the csv data.
+-t, the stream type of either 1 for the deprecated item stream or 2 for the loss stream. This is an optional parameter with default value 2.</p>
+<h5 id="usage">Usage</h5>
+<pre class="hljs"><code><div>$ gultobin [parameters] &lt; [input].csv | [stdin component]
+$ gultobin [parameters] &lt; [input].csv &gt; [output].bin
+</div></code></pre>
+<h5 id="example">Example</h5>
+<pre class="hljs"><code><div>$ gultobin -S100 &lt; gulcalci.csv | fmcalc &gt; fmcalc.bin
+$ gultobin -S100 &lt; gulcalci.csv &gt; gulcalci.bin
+$ gultobin -S100 -t1 &lt; gulcalci.csv &gt; gulcalci.bin
+$ gultobin -S100 -t2 &lt; gulcalci.csv &gt; gulcalci.bin
+</div></code></pre>
 <h5 id="standard-output-stream">Standard output stream</h5>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Byte 1</th>
+<tr>
+<th style="text-align:left">Byte 1</th>
 <th>Bytes 2-4</th>
-<th align="left">Description</th>
+<th style="text-align:left">Description</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>1</td>
-<td align="left">gulcalc item</td>
+<td style="text-align:left">gulcalc item</td>
+</tr>
+<tr>
+<td style="text-align:left">2</td>
+<td>1</td>
+<td style="text-align:left">gulcalc loss</td>
 </tr>
 </tbody>
 </table>
 <p><a href="#streamconversioncomponents">Return to top</a></p>
-<p><a href="ValidationComponents.html">Go to 4.5. Validation Components</a></p>
-<p><a href="Contents.html">Back to Contents</a></p>
+<p><a href="ValidationComponents.md">Go to 4.5. Validation Components</a></p>
+<p><a href="Contents.md">Back to Contents</a></p>
+
 </body>
 </html>

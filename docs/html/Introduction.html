@@ -1,78 +1,400 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <meta http-equiv="Content-Style-Type" content="text/css" />
-  <meta name="generator" content="pandoc" />
-  <title></title>
-  <style type="text/css">code{white-space: pre;}</style>
-  <style type="text/css">
-div.sourceCode { overflow-x: auto; }
-table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
-  margin: 0; padding: 0; vertical-align: baseline; border: none; }
-table.sourceCode { width: 100%; line-height: 100%; }
-td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
-td.sourceCode { padding-left: 5px; }
-code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code > span.dt { color: #902000; } /* DataType */
-code > span.dv { color: #40a070; } /* DecVal */
-code > span.bn { color: #40a070; } /* BaseN */
-code > span.fl { color: #40a070; } /* Float */
-code > span.ch { color: #4070a0; } /* Char */
-code > span.st { color: #4070a0; } /* String */
-code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code > span.ot { color: #007020; } /* Other */
-code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code > span.fu { color: #06287e; } /* Function */
-code > span.er { color: #ff0000; font-weight: bold; } /* Error */
-code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-code > span.cn { color: #880000; } /* Constant */
-code > span.sc { color: #4070a0; } /* SpecialChar */
-code > span.vs { color: #4070a0; } /* VerbatimString */
-code > span.ss { color: #bb6688; } /* SpecialString */
-code > span.im { } /* Import */
-code > span.va { color: #19177c; } /* Variable */
-code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code > span.op { color: #666666; } /* Operator */
-code > span.bu { } /* BuiltIn */
-code > span.ex { } /* Extension */
-code > span.pp { color: #bc7a00; } /* Preprocessor */
-code > span.at { color: #7d9029; } /* Attribute */
-code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-  </style>
+<title>Introduction.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
 </head>
 <body>
-<p><img src="../img/banner.jpg" title="banner" alt="alt text" /></p>
-<h1 id="introduction">1. Introduction</h1>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<p><img src="../img/banner.jpg" alt="alt text" title="banner"></p>
+<h1 id="1-introduction">1. Introduction</h1>
 <p>The in-memory solution for the Oasis Kernel is called the kernel tools or “ktools”. ktools is an independent “specification” of a set of processes which means that it defines the processing architecture and data structures. The framework is implemented as a set of components called the “reference model” which can then be adapted for particular model or business needs.</p>
-<p>The code can be compiled in Linux, POSIX-compliant Windows and native Windows. The installation instructions can be found in <a href="../../README.html">README.html</a>.</p>
+<p>The code can be compiled in Linux, POSIX-compliant Windows and native Windows. The installation instructions can be found in <a href="../../README.md">README.md</a>.</p>
 <h3 id="background">Background</h3>
 <p>The Kernel performs the core Oasis calculations of computing effective damageability distributions, Monte-Carlo sampling of ground up loss, the financial module calculations, which apply insurance policy terms and conditions to the sampled losses, and finally some common catastrophe model outputs.</p>
-<p>The early releases of Oasis used a SQL-compliant database to perform all calculations. Release 1.3 included the first “in-memory” version of the Oasis Kernel written in C++ and C to provide streamed calculation at high computational performance, as an alternative to the database calculation. The scope of the in-memory calculation was for the most intensive Kernel calculations of ground up loss sampling and the financial module. This in-memory variant was first delivered as a stand-alone toolkit &quot;ktools&quot; with R1.4.</p>
+<p>The early releases of Oasis used a SQL-compliant database to perform all calculations.  Release 1.3  included the first “in-memory” version of the Oasis Kernel written in C++ and C to provide streamed calculation at high computational performance, as an alternative to the database calculation. The scope of the in-memory calculation was for the most intensive Kernel calculations of ground up loss sampling and the financial module. This in-memory variant was first delivered as a stand-alone toolkit &quot;ktools&quot; with R1.4.</p>
 <p>With R1.5, a Linux-based in-memory calculation back-end was released, using the reference model components of ktools. The range of functionality of ktools was still limited to ground up loss sampling, the financial module and single output workflows, with effective damage distributions and output calculations still being performed in a SQL-compliant database.</p>
-<p>In 2016 the functionality of ktools was extended to include the full range of Kernel calculations, including effective damageability distribution calculations and a wider range of financial module and output calculations. The data stream structures and input data formats were also substantially revised to handle multi-peril models, user-definable summary levels for outputs, and multiple output workflows.</p>
+<p>In 2016 the functionality of ktools was extended to include the full range of Kernel calculations, including effective damageability distribution calculations and a wider range of financial module and output calculations.  The data stream structures and input data formats were also substantially revised to handle multi-peril models, user-definable summary levels for outputs, and multiple output workflows.</p>
 <p>In 2018 the Financial Module was extended to perform net loss calculations for per occurrence forms of reinsurance, including facultative reinsurance, quota share, surplus share, per risk and catastrophe excess of loss treaties.</p>
 <h3 id="architecture">Architecture</h3>
-<p>The Kernel is provided as a toolkit of components (“ktools”) which can be invoked at the command line. Each component is a separately compiled executable with a binary data stream of inputs and/or outputs.</p>
-<p>The principle is to stream data through the calculations in memory, starting with generating the damage distributions and ending with calculating the user's required result, before writing the output to disk. This is done on an event-by-event basis, which means at any one time the compute server only has to hold the model data for a single event in its memory, per process. The user can run the calculation across multiple processes in parallel, specifiying the analysis workfkow and number of processes in a script file appropriate to the operating system.</p>
+<p>The Kernel is provided as a toolkit of components (“ktools”) which can be invoked at the command line.  Each component is a separately compiled executable with a binary data stream of inputs and/or outputs.</p>
+<p>The principle is to stream data through the calculations in memory, starting with generating the damage distributions and ending with calculating the user's required result, before writing the output to disk.  This is done on an event-by-event basis, which means at any one time the compute server only has to hold the model data for a single event in its memory, per process. The user can run the calculation across multiple processes in parallel, specifiying the analysis workfkow and number of processes in a script file appropriate to the operating system.</p>
 <h3 id="language">Language</h3>
-<p>The components can be written in any language as long as the data structures of the binary streams are adhered to. The current set of components have been written in POSIX-compliant C++. This means that they can be compiled in Linux and Windows using the latest GNU compiler toolchain.</p>
+<p>The components can be written in any language as long as the data structures of the binary streams are adhered to.  The current set of components have been written in POSIX-compliant C++.  This means that they can be compiled in Linux and Windows using the latest GNU compiler toolchain.</p>
 <h3 id="components">Components</h3>
 <p>The components in the Reference Model can be summarized as follows;</p>
 <ul>
-<li><strong><a href="CoreComponents.html">Core components</a></strong> perform the core kernel calculations and are used in the main analysis workflow.</li>
-<li><strong><a href="OutputComponents.html">Output components</a></strong> perform specific output calculations at the end of the analysis workflow. Essentially, they produce various statistical summaries of the sampled losses from the core calculation.</li>
-<li><strong><a href="InputConversionComponents.html">Data conversion components</a></strong> are provided to enable users to convert model and exposure data into the required binary formats.</li>
-<li><strong><a href="StreamConversionComponents.html">Stream conversion components</a></strong> are provided to inspect the data streams flowing between the core components, for more detailed analysis or debugging purposes.</li>
+<li><strong><a href="CoreComponents.md">Core components</a></strong> perform the core kernel calculations and are used in the main analysis workflow.</li>
+<li><strong><a href="OutputComponents.md">Output components</a></strong> perform specific output calculations at the end of the analysis workflow. Essentially, they produce various statistical summaries of the sampled losses from the core calculation.</li>
+<li><strong><a href="InputConversionComponents.md">Data conversion components</a></strong> are provided to enable users to convert model and exposure data into the required binary formats.</li>
+<li><strong><a href="StreamConversionComponents.md">Stream conversion components</a></strong> are provided to inspect the data streams flowing between the core components, for more detailed analysis or debugging purposes.</li>
 </ul>
 <h3 id="usage">Usage</h3>
 <p>Standard piping syntax can be used to invoke the components at the command line. It is the same syntax in Windows DOS, Linux terminal or Cygwin (a Linux emulator for Windows). For example the following command invokes eve, getmodel, gulcalc, fmcalc, summarycalc and eltcalc, and exports an event loss table output to a csv file.</p>
-<div class="sourceCode"><pre class="sourceCode sh"><code class="sourceCode bash">$ <span class="ex">eve</span> 1 1 <span class="kw">|</span> <span class="ex">getmodel</span> <span class="kw">|</span> <span class="ex">gulcalc</span> -r –S100 -a1 –i - <span class="kw">|</span> <span class="ex">fmcalc</span> <span class="kw">|</span> <span class="ex">summarycalc</span> -f -1 - <span class="kw">|</span> <span class="ex">eltcalc</span> <span class="op">&gt;</span> elt.csv</code></pre></div>
-<p>Example python scripts are provided along with a binary data package in the /examples folder to demonstrate usage of the toolkit. For more guidance on how to use the toolkit, see <a href="Workflows.html">Workflows</a>.</p>
-<p><a href="Overview.html">Go to 2. Data streaming architecture overview</a></p>
-<p><a href="Contents.html">Back to Contents</a></p>
+<pre class="hljs"><code><div>$ eve 1 1 | getmodel | gulcalc -r –S100 -a1 –i - | fmcalc | summarycalc -f -1 - | eltcalc &gt; elt.csv
+</div></code></pre>
+<p>Example python scripts are provided along with a binary data package in the /examples folder to demonstrate usage of the toolkit. For more guidance on how to use the toolkit, see <a href="Workflows.md">Workflows</a>.</p>
+<p><a href="Overview.md">Go to 2. Data streaming architecture overview</a></p>
+<p><a href="Contents.md">Back to Contents</a></p>
+
 </body>
 </html>

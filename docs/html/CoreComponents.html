@@ -1,18 +1,375 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html>
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <meta http-equiv="Content-Style-Type" content="text/css" />
-  <meta name="generator" content="pandoc" />
-  <title></title>
-  <style type="text/css">code{white-space: pre;}</style>
+<title>CoreComponents.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
 </head>
 <body>
-<p><img src="../img/banner.jpg" title="banner" alt="alt text" /></p>
-<h1 id="core-components">4.1 Core Components <a id="corecomponents"></a></h1>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<p><img src="../img/banner.jpg" alt="alt text" title="banner"></p>
+<h1 id="41-core-components-a-id%22corecomponents%22a">4.1 Core Components <a id="corecomponents"></a></h1>
 <p><a id="eve"></a></p>
 <h3 id="eve">eve</h3>
-<hr />
+<hr>
 <p>eve takes a list of event ids in binary format as input and generates a partition of event ids as a binary data stream, according to the parameters supplied. Events are &quot;shuffled&quot; by being assigned to processes one by one cyclically, rather than being distributed to processes in blocks, in the order they are input. This helps to even the workload by process, in case all the &quot;big&quot; events are together in the same range of the event list.</p>
 <h5 id="output-stream">Output stream</h5>
 <p>The output stream is a simple list of event_ids (4 byte integers).</p>
@@ -27,12 +384,14 @@
 <li>-n - No shuffled events. Events are split up and distributed in blocks in respect of the order they are input.</li>
 </ul>
 <h5 id="usage">Usage</h5>
-<pre><code>$ eve [parameters] &gt; [output].bin
-$ eve [parameters] | getmodel | gulcalc [parameters] &gt; [stdout].bin</code></pre>
+<pre class="hljs"><code><div>$ eve [parameters] &gt; [output].bin
+$ eve [parameters] | getmodel | gulcalc [parameters] &gt; [stdout].bin
+</div></code></pre>
 <h5 id="example">Example</h5>
-<pre><code>$ eve 1 2 &gt; events1_2_shuffled.bin 
+<pre class="hljs"><code><div>$ eve 1 2 &gt; events1_2_shuffled.bin 
 $ eve -n 1 2 &gt; events1_2_unshuffled.bin 
-$ eve 1 2 | getmodel | gulcalc -r -S100 -i - &gt; gulcalc1_2.bin</code></pre>
+$ eve 1 2 | getmodel | gulcalc -r -S100 -i - &gt; gulcalc1_2.bin
+</div></code></pre>
 <p>In this example, the events from the file events.bin will be read into memory and the first half (partition 1 of 2) would be streamed out to binary file, or downstream to a single process calculation workflow.</p>
 <h5 id="internal-data">Internal data</h5>
 <p>The program requires an event binary. The file is picked up from the input sub-directory relative to where the program is invoked and has the following filename;</p>
@@ -43,37 +402,39 @@ $ eve 1 2 | getmodel | gulcalc -r -S100 -i - &gt; gulcalc1_2.bin</code></pre>
 <p><a href="#corecomponents">Return to top</a></p>
 <p><a id="getmodel"></a></p>
 <h3 id="getmodel">getmodel</h3>
-<hr />
+<hr>
 <p>getmodel generates a stream of effective damageability distributions (cdfs) from an input list of events. Specifically, it combines the probability distributions from the model files, footprint.bin and vulnerability.bin, to generate effective damageability cdfs for the subset of exposures contained in the items.bin file and converts them into a binary stream.</p>
 <p>This is reference example of the class of programs which generates the damage distributions for an event set and streams them into memory. It is envisaged that model developers who wish to use the toolkit as a back-end calculator of their existing platforms can write their own version of getmodel, reading in their own source data and converting it into the standard output stream. As long as the standard input and output structures are adhered to, each program can be written in any language and read any input data.</p>
-<h5 id="output-stream-1">Output stream</h5>
+<h5 id="output-stream">Output stream</h5>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Byte 1</th>
+<tr>
+<th style="text-align:left">Byte 1</th>
 <th>Bytes 2-4</th>
-<th align="left">Description</th>
+<th style="text-align:left">Description</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">0</td>
+<tr>
+<td style="text-align:left">0</td>
 <td>1</td>
-<td align="left">cdf stream</td>
+<td style="text-align:left">cdf stream</td>
 </tr>
 </tbody>
 </table>
-<h5 id="parameters-1">Parameters</h5>
+<h5 id="parameters">Parameters</h5>
 <p>None</p>
-<h5 id="usage-1">Usage</h5>
-<pre><code>$ [stdin component] | getmodel | [stout component]
+<h5 id="usage">Usage</h5>
+<pre class="hljs"><code><div>$ [stdin component] | getmodel | [stout component]
 $ [stdin component] | getmodel &gt; [stdout].bin
-$ getmodel &lt; [stdin].bin &gt; [stdout].bin</code></pre>
-<h5 id="example-1">Example</h5>
-<pre><code>$ eve 1 1 | getmodel | gulcalc -r -S100 -i gulcalci.bin
+$ getmodel &lt; [stdin].bin &gt; [stdout].bin
+</div></code></pre>
+<h5 id="example">Example</h5>
+<pre class="hljs"><code><div>$ eve 1 1 | getmodel | gulcalc -r -S100 -i gulcalci.bin
 $ eve 1 1 | getmodel &gt; getmodel.bin
-$ getmodel &lt; events.bin &gt; getmodel.bin </code></pre>
-<h5 id="internal-data-1">Internal data</h5>
+$ getmodel &lt; events.bin &gt; getmodel.bin 
+</div></code></pre>
+<h5 id="internal-data">Internal data</h5>
 <p>The program requires the footprint binary and index file for the model, the vulnerability binary model file, and the items file representing the user's exposures. The files are picked up from sub-directories relative to where the program is invoked, as follows;</p>
 <ul>
 <li>static/footprint.bin</li>
@@ -84,63 +445,59 @@ $ getmodel &lt; events.bin &gt; getmodel.bin </code></pre>
 </ul>
 <p>The getmodel output stream is ordered by event and streamed out in blocks for each event.</p>
 <h5 id="calculation">Calculation</h5>
-<p>The program filters the footprint binary file for all 'areaperil_id's which appear in the items file. This selects the event footprints that affect the exposures on the basis on their location. Similarly the program filters the vulnerability file for 'vulnerability_id's that appear in the items file. This selects damage distributions which are relevant for the exposures. Then the intensity distributions from the footprint file and conditional damage distributions from the vulnerability file are convolved for every combination of areaperil_id and vulnerability_id in the items file. The effective damage probabilities are calculated by a sum product of conditional damage probabilities with intensity probabilities for each event, areaperil, vulnerability combination and each damage bin. The resulting discrete probability distributions are converted into discrete cumulative distribution functions 'cdfs'. Finally, the damage bin mid-point from the damage bin dictionary ('interpolation' field) is read in as a new field in the cdf stream as 'bin_mean'. This field is the conditional mean damage for the bin and it is used to facilitate the calculation of mean and standard deviation in the gulcalc component.</p>
+<p>The program filters the footprint binary file for all 'areaperil_id's which appear in the items file. This selects the event footprints that affect the exposures on the basis on their location.  Similarly the program filters the vulnerability file for 'vulnerability_id's that appear in the items file. This selects damage distributions which are relevant for the exposures. Then the intensity distributions from the footprint file and conditional damage distributions from the vulnerability file are convolved for every combination of areaperil_id and vulnerability_id in the items file. The effective damage probabilities are calculated by a sum product of conditional damage probabilities with intensity probabilities for each event, areaperil, vulnerability combination and each damage bin.  The resulting discrete probability distributions are converted into discrete cumulative distribution functions 'cdfs'.  Finally, the damage bin mid-point from the damage bin dictionary ('interpolation' field) is read in as a new field in the cdf stream as 'bin_mean'.  This field is the conditional mean damage for the bin and it is used to facilitate the calculation of mean and standard deviation in the gulcalc component.</p>
 <p><a href="#corecomponents">Return to top</a></p>
 <p><a id="gulcalc"></a></p>
 <h3 id="gulcalc">gulcalc</h3>
-<hr />
+<hr>
 <p>The gulcalc program performs Monte Carlo sampling of ground up loss using interpolation of uniform random numbers against the effective damage cdf, and calculates mean and standard deviation by numerical integration of the cdfs. The sampling methodology has been extended beyond linear interpolation to include point value sampling and quadratic interpolation. This supports damage bin intervals which represent a single discrete damage value, and damage distributions with cdfs that are described by a piecewise quadratic function.</p>
-<p>Gulcalc also performs back-allocation of total coverage losses to the contributing subperil item losses (for multi-subperil models). This occurs when there are two or more items representing losses from different subperils to the same coverage, such as wind loss and storm surge loss, for example. In these cases, because the subperil losses are generated independently from each other it is possible to result in a total damage ratio of &gt; 1 for the coverage, or a total loss of &gt; TIV. gulcalc provides the following options for summing and back-allocating the total coverage ground up loss;</p>
-<table style="width:100%;">
-<colgroup>
-<col width="16%" />
-<col width="83%" />
-</colgroup>
+<p>Gulcalc also performs back-allocation of total coverage losses to the contributing subperil item losses (for multi-subperil models).  This occurs when there are two or more items representing losses from different subperils to the same coverage, such as wind loss and storm surge loss, for example. In these cases, because the subperil losses are generated independently from each other it is possible to result in a total damage ratio of &gt; 1 for the coverage, or a total loss of &gt; TIV. gulcalc provides the following options for summing and back-allocating the total coverage ground up loss;</p>
+<table>
 <thead>
-<tr class="header">
-<th align="left">Allocation option</th>
-<th align="left">Description</th>
+<tr>
+<th style="text-align:left">Allocation option</th>
+<th style="text-align:left">Description</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">1</td>
-<td align="left">Sum damage ratios and cap to 1. Back-allocate in proportion to contributing subperil damage ratio</td>
+<tr>
+<td style="text-align:left">1</td>
+<td style="text-align:left">Sum damage ratios and cap to 1. Back-allocate in proportion to contributing subperil damage ratio</td>
 </tr>
 </tbody>
 </table>
 <h5 id="stream-output">Stream output</h5>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Byte 1</th>
+<tr>
+<th style="text-align:left">Byte 1</th>
 <th>Bytes 2-4</th>
-<th align="left">Description</th>
+<th style="text-align:left">Description</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>1</td>
-<td align="left">gulcalc item stream <strong>(deprecated)</strong></td>
+<td style="text-align:left">gulcalc item stream <strong>(deprecated)</strong></td>
 </tr>
-<tr class="even">
-<td align="left">1</td>
+<tr>
+<td style="text-align:left">1</td>
 <td>2</td>
-<td align="left">gulcalc coverage stream <strong>(deprecated)</strong></td>
+<td style="text-align:left">gulcalc coverage stream <strong>(deprecated)</strong></td>
 </tr>
-<tr class="odd">
-<td align="left">2</td>
+<tr>
+<td style="text-align:left">2</td>
 <td>1</td>
-<td align="left">loss stream</td>
+<td style="text-align:left">loss stream</td>
 </tr>
 </tbody>
 </table>
-<h5 id="parameters-2">Parameters</h5>
+<h5 id="parameters">Parameters</h5>
 <p>Required parameters are;</p>
 <ul>
 <li>-S{number}. Number of samples</li>
-<li>-a{number} -i{destination} . Specifies stdout option 2/1 loss stream with an allocation option<br />
+<li>-a{number} -i{destination} . Specifies stdout option 2/1 loss stream with an allocation option
 <strong>or</strong></li>
 <li>-c and/or -i {destination}. Specifies stdout option 1/1 gulcalc coverage or 1/2 gulcalc item stream respectively.</li>
 </ul>
@@ -154,22 +511,24 @@ $ getmodel &lt; events.bin &gt; getmodel.bin </code></pre>
 <li>-s{number} Manual seed for random numbers (to make them repeatable)</li>
 <li>-r Read random numbers from random.bin file</li>
 </ul>
-<h5 id="usage-2">Usage</h5>
-<pre><code>$ [stdin component] | gulcalc [parameters] | [stout component]
+<h5 id="usage">Usage</h5>
+<pre class="hljs"><code><div>$ [stdin component] | gulcalc [parameters] | [stout component]
 $ [stdin component] | gulcalc [parameters]
-$ gulcalc [parameters] &lt; [stdin].bin </code></pre>
-<h5 id="example-2">Example</h5>
-<pre><code>&#39;To stdout loss stream
+$ gulcalc [parameters] &lt; [stdin].bin 
+</div></code></pre>
+<h5 id="example">Example</h5>
+<pre class="hljs"><code><div>'To stdout loss stream
 $ eve 1 1 | getmodel | gulcalc -R1000000 -S100 -a1 -i - | fmcalc &gt; fmcalc.bin
 $ eve 1 1 | getmodel | gulcalc -R1000000 -S100 -a1 -i - | summarycalc -i -1 summarycalc1.bin
 $ eve 1 1 | getmodel | gulcalc -r -S100 -a1 -i gulcalci.bin
 $ gulcalc -r -S100 -i -a1 gulcalci.bin &lt; getmodel.bin 
-&#39;To stdout gulcalc coverage and item stream (deprecated)
+'To stdout gulcalc coverage and item stream (deprecated)
 $ eve 1 1 | getmodel | gulcalc -R1000000 -S100 -c - | summarycalc -g -1 summarycalc1.bin
 $ eve 1 1 | getmodel | gulcalc -R1000000 -S100 -i - | fmcalc &gt; fmcalc.bin
 $ eve 1 1 | getmodel | gulcalc -r -S100 -i gulcalci.bin -c gulcalcc.bin
-$ gulcalc -r -S100 -i gulcalci.bin -c gulcalcc.bin &lt; getmodel.bin </code></pre>
-<h5 id="internal-data-2">Internal data</h5>
+$ gulcalc -r -S100 -i gulcalci.bin -c gulcalcc.bin &lt; getmodel.bin 
+</div></code></pre>
+<h5 id="internal-data">Internal data</h5>
 <p>The program requires the damage bin dictionary binary for the static folder and the item and coverage binaries from the input folder. The files are found in the following locations relative to the working directory with the filenames;</p>
 <ul>
 <li>static/damage_bin_dictionary.bin</li>
@@ -180,7 +539,7 @@ $ gulcalc -r -S100 -i gulcalci.bin -c gulcalcc.bin &lt; getmodel.bin </code></pr
 <ul>
 <li>static/random.bin</li>
 </ul>
-<h5 id="calculation-1">Calculation</h5>
+<h5 id="calculation">Calculation</h5>
 <p>The stdin stream is a block of cdfs which are ordered by event_id, areaperil_id, vulnerability_id and bin_index asccending, from getmodel. The gulcalc program constructs a cdf for each item, based on matching the areaperil_id and vulnerability_id from the stdin and the item file.</p>
 <p>For each item cdf and for the number of samples specified, the program draws a random number and uses it to sample ground up loss from the cdf using one of three methods, as follows;</p>
 <p>For a given damage interval corresponding to a cumulative probability interval that each random number falls within;</p>
@@ -192,37 +551,37 @@ $ gulcalc -r -S100 -i gulcalci.bin -c gulcalcc.bin &lt; getmodel.bin </code></pr
 <p>An example of the three cases and methods is given below;</p>
 <table>
 <thead>
-<tr class="header">
-<th align="left">bin_from</th>
+<tr>
+<th style="text-align:left">bin_from</th>
 <th>bin_to</th>
 <th>bin_mean</th>
-<th align="left">Method used</th>
+<th style="text-align:left">Method used</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">0.1</td>
+<tr>
+<td style="text-align:left">0.1</td>
 <td>0.2</td>
 <td>0.15</td>
-<td align="left">Linear interpolation</td>
+<td style="text-align:left">Linear interpolation</td>
 </tr>
-<tr class="even">
-<td align="left">0.1</td>
+<tr>
+<td style="text-align:left">0.1</td>
 <td>0.1</td>
 <td>0.1</td>
-<td align="left">Sample bin value</td>
+<td style="text-align:left">Sample bin value</td>
 </tr>
-<tr class="odd">
-<td align="left">0.1</td>
+<tr>
+<td style="text-align:left">0.1</td>
 <td>0.2</td>
 <td>0.14</td>
-<td align="left">Quadratic interpolation</td>
+<td style="text-align:left">Quadratic interpolation</td>
 </tr>
 </tbody>
 </table>
-<p>If the -R parameter is used along with a specified number of random numbers then random numbers used for sampling are generated on the fly for each event and group of items which have a common group_id using the Mersenne twister psuedo random number generator (the default RNG of the C++ v11 compiler). These random numbers are not repeatable, unless a seed is also specified (-s{number}).</p>
+<p>If the -R parameter is used along with a specified number of random numbers then random numbers used for sampling are generated on the fly for each event and group of items which have a common group_id using the Mersenne twister psuedo random number generator (the default RNG of the C++ v11 compiler).  These random numbers are not repeatable, unless a seed is also specified (-s{number}).</p>
 <p>If the -r parameter is used, gulcalc reads a random number from the provided random number file, which produces repeatable results.</p>
-<p>The default random number behaviour (no additional parameters) is to generate random numbers from a seed determined by a combination of the event_id and group_id, which produces repeatable results. See <a href="RandomNumbers.html">Random Numbers</a> for more details.</p>
+<p>The default random number behaviour (no additional parameters) is to generate random numbers from a seed determined by a combination of the event_id and group_id, which produces repeatable results. See <a href="RandomNumbers.md">Random Numbers</a> for more details.</p>
 <p>Each sampled damage is multiplied by the item TIV, looked up from the coverage file.</p>
 <p>The mean and standard deviation of ground up loss is also calculated. For each cdf, the mean and standard deviation of damage is calculated by numerical integration of the effective damageability probability distribution and the result is multiplied by the TIV. The results are included in the output to the stdout stream as sidx=-1 (mean) and sidx=-2 (standard deviation), for each event and item (or coverage).</p>
 <p>At this stage, there are three possible output streams, as follows;</p>
@@ -235,26 +594,26 @@ $ gulcalc -r -S100 -i gulcalci.bin -c gulcalcc.bin &lt; getmodel.bin </code></pr
 <p><a href="#corecomponents">Return to top</a></p>
 <p><a id="fmcalc"></a></p>
 <h3 id="fmcalc">fmcalc</h3>
-<hr />
-<p>fmcalc is the reference implementation of the Oasis Financial Module. It applies policy terms and conditions to the ground up losses and produces loss sample output. It reads in losses from gulcalc at item level (gulcalc item stream 1/1 or loss stream 2/1) and it can run recursively on losses output from fmcalc (loss stream 2/1) and apply several consecutive sets of policy terms and conditions.</p>
-<h5 id="stream-output-1">Stream output</h5>
+<hr>
+<p>fmcalc is the reference implementation of the Oasis Financial Module. It applies policy terms and conditions to the ground up losses and produces loss sample output.  It reads in losses from gulcalc at item level (gulcalc item stream 1/1 or loss stream 2/1) and it can run recursively on losses output from fmcalc (loss stream 2/1) and apply several consecutive sets of policy terms and conditions.</p>
+<h5 id="stream-output">Stream output</h5>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Byte 1</th>
+<tr>
+<th style="text-align:left">Byte 1</th>
 <th>Bytes 2-4</th>
-<th align="left">Description</th>
+<th style="text-align:left">Description</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">2</td>
+<tr>
+<td style="text-align:left">2</td>
 <td>1</td>
-<td align="left">loss stream</td>
+<td style="text-align:left">loss stream</td>
 </tr>
 </tbody>
 </table>
-<h5 id="parameters-3">Parameters</h5>
+<h5 id="parameters">Parameters</h5>
 <p>Optional parameters are;</p>
 <ul>
 <li>-p {string} The location of the input files. The default location is the 'input' directory in the present working directory</li>
@@ -262,16 +621,18 @@ $ gulcalc -r -S100 -i gulcalci.bin -c gulcalcc.bin &lt; getmodel.bin </code></pr
 <li>-n Output net losses. Net losses are the difference between the input loss and the calculated loss. The default is to output the calculated loss.</li>
 <li>-S Use fm_profile_step input file (default is to use fm_profile)</li>
 </ul>
-<h5 id="usage-3">Usage</h5>
-<pre><code>$ [stdin component] | fmcalc [parameters] | [stout component]
+<h5 id="usage">Usage</h5>
+<pre class="hljs"><code><div>$ [stdin component] | fmcalc [parameters] | [stout component]
 $ [stdin component] | fmcalc [parameters] &gt; [stdout].bin
-$ fmcalc [parameters] &lt; [stdin].bin &gt; [stdout].bin</code></pre>
-<h5 id="example-3">Example</h5>
-<pre><code>$ eve 1 1 | getmodel | gulcalc -r -S100 -a1 -i - | fmcalc -p direct -a2 | summarycalc -f -2 - | eltcalc &gt; elt.csv
+$ fmcalc [parameters] &lt; [stdin].bin &gt; [stdout].bin
+</div></code></pre>
+<h5 id="example">Example</h5>
+<pre class="hljs"><code><div>$ eve 1 1 | getmodel | gulcalc -r -S100 -a1 -i - | fmcalc -p direct -a2 | summarycalc -f -2 - | eltcalc &gt; elt.csv
 $ eve 1 1 | getmodel | gulcalc -r -S100 -a1 -i - | fmcalc -p direct -a1 &gt; fmcalc.bin
 $ fmcalc -p ri1 -a2 -S -n &lt; gulcalci.bin &gt; fmcalc.bin
-$ fmcalc -p direct | fmcalc -p ri1 -n | fmcalc -p ri2 -n &lt; gulcalci.bin &gt; fm_ri2_net.bin </code></pre>
-<h5 id="internal-data-3">Internal data</h5>
+$ fmcalc -p direct | fmcalc -p ri1 -n | fmcalc -p ri2 -n &lt; gulcalci.bin &gt; fm_ri2_net.bin 
+</div></code></pre>
+<h5 id="internal-data">Internal data</h5>
 <p>For the gulcalc item stream input, the program requires the item, coverage and fm input data files, which are Oasis abstract data objects that describe an insurance or reinsurance programme. This data is picked up from the following files relative to the working directory by default;</p>
 <ul>
 <li>input/items.bin</li>
@@ -289,67 +650,71 @@ $ fmcalc -p direct | fmcalc -p ri1 -n | fmcalc -p ri2 -n &lt; gulcalci.bin &gt; 
 <li>input/fm_xref.bin</li>
 </ul>
 <p>The location of the files can be changed by using the -p parameter followed by the path location relative to the present working directory. eg -p ri1</p>
-<h5 id="calculation-2">Calculation</h5>
-<p>See <a href="FinancialModule.html">Financial Module</a></p>
+<h5 id="calculation">Calculation</h5>
+<p>See <a href="FinancialModule.md">Financial Module</a></p>
 <p><a href="#corecomponents">Return to top</a></p>
 <p><a id="summarycalc"></a></p>
 <h3 id="summarycalc">summarycalc</h3>
-<hr />
-<p>The purpose of summarycalc is firstly to aggregate the samples of loss to a level of interest for reporting, thereby reducing the volume of data in the stream. This is a generic first step which precedes all of the downstream output calculations. Secondly, it unifies the formats of the gulcalc and fmcalc streams, so that they are transformed into an identical stream type for downstream outputs. Finally, it can generate up to 10 summary level outputs in one go, creating multiple output streams or files.</p>
-<p>The output is similar to the gulcalc or fmcalc input which are losses are by sample index and by event, but the ground up or (re)insurance loss input losses are grouped to an abstract level represented by a summary_id. The relationship between the input identifier and the summary_id are defined in cross reference files called <strong>gulsummaryxref</strong> and <strong>fmsummaryxref</strong>.</p>
-<h5 id="stream-output-2">Stream output</h5>
+<hr>
+<p>The purpose of summarycalc is firstly to aggregate the samples of loss to a level of interest for reporting, thereby reducing the volume of data in the stream. This is a generic first step which precedes all of the downstream output calculations.  Secondly, it unifies the formats of the gulcalc and fmcalc streams, so that they are transformed into an identical stream type for downstream outputs. Finally, it can generate up to 10 summary level outputs in one go, creating multiple output streams or files.</p>
+<p>The output is similar to the gulcalc or fmcalc input which are losses are by sample index and by event, but the ground up or (re)insurance loss input losses are grouped to an abstract level represented by a summary_id.  The relationship between the input identifier and the summary_id are defined in cross reference files called <strong>gulsummaryxref</strong> and <strong>fmsummaryxref</strong>.</p>
+<h5 id="stream-output">Stream output</h5>
 <table>
 <thead>
-<tr class="header">
-<th align="left">Byte 1</th>
+<tr>
+<th style="text-align:left">Byte 1</th>
 <th>Bytes 2-4</th>
-<th align="left">Description</th>
+<th style="text-align:left">Description</th>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
-<td align="left">3</td>
+<tr>
+<td style="text-align:left">3</td>
 <td>1</td>
-<td align="left">summary stream</td>
+<td style="text-align:left">summary stream</td>
 </tr>
 </tbody>
 </table>
-<h5 id="parameters-4">Parameters</h5>
+<h5 id="parameters">Parameters</h5>
 <p>The input stream should be identified explicitly as -g for gulcalc item stream, -i for gulcalc loss stream or -f for fmcalc loss stream.</p>
-<p>summarycalc supports up to 10 concurrent outputs. This is achieved by explictly directing each output to a named pipe, file, or to standard output.</p>
+<p>summarycalc supports up to 10 concurrent outputs.  This is achieved by explictly directing each output to a named pipe, file, or to standard output.</p>
 <p>For each output stream, the following tuple of parameters must be specified for at least one summary set;</p>
 <ul>
 <li>summaryset_id number. valid values are -0 to -9</li>
 <li>destination pipe or file. Use either - for standard output, or {name} for a named pipe or file.</li>
 </ul>
 <p>For example the following parameter choices are valid;</p>
-<pre><code>$ summarycalc -i -1 -                                       
-&#39;outputs results for summaryset 1 to standard output
+<pre class="hljs"><code><div>$ summarycalc -i -1 -                                       
+'outputs results for summaryset 1 to standard output
 $ summarycalc -i -1 summarycalc1.bin                        
-&#39;outputs results for summaryset 1 to a file (or named pipe)
+'outputs results for summaryset 1 to a file (or named pipe)
 $ summarycalc -i -1 summarycalc1.bin -2 summarycalc2.bin    
-&#39;outputs results for summaryset 1 and 2 to a file (or named pipe)</code></pre>
+'outputs results for summaryset 1 and 2 to a file (or named pipe)
+</div></code></pre>
 <p>Note that the summaryset_id relates to a summaryset_id in the required input data file <strong>gulsummaryxref.bin</strong> or <strong>fmsummaryxref.bin</strong> for a gulcalc input stream or a fmcalc input stream, respectively, and represents a user specified summary reporting level. For example summaryset_id = 1 represents portfolio level, summaryset_id = 2 represents zipcode level and summaryset_id 3 represents site level.</p>
-<h5 id="usage-4">Usage</h5>
-<pre><code>$ [stdin component] | summarycalc [parameters] | [stdout component]
+<h5 id="usage">Usage</h5>
+<pre class="hljs"><code><div>$ [stdin component] | summarycalc [parameters] | [stdout component]
 $ [stdin component] | summarycalc [parameters]
-$ summarycalc [parameters] &lt; [stdin].bin</code></pre>
-<h5 id="example-4">Example</h5>
-<pre><code>$ eve 1 1 | getmodel | gulcalc -r -S100 -a1 -i - | summarycalc -i -1 - | eltcalc &gt; eltcalc.csv
+$ summarycalc [parameters] &lt; [stdin].bin
+</div></code></pre>
+<h5 id="example">Example</h5>
+<pre class="hljs"><code><div>$ eve 1 1 | getmodel | gulcalc -r -S100 -a1 -i - | summarycalc -i -1 - | eltcalc &gt; eltcalc.csv
 $ eve 1 1 | getmodel | gulcalc -r -S100 -a1 -i - | summarycalc -i -1 gulsummarycalc.bin 
 $ eve 1 1 | getmodel | gulcalc -r -S100 -a1 -i - | fmcalc | summarycalc -f -1 fmsummarycalc.bin 
-$ summarycalc -f -1 fmsummarycalc.bin &lt; fmcalc.bin</code></pre>
-<h5 id="internal-data-4">Internal data</h5>
+$ summarycalc -f -1 fmsummarycalc.bin &lt; fmcalc.bin
+</div></code></pre>
+<h5 id="internal-data">Internal data</h5>
 <p>The program requires the gulsummaryxref file for gulcalc input (-g or -i option), or the fmsummaryxref file for fmcalc input (-f option). This data is picked up from the following files relative to the working directory;</p>
 <ul>
 <li>input/gulsummaryxref.bin</li>
 <li>input/fmsummaryxref.bin</li>
 </ul>
-<h5 id="calculation-3">Calculation</h5>
-<p>summarycalc takes either ground up loss (by coverage_id -g or by item_id -i) or insured loss samples (by output_id -f) as input and aggregates them to a user-defined summary reporting level. The output is similar to the input which are losses are by sample index and by event, but the ground up or insured losses are grouped to an abstract level represented by a summary_id. The relationship between the input identifier, item_id or coverage_id for gulcalc or output_id for fmcalc, and the summary_id are defined in the internal data files.</p>
-<p>For gulcalc coverage stream (1/2) input, summarycalc also calculates the maximum exposure value by summary_id and event_id. This is carried through in the stream header and output by eltcalc, aalcalc and pltcalc. For gulcalc coverage stream this is the sum of TIV for all coverages which intersect with a given event footprint on the basis of areaperil_id (regardless or not of whether there are any sampled losses). For gulcalc or fmcalc loss stream (2/1) input , this is the sum of the losses for sample index -3. Sample index -3 is the 100% loss scenario for all impacted items passed through the financial module calculations. Because the event footprints vary geographically, the value can be different for each event.</p>
+<h5 id="calculation">Calculation</h5>
+<p>summarycalc takes either ground up loss (by coverage_id -g or by item_id -i) or insured loss samples (by output_id -f) as input and aggregates them to a user-defined summary reporting level. The output is similar to the input which are losses are by sample index and by event, but the ground up or insured losses are grouped to an abstract level represented by a summary_id.  The relationship between the input identifier, item_id or coverage_id for gulcalc or output_id for fmcalc, and the summary_id are defined in the internal data files.</p>
+<p>For gulcalc coverage stream (1/2) input, summarycalc also calculates the maximum exposure value by summary_id and event_id. This is carried through in the stream header and output by eltcalc, aalcalc and pltcalc. For gulcalc coverage stream this is the sum of TIV for all coverages which intersect with a given event footprint on the basis of areaperil_id (regardless or not of whether there are any sampled losses). For gulcalc or fmcalc loss stream (2/1) input , this is the sum of the losses for sample index -3.  Sample index -3 is the 100% loss scenario for all impacted items passed through the financial module calculations.  Because the event footprints vary geographically, the value can be different for each event.</p>
 <p><a href="#corecomponents">Return to top</a></p>
-<p><a href="OutputComponents.html">Go to 4.2 Output Components section</a></p>
-<p><a href="Contents.html">Back to Contents</a></p>
+<p><a href="OutputComponents.md">Go to 4.2 Output Components section</a></p>
+<p><a href="Contents.md">Back to Contents</a></p>
+
 </body>
 </html>

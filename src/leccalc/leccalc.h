@@ -70,6 +70,8 @@ typedef  std::vector<OASIS_FLOAT> lossvec;
 
 typedef  std::vector<lossval> lossvec2;
 
+bool operator<(const outkey2& lhs, const outkey2& rhs);
+
 //extern FILE *fout[];
 
 #endif

@@ -3,13 +3,19 @@ Ktools Changelog
 
 .. * [#_](https://github.com/OasisLMF/OasisLMF/issues/_) -  
 
-`v3.4.0`_
+`v3.4.1`_
 ---------
 .. start_latest_release
+* [#38](https://github.com/OasisLMF/ktools/issues/38) - Drop interval type column from damage bin dictionary
+* [#155](https://github.com/OasisLMF/ktools/issues/155) - Provide support for compressed and indexed vulnerability files
+* [#165](https://github.com/OasisLMF/ktools/issues/165) - Introduce option to write original data size to footprint index file
+.. end_latest_release
+
+`v3.4.0`_
+---------
 * [#154](https://github.com/OasisLMF/ktools/issues/154) - Improve performance of getmodel when there is uncertainty in the footprint file
 * [#160](https://github.com/OasisLMF/ktools/issues/160) - Add stream type argument to gultobin
 * Implement step policies from loss stream in fmcalc
-.. end_latest_release
 
 `v3.3.8`_
 ---------

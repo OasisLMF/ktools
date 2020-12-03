@@ -68,7 +68,7 @@ void segfault_sigaction(int, siginfo_t *si, void *)
 
 void help()
 {
-	fprintf(stderr, "-h help\n-v version\n,-n no header row\n");
+	fprintf(stderr, "-h help\n-v version\n-n no header row\n");
 }
 
 int main(int argc, char *argv[])

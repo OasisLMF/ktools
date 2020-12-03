@@ -49,7 +49,6 @@ private:
 	std::map<outkey2, OASIS_FLOAT> &max_out_loss_;
 	FILE **fout_;
 	bool useReturnPeriodFile_;
-	int max_ensemble_id_ = 0;
 	int samplesize_ = 0;
 	std::vector<int> returnperiods_;
 	std::map <int, double> periodstoweighting_;

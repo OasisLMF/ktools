@@ -190,8 +190,8 @@ void aggreports::writefulluncertainty(const int handle, const int type,
 
 	std::map<int, lossvec2> items;
 	for (auto x : out_loss) {
-		if (type == 1 && x.first.sidx == -1 || 
-		    type == 2 && x.first.sidx > 0) { 
+		if ((type == 1 && x.first.sidx == -1) || 
+		    (type == 2 && x.first.sidx > 0)) { 
 			lossval lv;
 			lv.value = x.second;
 			// assume weighting is zero if not supplied

@@ -255,9 +255,28 @@ $ vulnerabilitytobin -d {number of damage bins} < vulnerability.csv > vulnerabil
 ```
 The parameter -d number of damage bins is the maximum value of damage_bin_index. This is held in the header of vulnerability.bin and used by getmodel.
 
+In the case of very large vulnerability files, it may be preferrable to create an index file to improve performance. Issuing the -i flag creates vulnerability.bin and vulnerability.idx in the current working directory:
+
+```
+$ vulnerabilitytobin -d {number of damage bins} -i < vulnerability.csv
+```
+
+Additionally, the data can be compressed as it is written to the binary file. Compression is performed with [zlib](https://zlib.net/) by issuing the -z flag. This creates vulnerability.bin.z and vulnerability.idx.z in the current working directory:
+
+```
+$ vulnerabilitytobin -d {number of damage bins} -i < vulnerability.csv
+```
+
+The getmodel component will look for the presence of index files in the following order to determine which algorithm to use to extract data from vulnerability.bin:
+
+1. static/vulnerability.idx.z
+2. static/vulnerability.idx
+
 ##### vulnerabilitytocsv
 ```
 $ vulnerabilitytocsv < vulnerability.bin > vulnerability.csv
+$ vulnerabilitytocsv -i > vulnerability.csv
+$ vulnerabilitytocsv -z > vulnerability.csv
 ```
 [Return to top](#dataconversioncomponents)
 

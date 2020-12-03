@@ -76,6 +76,9 @@ private:
 	std::vector<Result> _temp_results;
     //Result* _temp_results;
     bool _zip = false;
+    inline void assignProbabilities(const int vulnerability_id,
+      int& current_vulnerability_id, const int intensity_bin_id,
+      const int damage_bin_id, OASIS_FLOAT probability);
     void getVulnerabilities(const std::set<int> &v);
     void getDamageBinDictionary();
     void getFootPrints();

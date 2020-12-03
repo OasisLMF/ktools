@@ -738,8 +738,21 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv
 <pre class="hljs"><code><div>$ vulnerabilitytobin -d {number of damage bins} &lt; vulnerability.csv &gt; vulnerability.bin
 </div></code></pre>
 <p>The parameter -d number of damage bins is the maximum value of damage_bin_index. This is held in the header of vulnerability.bin and used by getmodel.</p>
+<p>In the case of very large vulnerability files, it may be preferrable to create an index file to improve performance. Issuing the -i flag creates vulnerability.bin and vulnerability.idx in the current working directory:</p>
+<pre class="hljs"><code><div>$ vulnerabilitytobin -d {number of damage bins} -i &lt; vulnerability.csv
+</div></code></pre>
+<p>Additionally, the data can be compressed as it is written to the binary file. Compression is performed with <a href="https://zlib.net/">zlib</a> by issuing the -z flag. This creates vulnerability.bin.z and vulnerability.idx.z in the current working directory:</p>
+<pre class="hljs"><code><div>$ vulnerabilitytobin -d {number of damage bins} -i &lt; vulnerability.csv
+</div></code></pre>
+<p>The getmodel component will look for the presence of index files in the following order to determine which algorithm to use to extract data from vulnerability.bin:</p>
+<ol>
+<li>static/vulnerability.idx.z</li>
+<li>static/vulnerability.idx</li>
+</ol>
 <h5 id="vulnerabilitytocsv">vulnerabilitytocsv</h5>
 <pre class="hljs"><code><div>$ vulnerabilitytocsv &lt; vulnerability.bin &gt; vulnerability.csv
+$ vulnerabilitytocsv -i &gt; vulnerability.csv
+$ vulnerabilitytocsv -z &gt; vulnerability.csv
 </div></code></pre>
 <p><a href="#dataconversioncomponents">Return to top</a></p>
 <h2 id="input-data">Input data</h2>

@@ -682,7 +682,6 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 				if (y.tc_id == limit_1) lim = y.tc_val;
 			}
 			OASIS_FLOAT loss = 0;
-			OASIS_FLOAT effective_ded = 0;
 			OASIS_FLOAT loss_delta = 0;
 
 			if ((ded1 + x.effective_deductible) > ded3) { //If carried + ded > max ded

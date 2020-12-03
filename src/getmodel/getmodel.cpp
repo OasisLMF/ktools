@@ -190,7 +190,7 @@ void getmodel::getVulnerabilities(const std::set<int> &v) {
 	}
 
 	VulnerabilityRow *row = (VulnerabilityRow*)&uncompressedBuffer[0];
-	uLongf i = 0;
+	long long i = 0;
 	while (i < idx.original_size) {
 	  assignProbabilities(idx.vulnerability_id, current_vulnerability_id,
 			      row->intensity_bin_id, row->damage_bin_id,

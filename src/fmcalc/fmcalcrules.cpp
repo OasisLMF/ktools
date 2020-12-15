@@ -114,7 +114,12 @@ void applycalcrule_stepped(const profile_rec_new& profile, LossRec& x, int layer
 				x.over_limit = loss - lim;
 				loss = lim;
 			}
-		x.under_limit = lim - loss;
+		OASIS_FLOAT under_limit = 0;
+		under_limit = (x.loss * lim) - loss;
+		if (x.under_limit > 0) {
+			if (under_limit > x.under_limit + x.loss - loss) under_limit = x.under_limit + x.loss - loss;
+		}
+		x.under_limit = under_limit;
 		//x.retained_loss = x.retained_loss + (x.loss - loss);
 		OASIS_FLOAT net_loss = 0;
 		if (layer > 1)	net_loss = x.previous_layer_retained_loss - loss;
@@ -547,13 +552,19 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			}
 			//Function1 = IIf(Loss < Ded, 0, IIf(Loss > Ded + Lim, Lim, Loss - Ded))
 			OASIS_FLOAT loss = x.loss - ded;
+
 			if (loss < 0) loss = 0;
 			x.effective_deductible = x.effective_deductible + (x.loss - loss);
 			if (loss > lim) {
 				x.over_limit = loss - lim;
 				loss = lim;
 			}
-			x.under_limit = lim - loss;
+			OASIS_FLOAT under_limit = 0;
+			under_limit = lim - loss;
+			if (x.under_limit > 0) {
+				if (under_limit > x.under_limit + x.loss - loss) under_limit = x.under_limit + x.loss - loss;
+			}
+			x.under_limit = under_limit;
 			x.loss = loss;
 		}
 		break;
@@ -606,7 +617,12 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 				x.over_limit = loss - lim;
 				loss = lim;
 			}
-			x.under_limit = lim - loss;
+			OASIS_FLOAT under_limit = 0;
+			under_limit = lim - loss;
+			if (x.under_limit > 0) {
+				if (under_limit > x.under_limit + x.loss - loss) under_limit = x.under_limit + x.loss - loss;
+			}
+			x.under_limit = under_limit;
 			//x.retained_loss = x.retained_loss + (x.loss - loss);
 			OASIS_FLOAT net_loss = 0;
 			if (layer > 1)	net_loss = x.previous_layer_retained_loss - loss;
@@ -631,7 +647,12 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 				x.over_limit = loss - lim;
 				loss = lim;
 			}
-			x.under_limit = lim - loss;
+			OASIS_FLOAT under_limit = 0;
+			under_limit = lim - loss;
+			if (x.under_limit > 0) {
+				if (under_limit > x.under_limit + x.loss - loss) under_limit = x.under_limit + x.loss - loss;
+			}
+			x.under_limit = under_limit;
 			x.loss = loss;
 		}
 		break;
@@ -650,7 +671,12 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 				x.over_limit = loss - (lim * x.loss);
 				loss = lim * x.loss;
 			}
-			x.under_limit = lim - loss;
+			OASIS_FLOAT under_limit = 0;
+			under_limit = lim - loss;
+			if (x.under_limit > 0) {
+				if (under_limit > x.under_limit + x.loss - loss) under_limit = x.under_limit + x.loss - loss;
+			}
+			x.under_limit = under_limit;
 			x.loss = loss;
 		}
 		break;
@@ -742,7 +768,12 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 				loss = lim;
 			}
 			else x.over_limit = 0;
-			x.under_limit = lim - loss;
+			OASIS_FLOAT under_limit = 0;
+			under_limit = lim - loss;
+			if (x.under_limit > 0) {
+				if (under_limit > x.under_limit + x.loss - loss) under_limit = x.under_limit + x.loss - loss;
+			}
+			x.under_limit = under_limit;
 			x.loss = loss;
 		}
 
@@ -789,7 +820,12 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 				x.over_limit = loss - lim;
 				loss = lim;
 			}
-			x.under_limit = lim - loss;
+			OASIS_FLOAT under_limit = 0;
+			under_limit = lim - loss;
+			if (x.under_limit > 0) {
+				if (under_limit > x.under_limit + x.loss - loss) under_limit = x.under_limit + x.loss - loss;
+			}
+			x.under_limit = under_limit;
 			x.loss = loss;
 		
 		}
@@ -810,7 +846,12 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 				x.over_limit = loss - lim;
 				loss = lim;
 			}
-			x.under_limit = lim - loss;
+			OASIS_FLOAT under_limit = 0;
+			under_limit = lim - loss;
+			if (x.under_limit > 0) {
+				if (under_limit > x.under_limit + x.loss - loss) under_limit = x.under_limit + x.loss - loss;
+			}
+			x.under_limit = under_limit;
 			x.loss = loss;
 		}
 		break;
@@ -992,7 +1033,12 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 				x.over_limit = loss - lim;
 				loss = lim;
 			}
-			x.under_limit = lim - loss;
+			OASIS_FLOAT under_limit = 0;
+			under_limit = lim - loss;
+			if (x.under_limit > 0) {
+				if (under_limit > x.under_limit + x.loss - loss) under_limit = x.under_limit + x.loss - loss;
+			}
+			x.under_limit = under_limit;
 			//x.retained_loss = x.retained_loss + (x.loss - loss);
 			OASIS_FLOAT net_loss = 0;
 			if (layer > 1)	net_loss = x.previous_layer_retained_loss - loss;
@@ -1017,7 +1063,12 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			if (x.loss > loss) {
 				x.over_limit = x.loss - loss;
 				}
-			x.under_limit = lim - loss;			
+			OASIS_FLOAT under_limit = 0;
+			under_limit = lim - loss;
+			if (x.under_limit > 0) {
+				if (under_limit > x.under_limit + x.loss - loss) under_limit = x.under_limit + x.loss - loss;
+			}
+			x.under_limit = under_limit;
 			x.loss = loss;
 		}
 		break;
@@ -1417,7 +1468,12 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 				x.over_limit = loss - lim;
 				loss = lim;
 			}
-			x.under_limit = lim - loss;
+			OASIS_FLOAT under_limit = 0;
+			under_limit = lim - loss;
+			if (x.under_limit > 0) {
+				if (under_limit > x.under_limit + x.loss - loss) under_limit = x.under_limit + x.loss - loss;
+			}
+			x.under_limit = under_limit;
 			x.loss = loss;
 			}
 			x.loss = loss;
@@ -1436,7 +1492,16 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			loss = x.loss - (ded * x.loss);
 			if (loss < 0) loss = 0;
 			x.effective_deductible = x.effective_deductible + (x.loss - loss);
-			if (loss > lim) loss = lim;
+			if (loss > lim) {
+				x.over_limit = loss - lim;
+				loss = lim;
+			}
+			OASIS_FLOAT under_limit = 0;
+			under_limit = lim - loss;
+			if (x.under_limit > 0) {
+				if (under_limit > x.under_limit + x.loss - loss) under_limit = x.under_limit + x.loss - loss;
+			}
+			x.under_limit = under_limit;
 			x.loss = loss;
 		}
 		break;
@@ -1540,7 +1605,12 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 					x.over_limit = loss - (x.loss * lim);
 					loss = (x.loss * lim);
 				}
-				x.under_limit = (x.loss * lim) - loss;
+				OASIS_FLOAT under_limit = 0;
+				under_limit = (x.loss * lim) - loss;
+				if (x.under_limit > 0) {
+					if (under_limit > x.under_limit + x.loss - loss) under_limit = x.under_limit + x.loss - loss;
+				}
+				x.under_limit = under_limit;
 				x.loss = loss;
 			}
 			x.loss = loss;
@@ -1618,7 +1688,12 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 					x.over_limit = loss - (x.loss * lim);
 					loss = (x.loss * lim);
 				}
-				x.under_limit = (x.loss * lim) - loss;
+				OASIS_FLOAT under_limit = 0;
+				under_limit = (x.loss * lim) - loss;
+				if (x.under_limit > 0) {
+					if (under_limit > x.under_limit + x.loss - loss) under_limit = x.under_limit + x.loss - loss;
+				}
+				x.under_limit = under_limit;
 				x.loss = loss;
 			}
 			x.loss = loss;

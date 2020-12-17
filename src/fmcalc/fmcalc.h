@@ -68,6 +68,7 @@ private:
 	int max_layer_ = 0;		// initialized from policy_tc
 	int max_agg_id_ = 0;	// initialized from policy_tc
 	bool isGULStreamType_ = true;
+	bool isOldGULStreamType_ = false;
 	std::vector <profile_rec_new> profile_vec_new_;
 	std::vector<std::vector <profile_rec_new>> profile_vec_stepped_;
 	int maxLevel_ = -1;

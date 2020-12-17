@@ -6,7 +6,6 @@ void fmcalc::doit()
 {
 	// fmcalc fc(maxLevel, allocrule, inputpath, netvalue, oldFMProfile);
 
-	isGULStreamType_ = true;
 	unsigned int fmstream_type = 1 | fmstream_id;
 
 	fwrite(&fmstream_type, sizeof(fmstream_type), 1, stdout);
@@ -31,7 +30,16 @@ void fmcalc::doit()
 		isGULStreamType_ = false;
 		stream_type = streamno_mask & fmstream_type;
 	}
-	if (isGULStreamType_ == true || stepped_ == true) init_itemtotiv();
+	try{
+	    init_itemtotiv();
+	    if (!isGULStreamType_){
+	        isGULStreamType_ = true;
+	    }
+	    else {
+	        isOldGULStreamType_ = true;
+	    }
+	}
+	catch (...) {}
 	if (stream_type != 1) {
 		fprintf(stderr, "%s: Unsupported gul stream type %d\n", __func__, stream_type);
 		exit(-1);
@@ -75,7 +83,7 @@ void fmcalc::doit()
 				gs.item_id = gh.item_id;
 				gs.sidx = gr.sidx;
 				gs.loss = gr.loss;
-				if (isGULStreamType_ == false && gr.sidx == tiv_idx) {
+				if (isOldGULStreamType_ == false && gr.sidx == tiv_idx) {
 					items.push_back(gh.item_id);
 					for (unsigned int i = 0; i < event_guls.size(); i++) event_guls[i].resize(items.size());
 					current_item_index = static_cast<int> (items.size() - 1);
@@ -84,7 +92,7 @@ void fmcalc::doit()
 					event_guls[sidx][current_item_index] = gs.loss;
 				}
 				if (gr.sidx >= mean_idx) {
-					if (gr.sidx == mean_idx && isGULStreamType_ == true) {
+					if (gr.sidx == mean_idx && isOldGULStreamType_ == true) {
 						items.push_back(gh.item_id);
 						for (unsigned int i = 0; i < event_guls.size(); i++) event_guls[i].resize(items.size());
 						current_item_index = static_cast<int> (items.size() - 1);
@@ -92,7 +100,7 @@ void fmcalc::doit()
 					int sidx = gs.sidx + 1;
 					if (gs.sidx == mean_idx) sidx = 1;
 					event_guls[sidx][current_item_index] = gs.loss;
-					if (isGULStreamType_ == true && gs.sidx == mean_idx) { // add additional row for tiv
+					if (isOldGULStreamType_ == true && gs.sidx == mean_idx) { // add additional row for tiv
 						sidx = 0;
 						gs.loss = gettiv(gs.item_id);
 						event_guls[sidx][current_item_index] = gs.loss;

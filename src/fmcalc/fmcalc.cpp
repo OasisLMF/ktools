@@ -375,7 +375,7 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 	if (agg_vec.size() != aggid_to_vectorlookup->size()) {
 		agg_vec.resize(aggid_to_vectorlookup->size());
 	}
-
+//	std::vector<bool> used_tiv(agg_vec_previous_level.size(), false);
 
 	for (unsigned int i = 0;i < agg_vec_previous_level.size();i++){ // loop through previous levels of agg_vec
 		if (agg_vec_previous_level[i].agg_id != 0) {
@@ -804,7 +804,7 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 				agg_vec[vec_idx].agg_id = avx[1][vid].agg_id;
 				agg_vec[vec_idx].item_idx = &avx[1][vid].item_idx;
 				if (isGULStreamType_ == true || stepped_ == true) {
-					agg_vec[vec_idx].accumulated_tiv = item_to_tiv_[avx[1][vid].item_idx[0]+1];
+					agg_vec[vec_idx].accumulated_tiv = item_to_tiv_[avx[1][vid].item_idx[0] + 1];
 				} else agg_vec[vec_idx].accumulated_tiv = 0;
 				agg_vec[vec_idx].policytc_id = avx[1][vid].policytc_id;
 			}
@@ -1054,8 +1054,10 @@ void fmcalc::init_itemtotiv()
 	long long sz = fltell(fin);
 	flseek(fin, 0L, SEEK_SET);
 	int last_item_id = 0;
-	unsigned int nrec = (unsigned int) sz / (unsigned int)sizeof(item);
-	item_to_tiv_.resize(nrec+1,0.0);
+
+	unsigned int nrec = (unsigned int)sz / (unsigned int)sizeof(item);
+	item_to_tiv_.resize(nrec + 1, 0.0);
+	std::vector<bool> used_tiv(nrec + 1, false);
 
 	item itm;
 	size_t i = fread(&itm, sizeof(itm), 1, fin);
@@ -1066,11 +1068,15 @@ void fmcalc::init_itemtotiv()
 			exit(-1);
 		}
 		last_item_id = itm.id;
-		item_to_tiv_[itm.id] = coverages[itm.coverage_id];
+		if (!used_tiv[itm.coverage_id]) {
+			item_to_tiv_[itm.id] = coverages[itm.coverage_id];
+			used_tiv[itm.coverage_id] = true;
+		}
+		else {
+			item_to_tiv_[itm.id] = 0;
+		}
 		i = fread(&itm, sizeof(itm), 1, fin);
 	}
-	fclose(fin);
-
 }
 
 bool fmcalc::fileexists(const std::string& name) {

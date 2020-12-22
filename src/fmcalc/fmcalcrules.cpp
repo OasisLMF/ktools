@@ -149,7 +149,6 @@ void applycalcrule_stepped(const profile_rec_new& profile, LossRec& x, int layer
 		OASIS_FLOAT condloss = 0;
 		loss = x.loss / x.accumulated_tiv;
 		if (tend == 1) { // if the upper threshold is 100% then include loss = tend in the conditional calculation
-//			if (loss <= tend) {
 			if (loss >= tstart) {
 				loss = (payout * x.accumulated_tiv) - deductible1; //calculate primary payout
 				if (loss < 0) loss = 0;
@@ -160,8 +159,6 @@ void applycalcrule_stepped(const profile_rec_new& profile, LossRec& x, int layer
 				loss = loss * (1 + scale1); // gross up for debris removal
 			}
 				else loss = 0;
-//			}
-//			else loss = 0;
 		}
 		else { // if the upper threshold is not 100% then do not include loss = tend in the conditional calculation
 			if (loss < tend) {
@@ -215,7 +212,6 @@ void applycalcrule_stepped(const profile_rec_new& profile, LossRec& x, int layer
 			OASIS_FLOAT condloss = 0;
 			loss = x.loss / x.accumulated_tiv;
 			if (tend == 1) { // if the upper threshold is 100% then include loss = tend in the conditional calculation
-//				if (loss <= tend) {
 				if (loss >= tstart) {
 					loss = (payout * x.loss) - deductible1; //calculate primary payout
 					if (loss < 0) loss = 0;
@@ -228,8 +224,6 @@ void applycalcrule_stepped(const profile_rec_new& profile, LossRec& x, int layer
 					loss = loss * (1 + scale1); // gross up for debris removal
 				}
 					else loss = 0;
-//				}
-//				else loss = 0;
 			}
 			else { // if the upper threshold is not 100% then do not include loss = tend in the conditional calculation
 				if (loss < tend) {
@@ -284,7 +278,6 @@ void applycalcrule_stepped(const profile_rec_new& profile, LossRec& x, int layer
 			OASIS_FLOAT condloss = 0;
 			loss = x.loss / x.accumulated_tiv;
 			if (tend == 1) { // if the upper threshold is 100% then include loss = tend in the conditional calculation
-//				if (loss <= tend) {
 				if (loss >= tstart) {
 					loss = (payout * x.accumulated_tiv) - deductible1; //calculate primary payout
 					if (loss < 0) loss = 0;
@@ -294,8 +287,6 @@ void applycalcrule_stepped(const profile_rec_new& profile, LossRec& x, int layer
 					loss = loss * (1 + scale1); // gross up for debris removal
 				}
 					else loss = 0;
-//				}
-//				else loss = 0;
 			}
 			else { // if the upper threshold is not 100% then do not include loss = tend in the conditional calculation
 				if (loss < tend) {
@@ -349,7 +340,6 @@ void applycalcrule_stepped(const profile_rec_new& profile, LossRec& x, int layer
 			OASIS_FLOAT condloss = 0;
 			loss = x.loss / x.accumulated_tiv;
 			if (tend == 1) { // if the upper threshold is 100% then include loss = tend in the conditional calculation
-//				if (loss <= tend) {
 				if (loss >= tstart) {
 					loss = (payout * limit1) - deductible1; //calculate primary payout
 					if (loss < 0) loss = 0;
@@ -359,8 +349,6 @@ void applycalcrule_stepped(const profile_rec_new& profile, LossRec& x, int layer
 					loss = loss * (1 + scale1); // gross up for debris removal
 				}
 					else loss = 0;
-//				}
-//				else loss = 0;
 			}
 			else { // if the upper threshold is not 100% then do not include loss = tend in the conditional calculation
 				if (loss < tend) {
@@ -412,7 +400,6 @@ void applycalcrule_stepped(const profile_rec_new& profile, LossRec& x, int layer
 			OASIS_FLOAT condloss = 0;
 			loss = x.loss / x.accumulated_tiv;
 			if (tend == 1) { // if the upper threshold is 100% then include loss = tend in the conditional calculation
-//				if (loss <= tend) {
 				if (loss >= tstart) {
 					loss = payout - deductible1; //calculate primary payout
 					if (loss < 0) loss = 0;
@@ -422,8 +409,6 @@ void applycalcrule_stepped(const profile_rec_new& profile, LossRec& x, int layer
 					loss = loss * (1 + scale1); // gross up for debris removal
 				}
 					else loss = 0;
-//				}
-//				else loss = 0;
 			}
 			else { // if the upper threshold is not 100% then do not include loss = tend in the conditional calculation
 				if (loss < tend) {

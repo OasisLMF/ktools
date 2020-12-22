@@ -783,10 +783,11 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 	vector <LossRec> &agg_vec = agg_vecs[level][layer_id];
 	std::map<int, std::vector<fmlevelrec>> outmap;
 	
-	for (unsigned int gul_idx = 0; gul_idx < event_guls.size(); gul_idx++) {	// loop sample + 1 times
-		const std::vector<OASIS_FLOAT> &guls = event_guls[gul_idx];
+	for (unsigned int gul_idx = 0; gul_idx < event_guls.size(); gul_idx++) {    // loop sample + 1 times
+		const std::vector<OASIS_FLOAT>& guls = event_guls[gul_idx];
+		used_tiv.assign(used_tiv.size(), false);
 		if (gul_idx < 2 || gulhasvalue(guls)) {
-			agg_vec.resize(total_loss_items);			
+			agg_vec.resize(total_loss_items);
 			//fmlevelhdr fmhdr;
 			//fmhdr.event_id = event_id;
 			const std::vector<std::vector<policytcvidx>> &avx = avxs[level];
@@ -804,7 +805,7 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 				agg_vec[vec_idx].agg_id = avx[1][vid].agg_id;
 				agg_vec[vec_idx].item_idx = &avx[1][vid].item_idx;
 				if (isGULStreamType_ == true) {
-				    if !(used_tiv[item_to_cov_id_[items[i]]]):{
+				    if (!used_tiv[item_to_cov_id_[items[i]]]) {
 				        agg_vec[vec_idx].accumulated_tiv = item_to_tiv_[items[i]];
 				        used_tiv[item_to_cov_id_[items[i]]] = true;
 				    }

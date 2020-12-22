@@ -78,7 +78,7 @@ private:
 	std::vector<std::vector<int>> pfm_vec_vec_;  // initialized from fm/programme.bin  pfm_vec_vec[level_id][item_id] returns agg_id 
 	std::vector<OASIS_FLOAT> item_to_tiv_;
 	std::vector<int> item_to_cov_id_;
-	std::vector<bool> used_tiv(nrec + 1, false);
+	std::vector<bool> used_tiv;
 	void init_programme(int maxrunLevel);
 	void init_profile();
 	void init_profile_step();

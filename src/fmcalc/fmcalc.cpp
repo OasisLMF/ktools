@@ -803,15 +803,14 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 				int vid = aggid_to_vectorlookup[agg_id - 1];
 				agg_vec[vec_idx].agg_id = avx[1][vid].agg_id;
 				agg_vec[vec_idx].item_idx = &avx[1][vid].item_idx;
-				if (isGULStreamType_ == true || stepped_ == true) {
-//					agg_vec[vec_idx].accumulated_tiv = item_to_tiv_[avx[1][vid].item_idx[0] + 1];
-//					agg_vec[vec_idx].accumulated_tiv = item_to_tiv_[avx[1][vid].agg_id];
-					agg_vec[vec_idx].accumulated_tiv = item_to_tiv_[items[i]];
+				if (isGULStreamType_ == true) {
+				    if !(used_tiv[item_to_cov_id_[items[i]]]):{
+				        agg_vec[vec_idx].accumulated_tiv = item_to_tiv_[items[i]];
+				        used_tiv[item_to_cov_id_[items[i]]] = true;
+				    }
 				} else agg_vec[vec_idx].accumulated_tiv = 0;
 				agg_vec[vec_idx].policytc_id = avx[1][vid].policytc_id;
 			}
-
-//			dofmcalc(agg_vec);					
 			
 			dofmcalc_r(aggid_to_vectorlookups, agg_vecs, level + 1, maxLevel_, outmap, gul_idx, avxs, 1, items, event_guls,1);
 
@@ -1059,7 +1058,8 @@ void fmcalc::init_itemtotiv()
 
 	unsigned int nrec = (unsigned int)sz / (unsigned int)sizeof(item);
 	item_to_tiv_.resize(nrec + 1, 0.0);
-	std::vector<bool> used_tiv(nrec + 1, false);
+	item_to_cov_id_.resize(nrec + 1, 0);
+	used_tiv.resize(nrec + 1, false);
 
 	item itm;
 	size_t i = fread(&itm, sizeof(itm), 1, fin);
@@ -1070,15 +1070,11 @@ void fmcalc::init_itemtotiv()
 			exit(-1);
 		}
 		last_item_id = itm.id;
-		if (!used_tiv[itm.coverage_id]) {
-			item_to_tiv_[itm.id] = coverages[itm.coverage_id];
-			used_tiv[itm.coverage_id] = true;
-		}
-		else {
-			item_to_tiv_[itm.id] = 0;
-		}
+        item_to_tiv_[itm.id] = coverages[itm.coverage_id];
+        item_to_cov_id_[itm.id] = itm.coverage_id;
 		i = fread(&itm, sizeof(itm), 1, fin);
 	}
+	fclose(fin);
 }
 
 bool fmcalc::fileexists(const std::string& name) {

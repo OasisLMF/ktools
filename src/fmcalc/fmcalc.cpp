@@ -995,6 +995,17 @@ void fmcalc::init_programme(int maxRunLevel)
             if (f.to_agg_id == 0) {
                 fprintf(stderr, "FATAL: Invalid agg id from fm_programme.bin\n");
             }
+
+	    // Fill prog_vec_[level_id][to_agg_id] = vector<int>(from_agg_id)
+	    if (prog_vec_.size() < (size_t)f.level_id + 1) {
+		prog_vec_.resize(f.level_id + 1);
+		parent_to_children_.resize(f.level_id + 1);
+	    }
+	    if (prog_vec_[f.level_id].size() < (size_t)f.to_agg_id + 1) {
+		prog_vec_[f.level_id].resize(f.to_agg_id + 1);
+		parent_to_children_[f.level_id].resize(f.to_agg_id + 1);
+	    }
+	    prog_vec_[f.level_id][f.to_agg_id].push_back(f.from_agg_id);
         }
 		i = fread(&f, sizeof(f), 1, fin);
 	}
@@ -1036,6 +1047,27 @@ bool fmcalc::loadcoverages(std::vector<OASIS_FLOAT> &coverages)
 	return true;
 
 }
+
+std::set<int> fmcalc::assign_children(const int level, const int to_agg_id)
+{
+	std::set<int> ret_set;
+	if (level == 0) {   // Youngest generation
+		ret_set.insert(item_to_cov_id_[to_agg_id]);
+		return ret_set;
+	}
+
+	for (std::vector<int>::iterator agg_id = prog_vec_[level][to_agg_id].begin();
+			agg_id != prog_vec_[level][to_agg_id].end(); agg_id++) {
+
+		std::set<int> temp_set = assign_children(level-1, *agg_id);
+		ret_set.insert(temp_set.begin(), temp_set.end());
+
+	}
+
+	parent_to_children_[level][to_agg_id] = ret_set;
+	return ret_set;
+}
+
 void fmcalc::init_itemtotiv()
 {
 	std::vector<OASIS_FLOAT> coverages;
@@ -1076,6 +1108,24 @@ void fmcalc::init_itemtotiv()
 		i = fread(&itm, sizeof(itm), 1, fin);
 	}
 	fclose(fin);
+
+	// Calculate accumulated TIV
+	int final_level = prog_vec_.size() - 1;
+	for (int i = 1; i < prog_vec_[final_level].size(); i++) {
+		assign_children(final_level, i);
+	}
+	accumulated_tivs_.resize(parent_to_children_.size());
+	for (int i = 0; i < parent_to_children_.size(); i++) {
+		accumulated_tivs_[i].resize(parent_to_children_[i].size());
+		for (int j = 0; j < parent_to_children_[i].size(); j++) {
+			accumulated_tivs_[i][j] = 0;
+			for (std::set<int>::iterator k = parent_to_children_[i][j].begin();
+					k != parent_to_children_[i][j].end(); k++) {
+				accumulated_tivs_[i][j] += coverages[*k];
+			}
+		}
+	}
+
 }
 
 bool fmcalc::fileexists(const std::string& name) {

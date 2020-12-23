@@ -1022,11 +1022,8 @@ bool fmcalc::loadcoverages(std::vector<OASIS_FLOAT> &coverages)
 		file = inputpath_ + file.substr(5);
 	}
 	fin = fopen(file.c_str(), "rb");
-	if (fin == NULL) {
-		fprintf(stderr, "FATAL: %s: cannot open %s\n", __func__, file.c_str());
-		exit(EXIT_FAILURE);
-	}
-	
+	if (fin == NULL) return false;
+
 	flseek(fin, 0L, SEEK_END);
 	long long sz = fltell(fin);
 	flseek(fin, 0L, SEEK_SET);
@@ -1068,10 +1065,11 @@ std::set<int> fmcalc::assign_coverage_ids(const int level, const int to_agg_id)
 	return ret_set;
 }
 
-void fmcalc::init_itemtotiv()
+bool fmcalc::init_itemtotiv()
 {
 	std::vector<OASIS_FLOAT> coverages;
-	loadcoverages(coverages);
+	bool has_coverage = loadcoverages(coverages);
+	if (!has_coverage) return false;
 
 	FILE *fin = NULL;
 	std::string file = ITEMS_FILE;
@@ -1124,6 +1122,7 @@ void fmcalc::init_itemtotiv()
 			}
 		}
 	}
+	return true;
 
 }
 

@@ -31,12 +31,10 @@ void fmcalc::doit()
 		stream_type = streamno_mask & fmstream_type;
 	}
 	try{
-	    init_itemtotiv();
-	    if (!isGULStreamType_){
-	        isGULStreamType_ = true;
-	    }
-	    else {
-	        isOldGULStreamType_ = true;
+	    bool tiv_inited = init_itemtotiv();
+	    if (tiv_inited){
+	        if (!isGULStreamType_) isGULStreamType_ = true;
+	        else isOldGULStreamType_ = true;
 	    }
 	}
 	catch (...) {}

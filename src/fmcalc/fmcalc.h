@@ -88,7 +88,7 @@ private:
 	void init_profile__stepped_rec(fm_profile_step& f);
 	void init_profile_rec(fm_profile &f);
 	std::set<int> assign_coverage_ids(const int level, const int to_agg_id);
-	void init_itemtotiv();
+	bool init_itemtotiv();
 	void init_fmxref();
 	void init(int MaxRunLevel);
 	void init_policytc(int MaxRunLevel);

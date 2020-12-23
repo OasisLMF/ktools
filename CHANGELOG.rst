@@ -3,13 +3,18 @@ Ktools Changelog
 
 .. * [#_](https://github.com/OasisLMF/OasisLMF/issues/_) -  
 
-`v3.4.1`_
+`v3.4.2`_
 ---------
 .. start_latest_release
+* [#175](https://github.com/OasisLMF/ktools/issues/175) - Calculate accumulated TIV without duplication of TIVs for multi-peril models
+* [#176](https://github.com/OasisLMF/ktools/issues/176) - Include TIVs for coverages where there are no input losses
+.. end_latest_release
+
+`v3.4.1`_
+---------
 * [#38](https://github.com/OasisLMF/ktools/issues/38) - Drop interval type column from damage bin dictionary
 * [#155](https://github.com/OasisLMF/ktools/issues/155) - Provide support for compressed and indexed vulnerability files
 * [#165](https://github.com/OasisLMF/ktools/issues/165) - Introduce option to write original data size to footprint index file
-.. end_latest_release
 
 `v3.4.0`_
 ---------

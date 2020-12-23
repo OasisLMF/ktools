@@ -376,7 +376,6 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 		agg_vec.resize(aggid_to_vectorlookup->size());
 	}
 
-
 	for (unsigned int i = 0;i < agg_vec_previous_level.size();i++){ // loop through previous levels of agg_vec
 		if (agg_vec_previous_level[i].agg_id != 0) {
 			int agg_id = pfm_vec_vec_[level][agg_vec_previous_level[i].agg_id];
@@ -392,8 +391,13 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 				}
 
 				agg_vec[vec_idx].loss += agg_vec_previous_level[i].loss;
-				agg_vec[vec_idx].retained_loss += agg_vec_previous_level[i].retained_loss;				
-				agg_vec[vec_idx].accumulated_tiv += agg_vec_previous_level[i].accumulated_tiv;
+				agg_vec[vec_idx].retained_loss += agg_vec_previous_level[i].retained_loss;
+				if (isGULStreamType_) {
+				    agg_vec[vec_idx].accumulated_tiv = accumulated_tivs_[level][agg_id];
+				}
+				else {
+				    agg_vec[vec_idx].accumulated_tiv = 0;
+				}
 				agg_vec[vec_idx].effective_deductible += agg_vec_previous_level[i].effective_deductible;
 				agg_vec[vec_idx].over_limit += agg_vec_previous_level[i].over_limit;
 				agg_vec[vec_idx].under_limit += agg_vec_previous_level[i].under_limit;
@@ -783,10 +787,10 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 	vector <LossRec> &agg_vec = agg_vecs[level][layer_id];
 	std::map<int, std::vector<fmlevelrec>> outmap;
 	
-	for (unsigned int gul_idx = 0; gul_idx < event_guls.size(); gul_idx++) {	// loop sample + 1 times
-		const std::vector<OASIS_FLOAT> &guls = event_guls[gul_idx];
+	for (unsigned int gul_idx = 0; gul_idx < event_guls.size(); gul_idx++) {    // loop sample + 1 times
+		const std::vector<OASIS_FLOAT>& guls = event_guls[gul_idx];
 		if (gul_idx < 2 || gulhasvalue(guls)) {
-			agg_vec.resize(total_loss_items);			
+			agg_vec.resize(total_loss_items);
 			//fmlevelhdr fmhdr;
 			//fmhdr.event_id = event_id;
 			const std::vector<std::vector<policytcvidx>> &avx = avxs[level];
@@ -803,13 +807,11 @@ void fmcalc::dofm(int event_id, const std::vector<int> &items, std::vector<vecto
 				int vid = aggid_to_vectorlookup[agg_id - 1];
 				agg_vec[vec_idx].agg_id = avx[1][vid].agg_id;
 				agg_vec[vec_idx].item_idx = &avx[1][vid].item_idx;
-				if (isGULStreamType_ == true || stepped_ == true) {
-					agg_vec[vec_idx].accumulated_tiv = item_to_tiv_[avx[1][vid].item_idx[0]+1];
+				if (isGULStreamType_ == true) {
+				    agg_vec[vec_idx].accumulated_tiv = item_to_tiv_[items[i]];
 				} else agg_vec[vec_idx].accumulated_tiv = 0;
 				agg_vec[vec_idx].policytc_id = avx[1][vid].policytc_id;
 			}
-
-//			dofmcalc(agg_vec);					
 			
 			dofmcalc_r(aggid_to_vectorlookups, agg_vecs, level + 1, maxLevel_, outmap, gul_idx, avxs, 1, items, event_guls,1);
 
@@ -993,6 +995,17 @@ void fmcalc::init_programme(int maxRunLevel)
             if (f.to_agg_id == 0) {
                 fprintf(stderr, "FATAL: Invalid agg id from fm_programme.bin\n");
             }
+
+	    // Fill node_to_direct_sub_nodes_vec_[level_id][to_agg_id] = vector<int>(from_agg_id)
+	    if (node_to_direct_sub_nodes_vec_.size() < (size_t)f.level_id + 1) {
+		node_to_direct_sub_nodes_vec_.resize(f.level_id + 1);
+		node_to_coverage_ids_.resize(f.level_id + 1);
+	    }
+	    if (node_to_direct_sub_nodes_vec_[f.level_id].size() < (size_t)f.to_agg_id + 1) {
+		node_to_direct_sub_nodes_vec_[f.level_id].resize(f.to_agg_id + 1);
+		node_to_coverage_ids_[f.level_id].resize(f.to_agg_id + 1);
+	    }
+	    node_to_direct_sub_nodes_vec_[f.level_id][f.to_agg_id].push_back(f.from_agg_id);
         }
 		i = fread(&f, sizeof(f), 1, fin);
 	}
@@ -1009,11 +1022,8 @@ bool fmcalc::loadcoverages(std::vector<OASIS_FLOAT> &coverages)
 		file = inputpath_ + file.substr(5);
 	}
 	fin = fopen(file.c_str(), "rb");
-	if (fin == NULL) {
-		fprintf(stderr, "FATAL: %s: cannot open %s\n", __func__, file.c_str());
-		exit(EXIT_FAILURE);
-	}
-	
+	if (fin == NULL) return false;
+
 	flseek(fin, 0L, SEEK_END);
 	long long sz = fltell(fin);
 	flseek(fin, 0L, SEEK_SET);
@@ -1034,10 +1044,32 @@ bool fmcalc::loadcoverages(std::vector<OASIS_FLOAT> &coverages)
 	return true;
 
 }
-void fmcalc::init_itemtotiv()
+
+std::set<int> fmcalc::assign_coverage_ids(const int level, const int to_agg_id)
+{
+	std::set<int> ret_set;
+	if (level == 0) {   // Youngest generation
+		ret_set.insert(item_to_cov_id_[to_agg_id]);
+		return ret_set;
+	}
+
+	for (std::vector<int>::iterator agg_id = node_to_direct_sub_nodes_vec_[level][to_agg_id].begin();
+			agg_id != node_to_direct_sub_nodes_vec_[level][to_agg_id].end(); agg_id++) {
+
+		std::set<int> temp_set = assign_coverage_ids(level-1, *agg_id);
+		ret_set.insert(temp_set.begin(), temp_set.end());
+
+	}
+
+	node_to_coverage_ids_[level][to_agg_id] = ret_set;
+	return ret_set;
+}
+
+bool fmcalc::init_itemtotiv()
 {
 	std::vector<OASIS_FLOAT> coverages;
-	loadcoverages(coverages);
+	bool has_coverage = loadcoverages(coverages);
+	if (!has_coverage) return false;
 
 	FILE *fin = NULL;
 	std::string file = ITEMS_FILE;
@@ -1054,8 +1086,10 @@ void fmcalc::init_itemtotiv()
 	long long sz = fltell(fin);
 	flseek(fin, 0L, SEEK_SET);
 	int last_item_id = 0;
-	unsigned int nrec = (unsigned int) sz / (unsigned int)sizeof(item);
-	item_to_tiv_.resize(nrec+1,0.0);
+
+	unsigned int nrec = (unsigned int)sz / (unsigned int)sizeof(item);
+	item_to_tiv_.resize(nrec + 1, 0.0);
+	item_to_cov_id_.resize(nrec + 1, 0);
 
 	item itm;
 	size_t i = fread(&itm, sizeof(itm), 1, fin);
@@ -1066,10 +1100,29 @@ void fmcalc::init_itemtotiv()
 			exit(-1);
 		}
 		last_item_id = itm.id;
-		item_to_tiv_[itm.id] = coverages[itm.coverage_id];
+        item_to_tiv_[itm.id] = coverages[itm.coverage_id];
+        item_to_cov_id_[itm.id] = itm.coverage_id;
 		i = fread(&itm, sizeof(itm), 1, fin);
 	}
 	fclose(fin);
+
+	// Calculate accumulated TIV
+	int final_level = node_to_direct_sub_nodes_vec_.size() - 1;
+	for (int i = 1; i < node_to_direct_sub_nodes_vec_[final_level].size(); i++) {
+		assign_coverage_ids(final_level, i);
+	}
+	accumulated_tivs_.resize(node_to_coverage_ids_.size());
+	for (int i = 0; i < node_to_coverage_ids_.size(); i++) {
+		accumulated_tivs_[i].resize(node_to_coverage_ids_[i].size());
+		for (int j = 0; j < node_to_coverage_ids_[i].size(); j++) {
+			accumulated_tivs_[i][j] = 0;
+			for (std::set<int>::iterator k = node_to_coverage_ids_[i][j].begin();
+					k != node_to_coverage_ids_[i][j].end(); k++) {
+				accumulated_tivs_[i][j] += coverages[*k];
+			}
+		}
+	}
+	return true;
 
 }
 

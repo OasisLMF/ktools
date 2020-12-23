@@ -77,18 +77,17 @@ private:
 	int max_level_ = 0;
 	std::vector<int> level_to_max_layer_;
 	std::vector<std::vector<int>> pfm_vec_vec_;  // initialized from fm/programme.bin  pfm_vec_vec[level_id][item_id] returns agg_id 
-	std::vector<std::vector<std::vector<int>>> prog_vec_;
+	std::vector<std::vector<std::vector<int>>> node_to_direct_sub_nodes_vec_;
 	std::vector<OASIS_FLOAT> item_to_tiv_;
 	std::vector<int> item_to_cov_id_;
-	std::vector<std::vector<std::set<int>>> parent_to_children_;
+	std::vector<std::vector<std::set<int>>> node_to_coverage_ids_;
 	std::vector<std::vector<OASIS_FLOAT>> accumulated_tivs_;
-	std::vector<bool> used_tiv;
 	void init_programme(int maxrunLevel);
 	void init_profile();
 	void init_profile_step();
 	void init_profile__stepped_rec(fm_profile_step& f);
 	void init_profile_rec(fm_profile &f);
-	std::set<int> assign_children(const int level, const int to_agg_id);
+	std::set<int> assign_coverage_ids(const int level, const int to_agg_id);
 	void init_itemtotiv();
 	void init_fmxref();
 	void init(int MaxRunLevel);

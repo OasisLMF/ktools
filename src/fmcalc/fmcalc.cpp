@@ -391,8 +391,13 @@ inline void fmcalc::dofmcalc_r(std::vector<std::vector<int>>  &aggid_to_vectorlo
 				}
 
 				agg_vec[vec_idx].loss += agg_vec_previous_level[i].loss;
-				agg_vec[vec_idx].retained_loss += agg_vec_previous_level[i].retained_loss;				
-				agg_vec[vec_idx].accumulated_tiv = accumulated_tivs_[level][agg_id];
+				agg_vec[vec_idx].retained_loss += agg_vec_previous_level[i].retained_loss;
+				if (isGULStreamType_) {
+				    agg_vec[vec_idx].accumulated_tiv = accumulated_tivs_[level][agg_id];
+				}
+				else {
+				    agg_vec[vec_idx].accumulated_tiv = 0;
+				}
 				agg_vec[vec_idx].effective_deductible += agg_vec_previous_level[i].effective_deductible;
 				agg_vec[vec_idx].over_limit += agg_vec_previous_level[i].over_limit;
 				agg_vec[vec_idx].under_limit += agg_vec_previous_level[i].under_limit;

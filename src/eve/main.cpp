@@ -55,7 +55,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 namespace eve {
     void emitevents(OASIS_INT pno_, OASIS_INT total_, bool shuffle,
-                    bool textmode);
+		    bool randomise, bool textmode);
 }
 char *progname;
 
@@ -70,7 +70,8 @@ void segfault_sigaction(int , siginfo_t *si, void *) {
 void help() {
     fprintf(stderr, "usage: processno totalprocesses\n"
                     "-h help\n"
-                    "-n No shuffled events\n"
+                    "-n no shuffled events\n"
+		    "-r use Fisher-Yates shuffle\n"
                     "-v version\n"
                     "-t text mode\n");
 }
@@ -78,10 +79,11 @@ int main(int argc, char *argv[]) {
     progname = argv[0];
 
     int opt;
+    bool randomise = false;
     bool shuffle = true;
     bool textmode = false;
 
-    while ((opt = getopt(argc, argv, "nvht")) != -1) {
+    while ((opt = getopt(argc, argv, "nrvht")) != -1) {
         switch (opt) {
         case 'v': {
             fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
@@ -100,6 +102,9 @@ int main(int argc, char *argv[]) {
         case 'n': {
             shuffle = false;
         } break;
+	case 'r': {
+	    randomise = true;
+	} break;
         case 't': {
             textmode = true;
         } break;
@@ -139,10 +144,15 @@ int main(int argc, char *argv[]) {
     sigaction(SIGSEGV, &sa, NULL);
 #endif
 
+    if (shuffle == false && randomise == true) {
+	logprintf(progname, "INFO", "incompatible arguments -n and -r supplied; ignoring -r\n");
+	randomise = false;
+    }
+
     try {
-        initstreams("", "");        
-        logprintf(progname, "INFO","starting part no: %d total: %d shuffle: %d\n",  pno, total, shuffle);
-        eve::emitevents(pno, total, shuffle, textmode);
+        initstreams("", "");
+        logprintf(progname, "INFO","starting part no: %d total: %d shuffle: %d randomise: %d\n",  pno, total, shuffle, randomise);
+        eve::emitevents(pno, total, shuffle, randomise, textmode);
         logprintf(progname, "INFO","finishing part no: %d\n",pno);
     } catch (std::bad_alloc&) {
         fprintf(stderr, "FATAL:%s: Memory allocation failed\n", progname);

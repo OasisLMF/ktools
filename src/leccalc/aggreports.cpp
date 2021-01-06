@@ -1039,9 +1039,13 @@ void aggreports::wheatSheafMean(int samplesize, int handle, const std::map<outke
 				if (useReturnPeriodFile_) {
 					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, s.first.summary_id, 1, max_retperiod);
 				} else {
-					char buffer[4096];
+					const int bufferSize = 4096;
+					char buffer[bufferSize];
 					int strLen;
-					strLen = sprintf(buffer, "%d,1,%f,%f\n", s.first.summary_id, retperiod, lp);
+					strLen = snprintf(buffer, bufferSize, "%d,1,%f,%f", s.first.summary_id, retperiod, lp);
+					if (ensembletosidx_.size() > 0)
+						strLen += snprintf(buffer+strLen, bufferSize-strLen, ",0");
+					strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
 					outputrows(handle, buffer, strLen);
 				}
 
@@ -1078,9 +1082,13 @@ void aggreports::wheatSheafMean(int samplesize, int handle, const std::map<outke
 				OASIS_FLOAT loss = lp / samplesize;
 				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, loss, m.first, 2, max_retperiod);
 			} else {
-				char buffer[4096];
+				const int bufferSize = 4096;
+				char buffer[bufferSize];
 				int strLen;
-				strLen = sprintf(buffer, "%d,2,%f,%f\n", m.first, retperiod, lp / samplesize);
+				strLen = snprintf(buffer, bufferSize, "%d,2,%f,%f", m.first, retperiod, lp / samplesize);
+				if (ensembletosidx_.size() > 0)
+					strLen += snprintf(buffer+strLen, bufferSize-strLen, ",0");
+				strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
 				outputrows(handle, buffer, strLen);
 			}
 			i++;

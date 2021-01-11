@@ -85,6 +85,10 @@ namespace kat {
 				inArgs = sscanf(line, "%d,%d,%d,%f,%f,%f", &eOut[*it].summary_id, &eOut[*it].type, &eOut[*it].event_id, &eOut[*it].mean, &eOut[*it].standard_deviation, &eOut[*it].exposure_value);
 				if (inArgs == 0)   // Print header
 					fprintf(stdout, "%s", line);
+				else if (inArgs != 6) {   // Check file is valid
+					fprintf(stderr, "ERROR: Invalid eltcalc output file found\n");
+					exit(EXIT_FAILURE);
+				}
 			} while (inArgs == 0);   // Skip header
 
 		}

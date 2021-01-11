@@ -81,7 +81,7 @@ void help()
 	fprintf(stderr,
 		"-P process_id\n"
 		"-d path for concatenation\n"
-		"-n no sorting by event ID\n"
+		"-s sort by event ID (only supported for eltcalc output)\n"
 		"-h help\n"
 		"-v version\n"
 	);
@@ -94,9 +94,9 @@ int main(int argc, char* argv[])
 
 	int opt;
 	int processid = 0;
-	bool sortevents = true;
+	bool sortevents = false;
 	std::string path;
-	while ((opt = getopt(argc, argv, "d:P:nvh")) != -1) {
+	while ((opt = getopt(argc, argv, "d:P:svh")) != -1) {
 		switch (opt) {
 		case 'P':
 			processid = atoi(optarg);
@@ -105,8 +105,8 @@ int main(int argc, char* argv[])
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
 			::exit(EXIT_FAILURE);
 			break;
-		case 'n':
-			sortevents = false;
+		case 's':
+			sortevents = true;
 			break;
 		case 'd':
 			path = optarg;

@@ -80,7 +80,7 @@ void help()
 {
 	fprintf(stderr,
 		"-P process_id\n"
-		"-p path for concatenation\n"
+		"-d path for concatenation\n"
 		"-n no sorting by event ID\n"
 		"-h help\n"
 		"-v version\n"

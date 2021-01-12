@@ -16,6 +16,8 @@ Required parameters are;
 
 Optional parameters are;
 * -n - No shuffled events. Events are split up and distributed in blocks in respect of the order they are input.
+* -r - Randomise events. Events are split up and distributed in blocks randomly using the Fisher-Yates shuffle.
+No shuffled events takes priority in cases where both optional parameters are supplied.
 
 
 ##### Usage
@@ -28,6 +30,7 @@ $ eve [parameters] | getmodel | gulcalc [parameters] > [stdout].bin
 ```
 $ eve 1 2 > events1_2_shuffled.bin 
 $ eve -n 1 2 > events1_2_unshuffled.bin 
+$ eve -r 1 2 > events1_2_random.bin
 $ eve 1 2 | getmodel | gulcalc -r -S100 -i - > gulcalc1_2.bin
 ```
 

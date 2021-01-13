@@ -200,6 +200,7 @@ In the former case, the output format is;
 | Name              | Type   |  Bytes | Description                                                         | Example     |
 |:------------------|--------|--------| :-------------------------------------------------------------------|------------:|
 | type              | int    |    4   | 1 for analytical mean, 2 for sample mean                            |  1          |
+| summary_id        | int    |    4   | summary_id representing a grouping of losses                        |  10         |
 | event_id          | int    |    4   | Oasis event_id                                                      |  45567      |
 | period_no         | int    |    4   | identifying an abstract period of time, such as a year              |  56876      |
 | mean              | float  |    4   | mean                                                                |   1345.678  |
@@ -214,6 +215,7 @@ In the latter case, the output format is;
 | Name              | Type   |  Bytes | Description                                                         | Example     |
 |:------------------|--------|--------| :-------------------------------------------------------------------|------------:|
 | type              | int    |    4   | 1 for analytical mean, 2 for sample mean                            |  1          |
+| summary_id        | int    |    4   | summary_id representing a grouping of losses                        |  10         |
 | event_id          | int    |    4   | Oasis event_id                                                      |  45567      |
 | period_no         | int    |    4   | identifying an abstract period of time, such as a year              |  56876      |
 | mean              | float  |    4   | mean                                                                |   1345.678  |

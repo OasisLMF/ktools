@@ -300,6 +300,38 @@ This feature will be invoked automatically if the periods.bin file is present in
 
 [Return to top](#outputcomponents)
 
+### kat <a id="kat"></a>
+***
+In cases where events have been distributed to multiple processes, the output files can be concatenated to standard output.
+
+#### Parameters
+
+Optional parameters are:
+
+* -d {file path} - The directory containing output files to be concatenated.
+* -s - Sort by event ID (currently only supported for eltcalc output).
+
+The sort by event ID option assumes that events have not been distributed to processes randomly and the list of event IDs in events.bin is sequential and contiguous. Should either of these conditions be false, the output will still contain all events but sorting cannot be guaranteed.
+
+#### Usage
+
+```
+$ kat [parameters] [file]... > [stdout component]
+```
+
+#### Examples
+
+```
+$ kat -d pltcalc_output/ > pltcalc.csv
+$ kat eltcalc_P1 eltcalc_P2 eltcalc_P3 > eltcalc.csv
+$ kat -s eltcalc_P1 eltcalc_P2 eltcalc_P3 > eltcalc.csv
+$ kat -s -d eltcalc_output/ > eltcalc.csv
+```
+
+Files are concatenated in the order in which they are presented on the command line. Should a file path be specified, files are concatenated in alphabetical order. When asked to sort by event ID, the order of input files is irrelevant.
+
+[Return to top](#outputcomponents)
+
 [Go to 4.3 Data conversion components section](DataConversionComponents.md)
 
 [Back to Contents](Contents.md)

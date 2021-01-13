@@ -130,6 +130,7 @@ private:
 	void outputresultscsv_new(std::vector<aal_rec> &vec_aal, int periods, int sample_size);
 	void outputresultscsv_new(const std::vector<aal_rec_ensemble> &vec_aal, const int periods);
 	void outputresultscsv_new();
+	inline void outputrows(const char * buffer, int strLen);
 	void getmaxsummaryid(std::string& path);
 public:
 	aalcalc(bool skipheader) : skipheader_(skipheader) {};

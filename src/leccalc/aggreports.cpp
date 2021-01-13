@@ -38,6 +38,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <vector>
 #include <algorithm>    // std::sort
 #include <assert.h>
+#include <string.h>
 #include "aggreports.h"
 #include "../include/oasis.h"
 
@@ -185,6 +186,35 @@ void aggreports::loadensemblemapping() {
 }
 
 
+inline void aggreports::outputrows(const int handle, const char * buffer,
+				   int strLen) {
+
+	const char * bufPtr = buffer;
+	int num;
+	int counter = 0;
+	do {
+
+		num = fprintf(fout_[handle], "%s", bufPtr);
+		if (num < 0) {   // Write error
+			fprintf(stderr, "FATAL: Error writing %s: %s\n",
+				buffer, strerror(errno));
+			exit(EXIT_FAILURE);
+		} else if (num < strLen) {   // Incomplete write
+			bufPtr += num;
+			strLen -= num;
+		} else return;   // Success
+
+		fprintf(stderr, "INFO: Attempt %d to write %s\n", ++counter,
+			buffer);
+
+	} while (counter < 10);
+
+	fprintf(stderr, "FATAL: Maximum attempts to write %s exceeded\n",
+		buffer);
+	exit(EXIT_FAILURE);
+
+}
+
 void aggreports::writefulluncertainty(const int handle, const int type,
 	const std::map<outkey2, OASIS_FLOAT> &out_loss, const int ensemble_id) {
 
@@ -230,9 +260,14 @@ void aggreports::writefulluncertainty(const int handle, const int type,
 					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, s.first, type, max_retperiod, ensemble_id);
 				}
 				else {
-					fprintf(fout_[handle], "%d,%d,%f,%f", s.first, type, retperiod, lp.value);
-					if (ensembletosidx_.size() > 0) fprintf(fout_[handle], ",%d", ensemble_id);
-					fprintf(fout_[handle], "\n");
+					const int bufferSize = 4096;
+					char buffer[bufferSize];
+					int strLen;
+					strLen = snprintf(buffer, bufferSize, "%d,%d,%f,%f", s.first, type, retperiod, lp.value);
+					if (ensembletosidx_.size() > 0)
+						strLen += snprintf(buffer+strLen, bufferSize-strLen, "%d", ensemble_id);
+					strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
+					outputrows(handle, buffer, strLen);
 				}
 			}
 		}
@@ -303,10 +338,15 @@ void aggreports::fulluncertainty(int handle,const std::map<outkey2, OASIS_FLOAT>
 			OASIS_FLOAT retperiod = t / i;
 			if (useReturnPeriodFile_) {
 				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, s.first, 1, max_retperiod);
-			}else{
-				fprintf(fout_[handle],"%d,1,%f,%f", s.first, retperiod, lp);
-				if (ensembletosidx_.size() > 0) fprintf(fout_[handle], ",0");
-				fprintf(fout_[handle], "\n");
+			} else {
+				const int bufferSize = 4096;
+				char buffer[bufferSize];
+				int strLen;
+				strLen = snprintf(buffer, bufferSize, "%d,1,%f,%f", s.first, retperiod, lp);
+				if (ensembletosidx_.size() > 0)
+					strLen += snprintf(buffer+strLen, bufferSize-strLen, ",0");
+				strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
+				outputrows(handle, buffer, strLen);
 			}
 			i++;
 		}
@@ -341,9 +381,14 @@ void aggreports::fulluncertainty(int handle,const std::map<outkey2, OASIS_FLOAT>
 				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, s.first, 2, max_retperiod);
 			}
 			else {
-				fprintf(fout_[handle], "%d,2,%f,%f", s.first, retperiod, lp);
-				if (ensembletosidx_.size() > 0) fprintf(fout_[handle], ",0");
-				fprintf(fout_[handle], "\n");
+				const int bufferSize = 4096;
+				char buffer[bufferSize];
+				int strLen;
+				strLen = snprintf(buffer, bufferSize, "%d,2,%f,%f", s.first, retperiod, lp);
+				if (ensembletosidx_.size() > 0)
+					strLen += snprintf(buffer+strLen, bufferSize-strLen, ",0");
+				strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
+				outputrows(handle, buffer, strLen);
 			}
 			i++;
 		}
@@ -380,7 +425,10 @@ void aggreports::fulluncertainty(int handle,const std::map<outkey2, OASIS_FLOAT>
 					if (useReturnPeriodFile_) {
 						doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, s.first, 2, max_retperiod, ensemble.first);
 					} else {
-						fprintf(fout_[handle], "%d,2,%f,%f,%d\n", s.first, retperiod, lp, ensemble.first);
+						char buffer[4096];
+						int strLen;
+						strLen = sprintf(buffer, "%d,2,%f,%f,%d\n", s.first, retperiod, lp, ensemble.first);
+						outputrows(handle, buffer, strLen);
 					}
 					i++;
 				}
@@ -468,12 +516,18 @@ void aggreports::doreturnperiodout(int handle, size_t &nextreturnperiod_index,
 		} else {
 			loss = getloss(nextreturnperiod_value, last_return_period, last_loss, current_return_period, current_loss);
 		}
+		const int bufferSize = 4096;
+		char buffer[bufferSize];
+		int strLen;
 		if(type) {
-			fprintf(fout_[handle],"%d,%d,%f,%f", summary_id, type, (OASIS_FLOAT)nextreturnperiod_value, loss);
-			if (ensembletosidx_.size() > 0) fprintf(fout_[handle], ",%d", ensemble_id);
-			fprintf(fout_[handle], "\n");
+			strLen = snprintf(buffer, bufferSize, "%d,%d,%f,%f", summary_id, type, (OASIS_FLOAT)nextreturnperiod_value, loss);
+			if (ensembletosidx_.size() > 0)
+				strLen += snprintf(buffer+strLen, bufferSize-strLen, ",%d", ensemble_id);
+			strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
+			outputrows(handle, buffer, strLen);
 		} else {
-			fprintf(fout_[handle],"%d,%f,%f\n", summary_id, (OASIS_FLOAT)nextreturnperiod_value, loss);
+			strLen = sprintf(buffer, "%d,%f,%f\n", summary_id, (OASIS_FLOAT)nextreturnperiod_value, loss);
+			outputrows(handle, buffer, strLen);
 		}
 		nextreturnperiod_index++;
 		if (nextreturnperiod_index < returnperiods_.size()) {
@@ -525,10 +579,18 @@ void aggreports::wheatsheaf(int handle, const std::map<outkey2, OASIS_FLOAT> &ou
 			if (useReturnPeriodFile_) {
 				if (nextreturnperiodindex == returnperiods_.size()) break;
 				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, s.first.summary_id, s.first.sidx, max_retperiod);
-			}else {
-				fprintf(fout_[handle],"%d,%d,%f,%f", s.first.summary_id, s.first.sidx, t / i, lp);
+			} else {
+				const int bufferSize = 4096;
+				char buffer[bufferSize];
+				int strLen;
+				strLen = snprintf(buffer, bufferSize, "%d,%d,%f,%f", s.first.summary_id, s.first.sidx, t / i, lp);
+				if (ensembletosidx_.size() > 0)
+					strLen += snprintf(buffer+strLen, bufferSize-strLen, ",0");
+				strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
+				outputrows(handle, buffer, strLen);
+				/*fprintf(fout_[handle],"%d,%d,%f,%f", s.first.summary_id, s.first.sidx, t / i, lp);
 				if (ensembletosidx_.size() > 0) fprintf(fout_[handle], ",0");
-				fprintf(fout_[handle], "\n");
+				fprintf(fout_[handle], "\n");*/
 			}
 			i++;
 		}
@@ -558,8 +620,11 @@ void aggreports::wheatsheaf(int handle, const std::map<outkey2, OASIS_FLOAT> &ou
 					if (useReturnPeriodFile_) {
 						if (nextreturnperiodindex == returnperiods_.size()) break;
 						doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, s.first.summary_id, s.first.sidx, max_retperiod, ensemble.first);
-					}else {
-						fprintf(fout_[handle],"%d,%d,%f,%f,%d\n", s.first.summary_id, s.first.sidx, t / i, lp, ensemble.first);
+					} else {
+						char buffer[4096];
+						int strLen;
+						strLen = sprintf(buffer, "%d,%d,%f,%f,%d\n", s.first.summary_id, s.first.sidx, t / i, lp, ensemble.first);
+						outputrows(handle, buffer, strLen);
 					}
 					i++;
 				}
@@ -627,9 +692,14 @@ void aggreports::wheatsheafwithweighting(int handle, const std::map<outkey2, OAS
 					if (nextreturnperiodindex == returnperiods_.size()) break;
 					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, s.first.summary_id, s.first.sidx, max_retperiod);
 				} else {
-					fprintf(fout_[handle], "%d,%d,%f,%f", s.first.summary_id, s.first.sidx, retperiod, lp.value);
-					if (ensembletosidx_.size() > 0) fprintf(fout_[handle], ",0");
-					fprintf(fout_[handle], "\n");
+					const int bufferSize = 4096;
+					char buffer[bufferSize];
+					int strLen;
+					strLen = snprintf(buffer, bufferSize, "%d,%d,%f,%f", s.first.summary_id, s.first.sidx, retperiod, lp.value);
+					if (ensembletosidx_.size() > 0)
+						strLen += snprintf(buffer+strLen, bufferSize-strLen, ",0");
+					strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
+					outputrows(handle, buffer, strLen);
 				}
 			}
 		}
@@ -667,7 +737,11 @@ void aggreports::wheatsheafwithweighting(int handle, const std::map<outkey2, OAS
 							if (nextreturnperiodindex == returnperiods_.size()) break;
 							doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, s.first.summary_id, s.first.sidx, max_retperiod, ensemble.first);
 						} else {
-							fprintf(fout_[handle], "%d,%d,%f,%f,%d\n", s.first.summary_id, s.first.sidx, retperiod, lp.value, ensemble.first);
+							char buffer[4096];
+							int strLen;
+							strLen = sprintf(buffer, "%d,%d,%f,%f,%d\n",
+									 s.first.summary_id, s.first.sidx, retperiod, lp.value, ensemble.first);
+							outputrows(handle, buffer, strLen);
 						}
 					}
 				}
@@ -762,9 +836,17 @@ void aggreports::wheatSheafMeanwithweighting(int samplesize, int handle, const s
 					if (useReturnPeriodFile_) {
 						doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, s.first.summary_id, 1, max_retperiod);
 					} else {
-						fprintf(fout_[handle], "%d,1,%f,%f", s.first.summary_id, retperiod, lp.value);
+						const int bufferSize = 4096;
+						char buffer[bufferSize];
+						int strLen;
+						strLen = snprintf(buffer, bufferSize, "%d,1,%f,%f", s.first.summary_id, retperiod, lp.value);
+						if (ensembletosidx_.size() > 0)
+							strLen += snprintf(buffer+strLen, bufferSize-strLen, ",0");
+						strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
+						outputrows(handle, buffer, strLen);
+						/*fprintf(fout_[handle], "%d,1,%f,%f", s.first.summary_id, retperiod, lp.value);
 						if (ensembletosidx_.size() > 0) fprintf(fout_[handle], ",0");
-						fprintf(fout_[handle], "\n");
+						fprintf(fout_[handle], "\n");*/
 					}
 				}
 			}
@@ -807,9 +889,14 @@ void aggreports::wheatSheafMeanwithweighting(int samplesize, int handle, const s
 					OASIS_FLOAT loss = lp.value / samplesize;
 					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, loss, m.first, 2, max_retperiod);
 				} else {
-					fprintf(fout_[handle], "%d,2,%f,%f", m.first, retperiod, lp.value / samplesize);
-					if (ensembletosidx_.size() > 0) fprintf(fout_[handle], ",0");
-					fprintf(fout_[handle], "\n");
+					const int bufferSize = 4096;
+					char buffer[bufferSize];
+					int strLen;
+					strLen = snprintf(buffer, bufferSize, "%d,2,%f,%f", m.first, retperiod, lp.value / samplesize);
+					if (ensembletosidx_.size() > 0)
+						strLen += snprintf(buffer+strLen, bufferSize-strLen, ",0");
+					strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
+					outputrows(handle, buffer, strLen);
 				}
 			}
 			i++;
@@ -881,7 +968,11 @@ void aggreports::wheatSheafMeanwithweighting(int samplesize, int handle, const s
 							OASIS_FLOAT loss = lp.value / samplesize;
 							doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, loss, m.first, 2, max_retperiod, ensemble.first);
 						} else {
-							fprintf(fout_[handle], "%d,2,%f,%f,%d\n", m.first, retperiod, lp.value / samplesize, ensemble.first);
+							char buffer[4096];
+							int strLen;
+							strLen = sprintf(buffer, "%d,2,%f,%f,%d\n",
+									 m.first, retperiod, lp.value / samplesize, ensemble.first);
+							outputrows(handle, buffer, strLen);
 						}
 					}
 					i++;
@@ -947,8 +1038,15 @@ void aggreports::wheatSheafMean(int samplesize, int handle, const std::map<outke
 				OASIS_FLOAT retperiod = t / i;
 				if (useReturnPeriodFile_) {
 					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, s.first.summary_id, 1, max_retperiod);
-				}else {
-					fprintf(fout_[handle],"%d,1,%f,%f\n", s.first.summary_id, retperiod, lp);
+				} else {
+					const int bufferSize = 4096;
+					char buffer[bufferSize];
+					int strLen;
+					strLen = snprintf(buffer, bufferSize, "%d,1,%f,%f", s.first.summary_id, retperiod, lp);
+					if (ensembletosidx_.size() > 0)
+						strLen += snprintf(buffer+strLen, bufferSize-strLen, ",0");
+					strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
+					outputrows(handle, buffer, strLen);
 				}
 
 				i++;
@@ -983,8 +1081,15 @@ void aggreports::wheatSheafMean(int samplesize, int handle, const std::map<outke
 			if (useReturnPeriodFile_) {
 				OASIS_FLOAT loss = lp / samplesize;
 				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, loss, m.first, 2, max_retperiod);
-			}else {
-				fprintf(fout_[handle],"%d,2,%f,%f\n", m.first, retperiod, lp / samplesize);
+			} else {
+				const int bufferSize = 4096;
+				char buffer[bufferSize];
+				int strLen;
+				strLen = snprintf(buffer, bufferSize, "%d,2,%f,%f", m.first, retperiod, lp / samplesize);
+				if (ensembletosidx_.size() > 0)
+					strLen += snprintf(buffer+strLen, bufferSize-strLen, ",0");
+				strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
+				outputrows(handle, buffer, strLen);
 			}
 			i++;
 			if (i > maxindex) break;
@@ -1043,7 +1148,10 @@ void aggreports::wheatSheafMean(int samplesize, int handle, const std::map<outke
 						OASIS_FLOAT loss = lp / ensemble.second.size();
 						doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, loss, m.first,2, max_retperiod, ensemble.first);
 					} else {
-						fprintf(fout_[handle],"%d,2,%f,%f,%d\n", m.first, retperiod, lp / ensemble.second.size(), ensemble.first);
+						char buffer[4096];
+						int strLen;
+						strLen = sprintf(buffer, "%d,2,%f,%f,%d\n", m.first, retperiod, lp / ensemble.second.size(), ensemble.first);
+						outputrows(handle, buffer, strLen);
 					}
 					i++;
 					if (i > maxindex) break;
@@ -1114,9 +1222,14 @@ inline void aggreports::writeSampleMean(const int handle, const int type,
 					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, m.first, type, max_retperiod, ensemble_id);
 				}
 				else {
-					fprintf(fout_[handle], "%d,%d,%f,%f", m.first, type, retperiod, lp.value);
-					if (ensembletosidx_.size() > 0) fprintf(fout_[handle], ",%d", ensemble_id);
-					fprintf(fout_[handle], "\n");
+					const int bufferSize = 4096;
+					char buffer[bufferSize];
+					int strLen;
+					strLen = snprintf(buffer, bufferSize, "%d,%d,%f,%f", m.first, type, retperiod, lp.value);
+					if (ensembletosidx_.size() > 0)
+						strLen += snprintf(buffer+strLen, bufferSize-strLen, ",%d", ensemble_id);
+					strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
+					outputrows(handle, buffer, strLen);
 				}
 			}
 		}
@@ -1244,9 +1357,17 @@ void aggreports::sampleMean(int samplesize, int handle, const std::map<outkey2, 
 			if (useReturnPeriodFile_) {
 				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, m.first.summary_id, m.first.type, max_retperiod);
 			}else {
-				fprintf(fout_[handle],"%d,%d,%f,%f", m.first.summary_id, m.first.type, retperiod, lp);
+				const int bufferSize = 4096;
+				char buffer[bufferSize];
+				int strLen;
+				strLen = snprintf(buffer, bufferSize, "%d,%d,%f,%f", m.first.summary_id, m.first.type, retperiod, lp);
+				if (ensembletosidx_.size() > 0)
+					strLen += snprintf(buffer+strLen, bufferSize-strLen, ",0");
+				strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
+				outputrows(handle, buffer, strLen);
+				/*fprintf(fout_[handle],"%d,%d,%f,%f", m.first.summary_id, m.first.type, retperiod, lp);
 				if (ensembletosidx_.size() > 0) fprintf(fout_[handle], ",0");
-				fprintf(fout_[handle], "\n");
+				fprintf(fout_[handle], "\n");*/
 			}
 			i++;
 		}
@@ -1295,7 +1416,10 @@ void aggreports::sampleMean(int samplesize, int handle, const std::map<outkey2, 
 					if (useReturnPeriodFile_) {
 						doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, m.first.summary_id, m.first.type, max_retperiod, ensemble.first);
 					} else {
-						fprintf(fout_[handle],"%d,%d,%f,%f,%d\n", m.first.summary_id, m.first.type, retperiod, lp, ensemble.first);
+						char buffer[4096];
+						int strLen;
+						strLen = sprintf(buffer, "%d,%d,%f,%f,%d\n", m.first.summary_id, m.first.type, retperiod, lp, ensemble.first);
+						outputrows(handle, buffer, strLen);
 					}
 					i++;
 				}

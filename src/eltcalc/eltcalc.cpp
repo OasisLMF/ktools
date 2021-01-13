@@ -40,6 +40,7 @@ Author: Ben Matharu  email : ben.matharu@oasislmf.org
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <math.h>
 
 #include <chrono>
@@ -64,6 +65,45 @@ namespace eltcalc {
 	{
 		unsigned int stype = summarycalc_id & stream_type;
 		return (stype == summarycalc_id);
+	}
+
+	void OutputRows(const summarySampleslevelHeader& sh, const int type,
+			const OASIS_FLOAT mean, const OASIS_FLOAT stdDev=0)
+	{
+
+		char buffer[4096];
+		char * bufPtr = buffer;
+		int strLen;
+		if (type == 1) {
+			strLen = sprintf(buffer, "%d,1,%d,%f,0,%f\n",
+					 sh.summary_id, sh.event_id, mean,
+					 sh.expval);
+		} else {   // type == 2
+			strLen = sprintf(buffer, "%d,2,%d,%f,%f,%f\n",
+					 sh.summary_id, sh.event_id, mean,
+					 stdDev, sh.expval);
+		}
+		int num;
+		int counter = 0;
+		do {
+
+			num = printf("%s", bufPtr);
+			if (num < 0) {   // Write error
+				fprintf(stderr, "FATAL: Error writing %s: %s\n", buffer, strerror(errno));
+				exit(EXIT_FAILURE);
+			} else if (num < strLen) {   // Incomplete write
+				bufPtr += num;
+				strLen -= num;
+			} else return;   // Success
+
+			fprintf(stderr, "INFO: Attempt %d to write %s\n",
+				++counter, buffer);
+
+		} while (counter < 10);
+
+		fprintf(stderr, "FATAL: Maximum attempts to write %s exceeded\n", buffer);
+		exit(EXIT_FAILURE);
+
 	}
 
 	void doetloutput(int samplesize, bool skipHeader)
@@ -105,12 +145,12 @@ namespace eltcalc {
 				}
 			}
 			if (sh.expval > 0) {	// only output rows with a none zero exposure value
-				printf("%d,1,%d,%f,0,%f\n", sh.summary_id, sh.event_id, analytical_mean, sh.expval);
+				OutputRows(sh, 1, analytical_mean);
 				if (firstOutput == true) {
 					std::this_thread::sleep_for(std::chrono::milliseconds(PIPE_DELAY)); // used to stop possible race condition with kat
 					firstOutput = false;
 				}
-				if (samplesize) printf("%d,2,%d,%f,%f,%f\n", sh.summary_id, sh.event_id, sample_mean, sd, sh.expval);
+				if (samplesize) OutputRows(sh, 2, sample_mean, sd);
 			}
 
 

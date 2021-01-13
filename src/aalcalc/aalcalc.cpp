@@ -400,6 +400,34 @@ inline void aalcalc::calculatemeansddev(const aal_rec_ensemble &record,
 
 }
 
+inline void aalcalc::outputrows(const char * buffer, int strLen) {
+
+	const char * bufPtr = buffer;
+	int num;
+	int counter = 0;
+	do {
+
+		num = printf("%s", bufPtr);
+		if (num < 0) {   // Write error
+			fprintf(stderr, "FATAL: Error writing %s: %s\n",
+				buffer, strerror(errno));
+			exit(EXIT_FAILURE);
+		} else if (num < strLen) {   // Incomplete write
+			bufPtr += num;
+			strLen -= num;
+		} else return;   // Success
+
+		fprintf(stderr, "INFO: Attempt %d to write %s\n", ++counter,
+			buffer);
+
+	} while (counter < 10);
+
+	fprintf(stderr, "FATAL: Maximum attempts to write %s exceeded\n",
+		buffer);
+	exit(EXIT_FAILURE);
+
+}
+
 void aalcalc::outputresultscsv_new(const std::vector<aal_rec_ensemble> &vec_aal,
 				   const int periods) {
 
@@ -414,9 +442,15 @@ void aalcalc::outputresultscsv_new(const std::vector<aal_rec_ensemble> &vec_aal,
 			double mean, sd_dev;
 			calculatemeansddev(*v_iter, sample_size, p1, p2,
 					   periods, mean, sd_dev);
-			printf("%d,%d,%f,%f,%f,%d\n", v_iter->summary_id,
-			       v_iter->type, mean, sd_dev,
-			       v_iter->max_exposure_value, v_iter->ensemble_id);
+
+			char buffer[4096];
+			int strLen;
+			strLen = sprintf(buffer, "%d,%d,%f,%f,%f,%d\n",
+					 v_iter->summary_id, v_iter->type,
+					 mean, sd_dev,
+					 v_iter->max_exposure_value,
+					 v_iter->ensemble_id);
+			outputrows(buffer, strLen);
 
 		}
 
@@ -440,11 +474,20 @@ void aalcalc::outputresultscsv_new(std::vector<aal_rec>& vec_aal, int periods,in
 			double s2 = s1 / p2;
 			double sd_dev = sqrt(s2);
 			mean = mean / periods;
-			printf("%d,%d,%f,%f,%f", v_iter->summary_id, v_iter->type, mean, sd_dev, v_iter->max_exposure_value);
+
+			const int bufferSize = 4096;
+			char buffer[bufferSize];
+			int strLen;
+			strLen = snprintf(buffer, bufferSize, "%d,%d,%f,%f,%f",
+					  v_iter->summary_id, v_iter->type,
+					  mean, sd_dev,
+					  v_iter->max_exposure_value);
 			// If relevant use ensemble ID = 0 for calculations
 			// across all ensembles
-			if (sidxtoensemble_.size() > 0) printf(",0");
-			printf("\n");
+			if (sidxtoensemble_.size() > 0)
+				strLen += snprintf(buffer+strLen, bufferSize-strLen, ",0");
+			strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
+			outputrows(buffer, strLen);
 		}
 		v_iter++;
 	}

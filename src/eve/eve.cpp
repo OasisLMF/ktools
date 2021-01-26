@@ -126,13 +126,14 @@ namespace eve {
 
     void emitevents(OASIS_INT pno_, OASIS_INT total_, std::vector<int> &events,
                     bool textmode) {
-        size_t total_events = events.size();
-        int chunksize = (int)ceil((OASIS_FLOAT)total_events / total_);
-        size_t end_pos = chunksize * pno_;
-        pno_--;
-        size_t start_pos = chunksize * pno_;
-        if (end_pos > (size_t) events.size())
-            end_pos = events.size();
+
+	int total_events = (int)events.size();
+	int min_chunksize = total_events / total_;
+	int first_min_pno = (total_events % total_) + 1;
+	int start_pos = (min_chunksize + 1) * (std::min(first_min_pno, pno_) - 1);
+	start_pos += min_chunksize * std::max(pno_ - first_min_pno, 0);
+	int end_pos = (min_chunksize + 1) * (std::min(first_min_pno, pno_+1) - 1);
+	end_pos += min_chunksize * std::max(pno_+1 - first_min_pno, 0);
 
         while (start_pos < end_pos) {
             int eventid = events[start_pos];

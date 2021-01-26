@@ -55,7 +55,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 namespace eve {
     void emitevents(OASIS_INT pno_, OASIS_INT total_, bool shuffle,
-		    bool randomise, bool textmode);
+		    bool randomise, bool randomiselegacy, bool textmode);
 }
 char *progname;
 
@@ -72,6 +72,7 @@ void help() {
                     "-h help\n"
                     "-n no shuffled events\n"
 		    "-r use Fisher-Yates shuffle\n"
+		    "-R use std::shuffle\n"
                     "-v version\n"
                     "-t text mode\n");
 }
@@ -80,10 +81,11 @@ int main(int argc, char *argv[]) {
 
     int opt;
     bool randomise = false;
+    bool randomiselegacy = false;
     bool shuffle = true;
     bool textmode = false;
 
-    while ((opt = getopt(argc, argv, "nrvht")) != -1) {
+    while ((opt = getopt(argc, argv, "nrRvht")) != -1) {
         switch (opt) {
         case 'v': {
             fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
@@ -104,6 +106,9 @@ int main(int argc, char *argv[]) {
         } break;
 	case 'r': {
 	    randomise = true;
+	} break;
+	case 'R': {
+	    randomiselegacy = true;
 	} break;
         case 't': {
             textmode = true;
@@ -148,11 +153,19 @@ int main(int argc, char *argv[]) {
 	logprintf(progname, "INFO", "incompatible arguments -n and -r supplied; ignoring -r\n");
 	randomise = false;
     }
+    if (shuffle == false && randomiselegacy == true) {
+	logprintf(progname, "INFO", "incompatible arguments -n and -R supplied; ignoring -R\n");
+	randomiselegacy = false;
+    }
+    if (randomise == true && randomiselegacy == true) {
+	logprintf(progname, "INFO", "incompatible arguments -r and -R supplied; ignoring -R\n");
+	randomiselegacy = false;
+    }
 
     try {
         initstreams("", "");
-        logprintf(progname, "INFO","starting part no: %d total: %d shuffle: %d randomise: %d\n",  pno, total, shuffle, randomise);
-        eve::emitevents(pno, total, shuffle, randomise, textmode);
+        logprintf(progname, "INFO","starting part no: %d total: %d shuffle: %d randomise (Fisher-Yates): %d randomise (std::shuffle): %d\n",  pno, total, shuffle, randomise, randomiselegacy);
+        eve::emitevents(pno, total, shuffle, randomise, randomiselegacy, textmode);
         logprintf(progname, "INFO","finishing part no: %d\n",pno);
     } catch (std::bad_alloc&) {
         fprintf(stderr, "FATAL:%s: Memory allocation failed\n", progname);

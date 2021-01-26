@@ -94,6 +94,14 @@ namespace eve {
 
     }
 
+    void randomiseeventslegacy(std::vector<int> &events) {
+
+	unsigned seed = 1234;
+	std::default_random_engine e(seed);
+	std::shuffle(events.begin(), events.end(), e);
+
+    }
+
     void doshuffle(OASIS_INT pno_, OASIS_INT total_, std::vector<int> &events,
 		   bool textmode) {
 
@@ -137,7 +145,7 @@ namespace eve {
     }
 
     void emitevents(OASIS_INT pno_, OASIS_INT total_, bool shuffle,
-		    bool randomise, bool textmode) {
+		    bool randomise, bool randomiselegacy, bool textmode) {
 
 	std::vector<int> events;
 	readevents(events);
@@ -148,6 +156,10 @@ namespace eve {
 
 	    if (randomise) {   // Implement Fisher-Yates shuffle
 		randomiseevents(pno_, total_, events, textmode);
+
+	    } else if (randomiselegacy) {   // Implement std::shuffle
+		randomiseeventslegacy(events);
+		emitevents(pno_, total_, events, textmode);
 
 	    } else {   // Implement deterministic approach
 		doshuffle(pno_, total_, events, textmode);

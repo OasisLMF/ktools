@@ -3,12 +3,19 @@ Ktools Changelog
 
 .. * [#_](https://github.com/OasisLMF/OasisLMF/issues/_) -  
 
-`v3.4.2`_
+`v3.4.3`_
 ---------
 .. start_latest_release
+* [#168](https://github.com/OasisLMF/ktools/issues/168) - Remove unrequired lines in getmodel output
+* [#172](https://github.com/OasisLMF/ktools/issues/172) - Better error reporting and handling of partial output in eltcalc
+* [#174](https://github.com/OasisLMF/ktools/issues/174) - Better error reporting and handling of partial output in aalcalc and leccalc
+* [#181](https://github.com/OasisLMF/ktools/issues/181) - Correction to Wheatsheaf Mean output in leccalc
+.. end_latest_release
+
+`v3.4.2`_
+---------
 * [#175](https://github.com/OasisLMF/ktools/issues/175) - Calculate accumulated TIV without duplication of TIVs for multi-peril models
 * [#176](https://github.com/OasisLMF/ktools/issues/176) - Include TIVs for coverages where there are no input losses
-.. end_latest_release
 
 `v3.4.1`_
 ---------

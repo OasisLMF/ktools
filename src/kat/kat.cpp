@@ -36,6 +36,7 @@ Used to multiples pipes functionality of simple cat command with multiple inputs
 Author: Ben Matharu  email: ben.matharu@oasislmf.org
 */
 #include "../include/oasis.h"
+#include <map>
 #include <vector>
 #include <algorithm>
 
@@ -51,6 +52,85 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <sys/stat.h>
 
 namespace kat {
+
+	struct eltcalcOutput {
+		int summary_id;
+		int type;
+		int event_id;
+		OASIS_FLOAT mean;
+		OASIS_FLOAT standard_deviation;
+		OASIS_FLOAT exposure_value;
+	};
+
+	// This function will only sort data by event ID as intended if
+	// event IDs have been deterministically assigned to processes.
+	// If the event IDs have been randomised, it won't do any harm: they
+	// just won't be in order.
+	void doitsort(std::vector<FILE*>& infiles) {
+
+		std::map<FILE*, eltcalcOutput> eOut;
+		char line[4096];
+
+		// Get first line from each file
+		for (std::vector<FILE*>::iterator it = infiles.begin();
+		     it != infiles.end(); it++) {
+
+			int inArgs;
+			do {
+				char * data = fgets(line, sizeof(line), *it);
+				if (data == nullptr) {   // Empty file
+					eOut[*it].event_id = 0;
+					break;
+				}
+				inArgs = sscanf(line, "%d,%d,%d,%f,%f,%f", &eOut[*it].summary_id, &eOut[*it].type, &eOut[*it].event_id, &eOut[*it].mean, &eOut[*it].standard_deviation, &eOut[*it].exposure_value);
+				if (inArgs == 0)   // Print header
+					fprintf(stdout, "%s", line);
+				else if (inArgs != 6) {   // Check file is valid
+					fprintf(stderr, "ERROR: Invalid eltcalc output file found\n");
+					exit(EXIT_FAILURE);
+				}
+			} while (inArgs == 0);   // Skip header
+
+		}
+
+		// Determine order of files
+		std::vector<std::pair<int, FILE*>> orders;
+		for (std::map<FILE*, eltcalcOutput>::iterator it = eOut.begin();
+		     it != eOut.end(); it++) {
+			if (it->second.event_id != 0) {
+				int order = it->second.event_id % eOut.size();
+				if (order == 0) order = eOut.size();
+				orders.push_back(std::make_pair(order, it->first));
+			}
+		}
+		std::sort(orders.begin(), orders.end());
+
+		// Go through each file in order and output data in order of event ID
+		int expectedEventID = 1;
+		while (orders.size() > 0) {
+			for (std::vector<std::pair<int, FILE*>>::iterator it = orders.begin();
+			     it != orders.end(); it++) {
+				eltcalcOutput * e = &eOut[it->second];
+				if (e->event_id <= expectedEventID) {
+					int currentEventID = e->event_id;
+					do {
+						fprintf(stdout, "%d,%d,%d,%f,%f,%f\n", e->summary_id, e->type, e->event_id, e->mean, e->standard_deviation, e->exposure_value);
+						if (fgets(line, sizeof(line), it->second) == 0) {
+							orders.erase(it);
+							it--;
+							break;
+						} else {
+							sscanf(line, "%d,%d,%d,%f,%f,%f", &e->summary_id, &e->type, &e->event_id, &e->mean, &e->standard_deviation, &e->exposure_value);
+						}
+						currentEventID = e->event_id;
+					} while (currentEventID <= expectedEventID);
+				}
+				expectedEventID++;
+			}
+		}
+
+	}
+
 	void doit(std::vector <FILE*>& infiles)
 	{
 		for (FILE* fin : infiles) {

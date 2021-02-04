@@ -8,6 +8,7 @@ Ktools Changelog
 .. start_latest_release
 * [#36](https://github.com/OasisLMF/ktools/issues/36) - Sort eltcalc output with kat
 * [#119](https://github.com/OasisLMF/ktools/issues/119) - Add options to partition events between multiple processes deterministically or using Fisher-Yates shuffle
+* [#180](https://github.com/OasisLMF/ktools/pull/180) - Evenly distribute events among processes
 .. end_latest_release
 
 `v3.4.3`_

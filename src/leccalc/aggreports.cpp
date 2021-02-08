@@ -277,8 +277,8 @@ void aggreports::writefulluncertaintywithweighting(const int handle,
 	// By ensemble ID
 	if (ensembletosidx_.size() > 0 && type == 2 && ensemble_id == 0) {
 		std::map<outkey2, OASIS_FLOAT> out_loss_by_ensemble_id;
-		out_loss_by_ensemble_id.clear();
 		for (auto ensemble : ensembletosidx_) {
+			out_loss_by_ensemble_id.clear();
 			for (auto sidx : ensemble.second) {
 				for (auto x : out_loss) {
 					if (x.first.sidx == sidx) out_loss_by_ensemble_id[x.first] = x.second;

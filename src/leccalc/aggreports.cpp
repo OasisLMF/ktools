@@ -215,8 +215,9 @@ inline void aggreports::outputrows(const int handle, const char * buffer,
 
 }
 
-void aggreports::writefulluncertainty(const int handle, const int type,
-	const std::map<outkey2, OASIS_FLOAT> &out_loss, const int ensemble_id) {
+void aggreports::writefulluncertaintywithweighting(const int handle,
+	const int type, const std::map<outkey2, OASIS_FLOAT> &out_loss,
+	const int ensemble_id) {
 
 	std::map<int, lossvec2> items;
 	for (auto x : out_loss) {
@@ -283,9 +284,9 @@ void aggreports::writefulluncertainty(const int handle, const int type,
 					if (x.first.sidx == sidx) out_loss_by_ensemble_id[x.first] = x.second;
 				}
 			}
-			writefulluncertainty(handle, type, 
-					     out_loss_by_ensemble_id,
-					     ensemble.first);
+			writefulluncertaintywithweighting(handle, type, 
+							  out_loss_by_ensemble_id,
+							  ensemble.first);
 		}
 	}
 
@@ -303,28 +304,21 @@ void aggreports::fulluncertaintywithweighting(int handle,
 			fprintf(fout_[handle], ",ensemble_id");
 		fprintf(fout_[handle], "\n");
 	}
-	writefulluncertainty(handle, 1, out_loss);   // sidx = -1
-	writefulluncertainty(handle, 2, out_loss);   // sidx > 0
+	writefulluncertaintywithweighting(handle, 1, out_loss);   // sidx = -1
+	writefulluncertaintywithweighting(handle, 2, out_loss);   // sidx > 0
 
 }
 
-void aggreports::fulluncertainty(int handle,const std::map<outkey2, OASIS_FLOAT> &out_loss)
-{
-	if (fout_[handle] == nullptr) return;
+void aggreports::writefulluncertainty(const int handle, const int type,
+	const std::map<outkey2, OASIS_FLOAT> &out_loss, const int ensemble_id) {
+
 	std::map<int, lossvec> items;
 	for (auto x : out_loss) {
-		if (x.first.sidx == -1)	items[x.first.summary_id].push_back(x.second);
-	}
-
-	if (skipheader_ == false) {
-		fprintf(fout_[handle], "summary_id,type,return_period,loss");
-		if (ensembletosidx_.size() > 0) {
-			fprintf(fout_[handle], ",ensemble_id");
+		if ((type == 1 && x.first.sidx == -1) ||
+		    (type == 2 && x.first.sidx > 0)) {
+			items[x.first.summary_id].push_back(x.second);
 		}
-		fprintf(fout_[handle], "\n");
 	}
-
-	OASIS_FLOAT max_retperiod = (OASIS_FLOAT)totalperiods_;
 
 	for (auto s : items) {
 		lossvec &lpv = s.second;
@@ -333,119 +327,70 @@ void aggreports::fulluncertainty(int handle,const std::map<outkey2, OASIS_FLOAT>
 		OASIS_FLOAT last_computed_rp = 0;
 		OASIS_FLOAT last_computed_loss = 0;
 		int i = 1;
-		OASIS_FLOAT t = (OASIS_FLOAT) totalperiods_;
+		OASIS_FLOAT t = (OASIS_FLOAT)totalperiods_;
+		if (type == 2) {
+			if (ensemble_id != 0) t *= ensembletosidx_[ensemble_id].size();
+			else if (samplesize_) t *= samplesize_;
+		}
+		OASIS_FLOAT max_retperiod = t;
 		for (auto lp : lpv) {
 			OASIS_FLOAT retperiod = t / i;
 			if (useReturnPeriodFile_) {
-				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, s.first, 1, max_retperiod);
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, s.first, type, max_retperiod, ensemble_id);
 			} else {
 				const int bufferSize = 4096;
 				char buffer[bufferSize];
 				int strLen;
-				strLen = snprintf(buffer, bufferSize, "%d,1,%f,%f", s.first, retperiod, lp);
+				strLen = snprintf(buffer, bufferSize, "%d,%d,%f,%f", s.first, type, retperiod, lp);
 				if (ensembletosidx_.size() > 0)
-					strLen += snprintf(buffer+strLen, bufferSize-strLen, ",0");
+					strLen += snprintf(buffer+strLen, bufferSize-strLen, ",%d", ensemble_id);
 				strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
 				outputrows(handle, buffer, strLen);
 			}
 			i++;
 		}
 		if (useReturnPeriodFile_) {
-			doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first, 1, max_retperiod);
+			doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first, type, max_retperiod, ensemble_id);
 			while (nextreturnperiodindex < returnperiods_.size()) {
-				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first, 1, max_retperiod);
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first, type, max_retperiod, ensemble_id);
 			}
 		}
-
-	}
-
-// Now type 2
-	items.clear();
-	for (auto x : out_loss) {
-		if (x.first.sidx > 0)	items[x.first.summary_id].push_back(x.second);
-	}
-
-	for (auto s : items) {
-		lossvec& lpv = s.second;
-		std::sort(lpv.rbegin(), lpv.rend());
-		size_t nextreturnperiodindex = 0;
-		OASIS_FLOAT last_computed_rp = 0;
-		OASIS_FLOAT last_computed_loss = 0;
-		int i = 1;
-		OASIS_FLOAT t = (OASIS_FLOAT)totalperiods_;
-		if (samplesize_) t *= samplesize_;
-		max_retperiod = t;
-		for (auto lp : lpv) {
-			OASIS_FLOAT retperiod = t / i;
-			if (useReturnPeriodFile_) {
-				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, s.first, 2, max_retperiod);
-			}
-			else {
-				const int bufferSize = 4096;
-				char buffer[bufferSize];
-				int strLen;
-				strLen = snprintf(buffer, bufferSize, "%d,2,%f,%f", s.first, retperiod, lp);
-				if (ensembletosidx_.size() > 0)
-					strLen += snprintf(buffer+strLen, bufferSize-strLen, ",0");
-				strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
-				outputrows(handle, buffer, strLen);
-			}
-			i++;
-		}
-		if (useReturnPeriodFile_) {
-			doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first, 2, max_retperiod);
-			while (nextreturnperiodindex < returnperiods_.size()) {
-				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first, 2, max_retperiod);
-			}
-		}
-
 	}
 
 	// By ensemble ID
-	if (ensembletosidx_.size() > 0) {
+	if (ensembletosidx_.size() > 0 && type == 2 && ensemble_id == 0) {
+		std::map<outkey2, OASIS_FLOAT> out_loss_by_ensemble_id;
 		for (auto ensemble : ensembletosidx_) {
-			items.clear();
+			out_loss_by_ensemble_id.clear();
 			for (auto sidx : ensemble.second) {
 				for (auto x : out_loss) {
-					if (x.first.sidx == sidx) items[x.first.summary_id].push_back(x.second);
+					if (x.first.sidx == sidx) out_loss_by_ensemble_id[x.first] = x.second;
 				}
 			}
-			for (auto s : items) {
-				lossvec& lpv = s.second;
-				std::sort(lpv.rbegin(), lpv.rend());
-				size_t nextreturnperiodindex = 0;
-				OASIS_FLOAT last_computed_rp = 0;
-				OASIS_FLOAT last_computed_loss = 0;
-				int i = 1;
-				OASIS_FLOAT t = (OASIS_FLOAT)totalperiods_;
-				if (ensemble.second.size() > 0) t *= ensemble.second.size();
-				max_retperiod = t;
-				for (auto lp : lpv) {
-					OASIS_FLOAT retperiod = t / i;
-					if (useReturnPeriodFile_) {
-						doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, s.first, 2, max_retperiod, ensemble.first);
-					} else {
-						char buffer[4096];
-						int strLen;
-						strLen = sprintf(buffer, "%d,2,%f,%f,%d\n", s.first, retperiod, lp, ensemble.first);
-						outputrows(handle, buffer, strLen);
-					}
-					i++;
-				}
-				if (useReturnPeriodFile_) {
-					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first, 2, max_retperiod, ensemble.first);
-					while (nextreturnperiodindex < returnperiods_.size()) {
-						doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first, 2, max_retperiod, ensemble.first);
-					}
-				}
-
-			}
-
+			writefulluncertainty(handle, type,
+					     out_loss_by_ensemble_id,
+					     ensemble.first);
 		}
-
 	}
 
 }
+
+void aggreports::fulluncertainty(int handle,const std::map<outkey2, OASIS_FLOAT> &out_loss)
+{
+	if (fout_[handle] == nullptr) return;
+
+	if (skipheader_ == false) {
+		fprintf(fout_[handle], "summary_id,type,return_period,loss");
+		if (ensembletosidx_.size() > 0) {
+			fprintf(fout_[handle], ",ensemble_id");
+		}
+		fprintf(fout_[handle], "\n");
+	}
+	writefulluncertainty(handle, 1, out_loss);   // sidx = -1
+	writefulluncertainty(handle, 2, out_loss);   // sidx > 0
+
+}
+
 void aggreports::outputOccFulluncertainty()
 {
 	if (periodstoweighting_.size() == 0) {

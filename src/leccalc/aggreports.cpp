@@ -94,9 +94,10 @@ bool operator<(const wheatkey& lhs, const wheatkey& rhs)
 }
 
 aggreports::aggreports(int totalperiods, int maxsummaryid, std::map<outkey2, OASIS_FLOAT> &agg_out_loss,
-	std::map<outkey2, OASIS_FLOAT> &max_out_loss, FILE **fout, bool useReturnPeriodFile, int samplesize, bool skipheader) :
+	std::map<outkey2, OASIS_FLOAT> &max_out_loss, FILE **fout, bool useReturnPeriodFile, int samplesize, bool skipheader,
+	FILE *ord_out) :
 	totalperiods_(totalperiods), maxsummaryid_(maxsummaryid), agg_out_loss_(agg_out_loss), max_out_loss_(max_out_loss),
-	fout_(fout), useReturnPeriodFile_(useReturnPeriodFile), samplesize_(samplesize),skipheader_(skipheader)
+	fout_(fout), useReturnPeriodFile_(useReturnPeriodFile), samplesize_(samplesize),skipheader_(skipheader), ord_out_(ord_out)
 {
 	loadreturnperiods();
 };
@@ -186,6 +187,16 @@ void aggreports::loadensemblemapping() {
 }
 
 
+void aggreports::initordout() {
+
+	if (ord_out_ == nullptr) return;
+	if (skipheader_) return;
+
+	fprintf(ord_out_, "SummaryID,EPCalc,EPType,ReturnPeriod,Loss\n");
+
+}
+
+
 inline void aggreports::outputrows(const int handle, const char * buffer,
 				   int strLen) {
 
@@ -195,6 +206,35 @@ inline void aggreports::outputrows(const int handle, const char * buffer,
 	do {
 
 		num = fprintf(fout_[handle], "%s", bufPtr);
+		if (num < 0) {   // Write error
+			fprintf(stderr, "FATAL: Error writing %s: %s\n",
+				buffer, strerror(errno));
+			exit(EXIT_FAILURE);
+		} else if (num < strLen) {   // Incomplete write
+			bufPtr += num;
+			strLen -= num;
+		} else return;   // Success
+
+		fprintf(stderr, "INFO: Attempt %d to write %s\n", ++counter,
+			buffer);
+
+	} while (counter < 10);
+
+	fprintf(stderr, "FATAL: Maximum attempts to write %s exceeded\n",
+		buffer);
+	exit(EXIT_FAILURE);
+
+}
+
+inline void aggreports::outputrows(const char * buffer, int strLen) {
+
+	const char * bufPtr = buffer;
+	int num;
+	int counter = 0;
+
+	do {
+
+		num = fprintf(ord_out_, "%s", bufPtr);
 		if (num < 0) {   // Write error
 			fprintf(stderr, "FATAL: Error writing %s: %s\n",
 				buffer, strerror(errno));
@@ -346,6 +386,16 @@ void aggreports::writefulluncertainty(const int handle, const int type,
 					strLen += snprintf(buffer+strLen, bufferSize-strLen, ",%d", ensemble_id);
 				strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
 				outputrows(handle, buffer, strLen);
+
+				// ORD output
+				if (ord_out_ != nullptr && type == 2) {
+					buffer[0] = 0;
+					int eptype = 0;
+					if (handle == OCC_FULL_UNCERTAINTY) eptype = OEP;
+					else if (handle == AGG_FULL_UNCERTAINTY) eptype = AEP;
+					strLen = snprintf(buffer, bufferSize, "%d,1,%d,%f,%f\n", s.first, eptype, retperiod, lp);
+					outputrows(buffer, strLen);
+				}
 			}
 			i++;
 		}

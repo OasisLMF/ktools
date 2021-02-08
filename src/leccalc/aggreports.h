@@ -41,6 +41,8 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include<vector>
 #include "leccalc.h"
 
+enum { OEP = 1, AEP, OEPTVAR, AEPTVAR };
+
 class aggreports {
 private:
 	int totalperiods_;
@@ -48,6 +50,7 @@ private:
 	std::map<outkey2, OASIS_FLOAT> &agg_out_loss_;
 	std::map<outkey2, OASIS_FLOAT> &max_out_loss_;
 	FILE **fout_;
+	FILE *ord_out_;
 	bool useReturnPeriodFile_;
 	int samplesize_ = 0;
 	std::vector<int> returnperiods_;
@@ -57,6 +60,7 @@ private:
 
 //
 	inline void outputrows(const int handle, const char * buffer, int strLen);
+	inline void outputrows(const char * buffer, int strLen);
 	void fulluncertainty(int handle, const std::map<outkey2, OASIS_FLOAT> &out_loss);
 	void writefulluncertainty(const int handle, const int type, const std::map<outkey2, OASIS_FLOAT> &out_loss, const int ensemble_id=0);
 	void fulluncertaintywithweighting(int handle, const std::map<outkey2, OASIS_FLOAT> &out_loss);
@@ -81,6 +85,7 @@ private:
 public:
 	void loadperiodtoweigthing();
 	void loadensemblemapping();
+	void initordout();
 	void outputOccFulluncertainty();
 	void outputAggFulluncertainty();
 	void outputOccWheatsheaf();
@@ -90,6 +95,6 @@ public:
 	void outputOccSampleMean(int samplesize);
 	void outputAggSampleMean(int samplesize);
 	aggreports(int totalperiods, int maxsummaryid, std::map<outkey2, OASIS_FLOAT> &agg_out_loss, std::map<outkey2, OASIS_FLOAT> &max_out_loss,
-		FILE **fout, bool useReturnPeriodFile, int samplesize, bool skipheader) ;
+		FILE **fout, bool useReturnPeriodFile, int samplesize, bool skipheader, FILE *ord_out) ;
 };
 #endif // AGGREPORTS_H_

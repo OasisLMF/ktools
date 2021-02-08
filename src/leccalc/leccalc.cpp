@@ -215,7 +215,7 @@ namespace leccalc {
 
 	}
 
-	void doit(const std::string& subfolder, FILE** fout, bool useReturnPeriodFile, bool skipheader)
+	void doit(const std::string& subfolder, FILE** fout, bool useReturnPeriodFile, bool skipheader, FILE* ord_out)
 	{
 		std::string path = "work/" + subfolder;
 		if (path.substr(path.length() - 1, 1) != "/") {
@@ -252,15 +252,18 @@ namespace leccalc {
 			}
 		}
 
-		aggreports agg(totalperiods, maxsummaryid, agg_out_loss, max_out_loss, fout, useReturnPeriodFile, samplesize, skipheader);
+		aggreports agg(totalperiods, maxsummaryid, agg_out_loss, max_out_loss, fout, useReturnPeriodFile, samplesize, skipheader, ord_out);
 		agg.loadperiodtoweigthing();
 		agg.loadensemblemapping();
-		agg.outputAggWheatsheaf();
+		agg.initordout();
+		agg.outputOccFulluncertainty();
 		agg.outputAggFulluncertainty();
+		agg.outputAggWheatsheaf();
+//		agg.outputAggFulluncertainty();
 		agg.outputAggWheatSheafMean(samplesize);
 		agg.outputAggSampleMean(samplesize);
 		agg.outputOccWheatsheaf();
-		agg.outputOccFulluncertainty();
+//		agg.outputOccFulluncertainty();
 		agg.outputOccWheatSheafMean(samplesize);
 		agg.outputOccSampleMean(samplesize);
 

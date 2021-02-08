@@ -63,7 +63,7 @@ void segfault_sigaction(int, siginfo_t *si, void *) {
 #endif
 
 namespace leccalc {
-	void doit(const std::string& subfolder, FILE** fout, bool useReturnPeriodFile, bool skipheader);
+	void doit(const std::string& subfolder, FILE** fout, bool useReturnPeriodFile, bool skipheader, FILE* ord_out);
 }
 
 
@@ -78,6 +78,20 @@ void openpipe(int output_id, const std::string& pipe, FILE** fout)
 			::exit(-1);
 		}
 	}
+}
+
+void openordpipe(const std::string& pipe, FILE** ord_out) {
+
+	if (pipe == "-") *ord_out = stdout;
+	else {
+		FILE* f = fopen(pipe.c_str(), "wb");
+		if (f != nullptr) *ord_out = f;
+		else {
+			fprintf(stderr, "FATAL: Cannot open %s for output\n", pipe.c_str());
+			::exit(-1);
+		}
+	}
+
 }
 
 void help()
@@ -103,11 +117,12 @@ int main(int argc, char* argv[])
 {
 	bool useReturnPeriodFile = false;
 	FILE* fout[] = { nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr };
+	FILE* ord_out = nullptr;
 
 	std::string subfolder;
 	int opt;
 	bool skipheader = false;
-	while ((opt = getopt(argc, argv, "vhrHF:W:M:S:K:f:w:s:m:")) != -1) {
+	while ((opt = getopt(argc, argv, "vhrHF:W:M:S:K:f:w:s:m:o:")) != -1) {
 		switch (opt) {
 		case 'K':
 			subfolder = optarg;
@@ -141,6 +156,9 @@ int main(int argc, char* argv[])
 			break;
 		case 'r':
 			useReturnPeriodFile = true;
+			break;
+		case 'o':
+			openordpipe(optarg, &ord_out);
 			break;
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
@@ -176,7 +194,7 @@ int main(int argc, char* argv[])
 	try {
 		initstreams();
         logprintf(progname, "INFO", "starting process..\n");
-		leccalc::doit(subfolder, fout, useReturnPeriodFile, skipheader);
+		leccalc::doit(subfolder, fout, useReturnPeriodFile, skipheader, ord_out);
         logprintf(progname, "INFO", "finishing process..\n");
 		return EXIT_SUCCESS;
 	}catch (std::bad_alloc&) {
@@ -185,6 +203,3 @@ int main(int argc, char* argv[])
 	}
 	
 }
-
-
-

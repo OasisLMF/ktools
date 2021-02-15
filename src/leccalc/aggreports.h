@@ -83,6 +83,16 @@ private:
 			       OASIS_FLOAT current_loss, int summary_id,
 			       int type, OASIS_FLOAT max_retperiod,
 			       int ensemble_id=0, int epcalc=0, int eptype=0);
+	void doreturnperiodout_tvar(size_t &nextreturnperiod_index,
+				    OASIS_FLOAT &last_return_period,
+				    OASIS_FLOAT &last_loss,
+				    const OASIS_FLOAT current_return_period,
+				    const OASIS_FLOAT current_loss,
+				    OASIS_FLOAT tvar, int counter,
+				    const int summary_id, const int epcalc,
+				    const int eptype,
+				    const OASIS_FLOAT max_retperiod);
+
 public:
 	void loadperiodtoweigthing();
 	void loadensemblemapping();

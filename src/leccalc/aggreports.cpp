@@ -354,9 +354,15 @@ void aggreports::writefulluncertainty(const int handle, const int type,
 
 	const int epcalc = FULL;
 	int eptype = 0;
+	int eptype_tvar = 0;
 	if (ord_out_ && type == 2) {
-		if (handle == OCC_FULL_UNCERTAINTY) eptype = OEP;
-		else if (handle == AGG_FULL_UNCERTAINTY) eptype = AEP;
+		if (handle == OCC_FULL_UNCERTAINTY) {
+			eptype = OEP;
+			eptype_tvar = OEPTVAR;
+		} else if (handle == AGG_FULL_UNCERTAINTY) {
+			eptype = AEP;
+			eptype_tvar = AEPTVAR;
+		}
 	}
 
 	std::map<int, lossvec> items;
@@ -407,6 +413,35 @@ void aggreports::writefulluncertainty(const int handle, const int type,
 			doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first, type, max_retperiod, ensemble_id, epcalc, eptype);
 			while (nextreturnperiodindex < returnperiods_.size()) {
 				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first, type, max_retperiod, ensemble_id, epcalc, eptype);
+			}
+		}
+
+		// Tail Value at Risk (TVaR) - ORD output only
+		if (ord_out_ != nullptr && type == 2 && ensemble_id == 0) {
+			OASIS_FLOAT tvar = 0;
+			nextreturnperiodindex = 0;
+			last_computed_rp = 0;
+			last_computed_loss = 0;
+			i = 1;
+			for (auto lp : lpv) {
+				OASIS_FLOAT retperiod = t / i;
+				if (useReturnPeriodFile_) {
+					doreturnperiodout_tvar(nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, tvar, i, s.first, epcalc, eptype_tvar, max_retperiod);
+					tvar = tvar - ((tvar - lp) / i);
+				} else {
+					tvar = tvar - ((tvar - lp) / i);
+					const int bufferSize = 4096;
+					char buffer[bufferSize];
+					int strLen;
+					strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", s.first, epcalc, eptype_tvar, retperiod, tvar);
+					outputrows(buffer, strLen);
+				}
+				i++;
+			}
+			if (useReturnPeriodFile_) {
+				do {
+					doreturnperiodout_tvar(nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, tvar, i, s.first, epcalc, eptype_tvar, max_retperiod);
+				} while (nextreturnperiodindex < returnperiods_.size());
 			}
 		}
 	}
@@ -539,6 +574,55 @@ void aggreports::doreturnperiodout(int handle, size_t &nextreturnperiod_index,
 			break;
 		}
 	}
+	if (current_return_period > 0) {
+		last_return_period = current_return_period;
+		last_loss = current_loss;
+	}
+}
+
+
+void aggreports::doreturnperiodout_tvar(size_t &nextreturnperiod_index,
+					OASIS_FLOAT &last_return_period,
+					OASIS_FLOAT &last_loss,
+					const OASIS_FLOAT current_return_period,
+					const OASIS_FLOAT current_loss,
+					OASIS_FLOAT tvar, int counter,
+					const int summary_id, const int epcalc,
+					const int eptype,
+					const OASIS_FLOAT max_retperiod)
+{
+	if (nextreturnperiod_index >= returnperiods_.size()) {
+		return;
+	}
+	OASIS_FLOAT nextreturnperiod_value = returnperiods_[nextreturnperiod_index];
+	while (current_return_period <= nextreturnperiod_value) {
+		// Interpolated return period loss should not exceed that for
+		// maximum return period
+		OASIS_FLOAT loss;
+		if (max_retperiod < nextreturnperiod_value) {
+			nextreturnperiod_index++;
+			if (nextreturnperiod_index < returnperiods_.size()) {
+				nextreturnperiod_value = (OASIS_FLOAT)returnperiods_[nextreturnperiod_index];
+			} else break;
+			continue;
+		} else {
+			loss = getloss(nextreturnperiod_value, last_return_period, last_loss, current_return_period, current_loss);
+		}
+
+		tvar = tvar - ((tvar - loss) / counter);
+		const int bufferSize = 4096;
+		char buffer[bufferSize];
+		int strLen;
+		strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", summary_id, epcalc, eptype, (OASIS_FLOAT)nextreturnperiod_value, tvar);
+		outputrows(buffer, strLen);
+
+		nextreturnperiod_index++;
+		if (nextreturnperiod_index < returnperiods_.size()) {
+			nextreturnperiod_value = (OASIS_FLOAT)returnperiods_[nextreturnperiod_index];
+			counter++;
+		} else break;
+	}
+
 	if (current_return_period > 0) {
 		last_return_period = current_return_period;
 		last_loss = current_loss;

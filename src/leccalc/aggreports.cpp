@@ -352,6 +352,13 @@ void aggreports::fulluncertaintywithweighting(int handle,
 void aggreports::writefulluncertainty(const int handle, const int type,
 	const std::map<outkey2, OASIS_FLOAT> &out_loss, const int ensemble_id) {
 
+	const int epcalc = FULL;
+	int eptype = 0;
+	if (ord_out_ && type == 2) {
+		if (handle == OCC_FULL_UNCERTAINTY) eptype = OEP;
+		else if (handle == AGG_FULL_UNCERTAINTY) eptype = AEP;
+	}
+
 	std::map<int, lossvec> items;
 	for (auto x : out_loss) {
 		if ((type == 1 && x.first.sidx == -1) ||
@@ -376,7 +383,7 @@ void aggreports::writefulluncertainty(const int handle, const int type,
 		for (auto lp : lpv) {
 			OASIS_FLOAT retperiod = t / i;
 			if (useReturnPeriodFile_) {
-				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, s.first, type, max_retperiod, ensemble_id);
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, s.first, type, max_retperiod, ensemble_id, epcalc, eptype);
 			} else {
 				const int bufferSize = 4096;
 				char buffer[bufferSize];
@@ -388,21 +395,18 @@ void aggreports::writefulluncertainty(const int handle, const int type,
 				outputrows(handle, buffer, strLen);
 
 				// ORD output
-				if (ord_out_ != nullptr && type == 2) {
+				if (ord_out_ != nullptr && type == 2 && ensemble_id == 0) {
 					buffer[0] = 0;
-					int eptype = 0;
-					if (handle == OCC_FULL_UNCERTAINTY) eptype = OEP;
-					else if (handle == AGG_FULL_UNCERTAINTY) eptype = AEP;
-					strLen = snprintf(buffer, bufferSize, "%d,1,%d,%f,%f\n", s.first, eptype, retperiod, lp);
+					strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", s.first, epcalc, eptype, retperiod, lp);
 					outputrows(buffer, strLen);
 				}
 			}
 			i++;
 		}
 		if (useReturnPeriodFile_) {
-			doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first, type, max_retperiod, ensemble_id);
+			doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first, type, max_retperiod, ensemble_id, epcalc, eptype);
 			while (nextreturnperiodindex < returnperiods_.size()) {
-				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first, type, max_retperiod, ensemble_id);
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first, type, max_retperiod, ensemble_id, epcalc, eptype);
 			}
 		}
 	}
@@ -490,7 +494,7 @@ void aggreports::doreturnperiodout(int handle, size_t &nextreturnperiod_index,
 				   OASIS_FLOAT current_return_period,
 				   OASIS_FLOAT current_loss, int summary_id,
 				   int type, OASIS_FLOAT max_retperiod,
-				   int ensemble_id)
+				   int ensemble_id, int epcalc, int eptype)
 {
 	if (nextreturnperiod_index >= returnperiods_.size()) {
 		return;
@@ -514,6 +518,10 @@ void aggreports::doreturnperiodout(int handle, size_t &nextreturnperiod_index,
 		const int bufferSize = 4096;
 		char buffer[bufferSize];
 		int strLen;
+		if (epcalc && eptype && !ensemble_id) {   // ORD output
+			strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", summary_id, epcalc, eptype, (OASIS_FLOAT)nextreturnperiod_value, loss);
+			outputrows(buffer, strLen);
+		}
 		if(type) {
 			strLen = snprintf(buffer, bufferSize, "%d,%d,%f,%f", summary_id, type, (OASIS_FLOAT)nextreturnperiod_value, loss);
 			if (ensembletosidx_.size() > 0)

@@ -41,6 +41,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include<vector>
 #include "leccalc.h"
 
+enum { FULL = 1, PERSAMPLEMEAN, MEANDR, MEANSAMPLE };
 enum { OEP = 1, AEP, OEPTVAR, AEPTVAR };
 
 class aggreports {
@@ -81,7 +82,7 @@ private:
 			       OASIS_FLOAT current_return_period,
 			       OASIS_FLOAT current_loss, int summary_id,
 			       int type, OASIS_FLOAT max_retperiod,
-			       int ensemble_id=0);
+			       int ensemble_id=0, int epcalc=0, int eptype=0);
 public:
 	void loadperiodtoweigthing();
 	void loadensemblemapping();

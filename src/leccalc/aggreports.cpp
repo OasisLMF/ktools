@@ -591,9 +591,6 @@ void aggreports::wheatsheaf(int handle, const std::map<outkey2, OASIS_FLOAT> &ou
 					strLen += snprintf(buffer+strLen, bufferSize-strLen, ",0");
 				strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
 				outputrows(handle, buffer, strLen);
-				/*fprintf(fout_[handle],"%d,%d,%f,%f", s.first.summary_id, s.first.sidx, t / i, lp);
-				if (ensembletosidx_.size() > 0) fprintf(fout_[handle], ",0");
-				fprintf(fout_[handle], "\n");*/
 			}
 			i++;
 		}
@@ -847,9 +844,6 @@ void aggreports::wheatSheafMeanwithweighting(int samplesize, int handle, const s
 							strLen += snprintf(buffer+strLen, bufferSize-strLen, ",0");
 						strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
 						outputrows(handle, buffer, strLen);
-						/*fprintf(fout_[handle], "%d,1,%f,%f", s.first.summary_id, retperiod, lp.value);
-						if (ensembletosidx_.size() > 0) fprintf(fout_[handle], ",0");
-						fprintf(fout_[handle], "\n");*/
 					}
 				}
 			}
@@ -1368,9 +1362,6 @@ void aggreports::sampleMean(int samplesize, int handle, const std::map<outkey2, 
 					strLen += snprintf(buffer+strLen, bufferSize-strLen, ",0");
 				strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
 				outputrows(handle, buffer, strLen);
-				/*fprintf(fout_[handle],"%d,%d,%f,%f", m.first.summary_id, m.first.type, retperiod, lp);
-				if (ensembletosidx_.size() > 0) fprintf(fout_[handle], ",0");
-				fprintf(fout_[handle], "\n");*/
 			}
 			i++;
 		}

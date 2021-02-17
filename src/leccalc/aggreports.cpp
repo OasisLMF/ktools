@@ -415,14 +415,21 @@ void aggreports::writefulluncertainty(const int handle, const int type,
 				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first, type, max_retperiod, ensemble_id, epcalc, eptype);
 			}
 		}
+	}
 
-		// Tail Value at Risk (TVaR) - ORD output only
-		if (ord_out_ != nullptr && type == 2 && ensemble_id == 0) {
+	// Tail Value at Risk (TVaR) - ORD output only
+	if (ord_out_ != nullptr && type == 2 && ensemble_id == 0) {
+		for (auto s : items) {
+			lossvec &lpv = s.second;
+			std::sort(lpv.rbegin(), lpv.rend());
 			OASIS_FLOAT tvar = 0;
-			nextreturnperiodindex = 0;
-			last_computed_rp = 0;
-			last_computed_loss = 0;
-			i = 1;
+			size_t nextreturnperiodindex = 0;
+			OASIS_FLOAT last_computed_rp = 0;
+			OASIS_FLOAT last_computed_loss = 0;
+			int i = 1;
+			OASIS_FLOAT t = (OASIS_FLOAT)totalperiods_;
+			if (samplesize_) t *= samplesize_;
+			OASIS_FLOAT max_retperiod = t;
 			for (auto lp : lpv) {
 				OASIS_FLOAT retperiod = t / i;
 				if (useReturnPeriodFile_) {

@@ -38,7 +38,8 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #ifndef AGGREPORTS_H_
 #define AGGREPORTS_H_
 
-#include<vector>
+#include <map>
+#include <vector>
 #include "leccalc.h"
 
 enum { FULL = 1, PERSAMPLEMEAN, MEANDR, MEANSAMPLE };
@@ -52,6 +53,9 @@ private:
 	std::map<outkey2, OASIS_FLOAT> &max_out_loss_;
 	FILE **fout_;
 	FILE *ord_out_;
+	std::map<int, bool> meanDR_ = {
+		{ 0, true }, { OEP, false }, { AEP, false }
+	};   // key 0 for fail safe
 	bool useReturnPeriodFile_;
 	int samplesize_ = 0;
 	std::vector<int> returnperiods_;

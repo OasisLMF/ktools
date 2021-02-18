@@ -259,6 +259,26 @@ void aggreports::writefulluncertaintywithweighting(const int handle,
 	const int type, const std::map<outkey2, OASIS_FLOAT> &out_loss,
 	const int ensemble_id) {
 
+	// Variables for ORD output
+	int epcalc = 0;
+	int eptype = 0;
+	int eptype_tvar = 0;
+	if (ord_out_) {
+		if (type == 1) {
+			epcalc = MEANDR;
+		} else if (type == 2) {
+			epcalc = FULL;
+		}
+
+		if (handle == OCC_FULL_UNCERTAINTY) {
+			eptype = OEP;
+			eptype_tvar = OEPTVAR;
+		} else if (handle == AGG_FULL_UNCERTAINTY) {
+			eptype = AEP;
+			eptype_tvar = AEPTVAR;
+		}
+	}
+
 	std::map<int, lossvec2> items;
 	for (auto x : out_loss) {
 		if ((type == 1 && x.first.sidx == -1) || 
@@ -298,7 +318,7 @@ void aggreports::writefulluncertaintywithweighting(const int handle,
 					largest_loss = true;
 				}
 				if (useReturnPeriodFile_) {
-					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, s.first, type, max_retperiod, ensemble_id);
+					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, s.first, type, max_retperiod, ensemble_id, epcalc, eptype);
 				}
 				else {
 					const int bufferSize = 4096;
@@ -309,6 +329,60 @@ void aggreports::writefulluncertaintywithweighting(const int handle,
 						strLen += snprintf(buffer+strLen, bufferSize-strLen, "%d", ensemble_id);
 					strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
 					outputrows(handle, buffer, strLen);
+
+					// ORD output
+					if (ord_out_ != nullptr && ensemble_id == 0) {
+						if (epcalc == FULL || (epcalc == MEANDR && meanDR_[eptype] == false)) {
+							buffer[0] = 0;
+							strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", s.first, epcalc, eptype, retperiod, lp.value);
+							outputrows(buffer, strLen);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// Tail Value at Risk (TVaR) - ORD output only
+	if (ord_out_ != nullptr && ensemble_id == 0) {
+		if (epcalc == FULL || (epcalc == MEANDR && meanDR_[eptype] == false)) {
+			for (auto s : items) {
+				OASIS_FLOAT tvar = 0;
+				OASIS_FLOAT cummulative_weighting = 0;
+				lossvec2 &lpv = s.second;
+				std::sort(lpv.rbegin(), lpv.rend());
+				size_t nextreturnperiodindex = 0;
+				OASIS_FLOAT last_computed_rp = 0;
+				OASIS_FLOAT last_computed_loss = 0;
+				OASIS_FLOAT max_retperiod = 0;
+				bool largest_loss = false;
+				int i = 1;
+				for (auto lp : lpv) {
+					if (type == 1) {
+						cummulative_weighting += (lp.period_weighting * samplesize_);
+					} else if (type == 2) {
+						cummulative_weighting += lp.period_weighting;
+					}
+
+					if (lp.period_weighting) {
+						OASIS_FLOAT retperiod = 1 / cummulative_weighting;
+						if (!largest_loss) {
+							max_retperiod = retperiod;
+							largest_loss = true;
+						}
+						if (useReturnPeriodFile_) {
+							doreturnperiodout_tvar(nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, tvar, i, s.first, epcalc, eptype_tvar, max_retperiod);
+							tvar = tvar - ((tvar - lp.value) / i);
+						} else {
+							tvar = tvar - ((tvar - lp.value) / i);
+							const int bufferSize = 4096;
+							char buffer[bufferSize];
+							int strLen;
+							strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", s.first, epcalc, eptype_tvar, retperiod, tvar);
+							outputrows(buffer, strLen);
+						}
+						i++;
+					}
 				}
 			}
 		}
@@ -329,6 +403,8 @@ void aggreports::writefulluncertaintywithweighting(const int handle,
 							  ensemble.first);
 		}
 	}
+
+	meanDR_[eptype] == true;   // Do not output type 1 to ORD file again
 
 }
 

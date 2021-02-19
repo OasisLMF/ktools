@@ -404,7 +404,7 @@ void aggreports::writefulluncertaintywithweighting(const int handle,
 		}
 	}
 
-	meanDR_[eptype] == true;   // Do not output type 1 to ORD file again
+	meanDR_[eptype] = true;   // Do not output type 1 to ORD file again
 
 }
 
@@ -556,7 +556,7 @@ void aggreports::writefulluncertainty(const int handle, const int type,
 		}
 	}
 
-	meanDR_[eptype] == true;   // Do not output type 1 to ORD file again
+	meanDR_[eptype] = true;   // Do not output type 1 to ORD file again
 
 }
 
@@ -965,6 +965,20 @@ void aggreports::writewheatSheafMeanwithweighting(const std::map<int, std::vecto
 						  const int ensemble_id)
 {
 
+	// Variables for ORD output
+	int epcalc = PERSAMPLEMEAN;   // All type 2
+	int eptype = 0;
+	int eptype_tvar = 0;
+	if (ord_out_) {
+		if (handle == OCC_WHEATSHEAF_MEAN) {
+			eptype = OEP;
+			eptype_tvar = OEPTVAR;
+		} else if (handle == AGG_WHEATSHEAF_MEAN) {
+			eptype = AEP;
+			eptype_tvar = AEPTVAR;
+		}
+	}
+
 	for (auto m : mean_map) {
 
 		std::vector<lossval> &lpv = m.second;
@@ -992,7 +1006,7 @@ void aggreports::writewheatSheafMeanwithweighting(const std::map<int, std::vecto
 				}
 				if (useReturnPeriodFile_) {
 					OASIS_FLOAT loss = lp.value / samplesize;
-					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, loss, m.first, 2, max_retperiod, ensemble_id);
+					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, loss, m.first, 2, max_retperiod, ensemble_id, epcalc, eptype);
 				} else {
 					const int bufferSize = 4096;
 					char buffer[bufferSize];
@@ -1002,6 +1016,13 @@ void aggreports::writewheatSheafMeanwithweighting(const std::map<int, std::vecto
 						strLen += snprintf(buffer+strLen, bufferSize-strLen, ",%d", ensemble_id);
 					strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
 					outputrows(handle, buffer, strLen);
+
+					// ORD output
+					if (ord_out_ != nullptr && ensemble_id == 0) {
+						buffer[0] = 0;
+						strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", m.first, epcalc, eptype, retperiod, lp.value / samplesize);
+						outputrows(buffer, strLen);
+					}
 				}
 			}
 			i++;
@@ -1009,7 +1030,7 @@ void aggreports::writewheatSheafMeanwithweighting(const std::map<int, std::vecto
 		}
 		if (useReturnPeriodFile_) {
 			do {
-				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first, 2, max_retperiod, ensemble_id);
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first, 2, max_retperiod, ensemble_id, epcalc, eptype);
 			} while (nextreturnperiodindex < returnperiods_.size());
 
 		}
@@ -1020,6 +1041,21 @@ void aggreports::writewheatSheafMeanwithweighting(const std::map<int, std::vecto
 
 void aggreports::wheatSheafMeanwithweighting(int samplesize, int handle, const std::map<outkey2, OASIS_FLOAT> &out_loss)
 {
+
+	// Variables for ORD output
+	int epcalc = MEANDR;   // Only Type 1 written here
+	int eptype = 0;
+	int eptype_tvar = 0;
+	if (ord_out_) {
+		if (handle == OCC_WHEATSHEAF_MEAN) {
+			eptype = OEP;
+			eptype_tvar = OEPTVAR;
+		} else if (handle == AGG_WHEATSHEAF_MEAN) {
+			eptype = AEP;
+			eptype_tvar = AEPTVAR;
+		}
+	}
+
 	if (fout_[handle] == nullptr) return;
 	std::map<wheatkey, lossvec2> items;
 	int maxPeriod = 0;
@@ -1075,7 +1111,7 @@ void aggreports::wheatSheafMeanwithweighting(int samplesize, int handle, const s
 						largest_loss = true;
 					}
 					if (useReturnPeriodFile_) {
-						doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, s.first.summary_id, 1, max_retperiod);
+						doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, s.first.summary_id, 1, max_retperiod, 0, epcalc, eptype);
 					} else {
 						const int bufferSize = 4096;
 						char buffer[bufferSize];
@@ -1085,21 +1121,30 @@ void aggreports::wheatSheafMeanwithweighting(int samplesize, int handle, const s
 							strLen += snprintf(buffer+strLen, bufferSize-strLen, ",0");
 						strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
 						outputrows(handle, buffer, strLen);
+
+						// ORD output
+						if (ord_out_ != nullptr && meanDR_[eptype] == false) {
+							buffer[0] = 0;
+							strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", s.first.summary_id, epcalc, eptype, retperiod, lp.value);
+							outputrows(buffer, strLen);
+						}
 					}
 				}
 			}
 			if (useReturnPeriodFile_) {
-				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, 1, max_retperiod);
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, 1, max_retperiod, 0, epcalc, eptype);
 				while (nextreturnperiodindex < returnperiods_.size()) {
-					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, 1, max_retperiod);
+					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, 1, max_retperiod, 0, epcalc, eptype);
 				}
 			}
 		}
 	}
 
+	meanDR_[eptype] = true;   // Do not output Type 1 to ORD file again
+
 	if (samplesize == 0) return; // avoid divide by zero error
 
-	writewheatSheafMeanwithweighting(mean_map, samplesize, handle, 0);
+	writewheatSheafMeanwithweighting(mean_map, samplesize, handle, 0);   // Type 2
 
 	// By ensemble ID
 	if (ensembletosidx_.size() > 0) {
@@ -1144,6 +1189,20 @@ void aggreports::writewheatSheafMean(const std::map<int, std::vector<OASIS_FLOAT
 				     const OASIS_FLOAT max_retperiod, const int ensemble_id)
 {
 
+	// Variables for ORD output
+	int epcalc = PERSAMPLEMEAN;   // All type 2
+	int eptype = 0;
+	int eptype_tvar = 0;
+	if (ord_out_) {
+		if (handle == OCC_WHEATSHEAF_MEAN) {
+			eptype = OEP;
+			eptype_tvar = OEPTVAR;
+		} else if (handle == AGG_WHEATSHEAF_MEAN) {
+			eptype = AEP;
+			eptype_tvar = AEPTVAR;
+		}
+	}
+
 	for (auto m : mean_map) {
 
 		std::vector<OASIS_FLOAT> &lpv = m.second;
@@ -1163,7 +1222,7 @@ void aggreports::writewheatSheafMean(const std::map<int, std::vector<OASIS_FLOAT
 			OASIS_FLOAT retperiod = t / i;
 			if (useReturnPeriodFile_) {
 				OASIS_FLOAT loss = lp / samplesize;
-				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, loss, m.first, 2, max_retperiod, ensemble_id);
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, loss, m.first, 2, max_retperiod, ensemble_id, epcalc, eptype);
 			} else {
 				const int bufferSize = 4096;
 				char buffer[bufferSize];
@@ -1173,13 +1232,20 @@ void aggreports::writewheatSheafMean(const std::map<int, std::vector<OASIS_FLOAT
 					strLen += snprintf(buffer+strLen, bufferSize-strLen, ",%d", ensemble_id);
 				strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
 				outputrows(handle, buffer, strLen);
+
+				// ORD output
+				if (ord_out_ != nullptr && ensemble_id == 0) {
+					buffer[0] = 0;
+					strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", m.first, epcalc, eptype, retperiod, lp / samplesize);
+					outputrows(buffer, strLen);
+				}
 			}
 			i++;
 			if (i > maxindex) break;
 		}
 		if (useReturnPeriodFile_) {
 			do {
-				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first, 2, max_retperiod, ensemble_id);
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first, 2, max_retperiod, ensemble_id, epcalc, eptype);
 			} while (nextreturnperiodindex < returnperiods_.size());
 		}
 
@@ -1190,6 +1256,21 @@ void aggreports::writewheatSheafMean(const std::map<int, std::vector<OASIS_FLOAT
 
 void aggreports::wheatSheafMean(int samplesize, int handle, const std::map<outkey2, OASIS_FLOAT> &out_loss)
 {
+
+	// Variables for ORD output
+	int epcalc = MEANDR;   // Only Type 1 written here
+	int eptype = 0;
+	int eptype_tvar = 0;
+	if (ord_out_) {
+		if (handle == OCC_WHEATSHEAF_MEAN) {
+			eptype = OEP;
+			eptype_tvar = OEPTVAR;
+		} else if (handle == AGG_WHEATSHEAF_MEAN) {
+			eptype = AEP;
+			eptype_tvar = AEPTVAR;
+		}
+	}
+
 	if (fout_[handle] == nullptr) return;
 	std::map<wheatkey, lossvec> items;
 	for (auto x : out_loss) {
@@ -1235,7 +1316,7 @@ void aggreports::wheatSheafMean(int samplesize, int handle, const std::map<outke
 			for (auto lp : lpv) {
 				OASIS_FLOAT retperiod = t / i;
 				if (useReturnPeriodFile_) {
-					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, s.first.summary_id, 1, max_retperiod);
+					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, s.first.summary_id, 1, max_retperiod, 0, epcalc, eptype);
 				} else {
 					const int bufferSize = 4096;
 					char buffer[bufferSize];
@@ -1245,22 +1326,31 @@ void aggreports::wheatSheafMean(int samplesize, int handle, const std::map<outke
 						strLen += snprintf(buffer+strLen, bufferSize-strLen, ",0");
 					strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
 					outputrows(handle, buffer, strLen);
+
+					// ORD output
+					if (ord_out_ != nullptr && meanDR_[eptype] == false) {
+						buffer[0] = 0;
+						strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", s.first.summary_id, epcalc, eptype, retperiod, lp);
+						outputrows(buffer, strLen);
+					}
 				}
 
 				i++;
 			}
 			if (useReturnPeriodFile_) {
-				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, 1, max_retperiod);
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, 1, max_retperiod, 0, epcalc, eptype);
 				while (nextreturnperiodindex < returnperiods_.size()) {
-					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, 1, max_retperiod);
+					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, 1, max_retperiod, 0, epcalc, eptype);
 				}
 			}
 		}
 	}
 
+	meanDR_[eptype] = true;   // Do not output Type 1 to ORD file again
+
 	if (samplesize == 0) return; // avoid divide by zero error
 
-	writewheatSheafMean(mean_map, samplesize, handle, max_retperiod, 0);
+	writewheatSheafMean(mean_map, samplesize, handle, max_retperiod, 0);   // Type 2
 
 	// By ensemble ID
 	if (ensembletosidx_.size() > 0) {

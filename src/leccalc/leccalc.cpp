@@ -260,14 +260,16 @@ namespace leccalc {
 		agg.outputAggFulluncertainty();
 		agg.outputOccWheatSheafMean(samplesize);
 		agg.outputAggWheatSheafMean(samplesize);
+		agg.outputOccSampleMean(samplesize);
+		agg.outputAggSampleMean(samplesize);
 		agg.outputAggWheatsheaf();
 //		agg.outputAggFulluncertainty();
 //		agg.outputAggWheatSheafMean(samplesize);
-		agg.outputAggSampleMean(samplesize);
+//		agg.outputAggSampleMean(samplesize);
 		agg.outputOccWheatsheaf();
 //		agg.outputOccFulluncertainty();
 //		agg.outputOccWheatSheafMean(samplesize);
-		agg.outputOccSampleMean(samplesize);
+//		agg.outputOccSampleMean(samplesize);
 
 	}
 

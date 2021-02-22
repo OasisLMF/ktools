@@ -1585,9 +1585,29 @@ void aggreports::outputAggWheatSheafMean(int samplesize)
 }
 
 
-inline void aggreports::writeSampleMean(const int handle, const int type,
-	const std::map<summary_id_period_key, lossval> &items,
+inline void aggreports::writeSampleMeanwithweighting(const int handle,
+	const int type, const std::map<summary_id_period_key, lossval> &items,
 	const int ensemble_id) {
+
+	// Variables for ORD output
+	int epcalc = 0;
+	int eptype = 0;
+	int eptype_tvar = 0;
+	if (ord_out_) {
+		if (type == 1) {
+			epcalc = MEANDR;
+		} else if (type == 2) {
+			epcalc = MEANSAMPLE;
+		}
+
+		if (handle == OCC_SAMPLE_MEAN) {
+			eptype = OEP;
+			eptype_tvar = OEPTVAR;
+		} else if (handle == AGG_SAMPLE_MEAN) {
+			eptype = AEP;
+			eptype_tvar = AEPTVAR;
+		}
+	}
 
 	std::map<int, std::vector<lossval>> mean_map;
 
@@ -1613,7 +1633,7 @@ inline void aggreports::writeSampleMean(const int handle, const int type,
 					largest_loss = true;
 				}
 				if (useReturnPeriodFile_) {
-					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, m.first, type, max_retperiod, ensemble_id);
+					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, m.first, type, max_retperiod, ensemble_id, epcalc, eptype);
 				}
 				else {
 					const int bufferSize = 4096;
@@ -1624,13 +1644,21 @@ inline void aggreports::writeSampleMean(const int handle, const int type,
 						strLen += snprintf(buffer+strLen, bufferSize-strLen, ",%d", ensemble_id);
 					strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
 					outputrows(handle, buffer, strLen);
+
+					if (ord_out_ && ensemble_id == 0) {
+						if (epcalc == MEANSAMPLE || (epcalc == MEANDR && meanDR_[eptype] == false)) {
+							buffer[0] = 0;
+							strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", m.first, epcalc, eptype, retperiod, lp.value);
+							outputrows(buffer, strLen);
+						}
+					}
 				}
 			}
 		}
 		if (useReturnPeriodFile_) {
-			doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first, type, max_retperiod, ensemble_id);
+			doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first, type, max_retperiod, ensemble_id, epcalc, eptype);
 			while (nextreturnperiodindex < returnperiods_.size()) {
-				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first, type, max_retperiod, ensemble_id);
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first, type, max_retperiod, ensemble_id, epcalc, eptype);
 			}
 		}
 	}
@@ -1672,8 +1700,8 @@ void aggreports::sampleMeanwithweighting(int samplesize, int handle, const std::
 		if (ensembletosidx_.size() > 0) fprintf(fout_[handle], ",ensemble_id");
 		fprintf(fout_[handle], "\n");
 	}
-	writeSampleMean(handle, 1, itemsType1);   // sidx = -1
-	writeSampleMean(handle, 2, itemsType2);   // sidx > 0
+	writeSampleMeanwithweighting(handle, 1, itemsType1);   // sidx = -1
+	writeSampleMeanwithweighting(handle, 2, itemsType2);   // sidx > 0
 
 	// By ensemble ID
 	if (ensembletosidx_.size() > 0) {
@@ -1693,7 +1721,73 @@ void aggreports::sampleMeanwithweighting(int samplesize, int handle, const std::
 					}
 				}
 			}
-			writeSampleMean(handle, 2, itemsType2, ensemble.first);
+			writeSampleMeanwithweighting(handle, 2, itemsType2, ensemble.first);
+		}
+	}
+
+}
+
+void aggreports::writesampleMean(const int handle,
+				 const std::map<summary_id_type_key, std::vector<OASIS_FLOAT>> &mean_map,
+				 const OASIS_FLOAT max_retperiod,
+				 const int ensemble_id)
+{
+
+	// Variables for ORD output
+	int epcalc = 0;   // Fail safe
+	int eptype = 0;
+	int eptype_tvar = 0;
+	if (ord_out_) {
+		if (handle == OCC_SAMPLE_MEAN) {
+			eptype = OEP;
+			eptype_tvar = OEPTVAR;
+		} else if (handle == AGG_SAMPLE_MEAN) {
+			eptype = AEP;
+			eptype_tvar = AEPTVAR;
+		}
+	}
+
+	for (auto m : mean_map) {
+		std::vector<OASIS_FLOAT> &lpv = m.second;
+		std::sort(lpv.rbegin(), lpv.rend());
+		size_t nextreturnperiodindex = 0;
+		OASIS_FLOAT last_computed_rp = 0;
+		OASIS_FLOAT last_computed_loss = 0;
+		int i = 1;
+		OASIS_FLOAT t = (OASIS_FLOAT)totalperiods_;
+		for (auto lp : lpv) {
+			OASIS_FLOAT retperiod = t / i;
+			if (m.first.type == 1) epcalc = MEANDR;
+			else if (m.first.type == 2) epcalc = MEANSAMPLE;
+			else epcalc = 0;   // Should never get here
+
+			if (useReturnPeriodFile_) {
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, m.first.summary_id, m.first.type, max_retperiod, ensemble_id, epcalc, eptype);
+			} else {
+				const int bufferSize = 4096;
+				char buffer[bufferSize];
+				int strLen;
+				strLen = snprintf(buffer, bufferSize, "%d,%d,%f,%f\n", m.first.summary_id, m.first.type, retperiod, lp);
+				if (ensembletosidx_.size() > 0)
+					strLen += snprintf(buffer+strLen, bufferSize-strLen, ",0");
+				strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
+				outputrows(handle, buffer, strLen);
+
+				// ORD output
+				if (ord_out_ != nullptr && ensemble_id == 0) {
+					if (epcalc == MEANSAMPLE || (epcalc == MEANDR && meanDR_[eptype] == false)) {
+						buffer[0] = 0;
+						strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", m.first.summary_id, epcalc, eptype, retperiod, lp);
+						outputrows(buffer, strLen);
+					}
+				}
+			}
+			i++;
+		}
+		if (useReturnPeriodFile_) {
+			do {
+				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first.summary_id, m.first.type, max_retperiod, ensemble_id, epcalc, eptype);
+			} while (nextreturnperiodindex < returnperiods_.size());
 		}
 	}
 
@@ -1701,6 +1795,7 @@ void aggreports::sampleMeanwithweighting(int samplesize, int handle, const std::
 
 void aggreports::sampleMean(int samplesize, int handle, const std::map<outkey2, OASIS_FLOAT> &out_loss)
 {
+
 	if (fout_[handle] == nullptr) return;
 	std::map<summary_id_period_key, OASIS_FLOAT> items;
 
@@ -1738,37 +1833,7 @@ void aggreports::sampleMean(int samplesize, int handle, const std::map<outkey2, 
 
 	OASIS_FLOAT max_retperiod = (OASIS_FLOAT)totalperiods_;
 
-	for (auto m : mean_map) {
-		std::vector<OASIS_FLOAT> &lpv = m.second;
-		std::sort(lpv.rbegin(), lpv.rend());
-		size_t nextreturnperiodindex = 0;
-		OASIS_FLOAT last_computed_rp = 0;
-		OASIS_FLOAT last_computed_loss = 0;
-		int i = 1;
-		OASIS_FLOAT t = (OASIS_FLOAT) totalperiods_;
-		for (auto lp : lpv) {
-			OASIS_FLOAT retperiod = t / i;
-			if (useReturnPeriodFile_) {
-				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, m.first.summary_id, m.first.type, max_retperiod);
-			}else {
-				const int bufferSize = 4096;
-				char buffer[bufferSize];
-				int strLen;
-				strLen = snprintf(buffer, bufferSize, "%d,%d,%f,%f", m.first.summary_id, m.first.type, retperiod, lp);
-				if (ensembletosidx_.size() > 0)
-					strLen += snprintf(buffer+strLen, bufferSize-strLen, ",0");
-				strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
-				outputrows(handle, buffer, strLen);
-			}
-			i++;
-		}
-		if (useReturnPeriodFile_) {
-			doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first.summary_id, m.first.type, max_retperiod);
-			while (nextreturnperiodindex < returnperiods_.size()) {
-				doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first.summary_id, m.first.type, max_retperiod);
-			}
-		}
-	}
+	writesampleMean(handle, mean_map, max_retperiod);
 
 	// By ensemble ID
 	if (ensembletosidx_.size() > 0) {
@@ -1794,33 +1859,7 @@ void aggreports::sampleMean(int samplesize, int handle, const std::map<outkey2, 
 				mean_map[st].push_back(s.second);
 			}
 
-			for (auto m : mean_map) {
-				std::vector<OASIS_FLOAT> &lpv = m.second;
-				std::sort(lpv.rbegin(), lpv.rend());
-				size_t nextreturnperiodindex = 0;
-				OASIS_FLOAT last_computed_rp = 0;
-				OASIS_FLOAT last_computed_loss = 0;
-				int i = 1;
-				OASIS_FLOAT t = (OASIS_FLOAT) totalperiods_;
-				for (auto lp : lpv) {
-					OASIS_FLOAT retperiod = t / i;
-					if (useReturnPeriodFile_) {
-						doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, m.first.summary_id, m.first.type, max_retperiod, ensemble.first);
-					} else {
-						char buffer[4096];
-						int strLen;
-						strLen = sprintf(buffer, "%d,%d,%f,%f,%d\n", m.first.summary_id, m.first.type, retperiod, lp, ensemble.first);
-						outputrows(handle, buffer, strLen);
-					}
-					i++;
-				}
-				if (useReturnPeriodFile_) {
-					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first.summary_id, m.first.type, max_retperiod, ensemble.first);
-					while (nextreturnperiodindex < returnperiods_.size()) {
-						doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, m.first.summary_id, m.first.type, max_retperiod, ensemble.first);
-					}
-				}
-			}
+			writesampleMean(handle, mean_map, max_retperiod, ensemble.first);
 
 		}
 

@@ -1036,6 +1036,59 @@ void aggreports::writewheatSheafMeanwithweighting(const std::map<int, std::vecto
 		}
 	}
 
+	// Tail Value at Risk (TVaR) - ORD output only
+	if (ord_out_ != nullptr && ensemble_id == 0) {
+		for (auto m : mean_map) {
+
+			std::vector<lossval> &lpv = m.second;
+			std::vector<lossval>::reverse_iterator rit = lpv.rbegin();
+			int maxindex = (int)lpv.size();
+			while (rit != lpv.rend()) {
+				if (rit->value != 0.0) break;
+				maxindex--;
+				rit++;
+			}
+			size_t nextreturnperiodindex = 0;
+			OASIS_FLOAT last_computed_rp = 0;
+			OASIS_FLOAT last_computed_loss = 0;
+			int i = 1;
+			OASIS_FLOAT tvar = 0;
+			OASIS_FLOAT cummulative_weighting = 0;
+			OASIS_FLOAT max_retperiod = 0;
+			bool largest_loss = false;
+			for (auto lp : lpv) {
+				cummulative_weighting += (OASIS_FLOAT)(lp.period_weighting * samplesize_);
+				if (lp.period_weighting) {
+					OASIS_FLOAT retperiod = 1 / cummulative_weighting;
+					if (!largest_loss) {
+						max_retperiod = retperiod;
+						largest_loss = true;
+					}
+					OASIS_FLOAT loss = lp.value / samplesize;
+					if (useReturnPeriodFile_) {
+						doreturnperiodout_tvar(nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, loss, tvar, i, m.first, epcalc, eptype_tvar, max_retperiod);
+						tvar = tvar - ((tvar - loss) / i);
+					} else {
+						tvar = tvar - ((tvar - loss) / i);
+						const int bufferSize = 4096;
+						char buffer[bufferSize];
+						int strLen;
+						strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", m.first, epcalc, eptype_tvar, retperiod, tvar);
+						outputrows(buffer, strLen);
+					}
+					i++;
+					if (i > maxindex) break;
+				}
+				if (useReturnPeriodFile_) {
+					do {
+						doreturnperiodout_tvar(nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, tvar, i, m.first, epcalc, eptype_tvar, max_retperiod);
+					} while (nextreturnperiodindex < returnperiods_.size());
+				}
+			}
+
+		}
+	}
+
 }
 
 
@@ -1136,6 +1189,50 @@ void aggreports::wheatSheafMeanwithweighting(int samplesize, int handle, const s
 				while (nextreturnperiodindex < returnperiods_.size()) {
 					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, 1, max_retperiod, 0, epcalc, eptype);
 				}
+			}
+		}
+	}
+
+	// Tail Value at Risk (TVaR) - Mean Disaster Recovery ORD output only
+	if (ord_out_ != nullptr && meanDR_[eptype] == false) {
+		for (auto s : items) {
+			if (s.first.sidx != -1) continue;
+			OASIS_FLOAT tvar = 0;
+			OASIS_FLOAT cummulative_weighting = 0;
+			lossvec2 &lpv = s.second;
+			std::sort(lpv.rbegin(), lpv.rend());
+			size_t nextreturnperiodindex = 0;
+			OASIS_FLOAT last_computed_rp = 0;
+			OASIS_FLOAT last_computed_loss = 0;
+			OASIS_FLOAT max_retperiod = 0;
+			bool largest_loss = false;
+			int i = 1;
+			for (auto lp : lpv) {
+				cummulative_weighting += (lp.period_weighting * samplesize_);
+				if (lp.period_weighting) {
+					OASIS_FLOAT retperiod = 1 / cummulative_weighting;
+					if (!largest_loss) {
+						max_retperiod = retperiod;
+						largest_loss = true;
+					}
+					if (useReturnPeriodFile_) {
+						doreturnperiodout_tvar(nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, tvar, i, s.first.summary_id, epcalc, eptype_tvar, max_retperiod);
+						tvar = tvar - ((tvar - lp.value) / i);
+					} else {
+						tvar = tvar - ((tvar - lp.value) / i);
+						const int bufferSize = 4096;
+						char buffer[bufferSize];
+						int strLen;
+						strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", s.first.summary_id, epcalc, eptype_tvar, retperiod, tvar);
+						outputrows(buffer, strLen);
+					}
+					i++;
+				}
+			}
+			if (useReturnPeriodFile_) {
+				do {
+					doreturnperiodout_tvar(nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, tvar, i, s.first.summary_id, epcalc, eptype_tvar, max_retperiod);
+				} while (nextreturnperiodindex < returnperiods_.size());
 			}
 		}
 	}
@@ -1251,6 +1348,50 @@ void aggreports::writewheatSheafMean(const std::map<int, std::vector<OASIS_FLOAT
 
 	}
 
+	// Tail Value at Risk (TVaR) - ORD output only
+	if (ord_out_ != nullptr && ensemble_id == 0) {
+		for (auto m : mean_map) {
+
+			std::vector<OASIS_FLOAT> &lpv = m.second;
+			std::vector<OASIS_FLOAT>::reverse_iterator rit = lpv.rbegin();
+			int maxindex = (int)lpv.size();
+			while (rit != lpv.rend()) {
+				if (*rit != 0.0) break;
+				maxindex--;
+				rit++;
+			}
+			size_t nextreturnperiodindex = 0;
+			OASIS_FLOAT last_computed_rp = 0;
+			OASIS_FLOAT last_computed_loss = 0;
+			int i = 1;
+			OASIS_FLOAT tvar = 0;
+			OASIS_FLOAT t = (OASIS_FLOAT)totalperiods_;
+			for (auto lp : lpv) {
+				OASIS_FLOAT retperiod = t / i;
+				OASIS_FLOAT loss = lp / samplesize;
+				if (useReturnPeriodFile_) {
+					doreturnperiodout_tvar(nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, loss, tvar, i, m.first, epcalc, eptype_tvar, max_retperiod);
+					tvar = tvar - ((tvar - loss) / i);
+				} else {
+					tvar = tvar - ((tvar - loss) / i);
+					const int bufferSize = 4096;
+					char buffer[bufferSize];
+					int strLen;
+					strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", m.first, epcalc, eptype_tvar, retperiod, tvar);
+					outputrows(buffer, strLen);
+				}
+				i++;
+				if (i > maxindex) break;
+			}
+			if (useReturnPeriodFile_) {
+				do {
+					doreturnperiodout_tvar(nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, tvar, i, m.first, epcalc, eptype_tvar, max_retperiod);
+				} while (nextreturnperiodindex < returnperiods_.size());
+			}
+
+		}
+	}
+
 }
 
 
@@ -1342,6 +1483,41 @@ void aggreports::wheatSheafMean(int samplesize, int handle, const std::map<outke
 				while (nextreturnperiodindex < returnperiods_.size()) {
 					doreturnperiodout(handle, nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, s.first.summary_id, 1, max_retperiod, 0, epcalc, eptype);
 				}
+			}
+		}
+	}
+
+	// Tail Value at Risk (TVaR) - Mean Disaster Recovery ORD output only
+	if (ord_out_ != nullptr && meanDR_[eptype] == false) {
+		for (auto s : items) {
+			if (s.first.sidx != -1) continue;   // Type 1 only
+			lossvec &lpv = s.second;
+			std::sort(lpv.rbegin(), lpv.rend());
+			OASIS_FLOAT tvar = 0;
+			size_t nextreturnperiodindex = 0;
+			OASIS_FLOAT last_computed_rp = 0;
+			OASIS_FLOAT last_computed_loss = 0;
+			int i = 1;
+			OASIS_FLOAT t = (OASIS_FLOAT)totalperiods_;
+			for (auto lp : lpv) {
+				OASIS_FLOAT retperiod = t / i;
+				if (useReturnPeriodFile_) {
+					doreturnperiodout_tvar(nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, tvar, i, s.first.summary_id, epcalc, eptype_tvar, max_retperiod);
+					tvar = tvar - ((tvar - lp) / i);
+				} else {
+					tvar = tvar - ((tvar - lp) / i);
+					const int bufferSize = 4096;
+					char buffer[bufferSize];
+					int strLen;
+					strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", s.first.summary_id, epcalc, eptype_tvar, retperiod, tvar);
+					outputrows(buffer, strLen);
+				}
+				i++;
+			}
+			if (useReturnPeriodFile_) {
+				do {
+					doreturnperiodout_tvar(nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, tvar, i, s.first.summary_id, epcalc, eptype_tvar, max_retperiod);
+				} while (nextreturnperiodindex < returnperiods_.size());
 			}
 		}
 	}

@@ -514,7 +514,9 @@ void aggreports::writefulluncertainty(const int handle, const int type,
 				OASIS_FLOAT last_computed_loss = 0;
 				int i = 1;
 				OASIS_FLOAT t = (OASIS_FLOAT)totalperiods_;
-				if (samplesize_) t *= samplesize_;
+				if (type == 2) {
+					if (samplesize_) t *= samplesize_;
+				}
 				OASIS_FLOAT max_retperiod = t;
 				for (auto lp : lpv) {
 					OASIS_FLOAT retperiod = t / i;

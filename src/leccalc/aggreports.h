@@ -52,7 +52,7 @@ private:
 	std::map<outkey2, OASIS_FLOAT> &agg_out_loss_;
 	std::map<outkey2, OASIS_FLOAT> &max_out_loss_;
 	FILE **fout_;
-	FILE *ord_out_;
+	FILE **ord_out_;
 	std::map<int, bool> meanDR_ = {
 		{ 0, true }, { OEP, false }, { AEP, false }
 	};   // key 0 for fail safe
@@ -64,8 +64,7 @@ private:
 	bool skipheader_ = false;
 
 //
-	inline void outputrows(const int handle, const char * buffer, int strLen);
-	inline void outputrows(const char * buffer, int strLen);
+	inline void outputrows(FILE * outputFile, const char * buffer, int strLen);
 	void fulluncertainty(int handle, const std::map<outkey2, OASIS_FLOAT> &out_loss);
 	void writefulluncertainty(const int handle, const int type, const std::map<outkey2, OASIS_FLOAT> &out_loss, const int ensemble_id=0);
 	void fulluncertaintywithweighting(int handle, const std::map<outkey2, OASIS_FLOAT> &out_loss);
@@ -123,6 +122,6 @@ public:
 	void outputOccSampleMean(int samplesize);
 	void outputAggSampleMean(int samplesize);
 	aggreports(int totalperiods, int maxsummaryid, std::map<outkey2, OASIS_FLOAT> &agg_out_loss, std::map<outkey2, OASIS_FLOAT> &max_out_loss,
-		FILE **fout, bool useReturnPeriodFile, int samplesize, bool skipheader, FILE *ord_out) ;
+		FILE **fout, bool useReturnPeriodFile, int samplesize, bool skipheader, FILE **ord_out) ;
 };
 #endif // AGGREPORTS_H_

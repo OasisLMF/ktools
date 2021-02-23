@@ -215,7 +215,7 @@ namespace leccalc {
 
 	}
 
-	void doit(const std::string& subfolder, FILE** fout, bool useReturnPeriodFile, bool skipheader, FILE* ord_out)
+	void doit(const std::string& subfolder, FILE** fout, bool useReturnPeriodFile, bool skipheader, FILE** ord_out)
 	{
 		std::string path = "work/" + subfolder;
 		if (path.substr(path.length() - 1, 1) != "/") {

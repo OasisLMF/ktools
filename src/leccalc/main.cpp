@@ -63,7 +63,7 @@ void segfault_sigaction(int, siginfo_t *si, void *) {
 #endif
 
 namespace leccalc {
-	void doit(const std::string& subfolder, FILE** fout, bool useReturnPeriodFile, bool skipheader, FILE* ord_out);
+	void doit(const std::string& subfolder, FILE** fout, bool useReturnPeriodFile, bool skipheader, FILE** ord_out);
 }
 
 
@@ -80,19 +80,6 @@ void openpipe(int output_id, const std::string& pipe, FILE** fout)
 	}
 }
 
-void openordpipe(const std::string& pipe, FILE** ord_out) {
-
-	if (pipe == "-") *ord_out = stdout;
-	else {
-		FILE* f = fopen(pipe.c_str(), "wb");
-		if (f != nullptr) *ord_out = f;
-		else {
-			fprintf(stderr, "FATAL: Cannot open %s for output\n", pipe.c_str());
-			::exit(-1);
-		}
-	}
-
-}
 
 void help()
 {
@@ -112,12 +99,17 @@ void help()
 }
 
 
-// 
 int main(int argc, char* argv[])
 {
 	bool useReturnPeriodFile = false;
 	FILE* fout[] = { nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr };
-	FILE* ord_out = nullptr;
+
+	// Variables for ORD output
+	FILE* ord_out[] = { nullptr, nullptr };
+	bool ordOutput = false;
+	bool ept = false;
+	bool psept = false;
+	std::string ordStem;
 
 	std::string subfolder;
 	int opt;
@@ -132,33 +124,42 @@ int main(int argc, char* argv[])
 			break;
 		case 'F':
 			openpipe(AGG_FULL_UNCERTAINTY, optarg, fout);
+			ept = true;
 			break;
 		case 'f':
 			openpipe(OCC_FULL_UNCERTAINTY, optarg, fout);
+			ept = true;
 			break;
 		case 'W':
 			openpipe(AGG_WHEATSHEAF, optarg, fout);
+			psept = true;
 			break;
 		case 'w':
 			openpipe(OCC_WHEATSHEAF, optarg, fout);
+			psept = true;
 			break;
 		case 'S':
 			openpipe(AGG_SAMPLE_MEAN, optarg, fout);
+			ept = true;
 			break;
 		case 's':
 			openpipe(OCC_SAMPLE_MEAN, optarg, fout);
+			ept = true;
 			break;
 		case 'M':
 			openpipe(AGG_WHEATSHEAF_MEAN, optarg, fout);
+			ept = true;
 			break;
 		case 'm':
 			openpipe(OCC_WHEATSHEAF_MEAN, optarg, fout);
+			ept = true;
 			break;
 		case 'r':
 			useReturnPeriodFile = true;
 			break;
 		case 'o':
-			openordpipe(optarg, &ord_out);
+			ordOutput = true;
+			ordStem = optarg;
 			break;
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
@@ -177,6 +178,19 @@ int main(int argc, char* argv[])
 	if (argc == 1) {
 		fprintf(stderr, "FATAL: Invalid parameters\n");
 		help();
+	}
+
+	if (ordOutput) {
+		if (ept) {
+			std::string eptFilename = ordStem;
+			if (eptFilename != "-") eptFilename += "_ept.csv";
+			openpipe(EPT, eptFilename, ord_out);
+		}
+		if (psept) {
+			std::string pseptFilename = ordStem;
+			if (pseptFilename != "-") pseptFilename += "_psept.csv";
+			openpipe(PSEPT, pseptFilename, ord_out);
+		}
 	}
 
 	progname = argv[0];

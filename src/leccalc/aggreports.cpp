@@ -95,7 +95,7 @@ bool operator<(const wheatkey& lhs, const wheatkey& rhs)
 
 aggreports::aggreports(int totalperiods, int maxsummaryid, std::map<outkey2, OASIS_FLOAT> &agg_out_loss,
 	std::map<outkey2, OASIS_FLOAT> &max_out_loss, FILE **fout, bool useReturnPeriodFile, int samplesize, bool skipheader,
-	FILE *ord_out) :
+	FILE **ord_out) :
 	totalperiods_(totalperiods), maxsummaryid_(maxsummaryid), agg_out_loss_(agg_out_loss), max_out_loss_(max_out_loss),
 	fout_(fout), useReturnPeriodFile_(useReturnPeriodFile), samplesize_(samplesize),skipheader_(skipheader), ord_out_(ord_out)
 {
@@ -189,15 +189,20 @@ void aggreports::loadensemblemapping() {
 
 void aggreports::initordout() {
 
-	if (ord_out_ == nullptr) return;
 	if (skipheader_) return;
 
-	fprintf(ord_out_, "SummaryID,EPCalc,EPType,ReturnPeriod,Loss\n");
+	char columnNames[4096];
+	sprintf(columnNames, "%s", "SummaryID,EPCalc,EPType,ReturnPeriod,Loss");
+	if (ord_out_[EPT] != nullptr) {
+		fprintf(ord_out_[EPT], "%s\n", columnNames);
+	}
+	if (ord_out_[PSEPT] != nullptr) {
+		fprintf(ord_out_[PSEPT], "%s\n", columnNames);
+	}
 
 }
 
-
-inline void aggreports::outputrows(const int handle, const char * buffer,
+inline void aggreports::outputrows(FILE * outputFile, const char * buffer,
 				   int strLen) {
 
 	const char * bufPtr = buffer;
@@ -205,7 +210,7 @@ inline void aggreports::outputrows(const int handle, const char * buffer,
 	int counter = 0;
 	do {
 
-		num = fprintf(fout_[handle], "%s", bufPtr);
+		num = fprintf(outputFile, "%s", bufPtr);
 		if (num < 0) {   // Write error
 			fprintf(stderr, "FATAL: Error writing %s: %s\n",
 				buffer, strerror(errno));
@@ -226,34 +231,6 @@ inline void aggreports::outputrows(const int handle, const char * buffer,
 
 }
 
-inline void aggreports::outputrows(const char * buffer, int strLen) {
-
-	const char * bufPtr = buffer;
-	int num;
-	int counter = 0;
-
-	do {
-
-		num = fprintf(ord_out_, "%s", bufPtr);
-		if (num < 0) {   // Write error
-			fprintf(stderr, "FATAL: Error writing %s: %s\n",
-				buffer, strerror(errno));
-			exit(EXIT_FAILURE);
-		} else if (num < strLen) {   // Incomplete write
-			bufPtr += num;
-			strLen -= num;
-		} else return;   // Success
-
-		fprintf(stderr, "INFO: Attempt %d to write %s\n", ++counter,
-			buffer);
-
-	} while (counter < 10);
-
-	fprintf(stderr, "FATAL: Maximum attempts to write %s exceeded\n",
-		buffer);
-	exit(EXIT_FAILURE);
-
-}
 
 void aggreports::writefulluncertaintywithweighting(const int handle,
 	const int type, const std::map<outkey2, OASIS_FLOAT> &out_loss,
@@ -328,14 +305,14 @@ void aggreports::writefulluncertaintywithweighting(const int handle,
 					if (ensembletosidx_.size() > 0)
 						strLen += snprintf(buffer+strLen, bufferSize-strLen, "%d", ensemble_id);
 					strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
-					outputrows(handle, buffer, strLen);
+					outputrows(fout_[handle], buffer, strLen);
 
 					// ORD output
 					if (ord_out_ != nullptr && ensemble_id == 0) {
 						if (epcalc == FULL || (epcalc == MEANDR && meanDR_[eptype] == false)) {
 							buffer[0] = 0;
 							strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", s.first, epcalc, eptype, retperiod, lp.value);
-							outputrows(buffer, strLen);
+							outputrows(ord_out_[EPT], buffer, strLen);
 						}
 					}
 				}
@@ -379,7 +356,7 @@ void aggreports::writefulluncertaintywithweighting(const int handle,
 							char buffer[bufferSize];
 							int strLen;
 							strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", s.first, epcalc, eptype_tvar, retperiod, tvar);
-							outputrows(buffer, strLen);
+							outputrows(ord_out_[EPT], buffer, strLen);
 						}
 						i++;
 					}
@@ -481,14 +458,14 @@ void aggreports::writefulluncertainty(const int handle, const int type,
 				if (ensembletosidx_.size() > 0)
 					strLen += snprintf(buffer+strLen, bufferSize-strLen, ",%d", ensemble_id);
 				strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
-				outputrows(handle, buffer, strLen);
+				outputrows(fout_[handle], buffer, strLen);
 
 				// ORD output
 				if (ord_out_ != nullptr && ensemble_id == 0) {
 					if (epcalc == FULL || (epcalc == MEANDR && meanDR_[eptype] == false)) {
 						buffer[0] = 0;
 						strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", s.first, epcalc, eptype, retperiod, lp);
-						outputrows(buffer, strLen);
+						outputrows(ord_out_[EPT], buffer, strLen);
 					}
 				}
 			}
@@ -529,7 +506,7 @@ void aggreports::writefulluncertainty(const int handle, const int type,
 						char buffer[bufferSize];
 						int strLen;
 						strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", s.first, epcalc, eptype_tvar, retperiod, tvar);
-						outputrows(buffer, strLen);
+						outputrows(ord_out_[EPT], buffer, strLen);
 					}
 					i++;
 				}
@@ -654,7 +631,7 @@ void aggreports::doreturnperiodout(int handle, size_t &nextreturnperiod_index,
 		if (epcalc && eptype && !ensemble_id) {   // ORD output
 			if (!(epcalc == MEANDR && meanDR_[eptype] == true)) {
 				strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", summary_id, epcalc, eptype, (OASIS_FLOAT)nextreturnperiod_value, loss);
-				outputrows(buffer, strLen);
+				outputrows(ord_out_[EPT], buffer, strLen);
 			}
 		}
 		if(type) {
@@ -662,10 +639,10 @@ void aggreports::doreturnperiodout(int handle, size_t &nextreturnperiod_index,
 			if (ensembletosidx_.size() > 0)
 				strLen += snprintf(buffer+strLen, bufferSize-strLen, ",%d", ensemble_id);
 			strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
-			outputrows(handle, buffer, strLen);
+			outputrows(fout_[handle], buffer, strLen);
 		} else {
 			strLen = sprintf(buffer, "%d,%f,%f\n", summary_id, (OASIS_FLOAT)nextreturnperiod_value, loss);
-			outputrows(handle, buffer, strLen);
+			outputrows(fout_[handle], buffer, strLen);
 		}
 		nextreturnperiod_index++;
 		if (nextreturnperiod_index < returnperiods_.size()) {
@@ -714,7 +691,7 @@ void aggreports::doreturnperiodout_tvar(size_t &nextreturnperiod_index,
 		char buffer[bufferSize];
 		int strLen;
 		strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", summary_id, epcalc, eptype, (OASIS_FLOAT)nextreturnperiod_value, tvar);
-		outputrows(buffer, strLen);
+		outputrows(ord_out_[EPT], buffer, strLen);
 
 		nextreturnperiod_index++;
 		if (nextreturnperiod_index < returnperiods_.size()) {
@@ -774,7 +751,7 @@ void aggreports::wheatsheaf(int handle, const std::map<outkey2, OASIS_FLOAT> &ou
 				if (ensembletosidx_.size() > 0)
 					strLen += snprintf(buffer+strLen, bufferSize-strLen, ",0");
 				strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
-				outputrows(handle, buffer, strLen);
+				outputrows(fout_[handle], buffer, strLen);
 			}
 			i++;
 		}
@@ -808,7 +785,7 @@ void aggreports::wheatsheaf(int handle, const std::map<outkey2, OASIS_FLOAT> &ou
 						char buffer[4096];
 						int strLen;
 						strLen = sprintf(buffer, "%d,%d,%f,%f,%d\n", s.first.summary_id, s.first.sidx, t / i, lp, ensemble.first);
-						outputrows(handle, buffer, strLen);
+						outputrows(fout_[handle], buffer, strLen);
 					}
 					i++;
 				}
@@ -883,7 +860,7 @@ void aggreports::wheatsheafwithweighting(int handle, const std::map<outkey2, OAS
 					if (ensembletosidx_.size() > 0)
 						strLen += snprintf(buffer+strLen, bufferSize-strLen, ",0");
 					strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
-					outputrows(handle, buffer, strLen);
+					outputrows(fout_[handle], buffer, strLen);
 				}
 			}
 		}
@@ -925,7 +902,7 @@ void aggreports::wheatsheafwithweighting(int handle, const std::map<outkey2, OAS
 							int strLen;
 							strLen = sprintf(buffer, "%d,%d,%f,%f,%d\n",
 									 s.first.summary_id, s.first.sidx, retperiod, lp.value, ensemble.first);
-							outputrows(handle, buffer, strLen);
+							outputrows(fout_[handle], buffer, strLen);
 						}
 					}
 				}
@@ -1017,13 +994,13 @@ void aggreports::writewheatSheafMeanwithweighting(const std::map<int, std::vecto
 					if (ensembletosidx_.size() > 0)
 						strLen += snprintf(buffer+strLen, bufferSize-strLen, ",%d", ensemble_id);
 					strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
-					outputrows(handle, buffer, strLen);
+					outputrows(fout_[handle], buffer, strLen);
 
 					// ORD output
 					if (ord_out_ != nullptr && ensemble_id == 0) {
 						buffer[0] = 0;
 						strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", m.first, epcalc, eptype, retperiod, lp.value / samplesize);
-						outputrows(buffer, strLen);
+						outputrows(ord_out_[EPT], buffer, strLen);
 					}
 				}
 			}
@@ -1076,7 +1053,7 @@ void aggreports::writewheatSheafMeanwithweighting(const std::map<int, std::vecto
 						char buffer[bufferSize];
 						int strLen;
 						strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", m.first, epcalc, eptype_tvar, retperiod, tvar);
-						outputrows(buffer, strLen);
+						outputrows(ord_out_[EPT], buffer, strLen);
 					}
 					i++;
 					if (i > maxindex) break;
@@ -1175,13 +1152,13 @@ void aggreports::wheatSheafMeanwithweighting(int samplesize, int handle, const s
 						if (ensembletosidx_.size() > 0)
 							strLen += snprintf(buffer+strLen, bufferSize-strLen, ",0");
 						strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
-						outputrows(handle, buffer, strLen);
+						outputrows(fout_[handle], buffer, strLen);
 
 						// ORD output
 						if (ord_out_ != nullptr && meanDR_[eptype] == false) {
 							buffer[0] = 0;
 							strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", s.first.summary_id, epcalc, eptype, retperiod, lp.value);
-							outputrows(buffer, strLen);
+							outputrows(ord_out_[EPT], buffer, strLen);
 						}
 					}
 				}
@@ -1226,7 +1203,7 @@ void aggreports::wheatSheafMeanwithweighting(int samplesize, int handle, const s
 						char buffer[bufferSize];
 						int strLen;
 						strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", s.first.summary_id, epcalc, eptype_tvar, retperiod, tvar);
-						outputrows(buffer, strLen);
+						outputrows(ord_out_[EPT], buffer, strLen);
 					}
 					i++;
 				}
@@ -1330,13 +1307,13 @@ void aggreports::writewheatSheafMean(const std::map<int, std::vector<OASIS_FLOAT
 				if (ensembletosidx_.size() > 0)
 					strLen += snprintf(buffer+strLen, bufferSize-strLen, ",%d", ensemble_id);
 				strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
-				outputrows(handle, buffer, strLen);
+				outputrows(fout_[handle], buffer, strLen);
 
 				// ORD output
 				if (ord_out_ != nullptr && ensemble_id == 0) {
 					buffer[0] = 0;
 					strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", m.first, epcalc, eptype, retperiod, lp / samplesize);
-					outputrows(buffer, strLen);
+					outputrows(ord_out_[EPT], buffer, strLen);
 				}
 			}
 			i++;
@@ -1380,7 +1357,7 @@ void aggreports::writewheatSheafMean(const std::map<int, std::vector<OASIS_FLOAT
 					char buffer[bufferSize];
 					int strLen;
 					strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", m.first, epcalc, eptype_tvar, retperiod, tvar);
-					outputrows(buffer, strLen);
+					outputrows(ord_out_[EPT], buffer, strLen);
 				}
 				i++;
 				if (i > maxindex) break;
@@ -1468,13 +1445,13 @@ void aggreports::wheatSheafMean(int samplesize, int handle, const std::map<outke
 					if (ensembletosidx_.size() > 0)
 						strLen += snprintf(buffer+strLen, bufferSize-strLen, ",0");
 					strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
-					outputrows(handle, buffer, strLen);
+					outputrows(fout_[handle], buffer, strLen);
 
 					// ORD output
 					if (ord_out_ != nullptr && meanDR_[eptype] == false) {
 						buffer[0] = 0;
 						strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", s.first.summary_id, epcalc, eptype, retperiod, lp);
-						outputrows(buffer, strLen);
+						outputrows(ord_out_[EPT], buffer, strLen);
 					}
 				}
 
@@ -1512,7 +1489,7 @@ void aggreports::wheatSheafMean(int samplesize, int handle, const std::map<outke
 					char buffer[bufferSize];
 					int strLen;
 					strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", s.first.summary_id, epcalc, eptype_tvar, retperiod, tvar);
-					outputrows(buffer, strLen);
+					outputrows(ord_out_[EPT], buffer, strLen);
 				}
 				i++;
 			}
@@ -1643,13 +1620,13 @@ inline void aggreports::writeSampleMeanwithweighting(const int handle,
 					if (ensembletosidx_.size() > 0)
 						strLen += snprintf(buffer+strLen, bufferSize-strLen, ",%d", ensemble_id);
 					strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
-					outputrows(handle, buffer, strLen);
+					outputrows(fout_[handle], buffer, strLen);
 
 					if (ord_out_ && ensemble_id == 0) {
 						if (epcalc == MEANSAMPLE || (epcalc == MEANDR && meanDR_[eptype] == false)) {
 							buffer[0] = 0;
 							strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", m.first, epcalc, eptype, retperiod, lp.value);
-							outputrows(buffer, strLen);
+							outputrows(ord_out_[EPT], buffer, strLen);
 						}
 					}
 				}
@@ -1694,7 +1671,7 @@ inline void aggreports::writeSampleMeanwithweighting(const int handle,
 							char buffer[bufferSize];
 							int strLen;
 							strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", m.first, epcalc, eptype_tvar, retperiod, tvar);
-							outputrows(buffer, strLen);
+							outputrows(ord_out_[EPT], buffer, strLen);
 						}
 						i++;
 					}
@@ -1814,18 +1791,18 @@ void aggreports::writesampleMean(const int handle,
 				const int bufferSize = 4096;
 				char buffer[bufferSize];
 				int strLen;
-				strLen = snprintf(buffer, bufferSize, "%d,%d,%f,%f\n", m.first.summary_id, m.first.type, retperiod, lp);
+				strLen = snprintf(buffer, bufferSize, "%d,%d,%f,%f", m.first.summary_id, m.first.type, retperiod, lp);
 				if (ensembletosidx_.size() > 0)
 					strLen += snprintf(buffer+strLen, bufferSize-strLen, ",0");
 				strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
-				outputrows(handle, buffer, strLen);
+				outputrows(fout_[handle], buffer, strLen);
 
 				// ORD output
 				if (ord_out_ != nullptr && ensemble_id == 0) {
 					if (epcalc == MEANSAMPLE || (epcalc == MEANDR && meanDR_[eptype] == false)) {
 						buffer[0] = 0;
 						strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", m.first.summary_id, epcalc, eptype, retperiod, lp);
-						outputrows(buffer, strLen);
+						outputrows(ord_out_[EPT], buffer, strLen);
 					}
 				}
 			}
@@ -1867,7 +1844,7 @@ void aggreports::writesampleMean(const int handle,
 					char buffer[bufferSize];
 					int strLen;
 					strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", m.first.summary_id, epcalc, eptype_tvar, retperiod, tvar);
-					outputrows(buffer, strLen);
+					outputrows(ord_out_[EPT], buffer, strLen);
 				}
 				i++;
 			}

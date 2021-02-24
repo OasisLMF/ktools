@@ -238,7 +238,7 @@ void aggreports::writefulluncertaintywithweighting(const int handle,
 	int epcalc = 0;
 	int eptype = 0;
 	int eptype_tvar = 0;
-	if (ord_out_) {
+	if (ord_out_[EPT] != nullptr) {
 		if (type == 1) {
 			epcalc = MEANDR;
 		} else if (type == 2) {
@@ -306,7 +306,7 @@ void aggreports::writefulluncertaintywithweighting(const int handle,
 					outputrows(fout_[handle], buffer, strLen);
 
 					// ORD output
-					if (ord_out_ != nullptr && ensemble_id == 0) {
+					if (ord_out_[EPT] != nullptr && ensemble_id == 0) {
 						if (epcalc == FULL || (epcalc == MEANDR && meanDR_[eptype] == false)) {
 							buffer[0] = 0;
 							strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", s.first, epcalc, eptype, retperiod, lp.value);
@@ -319,7 +319,7 @@ void aggreports::writefulluncertaintywithweighting(const int handle,
 	}
 
 	// Tail Value at Risk (TVaR) - ORD output only
-	if (ord_out_ != nullptr && ensemble_id == 0) {
+	if (ord_out_[EPT] != nullptr && ensemble_id == 0) {
 		if (epcalc == FULL || (epcalc == MEANDR && meanDR_[eptype] == false)) {
 			for (auto s : items) {
 				OASIS_FLOAT tvar = 0;
@@ -407,7 +407,7 @@ void aggreports::writefulluncertainty(const int handle, const int type,
 	int epcalc = 0;
 	int eptype = 0;
 	int eptype_tvar = 0;
-	if (ord_out_) {
+	if (ord_out_[EPT] != nullptr) {
 		if (type == 1) {
 			epcalc = MEANDR;
 		} else if (type == 2) {
@@ -459,7 +459,7 @@ void aggreports::writefulluncertainty(const int handle, const int type,
 				outputrows(fout_[handle], buffer, strLen);
 
 				// ORD output
-				if (ord_out_ != nullptr && ensemble_id == 0) {
+				if (ord_out_[EPT] != nullptr && ensemble_id == 0) {
 					if (epcalc == FULL || (epcalc == MEANDR && meanDR_[eptype] == false)) {
 						buffer[0] = 0;
 						strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", s.first, epcalc, eptype, retperiod, lp);
@@ -478,7 +478,7 @@ void aggreports::writefulluncertainty(const int handle, const int type,
 	}
 
 	// Tail Value at Risk (TVaR) - ORD output only
-	if (ord_out_ != nullptr && ensemble_id == 0) {
+	if (ord_out_[EPT] != nullptr && ensemble_id == 0) {
 		if (epcalc == FULL || (epcalc == MEANDR && meanDR_[eptype] == false)) {
 			for (auto s : items) {
 				lossvec &lpv = s.second;
@@ -628,7 +628,8 @@ void aggreports::doreturnperiodout(int handle, size_t &nextreturnperiod_index,
 		char buffer[bufferSize];
 		int strLen;
 		if (epcalc && eptype && !ensemble_id) {   // ORD output
-			if (!(epcalc == MEANDR && meanDR_[eptype] == true)) {
+			if (!(epcalc == MEANDR && meanDR_[eptype] == true)
+			    || psept_out) {   // epcalc variable reused as sample ID for Per Sample Exceedance Probability Table (PSEPT)
 				strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", summary_id, epcalc, eptype, (OASIS_FLOAT)nextreturnperiod_value, loss);
 				if (psept_out) {
 					outputrows(ord_out_[PSEPT], buffer, strLen);
@@ -722,7 +723,7 @@ void aggreports::wheatsheaf(int handle, const std::map<outkey2, OASIS_FLOAT> &ou
 	// Variables for ORD output
 	int eptype = 0;
 	int eptype_tvar = 0;
-	if (ord_out_) {
+	if (ord_out_[PSEPT] != nullptr) {
 		if (handle == OCC_WHEATSHEAF) {
 			eptype = OEP;
 			eptype_tvar = OEPTVAR;
@@ -873,7 +874,7 @@ void aggreports::wheatsheafwithweighting(int handle, const std::map<outkey2, OAS
 	// Variables for ORD output
 	int eptype = 0;
 	int eptype_tvar = 0;
-	if (ord_out_) {
+	if (ord_out_[PSEPT] != nullptr) {
 		if (handle == OCC_WHEATSHEAF) {
 			eptype = OEP;
 			eptype_tvar = OEPTVAR;
@@ -1074,7 +1075,7 @@ void aggreports::writewheatSheafMeanwithweighting(const std::map<int, std::vecto
 	int epcalc = PERSAMPLEMEAN;   // All type 2
 	int eptype = 0;
 	int eptype_tvar = 0;
-	if (ord_out_) {
+	if (ord_out_[EPT] != nullptr) {
 		if (handle == OCC_WHEATSHEAF_MEAN) {
 			eptype = OEP;
 			eptype_tvar = OEPTVAR;
@@ -1123,7 +1124,7 @@ void aggreports::writewheatSheafMeanwithweighting(const std::map<int, std::vecto
 					outputrows(fout_[handle], buffer, strLen);
 
 					// ORD output
-					if (ord_out_ != nullptr && ensemble_id == 0) {
+					if (ord_out_[EPT] != nullptr && ensemble_id == 0) {
 						buffer[0] = 0;
 						strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", m.first, epcalc, eptype, retperiod, lp.value / samplesize);
 						outputrows(ord_out_[EPT], buffer, strLen);
@@ -1142,7 +1143,7 @@ void aggreports::writewheatSheafMeanwithweighting(const std::map<int, std::vecto
 	}
 
 	// Tail Value at Risk (TVaR) - ORD output only
-	if (ord_out_ != nullptr && ensemble_id == 0) {
+	if (ord_out_[EPT] != nullptr && ensemble_id == 0) {
 		for (auto m : mean_map) {
 
 			std::vector<lossval> &lpv = m.second;
@@ -1204,7 +1205,7 @@ void aggreports::wheatSheafMeanwithweighting(int samplesize, int handle, const s
 	int epcalc = MEANDR;   // Only Type 1 written here
 	int eptype = 0;
 	int eptype_tvar = 0;
-	if (ord_out_) {
+	if (ord_out_[EPT] != nullptr) {
 		if (handle == OCC_WHEATSHEAF_MEAN) {
 			eptype = OEP;
 			eptype_tvar = OEPTVAR;
@@ -1281,7 +1282,7 @@ void aggreports::wheatSheafMeanwithweighting(int samplesize, int handle, const s
 						outputrows(fout_[handle], buffer, strLen);
 
 						// ORD output
-						if (ord_out_ != nullptr && meanDR_[eptype] == false) {
+						if (ord_out_[EPT] != nullptr && meanDR_[eptype] == false) {
 							buffer[0] = 0;
 							strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", s.first.summary_id, epcalc, eptype, retperiod, lp.value);
 							outputrows(ord_out_[EPT], buffer, strLen);
@@ -1299,7 +1300,7 @@ void aggreports::wheatSheafMeanwithweighting(int samplesize, int handle, const s
 	}
 
 	// Tail Value at Risk (TVaR) - Mean Disaster Recovery ORD output only
-	if (ord_out_ != nullptr && meanDR_[eptype] == false) {
+	if (ord_out_[EPT] != nullptr && meanDR_[eptype] == false) {
 		for (auto s : items) {
 			if (s.first.sidx != -1) continue;
 			OASIS_FLOAT tvar = 0;
@@ -1395,7 +1396,7 @@ void aggreports::writewheatSheafMean(const std::map<int, std::vector<OASIS_FLOAT
 	int epcalc = PERSAMPLEMEAN;   // All type 2
 	int eptype = 0;
 	int eptype_tvar = 0;
-	if (ord_out_) {
+	if (ord_out_[EPT] != nullptr) {
 		if (handle == OCC_WHEATSHEAF_MEAN) {
 			eptype = OEP;
 			eptype_tvar = OEPTVAR;
@@ -1436,7 +1437,7 @@ void aggreports::writewheatSheafMean(const std::map<int, std::vector<OASIS_FLOAT
 				outputrows(fout_[handle], buffer, strLen);
 
 				// ORD output
-				if (ord_out_ != nullptr && ensemble_id == 0) {
+				if (ord_out_[EPT] != nullptr && ensemble_id == 0) {
 					buffer[0] = 0;
 					strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", m.first, epcalc, eptype, retperiod, lp / samplesize);
 					outputrows(ord_out_[EPT], buffer, strLen);
@@ -1454,7 +1455,7 @@ void aggreports::writewheatSheafMean(const std::map<int, std::vector<OASIS_FLOAT
 	}
 
 	// Tail Value at Risk (TVaR) - ORD output only
-	if (ord_out_ != nullptr && ensemble_id == 0) {
+	if (ord_out_[EPT] != nullptr && ensemble_id == 0) {
 		for (auto m : mean_map) {
 
 			std::vector<OASIS_FLOAT> &lpv = m.second;
@@ -1507,7 +1508,7 @@ void aggreports::wheatSheafMean(int samplesize, int handle, const std::map<outke
 	int epcalc = MEANDR;   // Only Type 1 written here
 	int eptype = 0;
 	int eptype_tvar = 0;
-	if (ord_out_) {
+	if (ord_out_[EPT] != nullptr) {
 		if (handle == OCC_WHEATSHEAF_MEAN) {
 			eptype = OEP;
 			eptype_tvar = OEPTVAR;
@@ -1574,7 +1575,7 @@ void aggreports::wheatSheafMean(int samplesize, int handle, const std::map<outke
 					outputrows(fout_[handle], buffer, strLen);
 
 					// ORD output
-					if (ord_out_ != nullptr && meanDR_[eptype] == false) {
+					if (ord_out_[EPT] != nullptr && meanDR_[eptype] == false) {
 						buffer[0] = 0;
 						strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", s.first.summary_id, epcalc, eptype, retperiod, lp);
 						outputrows(ord_out_[EPT], buffer, strLen);
@@ -1593,7 +1594,7 @@ void aggreports::wheatSheafMean(int samplesize, int handle, const std::map<outke
 	}
 
 	// Tail Value at Risk (TVaR) - Mean Disaster Recovery ORD output only
-	if (ord_out_ != nullptr && meanDR_[eptype] == false) {
+	if (ord_out_[EPT] != nullptr && meanDR_[eptype] == false) {
 		for (auto s : items) {
 			if (s.first.sidx != -1) continue;   // Type 1 only
 			lossvec &lpv = s.second;
@@ -1696,7 +1697,7 @@ inline void aggreports::writeSampleMeanwithweighting(const int handle,
 	int epcalc = 0;
 	int eptype = 0;
 	int eptype_tvar = 0;
-	if (ord_out_) {
+	if (ord_out_[EPT] != nullptr) {
 		if (type == 1) {
 			epcalc = MEANDR;
 		} else if (type == 2) {
@@ -1748,7 +1749,7 @@ inline void aggreports::writeSampleMeanwithweighting(const int handle,
 					strLen += snprintf(buffer+strLen, bufferSize-strLen, "\n");
 					outputrows(fout_[handle], buffer, strLen);
 
-					if (ord_out_ && ensemble_id == 0) {
+					if (ord_out_[EPT] != nullptr && ensemble_id == 0) {
 						if (epcalc == MEANSAMPLE || (epcalc == MEANDR && meanDR_[eptype] == false)) {
 							buffer[0] = 0;
 							strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", m.first, epcalc, eptype, retperiod, lp.value);
@@ -1767,7 +1768,7 @@ inline void aggreports::writeSampleMeanwithweighting(const int handle,
 	}
 
 	// Tail Value at Risk (TVaR) - ORD output only
-	if (ord_out_ != nullptr && ensemble_id == 0) {
+	if (ord_out_[EPT] != nullptr && ensemble_id == 0) {
 		if (epcalc == MEANSAMPLE || (epcalc == MEANDR && meanDR_[eptype] == false)) {
 			for (auto m : mean_map) {
 				std::vector<lossval> &lpv = m.second;
@@ -1887,7 +1888,7 @@ void aggreports::writesampleMean(const int handle,
 	int epcalc = 0;   // Fail safe
 	int eptype = 0;
 	int eptype_tvar = 0;
-	if (ord_out_) {
+	if (ord_out_[EPT] != nullptr) {
 		if (handle == OCC_SAMPLE_MEAN) {
 			eptype = OEP;
 			eptype_tvar = OEPTVAR;
@@ -1924,7 +1925,7 @@ void aggreports::writesampleMean(const int handle,
 				outputrows(fout_[handle], buffer, strLen);
 
 				// ORD output
-				if (ord_out_ != nullptr && ensemble_id == 0) {
+				if (ord_out_[EPT] != nullptr && ensemble_id == 0) {
 					if (epcalc == MEANSAMPLE || (epcalc == MEANDR && meanDR_[eptype] == false)) {
 						buffer[0] = 0;
 						strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", m.first.summary_id, epcalc, eptype, retperiod, lp);
@@ -1942,7 +1943,7 @@ void aggreports::writesampleMean(const int handle,
 	}
 
 	// Tail Value at Risk (TVaR) - ORD output only
-	if (ord_out_ != nullptr && ensemble_id == 0) {
+	if (ord_out_[EPT] != nullptr && ensemble_id == 0) {
 		for (auto m : mean_map) {
 			std::vector<OASIS_FLOAT> &lpv = m.second;
 			std::sort(lpv.rbegin(), lpv.rend());

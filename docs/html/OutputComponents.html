@@ -654,6 +654,13 @@ $ pltcalc &lt; summarycalc.bin &gt; plt.csv
 <td style="text-align:right">1</td>
 </tr>
 <tr>
+<td style="text-align:left">summary_id</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align:left">summary_id representing a grouping of losses</td>
+<td style="text-align:right">10</td>
+</tr>
+<tr>
 <td style="text-align:left">event_id</td>
 <td>int</td>
 <td>4</td>
@@ -716,6 +723,13 @@ $ pltcalc &lt; summarycalc.bin &gt; plt.csv
 <td>4</td>
 <td style="text-align:left">1 for analytical mean, 2 for sample mean</td>
 <td style="text-align:right">1</td>
+</tr>
+<tr>
+<td style="text-align:left">summary_id</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align:left">summary_id representing a grouping of losses</td>
+<td style="text-align:right">10</td>
 </tr>
 <tr>
 <td style="text-align:left">event_id</td>
@@ -862,6 +876,27 @@ $ aalcalc -Ksummary1 &gt; aal.csv
 <p>An additional feature of aalcalc is available to vary the relative importance of the period losses by providing a period weightings file to the calculation. In this file, a weight can be assigned to each period make it more or less important than neutral weighting (1 divided by the total number of periods). For example, if the neutral weight for period 1 is 1 in 10000 years, or 0.0001, then doubling the weighting to 0.0002 will mean that period's loss reoccurrence rate would double and the loss contribution to the average annual loss would double.</p>
 <p>All period_nos must appear in the file from 1 to P (no gaps). There is no constraint on the sum of weights. Periods with zero weight will not contribute any losses to the AAL.</p>
 <p>This feature will be invoked automatically if the periods.bin file is present in the input directory.</p>
+<p><a href="#outputcomponents">Return to top</a></p>
+<h3 id="kat-a-id%22kat%22a">kat <a id="kat"></a></h3>
+<hr>
+<p>In cases where events have been distributed to multiple processes, the output files can be concatenated to standard output.</p>
+<h4 id="parameters">Parameters</h4>
+<p>Optional parameters are:</p>
+<ul>
+<li>-d {file path} - The directory containing output files to be concatenated.</li>
+<li>-s - Sort by event ID (currently only supported for eltcalc output).</li>
+</ul>
+<p>The sort by event ID option assumes that events have not been distributed to processes randomly and the list of event IDs in events.bin is sequential and contiguous. Should either of these conditions be false, the output will still contain all events but sorting cannot be guaranteed.</p>
+<h4 id="usage">Usage</h4>
+<pre class="hljs"><code><div>$ kat [parameters] [file]... &gt; [stdout component]
+</div></code></pre>
+<h4 id="examples">Examples</h4>
+<pre class="hljs"><code><div>$ kat -d pltcalc_output/ &gt; pltcalc.csv
+$ kat eltcalc_P1 eltcalc_P2 eltcalc_P3 &gt; eltcalc.csv
+$ kat -s eltcalc_P1 eltcalc_P2 eltcalc_P3 &gt; eltcalc.csv
+$ kat -s -d eltcalc_output/ &gt; eltcalc.csv
+</div></code></pre>
+<p>Files are concatenated in the order in which they are presented on the command line. Should a file path be specified, files are concatenated in alphabetical order. When asked to sort by event ID, the order of input files is irrelevant.</p>
 <p><a href="#outputcomponents">Return to top</a></p>
 <p><a href="DataConversionComponents.md">Go to 4.3 Data conversion components section</a></p>
 <p><a href="Contents.md">Back to Contents</a></p>

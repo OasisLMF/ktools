@@ -3,13 +3,31 @@ Ktools Changelog
 
 .. * [#_](https://github.com/OasisLMF/OasisLMF/issues/_) -  
 
-`v3.4.1`_
+`v3.5.0`_
 ---------
 .. start_latest_release
+* [#36](https://github.com/OasisLMF/ktools/issues/36) - Sort eltcalc output with kat
+* [#119](https://github.com/OasisLMF/ktools/issues/119) - Add options to partition events between multiple processes deterministically or using Fisher-Yates shuffle
+* [#180](https://github.com/OasisLMF/ktools/pull/180) - Evenly distribute events among processes
+.. end_latest_release
+
+`v3.4.3`_
+---------
+* [#168](https://github.com/OasisLMF/ktools/issues/168) - Remove unrequired lines in getmodel output
+* [#172](https://github.com/OasisLMF/ktools/issues/172) - Better error reporting and handling of partial output in eltcalc
+* [#174](https://github.com/OasisLMF/ktools/issues/174) - Better error reporting and handling of partial output in aalcalc and leccalc
+* [#181](https://github.com/OasisLMF/ktools/issues/181) - Correction to Wheatsheaf Mean output in leccalc
+
+`v3.4.2`_
+---------
+* [#175](https://github.com/OasisLMF/ktools/issues/175) - Calculate accumulated TIV without duplication of TIVs for multi-peril models
+* [#176](https://github.com/OasisLMF/ktools/issues/176) - Include TIVs for coverages where there are no input losses
+
+`v3.4.1`_
+---------
 * [#38](https://github.com/OasisLMF/ktools/issues/38) - Drop interval type column from damage bin dictionary
 * [#155](https://github.com/OasisLMF/ktools/issues/155) - Provide support for compressed and indexed vulnerability files
 * [#165](https://github.com/OasisLMF/ktools/issues/165) - Introduce option to write original data size to footprint index file
-.. end_latest_release
 
 `v3.4.0`_
 ---------

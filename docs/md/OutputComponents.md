@@ -200,6 +200,7 @@ In the former case, the output format is;
 | Name              | Type   |  Bytes | Description                                                         | Example     |
 |:------------------|--------|--------| :-------------------------------------------------------------------|------------:|
 | type              | int    |    4   | 1 for analytical mean, 2 for sample mean                            |  1          |
+| summary_id        | int    |    4   | summary_id representing a grouping of losses                        |  10         |
 | event_id          | int    |    4   | Oasis event_id                                                      |  45567      |
 | period_no         | int    |    4   | identifying an abstract period of time, such as a year              |  56876      |
 | mean              | float  |    4   | mean                                                                |   1345.678  |
@@ -214,6 +215,7 @@ In the latter case, the output format is;
 | Name              | Type   |  Bytes | Description                                                         | Example     |
 |:------------------|--------|--------| :-------------------------------------------------------------------|------------:|
 | type              | int    |    4   | 1 for analytical mean, 2 for sample mean                            |  1          |
+| summary_id        | int    |    4   | summary_id representing a grouping of losses                        |  10         |
 | event_id          | int    |    4   | Oasis event_id                                                      |  45567      |
 | period_no         | int    |    4   | identifying an abstract period of time, such as a year              |  56876      |
 | mean              | float  |    4   | mean                                                                |   1345.678  |
@@ -297,6 +299,38 @@ An additional feature of aalcalc is available to vary the relative importance of
 All period_nos must appear in the file from 1 to P (no gaps). There is no constraint on the sum of weights. Periods with zero weight will not contribute any losses to the AAL.
 
 This feature will be invoked automatically if the periods.bin file is present in the input directory.
+
+[Return to top](#outputcomponents)
+
+### kat <a id="kat"></a>
+***
+In cases where events have been distributed to multiple processes, the output files can be concatenated to standard output.
+
+#### Parameters
+
+Optional parameters are:
+
+* -d {file path} - The directory containing output files to be concatenated.
+* -s - Sort by event ID (currently only supported for eltcalc output).
+
+The sort by event ID option assumes that events have not been distributed to processes randomly and the list of event IDs in events.bin is sequential and contiguous. Should either of these conditions be false, the output will still contain all events but sorting cannot be guaranteed.
+
+#### Usage
+
+```
+$ kat [parameters] [file]... > [stdout component]
+```
+
+#### Examples
+
+```
+$ kat -d pltcalc_output/ > pltcalc.csv
+$ kat eltcalc_P1 eltcalc_P2 eltcalc_P3 > eltcalc.csv
+$ kat -s eltcalc_P1 eltcalc_P2 eltcalc_P3 > eltcalc.csv
+$ kat -s -d eltcalc_output/ > eltcalc.csv
+```
+
+Files are concatenated in the order in which they are presented on the command line. Should a file path be specified, files are concatenated in alphabetical order. When asked to sort by event ID, the order of input files is irrelevant.
 
 [Return to top](#outputcomponents)
 

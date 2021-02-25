@@ -62,21 +62,78 @@ namespace eve {
         }
         fclose(fin);
     }
-    void doshuffle(std::vector<int> &events) {
-        unsigned seed = 1234;
-        std::default_random_engine e(seed);
-        std::shuffle(events.begin(), events.end(), e);
+
+    void randomiseevents(OASIS_INT pno_, OASIS_INT total_,
+			 std::vector<int> &events, bool textmode) {
+
+	unsigned seed = 1234;
+	std::default_random_engine e(seed);
+
+	// As we only consider swapping each element once as we go through the
+	// vector sequentially, we can output events IDs as we proceed. We are
+	// only interested in a particular process ID, so only output events IDs
+	// assigned to that process
+	auto eventsSize = events.size();
+	int counter = 1;
+	for (std::vector<int>::iterator it = events.begin(); it != events.end();
+	     it++) {
+
+	    // Implement Fisher-Yates shuffle
+	    std::uniform_int_distribution<> d(0, --eventsSize);
+	    std::iter_swap(it, it + d(e));
+
+	    if ((counter - pno_) % total_ == 0) {
+
+		if (textmode) fprintf(stdout, "%d\n", *it);
+		else fwrite(&(*it), sizeof(*it), 1, stdout);
+
+	    }
+	    counter++;
+
+	}
+
+    }
+
+    void randomiseeventslegacy(std::vector<int> &events) {
+
+	unsigned seed = 1234;
+	std::default_random_engine e(seed);
+	std::shuffle(events.begin(), events.end(), e);
+
+    }
+
+    void doshuffle(OASIS_INT pno_, OASIS_INT total_, std::vector<int> &events,
+		   bool textmode) {
+
+	// As we go through event IDs in vector, assign them to processes in the
+	// same fashion as dealing a deck of cards. We are only interested in a
+	// particular process ID, so only output event IDs dealt to that process
+	int counter = 1;
+	for (std::vector<int>::iterator it = events.begin(); it != events.end();
+	     it++) {
+
+	    if ((counter - pno_) % total_ == 0) {
+
+		if (textmode) fprintf(stdout, "%d\n", *it);
+		else fwrite(&(*it), sizeof(*it), 1, stdout);
+
+	    }
+	    counter++;
+
+	}
+
     }
 
     void emitevents(OASIS_INT pno_, OASIS_INT total_, std::vector<int> &events,
                     bool textmode) {
-        size_t total_events = events.size();
-        int chunksize = (int)ceil((OASIS_FLOAT)total_events / total_);
-        size_t end_pos = chunksize * pno_;
-        pno_--;
-        size_t start_pos = chunksize * pno_;
-        if (end_pos > (size_t) events.size())
-            end_pos = events.size();
+
+	int total_events = (int)events.size();
+	int min_chunksize = total_events / total_;
+	int first_min_pno = (total_events % total_) + 1;
+	int start_pos = (min_chunksize + 1) * (std::min(first_min_pno, pno_) - 1);
+	start_pos += min_chunksize * std::max(pno_ - first_min_pno, 0);
+	int end_pos = (min_chunksize + 1) * (std::min(first_min_pno, pno_+1) - 1);
+	end_pos += min_chunksize * std::max(pno_+1 - first_min_pno, 0);
 
         while (start_pos < end_pos) {
             int eventid = events[start_pos];
@@ -87,15 +144,30 @@ namespace eve {
             start_pos++;
         }
     }
-    void emitevents(OASIS_INT pno_, OASIS_INT total_, bool shuffle,
-                    bool textmode) {
 
-        std::vector<int> events;
-        readevents(events);
-        if (shuffle == true) {
-            doshuffle(events);
-        }
-        emitevents(pno_, total_, events, textmode);
-        return;
+    void emitevents(OASIS_INT pno_, OASIS_INT total_, bool shuffle,
+		    bool randomise, bool randomiselegacy, bool textmode) {
+
+	std::vector<int> events;
+	readevents(events);
+	if (!shuffle) {   // No shuffling
+	    emitevents(pno_, total_, events, textmode);
+
+	} else {
+
+	    if (randomise) {   // Implement Fisher-Yates shuffle
+		randomiseevents(pno_, total_, events, textmode);
+
+	    } else if (randomiselegacy) {   // Implement std::shuffle
+		randomiseeventslegacy(events);
+		emitevents(pno_, total_, events, textmode);
+
+	    } else {   // Implement deterministic approach
+		doshuffle(pno_, total_, events, textmode);
+
+	    }
+	}
+
     }
+
 } // namespace eve

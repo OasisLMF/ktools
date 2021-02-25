@@ -381,11 +381,11 @@ void getmodel::doResultsNoIntensityUncertainty(
       OASIS_FLOAT prob = vulnerabilities[vulnerability_id][getVulnerabilityIndex(
           intensity_bin_index, damage_bin_index)];
 
-      // if (prob > 0 || damage_bin_index == 0)
-      //{
       cumulative_prob += prob;
       _temp_results[result_index++].prob = cumulative_prob;
-      //}
+
+      if (cumulative_prob > 0.999999940)
+        break; // single precision value approx 1
     }
 
     int num_results = result_index;

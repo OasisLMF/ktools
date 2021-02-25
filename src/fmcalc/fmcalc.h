@@ -41,6 +41,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include "../include/oasis.h"
 #include "fmstructs.h"
 
+#include <set>
 #include <vector>
 #include <map>
 
@@ -68,6 +69,7 @@ private:
 	int max_layer_ = 0;		// initialized from policy_tc
 	int max_agg_id_ = 0;	// initialized from policy_tc
 	bool isGULStreamType_ = true;
+	bool isOldGULStreamType_ = false;
 	std::vector <profile_rec_new> profile_vec_new_;
 	std::vector<std::vector <profile_rec_new>> profile_vec_stepped_;
 	int maxLevel_ = -1;
@@ -75,13 +77,18 @@ private:
 	int max_level_ = 0;
 	std::vector<int> level_to_max_layer_;
 	std::vector<std::vector<int>> pfm_vec_vec_;  // initialized from fm/programme.bin  pfm_vec_vec[level_id][item_id] returns agg_id 
-	std::vector<OASIS_FLOAT> item_to_tiv_;	
+	std::vector<std::vector<std::vector<int>>> node_to_direct_sub_nodes_vec_;
+	std::vector<OASIS_FLOAT> item_to_tiv_;
+	std::vector<int> item_to_cov_id_;
+	std::vector<std::vector<std::set<int>>> node_to_coverage_ids_;
+	std::vector<std::vector<OASIS_FLOAT>> accumulated_tivs_;
 	void init_programme(int maxrunLevel);
 	void init_profile();
 	void init_profile_step();
 	void init_profile__stepped_rec(fm_profile_step& f);
 	void init_profile_rec(fm_profile &f);
-	void init_itemtotiv();
+	std::set<int> assign_coverage_ids(const int level, const int to_agg_id);
+	bool init_itemtotiv();
 	void init_fmxref();
 	void init(int MaxRunLevel);
 	void init_policytc(int MaxRunLevel);

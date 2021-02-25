@@ -382,6 +382,8 @@ code {
 <p>Optional parameters are;</p>
 <ul>
 <li>-n - No shuffled events. Events are split up and distributed in blocks in respect of the order they are input.</li>
+<li>-r - Randomise events. Events are split up and distributed in blocks randomly using the Fisher-Yates shuffle.
+No shuffled events takes priority in cases where both optional parameters are supplied.</li>
 </ul>
 <h5 id="usage">Usage</h5>
 <pre class="hljs"><code><div>$ eve [parameters] &gt; [output].bin
@@ -390,6 +392,7 @@ $ eve [parameters] | getmodel | gulcalc [parameters] &gt; [stdout].bin
 <h5 id="example">Example</h5>
 <pre class="hljs"><code><div>$ eve 1 2 &gt; events1_2_shuffled.bin 
 $ eve -n 1 2 &gt; events1_2_unshuffled.bin 
+$ eve -r 1 2 &gt; events1_2_random.bin
 $ eve 1 2 | getmodel | gulcalc -r -S100 -i - &gt; gulcalc1_2.bin
 </div></code></pre>
 <p>In this example, the events from the file events.bin will be read into memory and the first half (partition 1 of 2) would be streamed out to binary file, or downstream to a single process calculation workflow.</p>

@@ -56,6 +56,7 @@ private:
 	bool skipheader_ = false;
 
 //
+	inline void outputrows(const int handle, const char * buffer, int strLen);
 	void fulluncertainty(int handle, const std::map<outkey2, OASIS_FLOAT> &out_loss);	
 	void fulluncertaintywithweighting(int handle, const std::map<outkey2, OASIS_FLOAT> &out_loss);
 	void writefulluncertainty(const int handle, const int type, const std::map<outkey2, OASIS_FLOAT> &out_loss, const int ensemble_id=0);

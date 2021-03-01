@@ -114,7 +114,12 @@ void applycalcrule_stepped(const profile_rec_new& profile, LossRec& x, int layer
 				x.over_limit = loss - lim;
 				loss = lim;
 			}
-		x.under_limit = lim - loss;
+		OASIS_FLOAT under_limit = 0;
+		under_limit = lim - loss;
+		if (x.under_limit > 0) {
+			if (under_limit > x.under_limit + x.loss - loss) under_limit = x.under_limit + x.loss - loss;
+		}
+		x.under_limit = under_limit;
 		//x.retained_loss = x.retained_loss + (x.loss - loss);
 		OASIS_FLOAT net_loss = 0;
 		if (layer > 1)	net_loss = x.previous_layer_retained_loss - loss;
@@ -532,13 +537,19 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			}
 			//Function1 = IIf(Loss < Ded, 0, IIf(Loss > Ded + Lim, Lim, Loss - Ded))
 			OASIS_FLOAT loss = x.loss - ded;
+
 			if (loss < 0) loss = 0;
 			x.effective_deductible = x.effective_deductible + (x.loss - loss);
 			if (loss > lim) {
 				x.over_limit = loss - lim;
 				loss = lim;
 			}
-			x.under_limit = lim - loss;
+			OASIS_FLOAT under_limit = 0;
+			under_limit = lim - loss;
+			if (x.under_limit > 0) {
+				if (under_limit > x.under_limit + x.loss - loss) under_limit = x.under_limit + x.loss - loss;
+			}
+			x.under_limit = under_limit;
 			x.loss = loss;
 		}
 		break;
@@ -591,7 +602,12 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 				x.over_limit = loss - lim;
 				loss = lim;
 			}
-			x.under_limit = lim - loss;
+			OASIS_FLOAT under_limit = 0;
+			under_limit = lim - loss;
+			if (x.under_limit > 0) {
+				if (under_limit > x.under_limit + x.loss - loss) under_limit = x.under_limit + x.loss - loss;
+			}
+			x.under_limit = under_limit;
 			//x.retained_loss = x.retained_loss + (x.loss - loss);
 			OASIS_FLOAT net_loss = 0;
 			if (layer > 1)	net_loss = x.previous_layer_retained_loss - loss;
@@ -616,7 +632,12 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 				x.over_limit = loss - lim;
 				loss = lim;
 			}
-			x.under_limit = lim - loss;
+			OASIS_FLOAT under_limit = 0;
+			under_limit = lim - loss;
+			if (x.under_limit > 0) {
+				if (under_limit > x.under_limit + x.loss - loss) under_limit = x.under_limit + x.loss - loss;
+			}
+			x.under_limit = under_limit;
 			x.loss = loss;
 		}
 		break;
@@ -635,7 +656,12 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 				x.over_limit = loss - (lim * x.loss);
 				loss = lim * x.loss;
 			}
-			x.under_limit = lim - loss;
+			OASIS_FLOAT under_limit = 0;
+			under_limit = lim - loss;
+			if (x.under_limit > 0) {
+				if (under_limit > x.under_limit + x.loss - loss) under_limit = x.under_limit + x.loss - loss;
+			}
+			x.under_limit = under_limit;
 			x.loss = loss;
 		}
 		break;
@@ -693,7 +719,7 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 				if ((ded1 + x.effective_deductible) < ded2) { //If carried + ded < min ded
 					loss_delta = x.effective_deductible - ded2;
 					if (x.over_limit + x.under_limit > 0) { // If there are prior level limits to reapply
-						if (x.under_limit == 0) { // If carried loss is at a prior level limit
+						if (x.over_limit > 0) { // If there is carried loss exceeding prior level limit
 							if (-loss_delta > x.over_limit) { // if the loss decrease will take the loss back through the prior level limits
 								loss = x.loss + x.over_limit + x.effective_deductible - ded2; //let the loss decrease by the difference between the overlimit and the loss delta
 								x.over_limit = 0; //update the overlimit
@@ -727,7 +753,12 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 				loss = lim;
 			}
 			else x.over_limit = 0;
-			x.under_limit = lim - loss;
+			OASIS_FLOAT under_limit = 0;
+			under_limit = lim - loss;
+			if (x.under_limit > 0) {
+				if (under_limit > x.under_limit + x.loss - loss) under_limit = x.under_limit + x.loss - loss;
+			}
+			x.under_limit = under_limit;
 			x.loss = loss;
 		}
 
@@ -747,7 +778,7 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			if (x.effective_deductible + ded1 < ded2) { // If effective deductible is less than the minimum, deductible will be increased to the minimum
 				loss_delta = x.effective_deductible - ded2; // negative loss change
 				if (x.over_limit + x.under_limit > 0) { // if there are prior level limits to reapply
-					if (x.under_limit == 0) { // If carried loss is at a prior level limit
+					if (x.over_limit > 0) { // If there is carried loss exceeding prior level limit
 						if (-loss_delta > x.over_limit) { // if the loss decrease will take the loss back through the prior level limits
 							loss = x.loss + x.over_limit + x.effective_deductible - ded2; //let the loss decrease by the difference between the overlimit and the loss delta
 							x.effective_deductible = ded2;
@@ -774,7 +805,12 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 				x.over_limit = loss - lim;
 				loss = lim;
 			}
-			x.under_limit = lim - loss;
+			OASIS_FLOAT under_limit = 0;
+			under_limit = lim - loss;
+			if (x.under_limit > 0) {
+				if (under_limit > x.under_limit + x.loss - loss) under_limit = x.under_limit + x.loss - loss;
+			}
+			x.under_limit = under_limit;
 			x.loss = loss;
 		
 		}
@@ -795,7 +831,12 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 				x.over_limit = loss - lim;
 				loss = lim;
 			}
-			x.under_limit = lim - loss;
+			OASIS_FLOAT under_limit = 0;
+			under_limit = lim - loss;
+			if (x.under_limit > 0) {
+				if (under_limit > x.under_limit + x.loss - loss) under_limit = x.under_limit + x.loss - loss;
+			}
+			x.under_limit = under_limit;
 			x.loss = loss;
 		}
 		break;
@@ -850,7 +891,7 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			if ((x.effective_deductible + ded1) < ded2) { // If effective deductible is less than the minimum, deductible will be increased to the minimum
 				loss_delta = x.effective_deductible - ded2; // negative loss change
 				if (x.over_limit + x.under_limit > 0) { // If there are prior level limits to reapply
-					if (x.under_limit == 0) { // If carried loss is at a prior level limit
+					if (x.over_limit > 0) { // If there is carried loss exceeding prior level limit
 						if (-loss_delta > x.over_limit) { // if the loss decrease will take the loss back through the prior level limits
 							loss = x.loss + x.over_limit + x.effective_deductible - ded2; //let the loss decrease by the difference between the overlimit and the loss delta
 							x.over_limit = 0; //update the overlimit
@@ -934,7 +975,7 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 				if (x.effective_deductible + ded1 < ded2) { // If effective deductible is less than the minimum, deductible will be increased to the minimum
 					loss_delta = x.effective_deductible - ded2; // negative loss change
 					if (x.over_limit + x.under_limit > 0) { // If there are prior level limits to reapply
-						if (x.under_limit == 0) { // If carried loss is at a prior level limit
+						if (x.over_limit > 0) { // If there is carried loss exceeding prior level limit
 							if (-loss_delta > x.over_limit) { // if the loss decrease will take the loss back through the prior level limits
 								loss = x.loss + x.over_limit + x.effective_deductible - ded2; //let the loss decrease by the difference between the overlimit and the loss delta
 								x.over_limit = 0; //update the overlimit
@@ -977,7 +1018,12 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 				x.over_limit = loss - lim;
 				loss = lim;
 			}
-			x.under_limit = lim - loss;
+			OASIS_FLOAT under_limit = 0;
+			under_limit = lim - loss;
+			if (x.under_limit > 0) {
+				if (under_limit > x.under_limit + x.loss - loss) under_limit = x.under_limit + x.loss - loss;
+			}
+			x.under_limit = under_limit;
 			//x.retained_loss = x.retained_loss + (x.loss - loss);
 			OASIS_FLOAT net_loss = 0;
 			if (layer > 1)	net_loss = x.previous_layer_retained_loss - loss;
@@ -1002,7 +1048,12 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			if (x.loss > loss) {
 				x.over_limit = x.loss - loss;
 				}
-			x.under_limit = lim - loss;			
+			OASIS_FLOAT under_limit = 0;
+			under_limit = lim - loss;
+			if (x.under_limit > 0) {
+				if (under_limit > x.under_limit + x.loss - loss) under_limit = x.under_limit + x.loss - loss;
+			}
+			x.under_limit = under_limit;
 			x.loss = loss;
 		}
 		break;
@@ -1111,7 +1162,7 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 				if ((x.loss * ded1) + x.effective_deductible < ded2) {
 					loss_delta =  x.effective_deductible - ded2; // negative loss change
 					if (x.over_limit + x.under_limit > 0) { // If there are prior level limits
-						if (x.under_limit == 0) { // If carried loss is at a prior level limit
+						if (x.over_limit > 0) { // If there is carried loss exceeding prior level limit
 							if (-loss_delta > x.over_limit) { // if the loss decrease will take the loss back through the prior level limits
 								loss = x.loss + x.over_limit + x.effective_deductible - ded2; //let the loss decrease by the difference between the overlimit and the loss delta
 								x.over_limit = 0; //update the overlimit
@@ -1202,7 +1253,7 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 				if ((effective_ded + x.effective_deductible) < ded2) {
 					loss_delta = x.effective_deductible - ded2;
 					if (x.over_limit + x.under_limit > 0) { // If there are prior level limits to reapply
-						if (x.under_limit == 0) { // If carried loss is at a prior level limit
+						if (x.over_limit > 0) { // If there is carried loss exceeding prior level limit
 							if (-loss_delta > x.over_limit) { // if the loss decrease will take the loss back through the prior level limits
 								loss = x.loss + x.over_limit + x.effective_deductible - ded2; //let the loss decrease by the difference between the overlimit and the loss delta
 								x.over_limit = 0; //update the overlimit
@@ -1370,7 +1421,7 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 				if (((x.loss * ded1) + x.effective_deductible) < ded2) { //If carried + ded < min ded
 					loss_delta = x.effective_deductible - ded2;
 					if (x.over_limit + x.under_limit > 0) { // If there are prior level limits to reapply
-						if (x.under_limit == 0) { // If carried loss is at a prior level limit
+						if (x.over_limit > 0) { // If there is carried loss exceeding prior level limit
 							if (-loss_delta > x.over_limit) { // if the loss decrease will take the loss back through the prior level limits
 								loss = x.loss + x.over_limit + x.effective_deductible - ded2; //let the loss decrease by the difference between the overlimit and the loss delta
 								x.over_limit = 0; //update the overlimit
@@ -1402,7 +1453,12 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 				x.over_limit = loss - lim;
 				loss = lim;
 			}
-			x.under_limit = lim - loss;
+			OASIS_FLOAT under_limit = 0;
+			under_limit = lim - loss;
+			if (x.under_limit > 0) {
+				if (under_limit > x.under_limit + x.loss - loss) under_limit = x.under_limit + x.loss - loss;
+			}
+			x.under_limit = under_limit;
 			x.loss = loss;
 			}
 			x.loss = loss;
@@ -1421,7 +1477,16 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			loss = x.loss - (ded * x.loss);
 			if (loss < 0) loss = 0;
 			x.effective_deductible = x.effective_deductible + (x.loss - loss);
-			if (loss > lim) loss = lim;
+			if (loss > lim) {
+				x.over_limit = loss - lim;
+				loss = lim;
+			}
+			OASIS_FLOAT under_limit = 0;
+			under_limit = lim - loss;
+			if (x.under_limit > 0) {
+				if (under_limit > x.under_limit + x.loss - loss) under_limit = x.under_limit + x.loss - loss;
+			}
+			x.under_limit = under_limit;
 			x.loss = loss;
 		}
 		break;
@@ -1493,7 +1558,7 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 				if (((x.loss * ded1) + x.effective_deductible) < ded2) { //If carried + ded < min ded
 					loss_delta = x.effective_deductible - ded2;
 					if (x.over_limit + x.under_limit > 0) { // If there are prior level limits to reapply
-						if (x.under_limit == 0) { // If carried loss is at a prior level limit
+						if (x.over_limit > 0) { // If there is carried loss exceeding prior level limit
 							if (-loss_delta > x.over_limit) { // if the loss decrease will take the loss back through the prior level limits
 								loss = x.loss + x.over_limit + x.effective_deductible - ded2; //let the loss decrease by the difference between the overlimit and the loss delta
 								x.over_limit = 0; //update the overlimit
@@ -1525,7 +1590,8 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 					x.over_limit = loss - (x.loss * lim);
 					loss = (x.loss * lim);
 				}
-				x.under_limit = (x.loss * lim) - loss;
+				OASIS_FLOAT under_limit = 0;
+				x.under_limit = under_limit;
 				x.loss = loss;
 			}
 			x.loss = loss;
@@ -1571,7 +1637,7 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 				if ((ded1 + x.effective_deductible) < ded2) { //If carried + ded < min ded
 					loss_delta = x.effective_deductible - ded2;
 					if (x.over_limit + x.under_limit > 0) { // If there are prior level limits to reapply
-						if (x.under_limit == 0) { // If carried loss is at a prior level limit
+						if (x.over_limit > 0) { // If there is carried loss exceeding prior level limit
 							if (-loss_delta > x.over_limit) { // if the loss decrease will take the loss back through the prior level limits
 								loss = x.loss + x.over_limit + x.effective_deductible - ded2; //let the loss decrease by the difference between the overlimit and the loss delta
 								x.over_limit = 0; //update the overlimit
@@ -1603,7 +1669,8 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 					x.over_limit = loss - (x.loss * lim);
 					loss = (x.loss * lim);
 				}
-				x.under_limit = (x.loss * lim) - loss;
+				OASIS_FLOAT under_limit = 0;
+				x.under_limit = under_limit;
 				x.loss = loss;
 			}
 			x.loss = loss;

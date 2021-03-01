@@ -3,13 +3,17 @@ Ktools Changelog
 
 .. * [#_](https://github.com/OasisLMF/OasisLMF/issues/_) -  
 
-`v3.5.0`_
+`v3.5.1`_
 ---------
 .. start_latest_release
+* [#159](https://github.com/OasisLMF/ktools/issues/159) - Bring over/under limit logic in fmcalc in line with fmpy
+.. end_latest_release
+
+`v3.5.0`_
+---------
 * [#36](https://github.com/OasisLMF/ktools/issues/36) - Sort eltcalc output with kat
 * [#119](https://github.com/OasisLMF/ktools/issues/119) - Add options to partition events between multiple processes deterministically or using Fisher-Yates shuffle
 * [#180](https://github.com/OasisLMF/ktools/pull/180) - Evenly distribute events among processes
-.. end_latest_release
 
 `v3.4.3`_
 ---------

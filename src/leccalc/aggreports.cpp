@@ -795,36 +795,38 @@ void aggreports::wheatsheaf(int handle, const std::map<outkey2, OASIS_FLOAT> &ou
 	}
 
 	// Tail Value at Risk (TVaR) - ORD output only
-	for (auto s : items) {
-		if (s.first.sidx == -1) continue;   // Skip sidx = -1
-		lossvec &lpv = s.second;
-		std::sort(lpv.rbegin(), lpv.rend());
-		size_t nextreturnperiodindex = 0;
-		OASIS_FLOAT last_computed_rp = 0;
-		OASIS_FLOAT last_computed_loss = 0;
-		int i = 1;
-		OASIS_FLOAT t = (OASIS_FLOAT)totalperiods_;
-		OASIS_FLOAT tvar = 0;
-		for (auto lp : lpv) {
-			OASIS_FLOAT retperiod = t / i;
-			if (useReturnPeriodFile_) {
-				if (nextreturnperiodindex == returnperiods_.size()) break;
-				doreturnperiodout_tvar(nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, tvar, i, s.first.summary_id, s.first.sidx, eptype_tvar, max_retperiod, true);
-				tvar = tvar - ((tvar - lp) / i);
-			} else {
-				tvar = tvar - ((tvar - lp) / i);
-				const int bufferSize = 4096;
-				char buffer[bufferSize];
-				int strLen;
-				strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", s.first.summary_id, s.first.sidx, eptype_tvar, retperiod, tvar);
-				outputrows(ord_out_[PSEPT], buffer, strLen);
+	if (ord_out_[PSEPT] != nullptr) {
+		for (auto s : items) {
+			if (s.first.sidx == -1) continue;   // Skip sidx = -1
+			lossvec &lpv = s.second;
+			std::sort(lpv.rbegin(), lpv.rend());
+			size_t nextreturnperiodindex = 0;
+			OASIS_FLOAT last_computed_rp = 0;
+			OASIS_FLOAT last_computed_loss = 0;
+			int i = 1;
+			OASIS_FLOAT t = (OASIS_FLOAT)totalperiods_;
+			OASIS_FLOAT tvar = 0;
+			for (auto lp : lpv) {
+				OASIS_FLOAT retperiod = t / i;
+				if (useReturnPeriodFile_) {
+					if (nextreturnperiodindex == returnperiods_.size()) break;
+					doreturnperiodout_tvar(nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp, tvar, i, s.first.summary_id, s.first.sidx, eptype_tvar, max_retperiod, true);
+					tvar = tvar - ((tvar - lp) / i);
+				} else {
+					tvar = tvar - ((tvar - lp) / i);
+					const int bufferSize = 4096;
+					char buffer[bufferSize];
+					int strLen;
+					strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", s.first.summary_id, s.first.sidx, eptype_tvar, retperiod, tvar);
+					outputrows(ord_out_[PSEPT], buffer, strLen);
+				}
+				i++;
 			}
-			i++;
-		}
-		if (useReturnPeriodFile_) {
-			do {
-				doreturnperiodout_tvar(nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, tvar, i, s.first.summary_id, s.first.sidx, eptype_tvar, max_retperiod, true);
-			} while (nextreturnperiodindex < returnperiods_.size());
+			if (useReturnPeriodFile_) {
+				do {
+					doreturnperiodout_tvar(nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, tvar, i, s.first.summary_id, s.first.sidx, eptype_tvar, max_retperiod, true);
+				} while (nextreturnperiodindex < returnperiods_.size());
+			}
 		}
 	}
 
@@ -958,45 +960,47 @@ void aggreports::wheatsheafwithweighting(int handle, const std::map<outkey2, OAS
 	}
 
 	// Tail Value at Risk (TVaR) - ORD output
-	for (auto s : items) {
-		if (s.first.sidx == -1) continue;   // Skip sidx = -1
-		OASIS_FLOAT cummulative_weighting = 0;
-		lossvec2 &lpv = s.second;
-		std::sort(lpv.rbegin(), lpv.rend());
-		size_t nextreturnperiodindex = 0;
-		OASIS_FLOAT last_computed_rp = 0;
-		OASIS_FLOAT last_computed_loss = 0;
-		OASIS_FLOAT max_retperiod = 0;
-		bool largest_loss = false;
-		OASIS_FLOAT tvar = 0;
-		int i = 1;
-		for (auto lp : lpv) {
-			cummulative_weighting += (OASIS_FLOAT)lp.period_weighting * samplesize_;
-			if (lp.period_weighting) {
-				OASIS_FLOAT retperiod = 1 / cummulative_weighting;
-				if (!largest_loss) {
-					max_retperiod = retperiod;
-					largest_loss = true;
+	if (ord_out_[PSEPT] != nullptr) {
+		for (auto s : items) {
+			if (s.first.sidx == -1) continue;   // Skip sidx = -1
+			OASIS_FLOAT cummulative_weighting = 0;
+			lossvec2 &lpv = s.second;
+			std::sort(lpv.rbegin(), lpv.rend());
+			size_t nextreturnperiodindex = 0;
+			OASIS_FLOAT last_computed_rp = 0;
+			OASIS_FLOAT last_computed_loss = 0;
+			OASIS_FLOAT max_retperiod = 0;
+			bool largest_loss = false;
+			OASIS_FLOAT tvar = 0;
+			int i = 1;
+			for (auto lp : lpv) {
+				cummulative_weighting += (OASIS_FLOAT)lp.period_weighting * samplesize_;
+				if (lp.period_weighting) {
+					OASIS_FLOAT retperiod = 1 / cummulative_weighting;
+					if (!largest_loss) {
+						max_retperiod = retperiod;
+						largest_loss = true;
+					}
+					if (useReturnPeriodFile_) {
+						if (nextreturnperiodindex == returnperiods_.size()) break;
+						doreturnperiodout_tvar(nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, tvar, i, s.first.summary_id, s.first.sidx, eptype_tvar, max_retperiod, true);
+						tvar = tvar - ((tvar - lp.value) / i);
+					} else {
+						tvar = tvar - ((tvar - lp.value) / i);
+						const int bufferSize = 4096;
+						char buffer[bufferSize];
+						int strLen;
+						strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", s.first.summary_id, s.first.sidx, eptype_tvar, retperiod, tvar);
+						outputrows(ord_out_[PSEPT], buffer, strLen);
+					}
+					i++;
 				}
-				if (useReturnPeriodFile_) {
-					if (nextreturnperiodindex == returnperiods_.size()) break;
-					doreturnperiodout_tvar(nextreturnperiodindex, last_computed_rp, last_computed_loss, retperiod, lp.value, tvar, i, s.first.summary_id, s.first.sidx, eptype_tvar, max_retperiod, true);
-					tvar = tvar - ((tvar - lp.value) / i);
-				} else {
-					tvar = tvar - ((tvar - lp.value) / i);
-					const int bufferSize = 4096;
-					char buffer[bufferSize];
-					int strLen;
-					strLen = snprintf(buffer, bufferSize, "%d,%d,%d,%f,%f\n", s.first.summary_id, s.first.sidx, eptype_tvar, retperiod, tvar);
-					outputrows(ord_out_[PSEPT], buffer, strLen);
-				}
-				i++;
 			}
-		}
-		if (useReturnPeriodFile_) {
-			do {
-				doreturnperiodout_tvar(nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, tvar, i, s.first.summary_id, s.first.sidx, eptype_tvar, max_retperiod, true);
-			} while (nextreturnperiodindex < returnperiods_.size());
+			if (useReturnPeriodFile_) {
+				do {
+					doreturnperiodout_tvar(nextreturnperiodindex, last_computed_rp, last_computed_loss, 0, 0, tvar, i, s.first.summary_id, s.first.sidx, eptype_tvar, max_retperiod, true);
+				} while (nextreturnperiodindex < returnperiods_.size());
+			}
 		}
 	}
 

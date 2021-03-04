@@ -42,8 +42,8 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <vector>
 #include "leccalc.h"
 
-enum { FULL = 1, PERSAMPLEMEAN, MEANDR, MEANSAMPLE };
-enum { OEP = 1, AEP, OEPTVAR, AEPTVAR };
+enum { MEANDR = 1, FULL, PERSAMPLEMEAN, MEANSAMPLE };
+enum { OEP = 1, OEPTVAR, AEP, AEPTVAR };
 
 class aggreports {
 private:

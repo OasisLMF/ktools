@@ -649,8 +649,9 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 				if (y.tc_id == deductible_1) ded = y.tc_val;
 				if (y.tc_id == limit_1) lim = y.tc_val;
 			}
-			//Function5 = Loss * (Lim - Ded)
+			
 			OASIS_FLOAT loss = x.loss - (x.loss * ded);
+			if (loss < 0) loss = 0;
 			x.effective_deductible = x.effective_deductible + (x.loss - loss);
 			if (loss > (lim * x.loss)) {
 				x.over_limit = loss - (lim * x.loss);
@@ -788,6 +789,7 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 					}
 					else {
 						loss = x.loss + loss_delta; // loss decreases by the full difference between effective deductible and min deductible
+						if (loss < 0) loss = 0; //loss can't go negative
 					}
 				}
 				else {

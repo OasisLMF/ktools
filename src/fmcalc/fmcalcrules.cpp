@@ -788,6 +788,7 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 					}
 					else {
 						loss = x.loss + loss_delta; // loss decreases by the full difference between effective deductible and min deductible
+						if (loss < 0) loss = 0; //loss can't go negative
 					}
 				}
 				else {

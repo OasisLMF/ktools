@@ -343,7 +343,7 @@ void aggreports::WriteTVaR(const std::vector<int> fileIDs,
 
 
 inline void aggreports::DoSetUp(int &eptype, int &eptype_tvar, int &epcalc,
-	const int ensemble_id,
+	const int ensemble_id, const std::vector<int> fileIDs,
 	void (aggreports::*&WriteOutput)(const std::vector<int>, const int,
 					 const int, const int,
 					 const OASIS_FLOAT, const OASIS_FLOAT))
@@ -351,6 +351,20 @@ inline void aggreports::DoSetUp(int &eptype, int &eptype_tvar, int &epcalc,
 
   if (eptype == AEP) eptype_tvar = AEPTVAR;
   else if (eptype == OEP) eptype_tvar = OEPTVAR;
+
+  if (epcalc == MEANDR && eptHeader_ == true) {
+    std::string fileHeader;
+    if (ordFlag_) {
+      fileHeader = "SummaryID,EPCalc,EPType,ReturnPeriod,Loss\n";
+      eptHeader_ = false;
+    } else {
+      fileHeader = "summary_id,type,return_period,loss\n";
+    }
+    for (std::vector<int>::const_iterator it = fileIDs.begin();
+	 it != fileIDs.end(); ++it) {
+      fprintf(fout_[*it], "%s", fileHeader.c_str());
+    }
+  }
 
   if (ordFlag_) {
     WriteOutput = &aggreports::WriteORDOutput;
@@ -383,7 +397,7 @@ void aggreports::WriteExceedanceProbabilityTable(
   void (aggreports::*WriteOutput)(const std::vector<int>, const int, const int,
 				  const int, const OASIS_FLOAT,
 				  const OASIS_FLOAT);
-  DoSetUp(eptype, eptype_tvar, epcalc, ensemble_id, WriteOutput);
+  DoSetUp(eptype, eptype_tvar, epcalc, ensemble_id, fileIDs, WriteOutput);
 
   std::map<int, std::vector<TVaR>> tail;
 
@@ -442,7 +456,7 @@ void aggreports::WriteExceedanceProbabilityTable(
   void (aggreports::*WriteOutput)(const std::vector<int>, const int, const int,
 				  const int, const OASIS_FLOAT,
 				  const OASIS_FLOAT);
-  DoSetUp(eptype, eptype_tvar, epcalc, ensemble_id, WriteOutput);
+  DoSetUp(eptype, eptype_tvar, epcalc, ensemble_id, fileIDs, WriteOutput);
 
   std::map<int, std::vector<TVaR>> tail;
 
@@ -501,7 +515,7 @@ void aggreports::WriteExceedanceProbabilityTable(
 
 
 void aggreports::DoSetUpWheatsheaf(int &eptype, int &eptype_tvar,
-	const int ensemble_id,
+	const int ensemble_id, const std::vector<int> fileIDs,
 	void (aggreports::*&WriteOutput)(const std::vector<int>, const int,
 					 const int, const int,
 					 const OASIS_FLOAT, const OASIS_FLOAT))
@@ -509,6 +523,18 @@ void aggreports::DoSetUpWheatsheaf(int &eptype, int &eptype_tvar,
 
   if (eptype == AEP) eptype_tvar = AEPTVAR;
   else if (eptype == OEP) eptype_tvar = OEPTVAR;
+
+  std::string fileHeader;
+  if (ordFlag_ && pseptHeader_) {
+    fileHeader = "SummaryID,SampleID,EPType,ReturnPeriod,Loss\n";
+    pseptHeader_ = false;
+  } else if (!ordFlag_) {
+    fileHeader = "summary_id,sidx,return_period,loss\n";
+  }
+  for (std::vector<int>::const_iterator it = fileIDs.begin();
+       it != fileIDs.end(); ++it) {
+    fprintf(fout_[*it], "%s", fileHeader.c_str());
+  }
 
   if (ordFlag_) {
     WriteOutput = &aggreports::WriteORDOutput;
@@ -528,18 +554,10 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
   if (items.size() == 0) return;
 
   int eptype_tvar = 0;
-  if (eptype == AEP) eptype_tvar = AEPTVAR;
-  else if (eptype == OEP) eptype_tvar = OEPTVAR;
-
   void (aggreports::*WriteOutput)(const std::vector<int>, const int, const int,
 				  const int, const OASIS_FLOAT,
 				  const OASIS_FLOAT);
-  if (ordFlag_) {
-    WriteOutput = &aggreports::WriteORDOutput;
-  } else {
-    WriteOutput = &aggreports::WriteLegacyOutput;
-    eptype = ensemble_id;
-  }
+  DoSetUpWheatsheaf(eptype, eptype_tvar, ensemble_id, fileIDs, WriteOutput);
 
   std::map<wheatkey, std::vector<TVaR>> tail;
   const OASIS_FLOAT max_retperiod = totalperiods_;
@@ -598,7 +616,7 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
   void (aggreports::*WriteOutput)(const std::vector<int>, const int, const int,
 				  const int, const OASIS_FLOAT,
 				  const OASIS_FLOAT);
-  DoSetUpWheatsheaf(eptype, eptype_tvar, ensemble_id, WriteOutput);
+  DoSetUpWheatsheaf(eptype, eptype_tvar, ensemble_id, fileIDs, WriteOutput);
 
   std::map<wheatkey, std::vector<TVaR>> tail;
 

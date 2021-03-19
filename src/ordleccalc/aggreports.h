@@ -61,9 +61,11 @@ private:
 	std::vector<std::map<outkey2, OutLosses>> &out_loss_;
 	const bool *outputFlags_;
 	FILE **fout_;
-	std::map<int, bool> meanDR_ = {
-		{ 0, true }, { OEP, false }, { AEP, false }
-	};   // key 0 for fail safe
+	bool eptHeader_ = true;
+	bool pseptHeader_ = true;
+//	std::map<int, bool> meanDR_ = {
+//		{ 0, true }, { OEP, false }, { AEP, false }
+//	};   // key 0 for fail safe
 	bool useReturnPeriodFile_;
 	const int samplesize_;
 	std::vector<int> returnperiods_;
@@ -120,7 +122,7 @@ private:
 	void WriteTVaR(const std::vector<int> fileIDs, const int eptype_tvar,
 		       const std::map<wheatkey, std::vector<TVaR>> &tail);
 	inline void DoSetUp(int &eptype, int &eptype_tvar, int &epcalc,
-		const int ensemble_id,
+		const int ensemble_id, const std::vector<int> fileIDs,
 		void (aggreports::*&WriteOutput)(const std::vector<int>,
 						 const int, const int,
 						 const int, const OASIS_FLOAT,
@@ -136,7 +138,7 @@ private:
 		const OASIS_FLOAT cum_weight_constant, int epcalc, int eptype,
 		int samplesize=1, int ensemble_id=0);
 	void DoSetUpWheatsheaf(int &eptype, int &eptype_tvar,
-		const int ensemble_id,
+		const int ensemble_id, const std::vector<int> fileIDs,
 		void (aggreports::*&WriteOutput)(const std::vector<int>,
 						 const int, const int,
 						 const int, const OASIS_FLOAT,

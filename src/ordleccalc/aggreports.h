@@ -77,6 +77,7 @@ private:
 
 	void LoadReturnPeriods();
 	void LoadPeriodsToWeighting();
+	void LoadEnsembleMapping();
 	OASIS_FLOAT GetLoss(const OASIS_FLOAT next_return_period,
 			    const OASIS_FLOAT last_return_period,
 			    const OASIS_FLOAT last_loss,
@@ -159,12 +160,21 @@ private:
 			     const int eptype);
 	void FullUncertaintyWithWeighting(const std::vector<int> fileIDs,
 		OASIS_FLOAT (OutLosses::*GetOutLoss)(), const int eptype);
+	inline void FillWheatsheafItems(const outkey2 key,
+					std::map<wheatkey, lossvec> &items,
+					const OASIS_FLOAT loss);
+	inline void FillWheatsheafItems(const outkey2 key,
+					std::map<wheatkey, lossvec2> &items,
+					const OASIS_FLOAT loss,
+					std::vector<int> &maxPeriodNo);
 	void WheatsheafAndWheatsheafMean(const std::vector<int> handles,
 					 OASIS_FLOAT (OutLosses::*GetOutLoss)(),
-					 const int eptype);
+					 const int eptype,
+					 const int ensemble_id=0);
 	void WheatsheafAndWheatsheafMeanWithWeighting(
 		const std::vector<int> handles,
-		OASIS_FLOAT (OutLosses::*GetOutLoss)(), const int eptype);
+		OASIS_FLOAT (OutLosses::*GetOutLoss)(), const int eptype,
+		const int ensemble_id=0);
 	void SampleMean(const std::vector<int> fileIDs,
 			OASIS_FLOAT (OutLosses::*GetOutLoss)(),
 			const int eptype);

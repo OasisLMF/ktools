@@ -361,7 +361,9 @@ inline void aggreports::DoSetUp(int &eptype, int &eptype_tvar, int &epcalc,
       fileHeader = "SummaryID,EPCalc,EPType,ReturnPeriod,Loss\n";
       eptHeader_ = false;
     } else {
-      fileHeader = "summary_id,type,return_period,loss\n";
+      fileHeader = "summary_id,type,return_period,loss";
+      if (ensembletosidx_.size() > 0) fileHeader += ",ensemble_id";
+      fileHeader += "\n";
     }
     for (std::vector<int>::const_iterator it = fileIDs.begin();
 	 it != fileIDs.end(); ++it) {
@@ -517,7 +519,7 @@ void aggreports::WriteExceedanceProbabilityTable(
 }
 
 
-void aggreports::DoSetUpWheatsheaf(int &eptype, int &eptype_tvar,
+inline void aggreports::DoSetUpWheatsheaf(int &eptype, int &eptype_tvar,
 	const int ensemble_id, const std::vector<int> fileIDs,
 	void (aggreports::*&WriteOutput)(const std::vector<int>, const int,
 					 const int, const int,
@@ -531,8 +533,11 @@ void aggreports::DoSetUpWheatsheaf(int &eptype, int &eptype_tvar,
   if (ordFlag_ && pseptHeader_) {
     fileHeader = "SummaryID,SampleID,EPType,ReturnPeriod,Loss\n";
     pseptHeader_ = false;
-  } else if (!ordFlag_) {
-    fileHeader = "summary_id,sidx,return_period,loss\n";
+  } else if (!ordFlag_ && wheatSheaf_[eptype] == false) {
+    fileHeader = "summary_id,sidx,return_period,loss";
+    if (ensembletosidx_.size() > 0) fileHeader += ",ensemble_id";
+    fileHeader += "\n";
+    wheatSheaf_[eptype] = true;
   }
   for (std::vector<int>::const_iterator it = fileIDs.begin();
        it != fileIDs.end(); ++it) {
@@ -809,8 +814,8 @@ void aggreports::FullUncertainty(const std::vector<int> fileIDs,
 	}
       }
       WriteExceedanceProbabilityTable(fileIDs, items,
-				      totalperiods_ * samplesize_, FULL,
-				      eptype, 1, ensemble.first);
+				      totalperiods_ * ensemble.second.size(),
+				      FULL, eptype, 1, ensemble.first);
     }
   }
 
@@ -937,8 +942,10 @@ void aggreports::WheatsheafAndWheatsheafMean(const std::vector<int> handles,
 				const int eptype, const int ensemble_id) {
 
   std::map<wheatkey, lossvec> items;
+  int samplesize;
 
   if (ensemble_id != 0) {
+    samplesize = (int)ensembletosidx_[ensemble_id].size();
     for (auto x : out_loss_[SAMPLES]) {
       for (auto sidx : ensembletosidx_[ensemble_id]) {
 	if (x.first.sidx == sidx) {
@@ -947,6 +954,7 @@ void aggreports::WheatsheafAndWheatsheafMean(const std::vector<int> handles,
       }
     }
   } else {
+    samplesize = samplesize_;
     for (auto x : out_loss_[SAMPLES]) {
       FillWheatsheafItems(x.first, items, (x.second.*GetOutLoss)());
     }
@@ -984,7 +992,7 @@ void aggreports::WheatsheafAndWheatsheafMean(const std::vector<int> handles,
 
   std::vector<int> fileIDs = GetFileIDs(handles[WHEATSHEAF_MEAN]);
   WriteExceedanceProbabilityTable(fileIDs, mean_map, totalperiods_,
-				  PERSAMPLEMEAN, eptype, samplesize_,
+				  PERSAMPLEMEAN, eptype, samplesize,
 				  ensemble_id);
 
 }
@@ -997,9 +1005,11 @@ void aggreports::WheatsheafAndWheatsheafMeanWithWeighting(
 	const int eptype, const int ensemble_id) {
 
   std::map<wheatkey, lossvec2> items;
+  int samplesize;
   std::vector<int> maxPeriodNo(maxsummaryid_, 0);
 
   if (ensemble_id != 0) {
+    samplesize = (int)ensembletosidx_[ensemble_id].size();
     for (auto x : out_loss_[SAMPLES]) {
       for (auto sidx : ensembletosidx_[ensemble_id]) {
 	if (x.first.sidx == sidx) {
@@ -1009,6 +1019,7 @@ void aggreports::WheatsheafAndWheatsheafMeanWithWeighting(
       }
     }
   } else {
+    samplesize = samplesize_;
     for (auto x : out_loss_[SAMPLES]) {
       FillWheatsheafItems(x.first, items, (x.second.*GetOutLoss)(),
 			  maxPeriodNo);
@@ -1040,8 +1051,8 @@ void aggreports::WheatsheafAndWheatsheafMeanWithWeighting(
   }
 
   std::vector<int> fileIDs = GetFileIDs(handles[WHEATSHEAF_MEAN]);
-  WriteExceedanceProbabilityTable(fileIDs, mean_map, samplesize_,
-				  PERSAMPLEMEAN, eptype, samplesize_,
+  WriteExceedanceProbabilityTable(fileIDs, mean_map, samplesize,
+				  PERSAMPLEMEAN, eptype, samplesize,
 				  ensemble_id);
 
 }
@@ -1146,7 +1157,7 @@ void aggreports::SampleMean(const std::vector<int> fileIDs,
 	    summary_id_period_key sk;
 	    sk.summary_id = x.first.summary_id;
 	    sk.period_no = x.first.period_no;
-	    items[sk] += ((x.second.*GetOutLoss)() / samplesize_);
+	    items[sk] += ((x.second.*GetOutLoss)() / ensemble.second.size());
 	  }
 	}
       }
@@ -1203,7 +1214,7 @@ void aggreports::SampleMeanWithWeighting(const std::vector<int> fileIDs,
 	    if (iter != periodstoweighting_.end()) {
 	      items[sk].period_weighting = iter->second;
 	      items[sk].period_no = x.first.period_no;   // for debugging
-	      items[sk].value += ((x.second.*GetOutLoss)() / samplesize_);
+	      items[sk].value += ((x.second.*GetOutLoss)() / ensemble.second.size());
 	    }
 	  }
 	}

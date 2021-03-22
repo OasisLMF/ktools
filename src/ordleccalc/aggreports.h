@@ -63,9 +63,9 @@ private:
 	FILE **fout_;
 	bool eptHeader_ = true;
 	bool pseptHeader_ = true;
-//	std::map<int, bool> meanDR_ = {
-//		{ 0, true }, { OEP, false }, { AEP, false }
-//	};   // key 0 for fail safe
+	std::map<int, bool> wheatSheaf_ = {
+		{ 0, true }, { OEP, false }, { AEP, false }
+	};   // key 0 for fail safe
 	bool useReturnPeriodFile_;
 	const int samplesize_;
 	std::vector<int> returnperiods_;
@@ -137,7 +137,7 @@ private:
 		std::map<int, lossvec2> &items,
 		const OASIS_FLOAT cum_weight_constant, int epcalc, int eptype,
 		int samplesize=1, int ensemble_id=0);
-	void DoSetUpWheatsheaf(int &eptype, int &eptype_tvar,
+	inline void DoSetUpWheatsheaf(int &eptype, int &eptype_tvar,
 		const int ensemble_id, const std::vector<int> fileIDs,
 		void (aggreports::*&WriteOutput)(const std::vector<int>,
 						 const int, const int,

@@ -80,7 +80,6 @@ struct wheatkey {
 struct summary_id_period_key {
 	int summary_id;
 	int period_no;
-//	int type;   // HC
 };
 
 struct lossval {

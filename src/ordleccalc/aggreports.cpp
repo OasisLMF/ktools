@@ -252,14 +252,17 @@ inline void aggreports::OutputRows(const std::vector<int> fileIDs,
       } else if (num < strLen) {   // Incomplete write
 	bufPtr += num;
 	strLen -= num;
-      } else return;   // Success
+      } else break;   // Success
 
       fprintf(stderr, "INFO: Attempt %d to write %s\n", ++counter, buffer);
 
-    } while (counter < 10);
+      if (counter == 10) {
+	fprintf(stderr, "FATAL: Maximum attempts to write %s exceeded\n",
+		buffer);
+	exit(EXIT_FAILURE);
+      }
 
-    fprintf(stderr, "FATAL: Maximum attempts to write %s exceeded\n", buffer);
-    exit (EXIT_FAILURE);
+    } while (true);
 
   }
 

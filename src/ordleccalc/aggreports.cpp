@@ -968,7 +968,7 @@ void aggreports::WheatsheafAndWheatsheafMean(const std::vector<int> handles,
 
   if (outputFlags_[handles[WHEATSHEAF_MEAN]] == false) return;
 
-  std::vector<size_t> maxCount(maxsummaryid_, 0);
+  std::vector<size_t> maxCount(maxsummaryid_+1, 0);
   for (auto x : items) {
     if (x.second.size() > maxCount[x.first.summary_id]) {
       maxCount[x.first.summary_id] = x.second.size();
@@ -1006,7 +1006,7 @@ void aggreports::WheatsheafAndWheatsheafMeanWithWeighting(
 
   std::map<wheatkey, lossvec2> items;
   int samplesize;
-  std::vector<int> maxPeriodNo(maxsummaryid_, 0);
+  std::vector<int> maxPeriodNo(maxsummaryid_+1, 0);
 
   if (ensemble_id != 0) {
     samplesize = (int)ensembletosidx_[ensemble_id].size();

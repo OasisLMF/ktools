@@ -110,7 +110,7 @@ namespace cdftocsv {
 #ifdef AREAPERIL_TYPE_UNSIGNED_LONG_LONG
 			fprintf(stdout, "%d,%llu,%d,%d,%f,%f\n", d->event_id, d->areaperil_id, d->vulnerability_id, bin_index + 1, pp->prob_to, pp->bin_mean);
 #else
-			fprintf(stdout, "%d,%d,%d,%d,%f,%f\n", d->event_id, d->areaperil_id, d->vulnerability_id, bin_index + 1, pp->prob_to, pp->bin_mean);
+			fprintf(stdout, "%d,%u,%d,%d,%f,%f\n", d->event_id, d->areaperil_id, d->vulnerability_id, bin_index + 1, pp->prob_to, pp->bin_mean);
 #endif
 			pp++;
 		}

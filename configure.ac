@@ -152,6 +152,7 @@ AC_CONFIG_FILES([
                  src/occurrencetobin/Makefile
                  src/occurrencetocsv/Makefile
                  src/leccalc/Makefile
+		 src/ordleccalc/Makefile
                  src/aalcalc/Makefile
                  src/aalcalctocsv/Makefile
                  src/vulnerabilitytobin/Makefile

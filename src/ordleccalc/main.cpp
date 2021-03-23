@@ -40,7 +40,7 @@ Author: Ben Matharu  email : ben.matharu@oasislmf.org
 
 
 #include <vector>
-#include "leccalc.h"
+#include "../leccalc/leccalc.h"
 
 
 #if defined(_MSC_VER)

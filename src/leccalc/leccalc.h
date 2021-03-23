@@ -44,6 +44,28 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 enum { AGG_FULL_UNCERTAINTY = 0, AGG_WHEATSHEAF, AGG_SAMPLE_MEAN, AGG_WHEATSHEAF_MEAN, OCC_FULL_UNCERTAINTY, OCC_WHEATSHEAF, OCC_SAMPLE_MEAN, OCC_WHEATSHEAF_MEAN };
 enum { EPT = 0, PSEPT };
 
+struct OutLosses {
+	OutLosses() {
+		agg_out_loss = 0;
+		max_out_loss = 0;
+	}
+	OASIS_FLOAT agg_out_loss;
+	OASIS_FLOAT max_out_loss;
+
+	OASIS_FLOAT GetAggOutLoss() {
+		return agg_out_loss;
+	}
+
+	OASIS_FLOAT GetMaxOutLoss() {
+		return max_out_loss;
+	}
+};
+
+struct TVaR {
+	OASIS_FLOAT retperiod;
+	OASIS_FLOAT tvar;
+};
+
 struct outkey2 {
 	int summary_id;
 	int period_no;
@@ -58,7 +80,6 @@ struct wheatkey {
 struct summary_id_period_key {
 	int summary_id;
 	int period_no;
-	int type;
 };
 
 struct lossval {

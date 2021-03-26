@@ -484,7 +484,7 @@ void aggreports::WriteExceedanceProbabilityTable(
 	OASIS_FLOAT retperiod = 1 / cummulative_weighting;
 
 	if (!largest_loss) {
-	  max_retperiod = retperiod;
+	  max_retperiod = retperiod + 0.0001;   // Add for floating point errors
 	  largest_loss = true;
 	}
 
@@ -647,7 +647,7 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
 	OASIS_FLOAT retperiod = 1 / cummulative_weighting;
 
 	if (!largest_loss) {
-	  max_retperiod = retperiod;
+	  max_retperiod = retperiod + 0.0001;   // Add for floating point errors
 	  largest_loss = true;
 	}
 

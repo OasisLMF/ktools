@@ -110,22 +110,18 @@ namespace leccalc {
 
 	}
 
-	//
-	//
-	//
 
 	inline void dolecoutputaggsummary(int summary_id, int sidx, OASIS_FLOAT loss, const std::vector<int>& periods,
-		std::map<outkey2, OASIS_FLOAT>& agg_out_loss, std::map<outkey2, OASIS_FLOAT>& max_out_loss)
+		std::vector<std::map<outkey2, OutLosses>> &out_loss)
 	{
 		outkey2 key;
 		key.summary_id = summary_id;
+		key.sidx = sidx;
 
 		for (auto x : periods) {
 			key.period_no = x;
-			key.sidx = sidx;
-			agg_out_loss[key] += loss;
-			if (max_out_loss[key] < loss) max_out_loss[key] = loss;
-
+			out_loss[sidx != -1][key].agg_out_loss += loss;
+			if (out_loss[sidx != -1][key].max_out_loss < loss) out_loss[sidx != -1][key].max_out_loss = loss;
 		}
 	}
 
@@ -134,8 +130,7 @@ namespace leccalc {
 		unsigned int& samplesize,
 		const std::map<int, std::vector<int> >& event_to_periods,
 		int& maxsummaryid,
-		std::map<outkey2, OASIS_FLOAT>& agg_out_loss,
-		std::map<outkey2, OASIS_FLOAT>& max_out_loss)
+		std::vector<std::map<outkey2, OutLosses>> &out_loss)
 	{
 		// read_stream_type()
 		unsigned int stream_type = 0;
@@ -200,7 +195,7 @@ namespace leccalc {
 
 				if (sr.loss > 0.0)
 				{
-					dolecoutputaggsummary(sh.summary_id, sr.sidx, sr.loss, iter->second, agg_out_loss, max_out_loss);
+					dolecoutputaggsummary(sh.summary_id, sr.sidx, sr.loss, iter->second, out_loss);
 				}
 			}
 		}
@@ -215,7 +210,7 @@ namespace leccalc {
 
 	}
 
-	void doit(const std::string& subfolder, FILE** fout, bool useReturnPeriodFile, bool skipheader, FILE** ord_out)
+	void doit(const std::string &subfolder, FILE **fout, const bool useReturnPeriodFile, const bool skipheader, bool *outputFlags, bool ordFlag)
 	{
 		std::string path = "work/" + subfolder;
 		if (path.substr(path.length() - 1, 1) != "/") {
@@ -224,14 +219,13 @@ namespace leccalc {
 		std::map<int, std::vector<int> > event_to_periods;
 		int totalperiods;
 		loadoccurence(event_to_periods, totalperiods);
-		std::map<outkey2, OASIS_FLOAT> agg_out_loss;
-		std::map<outkey2, OASIS_FLOAT> max_out_loss;
+		std::vector<std::map<outkey2, OutLosses>> out_loss(2);
 
 
 		unsigned int samplesize=0;
 		int maxsummaryid = -1;
 		if (subfolder.size() == 0) {
-			processinputfile(samplesize, event_to_periods, maxsummaryid, agg_out_loss, max_out_loss);
+			processinputfile(samplesize, event_to_periods, maxsummaryid, out_loss);
 		}
 		else {
 			DIR* dir;
@@ -242,7 +236,7 @@ namespace leccalc {
 					if (s.length() > 4 && s.substr(s.length() - 4, 4) == ".bin") {
 						s = path + ent->d_name;
 						setinputstream(s);
-						processinputfile(samplesize, event_to_periods, maxsummaryid, agg_out_loss, max_out_loss);
+						processinputfile(samplesize, event_to_periods, maxsummaryid, out_loss);
 					}
 				}
 			}
@@ -252,21 +246,16 @@ namespace leccalc {
 			}
 		}
 
-		aggreports agg(totalperiods, maxsummaryid, agg_out_loss, max_out_loss, fout, useReturnPeriodFile, samplesize, skipheader, ord_out);
-		agg.loadperiodtoweigthing();
-		agg.loadensemblemapping();
-		agg.initordout();
-		agg.outputOccFulluncertainty();
-		agg.outputAggFulluncertainty();
-		agg.outputOccWheatSheafMean(samplesize);
-		agg.outputAggWheatSheafMean(samplesize);
-		agg.outputOccSampleMean(samplesize);
-		agg.outputAggSampleMean(samplesize);
-		agg.outputOccWheatsheaf();
-		agg.outputAggWheatsheaf();
+		aggreports agg(totalperiods, maxsummaryid, out_loss, fout, useReturnPeriodFile, samplesize, skipheader, outputFlags, ordFlag);
+		agg.OutputOccMeanDamageRatio();
+		agg.OutputAggMeanDamageRatio();
+		agg.OutputOccFullUncertainty();
+		agg.OutputAggFullUncertainty();
+		agg.OutputOccWheatsheafAndWheatsheafMean();
+		agg.OutputAggWheatsheafAndWheatsheafMean();
+		agg.OutputOccSampleMean();
+		agg.OutputAggSampleMean();
 
 	}
 
-
 }
-

@@ -63,7 +63,8 @@ void segfault_sigaction(int, siginfo_t *si, void *) {
 #endif
 
 namespace leccalc {
-	void doit(const std::string& subfolder, FILE** fout, bool useReturnPeriodFile, bool skipheader, FILE** ord_out);
+//	void doit(const std::string& subfolder, FILE** fout, bool useReturnPeriodFile, bool skipheader, FILE** ord_out);
+	void doit(const std::string &subfolder, FILE** fout, const bool useReturnPeriodFile, const bool skipheader, bool *outputFlags, bool ordFlag);
 }
 
 
@@ -83,15 +84,15 @@ void openpipe(int output_id, const std::string& pipe, FILE** fout)
 
 void help()
 {
-	fprintf(stderr, "-F Aggregate Full Uncertainty\n");
-	fprintf(stderr, "-W Aggregate Wheatsheaf\n");
-	fprintf(stderr, "-S Aggregate sample mean\n");
-	fprintf(stderr, "-M Aggregate Wheatsheaf mean\n");
-	fprintf(stderr, "-f Occurrence Full Uncertainty\n");
-	fprintf(stderr, "-w Occurrence Wheatsheaf\n");
-	fprintf(stderr, "-s Occurrence sample mean\n");
-	fprintf(stderr, "-m Occurrence Wheatsheaf mean\n");
-	fprintf(stderr, "-K workspace sub folder\n");
+	fprintf(stderr, "-F [filename] Aggregate Full Uncertainty\n");
+	fprintf(stderr, "-W [filename] Aggregate Wheatsheaf\n");
+	fprintf(stderr, "-S [filename] Aggregate sample mean\n");
+	fprintf(stderr, "-M [filename] Aggregate Wheatsheaf mean\n");
+	fprintf(stderr, "-f [filename] Occurrence Full Uncertainty\n");
+	fprintf(stderr, "-w [filename] Occurrence Wheatsheaf\n");
+	fprintf(stderr, "-s [filename] Occurrence sample mean\n");
+	fprintf(stderr, "-m [filename] Occurrence Wheatsheaf mean\n");
+	fprintf(stderr, "-K [directory] workspace sub folder\n");
 	fprintf(stderr, "-r use return period file\n");
 	fprintf(stderr, "-H Skip header\n");
 	fprintf(stderr, "-h help\n");
@@ -103,18 +104,21 @@ int main(int argc, char* argv[])
 {
 	bool useReturnPeriodFile = false;
 	FILE* fout[] = { nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr };
+	bool outputFlags[8] = { false, false, false, false,
+				false, false, false, false };
+	const bool ordFlag = false;   // Turn off ORD output
 
-	// Variables for ORD output
+/*	// Variables for ORD output
 	FILE* ord_out[] = { nullptr, nullptr };
 	bool ordOutput = false;
 	bool ept = false;
 	bool psept = false;
-	std::string ordStem;
+	std::string ordStem;*/   // HC
 
 	std::string subfolder;
 	int opt;
 	bool skipheader = false;
-	while ((opt = getopt(argc, argv, "vhrHF:W:M:S:K:f:w:s:m:o:")) != -1) {
+	while ((opt = getopt(argc, argv, "vhrHF:W:M:S:K:f:w:s:m:")) != -1) {
 		switch (opt) {
 		case 'K':
 			subfolder = optarg;
@@ -124,42 +128,38 @@ int main(int argc, char* argv[])
 			break;
 		case 'F':
 			openpipe(AGG_FULL_UNCERTAINTY, optarg, fout);
-			ept = true;
+			outputFlags[AGG_FULL_UNCERTAINTY] = true;
 			break;
 		case 'f':
 			openpipe(OCC_FULL_UNCERTAINTY, optarg, fout);
-			ept = true;
+			outputFlags[OCC_FULL_UNCERTAINTY] = true;
 			break;
 		case 'W':
 			openpipe(AGG_WHEATSHEAF, optarg, fout);
-			psept = true;
+			outputFlags[AGG_WHEATSHEAF] = true;
 			break;
 		case 'w':
 			openpipe(OCC_WHEATSHEAF, optarg, fout);
-			psept = true;
+			outputFlags[OCC_WHEATSHEAF] = true;
 			break;
 		case 'S':
 			openpipe(AGG_SAMPLE_MEAN, optarg, fout);
-			ept = true;
+			outputFlags[AGG_SAMPLE_MEAN] = true;
 			break;
 		case 's':
 			openpipe(OCC_SAMPLE_MEAN, optarg, fout);
-			ept = true;
+			outputFlags[OCC_SAMPLE_MEAN] = true;
 			break;
 		case 'M':
 			openpipe(AGG_WHEATSHEAF_MEAN, optarg, fout);
-			ept = true;
+			outputFlags[AGG_WHEATSHEAF_MEAN] = true;
 			break;
 		case 'm':
 			openpipe(OCC_WHEATSHEAF_MEAN, optarg, fout);
-			ept = true;
+			outputFlags[OCC_WHEATSHEAF_MEAN] = true;
 			break;
 		case 'r':
 			useReturnPeriodFile = true;
-			break;
-		case 'o':
-			ordOutput = true;
-			ordStem = optarg;
 			break;
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
@@ -180,7 +180,7 @@ int main(int argc, char* argv[])
 		help();
 	}
 
-	if (ordOutput) {
+/*	if (ordOutput) {
 		if (ept) {
 			std::string eptFilename = ordStem;
 			if (eptFilename != "-") eptFilename += "_ept.csv";
@@ -191,7 +191,7 @@ int main(int argc, char* argv[])
 			if (pseptFilename != "-") pseptFilename += "_psept.csv";
 			openpipe(PSEPT, pseptFilename, ord_out);
 		}
-	}
+	}*/   // HC
 
 	progname = argv[0];
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
@@ -208,7 +208,8 @@ int main(int argc, char* argv[])
 	try {
 		initstreams();
         logprintf(progname, "INFO", "starting process..\n");
-		leccalc::doit(subfolder, fout, useReturnPeriodFile, skipheader, ord_out);
+//		leccalc::doit(subfolder, fout, useReturnPeriodFile, skipheader, ord_out);   // HC
+	leccalc::doit(subfolder, fout, useReturnPeriodFile, skipheader, outputFlags, ordFlag);
         logprintf(progname, "INFO", "finishing process..\n");
 		return EXIT_SUCCESS;
 	}catch (std::bad_alloc&) {

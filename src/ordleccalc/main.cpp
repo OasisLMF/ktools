@@ -40,7 +40,7 @@ Author: Ben Matharu  email : ben.matharu@oasislmf.org
 
 
 #include <vector>
-#include "leccalc.h"
+#include "../leccalc/leccalc.h"
 
 
 #if defined(_MSC_VER)
@@ -63,7 +63,6 @@ void segfault_sigaction(int, siginfo_t *si, void *) {
 #endif
 
 namespace leccalc {
-//	void doit(const std::string& subfolder, FILE** fout, bool useReturnPeriodFile, bool skipheader, FILE** ord_out);   // HC
 	void doit(const std::string &subfolder, FILE **fout, const bool useReturnPeriodFile, const bool skipheader, bool *outputFlags, bool ordFlag);
 }
 
@@ -106,17 +105,11 @@ int main(int argc, char* argv[])
 {
 	bool useReturnPeriodFile = false;
 	FILE* fout[] = { nullptr, nullptr };
-	bool outputFlags[8];   // Elements set to false on initialisation
+	bool outputFlags[8] = { false, false, false, false,
+				false, false, false, false };
 	const int maxStreams = 2;
-	bool outputStreams[maxStreams];
-	bool ordFlag = true;   // Turn on ORD output
-
-	// Variables for ORD output
-/*	FILE* ord_out[] = { nullptr, nullptr };
-	bool ordOutput = false;
-	bool ept = false;
-	bool psept = false;
-	std::string ordStem;*/
+	bool outputStreams[maxStreams] = { false, false };
+	const bool ordFlag = true;   // Turn on ORD output
 
 	std::string subfolder;
 	int opt;
@@ -220,12 +213,11 @@ int main(int argc, char* argv[])
 
 	try {
 		initstreams();
-        logprintf(progname, "INFO", "starting process..\n");
-//		leccalc::doit(subfolder, fout, useReturnPeriodFile, skipheader, ord_out);   // HC
-	leccalc::doit(subfolder, fout, useReturnPeriodFile, skipheader, outputFlags, ordFlag);
-        logprintf(progname, "INFO", "finishing process..\n");
+        	logprintf(progname, "INFO", "starting process..\n");
+		leccalc::doit(subfolder, fout, useReturnPeriodFile, skipheader, outputFlags, ordFlag);
+        	logprintf(progname, "INFO", "finishing process..\n");
 		return EXIT_SUCCESS;
-	}catch (std::bad_alloc&) {
+	} catch (std::bad_alloc&) {
 		fprintf(stderr, "FATAL: %s: Memory allocation failed\n", progname);
 		exit(EXIT_FAILURE);
 	}

@@ -144,6 +144,8 @@ OASIS_FLOAT aggreports::GetLoss(const OASIS_FLOAT next_return_period,
 
   if (current_return_period == 0.0) return 0.0;
 
+  if (current_loss == 0.0) return 0.0;
+
   if (current_return_period == next_return_period) return current_loss;
 
   if (current_return_period < next_return_period) {

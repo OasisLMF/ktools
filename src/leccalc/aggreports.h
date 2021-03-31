@@ -136,6 +136,7 @@ private:
 	void WriteExceedanceProbabilityTable(const std::vector<int> fileIDs,
 		std::map<int, lossvec2> &items,
 		const OASIS_FLOAT cum_weight_constant, int epcalc, int eptype,
+		std::map<int, double> &unusedperiodstoweighting,
 		int samplesize=1, int ensemble_id=0);
 	inline void DoSetUpWheatsheaf(int &eptype, int &eptype_tvar,
 		const int ensemble_id, const std::vector<int> fileIDs,
@@ -150,6 +151,7 @@ private:
 	void WritePerSampleExceedanceProbabilityTable(
 		const std::vector<int> fileIDs,
 		std::map<wheatkey, lossvec2> &items, int eptype,
+		std::map<int, double> &unusedperiodstoweighting,
 		int ensemble_id=0);
 	void MeanDamageRatio(const std::vector<int> fileIDs,
 			     OASIS_FLOAT (OutLosses::*GetOutLoss)(),
@@ -168,7 +170,8 @@ private:
 	inline void FillWheatsheafItems(const outkey2 key,
 					std::map<wheatkey, lossvec2> &items,
 					const OASIS_FLOAT loss,
-					std::vector<int> &maxPeriodNo);
+					std::vector<int> &maxPeriodNo,
+					std::map<int, double> &unusedperiodstoweighting);
 	void WheatsheafAndWheatsheafMean(const std::vector<int> handles,
 					 OASIS_FLOAT (OutLosses::*GetOutLoss)(),
 					 const int eptype,

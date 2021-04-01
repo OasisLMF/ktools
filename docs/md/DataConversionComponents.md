@@ -1,5 +1,5 @@
 ![alt text](../img/banner.jpg "banner")
-# 4.3 Data conversion components <a id="dataconversioncomponents"></a>
+# 4.4 Data conversion components <a id="dataconversioncomponents"></a>
 
 The following components convert input data in csv format to the binary format required by the calculation components in the reference model;
 
@@ -790,6 +790,6 @@ $ periodstocsv < periods.bin > periods.csv
 
 [Return to top](#dataconversioncomponents)
 
-[Go to 4.4 Stream conversion components section](StreamConversionComponents.md)
+[Go to 4.5 Stream conversion components section](StreamConversionComponents.md)
 
 [Back to Contents](Contents.md)

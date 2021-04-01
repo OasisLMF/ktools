@@ -38,57 +38,164 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #ifndef AGGREPORTS_H_
 #define AGGREPORTS_H_
 
-#include<vector>
+#include <map>
+#include <vector>
 #include "leccalc.h"
+
+enum { MEANDR = 1, FULL, PERSAMPLEMEAN, MEANSAMPLE };
+enum { OEP = 1, OEPTVAR, AEP, AEPTVAR };
+enum { MEANS = 0, SAMPLES };
+enum { WHEATSHEAF = 0, WHEATSHEAF_MEAN };
+
+struct line_points{
+	OASIS_FLOAT from_x;
+	OASIS_FLOAT from_y;
+	OASIS_FLOAT to_x;
+	OASIS_FLOAT to_y;
+};
 
 class aggreports {
 private:
-	int totalperiods_;
-	int maxsummaryid_;
-	std::map<outkey2, OASIS_FLOAT> &agg_out_loss_;
-	std::map<outkey2, OASIS_FLOAT> &max_out_loss_;
+	const int totalperiods_;
+	const int maxsummaryid_;
+	std::vector<std::map<outkey2, OutLosses>> &out_loss_;
+	const bool *outputFlags_;
 	FILE **fout_;
+	bool eptHeader_ = true;
+	bool pseptHeader_ = true;
+	std::map<int, bool> wheatSheaf_ = {
+		{ 0, true }, { OEP, false }, { AEP, false }
+	};   // key 0 for fail safe
 	bool useReturnPeriodFile_;
-	int samplesize_ = 0;
+	const int samplesize_;
 	std::vector<int> returnperiods_;
 	std::map <int, double> periodstoweighting_;
 	std::map<int, std::vector<int>> ensembletosidx_;
-	bool skipheader_ = false;
+	const bool skipheader_;
+	const bool ordFlag_;
 
-//
-	inline void outputrows(const int handle, const char * buffer, int strLen);
-	void fulluncertainty(int handle, const std::map<outkey2, OASIS_FLOAT> &out_loss);	
-	void fulluncertaintywithweighting(int handle, const std::map<outkey2, OASIS_FLOAT> &out_loss);
-	void writefulluncertainty(const int handle, const int type, const std::map<outkey2, OASIS_FLOAT> &out_loss, const int ensemble_id=0);
-	void wheatsheaf(int handle, const std::map<outkey2, OASIS_FLOAT> &out_loss);
-	void wheatsheafwithweighting(int handle, const std::map<outkey2, OASIS_FLOAT> &out_loss); 
-	void wheatSheafMean(int samplesize, int handle, const std::map<outkey2, OASIS_FLOAT> &out_loss);	
-	void wheatSheafMeanwithweighting(int samplesize, int handle, const std::map<outkey2, OASIS_FLOAT> &out_loss);
-	void sampleMean(int samplesize, int handle, const std::map<outkey2, OASIS_FLOAT> &out_loss);
-	void sampleMeanwithweighting(int samplesize, int handle, const std::map<outkey2, OASIS_FLOAT> &out_loss);
-	inline void writeSampleMean(const int handle, const int type, const std::map<summary_id_period_key, lossval> &items, const int ensemble_id=0);
-	void loadreturnperiods();
-	OASIS_FLOAT getloss(OASIS_FLOAT nextreturnperiod, OASIS_FLOAT last_return_period, OASIS_FLOAT last_loss, 
-		OASIS_FLOAT current_return_period, OASIS_FLOAT current_loss) const;
-	void doreturnperiodout(int handle, size_t &nextreturnperiod_index,
-			       OASIS_FLOAT &last_return_period,
-			       OASIS_FLOAT &last_loss,
-			       OASIS_FLOAT current_return_period,
-			       OASIS_FLOAT current_loss, int summary_id,
-			       int type, OASIS_FLOAT max_retperiod,
-			       int ensemble_id=0);
+	OASIS_FLOAT (OutLosses::*GetAgg)() = &OutLosses::GetAggOutLoss;
+	OASIS_FLOAT (OutLosses::*GetMax)() = &OutLosses::GetMaxOutLoss;
+
+	void LoadReturnPeriods();
+	void LoadPeriodsToWeighting();
+	void LoadEnsembleMapping();
+	OASIS_FLOAT GetLoss(const OASIS_FLOAT next_return_period,
+			    const OASIS_FLOAT last_return_period,
+			    const OASIS_FLOAT last_loss,
+			    const OASIS_FLOAT current_return_period,
+			    const OASIS_FLOAT current_loss) const;
+	void FillTVaR(std::map<int, std::vector<TVaR>> &tail,
+		      const int summary_id, const int epcalc,
+		      const OASIS_FLOAT nextreturnperiod_value,
+		      const OASIS_FLOAT tvar);
+	void FillTVaR(std::map<wheatkey, std::vector<TVaR>> &tail,
+		      const int summary_id, const int sidx,
+		      const OASIS_FLOAT nextreturnperiod_value,
+		      const OASIS_FLOAT tvar);
+	template<typename T>
+	void WriteReturnPeriodOut(const std::vector<int> fileIDs,
+		size_t &nextreturnperiod_index, OASIS_FLOAT &last_return_period,
+		OASIS_FLOAT &last_loss, const OASIS_FLOAT current_return_period,
+		const OASIS_FLOAT current_loss, const int summary_id,
+		const int eptype, const int epcalc,
+		const OASIS_FLOAT max_retperiod, int counter, OASIS_FLOAT tvar,
+		T &tail,
+		void (aggreports::*WriteOutput)(const std::vector<int>,
+						const int, const int, const int,
+						const OASIS_FLOAT,
+						const OASIS_FLOAT));
+	inline void OutputRows(const std::vector<int> fileIDs,
+			       const char * buffer, int strLen);
+	void WriteLegacyOutput(const std::vector<int> fileIDs,
+			       const int summary_id, const int type,
+			       const int ensemble_id,
+			       const OASIS_FLOAT retperiod,
+			       const OASIS_FLOAT loss);
+	void WriteORDOutput(const std::vector<int> fileIDs,
+			    const int summary_id, const int epcalc,
+			    const int eptype, const OASIS_FLOAT retperiod,
+			    const OASIS_FLOAT loss);
+	void WriteTVaR(const std::vector<int> fileIDs, const int epcalc,
+		       const int eptype_tvar,
+		       const std::map<int, std::vector<TVaR>> &tail);
+	void WriteTVaR(const std::vector<int> fileIDs, const int eptype_tvar,
+		       const std::map<wheatkey, std::vector<TVaR>> &tail);
+	inline void DoSetUp(int &eptype, int &eptype_tvar, int &epcalc,
+		const int ensemble_id, const std::vector<int> fileIDs,
+		void (aggreports::*&WriteOutput)(const std::vector<int>,
+						 const int, const int,
+						 const int, const OASIS_FLOAT,
+						 const OASIS_FLOAT));
+	void WriteExceedanceProbabilityTable(const std::vector<int> fileIDs,
+					     std::map<int, lossvec> &items,
+					     const OASIS_FLOAT max_retperiod,
+					     int epcalc, int eptype,
+					     int samplesize=1,
+					     int ensemble_id=0);
+	void WriteExceedanceProbabilityTable(const std::vector<int> fileIDs,
+		std::map<int, lossvec2> &items,
+		const OASIS_FLOAT cum_weight_constant, int epcalc, int eptype,
+		std::map<int, double> &unusedperiodstoweighting,
+		int samplesize=1, int ensemble_id=0);
+	inline void DoSetUpWheatsheaf(int &eptype, int &eptype_tvar,
+		const int ensemble_id, const std::vector<int> fileIDs,
+		void (aggreports::*&WriteOutput)(const std::vector<int>,
+						 const int, const int,
+						 const int, const OASIS_FLOAT,
+						 const OASIS_FLOAT));
+	void WritePerSampleExceedanceProbabilityTable(
+		const std::vector<int> fileIDs,
+		std::map<wheatkey, lossvec> &items, int eptype,
+		int ensemble_id=0);
+	void WritePerSampleExceedanceProbabilityTable(
+		const std::vector<int> fileIDs,
+		std::map<wheatkey, lossvec2> &items, int eptype,
+		std::map<int, double> &unusedperiodstoweighting,
+		int ensemble_id=0);
+	void MeanDamageRatio(const std::vector<int> fileIDs,
+			     OASIS_FLOAT (OutLosses::*GetOutLoss)(),
+			     const int eptype);
+	void MeanDamageRatioWithWeighting(const std::vector<int> fileIDs,
+		OASIS_FLOAT (OutLosses::*GetOutLoss)(), const int eptype);
+	inline std::vector<int> GetFileIDs(const int handle, int table=EPT);
+	void FullUncertainty(const std::vector<int> fileIDs,
+			     OASIS_FLOAT (OutLosses::*GetOutLoss)(),
+			     const int eptype);
+	void FullUncertaintyWithWeighting(const std::vector<int> fileIDs,
+		OASIS_FLOAT (OutLosses::*GetOutLoss)(), const int eptype);
+	inline void FillWheatsheafItems(const outkey2 key,
+					std::map<wheatkey, lossvec> &items,
+					const OASIS_FLOAT loss);
+	inline void FillWheatsheafItems(const outkey2 key,
+					std::map<wheatkey, lossvec2> &items,
+					const OASIS_FLOAT loss,
+					std::vector<int> &maxPeriodNo,
+					std::map<int, double> &unusedperiodstoweighting);
+	void WheatsheafAndWheatsheafMean(const std::vector<int> handles,
+					 OASIS_FLOAT (OutLosses::*GetOutLoss)(),
+					 const int eptype,
+					 const int ensemble_id=0);
+	void WheatsheafAndWheatsheafMeanWithWeighting(
+		const std::vector<int> handles,
+		OASIS_FLOAT (OutLosses::*GetOutLoss)(), const int eptype,
+		const int ensemble_id=0);
+	void SampleMean(const std::vector<int> fileIDs,
+			OASIS_FLOAT (OutLosses::*GetOutLoss)(),
+			const int eptype);
+	void SampleMeanWithWeighting(const std::vector<int> fileIDs,
+				     OASIS_FLOAT (OutLosses::*GetOutLoss)(),
+				     const int eptype);
+
 public:
-	void loadperiodtoweigthing();
-	void loadensemblemapping();
-	void outputOccFulluncertainty();
-	void outputAggFulluncertainty();
-	void outputOccWheatsheaf();
-	void outputAggWheatsheaf();
-	void outputOccWheatSheafMean(int samplesize);
-	void outputAggWheatSheafMean(int samplesize);
-	void outputOccSampleMean(int samplesize);
-	void outputAggSampleMean(int samplesize);
-	aggreports(int totalperiods, int maxsummaryid, std::map<outkey2, OASIS_FLOAT> &agg_out_loss, std::map<outkey2, OASIS_FLOAT> &max_out_loss,
-		FILE **fout, bool useReturnPeriodFile, int samplesize, bool skipheader) ;
+	aggreports(const int totalperiods, const int maxsummaryid, std::vector<std::map<outkey2, OutLosses>> &out_loss, FILE **fout, const bool useReturnPeriodFile, const int samplesize, const bool skipheader, const bool *outputFlags, const bool ordFlag);
+	void OutputAggMeanDamageRatio();
+	void OutputOccMeanDamageRatio();
+	void OutputAggFullUncertainty();
+	void OutputOccFullUncertainty();
+	void OutputAggWheatsheafAndWheatsheafMean();
+	void OutputOccWheatsheafAndWheatsheafMean();
+	void OutputAggSampleMean();
+	void OutputOccSampleMean();
 };
 #endif // AGGREPORTS_H_

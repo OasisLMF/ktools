@@ -2,17 +2,19 @@
 
 As well as the set of legacy outputs described in OutputComponents.md, ktools also supports Open Results Data "ORD" output calculations and reports. 
 
-Open Results Data is a data standard for catastrophe loss model results developed as part of Open Data Standards "ODS". ODS is curated by OasisLMF and governed by the Open Data Standards Steering Committee (SC), comprised of industry experts representing (re)insurers, brokers, service providers and catastrophe model vendors. More information about ODS can be found here.
+Open Results Data is a data standard for catastrophe loss model results developed as part of Open Data Standards "ODS". ODS is curated by OasisLMF and governed by the Open Data Standards Steering Committee (SC), comprised of industry experts representing (re)insurers, brokers, service providers and catastrophe model vendors. More information about ODS can be found [here](https://github.com/OasisLMF/OpenDataStandards).
 
 ### ordleccalc <a id="leccalc"></a>
 ***
 This component produces several variants of loss exceedance curves, known as Exceedance Probability Tables "EPT" under ORD. 
 
-Exceedance Probability Table is a set of user-specified percentiles of (typically) annual loss on one of two bases – AEP (sum of losses from all events in a year) or OEP (maximum of any one event’s losses in a year).  In ORD the percentiles are expressed as Return Periods, which is the reciprocal of the percentile. 
+An Exceedance Probability Table is a set of user-specified percentiles of (typically) annual loss on one of two bases – AEP (sum of losses from all events in a year) or OEP (maximum of any one event’s losses in a year).  In ORD the percentiles are expressed as Return Periods, which is the reciprocal of the percentile. 
 
-How EPTs are derived in general depends on the methodology of calculating the underlying ground up and insured losses. In the Oasis kernel the methodology is Monte Carlo sampling from damage distributions, which results in several samples (realisations) of an event loss for every event in the model's catalogue. The event losses are assigned to a year timeline and the years rank ordered by loss, so the method of computing the percentiles is by taking the ratio of the frequency of years of loss exceeding a given threshold over the total number of years.
+How EPTs are derived in general depends on the mathematical methodology of calculating the underlying ground up and insured losses. 
 
-The sampling approach gives rise to the five variations of calculation of these statistics:
+In the Oasis kernel the methodology is Monte Carlo sampling from damage distributions, which results in several samples (realisations) of an event loss for every event in the model's catalogue. The event losses are assigned to a year timeline and the years are rank ordered by loss. The method of computing the percentiles is by taking the ratio of the frequency of years with a loss exceeding a given threshold over the total number of years.
+
+The OasisLMF approach gives rise to five variations of calculation of these statistics:
 
 *	EP Table from Mean Damage Losses  – this means do the loss calculation for a year using the event mean damage loss computed by numerical integration of the effective damageability distributions. 
 *	EP Table of Sample Mean Losses – this means do the loss calculation for a year using the statistical sample event mean.
@@ -20,7 +22,7 @@ The sampling approach gives rise to the five variations of calculation of these 
 *	Per Sample EPT (PSEPT) – this means calculate the EP Curve for each sample and leave it at the sample level of detail, resulting in multiple "curves".
 *	Per Sample mean EPT – this means average the loss at each return period of the Per Sample EPT. 
 
-Exceedance Probability Tables are further generalised in Oasis to represent not only annual loss percentiles but loss percentiles over potentially any period of time. Thus the typical use of 'Year' label in outputs is replaced by the more general term 'Period', which can be any period of time as defined in the model data 'occurrence' file (although the normal period of interest is a year).
+Exceedance Probability Tables are further generalised in Oasis to represent not only annual loss percentiles but loss percentiles over any period of time. Thus the typical use of 'Year' label in outputs is replaced by the more general term 'Period', which can be any period of time as defined in the model data 'occurrence' file (although the normal period of interest is a year).
 
 
 ##### Parameters
@@ -94,10 +96,20 @@ If multiple events occur within a period;
 * For **aggregate** loss exceedance curves, the sum of losses is calculated.
 * For **occurrence** loss exceedance curves, the maximum loss is calculated.
 
+The 'EPType' field in the output identifies the basis of loss exceedance curve.
+
+The 'EPTypes' are;
+
+1. OEP
+2. OEP TVAR
+3. AEP
+4. AEP TVAR
+
+TVAR results are generated automatically if the OEP or AEP report is selected in the analysis options. TVAR, or Tail Conditional Expectation (TCE), is computed by averaging the rank ordered losses exceeding a given return period loss from the respective OEP or AEP result.
 
 Then the calculation differs by EPCalc type, as follows;
 
-1. The mean damage loss (sidx = -1) is output as a standard exceedance probability table.  If the calculation is run with 0 samples, then leccalc will still return the mean damage loss exceedance curve.  The 'EPType' field in the output identifies the type of loss exceedance curve.
+1. The mean damage loss (sidx = -1) is output as a standard exceedance probability table.  If the calculation is run with 0 samples, then leccalc will still return the mean damage loss exceedance curve.  
 
 2. Full uncertainty - all losses by period are rank ordered to produce a single loss exceedance curve. 
 
@@ -109,14 +121,6 @@ All four of the above variants are output into the same file when selected.
 
 Finally, the fifth variant, the Per Sample EPT is output to a separate file. In this case, for each sample, losses by period are rank ordered to produce a loss exceedance curve for each sample.
 
-The 'EPtypes' are;
-
-1. OEP
-2. OEP TVAR
-3. AEP
-4. AEP TVAR
-
-TVAR results are generated automatically if the OEP or AEP report is selected in the analysis options. TVAR, or Tail Conditional Expectation (TCE), is computed by averaging the rank ordered losses exceeding a given return period loss from the respective OEP or AEP result.
 
 ##### Output
 

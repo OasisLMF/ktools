@@ -1,5 +1,5 @@
 ![alt text](../img/banner.jpg "banner")
-# 4.4 Stream conversion components <a id="streamconversioncomponents"></a>
+# 4.5 Stream conversion components <a id="streamconversioncomponents"></a>
 
 The following components convert the binary output of each calculation component to csv format;
 * **[cdftocsv](#cdftocsv)** is a utility to convert binary format CDFs to a csv. getmodel standard output can be streamed directly into cdftocsv, or a binary file of the same format can be piped in.
@@ -226,7 +226,7 @@ $ gultobin -S100 -t2 < gulcalci.csv > gulcalci.bin
 
 [Return to top](#streamconversioncomponents)
 
-[Go to 4.5. Validation Components](ValidationComponents.md)
+[Go to 4.6. Validation Components](ValidationComponents.md)
 
 [Back to Contents](Contents.md)
 

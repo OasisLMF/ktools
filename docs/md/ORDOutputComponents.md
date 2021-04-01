@@ -8,15 +8,16 @@ Open Results Data is a data standard for catastrophe loss model results develope
 ***
 This component produces several variants of loss exceedance curves, known as Exceedance Probability Tables "EPT" under ORD. 
 
-Exceedance Probability Table is a set of user-specified percentiles of (typically) annual loss on one of two bases – AEP (sum of losses from all events in a year) or OEP (maximum of any one event’s losses in a year).  In ORD the percentiles are expressed as Return Periods, which is the reciprocal of the percentile.
+Exceedance Probability Table is a set of user-specified percentiles of (typically) annual loss on one of two bases – AEP (sum of losses from all events in a year) or OEP (maximum of any one event’s losses in a year).  In ORD the percentiles are expressed as Return Periods, which is the reciprocal of the percentile. 
 
-How EPTs are derived in general depends on the methodology of calculating the underlying ground up and insured losses. In the Oasis kernel the methodology is Monte Carlo sampling of the effective damageability distributions of the exposed assets, which results in several samples (realisations) of an event loss for every event in the model's catalogue, and the event occurrences are assigned to a timeline.
+How EPTs are derived in general depends on the methodology of calculating the underlying ground up and insured losses. In the Oasis kernel the methodology is Monte Carlo sampling from damage distributions, which results in several samples (realisations) of an event loss for every event in the model's catalogue. The event losses are assigned to a year timeline and the years rank ordered by loss, so the method of computing the percentiles is by taking the ratio of the frequency of years of loss exceeding a given threshold over the total number of years.
 
-The sampling approach therefore gives rise to the four variations of calculation of these statistics:
-•	EP Table from Mean Damage Losses  – this means do the loss calculation for a year using the event mean damage loss computed by numerical integration of the effective damageability distributions. 
-•	EP Table of Sample Mean Losses – this means do the loss calculation for a Year using event means from the statistical sample mean.
-•	Full Uncertainty EP Table – this means do the calculation across all samples (treating the samples effectively as repeat years) - this is the most accurate of all the single EP Curves.
-•	Per Sample EPT (PSEPT) – this means calculate the EP Curve for each sample and leave it at the sample level of detail, resulting in multiple "curves".
+The sampling approach gives rise to the four variations of calculation of these statistics:
+
+*	EP Table from Mean Damage Losses  – this means do the loss calculation for a year using the event mean damage loss computed by numerical integration of the effective damageability distributions. 
+*	EP Table of Sample Mean Losses – this means do the loss calculation for a year using the statistical sample event mean.
+*	Full Uncertainty EP Table – this means do the calculation across all samples (treating the samples effectively as repeat years) - this is the most accurate of all the single EP Curves.
+*	Per Sample EPT (PSEPT) – this means calculate the EP Curve for each sample and leave it at the sample level of detail, resulting in multiple "curves".
 
 Exceedance Probability Tables are further generalised in Oasis to represent not only annual loss percentiles but loss percentiles over potentially any period of time. Thus the typical use of 'Year' label in outputs is replaced by the more general term 'Period', which can be any period of time as defined in the model data 'occurrence' file (although the normal period of interest is a year).
 
@@ -24,9 +25,10 @@ Exceedance Probability Tables are further generalised in Oasis to represent not 
 ##### Parameters
 
 * -K{sub-directory}. The subdirectory of /work containing the input summarycalc binary files.
-Then the following tuple of parameters must be specified for at least one analysis type;
+Then the following parameters must be specified for at least one analysis type;
 * Analysis type. Use -F for Full Uncertainty Aggregate, -f for Full Uncertainty Occurrence, -W for Per Sample Aggregate,  -w for Per Sample Occurrence, -S for Sample Mean Aggregate, -s for Sample Mean Occurrence, -M for Per Sample Mean Aggregate, -m for Per Sample Mean Occurrence
-* Output filename
+* -O {ept.csv} is the output flag for the EPT csv ( for analysis types -F, -f, -S, -s, -M, -m)
+* -o {psept.csv} is the output flag for the PSEPT csv (for analysis types -W or -w)
 
 An optional parameter is; 
 * -r. Use return period file - use this parameter if you are providing a file with a specific list of return periods. If this file is not present then all calculated return periods will be returned, for losses greater than zero.
@@ -46,16 +48,16 @@ $ eve 2 2 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - > work/summar
 
 'Then run ordleccalc, pointing to the specified sub-directory of work containing summarycalc binaries.
 'Write aggregate and occurrence full uncertainty
-$ ordleccalc -F -f -O ept.csv
+$ ordleccalc -Ksummary1 -F -f -O ept.csv
 
 'Write occurrence per sample (PSEPT)
-$ ordleccalc -w -o psept.csv
+$ ordleccalc -Ksummary1 -w -o psept.csv
 
 'Write aggregate and occurrence per sample (written to PSEPT) and per sample mean (written to EPT file)
-$ ordleccalc -W -w -M -m -O ept.csv -o psept.csv
+$ ordleccalc -Ksummary1 -W -w -M -m -O ept.csv -o psept.csv
 
 'Write full output
-$ ordleccalc -F -f -W -w -S -s -M -m -O ept.csv -o psept.csv
+$ ordleccalc -Ksummary1 -F -f -W -w -S -s -M -m -O ept.csv -o psept.csv
 ```
 
 ##### Internal data
@@ -93,12 +95,25 @@ If multiple events occur within a period;
 
 Then the calculation differs by EPCalc type, as follows;
 
-* Full uncertainty - all losses by period are rank ordered to produce a single loss exceedance curve. 
-* Sample mean - the losses by period are first averaged across the samples, and then a single loss exceedance curve is created from the period sample mean losses.
-* Per Sample - losses by period are rank ordered for each sample, which produces many loss exceedance curves - one for each sample across the same timeline.
-* Per Sample mean - the return period losses from the Per Sample EPT are averaged, which produces a single loss exceedance curve.
+* 1. The mean damage loss (sidx = -1) is output as a standard exceedance probability table.  If the calculation is run with 0 samples, then leccalc will still return the mean damage loss exceedance curve.  The 'EPType' field in the output identifies the type of loss exceedance curve.
 
-The mean damage loss (sidx = -1) is output as a standard exceedance probability curve.  If the calculation is run with 0 samples, then leccalc will still return the mean damage loss exceedance curve.  The 'EPType' field in the output identifies the type of loss exceedance curve.
+* 2. Full uncertainty - all losses by period are rank ordered to produce a single loss exceedance curve. 
+
+* 3. Per Sample mean - the return period losses from the Per Sample EPT are averaged, which produces a single loss exceedance curve.
+
+* 4. Sample mean - the losses by period are first averaged across the samples, and then a single loss exceedance table is created from the period sample mean losses.
+
+The 'EPtypes' are;
+
+* 1. OEP
+
+* 2. OEP TVAR
+
+* 3. AEP
+
+* 4. AEP TVAR
+
+TVAR results are generated automatically if the OEP or AEP report is selected in the analysis options. TVAR, or Tail Conditional Expectation (TCE), is computed by averaging the rank ordered losses exceeding a given return period loss from the respective OEP or AEP result.
 
 ##### Output
 
@@ -112,19 +127,19 @@ csv files with the following fields;
 |:------------------|--------|--------| :-------------------------------------------------------------------|------------:|
 | SummaryId         | int    |    4   | identifier representing a summary level grouping of losses          |   10        |
 | EPCalc            | int    |    4   | 1, 2, 3 or 4								                        |    2        |
-| EPType 			| int    |    4   | 1, 2, 3 or 4			                                            |    250      |
+| EPType 			| int    |    4   | 1, 2, 3 or 4			                                            |    1        |
 | ReturnPeriod		| float  |    4   | return period interval                                              |    250      |
-| loss              | float  |    4   | loss exceedance threshold for return period                         |    546577.8 |
+| loss              | float  |    4   | loss exceedance threshold or TVAR for return period                 |    546577.8 |
 
 **Per Sample Exceedance Probability Tables (PSEPT)**
 
 | Name              | Type   |  Bytes | Description                                                         | Example     |
 |:------------------|--------|--------| :-------------------------------------------------------------------|------------:|
 | SummaryId         | int    |    4   | identifier representing a summary level grouping of losses          |   10        |
-| EPCalc            | int    |    4   | 1, 2, 3 or 4								                        |    2        |
-| EPType 			| int    |    4   | 1, 2, 3 or 4			                                            |    250      |
+| SampleID          | int    |    4   | Sample number								                        |    20       |
+| EPType 			| int    |    4   | 1, 2, 3 or 4			                                            |    3        |
 | ReturnPeriod		| float  |    4   | return period interval                                              |    250      |
-| loss              | float  |    4   | loss exceedance threshold for return period                         |    546577.8 |
+| loss              | float  |    4   | loss exceedance threshold or TVAR for return period                 |    546577.8 |
 
 ##### Period weightings
 

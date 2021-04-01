@@ -1,5 +1,5 @@
 ![alt text](../img/banner.jpg "banner")
-# Validation components <a id="validationcomponents"></a>
+# 4.6 Validation components <a id="validationcomponents"></a>
 
 The following components run validity checks on csv format files:
 

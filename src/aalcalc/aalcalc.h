@@ -91,10 +91,11 @@ private:
 	int max_ensemble_id_ = 0;
 	int max_period_no_=0;
 	int samplesize_ = -1;
+	std::vector<std::vector<double>> max_exposure_val_ = std::vector<std::vector<double>>(2);
 	std::map<int, aal_rec> map_analytical_aal_;
 	std::map<int, aal_rec> map_analytical_aal_w_;
 	std::map<int, aal_rec> map_sample_aal_;
-	std::vector< loss_rec>  vec_sample_sum_loss_;
+	std::vector<double> vec_sample_sum_loss_;
 	std::vector<aal_rec> vec_sample_aal_;
 	std::vector<aal_rec_ensemble> vec_ensemble_aal_;
 	std::vector<aal_rec> vec_analytical_aal_;

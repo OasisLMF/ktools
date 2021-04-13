@@ -68,12 +68,6 @@ struct period_sidx_map_key_new {
 	int sidx;
 };
 
-struct loss_rec {
-	double sum_of_loss = 0.0;
-	double max_exposure_value = 0.0;
-	double weighting = 0.0;
-};
-
 struct event_offset_rec{
 	int event_id;	
 	int fileindex;

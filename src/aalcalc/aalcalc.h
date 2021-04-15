@@ -68,12 +68,6 @@ struct period_sidx_map_key_new {
 	int sidx;
 };
 
-struct loss_rec {
-	double sum_of_loss = 0.0;
-	double max_exposure_value = 0.0;
-	double weighting = 0.0;
-};
-
 struct event_offset_rec{
 	int event_id;	
 	int fileindex;
@@ -91,10 +85,11 @@ private:
 	int max_ensemble_id_ = 0;
 	int max_period_no_=0;
 	int samplesize_ = -1;
+	std::vector<std::vector<double>> max_exposure_val_ = std::vector<std::vector<double>>(2);
 	std::map<int, aal_rec> map_analytical_aal_;
 	std::map<int, aal_rec> map_analytical_aal_w_;
 	std::map<int, aal_rec> map_sample_aal_;
-	std::vector< loss_rec>  vec_sample_sum_loss_;
+	std::vector<double> vec_sample_sum_loss_;
 	std::vector<aal_rec> vec_sample_aal_;
 	std::vector<aal_rec_ensemble> vec_ensemble_aal_;
 	std::vector<aal_rec> vec_analytical_aal_;

@@ -66,7 +66,7 @@ node {
                     }
                 }
             }
-        }
+        )
         // Print Build Params here 
         stage('Shell Env'){
             sh "env"

@@ -5,6 +5,7 @@ node {
 
     properties([
       parameters([
+        [$class: 'StringParameterDefinition',  name: 'BUILD_BRANCH', defaultValue: 'master'],
         [$class: 'StringParameterDefinition',  name: 'KTOOLS_BRANCH', defaultValue: BRANCH_NAME],
         [$class: 'StringParameterDefinition',  name: 'RELEASE_TAG', defaultValue: "${BRANCH_NAME}-${BUILD_NUMBER}"],
         [$class: 'StringParameterDefinition',  name: 'TEST_GCC', defaultValue: ""],
@@ -21,6 +22,15 @@ node {
     String ktools_workspace = 'ktools_workspace'
     String git_creds = "1335b248-336a-47a9-b0f6-9f7314d6f1f4"
 
+    // Build vars
+    String build_repo = 'git@github.com:OasisLMF/build.git'
+    String build_branch = params.BUILD_BRANCH
+    String build_workspace = 'oasis_build'
+    String script_dir = env.WORKSPACE + "/${build_workspace}"
+    String PIPELINE = script_dir + "/buildscript/pipeline.sh"
+    String utils_sh = '/buildscript/utils.sh'
+    env.PIPELINE_LOAD = script_dir + utils_sh
+
     // Set Global ENV
     env.KTOOLS_IMAGE_GCC   = "jenkins/Dockerfile.gcc-build"    // Docker image for Dynamic linked build
     env.KTOOLS_IMAGE_CLANG = "jenkins/Dockerfile.clang-build"  // Docker image for static ktools build
@@ -32,18 +42,27 @@ node {
     }
 
     try {
-        stage('Clone: Ktools') {
-            sshagent (credentials: [git_creds]) {
-                dir(ktools_workspace) {
-                    sh "git clone --recursive ${ktools_git_url} ."
-                    if (ktools_branch.matches("PR-[0-9]+")){
-                        // Checkout PR and merge into target branch, test on the result
-                        sh "git fetch origin pull/$CHANGE_ID/head:$BRANCH_NAME"
-                        sh "git checkout $CHANGE_TARGET"
-                        sh "git merge $BRANCH_NAME"
-                    } else {
-                        // Checkout branch
-                        sh "git checkout ${ktools_branch}"
+        parallel(
+            clone_oasis_build: {
+                stage('Clone: ' + build_workspace) {
+                    dir(build_workspace) {                                                                                                   
+                       git url: build_repo, credentialsId: git_creds, branch: build_branch
+                    }
+                }
+            },
+            Clone_Ktools: {
+                sshagent (credentials: [git_creds]) {
+                    dir(ktools_workspace) {
+                        sh "git clone --recursive ${ktools_git_url} ."
+                        if (ktools_branch.matches("PR-[0-9]+")){
+                            // Checkout PR and merge into target branch, test on the result
+                            sh "git fetch origin pull/$CHANGE_ID/head:$BRANCH_NAME"
+                            sh "git checkout $CHANGE_TARGET"
+                            sh "git merge $BRANCH_NAME"
+                        } else {
+                            // Checkout branch
+                            sh "git checkout ${ktools_branch}"
+                        }
                     }
                 }
             }
@@ -126,7 +145,7 @@ node {
         error('Build Failed')
     } finally {
         // Run merge back if publish 
-        if (params.PUBLISH){ 
+        if (params.PUBLISH && ! hasFailed){ 
             dir(ktools_workspace) {
                 sshagent (credentials: [git_creds]) {
                     if (! params.PRE_RELEASE) {

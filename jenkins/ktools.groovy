@@ -114,6 +114,9 @@ node {
                             filename='Linux_x86_64.tar.gz'
                             sh 'curl -XPOST -H "Authorization:token ' + gh_token + '" -H "Content-Type:application/octet-stream" --data-binary @' + filename + " https://uploads.github.com/repos/$repo/releases/$release_id/assets?name=" + filename
                         }    
+
+                        // Create milestone
+                        sh PIPELINE + " create_milestone ${gh_token} ${repo} ${RELEASE_TAG} CHANGELOG.rst"
                     }
                 }
             }

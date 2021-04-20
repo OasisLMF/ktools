@@ -105,9 +105,9 @@ void doitz(bool skipheader, bool fullprecision, bool show_exposure_value, bool o
 				} else {
 					// ORD output flag takes priority over exposure value flag
 					if (ord_output == true)
-						printf("%d,%d,%d,%.2f,%f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss, sh.expval);
+						printf("%d,%d,%d,%.2f,%.2f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss, sh.expval);
 					else if (show_exposure_value == true)
-						printf("%d,%f,%d,%d,%.2f\n", sh.event_id, sh.expval, sh.summary_id, sr.sidx, sr.loss);
+						printf("%d,%.2f,%d,%d,%.2f\n", sh.event_id, sh.expval, sh.summary_id, sr.sidx, sr.loss);
 					else
 						printf("%d,%d,%d,%.2f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
 				}
@@ -172,9 +172,9 @@ void doit(bool skipheader, bool fullprecision,bool show_exposure_value, bool rem
 				} else {
 					// ORD output flag takes priority over exposure value flag
 					if (ord_output == true)
-						printf("%d,%d,%d,%.2f,%f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss, sh.expval);
+						printf("%d,%d,%d,%.2f,%.2f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss, sh.expval);
 					else if (show_exposure_value == true)
-						printf("%d,%f,%d,%d,%.2f\n", sh.event_id, sh.expval, sh.summary_id, sr.sidx, sr.loss);
+						printf("%d,%.2f,%d,%d,%.2f\n", sh.event_id, sh.expval, sh.summary_id, sr.sidx, sr.loss);
 					else
 						printf("%d,%d,%d,%.2f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
 				}

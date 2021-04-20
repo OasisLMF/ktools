@@ -54,7 +54,7 @@ bool firstOutput = true;
 
 int rowcount = 0;
 
-void doitz(bool skipheader, bool fullprecision, bool show_exposure_value, bool remove_zero_exposure_records)
+void doitz(bool skipheader, bool fullprecision, bool show_exposure_value, bool remove_zero_exposure_records, bool ord_output)
 {
 	int summarycalcstream_type = 0;
 	size_t i = fread(&summarycalcstream_type, sizeof(summarycalcstream_type), 1, stdin);
@@ -67,8 +67,16 @@ void doitz(bool skipheader, bool fullprecision, bool show_exposure_value, bool r
 	stream_type = streamno_mask & summarycalcstream_type;
 
 	if (stream_type == 1) {
-		if (skipheader == false && stream_type == 1 && show_exposure_value == false) printf("event_id,summary_id,sidx,loss\n");
-		if (skipheader == false && stream_type == 1 && show_exposure_value == true) printf("event_id,exposure_value,summary_id,sidx,loss\n");
+		if (skipheader == false) {
+			// ORD output flag takes priority over exposure value flag
+			// ImpactedNumLocs not currently supported in ORD output
+			if (ord_output == true)
+				printf("EventID,SummaryID,SampleID,Loss,ImpactedExposure\n");
+			else if (show_exposure_value == true)
+				printf("event_id,exposure_value,summary_id,sidx,loss\n");
+			else
+				printf("event_id,summary_id,sidx,loss\n");
+		}
 		int samplesize = 0;
 		int summary_set = 0;
 		i = fread(&samplesize, sizeof(samplesize), 1, stdin);
@@ -91,10 +99,23 @@ void doitz(bool skipheader, bool fullprecision, bool show_exposure_value, bool r
 				}
 				
 				if (showRecord) {
-					if (fullprecision == true && show_exposure_value == false) printf("%d,%d,%d,%f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
-					if (fullprecision == false && show_exposure_value == false) printf("%d,%d,%d,%.2f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
-					if (fullprecision == true && show_exposure_value == true) printf("%d,%f,%d,%d,%f\n", sh.event_id, sh.expval, sh.summary_id, sr.sidx, sr.loss);
-					if (fullprecision == false && show_exposure_value == true) printf("%d,%.2f,%d,%d,%.2f\n", sh.event_id, sh.expval, sh.summary_id, sr.sidx, sr.loss);
+					if (fullprecision == true) {
+						// ORD output flag takes priority over exposure value flag
+						if (ord_output == true)
+							printf("%d,%d,%d,%f,%f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss, sh.expval);
+						else if (show_exposure_value == true)
+							printf("%d,%f,%d,%d,%f\n", sh.event_id, sh.expval, sh.summary_id, sr.sidx, sr.loss);
+						else
+							printf("%d,%d,%d,%f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
+					} else {
+						// ORD output flag takes priority over exposure value flag
+						if (ord_output == true)
+							printf("%d,%d,%d,%.2f,%f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss, sh.expval);
+						else if (show_exposure_value == true)
+							printf("%d,%f,%d,%d,%.2f\n", sh.event_id, sh.expval, sh.summary_id, sr.sidx, sr.loss);
+						else
+							printf("%d,%d,%d,%.2f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
+					}
 					if (firstOutput == true) {
 						std::this_thread::sleep_for(std::chrono::milliseconds(PIPE_DELAY));  // used to stop possible race condition with kat
 						firstOutput = false;
@@ -106,10 +127,10 @@ void doitz(bool skipheader, bool fullprecision, bool show_exposure_value, bool r
 	}
 	fprintf(stderr, "FATAL: Unsupported summarycalc stream type\n");
 }
-void doit(bool skipheader, bool fullprecision,bool show_exposure_value, bool remove_zero_exposure_records)
+void doit(bool skipheader, bool fullprecision,bool show_exposure_value, bool remove_zero_exposure_records, bool ord_output)
 {
 	if (remove_zero_exposure_records == true) {
-		doitz(skipheader, fullprecision, show_exposure_value, remove_zero_exposure_records);
+		doitz(skipheader, fullprecision, show_exposure_value, remove_zero_exposure_records, ord_output);
 		return;
 	}
 	int summarycalcstream_type = 0;
@@ -123,8 +144,16 @@ void doit(bool skipheader, bool fullprecision,bool show_exposure_value, bool rem
 	stream_type = streamno_mask & summarycalcstream_type;
 
 	if (stream_type == 1 ){
-		if (skipheader == false && stream_type==1 && show_exposure_value==false) printf ("event_id,summary_id,sidx,loss\n");
-		if (skipheader == false && stream_type == 1 && show_exposure_value == true) printf("event_id,exposure_value,summary_id,sidx,loss\n");
+		if (skipheader == false) {
+			// ORD output flag takes priority over exposure value flag
+			// ImpactedNumLocs not currently supported in ORD output
+			if (ord_output == true)
+				printf("EventID,SummaryID,SampleID,Loss,ImpactedExposure\n");
+			else if (show_exposure_value == true)
+				printf("event_id,exposure_value,summary_id,sidx,loss\n");
+			else
+				printf("event_id,summary_id,sidx,loss\n");
+		}
 		int samplesize=0;
 		int summary_set = 0;
 		i=fread(&samplesize, sizeof(samplesize), 1, stdin);
@@ -138,10 +167,23 @@ void doit(bool skipheader, bool fullprecision,bool show_exposure_value, bool rem
 				if (i == 0) break;	
 				if (sr.sidx == 0) break;
 				rowcount++;
-				if (fullprecision == true && show_exposure_value == false) printf("%d,%d,%d,%f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);				
-				if (fullprecision == false && show_exposure_value == false) printf("%d,%d,%d,%.2f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
-				if (fullprecision == true && show_exposure_value == true) printf("%d,%f,%d,%d,%f\n", sh.event_id, sh.expval, sh.summary_id, sr.sidx, sr.loss);
-				if (fullprecision == false && show_exposure_value == true) printf("%d,%.2f,%d,%d,%.2f\n", sh.event_id, sh.expval, sh.summary_id, sr.sidx, sr.loss);
+				if (fullprecision == true) {
+					// ORD output flag takes priority over exposure value flag
+					if (ord_output == true)
+						printf("%d,%d,%d,%f,%f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss, sh.expval);
+					else if (show_exposure_value == true)
+						printf("%d,%f,%d,%d,%f\n", sh.event_id, sh.expval, sh.summary_id, sr.sidx, sr.loss);
+					else
+						printf("%d,%d,%d,%f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
+				} else {
+					// ORD output flag takes priority over exposure value flag
+					if (ord_output == true)
+						printf("%d,%d,%d,%.2f,%f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss, sh.expval);
+					else if (show_exposure_value == true)
+						printf("%d,%f,%d,%d,%.2f\n", sh.event_id, sh.expval, sh.summary_id, sr.sidx, sr.loss);
+					else
+						printf("%d,%d,%d,%.2f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
+				}
 				if (firstOutput==true){
 					std::this_thread::sleep_for(std::chrono::milliseconds(PIPE_DELAY));  // used to stop possible race condition with kat
 					firstOutput=false;
@@ -162,6 +204,7 @@ void help()
 		"-e show exposure_value\n"
 		"-v version\n"
 		"-z remove records with zero exposure values\n"
+		"-o Open Results Data (ORD) output\n"
 		"-h help\n"
 	);
 }
@@ -174,7 +217,8 @@ int main(int argc, char* argv[])
 	bool fullprecision = false;
 	bool show_exposure_value = false;
 	bool remove_zero_exposure_records = false;
-	while ((opt = getopt(argc, argv, "zvhfse")) != -1) {
+	bool ord_output = false;
+	while ((opt = getopt(argc, argv, "zvhfseo")) != -1) {
 		switch (opt) {
 		case 's':
 			skipheader = true;
@@ -188,6 +232,9 @@ int main(int argc, char* argv[])
 		case 'z':
 			remove_zero_exposure_records = true;
 			break;
+		case 'o':
+			ord_output = true;
+			break;
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
 			exit(EXIT_FAILURE);
@@ -199,6 +246,6 @@ int main(int argc, char* argv[])
 	}
 
 	initstreams();
-	doit(skipheader, fullprecision, show_exposure_value, remove_zero_exposure_records);
+	doit(skipheader, fullprecision, show_exposure_value, remove_zero_exposure_records, ord_output);
 	return EXIT_SUCCESS;
 }

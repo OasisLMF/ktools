@@ -54,7 +54,7 @@ bool firstOutput = true;
 
 int rowcount = 0;
 
-void doitz(bool skipheader, bool fullprecision, bool show_exposure_value, bool remove_zero_exposure_records, bool ord_output)
+void doitz(bool skipheader, bool fullprecision, bool show_exposure_value, bool ord_output)
 {
 	int summarycalcstream_type = 0;
 	size_t i = fread(&summarycalcstream_type, sizeof(summarycalcstream_type), 1, stdin);
@@ -90,36 +90,30 @@ void doitz(bool skipheader, bool fullprecision, bool show_exposure_value, bool r
 				if (i == 0) break;
 				if (sr.sidx == 0) break;
 				bool showRecord = false;
-				if (remove_zero_exposure_records) {
-					if (sh.expval > 0) {
-						showRecord = true;
-					}
-				}else {
-					showRecord = true;
-				}
+
+				// Do not output records with exposure value = 0
+				if (sh.expval == 0) continue;
 				
-				if (showRecord) {
-					if (fullprecision == true) {
-						// ORD output flag takes priority over exposure value flag
-						if (ord_output == true)
-							printf("%d,%d,%d,%f,%f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss, sh.expval);
-						else if (show_exposure_value == true)
-							printf("%d,%f,%d,%d,%f\n", sh.event_id, sh.expval, sh.summary_id, sr.sidx, sr.loss);
-						else
-							printf("%d,%d,%d,%f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
-					} else {
-						// ORD output flag takes priority over exposure value flag
-						if (ord_output == true)
-							printf("%d,%d,%d,%.2f,%f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss, sh.expval);
-						else if (show_exposure_value == true)
-							printf("%d,%f,%d,%d,%.2f\n", sh.event_id, sh.expval, sh.summary_id, sr.sidx, sr.loss);
-						else
-							printf("%d,%d,%d,%.2f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
-					}
-					if (firstOutput == true) {
-						std::this_thread::sleep_for(std::chrono::milliseconds(PIPE_DELAY));  // used to stop possible race condition with kat
-						firstOutput = false;
-					}
+				if (fullprecision == true) {
+					// ORD output flag takes priority over exposure value flag
+					if (ord_output == true)
+						printf("%d,%d,%d,%f,%f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss, sh.expval);
+					else if (show_exposure_value == true)
+						printf("%d,%f,%d,%d,%f\n", sh.event_id, sh.expval, sh.summary_id, sr.sidx, sr.loss);
+					else
+						printf("%d,%d,%d,%f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
+				} else {
+					// ORD output flag takes priority over exposure value flag
+					if (ord_output == true)
+						printf("%d,%d,%d,%.2f,%f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss, sh.expval);
+					else if (show_exposure_value == true)
+						printf("%d,%f,%d,%d,%.2f\n", sh.event_id, sh.expval, sh.summary_id, sr.sidx, sr.loss);
+					else
+						printf("%d,%d,%d,%.2f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
+				}
+				if (firstOutput == true) {
+					std::this_thread::sleep_for(std::chrono::milliseconds(PIPE_DELAY));  // used to stop possible race condition with kat
+					firstOutput = false;
 				}
 			}
 		}
@@ -130,7 +124,7 @@ void doitz(bool skipheader, bool fullprecision, bool show_exposure_value, bool r
 void doit(bool skipheader, bool fullprecision,bool show_exposure_value, bool remove_zero_exposure_records, bool ord_output)
 {
 	if (remove_zero_exposure_records == true) {
-		doitz(skipheader, fullprecision, show_exposure_value, remove_zero_exposure_records, ord_output);
+		doitz(skipheader, fullprecision, show_exposure_value, ord_output);
 		return;
 	}
 	int summarycalcstream_type = 0;

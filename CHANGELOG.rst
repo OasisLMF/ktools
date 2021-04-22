@@ -3,22 +3,15 @@ Ktools Changelog
 
 .. * [#_](https://github.com/OasisLMF/OasisLMF/issues/_) -  
 
-`v3.6.0-rc3`_
+`v3.6.0`_
 -------------
 .. start_latest_release
+* [#184](https://github.com/OasisLMF/ktools/issues/184) - Calculate Tail Value at Risk (TVaR)
+* [#186](https://github.com/OasisLMF/ktools/issues/186) - Fix truncation of outer return periods in leccalc
+* [#193](https://github.com/OasisLMF/ktools/issues/193) - Fix areaperil ID output in cdftocsv
+* [#195](https://github.com/OasisLMF/ktools/pull/195) - Write Exceedance Probability Table (EPT) and Per Sample Exceedance Probability Table (PSEPT)
 * [#196](https://github.com/OasisLMF/ktools/issues/196) - Reduce memory footprint in aalcalc
-* [#195](https://github.com/OasisLMF/ktools/pull/195) - Write Exceedance Probability Table (EPT) and Per Sample Exceedance Probability Table (PSEPT)
-* [#184](https://github.com/OasisLMF/ktools/issues/184) - Calculate Tail Value at Risk (TVaR)
-* [#186](https://github.com/OasisLMF/ktools/issues/186) - Fix truncation of outer return periods in leccalc
-* [#193](https://github.com/OasisLMF/ktools/issues/193) - Fix areaperil ID output in cdftocsv
 .. end_latest_release
-
-`v3.6.0-rc2`_
--------------
-* [#195](https://github.com/OasisLMF/ktools/pull/195) - Write Exceedance Probability Table (EPT) and Per Sample Exceedance Probability Table (PSEPT)
-* [#184](https://github.com/OasisLMF/ktools/issues/184) - Calculate Tail Value at Risk (TVaR)
-* [#186](https://github.com/OasisLMF/ktools/issues/186) - Fix truncation of outer return periods in leccalc
-* [#193](https://github.com/OasisLMF/ktools/issues/193) - Fix areaperil ID output in cdftocsv
 
 `v3.5.1`_
 ---------
@@ -364,6 +357,22 @@ Release features:
 
 * First Alpha release of the kernel toolkit
 
+
+.. _`v3.6.0`:  https://github.com/OasisLMF/ktools/compare/v3.5.1...v3.6.0
+.. _`v3.5.1`:  https://github.com/OasisLMF/ktools/compare/v3.5.0...v3.5.1
+.. _`v3.5.0`:  https://github.com/OasisLMF/ktools/compare/v3.4.3...v3.5.0
+.. _`v3.4.3`:  https://github.com/OasisLMF/ktools/compare/v3.4.2...v3.4.3
+.. _`v3.4.2`:  https://github.com/OasisLMF/ktools/compare/v3.4.1...v3.4.2
+.. _`v3.4.1`:  https://github.com/OasisLMF/ktools/compare/v3.4.0...v3.4.1
+.. _`v3.4.0`:  https://github.com/OasisLMF/ktools/compare/v3.3.8...v3.4.0
+.. _`v3.3.8`:  https://github.com/OasisLMF/ktools/compare/v3.3.7...v3.3.8
+.. _`v3.3.7`:  https://github.com/OasisLMF/ktools/compare/v3.3.6...v3.3.7
+.. _`v3.3.6`:  https://github.com/OasisLMF/ktools/compare/v3.3.5...v3.3.6
+.. _`v3.3.5`:  https://github.com/OasisLMF/ktools/compare/v3.3.4...v3.3.5
+.. _`v3.3.4`:  https://github.com/OasisLMF/ktools/compare/v3.3.3...v3.3.4
+.. _`v3.3.3`:  https://github.com/OasisLMF/ktools/compare/v3.3.2...v3.3.3
+.. _`v3.3.2`:  https://github.com/OasisLMF/ktools/compare/v3.3.1...v3.3.2
+.. _`v3.3.1`:  https://github.com/OasisLMF/ktools/compare/v3.3.0...v3.3.1
 .. _`v3.3.0`:  https://github.com/OasisLMF/ktools/compare/v3.2.6...v3.3.0
 .. _`v3.2.6`:  https://github.com/OasisLMF/ktools/compare/v3.2.4...v3.2.6
 .. _`v3.2.5`:  https://github.com/OasisLMF/ktools/compare/v3.2.4...v3.2.5

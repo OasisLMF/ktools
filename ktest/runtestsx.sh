@@ -87,12 +87,15 @@ installertest()
     									    -f ../ktest/testout/fm_full_uncertainty_oep_2_r.csv -w ../ktest/testout/fm_wheatsheaf_oep_2_r.csv -s ../ktest/testout/fm_sample_mean_oep_2_r.csv -m ../ktest/testout/fm_wheatsheaf_mean_oep_2_r.csv
 
     # test ORD ept and psept (to do)
- 	# ../src/ordleccalc/ordleccalc -r -Kgul1/summary -F -f -W -w -M -m -S -s -O ../ktest/testout/gul_ept_1_r.csv -o ../ktest/testout/gul_psept_1_r.csv
-	# ../src/ordleccalc/ordleccalc -r -Kgul2/summary -F -f -W -w -M -m -S -s -O ../ktest/testout/gul_ept_2_r.csv -o ../ktest/testout/gul_psept_2_r.csv
+ 	../src/ordleccalc/ordleccalc  -Kgul1/summary -F -f -W -w -M -m -S -s -O ../ktest/testout/gul_ept_1.csv -o ../ktest/testout/gul_psept_1.csv
+	 ../src/ordleccalc/ordleccalc  -Kgul2/summary -F -f -W -w -M -m -S -s -O ../ktest/testout/gul_ept_2.csv -o ../ktest/testout/gul_psept_2.csv
+	 ../src/ordleccalc/ordleccalc  -Kfm1/summary -F -f -W -w -M -m -S -s -O ../ktest/testout/fm_ept_1.csv -o ../ktest/testout/fm_psept_1.csv
+	 ../src/ordleccalc/ordleccalc  -Kfm2/summary -F -f -W -w -M -m -S -s -O ../ktest/testout/fm_ept_2.csv -o ../ktest/testout/fm_psept_2.csv
+ 	 ../src/ordleccalc/ordleccalc -r -Kgul1/summary -F -f -W -w -M -m -S -s -O ../ktest/testout/gul_ept_1_r.csv -o ../ktest/testout/gul_psept_1_r.csv
+	 ../src/ordleccalc/ordleccalc -r -Kgul2/summary -F -f -W -w -M -m -S -s -O ../ktest/testout/gul_ept_2_r.csv -o ../ktest/testout/gul_psept_2_r.csv
 	 ../src/ordleccalc/ordleccalc -r -Kfm1/summary -F -f -W -w -M -m -S -s -O ../ktest/testout/fm_ept_1_r.csv -o ../ktest/testout/fm_psept_1_r.csv
-	# ../src/ordleccalc/ordleccalc -r -Kfm2/summary -F -f -W -w -M -m -S -s -O ../ktest/testout/fm_ept_2_r.csv -o ../ktest/testout/fm_psept_2_r.csv
-	../src/ordleccalc/ordleccalc -Kfm2/summary -F -W -S -M -f -w -s -m -O ../ktest/testout/fm2_ept.csv -o ../ktest/testout/fm2_psept.csv
-
+	 ../src/ordleccalc/ordleccalc -r -Kfm2/summary -F -f -W -w -M -m -S -s -O ../ktest/testout/fm_ept_2_r.csv -o ../ktest/testout/fm_psept_2_r.csv
+	
 
 	# test pltcalc
 	../src/pltcalc/pltcalc < ../ktest/testout/gulsummarycalc1.bin > ../ktest/testout/gulplt1.csv

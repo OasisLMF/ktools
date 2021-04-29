@@ -17,10 +17,10 @@ In v3.1.0 the method of combining losses became function-driven using the gulcal
 |:------------------|:------------------------------------------------------------------------------------------------------|
 | 0                 | Do nothing (suitable for single sub-peril models with one item per coverage)                          |
 | 1                 | Sum damage ratios and cap to 1. Back-allocate in proportion to contributing subperil loss             |
-| 2                 | Multiplicative method for combining damage. Back-allocate in proportion to contributing subperil loss |
-| 3                 | Total damage =  maximum subperil damage. Back-allocate all to the maximum contributing subperil loss  |
+| 2                 | Total damage =  maximum subperil damage. Back-allocate all to the maximum contributing subperil loss  |
+| 3                 | Multiplicative method for combining damage. Back-allocate in proportion to contributing subperil loss |
 
-Allocation option 1 has been implemented in v3.1.0.
+Allocation options 0,1,2 have been implemented to date. 
 
 Correlation of item damage is generic in ktools, as damage can either be 100% correlated or independent (see [Appendix A Random Numbers](RandomNumbers.md)). This is no different in the multi-peril case when items represent different elements of financial loss to the same asset, rather than different assets.  More sophisticated methods of multi-peril correlation have been implemented for particular models, but as yet no standard approach has been implemented in ktools.
 

@@ -75,6 +75,7 @@ void help()
 		"-c input stream = gul coverage\n"
 		"-i input stream = gul item\n"
 		"-p input path\n"
+		"-m reduce downstream memory use with index file(s)\n"
 		"-z output zeros\n"
 		"-[summarysetid] outfilepipe\n"
 		"where summarysetid range is 0 to 9\n"
@@ -92,10 +93,11 @@ int main(int argc, char* argv[])
 {
 	progname = argv[0];
 	int opt;
+	bool indexFile = false;
 	bool noneOutputTrue = true;
 	int truecount = 0;
 	summarycalc f;
-	while ((opt = getopt(argc, argv, "vzhcixfgp:0:1:2:3:4:5:6:7:8:9:")) != -1) {
+	while ((opt = getopt(argc, argv, "vzhcixfgmp:0:1:2:3:4:5:6:7:8:9:")) != -1) {
 		switch (opt) {
 		case 'g':
 			truecount++;
@@ -122,6 +124,9 @@ int main(int argc, char* argv[])
 			break;
 		case 'p':
 			f.setinputpath(optarg);
+			break;
+		case 'm':
+			indexFile = true;
 			break;
 		case '0':
 		case '1':
@@ -157,6 +162,8 @@ int main(int argc, char* argv[])
 	}
 
 	if (noneOutputTrue) return EXIT_FAILURE; // no output stream so nothing to do...
+
+	if (indexFile) f.openindexfiles();
 
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
 	struct sigaction sa;

@@ -36,7 +36,7 @@ node {
     env.KTOOLS_IMAGE_GCC   = "jenkins/Dockerfile.gcc-build"    // Docker image for Dynamic linked build
     env.KTOOLS_IMAGE_CLANG = "jenkins/Dockerfile.clang-build"  // Docker image for static ktools build
 
-    //make sure release candidate versions are tagged correctly                                                                              
+    //make sure release candidate versions are tagged correctly
     if (params.PUBLISH && params.PRE_RELEASE && ! params.RELEASE_TAG.matches('^v(\\d+\\.)(\\d+\\.)(\\*|\\d+)rc(\\d+)$')) {
         sh "echo release candidates must be tagged v{version}rc{N}, example: v1.0.0rc1"
         sh "exit 1"
@@ -46,7 +46,7 @@ node {
         parallel(
             clone_oasis_build: {
                 stage('Clone: ' + build_workspace) {
-                    dir(build_workspace) {                                                                                                   
+                    dir(build_workspace) {
                        git url: build_repo, credentialsId: git_creds, branch: build_branch
                     }
                 }
@@ -68,12 +68,12 @@ node {
                 }
             }
         )
-        // Print Build Params here 
+        // Print Build Params here
         stage('Shell Env'){
             sh "env"
         }
-    
-        // Create static build CLANG 
+
+        // Create static build CLANG
         stage("Ktools Builder: Linux_x86_64") {
             dir(ktools_workspace) {
                 sh "docker build -f $env.KTOOLS_IMAGE_CLANG -t ktools-builder ."
@@ -92,7 +92,7 @@ node {
             }
         }
 
-        // Optional: test dynamic linked builds GCC 
+        // Optional: test dynamic linked builds GCC
         gcc_vers = params.TEST_GCC.split()
         for(int i=0; i < gcc_vers.size(); i++) {
             stage("Ktools Tester: GCC ${gcc_vers[i]}") {
@@ -106,14 +106,14 @@ node {
         }
 
         if (params.PUBLISH){
-            // Build chanagelog image 
+            // Build chanagelog image
             stage("Create Changelog builder") {
                 dir(build_workspace) {
                     sh "docker build -f docker/Dockerfile.release-notes -t release-builder ."
-                }    
-            }    
-    
-            // Tag and release 
+                }
+            }
+
+            // Tag and release
             stage("Tag release") {
                 dir(ktools_workspace) {
                     sshagent (credentials: [git_creds]) {
@@ -123,13 +123,13 @@ node {
                 }
             }
 
-            // Create release notes 
+            // Create release notes
             stage('Create Changelog'){
                 dir(ktools_workspace) {
                     withCredentials([string(credentialsId: 'github-api-token', variable: 'gh_token')]) {
                         sh "docker run -v ${env.WORKSPACE}/${ktools_workspace}:/tmp release-builder build-changelog --repo ktools --from-tag ${params.PREV_RELEASE_TAG} --to-tag ${params.RELEASE_TAG} --github-token ${gh_token} --local-repo-path ./ --output-path ./CHANGELOG.rst --apply-milestone"
-                        sh "docker run -v ${env.WORKSPACE}/${ktools_workspace}:/tmp release-builder build-changelog --repo ktools --from-tag ${params.PREV_RELEASE_TAG} --to-tag ${params.RELEASE_TAG} --github-token ${gh_token} --local-repo-path ./ --output-path ./RELEASE.md"
-                    }    
+                        sh "docker run -v ${env.WORKSPACE}/${ktools_workspace}:/tmp release-builder build-release --repo ktools --from-tag ${params.PREV_RELEASE_TAG} --to-tag ${params.RELEASE_TAG} --github-token ${gh_token} --local-repo-path ./ --output-path ./RELEASE.md"
+                    }
                     sshagent (credentials: [git_creds]) {
                         sh "git add ./CHANGELOG.rst"
                         sh "git commit -m 'Update changelog'"
@@ -138,14 +138,13 @@ node {
                 }
             }
 
-
+            // Create GitHub release Page
             stage("Create Release: GitHub") {
                 dir(ktools_workspace) {
                     withCredentials([string(credentialsId: 'github-api-token', variable: 'gh_token')]) {
                         String repo = "OasisLMF/ktools"
-                        
                         def release_body = readFile(file: "${env.WORKSPACE}/${ktools_workspace}/RELEASE.md")
-                        def json_request = readJSON text: '{}'             
+                        def json_request = readJSON text: '{}'
 
                         json_request['tag_name'] = RELEASE_TAG
                         json_request['target_commitish'] = 'master'
@@ -157,38 +156,35 @@ node {
                         sh 'curl -XPOST -H "Authorization:token ' + gh_token + "\" --data @gh_request.json https://api.github.com/repos/$repo/releases > gh_response.json"
 
                         // Fetch release ID and post build tar
-                        def response = readJSON file: "gh_response.json" 
+                        def response = readJSON file: "gh_response.json"
                         release_id = response['id']
                         dir('tar') {
                             filename='Linux_x86_64.tar.gz'
                             sh 'curl -XPOST -H "Authorization:token ' + gh_token + '" -H "Content-Type:application/octet-stream" --data-binary @' + filename + " https://uploads.github.com/repos/$repo/releases/$release_id/assets?name=" + filename
-                        }    
-
-                        //// Create milestone
-                        //sh PIPELINE + " create_milestone ${gh_token} ${repo} ${RELEASE_TAG} CHANGELOG.rst"
+                        }
                     }
                 }
             }
-        } 
+        }
     } catch(hudson.AbortException | org.jenkinsci.plugins.workflow.steps.FlowInterruptedException buildException) {
         hasFailed = true
         error('Build Failed')
     } finally {
-        // Run merge back if publish 
-        if (params.AUTO_MERGE && params.PUBLISH && ! hasFailed){ 
+        // Run merge back if publish
+        if (params.AUTO_MERGE && params.PUBLISH && ! hasFailed){
             dir(ktools_workspace) {
                 sshagent (credentials: [git_creds]) {
                     if (! params.PRE_RELEASE) {
-                        // Release merge back into master 
+                        // Release merge back into master
                         sh "git checkout master && git pull"
                         sh "git merge ${ktools_branch} && git push"
                         sh "git checkout develop && git pull"
                         sh "git merge master && git push"
                     } else {
-                        // pre_pelease merge back into develop 
+                        // pre_pelease merge back into develop
                         sh "git checkout develop && git pull"
                         sh "git merge ${ktools_branch} && git push"
-                    }    
+                    }
                 }
             }
         }

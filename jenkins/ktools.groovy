@@ -5,14 +5,15 @@ node {
 
     properties([
       parameters([
-        [$class: 'StringParameterDefinition',  name: 'BUILD_BRANCH', defaultValue: 'master'],
-        [$class: 'StringParameterDefinition',  name: 'KTOOLS_BRANCH', defaultValue: BRANCH_NAME],
-        [$class: 'StringParameterDefinition',  name: 'RELEASE_TAG', defaultValue: "${BRANCH_NAME}-${BUILD_NUMBER}"],
-        [$class: 'StringParameterDefinition',  name: 'TEST_GCC', defaultValue: ""],
-        [$class: 'BooleanParameterDefinition', name: 'PURGE', defaultValue: Boolean.valueOf(true)],
-        [$class: 'BooleanParameterDefinition', name: 'PUBLISH', defaultValue: Boolean.valueOf(false)],
-        [$class: 'BooleanParameterDefinition', name: 'PRE_RELEASE', defaultValue: Boolean.valueOf(true)],
-        [$class: 'BooleanParameterDefinition', name: 'SLACK_MESSAGE', defaultValue: Boolean.valueOf(false)]
+        [$class: 'StringParameterDefinition',  description: "Oasis Build repo branch",       name: 'BUILD_BRANCH', defaultValue: 'master'],
+        [$class: 'StringParameterDefinition',  description: "Ktools repo branch",            name: 'KTOOLS_BRANCH', defaultValue: BRANCH_NAME],
+        [$class: 'StringParameterDefinition',  description: "Release tag to publish",        name: 'RELEASE_TAG', defaultValue: "${BRANCH_NAME}-${BUILD_NUMBER}"],
+        [$class: 'StringParameterDefinition',  description: "Last release, for changelog",   name: 'PREV_RELEASE_TAG', defaultValue: ""],
+        [$class: 'StringParameterDefinition',  description: "Versions of GCC to test",       name: 'TEST_GCC', defaultValue: ""],
+        [$class: 'BooleanParameterDefinition', description: "Create release if checked",     name: 'PUBLISH', defaultValue: Boolean.valueOf(false)],
+        [$class: 'BooleanParameterDefinition', description: "Mark as pre-released software", name: 'PRE_RELEASE', defaultValue: Boolean.valueOf(true)],
+        [$class: 'BooleanParameterDefinition', description: "Send message to slack",         name: 'SLACK_MESSAGE', defaultValue: Boolean.valueOf(false)]
+        [$class: 'BooleanParameterDefinition', description: "Perform a gitflow merge",       name: 'AUTO_MERGE', defaultValue: Boolean.valueOf(true)],
       ])
     ])
 
@@ -105,22 +106,49 @@ node {
         }
 
         if (params.PUBLISH){
+            // Build chanagelog image 
+            stage("Create Changelog builder") {
+                dir(build_workspace) {
+                    sh "docker build -f docker/Dockerfile.release-notes -t release-builder ."
+                }    
+            }    
+    
             // Tag and release 
-            stage("Create Release: GitHub") {
+            stage("Tag release")
                 dir(ktools_workspace) {
                     sshagent (credentials: [git_creds]) {
                         sh "git tag ${RELEASE_TAG}"
                         sh "git  push origin ${RELEASE_TAG}"
                     }
-                    
+                }
+            }
+
+            // Create release notes 
+            stage('Create Changelog'){
+                dir(ktools_workspace) {
+                    sh "docker run -v $PWD:/tmp release-builder build-changelog --repo ktools --from-tag ${params.PREV_RELEASE_TAG} --to-tag ${params.RELEASE_TAG} --github-token ${gh_token} --local-repo-path ./ --output-path ./CHANGELOG.rst --apply-milestone"
+                    sh "docker run -v $PWD:/tmp release-builder build-changelog --repo ktools --from-tag ${params.PREV_RELEASE_TAG} --to-tag ${params.RELEASE_TAG} --github-token ${gh_token} --local-repo-path ./ --output-path ./RELEASE.md"
+                    sshagent (credentials: [git_creds]) {
+                        sh "git add ./CHANGELOG.rst"
+                        sh "git commit -m 'Update changelog'"
+                        sh "git  push origin ${RELEASE_TAG}"
+                    }
+                }
+            }
+
+
+            stage("Create Release: GitHub") {
+                dir(ktools_workspace) {
                     withCredentials([string(credentialsId: 'github-api-token', variable: 'gh_token')]) {
                         String repo = "OasisLMF/ktools"
-
+                        
+                        def release_body = readFile: "./RELEASE.md"
                         def json_request = readJSON text: '{}'             
+
                         json_request['tag_name'] = RELEASE_TAG
                         json_request['target_commitish'] = 'master'
                         json_request['name'] = RELEASE_TAG
-                        json_request['body'] = ""
+                        json_request['body'] = release_body
                         json_request['draft'] = false
                         json_request['prerelease'] = params.PRE_RELEASE
                         writeJSON file: 'gh_request.json', json: json_request
@@ -134,8 +162,8 @@ node {
                             sh 'curl -XPOST -H "Authorization:token ' + gh_token + '" -H "Content-Type:application/octet-stream" --data-binary @' + filename + " https://uploads.github.com/repos/$repo/releases/$release_id/assets?name=" + filename
                         }    
 
-                        // Create milestone
-                        sh PIPELINE + " create_milestone ${gh_token} ${repo} ${RELEASE_TAG} CHANGELOG.rst"
+                        //// Create milestone
+                        //sh PIPELINE + " create_milestone ${gh_token} ${repo} ${RELEASE_TAG} CHANGELOG.rst"
                     }
                 }
             }
@@ -145,7 +173,7 @@ node {
         error('Build Failed')
     } finally {
         // Run merge back if publish 
-        if (params.PUBLISH && ! hasFailed){ 
+        if (params.AUTO_MERGE && params.PUBLISH && ! hasFailed){ 
             dir(ktools_workspace) {
                 sshagent (credentials: [git_creds]) {
                     if (! params.PRE_RELEASE) {

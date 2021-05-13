@@ -12,8 +12,8 @@ node {
         [$class: 'StringParameterDefinition',  description: "Versions of GCC to test",       name: 'TEST_GCC', defaultValue: ""],
         [$class: 'BooleanParameterDefinition', description: "Create release if checked",     name: 'PUBLISH', defaultValue: Boolean.valueOf(false)],
         [$class: 'BooleanParameterDefinition', description: "Mark as pre-released software", name: 'PRE_RELEASE', defaultValue: Boolean.valueOf(true)],
-        [$class: 'BooleanParameterDefinition', description: "Send message to slack",         name: 'SLACK_MESSAGE', defaultValue: Boolean.valueOf(false)]
-        [$class: 'BooleanParameterDefinition', description: "Perform a gitflow merge",       name: 'AUTO_MERGE', defaultValue: Boolean.valueOf(true)],
+        [$class: 'BooleanParameterDefinition', description: "Send message to slack",         name: 'SLACK_MESSAGE', defaultValue: Boolean.valueOf(false)],
+        [$class: 'BooleanParameterDefinition', description: "Perform a gitflow merge",       name: 'AUTO_MERGE', defaultValue: Boolean.valueOf(true)]
       ])
     ])
 
@@ -142,8 +142,7 @@ node {
                     withCredentials([string(credentialsId: 'github-api-token', variable: 'gh_token')]) {
                         String repo = "OasisLMF/ktools"
                         
-                        //def release_body = new File("${env.WORKSPACE}/${ktools_workspace}/RELEASE.md").text
-                        def release_body = "" 
+                        def release_body = new File("${env.WORKSPACE}/${ktools_workspace}/RELEASE.md").text
                         def json_request = readJSON text: '{}'             
 
                         json_request['tag_name'] = RELEASE_TAG

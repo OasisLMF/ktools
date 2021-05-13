@@ -142,7 +142,7 @@ node {
                     withCredentials([string(credentialsId: 'github-api-token', variable: 'gh_token')]) {
                         String repo = "OasisLMF/ktools"
                         
-                        def release_body = readFile: "./RELEASE.md"
+                        def release_body = new File("${env.WORKSPACE}/${ktools_workspace}/RELEASE.md").text
                         def json_request = readJSON text: '{}'             
 
                         json_request['tag_name'] = RELEASE_TAG

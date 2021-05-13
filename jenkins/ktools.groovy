@@ -127,8 +127,8 @@ node {
             stage('Create Changelog'){
                 dir(ktools_workspace) {
                     withCredentials([string(credentialsId: 'github-api-token', variable: 'gh_token')]) {
-                        sh "docker run -v $PWD:/tmp release-builder build-changelog --repo ktools --from-tag ${params.PREV_RELEASE_TAG} --to-tag ${params.RELEASE_TAG} --github-token ${gh_token} --local-repo-path ./ --output-path ./CHANGELOG.rst --apply-milestone"
-                        sh "docker run -v $PWD:/tmp release-builder build-changelog --repo ktools --from-tag ${params.PREV_RELEASE_TAG} --to-tag ${params.RELEASE_TAG} --github-token ${gh_token} --local-repo-path ./ --output-path ./RELEASE.md"
+                        sh "docker run -v ${env.WORKSPACE}/${ktools_workspace}:/tmp release-builder build-changelog --repo ktools --from-tag ${params.PREV_RELEASE_TAG} --to-tag ${params.RELEASE_TAG} --github-token ${gh_token} --local-repo-path ./ --output-path ./CHANGELOG.rst --apply-milestone"
+                        sh "docker run -v ${env.WORKSPACE}/${ktools_workspace}:/tmp release-builder build-changelog --repo ktools --from-tag ${params.PREV_RELEASE_TAG} --to-tag ${params.RELEASE_TAG} --github-token ${gh_token} --local-repo-path ./ --output-path ./RELEASE.md"
                     }    
                     sshagent (credentials: [git_creds]) {
                         sh "git add ./CHANGELOG.rst"

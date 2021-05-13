@@ -118,7 +118,7 @@ node {
                 dir(ktools_workspace) {
                     sshagent (credentials: [git_creds]) {
                         sh "git tag ${RELEASE_TAG}"
-                        sh "git  push origin ${RELEASE_TAG}"
+                        sh "git push origin ${RELEASE_TAG}"
                     }
                 }
             }
@@ -133,7 +133,7 @@ node {
                     sshagent (credentials: [git_creds]) {
                         sh "git add ./CHANGELOG.rst"
                         sh "git commit -m 'Update changelog'"
-                        sh "git  push origin ${RELEASE_TAG}"
+                        sh "git push"
                     }
                 }
             }
@@ -144,7 +144,7 @@ node {
                     withCredentials([string(credentialsId: 'github-api-token', variable: 'gh_token')]) {
                         String repo = "OasisLMF/ktools"
                         
-                        def release_body = new File("${env.WORKSPACE}/${ktools_workspace}/RELEASE.md").text
+                        def release_body = readFile(file: "${env.WORKSPACE}/${ktools_workspace}/RELEASE.md")
                         def json_request = readJSON text: '{}'             
 
                         json_request['tag_name'] = RELEASE_TAG

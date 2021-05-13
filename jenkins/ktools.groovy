@@ -37,7 +37,7 @@ node {
     env.KTOOLS_IMAGE_CLANG = "jenkins/Dockerfile.clang-build"  // Docker image for static ktools build
 
     //make sure release candidate versions are tagged correctly                                                                              
-    if (params.PUBLISH && params.PRE_RELEASE && ! params.RELEASE_TAG.matches('^v(\\d+\\.)(\\d+\\.)(\\*|\\d+)-rc(\\d+)$')) {
+    if (params.PUBLISH && params.PRE_RELEASE && ! params.RELEASE_TAG.matches('^v(\\d+\\.)(\\d+\\.)(\\*|\\d+)rc(\\d+)$')) {
         sh "echo release candidates must be tagged v{version}rc{N}, example: v1.0.0rc1"
         sh "exit 1"
     }

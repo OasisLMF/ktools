@@ -114,7 +114,7 @@ node {
             }    
     
             // Tag and release 
-            stage("Tag release")
+            stage("Tag release") {
                 dir(ktools_workspace) {
                     sshagent (credentials: [git_creds]) {
                         sh "git tag ${RELEASE_TAG}"

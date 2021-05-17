@@ -360,7 +360,7 @@ inline void aggreports::DoSetUp(int &eptype, int &eptype_tvar, int &epcalc,
   if (eptype == AEP) eptype_tvar = AEPTVAR;
   else if (eptype == OEP) eptype_tvar = OEPTVAR;
 
-  if (epcalc == MEANDR && eptHeader_ == true) {
+  if (epcalc == MEANDR && eptHeader_ == true && skipheader_ == false) {
     std::string fileHeader;
     if (ordFlag_) {
       fileHeader = "SummaryID,EPCalc,EPType,ReturnPeriod,Loss\n";
@@ -552,18 +552,20 @@ inline void aggreports::DoSetUpWheatsheaf(int &eptype, int &eptype_tvar,
   else if (eptype == OEP) eptype_tvar = OEPTVAR;
 
   std::string fileHeader;
-  if (ordFlag_ && pseptHeader_) {
-    fileHeader = "SummaryID,SampleID,EPType,ReturnPeriod,Loss\n";
-    pseptHeader_ = false;
-  } else if (!ordFlag_ && wheatSheaf_[eptype] == false) {
-    fileHeader = "summary_id,sidx,return_period,loss";
-    if (ensembletosidx_.size() > 0) fileHeader += ",ensemble_id";
-    fileHeader += "\n";
-    wheatSheaf_[eptype] = true;
-  }
-  for (std::vector<int>::const_iterator it = fileIDs.begin();
-       it != fileIDs.end(); ++it) {
-    fprintf(fout_[*it], "%s", fileHeader.c_str());
+  if (skipheader_ == false) {
+    if (ordFlag_ && pseptHeader_) {
+      fileHeader = "SummaryID,SampleID,EPType,ReturnPeriod,Loss\n";
+      pseptHeader_ = false;
+    } else if (!ordFlag_ && wheatSheaf_[eptype] == false) {
+      fileHeader = "summary_id,sidx,return_period,loss";
+      if (ensembletosidx_.size() > 0) fileHeader += ",ensemble_id";
+      fileHeader += "\n";
+      wheatSheaf_[eptype] = true;
+    }
+    for (std::vector<int>::const_iterator it = fileIDs.begin();
+	 it != fileIDs.end(); ++it) {
+      fprintf(fout_[*it], "%s", fileHeader.c_str());
+    }
   }
 
   if (ordFlag_) {

@@ -137,6 +137,11 @@ struct summarySampleslevelHeader {
 	OASIS_FLOAT expval;				// exposure value
 };
 
+struct summary_keyz {
+	int summary_id;
+	int fileindex;
+};
+
 struct gulSampleslevelRec {
 	int sidx;		// This has be stored for thresholds cannot be implied
 	OASIS_FLOAT loss;		// may want to cut down to singe this causes 4 byte padding for allignment

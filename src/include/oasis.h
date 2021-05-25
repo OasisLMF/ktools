@@ -321,7 +321,6 @@ struct Ensemble
 {
 	int sidx;
 	int ensemble_id;
-	int sample_id;
 };
 
 #pragma pack(pop)

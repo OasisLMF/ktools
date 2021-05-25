@@ -22,8 +22,7 @@ namespace ensembletobin {
 
     // Read data
     while(fgets(line, sizeof(line), stdin) != 0) {
-      if (sscanf(line, "%d,%d,%d", &q.sidx, &q.ensemble_id, &q.sample_id) != 3)
-      {
+      if (sscanf(line, "%d,%d", &q.sidx, &q.ensemble_id) != 2) {
 
 	fprintf(stderr, "FATAL: Invalid data in line %d:\n%s", lineno, line);
 	return;
@@ -33,9 +32,7 @@ namespace ensembletobin {
 	fwrite(&q, sizeof(q), 1, stdout);
 
       }
-
       lineno++;
-
     }
 
   }

@@ -409,6 +409,7 @@ inline  void logprintf(const std::string &program_name,const std::string &msgtyp
 #define RETURNPERIODS_FILE "input/returnperiods.bin"
 #define OCCURRENCE_FILE "input/occurrence.bin"
 #define PERIODS_FILE "input/periods.bin"		// period to weighting mapping
+#define ENSEMBLE_FILE "input/ensemble.bin"
 
 #define DAMAGE_BIN_DICT_FILE "static/damage_bin_dict.bin"
 #define DAMAGE_CDF_BIN_FILE "static/damage_cdf.bin"
@@ -419,7 +420,6 @@ inline  void logprintf(const std::string &program_name,const std::string &msgtyp
 // compressed variant of vulnerabilities
 #define ZVULNERABILITY_FILE "static/vulnerability.bin.z"
 #define ZVULNERABILITY_IDX_FILE "static/vulnerability.idx.z"
-#define ENSEMBLE_FILE "static/ensemble.bin"
 #define FOOTPRINT_FILE  "static/footprint.bin"
 #define FOOTPRINT_IDX_FILE  "static/footprint.idx"
 // compressed variant of footprint

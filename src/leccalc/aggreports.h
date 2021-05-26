@@ -39,6 +39,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #define AGGREPORTS_H_
 
 #include <map>
+#include <set>
 #include <vector>
 #include "leccalc.h"
 
@@ -57,7 +58,7 @@ struct line_points{
 class aggreports {
 private:
 	const int totalperiods_;
-	const int maxsummaryid_;
+	const std::set<int> summaryids_;
 	std::vector<std::map<outkey2, OutLosses>> &out_loss_;
 	const bool *outputFlags_;
 	FILE **fout_;
@@ -170,7 +171,7 @@ private:
 	inline void FillWheatsheafItems(const outkey2 key,
 					std::map<wheatkey, lossvec2> &items,
 					const OASIS_FLOAT loss,
-					std::vector<int> &maxPeriodNo,
+					std::map<int, int> &maxPeriodNo,
 					std::map<int, double> &unusedperiodstoweighting);
 	void WheatsheafAndWheatsheafMean(const std::vector<int> handles,
 					 OASIS_FLOAT (OutLosses::*GetOutLoss)(),
@@ -188,7 +189,7 @@ private:
 				     const int eptype);
 
 public:
-	aggreports(const int totalperiods, const int maxsummaryid, std::vector<std::map<outkey2, OutLosses>> &out_loss, FILE **fout, const bool useReturnPeriodFile, const int samplesize, const bool skipheader, const bool *outputFlags, const bool ordFlag);
+	aggreports(const int totalperiods, const std::set<int> &summaryids, std::vector<std::map<outkey2, OutLosses>> &out_loss, FILE **fout, const bool useReturnPeriodFile, const int samplesize, const bool skipheader, const bool *outputFlags, const bool ordFlag);
 	void OutputAggMeanDamageRatio();
 	void OutputOccMeanDamageRatio();
 	void OutputAggFullUncertainty();

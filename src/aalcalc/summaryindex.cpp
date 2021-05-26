@@ -50,12 +50,6 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <map>
 
 
-
-struct summary_keyz {
-	int summary_id;
-	int fileindex;
-};
-
 bool operator<(const summary_keyz& lhs, const summary_keyz& rhs)
 {
 	if (lhs.summary_id != rhs.summary_id) {

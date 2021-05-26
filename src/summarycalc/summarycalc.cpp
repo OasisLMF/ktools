@@ -306,7 +306,11 @@ void summarycalc::outputsummaryset(int sample_size, int summary_set, int event_i
 		sh.summary_id = i;
 		sh.expval = se[i];
 		if (sh.expval > 0 || zerooutput_ == true) {
+			if (idxout[summary_set] != nullptr) {   // Fill index file
+				fprintf(idxout[summary_set], "%d,%lld\n", i, offset_[summary_set]);
+			}
 			fwrite(&sh, sizeof(sh), 1, fout[summary_set]);
+			offset_[summary_set] += sizeof(sh);
 			for (int j = 0; j < sample_size + 3; j++) {
 				if (j != 2) {
 					sampleslevelRec s;
@@ -317,10 +321,14 @@ void summarycalc::outputsummaryset(int sample_size, int summary_set, int event_i
 					else {
 						s.loss = ssl[i][j].loss;
 						if (zerooutput_ == false) {
-							if (s.loss > 0.0) fwrite(&s, sizeof(s), 1, fout[summary_set]);
+							if (s.loss > 0.0) {
+								fwrite(&s, sizeof(s), 1, fout[summary_set]);
+								offset_[summary_set] += sizeof(s);
+							}
 						}
 						else {
 							fwrite(&s, sizeof(s), 1, fout[summary_set]);
+							offset_[summary_set] += sizeof(s);
 						}
 
 					}
@@ -330,6 +338,7 @@ void summarycalc::outputsummaryset(int sample_size, int summary_set, int event_i
 			s.sidx = 0;
 			s.loss = 0.0;
 			fwrite(&s, sizeof(s), 1, fout[summary_set]);
+			offset_[summary_set] += sizeof(s);
 		}
 	}
 }
@@ -339,11 +348,27 @@ void summarycalc::openpipe(int summary_id, const std::string &pipe)
 	if (pipe == "-") fout[summary_id] = stdout;
 	else {
 		FILE *f = fopen(pipe.c_str(), "wb");
-		if (f != nullptr) fout[summary_id] = f;
-		else {
+		if (f != nullptr) {
+			fout[summary_id] = f;
+			std::string indexFileName = pipe;
+			if (pipe.length() > 4 && pipe.substr(pipe.length() - 4, 4) == ".bin") {
+				indexFileName.erase(indexFileName.length() - 4);
+			}
+			indexFileName += ".idx";
+			indexFiles[summary_id] = indexFileName;
+		} else {
 			fprintf(stderr, "FATAL: %s: Cannot open %s for output\n", __func__, pipe.c_str());
 			::exit(-1);
 		}
+	}
+}
+
+
+void summarycalc::openindexfiles()
+{
+	for (auto x : indexFiles) {
+		FILE *f = fopen(x.second.c_str(), "w");
+		idxout[x.first] = f;
 	}
 }
 
@@ -352,6 +377,7 @@ void summarycalc::outputstreamtype(int summary_set)
 {
 	int streamtype = summarycalc_id | 1;
 	fwrite(&streamtype, sizeof(streamtype), 1, fout[summary_set]);
+	offset_[summary_set] += sizeof(streamtype);
 	std::this_thread::sleep_for(std::chrono::milliseconds(PIPE_DELAY));
 }
 
@@ -367,6 +393,7 @@ void summarycalc::outputsamplesizeandsummaryset(int summary_set, int sample_size
 {
 	fwrite(&sample_size, sizeof(sample_size), 1, fout[summary_set]);
 	fwrite(&summary_set, sizeof(summary_set), 1, fout[summary_set]);
+	offset_[summary_set] += sizeof(sample_size) + sizeof(summary_set);
 }
 void summarycalc::outputsamplesize(int samplesize)
 {

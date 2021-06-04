@@ -137,6 +137,11 @@ struct summarySampleslevelHeader {
 	OASIS_FLOAT expval;				// exposure value
 };
 
+struct summary_keyz {
+	int summary_id;
+	int fileindex;
+};
+
 struct gulSampleslevelRec {
 	int sidx;		// This has be stored for thresholds cannot be implied
 	OASIS_FLOAT loss;		// may want to cut down to singe this causes 4 byte padding for allignment
@@ -321,7 +326,6 @@ struct Ensemble
 {
 	int sidx;
 	int ensemble_id;
-	int sample_id;
 };
 
 #pragma pack(pop)
@@ -409,6 +413,7 @@ inline  void logprintf(const std::string &program_name,const std::string &msgtyp
 #define RETURNPERIODS_FILE "input/returnperiods.bin"
 #define OCCURRENCE_FILE "input/occurrence.bin"
 #define PERIODS_FILE "input/periods.bin"		// period to weighting mapping
+#define ENSEMBLE_FILE "input/ensemble.bin"
 
 #define DAMAGE_BIN_DICT_FILE "static/damage_bin_dict.bin"
 #define DAMAGE_CDF_BIN_FILE "static/damage_cdf.bin"
@@ -419,7 +424,6 @@ inline  void logprintf(const std::string &program_name,const std::string &msgtyp
 // compressed variant of vulnerabilities
 #define ZVULNERABILITY_FILE "static/vulnerability.bin.z"
 #define ZVULNERABILITY_IDX_FILE "static/vulnerability.idx.z"
-#define ENSEMBLE_FILE "static/ensemble.bin"
 #define FOOTPRINT_FILE  "static/footprint.bin"
 #define FOOTPRINT_IDX_FILE  "static/footprint.idx"
 // compressed variant of footprint

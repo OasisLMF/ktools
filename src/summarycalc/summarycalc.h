@@ -61,6 +61,7 @@ private:
 	int min_summary_id_[MAX_SUMMARY_SETS] = { MAX_SUMMARY_ID ,MAX_SUMMARY_ID , MAX_SUMMARY_ID , MAX_SUMMARY_ID , MAX_SUMMARY_ID , MAX_SUMMARY_ID , MAX_SUMMARY_ID , MAX_SUMMARY_ID , MAX_SUMMARY_ID  ,MAX_SUMMARY_ID };  // min should be equal to one											  
 	int max_summary_id_[MAX_SUMMARY_SETS] = { -1,-1,-1,-1,-1,-1,-1,-1,-1,-1 };
 	FILE *fout[MAX_SUMMARY_SETS] = { nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr };
+	FILE *idxout[MAX_SUMMARY_SETS] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 	coverage_id_or_output_id_to_Summary_id *co_to_s_[MAX_SUMMARY_SETS] = { nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr };
 	//output_id_to_Summary_id *o_to_s[MAX_SUMMARY_SETS] = { nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr };
 	loss_exp **sssl[MAX_SUMMARY_SETS] = { nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr }; // three dimensional array sssl[summary_set][summary_id][sidx] to loss exposure
@@ -72,6 +73,8 @@ private:
 	input_type inputtype_ = UNKNOWN;
 	std::string inputpath_;
 	bool zerooutput_ = false;
+	std::map<int, std::string> indexFiles;
+	long long offset_[MAX_SUMMARY_SETS] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };   // for index file
 // functions
 	void reset_sssl_array(int sample_size);
 	void alloc_sssl_array(int sample_size);
@@ -106,6 +109,7 @@ public:
 	void dofmsummary();
 	void doit();
 	void openpipe(int summary_id, const std::string &pipe);
+	void openindexfiles();
 	void setgulcoveragemode() { inputtype_ = GUL_COVERAGE_STREAM; };
 	void setgulitemmode() { inputtype_ = GUL_ITEM_STREAM; };
 	void setgulitemxmode() { inputtype_ = GUL_ITEMX_STREAM; };

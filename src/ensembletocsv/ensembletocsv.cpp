@@ -14,12 +14,12 @@ namespace ensembletocsv {
 
   void doit() {
 
-    printf("sidx, ensemble_id, sample_id\n");
+    printf("sidx, ensemble_id\n");
 
     Ensemble q;
     size_t i = fread(&q, sizeof(q), 1, stdin);
     while (i != 0) {
-      printf("%d, %d, %d\n", q.sidx, q.ensemble_id, q.sample_id);
+      printf("%d, %d\n", q.sidx, q.ensemble_id);
       i = fread(&q, sizeof(q), 1, stdin);
     }
 

@@ -43,12 +43,12 @@ bool operator<(const wheatkey &lhs, const wheatkey &rhs) {
 }
 
 
-aggreports::aggreports(const int totalperiods, const int maxsummaryid,
+aggreports::aggreports(const int totalperiods, const std::set<int> &summaryids,
 		       std::vector<std::map<outkey2, OutLosses>> &out_loss,
 		       FILE **fout, const bool useReturnPeriodFile,
 		       const int samplesize, const bool skipheader,
 		       const bool *outputFlags, const bool ordFlag) :
-  totalperiods_(totalperiods), maxsummaryid_(maxsummaryid),
+  totalperiods_(totalperiods), summaryids_(summaryids),
   out_loss_(out_loss), fout_(fout), useReturnPeriodFile_(useReturnPeriodFile),
   samplesize_(samplesize), skipheader_(skipheader), outputFlags_(outputFlags),
   ordFlag_(ordFlag)
@@ -360,7 +360,7 @@ inline void aggreports::DoSetUp(int &eptype, int &eptype_tvar, int &epcalc,
   if (eptype == AEP) eptype_tvar = AEPTVAR;
   else if (eptype == OEP) eptype_tvar = OEPTVAR;
 
-  if (epcalc == MEANDR && eptHeader_ == true) {
+  if (epcalc == MEANDR && eptHeader_ == true && skipheader_ == false) {
     std::string fileHeader;
     if (ordFlag_) {
       fileHeader = "SummaryID,EPCalc,EPType,ReturnPeriod,Loss\n";
@@ -552,18 +552,20 @@ inline void aggreports::DoSetUpWheatsheaf(int &eptype, int &eptype_tvar,
   else if (eptype == OEP) eptype_tvar = OEPTVAR;
 
   std::string fileHeader;
-  if (ordFlag_ && pseptHeader_) {
-    fileHeader = "SummaryID,SampleID,EPType,ReturnPeriod,Loss\n";
-    pseptHeader_ = false;
-  } else if (!ordFlag_ && wheatSheaf_[eptype] == false) {
-    fileHeader = "summary_id,sidx,return_period,loss";
-    if (ensembletosidx_.size() > 0) fileHeader += ",ensemble_id";
-    fileHeader += "\n";
-    wheatSheaf_[eptype] = true;
-  }
-  for (std::vector<int>::const_iterator it = fileIDs.begin();
-       it != fileIDs.end(); ++it) {
-    fprintf(fout_[*it], "%s", fileHeader.c_str());
+  if (skipheader_ == false) {
+    if (ordFlag_ && pseptHeader_) {
+      fileHeader = "SummaryID,SampleID,EPType,ReturnPeriod,Loss\n";
+      pseptHeader_ = false;
+    } else if (!ordFlag_ && wheatSheaf_[eptype] == false) {
+      fileHeader = "summary_id,sidx,return_period,loss";
+      if (ensembletosidx_.size() > 0) fileHeader += ",ensemble_id";
+      fileHeader += "\n";
+      wheatSheaf_[eptype] = true;
+    }
+    for (std::vector<int>::const_iterator it = fileIDs.begin();
+	 it != fileIDs.end(); ++it) {
+      fprintf(fout_[*it], "%s", fileHeader.c_str());
+    }
   }
 
   if (ordFlag_) {
@@ -960,7 +962,7 @@ inline void aggreports::FillWheatsheafItems(const outkey2 key,
 
 inline void aggreports::FillWheatsheafItems(const outkey2 key,
 	std::map<wheatkey, lossvec2> &items, const OASIS_FLOAT loss,
-	std::vector<int> &maxPeriodNo,
+	std::map<int, int> &maxPeriodNo,
 	std::map<int, double> &unusedperiodstoweighting) {
 
   wheatkey wk;
@@ -1015,7 +1017,7 @@ void aggreports::WheatsheafAndWheatsheafMean(const std::vector<int> handles,
 
   if (outputFlags_[handles[WHEATSHEAF_MEAN]] == false) return;
 
-  std::vector<size_t> maxCount(maxsummaryid_+1, 0);
+  std::map<int, size_t> maxCount;
   for (auto x : items) {
     if (x.second.size() > maxCount[x.first.summary_id]) {
       maxCount[x.first.summary_id] = x.second.size();
@@ -1023,8 +1025,9 @@ void aggreports::WheatsheafAndWheatsheafMean(const std::vector<int> handles,
   }
 
   std::map<int, lossvec> mean_map;
-  for (int i = 1; i <= maxsummaryid_; i++) {
-    mean_map[i] = lossvec(maxCount[i], 0);
+  for (std::set<int>::iterator it = summaryids_.begin();
+       it != summaryids_.end(); ++it) {
+    mean_map[*it] = lossvec(maxCount[*it], 0);
   }
 
   for (auto s : items) {
@@ -1053,7 +1056,7 @@ void aggreports::WheatsheafAndWheatsheafMeanWithWeighting(
 
   std::map<wheatkey, lossvec2> items;
   int samplesize;
-  std::vector<int> maxPeriodNo(maxsummaryid_+1, 0);
+  std::map<int, int> maxPeriodNo;
   std::map<int, double> unusedperiodstoweighting = periodstoweighting_;
 
   if (ensemble_id != 0) {
@@ -1084,8 +1087,9 @@ void aggreports::WheatsheafAndWheatsheafMeanWithWeighting(
   if (outputFlags_[handles[WHEATSHEAF_MEAN]] == false) return;
 
   std::map<int, lossvec2> mean_map;
-  for (int i = 1; i <= maxsummaryid_; i++) {
-    mean_map[i] = lossvec2(maxPeriodNo[i], lossval());
+  for (std::set<int>::iterator it = summaryids_.begin();
+       it != summaryids_.end(); ++it) {
+    mean_map[*it] = lossvec2(maxPeriodNo[*it], lossval());
   }
 
   for (auto s : items) {

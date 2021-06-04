@@ -63,8 +63,7 @@ void segfault_sigaction(int, siginfo_t *si, void *) {
 #endif
 
 namespace leccalc {
-//	void doit(const std::string& subfolder, FILE** fout, bool useReturnPeriodFile, bool skipheader, FILE** ord_out);
-	void doit(const std::string &subfolder, FILE** fout, const bool useReturnPeriodFile, const bool skipheader, bool *outputFlags, bool ordFlag);
+	void doit(const std::string &subfolder, FILE** fout, const bool useReturnPeriodFile, bool skipheader, bool *outputFlags, bool ordFlag);
 }
 
 
@@ -107,13 +106,6 @@ int main(int argc, char* argv[])
 	bool outputFlags[8] = { false, false, false, false,
 				false, false, false, false };
 	const bool ordFlag = false;   // Turn off ORD output
-
-/*	// Variables for ORD output
-	FILE* ord_out[] = { nullptr, nullptr };
-	bool ordOutput = false;
-	bool ept = false;
-	bool psept = false;
-	std::string ordStem;*/   // HC
 
 	std::string subfolder;
 	int opt;
@@ -180,19 +172,6 @@ int main(int argc, char* argv[])
 		help();
 	}
 
-/*	if (ordOutput) {
-		if (ept) {
-			std::string eptFilename = ordStem;
-			if (eptFilename != "-") eptFilename += "_ept.csv";
-			openpipe(EPT, eptFilename, ord_out);
-		}
-		if (psept) {
-			std::string pseptFilename = ordStem;
-			if (pseptFilename != "-") pseptFilename += "_psept.csv";
-			openpipe(PSEPT, pseptFilename, ord_out);
-		}
-	}*/   // HC
-
 	progname = argv[0];
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
 	struct sigaction sa;
@@ -207,10 +186,9 @@ int main(int argc, char* argv[])
 
 	try {
 		initstreams();
-        logprintf(progname, "INFO", "starting process..\n");
-//		leccalc::doit(subfolder, fout, useReturnPeriodFile, skipheader, ord_out);   // HC
-	leccalc::doit(subfolder, fout, useReturnPeriodFile, skipheader, outputFlags, ordFlag);
-        logprintf(progname, "INFO", "finishing process..\n");
+        	logprintf(progname, "INFO", "starting process..\n");
+		leccalc::doit(subfolder, fout, useReturnPeriodFile, skipheader, outputFlags, ordFlag);
+        	logprintf(progname, "INFO", "finishing process..\n");
 		return EXIT_SUCCESS;
 	}catch (std::bad_alloc&) {
 		fprintf(stderr, "FATAL: %s: Memory allocation failed\n", progname);

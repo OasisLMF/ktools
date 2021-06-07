@@ -79,11 +79,21 @@ namespace validatefootprint {
 
       // Check for invalid data
 #ifdef AREAPERIL_TYPE_UNSIGNED_LONG_LONG
+  #ifdef OASIS_FLOAT_TYPE_DOUBLE
+      if(sscanf(line, "%d,%llu,%d,%lf", &q.event_id, &q.areaperil_id,
+		&q.intensity_bin_id, &q.probability) != 4) {
+  #else
       if(sscanf(line, "%d,%llu,%d,%f", &q.event_id, &q.areaperil_id,
 		&q.intensity_bin_id, &q.probability) != 4) {
+  #endif
 #else
+  #ifdef OASIS_FLOAT_TYPE_DOUBLE
+      if(sscanf(line, "%d,%u,%d,%lf", &q.event_id, &q.areaperil_id,
+		&q.intensity_bin_id, &q.probability) != 4) {
+  #else
       if(sscanf(line, "%d,%u,%d,%f", &q.event_id, &q.areaperil_id,
 		&q.intensity_bin_id, &q.probability) != 4) {
+  #endif
 #endif
 
 	fprintf(stderr, "Invalid data in line %d:\n%s\n", lineno, line);

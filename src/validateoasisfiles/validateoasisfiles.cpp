@@ -286,10 +286,20 @@ namespace validateoasisfiles {
     lineno++;
     while(fgets(line, sizeof(line), fmprofileFile) != 0) {
 
-      if(sscanf(line, "%d,%d,%f,%f,%f,%f,%f,%f,%f,%f", &fmprof.profile_id,
-		&fmprof.calcrule_id, &fmprof.deductible1, &fmprof.deductible2,
-		&fmprof.deductible3, &fmprof.attachment, &fmprof.limit,
-		&fmprof.share1, &fmprof.share2, &fmprof.share3) != 10) {
+#ifdef OASIS_FLOAT_TYPE_DOUBLE
+      if(sscanf(line, "%d,%d,%lf,%lf,%lf,%lf,%lf,%lf,%lf,%lf",
+		&fmprof.profile_id, &fmprof.calcrule_id, &fmprof.deductible1,
+		&fmprof.deductible2, &fmprof.deductible3, &fmprof.attachment,
+		&fmprof.limit, &fmprof.share1, &fmprof.share2,
+		&fmprof.share3) != 10)
+#else
+      if(sscanf(line, "%d,%d,%f,%f,%f,%f,%f,%f,%f,%f",
+		&fmprof.profile_id, &fmprof.calcrule_id, &fmprof.deductible1,
+		&fmprof.deductible2, &fmprof.deductible3, &fmprof.attachment,
+		&fmprof.limit, &fmprof.share1, &fmprof.share2,
+		&fmprof.share3) != 10)
+#endif
+      {
 
 	fprintf(stderr, "File %s\n", fmprofilePath);
 	fprintf(stderr, "Invalid data in line %d:\n%s\n", lineno, line);

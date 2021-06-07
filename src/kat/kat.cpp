@@ -82,7 +82,11 @@ namespace kat {
 					eOut[*it].event_id = 0;
 					break;
 				}
+#ifdef OASIS_FLOAT_TYPE_DOUBLE
+				inArgs = sscanf(line, "%d,%d,%d,%lf,%lf,%lf", &eOut[*it].summary_id, &eOut[*it].type, &eOut[*it].event_id, &eOut[*it].mean, &eOut[*it].standard_deviation, &eOut[*it].exposure_value);
+#else
 				inArgs = sscanf(line, "%d,%d,%d,%f,%f,%f", &eOut[*it].summary_id, &eOut[*it].type, &eOut[*it].event_id, &eOut[*it].mean, &eOut[*it].standard_deviation, &eOut[*it].exposure_value);
+#endif
 				if (inArgs == 0)   // Print header
 					fprintf(stdout, "%s", line);
 				else if (inArgs != 6) {   // Check file is valid
@@ -120,7 +124,11 @@ namespace kat {
 							it--;
 							break;
 						} else {
+#ifdef OASIS_FLOAT_TYPE_DOUBLE
+							sscanf(line, "%d,%d,%d,%lf,%lf,%lf", &e->summary_id, &e->type, &e->event_id, &e->mean, &e->standard_deviation, &e->exposure_value);
+#else
 							sscanf(line, "%d,%d,%d,%f,%f,%f", &e->summary_id, &e->type, &e->event_id, &e->mean, &e->standard_deviation, &e->exposure_value);
+#endif
 						}
 						currentEventID = e->event_id;
 					} while (currentEventID <= expectedEventID);

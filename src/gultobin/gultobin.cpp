@@ -68,7 +68,11 @@ namespace gultobin {
 		gh.event_id = -1;
 		while (fgets(line, sizeof(line), stdin) != 0)
 		{
+#ifdef OASIS_FLOAT_TYPE_DOUBLE
+			if (sscanf(line, "%d,%d,%d,%lf", &q.event_id, &q.item_id, &q.sidx, &q.loss) != 4) {
+#else
 			if (sscanf(line, "%d,%d,%d,%f", &q.event_id, &q.item_id, &q.sidx, &q.loss) != 4) {
+#endif
 				fprintf(stderr, "FATAL: Invalid data in line %d:\n%s", lineno, line);
 				return;
 			}

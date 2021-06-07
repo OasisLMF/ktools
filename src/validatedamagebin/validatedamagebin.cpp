@@ -52,8 +52,13 @@ namespace validatedamagebin {
     bool newFormat;
     if (fgets(line, sizeof(line), stdin) != 0) {
       // Deprecated format
+#ifdef OASIS_FLOAT_TYPE_DOUBLE
+      if (sscanf(line, "%d,%lf,%lf,%lf,%d", &p.bin_index, &p.bin_from, &p.bin_to,
+		 &p.interpolation, &p.interval_type) == 5) {
+#else
       if (sscanf(line, "%d,%f,%f,%f,%d", &p.bin_index, &p.bin_from, &p.bin_to,
 		 &p.interpolation, &p.interval_type) == 5) {
+#endif
 
 	fprintf(stderr, "Deprecated format:"
 			" interval_type column no longer required.\n");
@@ -62,8 +67,13 @@ namespace validatedamagebin {
 
       }
       // New format
+#ifdef OASIS_FLOAT_TYPE_DOUBLE
+      else if (sscanf(line, "%d,%lf,%lf,%lf", &p.bin_index, &p.bin_from, &p.bin_to,
+		      &p.interpolation) == 4) {
+#else
       else if (sscanf(line, "%d,%f,%f,%f", &p.bin_index, &p.bin_from, &p.bin_to,
 		      &p.interpolation) == 4) {
+#endif
 
 	p.interval_type = 0;
 	newFormat = true;
@@ -90,8 +100,13 @@ namespace validatedamagebin {
 
       bool furtherChecks = true;
 
+#ifdef OASIS_FLOAT_TYPE_DOUBLE
+      if (sscanf(line, "%d,%lf,%lf,%lf,%d", &q.bin_index, &q.bin_from, &q.bin_to,
+		 &q.interpolation, &q.interval_type) == 5) {
+#else
       if (sscanf(line, "%d,%f,%f,%f,%d", &q.bin_index, &q.bin_from, &q.bin_to,
 		 &q.interpolation, &q.interval_type) == 5) {
+#endif
 
 	if (newFormat) {
 	  fprintf(stderr, "Deprecated format used in line %d:\n%s\n",
@@ -99,8 +114,14 @@ namespace validatedamagebin {
 	  dataValid = false;
 	}
 
-      } else if (sscanf(line, "%d,%f,%f,%f", &q.bin_index, &q.bin_from,
+      }
+#ifdef OASIS_FLOAT_TYPE_DOUBLE
+      else if (sscanf(line, "%d,%lf,%lf,%lf", &q.bin_index, &q.bin_from,
 			&q.bin_to, &q.interpolation) == 4) {
+#else
+      else if (sscanf(line, "%d,%f,%f,%f", &q.bin_index, &q.bin_from,
+			&q.bin_to, &q.interpolation) == 4) {
+#endif
 
 	if (!newFormat) {
 	  fprintf(stderr, "Missing interval_type column in line %d:\n%s\n",

@@ -66,7 +66,6 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 // Slowly where applicable we will replace int and OASIS_FLOAT references with
 // OASIS_INT and OASIS_FLOAT so its easy to change the size of the streams 
 typedef int32_t OASIS_INT ;
-//typedef float OASIS_FLOAT;   // HC
 
 // #define OASIS_FLOAT_TYPE_DOUBLE
 #ifdef OASIS_FLOAT_TYPE_DOUBLE

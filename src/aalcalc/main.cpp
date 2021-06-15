@@ -25,6 +25,8 @@ void segfault_sigaction(int, siginfo_t *si, void *)
 void help()
 {
 	fprintf(stderr, "-K workspace sub folder\n");
+	fprintf(stderr, "-o Open Results Data (ORD) output\n");
+	fprintf(stderr, "-s skip header\n");
 	fprintf(stderr, "-v version\n");
 	fprintf(stderr, "-h help\n");
 	
@@ -37,6 +39,7 @@ int main(int argc, char* argv[])
 	int opt;
 	bool debug = false;
 	bool skipheader = false;
+	bool ord_output = false;
 	while ((opt = getopt(argc, argv, (char *)"swvdhK:")) != -1) {
 		switch (opt) {
 		case 'v':
@@ -48,6 +51,9 @@ int main(int argc, char* argv[])
 			break;
 		case 'K':
 			subfolder = optarg;
+			break;
+		case 'o':
+			ord_output = true;
 			break;
 		case 'd':
 			debug = true;			
@@ -79,7 +85,7 @@ int main(int argc, char* argv[])
 
 	
 	try {
-		aalcalc a(skipheader);
+		aalcalc a(skipheader, ord_output);
 		if (debug == true) {
 			a.debug(subfolder);
 		}

@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
 	bool debug = false;
 	bool skipheader = false;
 	bool ord_output = false;
-	while ((opt = getopt(argc, argv, (char *)"swvdhK:")) != -1) {
+	while ((opt = getopt(argc, argv, (char *)"swvdohK:")) != -1) {
 		switch (opt) {
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);

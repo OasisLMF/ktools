@@ -43,8 +43,13 @@ namespace crossvalidation {
     damageBins.clear();
     while(fgets(line, sizeof(line), damagebinFile) != 0) {
 
-      if(sscanf(line, "%d,%f,%f,%f,%d", &d.bin_index, &d.bin_from, &d.bin_to,
-		&d.interpolation, &d.interval_type) != 5) {
+#ifdef OASIS_FLOAT_TYPE_DOUBLE
+      if(sscanf(line, "%d,%lf,%lf,%lf,%d", &d.bin_index, &d.bin_from,
+		&d.bin_to, &d.interpolation, &d.interval_type) != 5) {
+#else
+      if(sscanf(line, "%d,%f,%f,%f,%d", &d.bin_index, &d.bin_from,
+		&d.bin_to, &d.interpolation, &d.interval_type) != 5) {
+#endif
 
 	fprintf(stderr, "File %s\n", damagebinFileName);
 	fprintf(stderr, "Invalid data in line %d:\n%s\n", lineno, line);
@@ -82,8 +87,13 @@ namespace crossvalidation {
     intensityBins.clear();
     while(fgets(line, sizeof(line), vulnerabilityFile) != 0) {
 
+#ifdef OASIS_FLOAT_TYPE_DOUBLE
+      if(sscanf(line, "%d,%d,%d,%lf", &v.vulnerability_id, &v.intensity_bin_id,
+		&v.damage_bin_id, &v.probability) != 4) {
+#else
       if(sscanf(line, "%d,%d,%d,%f", &v.vulnerability_id, &v.intensity_bin_id,
 		&v.damage_bin_id, &v.probability) != 4) {
+#endif
 
 	fprintf(stderr, "File %s\n", vulnerabilityFileName);
 	fprintf(stderr, "Invalid data in line %d:\n%s\n", lineno, line);
@@ -129,11 +139,21 @@ namespace crossvalidation {
     while(fgets(line, sizeof(line), footprintFile) != 0) {
 
 #ifdef AREAPERIL_TYPE_UNSIGNED_LONG_LONG
+  #ifdef OASIS_FLOAT_TYPE_DOUBLE
+      if(sscanf(line, "%d,%llu,%d,%lf", &f.event_id, &f.areaperil_id,
+		&f.intensity_bin_id, &f.probability) != 4) {
+  #else
       if(sscanf(line, "%d,%llu,%d,%f", &f.event_id, &f.areaperil_id,
 		&f.intensity_bin_id, &f.probability) != 4) {
+  #endif
 #else
+  #ifdef OASIS_FLOAT_TYPE_DOUBLE
+      if(sscanf(line, "%d,%u,%d,%lf", &f.event_id, &f.areaperil_id,
+		&f.intensity_bin_id, &f.probability) != 4) {
+  #else
       if(sscanf(line, "%d,%u,%d,%f", &f.event_id, &f.areaperil_id,
 		&f.intensity_bin_id, &f.probability) != 4) {
+  #endif
 #endif
 
 	fprintf(stderr, "File %s\n", footprintFileName);

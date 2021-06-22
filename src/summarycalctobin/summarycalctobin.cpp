@@ -66,7 +66,11 @@ void doit(int maxsampleindex)
   fwrite(&summarystreamid, sizeof(int), 1, stdout);
     while (fgets(line, sizeof(line), stdin) != 0)
     {
+#ifdef OASIS_FLOAT_TYPE_DOUBLE
+      if (sscanf(line, "%d,%lf,%d,%d,%lf", &sh.event_id, &sh.expval, &sh.summary_id, &sr.sidx,&sr.loss) != 5){
+#else
       if (sscanf(line, "%d,%f,%d,%d,%f", &sh.event_id, &sh.expval, &sh.summary_id, &sr.sidx,&sr.loss) != 5){
+#endif
            fprintf(stderr, "FATAL: Invalid data in line %d:\n%s", lineno, line);
            return;
        }

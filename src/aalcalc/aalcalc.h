@@ -101,6 +101,7 @@ private:
 	std::vector<int> sidxtoensemble_;
 	std::vector<int> ensemblecount_;
 	bool skipheader_ = false;
+	bool ord_output_ = false;
 // private functions
 	void loadoccurrence();
 	void indexevents(const std::string& fullfilename, std::string& filename);
@@ -128,7 +129,7 @@ private:
 	inline void outputrows(const char * buffer, int strLen);
 	void getmaxsummaryid(std::string& path);
 public:
-	aalcalc(bool skipheader) : skipheader_(skipheader) {};
+	aalcalc(bool skipheader, bool ord_output) : skipheader_(skipheader), ord_output_(ord_output) {};
 	void doit(const std::string& subfolder);		// experimental
 	void debug(const std::string &subfolder);
 };

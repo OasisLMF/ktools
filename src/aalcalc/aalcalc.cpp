@@ -51,6 +51,10 @@ void aalcalc::loadensemblemapping()
 {
 	FILE *fin = fopen(ENSEMBLE_FILE, "rb");
 	if (fin == NULL) return;
+	if (ord_output_ == true) {
+		fprintf(stderr, "WARNING: ensembles not compatible with ORD format. Ignoring ensemble file.\n");
+		return;
+	}
 
 	Ensemble e;
 	sidxtoensemble_.resize(samplesize_ + 1, 0);
@@ -503,8 +507,12 @@ void aalcalc::outputresultscsv_new(std::vector<aal_rec>& vec_aal, int periods,in
 void aalcalc::outputresultscsv_new()
 {
 	if (skipheader_ == false) {
-		printf("summary_id,type,mean,standard_deviation,exposure_value");
-		if (sidxtoensemble_.size() > 0) printf(",ensemble_id");
+		if (ord_output_ == true) {
+			printf("SummaryID,SampleType,MeanLoss,SDLoss,SourceExposure");
+		} else {
+			printf("summary_id,type,mean,standard_deviation,exposure_value");
+			if (sidxtoensemble_.size() > 0) printf(",ensemble_id");
+		}
 		printf("\n");
 	}
 

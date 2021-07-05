@@ -138,11 +138,13 @@ int main(int argc, char *argv[]) {
     OASIS_INT pno = atoi(argv[optind]);
     OASIS_INT total = atoi(argv[optind + 1]);
     if (pno <= 0) {
-      fprintf(stderr, "FATAL:%s: Invalid value for processno supplied\n", progname);
+      fprintf(stderr, "FATAL:%s: Invalid value for processno supplied: %s\n",
+	      progname, argv[optind]);
       parameter_error = true;
     }
     if (total <= 0) {
-      fprintf(stderr, "FATAL:%s: Invalid value for totalprocesses supplied\n", progname);
+      fprintf(stderr, "FATAL:%s: Invalid value for totalprocesses supplied: %s\n",
+	      progname, argv[optind + 1]);
       parameter_error = true;
     }
     if (parameter_error) exit(EXIT_FAILURE);

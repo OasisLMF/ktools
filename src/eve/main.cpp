@@ -137,6 +137,15 @@ int main(int argc, char *argv[]) {
 
     OASIS_INT pno = atoi(argv[optind]);
     OASIS_INT total = atoi(argv[optind + 1]);
+    if (pno <= 0) {
+      fprintf(stderr, "FATAL:%s: Invalid value for processno supplied\n", progname);
+      parameter_error = true;
+    }
+    if (total <= 0) {
+      fprintf(stderr, "FATAL:%s: Invalid value for totalprocesses supplied\n", progname);
+      parameter_error = true;
+    }
+    if (parameter_error) exit(EXIT_FAILURE);
 
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
     struct sigaction sa;

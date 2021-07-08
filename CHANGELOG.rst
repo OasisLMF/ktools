@@ -1,6 +1,14 @@
 Ktools Changelog
 ================
 
+`v3.6.2`_
+ ---------
+* [#208](https://github.com/OasisLMF/ktools/pull/208) - Added Guthub templates
+* [#217](https://github.com/OasisLMF/ktools/pull/218) - Construct Period Average Loss Table (PALT) without SourceNumLocs field
+* [#222](https://github.com/OasisLMF/ktools/pull/223) - Bash exit handler not triggering on OOM kill  
+* [#215](https://github.com/OasisLMF/ktools/pull/216) - OASIS_FLOAT in kat
+.. _`v3.6.2`:  https://github.com/OasisLMF/ktools/compare/v3.6.1...v3.6.2
+
 `v3.6.1`_
  ---------
 * [#203](https://github.com/OasisLMF/ktools/pull/204) - Construct Sample Event Loss Table (SELT) without ImpactedNumLocs field

@@ -148,6 +148,12 @@ struct summary_keyz {
 	int fileindex;
 };
 
+struct summary_period {
+	int summary_id;
+	int fileindex;
+	int period_no;
+};
+
 struct gulSampleslevelRec {
 	int sidx;		// This has be stored for thresholds cannot be implied
 	OASIS_FLOAT loss;		// may want to cut down to singe this causes 4 byte padding for allignment

@@ -50,70 +50,74 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <map>
 
 
-bool operator<(const summary_keyz& lhs, const summary_keyz& rhs)
-{
+bool operator<(const summary_period &lhs, const summary_period &rhs) {
+
 	if (lhs.summary_id != rhs.summary_id) {
 		return lhs.summary_id < rhs.summary_id;
-	}
-	else {
+	} else if (lhs.period_no != rhs.period_no) {
+		return lhs.period_no < rhs.period_no;
+	} else {
 		return lhs.fileindex < rhs.fileindex;
 	}
+
 }
 
 namespace summaryindex {
 
-	void indexevents(const std::string& fullfilename, std::vector<int> &event_ids, std::map<summary_keyz, std::vector<long long>> &summary_id_file_id_to_offset, int file_id) {
-	FILE* fin = fopen(fullfilename.c_str(), "rb");
-	if (fin == NULL) {
-		fprintf(stderr, "%s: cannot open %s\n", __func__, fullfilename.c_str());
-		exit(EXIT_FAILURE);
-	}
-	long long offset = 0;
-	int summarycalcstream_type = 0;
-	size_t i = fread(&summarycalcstream_type, sizeof(summarycalcstream_type), 1, fin);
-	if (i != 0) offset += sizeof(summarycalcstream_type);
-	int stream_type = summarycalcstream_type & summarycalc_id;
-
-	if (stream_type != summarycalc_id) {
-		fprintf(stderr, "%s: Not a summarycalc stream type %d\n", __func__, stream_type);
-		exit(-1);
-	}
-
-	stream_type = streamno_mask & summarycalcstream_type;
-	int samplesize;
-	i = fread(&samplesize, sizeof(samplesize), 1, fin);
-	if (i != 0) offset += sizeof(samplesize);
-	int summary_set = 0;
-	if (i != 0) i = fread(&summary_set, sizeof(summary_set), 1, fin);
-	if (i != 0) offset += sizeof(summary_set);
-	summarySampleslevelHeader sh;
-	int last_event_id = -1;
-	while (i != 0) {
-		i = fread(&sh, sizeof(sh), 1, fin);
-		if (i != 0) {
-			summary_keyz k;
-			k.summary_id = sh.summary_id;
-			k.fileindex = file_id;
-			summary_id_file_id_to_offset[k].push_back(offset);
-			if (sh.event_id != last_event_id) {
-				last_event_id = sh.event_id;
-				event_ids.push_back(sh.event_id);
-			}
-			// fprintf(stdout, "%d, %d, %lld\n", sh.summary_id,sh.event_id, offset);
-			offset += sizeof(sh);
+	void indexevents(const std::string& fullfilename, std::vector<int> &event_ids, std::map<summary_period, std::vector<long long>> &summaryfileperiod_to_offset, int file_id, const std::map<int, std::vector<int>> &eventtoperiods) {
+		FILE* fin = fopen(fullfilename.c_str(), "rb");
+		if (fin == NULL) {
+			fprintf(stderr, "%s: cannot open %s\n", __func__, fullfilename.c_str());
+			exit(EXIT_FAILURE);
 		}
+		long long offset = 0;
+		int summarycalcstream_type = 0;
+		size_t i = fread(&summarycalcstream_type, sizeof(summarycalcstream_type), 1, fin);
+		if (i != 0) offset += sizeof(summarycalcstream_type);
+		int stream_type = summarycalcstream_type & summarycalc_id;
+
+		if (stream_type != summarycalc_id) {
+			fprintf(stderr, "%s: Not a summarycalc stream type %d\n", __func__, stream_type);
+			exit(-1);
+		}
+
+		stream_type = streamno_mask & summarycalcstream_type;
+		int samplesize;
+		i = fread(&samplesize, sizeof(samplesize), 1, fin);
+		if (i != 0) offset += sizeof(samplesize);
+		int summary_set = 0;
+		if (i != 0) i = fread(&summary_set, sizeof(summary_set), 1, fin);
+		if (i != 0) offset += sizeof(summary_set);
+		summarySampleslevelHeader sh;
+		int last_event_id = -1;
 		while (i != 0) {
-			sampleslevelRec sr;
-			i = fread(&sr, sizeof(sr), 1, fin);
-			if (i != 0) offset += sizeof(sr);
-			if (i == 0) break;
-			if (sr.sidx == 0) break;
+			i = fread(&sh, sizeof(sh), 1, fin);
+			if (i != 0) {
+				summary_period k;
+				k.summary_id = sh.summary_id;
+				k.fileindex = file_id;
+				for (auto period : eventtoperiods.at(sh.event_id)) {
+					k.period_no = period;
+					summaryfileperiod_to_offset[k].push_back(offset);
+				}
+				if (sh.event_id != last_event_id) {
+					last_event_id = sh.event_id;
+					event_ids.push_back(sh.event_id);
+				}
+				offset += sizeof(sh);
+			}
+			while (i != 0) {
+				sampleslevelRec sr;
+				i = fread(&sr, sizeof(sr), 1, fin);
+				if (i != 0) offset += sizeof(sr);
+				if (i == 0) break;
+				if (sr.sidx == 0) break;
+			}
 		}
-	}
 
-	fclose(fin);
-}
-void doit(const std::string& subfolder)
+		fclose(fin);
+	}
+void doit(const std::string& subfolder, const std::map<int, std::vector<int>> &eventtoperiods)
 {	
 	std::string path = "work/" + subfolder;
 	if (path.substr(path.length() - 1, 1) != "/") {
@@ -121,8 +125,7 @@ void doit(const std::string& subfolder)
 	}
 
 	std::vector<std::string> files;
-	//std::map<int, std::vector<int>> summary_id_to_events;
-	std::map<summary_keyz, std::vector<long long>> summary_id_file_id_to_offset;
+	std::map<summary_period, std::vector<long long>> summaryfileperiod_to_offset;
 	std::vector<int> event_ids;
 	DIR* dir;
 	struct dirent* ent;
@@ -133,7 +136,7 @@ void doit(const std::string& subfolder)
 			if (s.length() > 4 && s.substr(s.length() - 4, 4) == ".bin") {
 				std::string s2 = path + ent->d_name;
 				files.push_back(s);
-				indexevents(s2, event_ids, summary_id_file_id_to_offset, file_index);
+				indexevents(s2, event_ids, summaryfileperiod_to_offset, file_index, eventtoperiods);
 				file_index++;
 			}
 		}
@@ -157,21 +160,6 @@ void doit(const std::string& subfolder)
 
 	fclose(fout);
 
-	//filename = path + "events.idx";
-	//fout = fopen(filename.c_str(), "wb");
-	//if (fout == NULL) {
-	//	fprintf(stderr, "%s: cannot open %s\n", __func__, filename.c_str());
-	//	exit(EXIT_FAILURE);
-	//}
-	//
-	//auto e_iter = event_ids.begin();
-	//while (e_iter != event_ids.end()) {
-	//	fprintf(fout, "%d\n", *e_iter);
-	//	e_iter++;
-	//}
-
-	//fclose(fout);
-
 	int max_summary_id = 0;
 	filename = path + "summaries.idx";
 	fout = fopen(filename.c_str(), "wb");
@@ -180,12 +168,12 @@ void doit(const std::string& subfolder)
 		exit(EXIT_FAILURE);
 	}
 
-	auto s_iter = summary_id_file_id_to_offset.begin();
-	while (s_iter != summary_id_file_id_to_offset.end()) {
+	auto s_iter = summaryfileperiod_to_offset.begin();
+	while (s_iter != summaryfileperiod_to_offset.end()) {
 		if (s_iter->first.summary_id > max_summary_id) max_summary_id = s_iter->first.summary_id;
 		auto v_iter = s_iter->second.begin();
 		while (v_iter != s_iter->second.end()) {
-			fprintf(fout, "%d, %d, %lld\n", s_iter->first.summary_id, s_iter->first.fileindex, *v_iter);
+			fprintf(fout, "%d, %d, %d, %lld\n", s_iter->first.summary_id, s_iter->first.fileindex, s_iter->first.period_no, *v_iter);
 			v_iter++;
 		}
 		s_iter++;

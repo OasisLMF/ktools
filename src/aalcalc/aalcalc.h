@@ -43,7 +43,6 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 #include <string>
 #include <map>
-#include <unordered_set>
 #include <vector>
 struct aal_rec_vec {
 	std::vector<float> v;
@@ -95,7 +94,6 @@ private:
 	std::vector<aal_rec> vec_analytical_aal_;
 	int max_summary_id_ = 0;
 
-	std::unordered_set<int> set_periods_;
 	int current_summary_id_ = 0;
 	std::map <int, double> periodstoweighting_;
 	std::vector<int> sidxtoensemble_;

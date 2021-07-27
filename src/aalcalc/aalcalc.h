@@ -43,7 +43,6 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 #include <string>
 #include <map>
-#include <unordered_set>
 #include <vector>
 struct aal_rec_vec {
 	std::vector<float> v;
@@ -95,7 +94,6 @@ private:
 	std::vector<aal_rec> vec_analytical_aal_;
 	int max_summary_id_ = 0;
 
-	std::unordered_set<int> set_periods_;
 	int current_summary_id_ = 0;
 	std::map <int, double> periodstoweighting_;
 	std::vector<int> sidxtoensemble_;
@@ -111,13 +109,10 @@ private:
 	void loadensemblemapping();
 	void process_summaryfilew(const std::string &filename);
 	void debug_process_summaryfile(const std::string &filename);
-	void do_calc_end_new();
+	void do_calc_by_period(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec);
+	void do_calc_end(int period_no);
 	void do_sample_calc_newx(const summarySampleslevelHeader& sh, const std::vector<sampleslevelRec>& vrec);
 	void do_sample_calc_new(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec);
-	void doaalcalc_new(const summarySampleslevelHeader& sh, const std::vector<sampleslevelRec>& vrec);
-	void applyweightings(int event_id, const std::map <int, double> &periodstoweighting, std::vector<sampleslevelRec> &vrec) ;
-	void applyweightingstomap(std::map<int, aal_rec> &m);
-	void applyweightingstomaps();
 	inline void calculatemeansddev(const aal_rec_ensemble &record,
 				       const int sample_size, const int p1,
 				       const int p2, const int periods,

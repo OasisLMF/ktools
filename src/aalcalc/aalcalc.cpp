@@ -14,7 +14,7 @@
 
 
 namespace summaryindex {
-	void doit(const std::string& subfolder);
+	void doit(const std::string& subfolder, const std::map<int, std::vector<int>> &eventtoperiods);
 }
 
 bool operator<(const period_sidx_map_key& lhs, const period_sidx_map_key& rhs)
@@ -169,10 +169,8 @@ void aalcalc::indexevents(const std::string& fullfilename, std::string& filename
 		i = fread(&sh, sizeof(sh), 1, fin);
 		if (i != 0) {
 			if (last_event_id != sh.event_id || last_summary_id != sh.summary_id) {				
-				//fprintf(stdout, "%d, %s, %lld\n", sh.event_id, filename.c_str(), offset);
 				if (skiprecord == false && last_event_id > 0) {
 					event_offset_rec s;
-					//s.filename = filename;
 					s.offset = last_offset;
 					s.event_id = last_event_id;
 					s.fileindex = fileindex;
@@ -286,117 +284,76 @@ void aalcalc::load_event_to_summary_index(const std::string& subfolder)
 }
 
 
-void aalcalc::applyweightingstomap(std::map<int, aal_rec> &m)
-{
-	auto iter = m.begin();
-	while (iter != m.end()) {
-		iter++;
-	}
-}
-void aalcalc::applyweightingstomaps()
-{
-	int i =(int) periodstoweighting_.size();
-	if (i == 0) return;
-	applyweightingstomap(map_analytical_aal_);
-	applyweightingstomap(map_sample_aal_);
-}
-void aalcalc::do_calc_end_new()
-{
+void aalcalc::do_calc_end(const int period_no) {
+
+	// Get weighting
 	double weighting = 1;
 	double factor = (double)periodstoweighting_.size();
-	auto iter = set_periods_.begin();
-	while (iter != set_periods_.end()) {
-		if (factor > 0) {
-			if (periodstoweighting_.find(*iter) != periodstoweighting_.end()) {
-				weighting = periodstoweighting_[*iter] * factor;
-			} else {
-				weighting = 0;
-			}
+	if (factor > 0) {
+		if (periodstoweighting_.find(period_no) != periodstoweighting_.end()) {
+			weighting = periodstoweighting_[period_no] * factor;
+		} else {
+			weighting = 0;
 		}
-
-		int vidx = (samplesize_ + 1) * (*iter);
-		for (int sidx = 0; sidx < samplesize_ + 1; sidx++) {
-			double mean = vec_sample_sum_loss_[vidx + sidx];
-			if (sidx > 0) {
-				aal_rec& a = vec_sample_aal_[current_summary_id_];
-				a.type = 2;
-				a.summary_id = current_summary_id_;
-				a.max_exposure_value = max_exposure_val_[1][0];
-				a.mean += mean * weighting;
-				a.mean_squared += mean * mean * weighting;
-				// By ensemble ID
-				if (sidxtoensemble_.size() > 0) {
-					int current_ensemble_id = sidxtoensemble_[sidx];
-					aal_rec_ensemble& ea = vec_ensemble_aal_[max_ensemble_id_ * (current_summary_id_ - 1) + current_ensemble_id];
-					ea.summary_id = current_summary_id_;
-					ea.type = 2;
-					ea.ensemble_id = current_ensemble_id;
-					ea.max_exposure_value = max_exposure_val_[1][current_ensemble_id];
-					ea.mean += mean * weighting;
-					ea.mean_squared += mean * mean * weighting;
-				}
-			}
-			else {
-				aal_rec& a = vec_analytical_aal_[current_summary_id_];
-				a.type = 1;
-				a.summary_id = current_summary_id_;
-				a.max_exposure_value = max_exposure_val_[0][0];
-				a.mean += mean * weighting;
-				a.mean_squared += mean * mean * weighting;
-			}
-		}
-		iter++;
 	}
-	set_periods_.clear();
+
+	for (int sidx= 0; sidx < samplesize_ + 1; sidx++) {
+		double mean = vec_sample_sum_loss_[sidx];
+		if (sidx > 0) {
+			aal_rec& a = vec_sample_aal_[current_summary_id_];
+			a.type = 2;
+			a.summary_id = current_summary_id_;
+			a.max_exposure_value = max_exposure_val_[1][0];
+			a.mean += mean * weighting;
+			a.mean_squared += mean * mean * weighting;
+			// By ensemble ID
+			if (sidxtoensemble_.size() > 0) {
+				int current_ensemble_id = sidxtoensemble_[sidx];
+				aal_rec_ensemble& ea = vec_ensemble_aal_[max_ensemble_id_ * (current_summary_id_ - 1) + current_ensemble_id];
+				ea.summary_id = current_summary_id_;
+				ea.type = 2;
+				ea.ensemble_id = current_ensemble_id;
+				ea.max_exposure_value = max_exposure_val_[1][current_ensemble_id];
+				ea.mean += mean * weighting;
+				ea.mean_squared += mean * mean * weighting;
+			}
+		} else {
+			aal_rec& a = vec_analytical_aal_[current_summary_id_];
+			a.type = 1;
+			a.summary_id = current_summary_id_;
+			a.max_exposure_value = max_exposure_val_[0][0];
+			a.mean += mean * weighting;
+			a.mean_squared += mean * mean * weighting;
+		}
+	}
+
 	std::fill(vec_sample_sum_loss_.begin(), vec_sample_sum_loss_.end(), 0.0);
-	for (int type = 0; type < 2; type++) {
-		std::fill(max_exposure_val_[type].begin(), max_exposure_val_[type].end(), 0.0);
-	}
+
 }
 
-void aalcalc::do_sample_calc_newx(const summarySampleslevelHeader& sh, const std::vector<sampleslevelRec>& vrec) {
 
-	// k.summary_id = sh.summary_id;
-	auto p_iter = event_to_period_.find(sh.event_id);
-	if (p_iter == event_to_period_.end()) return;
+void aalcalc::do_calc_by_period(const summarySampleslevelHeader &sh,
+				const std::vector<sampleslevelRec> &vrec) {
 
-	double factor = (double)periodstoweighting_.size();
-
-	for (auto period_no : p_iter->second) {
-
-		set_periods_.emplace(period_no);
-
-		int vidx = 0;
-		for (auto x : vrec) {
-			if (x.loss > 0) {
-				int type_idx = (x.sidx != -1);
-				if (max_exposure_val_[type_idx][0] < sh.expval) {
-					max_exposure_val_[type_idx][0] = sh.expval;
-				}
-				if (sidxtoensemble_.size() > 0 && type_idx == 1) {
-					int ensemble_id = sidxtoensemble_[x.sidx];
-					if (max_exposure_val_[type_idx][ensemble_id] < sh.expval) {
-						max_exposure_val_[type_idx][ensemble_id] = sh.expval;
-					}
-				}
-				int sidx = (type_idx == 0) ? 0 : x.sidx;
-				vidx = (samplesize_ + 1) * period_no + sidx;
-				vec_sample_sum_loss_[vidx] += x.loss;
+	for (auto x : vrec) {
+		if (x.loss > 0) {
+			int type_idx = (x.sidx != -1);
+			if (max_exposure_val_[type_idx][0] < sh.expval) {
+				max_exposure_val_[type_idx][0] = sh.expval;
 			}
+			if (sidxtoensemble_.size() > 0 && type_idx == 1) {
+				int ensemble_id = sidxtoensemble_[x.sidx];
+				if(max_exposure_val_[type_idx][ensemble_id] < sh.expval) {
+					max_exposure_val_[type_idx][ensemble_id] = sh.expval;
+				}
+			}
+			int sidx = (type_idx == 0) ? 0 : x.sidx;
+			vec_sample_sum_loss_[sidx] += x.loss;
 		}
 	}
+
 }
 
-
-void aalcalc::do_sample_calc_new(const summarySampleslevelHeader& sh, const std::vector<sampleslevelRec>& vrec) {
-	do_sample_calc_newx(sh, vrec);
-}
-
-
-void aalcalc::doaalcalc_new(const summarySampleslevelHeader& sh, const std::vector<sampleslevelRec>& vrec)
-{
-	do_sample_calc_new(sh, vrec);
-}
 
 inline void aalcalc::calculatemeansddev(const aal_rec_ensemble &record,
 					const int sample_size, const int p1,
@@ -606,17 +563,17 @@ void aalcalc::doit(const std::string& subfolder)
 	if (path.substr(path.length() - 1, 1) != "/") {
 		path = path + "/";
 	}
-	summaryindex::doit(subfolder);
+	loadoccurrence();
+	summaryindex::doit(subfolder, event_to_period_);
 	initsameplsize(path);
 	getmaxsummaryid(path);
-	loadoccurrence();
 	loadperiodtoweigthing();	// move this to after the samplesize_ variable has been set i.e.  after reading the first 8 bytes of the first summary file
 	loadensemblemapping();
 	char line[4096];
 	for (int type = 0; type < 2; type++) {
 		max_exposure_val_[type].resize(max_ensemble_id_ + 1, 0.0);
 	}
-	vec_sample_sum_loss_.resize(((no_of_periods_+1) * (samplesize_+1)) + 1, 0.0);
+	vec_sample_sum_loss_.resize(samplesize_+1, 0.0);
 	vec_sample_aal_.resize(max_summary_id_ + 1);
 	vec_ensemble_aal_.resize(max_summary_id_ * max_ensemble_id_ + 1);
 	vec_analytical_aal_.resize(max_summary_id_ + 1);
@@ -655,24 +612,39 @@ void aalcalc::doit(const std::string& subfolder)
 
 	int summary_id;
 	int file_index;
+	int period_no;
 	long long file_offset;
 	int last_summary_id = -1;
+	int last_period_no = -1;
 	int last_file_index = -1;
 	FILE* summary_fin = nullptr;
 	while (fgets(line, sizeof(line), fin) != 0)
 	{
-		int ret = sscanf(line, "%d, %d, %lld", &summary_id, &file_index, &file_offset);
-		if (ret != 3) {
-			fprintf(stderr, "FATAL:Invalid data in line %d:\n%s %d", lineno, line, ret);
+		int ret = sscanf(line, "%d, %d, %d, %lld", &summary_id,
+				&file_index, &period_no, &file_offset);
+		if (ret != 4) {
+			fprintf(stderr, "FATAL:Invalid data in line %d:\n%s %d",
+				lineno, line, ret);
 			exit(-1);
 		}
 		else
 		{
-			if (last_summary_id != summary_id) {				
-				current_summary_id_ = last_summary_id;
-				applyweightingstomaps();
-				do_calc_end_new();
+			if (last_summary_id != summary_id) {
+				if (last_summary_id != -1) {
+					do_calc_end(last_period_no);
+				}
+				last_period_no = -1;   // Reset
+				current_summary_id_ = summary_id;
 				last_summary_id = summary_id;
+				for (int type = 0; type < 2; type++) {
+					std::fill(max_exposure_val_[type].begin(), max_exposure_val_[type].end(), 0.0);
+				}
+			}
+			if (last_period_no != period_no) {
+				if (last_period_no != -1) {
+					do_calc_end(last_period_no);
+				}
+				last_period_no = period_no;
 			}
 			
 			if (last_file_index != file_index) {
@@ -690,7 +662,7 @@ void aalcalc::doit(const std::string& subfolder)
 					if (i == 0 || sr.sidx == 0) break;
 					vrec.push_back(sr);
 				}
-				doaalcalc_new(sh, vrec);
+				do_calc_by_period(sh, vrec);
 			}else {
 				fprintf(stderr, "FATAL:File handle is a nullptr");
 				exit(EXIT_FAILURE);
@@ -702,16 +674,15 @@ void aalcalc::doit(const std::string& subfolder)
 
 	fclose(fin);
 	current_summary_id_ = last_summary_id;
-	applyweightingstomaps();
-	do_calc_end_new();
-	
+	if (last_summary_id != -1) do_calc_end(last_period_no);
+
 	outputresultscsv_new();
 	auto iter = filehandles.begin();
 	while (iter != filehandles.end()) {
 		fclose(*iter);
 		iter++;
 	}
-	filehandles.clear();	
+	filehandles.clear();
 }
 
 void aalcalc::debug_process_summaryfile(const std::string &filename)

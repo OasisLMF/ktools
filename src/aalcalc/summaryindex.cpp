@@ -64,7 +64,7 @@ bool operator<(const summary_period &lhs, const summary_period &rhs) {
 
 namespace summaryindex {
 
-	void indexevents(const std::string& fullfilename, std::vector<int> &event_ids, std::map<summary_period, std::vector<long long>> &summaryfileperiod_to_offset, int file_id, const std::map<int, std::vector<int>> &eventtoperiods) {
+	void indexevents(const std::string& fullfilename, std::map<summary_period, std::vector<long long>> &summaryfileperiod_to_offset, int file_id, const std::map<int, std::vector<int>> &eventtoperiods) {
 		FILE* fin = fopen(fullfilename.c_str(), "rb");
 		if (fin == NULL) {
 			fprintf(stderr, "%s: cannot open %s\n", __func__, fullfilename.c_str());
@@ -99,10 +99,6 @@ namespace summaryindex {
 				for (auto period : eventtoperiods.at(sh.event_id)) {
 					k.period_no = period;
 					summaryfileperiod_to_offset[k].push_back(offset);
-				}
-				if (sh.event_id != last_event_id) {
-					last_event_id = sh.event_id;
-					event_ids.push_back(sh.event_id);
 				}
 				offset += sizeof(sh);
 			}
@@ -167,7 +163,6 @@ void doit(const std::string& subfolder, const std::map<int, std::vector<int>> &e
 
 	std::vector<std::string> files;
 	std::map<summary_period, std::vector<long long>> summaryfileperiod_to_offset;
-	std::vector<int> event_ids;
 	DIR* dir;
 	struct dirent* ent;
 	int file_index = 0;
@@ -182,7 +177,7 @@ void doit(const std::string& subfolder, const std::map<int, std::vector<int>> &e
 				s3 += ".idx";
 				FILE * fidx = fopen(s3.c_str(), "r");
 				if (fidx == nullptr) {
-					indexevents(s2, event_ids, summaryfileperiod_to_offset, file_index, eventtoperiods);
+					indexevents(s2, summaryfileperiod_to_offset, file_index, eventtoperiods);
 				} else {
 					fclose(fidx);
 					indexevents(s2, s3, summaryfileperiod_to_offset, file_index, eventtoperiods);

@@ -117,6 +117,47 @@ namespace summaryindex {
 
 		fclose(fin);
 	}
+
+	void indexevents(const std::string &binfilename, std::string &idxfilename, std::map<summary_period, std::vector<long long>> &summaryfileperiod_to_offset, int file_id, const std::map<int, std::vector<int>> &eventtoperiods) {
+
+		FILE * fidx = fopen(idxfilename.c_str(), "r");
+		if (fidx == nullptr) {
+			fprintf(stderr, "FATAL: Cannot open %s\n", idxfilename.c_str());
+			exit(EXIT_FAILURE);
+		}
+		FILE * fbin = fopen(binfilename.c_str(), "r");
+		if (fbin == nullptr) {
+			fprintf(stderr, "FATAL: Cannot open %s\n", binfilename.c_str());
+			exit(EXIT_FAILURE);
+		}
+
+		char line[4096];
+		summary_period k;
+		k.fileindex = file_id;
+		while (fgets(line, sizeof(line), fidx) != 0) {
+			long long offset;
+			int ret = sscanf(line, "%d,%lld", &k.summary_id, &offset);
+			if (ret != 2) {
+				fprintf(stderr, "FATAL: Invalid data in file %s:\n%s", idxfilename.c_str(), line);
+				exit(EXIT_FAILURE);
+			}
+			// Get period numbers from event IDs
+			flseek(fbin, offset, SEEK_SET);
+			summarySampleslevelHeader sh;
+			size_t i = fread(&sh, sizeof(sh), 1, fbin);
+			std::map<int, std::vector<int>>::const_iterator iter = eventtoperiods.find(sh.event_id);
+			if (iter == eventtoperiods.end()) continue;   // Event not found so don't process it
+			for (auto period : iter->second) {
+				k.period_no = period;
+				summaryfileperiod_to_offset[k].push_back(offset);
+			}
+		}
+
+		fclose(fidx);
+		fclose(fbin);
+
+	}
+
 void doit(const std::string& subfolder, const std::map<int, std::vector<int>> &eventtoperiods)
 {	
 	std::string path = "work/" + subfolder;
@@ -136,7 +177,16 @@ void doit(const std::string& subfolder, const std::map<int, std::vector<int>> &e
 			if (s.length() > 4 && s.substr(s.length() - 4, 4) == ".bin") {
 				std::string s2 = path + ent->d_name;
 				files.push_back(s);
-				indexevents(s2, event_ids, summaryfileperiod_to_offset, file_index, eventtoperiods);
+				std::string s3 = s2;
+				s3.erase(s2.length() - 4);
+				s3 += ".idx";
+				FILE * fidx = fopen(s3.c_str(), "r");
+				if (fidx == nullptr) {
+					indexevents(s2, event_ids, summaryfileperiod_to_offset, file_index, eventtoperiods);
+				} else {
+					fclose(fidx);
+					indexevents(s2, s3, summaryfileperiod_to_offset, file_index, eventtoperiods);
+				}
 				file_index++;
 			}
 		}

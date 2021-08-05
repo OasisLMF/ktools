@@ -9,7 +9,6 @@ Ktools Changelog
 
 `v3.6.2`_
  ---------
-* [#208](https://github.com/OasisLMF/ktools/pull/208) - Added Guthub templates
 * [#217](https://github.com/OasisLMF/ktools/pull/218) - Construct Period Average Loss Table (PALT) without SourceNumLocs field
 * [#222](https://github.com/OasisLMF/ktools/pull/223) - Bash exit handler not triggering on OOM kill  
 * [#215](https://github.com/OasisLMF/ktools/pull/216) - OASIS_FLOAT in kat
@@ -19,7 +18,6 @@ Ktools Changelog
  ---------
 * [#203](https://github.com/OasisLMF/ktools/pull/204) - Construct Sample Event Loss Table (SELT) without ImpactedNumLocs field
 * [#197, #183](https://github.com/OasisLMF/ktools/pull/206) - Feature/197 ordleccalc tests
-* [#208](https://github.com/OasisLMF/ktools/pull/208) - Added Guthub templates
 * [#209](https://github.com/OasisLMF/ktools/pull/209) - Feature/auto changelog
 * [#130](https://github.com/OasisLMF/ktools/pull/210) - Investigate high memory use in leccalc
 * [#211, #212](https://github.com/OasisLMF/ktools/pull/213) - Change ensemble.bin directory and drop sample_id column

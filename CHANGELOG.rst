@@ -1,6 +1,12 @@
 Ktools Changelog
 ================
 
+`v3.6.3`_
+ ---------
+* [#219](https://github.com/OasisLMF/ktools/pull/224) - Calculate Standard Deviation in aalcalc using less memory
+* [#214](https://github.com/OasisLMF/ktools/pull/225) - Use summary index files from summarycalc in aalcalc
+.. _`v3.6.3`:  https://github.com/OasisLMF/ktools/compare/v3.6.2...v3.6.3
+
 `v3.6.3rc1`_
  ---------
 * [#219](https://github.com/OasisLMF/ktools/pull/224) - Calculate Standard Deviation in aalcalc using less memory

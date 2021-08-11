@@ -72,13 +72,14 @@ void segfault_sigaction(int, siginfo_t *si, void *)
 
 
 namespace eltcalc {
-	void doit(bool skipHeader);
+	void doit(bool skipHeader, bool ordOutput);
 	void setinitdone(int processid);
 }
 
 void help()
 {
 	fprintf(stderr,
+		"-o Open Results Data (ORD) output\n"
 		"-v version\n"
 		"-s skip header\n"
 		"-h help\n"
@@ -90,13 +91,17 @@ int main(int argc, char* argv[])
 	progname = argv[0];
 
 	bool skipHeader = false;
+	bool ordOutput = false;
 	int opt;
 	int processid = 0;
-	while ((opt = getopt(argc, argv, "vshP:")) != -1) {
+	while ((opt = getopt(argc, argv, "voshP:")) != -1) {
 		switch (opt) {
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
 			exit(EXIT_FAILURE);
+			break;
+		case 'o':
+			ordOutput = true;
 			break;
 		case 'P':
 			processid = atoi(optarg);
@@ -125,7 +130,7 @@ int main(int argc, char* argv[])
 		initstreams();
 		eltcalc::setinitdone(processid);
         logprintf(progname, "INFO", "starting process..\n");
-		eltcalc::doit(skipHeader);
+		eltcalc::doit(skipHeader, ordOutput);
         logprintf(progname, "INFO", "finishing process..\n");
 		return EXIT_SUCCESS;
 	}

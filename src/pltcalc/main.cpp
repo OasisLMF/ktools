@@ -53,7 +53,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 
 namespace pltcalc {
-	void doit(bool skipHeader);
+	void doit(bool skipHeader, bool ordOutput);
 }
 char* progname;
 
@@ -67,7 +67,8 @@ void segfault_sigaction(int, siginfo_t *si, void *) {
 
 void help()
 {
-	fprintf(stderr, 
+	fprintf(stderr,
+	"-o Open Results Data (ORD) output\n"
 	"-h help\n"
 	"-v version\n"
 	"-s skip header\n"
@@ -79,11 +80,15 @@ int main(int argc, char *argv[])
 {
 	int opt;
 	bool skipHeader = false;
-	while ((opt = getopt(argc, argv, "svh")) != -1) {
+	bool ordOutput = false;
+	while ((opt = getopt(argc, argv, "osvh")) != -1) {
 		switch (opt) {
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
 			::exit(EXIT_FAILURE);
+			break;
+		case 'o':
+			ordOutput = true;
 			break;
 		case 's':
 			skipHeader = true;
@@ -108,7 +113,7 @@ int main(int argc, char *argv[])
 
 	try {
 		initstreams();
-		pltcalc::doit(skipHeader);
+		pltcalc::doit(skipHeader, ordOutput);
 	}
 	catch (std::bad_alloc&) {
 		fprintf(stderr, "FATAL: %s: Memory allocation failed\n", progname);

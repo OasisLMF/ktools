@@ -42,6 +42,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <math.h>
 #include <chrono>
 #include <thread>
+#include <string.h>
 
 #if defined(_MSC_VER)
 #include "../wingetopt/wingetopt.h"
@@ -117,28 +118,68 @@ namespace pltcalc {
 		int occ_date_id;
 	};
 
+	inline void writeoutput(const char * buffer, int strLen)
+	{
+		const char * bufPtr = buffer;
+		int num;
+		int counter = 0;
+		do {
+			num = printf("%s", bufPtr);
+			if (num < 0) {   // Write error
+				fprintf(stderr, "FATAL: Error writing %s: %s\n",
+					buffer, strerror(errno));
+				exit(EXIT_FAILURE);
+			} else if (num < strLen) {   // Incomplete write
+				bufPtr += num;
+				strLen -= num;
+			} else return;   // Success
+
+			fprintf(stderr, "INFO: Attempt %d to write %s\n",
+				++counter, buffer);
+		} while (counter < 10);
+
+		fprintf(stderr, "FATAL: Maximum attempts to write %s exceeded\n",
+			buffer);
+		exit(EXIT_FAILURE);
+	}
+
 	void outputrows(const outrec& o, const int type) {
-		printf("%d,%d,%d,%d,%0.2f,%0.2f,%0.2f,%d\n", type,
-		       o.summary_id, o.period_no, o.event_id, o.mean,
-		       o.standard_deviation, o.exp_value, o.occ_date_id);
+		char buffer[4096];
+		int strLen;
+		strLen = sprintf(buffer, "%d,%d,%d,%d,%0.2f,%0.2f,%0.2f,%d\n",
+				 type, o.summary_id, o.period_no, o.event_id,
+				 o.mean, o.standard_deviation, o.exp_value,
+				 o.occ_date_id);
+		writeoutput(buffer, strLen);
 	}
 	void outputrows_da(const outrec& o, const int type) {
 		int occ_year, occ_month, occ_day;
 		d(o.occ_date_id, occ_year, occ_month, occ_day);
-		printf("%d,%d,%d,%d,%0.2f,%0.2f,%0.2f,%d,%d,%d\n", type,
-		       o.summary_id, o.period_no, o.event_id, o.mean,
-		       o.standard_deviation, o.exp_value, occ_year, occ_month,
-		       occ_day);
+
+		char buffer[4096];
+		int strLen;
+		strLen = sprintf(buffer,
+				"%d,%d,%d,%d,%0.2f,%0.2f,%0.2f,%d,%d,%d\n",
+				 type, o.summary_id, o.period_no, o.event_id,
+				 o.mean, o.standard_deviation, o.exp_value,
+				 occ_year, occ_month, occ_day);
+		writeoutput(buffer, strLen);
 	}
 	void outputrows_ord(const outrec& o, const int type) {
 		int occ_year, occ_month, occ_day;
 		d(o.occ_date_id, occ_year, occ_month, occ_day);
-		printf("%d,%d,%d,%d,%d,%d,%d,%0.2f,%0.2f,%0.2f\n", o.period_no,
-		       o.event_id, occ_year, occ_month, occ_day, o.summary_id,
-		       type, o.mean, o.standard_deviation, o.exp_value);
+
+		char buffer[4096];
+		int strLen;
+		strLen = sprintf(buffer,
+				 "%d,%d,%d,%d,%d,%d,%d,%0.2f,%0.2f,%0.2f\n",
+				 o.period_no, o.event_id, occ_year, occ_month,
+				 occ_day, o.summary_id, type, o.mean,
+				 o.standard_deviation, o.exp_value);
+		writeoutput(buffer, strLen);
 	}
 
-	void domeanout(const summarySampleslevelHeader& sh , OASIS_FLOAT mean_val, void (*WriteOutput)(const outrec&, const int))
+	void domeanout(const summarySampleslevelHeader& sh , OASIS_FLOAT mean_val, void (*OutputData)(const outrec&, const int))
 	{
 		std::vector<period_occ>& vp = m_occ[sh.event_id];
 		outrec o;
@@ -150,10 +191,10 @@ namespace pltcalc {
 		for (auto p : vp) {
 			o.period_no = p.period_no;
 			o.occ_date_id = p.occ_date_id;
-			WriteOutput(o, 1);
+			OutputData(o, 1);
 		}
 	}
-	void dopltcalc(const summarySampleslevelHeader& sh, const std::vector<sampleslevelRec>& vrec, void (*WriteOutput)(const outrec&, const int))
+	void dopltcalc(const summarySampleslevelHeader& sh, const std::vector<sampleslevelRec>& vrec, void (*OutputData)(const outrec&, const int))
 	{
 		std::vector<period_occ>& vp = m_occ[sh.event_id];
 		bool hasrec = false;
@@ -188,7 +229,7 @@ namespace pltcalc {
 				if (x < 0.0000001) sd = 0;   // fix OASIS_FLOATing point precision problems caused by using large numbers
 				o.standard_deviation = sqrt(sd);
 				if (o.mean > 0 || o.standard_deviation > 0) {
-					WriteOutput(o, 2);
+					OutputData(o, 2);
 				}
 			}
 		}
@@ -207,22 +248,22 @@ namespace pltcalc {
 			exit(-1);
 		}
 		stream_type = streamno_mask & summarycalcstream_type;
-		void (*WriteOutput)(const outrec&, const int);
+		void (*OutputData)(const outrec&, const int);
 		if (ordOutput) {
 			if (skipHeader == false) {
 				printf("Period,EventId,Year,Month,Day,SummaryId,SampleType,MeanLoss,SDLoss,FootprintExposure\n");
-				WriteOutput = &outputrows_ord;
+				OutputData = &outputrows_ord;
 			}
 		} else {
 			if (date_algorithm_) {
 				if (skipHeader == false) {
 					printf("type,summary_id,period_no,event_id,mean,standard_deviation,exposure_value,occ_year,occ_month,occ_day\n");
-					WriteOutput = &outputrows_da;
+					OutputData = &outputrows_da;
 				}
 			} else {
 				if (skipHeader == false) {
 					printf("type,summary_id,period_no,event_id,mean,standard_deviation,exposure_value,occ_date_id\n");
-					WriteOutput = &outputrows;
+					OutputData = &outputrows;
 				}
 			}
 		}
@@ -244,12 +285,12 @@ namespace pltcalc {
 					sampleslevelRec sr;
 					i = fread(&sr, sizeof(sr), 1, stdin);
 					if (i == 0 || sr.sidx == 0) {
-						dopltcalc(sh, vrec, WriteOutput);
+						dopltcalc(sh, vrec, OutputData);
 						vrec.clear();
 						break;
 					}
 					if (sr.sidx == -1) {
-						domeanout(sh, sr.loss, WriteOutput);
+						domeanout(sh, sr.loss, OutputData);
 					}else {
 						vrec.push_back(sr);
 					}

@@ -99,7 +99,6 @@ namespace eltcalc {
 	{
 
 		char buffer[4096];
-		char * bufPtr = buffer;
 		int strLen;
 		if (type == 1) {
 			strLen = sprintf(buffer, "%d,1,%d,%f,0,%f\n",

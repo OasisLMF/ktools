@@ -42,6 +42,8 @@ Author: Ben Matharu  email : ben.matharu@oasislmf.org
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <map>
+#include <vector>
 
 #include <chrono>
 #include <thread>
@@ -60,11 +62,45 @@ using namespace std;
 namespace eltcalc {
 	
 	bool firstOutput = true;
+	std::map<int, double> event_rate_;
 
 	bool isSummaryCalcStream(unsigned int stream_type)
 	{
 		unsigned int stype = summarycalc_id & stream_type;
 		return (stype == summarycalc_id);
+	}
+
+	void GetEventRates()
+	{
+		FILE * fin = fopen(OCCURRENCE_FILE, "rb");
+		if (fin == NULL) {
+			fprintf(stderr, "FATAL: %s: Error opening file %s\n",
+				__func__, OCCURRENCE_FILE);
+			exit(EXIT_FAILURE);
+		}
+
+		int date_algorithm = 0;
+		int no_of_periods = 0;
+		occurrence occ;
+		int max_period_no = 0;
+		int i = fread(&date_algorithm, sizeof(date_algorithm), 1, fin);
+		i = fread(&no_of_periods, sizeof(no_of_periods), 1, fin);
+		i = fread(&occ, sizeof(occ), 1, fin);
+		while (i != 0) {
+			event_rate_[occ.event_id] += 1 / (double)no_of_periods;
+			if (max_period_no < occ.period_no)
+				max_period_no = occ.period_no;
+			i = fread(&occ, sizeof(occ), 1, fin);
+		}
+		fclose(fin);
+
+		if (max_period_no > no_of_periods) {
+			fprintf(stderr, "FATAL: Maximum period number in occurrence file exceeds that in header.\n");
+			exit(EXIT_FAILURE);
+		}
+/*		for (auto i : event_rate_) {
+			fprintf(stderr, "%d : %lf\n", i.first, i.second);
+		}*/   // HC
 	}
 
 	inline void WriteOutput(const char * buffer, int strLen)
@@ -120,8 +156,10 @@ namespace eltcalc {
 
 		char buffer[4096];
 		int strLen;
-		strLen = sprintf(buffer, "%d,%d,%d,%f,%f,%f\n", sh.event_id,
-				 sh.summary_id, type, mean, stdDev, sh.expval);
+		strLen = sprintf(buffer, "%d,%d,%d,%lf,%f,%f,%f\n",
+				 sh.event_id, sh.summary_id, type,
+				 event_rate_[sh.event_id], mean, stdDev,
+				 sh.expval);
 		WriteOutput(buffer, strLen);
 
 	}
@@ -137,7 +175,7 @@ namespace eltcalc {
 				   const OASIS_FLOAT, const OASIS_FLOAT);
 		if (ordOutput) {
 			if (skipHeader == false) {
-				printf("EventId,SummaryID,SampleType,MeanLoss,SDLoss,FootprintExposure\n");
+				printf("EventId,SummaryID,SampleType,EventRate,MeanLoss,SDLoss,FootprintExposure\n");
 			}
 			OutputData = &eltcalc::OutputRowsORD;
 		} else {
@@ -200,6 +238,8 @@ namespace eltcalc {
 	{
 		unsigned int stream_type = 0;
 		size_t i = fread(&stream_type, sizeof(stream_type), 1, stdin);
+
+		if (ordOutput) GetEventRates();
 
 		if (isSummaryCalcStream(stream_type) == true) {
 			unsigned int samplesize;

@@ -98,9 +98,6 @@ namespace eltcalc {
 			fprintf(stderr, "FATAL: Maximum period number in occurrence file exceeds that in header.\n");
 			exit(EXIT_FAILURE);
 		}
-/*		for (auto i : event_rate_) {
-			fprintf(stderr, "%d : %lf\n", i.first, i.second);
-		}*/   // HC
 	}
 
 	inline void WriteOutput(const char * buffer, int strLen)
@@ -131,35 +128,27 @@ namespace eltcalc {
 	}
 
 	void OutputRows(const summarySampleslevelHeader& sh, const int type,
-			const OASIS_FLOAT mean, const OASIS_FLOAT stdDev=0)
+			const OASIS_FLOAT mean, const OASIS_FLOAT stdDev)
 	{
 
 		char buffer[4096];
 		int strLen;
-		if (type == 1) {
-			strLen = sprintf(buffer, "%d,1,%d,%f,0,%f\n",
-					 sh.summary_id, sh.event_id, mean,
-					 sh.expval);
-		} else {   // type == 2
-			strLen = sprintf(buffer, "%d,2,%d,%f,%f,%f\n",
-					 sh.summary_id, sh.event_id, mean,
-					 stdDev, sh.expval);
-		}
+		strLen = sprintf(buffer, "%d,%d,%d,%f,%f,%f\n", sh.summary_id,
+				 type, sh.event_id, mean, stdDev, sh.expval);
 
 		WriteOutput(buffer, strLen);
 
 	}
 
 	void OutputRowsORD(const summarySampleslevelHeader& sh, const int type,
-			   const OASIS_FLOAT mean, const OASIS_FLOAT stdDev=0)
+			   const OASIS_FLOAT mean, const OASIS_FLOAT stdDev)
 	{
 
 		char buffer[4096];
 		int strLen;
-		strLen = sprintf(buffer, "%d,%d,%d,%lf,%f,%f,%f\n",
-				 sh.event_id, sh.summary_id, type,
-				 event_rate_[sh.event_id], mean, stdDev,
-				 sh.expval);
+		strLen = sprintf(buffer, "%d,%d,%d,%f,%f,%f,%f\n", sh.event_id,
+				sh.summary_id, type, event_rate_[sh.event_id],
+				mean, stdDev, sh.expval);
 		WriteOutput(buffer, strLen);
 
 	}

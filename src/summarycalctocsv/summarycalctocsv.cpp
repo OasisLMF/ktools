@@ -93,23 +93,29 @@ void doitz(bool skipheader, bool fullprecision, bool show_exposure_value, bool o
 
 				// Do not output records with exposure value = 0
 				if (sh.expval == 0) continue;
-				
+			
 				if (fullprecision == true) {
 					// ORD output flag takes priority over exposure value flag
-					if (ord_output == true)
-						printf("%d,%d,%d,%f,%f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss, sh.expval);
-					else if (show_exposure_value == true)
+					if (ord_output == true) {
+						OASIS_FLOAT impacted_exp = sh.expval;
+						if (sr.loss == 0) impacted_exp = 0;
+						printf("%d,%d,%d,%f,%f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss, impacted_exp);
+					} else if (show_exposure_value == true) {
 						printf("%d,%f,%d,%d,%f\n", sh.event_id, sh.expval, sh.summary_id, sr.sidx, sr.loss);
-					else
+					} else {
 						printf("%d,%d,%d,%f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
+					}
 				} else {
 					// ORD output flag takes priority over exposure value flag
-					if (ord_output == true)
-						printf("%d,%d,%d,%.2f,%.2f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss, sh.expval);
-					else if (show_exposure_value == true)
+					if (ord_output == true) {
+						OASIS_FLOAT impacted_exp = sh.expval;
+						if (sr.loss == 0) impacted_exp = 0;
+						printf("%d,%d,%d,%.2f,%.2f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss, impacted_exp);
+					} else if (show_exposure_value == true) {
 						printf("%d,%.2f,%d,%d,%.2f\n", sh.event_id, sh.expval, sh.summary_id, sr.sidx, sr.loss);
-					else
+					} else {
 						printf("%d,%d,%d,%.2f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
+					}
 				}
 				if (firstOutput == true) {
 					std::this_thread::sleep_for(std::chrono::milliseconds(PIPE_DELAY));  // used to stop possible race condition with kat
@@ -163,20 +169,26 @@ void doit(bool skipheader, bool fullprecision,bool show_exposure_value, bool rem
 				rowcount++;
 				if (fullprecision == true) {
 					// ORD output flag takes priority over exposure value flag
-					if (ord_output == true)
-						printf("%d,%d,%d,%f,%f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss, sh.expval);
-					else if (show_exposure_value == true)
+					if (ord_output == true) {
+						OASIS_FLOAT impacted_exp = sh.expval;
+						if (sr.loss == 0) impacted_exp = 0;
+						printf("%d,%d,%d,%f,%f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss, impacted_exp);
+					} else if (show_exposure_value == true) {
 						printf("%d,%f,%d,%d,%f\n", sh.event_id, sh.expval, sh.summary_id, sr.sidx, sr.loss);
-					else
+					} else {
 						printf("%d,%d,%d,%f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
+					}
 				} else {
 					// ORD output flag takes priority over exposure value flag
-					if (ord_output == true)
-						printf("%d,%d,%d,%.2f,%.2f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss, sh.expval);
-					else if (show_exposure_value == true)
+					if (ord_output == true) {
+						OASIS_FLOAT impacted_exp = sh.expval;
+						if (sr.loss == 0) impacted_exp = 0;
+						printf("%d,%d,%d,%.2f,%.2f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss, impacted_exp);
+					} else if (show_exposure_value == true) {
 						printf("%d,%.2f,%d,%d,%.2f\n", sh.event_id, sh.expval, sh.summary_id, sr.sidx, sr.loss);
-					else
+					} else {
 						printf("%d,%d,%d,%.2f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
+					}
 				}
 				if (firstOutput==true){
 					std::this_thread::sleep_for(std::chrono::milliseconds(PIPE_DELAY));  // used to stop possible race condition with kat

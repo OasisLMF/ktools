@@ -63,6 +63,7 @@ namespace eltcalc {
 	
 	bool firstOutput = true;
 	std::map<int, double> event_rate_;
+	enum { MELT = 0, QELT };
 
 	bool isSummaryCalcStream(unsigned int stream_type)
 	{
@@ -100,14 +101,14 @@ namespace eltcalc {
 		}
 	}
 
-	inline void WriteOutput(const char * buffer, int strLen)
+	inline void WriteOutput(const char * buffer, int strLen, FILE * outFile)
 	{
 		const char * bufPtr = buffer;
 		int num;
 		int counter = 0;
 		do {
 
-			num = printf("%s", bufPtr);
+			num = fprintf(outFile, "%s", bufPtr);
 			if (num < 0) {   // Write error
 				fprintf(stderr, "FATAL: Error writing %s: %s\n",
 					buffer, strerror(errno));
@@ -128,7 +129,8 @@ namespace eltcalc {
 	}
 
 	void OutputRows(const summarySampleslevelHeader& sh, const int type,
-			const OASIS_FLOAT mean, const OASIS_FLOAT stdDev)
+			const OASIS_FLOAT mean, const OASIS_FLOAT stdDev,
+			FILE * outFile)
 	{
 
 		char buffer[4096];
@@ -136,24 +138,26 @@ namespace eltcalc {
 		strLen = sprintf(buffer, "%d,%d,%d,%f,%f,%f\n", sh.summary_id,
 				 type, sh.event_id, mean, stdDev, sh.expval);
 
-		WriteOutput(buffer, strLen);
+		WriteOutput(buffer, strLen, outFile);
 
 	}
 
 	void OutputRowsORD(const summarySampleslevelHeader& sh, const int type,
-			   const OASIS_FLOAT mean, const OASIS_FLOAT stdDev)
+			   const OASIS_FLOAT mean, const OASIS_FLOAT stdDev,
+			   FILE * outFile)
 	{
 
+		if (outFile == nullptr) return;
 		char buffer[4096];
 		int strLen;
 		strLen = sprintf(buffer, "%d,%d,%d,%f,%f,%f,%f\n", sh.event_id,
 				sh.summary_id, type, event_rate_[sh.event_id],
 				mean, stdDev, sh.expval);
-		WriteOutput(buffer, strLen);
+		WriteOutput(buffer, strLen, outFile);
 
 	}
 
-	void doetloutput(int samplesize, bool skipHeader, bool ordOutput)
+	void doetloutput(int samplesize, bool skipHeader, bool ordOutput, FILE **fout)
 	{
 		OASIS_FLOAT sumloss = 0.0;
 		OASIS_FLOAT sample_mean = 0.0;
@@ -161,17 +165,26 @@ namespace eltcalc {
 		OASIS_FLOAT sd = 0;
 		OASIS_FLOAT sumlosssqr = 0.0;
 		void (*OutputData)(const summarySampleslevelHeader&, const int,
-				   const OASIS_FLOAT, const OASIS_FLOAT);
+				   const OASIS_FLOAT, const OASIS_FLOAT, FILE*);
+		FILE * outFile = nullptr;
 		if (ordOutput) {
 			if (skipHeader == false) {
-				printf("EventId,SummaryID,SampleType,EventRate,MeanLoss,SDLoss,FootprintExposure\n");
+				if (fout[MELT] != nullptr) {
+					fprintf(fout[MELT], "EventId,SummaryId,SampleType,EventRate,MeanLoss,SDLoss,FootprintExposure\n");
+				}
+				// TODO: Implement Quantile Event Loss Table
+			/*	if (fout[QELT] != nullptr) {
+					fprintf(fout[QELT], "EventId,SummaryId,Quantile,Loss\n");
+				}*/
 			}
 			OutputData = &eltcalc::OutputRowsORD;
+			outFile = fout[MELT];
 		} else {
 			if (skipHeader == false) {
 				printf("summary_id,type,event_id,mean,standard_deviation,exposure_value\n");
 			}
 			OutputData = &eltcalc::OutputRows;
+			outFile = stdout;
 		}
 
 		summarySampleslevelHeader sh;
@@ -205,12 +218,12 @@ namespace eltcalc {
 				}
 			}
 			if (sh.expval > 0) {   // only output rows with a non-zero exposure value
-				OutputData(sh, 1, analytical_mean, 0);
+				OutputData(sh, 1, analytical_mean, 0, outFile);
 				if (firstOutput == true) {
 					std::this_thread::sleep_for(std::chrono::milliseconds(PIPE_DELAY)); // used to stop possible race condition with kat
 					firstOutput = false;
 				}
-				if (samplesize) OutputData(sh, 2, sample_mean, sd);
+				if (samplesize) OutputData(sh, 2, sample_mean, sd, outFile);
 			}
 
 
@@ -223,7 +236,7 @@ namespace eltcalc {
 		}
 
 	}
-	void doit(bool skipHeader, bool ordOutput)
+	void doit(bool skipHeader, bool ordOutput, FILE **fout)
 	{
 		unsigned int stream_type = 0;
 		size_t i = fread(&stream_type, sizeof(stream_type), 1, stdin);
@@ -236,7 +249,7 @@ namespace eltcalc {
 			i = fread(&samplesize, sizeof(samplesize), 1, stdin);
 			if (i == 1) i = fread(&summaryset_id, sizeof(summaryset_id), 1, stdin);
 			if (i == 1) {
-				doetloutput(samplesize, skipHeader, ordOutput);
+				doetloutput(samplesize, skipHeader, ordOutput, fout);
 			}
 			else {
 				fprintf(stderr, "FATAL: Stream read error\n");

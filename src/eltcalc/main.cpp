@@ -72,13 +72,30 @@ void segfault_sigaction(int, siginfo_t *si, void *)
 
 
 namespace eltcalc {
-	void doit(bool skipHeader);
+	void doit(bool skipHeader, bool ordOutput, FILE** fout);
 	void setinitdone(int processid);
+}
+
+void openpipe(int output_id, const std::string& pipe, FILE** fout)
+{
+	if (pipe == "-") {
+		fout[output_id] = stdout;
+	} else {
+		FILE * f = fopen(pipe.c_str(), "wb");
+		if (f != nullptr) {
+			fout[output_id] = f;
+		} else {
+			fprintf(stderr, "FATAL: Cannot open %s for output\n",
+				pipe.c_str());
+			exit(EXIT_FAILURE);
+		}
+	}
 }
 
 void help()
 {
 	fprintf(stderr,
+		"-M [filename] output Moment Event Loss Table (MELT)\n"
 		"-v version\n"
 		"-s skip header\n"
 		"-h help\n"
@@ -89,14 +106,22 @@ int main(int argc, char* argv[])
 {
 	progname = argv[0];
 
+	enum { MELT = 0, QELT };
+
 	bool skipHeader = false;
+	bool ordOutput = false;
+	FILE * fout[] = { nullptr, nullptr };
 	int opt;
 	int processid = 0;
-	while ((opt = getopt(argc, argv, "vshP:")) != -1) {
+	while ((opt = getopt(argc, argv, "vshP:M:")) != -1) {
 		switch (opt) {
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
 			exit(EXIT_FAILURE);
+			break;
+		case 'M':
+			ordOutput = true;
+			openpipe(MELT, optarg, fout);
 			break;
 		case 'P':
 			processid = atoi(optarg);
@@ -125,7 +150,7 @@ int main(int argc, char* argv[])
 		initstreams();
 		eltcalc::setinitdone(processid);
         logprintf(progname, "INFO", "starting process..\n");
-		eltcalc::doit(skipHeader);
+		eltcalc::doit(skipHeader, ordOutput, fout);
         logprintf(progname, "INFO", "finishing process..\n");
 		return EXIT_SUCCESS;
 	}

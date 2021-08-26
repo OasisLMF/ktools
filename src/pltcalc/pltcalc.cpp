@@ -42,6 +42,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <math.h>
 #include <chrono>
 #include <thread>
+#include <string.h>
 
 #if defined(_MSC_VER)
 #include "../wingetopt/wingetopt.h"
@@ -62,7 +63,10 @@ namespace pltcalc {
 	bool firstOutput = true;
 	std::map<int, std::vector<period_occ> > m_occ;
 	int date_algorithm_ = 0;
+	int no_of_periods_ = 0;
 	int samplesize_ = 0;
+	std::map<int, double> period_weights_;
+	enum { MPLT = 0, SPLT, QPLT };
 
 	void d(long long g, int& y, int& mm, int& dd)
 	{
@@ -79,6 +83,29 @@ namespace pltcalc {
 		return;
 	}
 
+	void getperiodweights()
+	{
+
+		FILE *fin = fopen(PERIODS_FILE, "rb");
+
+		// If there is no periods file, period weights are reciprocal
+		// of number of periods
+		if (fin == nullptr) {
+			for (int i = 1; i <= no_of_periods_; i++) {
+				period_weights_[i] = 1 / (double)no_of_periods_;
+			}
+			return;
+		}
+
+		Periods p;
+		while (fread(&p, sizeof(Periods), 1, fin) != 0){
+			period_weights_[p.period_no] = p.weighting;
+		}
+
+		fclose(fin);
+
+	}
+
 	void loadoccurrence()
 	{
 		FILE* fin = fopen(OCCURRENCE_FILE, "rb");
@@ -87,17 +114,15 @@ namespace pltcalc {
 			exit(-1);
 		}
 
-		int no_of_periods = 0;
 		occurrence occ;
 		int i = fread(&date_algorithm_, sizeof(date_algorithm_), 1, fin);
-		i = fread(&no_of_periods, sizeof(no_of_periods), 1, fin);
+		i = fread(&no_of_periods_, sizeof(no_of_periods_), 1, fin);
 		i = fread(&occ, sizeof(occ), 1, fin);
 		while (i != 0) {
 			period_occ p;
 			p.occ_date_id = occ.occ_date_id;
 			p.period_no = occ.period_no;
 			m_occ[occ.event_id].push_back(p);
-			//event_to_periods[occ.event_id].push_back(occ.period_no);
 			i = fread(&occ, sizeof(occ), 1, fin);
 		}
 
@@ -116,7 +141,104 @@ namespace pltcalc {
 		OASIS_FLOAT exp_value;
 		int occ_date_id;
 	};
-	void domeanout(const summarySampleslevelHeader& sh , OASIS_FLOAT mean_val)
+
+	inline void writeoutput(const char * buffer, int strLen,
+				FILE * outFile)
+	{
+		const char * bufPtr = buffer;
+		int num;
+		int counter = 0;
+		do {
+			num = fprintf(outFile, "%s", bufPtr);
+			if (num < 0) {   // Write error
+				fprintf(stderr, "FATAL: Error writing %s: %s\n",
+					buffer, strerror(errno));
+				exit(EXIT_FAILURE);
+			} else if (num < strLen) {   // Incomplete write
+				bufPtr += num;
+				strLen -= num;
+			} else return;   // Success
+
+			fprintf(stderr, "INFO: Attempt %d to write %s\n",
+				++counter, buffer);
+		} while (counter < 10);
+
+		fprintf(stderr, "FATAL: Maximum attempts to write %s exceeded\n",
+			buffer);
+		exit(EXIT_FAILURE);
+	}
+
+	void outputrows(const outrec& o, const int type, FILE * outFile) {
+		char buffer[4096];
+		int strLen;
+		strLen = sprintf(buffer, "%d,%d,%d,%d,%0.2f,%0.2f,%0.2f,%d\n",
+				 type, o.summary_id, o.period_no, o.event_id,
+				 o.mean, o.standard_deviation, o.exp_value,
+				 o.occ_date_id);
+		writeoutput(buffer, strLen, outFile);
+	}
+	void outputrows_da(const outrec& o, const int type, FILE * outFile) {
+		int occ_year, occ_month, occ_day;
+		d(o.occ_date_id, occ_year, occ_month, occ_day);
+
+		char buffer[4096];
+		int strLen;
+		strLen = sprintf(buffer,
+				"%d,%d,%d,%d,%0.2f,%0.2f,%0.2f,%d,%d,%d\n",
+				 type, o.summary_id, o.period_no, o.event_id,
+				 o.mean, o.standard_deviation, o.exp_value,
+				 occ_year, occ_month, occ_day);
+		writeoutput(buffer, strLen, outFile);
+	}
+	void outputrows_ord(const outrec& o, const int type, FILE * outFile) {
+		if (outFile == nullptr) return;
+
+		int occ_year, occ_month, occ_day;
+		d(o.occ_date_id, occ_year, occ_month, occ_day);
+
+		char buffer[4096];
+		int strLen;
+		strLen = sprintf(buffer,
+				 "%d,%f,%d,%d,%d,%d,%d,%d,%0.2f,%0.2f,%0.2f\n",
+				 o.period_no, period_weights_[o.period_no],
+				 o.event_id, occ_year, occ_month, occ_day,
+				 o.summary_id, type, o.mean,
+				 o.standard_deviation, o.exp_value);
+		writeoutput(buffer, strLen, outFile);
+	}
+
+	void outputrows_splt(const summarySampleslevelHeader& sh,
+			     const sampleslevelRec &sr, FILE * outFile)
+	{
+		if (outFile == nullptr) return;
+
+		std::vector<period_occ>& vp = m_occ[sh.event_id];
+		for (auto p : vp) {
+			int occ_year, occ_month, occ_day;
+			d(p.occ_date_id, occ_year, occ_month, occ_day);
+
+			OASIS_FLOAT impacted_exposure = 0;
+			if (sr.loss > 0) {
+				impacted_exposure = sh.expval;
+			}
+
+			char buffer[4096];
+			int strLen;
+			strLen = sprintf(buffer,
+					 "%d,%f,%d,%d,%d,%d,%d,%d,%0.2f,%0.2f\n",
+					 p.period_no,
+					 period_weights_[p.period_no],
+					 sh.event_id, occ_year, occ_month,
+					 occ_day, sh.summary_id, sr.sidx,
+					 sr.loss, impacted_exposure);
+			writeoutput(buffer, strLen, outFile);
+		}
+	}
+
+	void domeanout(const summarySampleslevelHeader& sh,
+		       OASIS_FLOAT mean_val,
+		       void (*OutputData)(const outrec&, const int, FILE*),
+		       FILE * outFile)
 	{
 		std::vector<period_occ>& vp = m_occ[sh.event_id];
 		outrec o;
@@ -128,17 +250,13 @@ namespace pltcalc {
 		for (auto p : vp) {
 			o.period_no = p.period_no;
 			o.occ_date_id = p.occ_date_id;
-			if (date_algorithm_) {
-				int occ_year, occ_month, occ_day;
-				d(o.occ_date_id, occ_year, occ_month, occ_day);
-				printf("%d,%d,%d,%d,%0.2f,%0.2f,%0.2f,%d,%d,%d\n",1, o.summary_id, o.period_no, o.event_id, o.mean, o.standard_deviation, o.exp_value, occ_year, occ_month, occ_day);
-			}
-			else {
-				printf("%d,%d,%d,%d,%0.2f,%0.2f,%0.2f,%d\n", 1,o.summary_id, o.period_no, o.event_id, o.mean, o.standard_deviation, o.exp_value, o.occ_date_id);
-			}
+			OutputData(o, 1, outFile);
 		}
 	}
-	void dopltcalc(const summarySampleslevelHeader& sh, const std::vector<sampleslevelRec>& vrec)
+	void dopltcalc(const summarySampleslevelHeader& sh,
+		       const std::vector<sampleslevelRec>& vrec,
+		       void (*OutputData)(const outrec&, const int, FILE*),
+		       FILE * outFile)
 	{
 		std::vector<period_occ>& vp = m_occ[sh.event_id];
 		bool hasrec = false;
@@ -173,23 +291,17 @@ namespace pltcalc {
 				if (x < 0.0000001) sd = 0;   // fix OASIS_FLOATing point precision problems caused by using large numbers
 				o.standard_deviation = sqrt(sd);
 				if (o.mean > 0 || o.standard_deviation > 0) {
-					if (date_algorithm_) {
-						int occ_year, occ_month, occ_day;
-						d(o.occ_date_id, occ_year, occ_month, occ_day);
-						printf("%d,%d,%d,%d,%0.2f,%0.2f,%0.2f,%d,%d,%d\n",2, o.summary_id, o.period_no, o.event_id, o.mean, o.standard_deviation, o.exp_value, occ_year, occ_month, occ_day);
-					}
-					else {
-						printf("%d,%d,%d,%d,%0.2f,%0.2f,%0.2f,%d\n", 2, o.summary_id, o.period_no, o.event_id, o.mean, o.standard_deviation, o.exp_value, o.occ_date_id);
-					}
+					OutputData(o, 2, outFile);
 				}
 			}
 		}
 
 	}
 
-	void doit(bool skipHeader)
+	void doit(bool skipHeader, bool ordOutput, FILE **fout)
 	{
 		loadoccurrence();
+		if (ordOutput) getperiodweights();
 		int summarycalcstream_type = 0;
 		int i = fread(&summarycalcstream_type, sizeof(summarycalcstream_type), 1, stdin);
 		int stream_type = summarycalcstream_type & summarycalc_id;
@@ -199,11 +311,33 @@ namespace pltcalc {
 			exit(-1);
 		}
 		stream_type = streamno_mask & summarycalcstream_type;
-		if (date_algorithm_) {
-			if (skipHeader == false) printf("type,summary_id,period_no,event_id,mean,standard_deviation,exposure_value,occ_year,occ_month,occ_day\n");
-		}
-		else {
-			if (skipHeader == false) printf("type,summary_id,period_no,event_id,mean,standard_deviation,exposure_value,occ_date_id\n");
+		void (*OutputData)(const outrec&, const int, FILE*);
+		FILE * outFile = nullptr;
+		if (ordOutput) {
+			if (skipHeader == false) {
+				if (fout[MPLT] != nullptr) {
+					fprintf(fout[MPLT],
+						"Period,PeriodWeight,EventId,Year,Month,Day,SummaryId,SampleType,MeanLoss,SDLoss,FootprintExposure\n");
+				}
+				if (fout[SPLT] != nullptr) {
+					fprintf(fout[SPLT], "Period,PeriodWeight,EventId,Year,Month,Day,SummaryId,SampleId,Loss,ImpactedExposure\n");
+				}
+			}
+			OutputData = &outputrows_ord;
+			outFile = fout[MPLT];
+		} else {
+			if (date_algorithm_) {
+				if (skipHeader == false) {
+					printf("type,summary_id,period_no,event_id,mean,standard_deviation,exposure_value,occ_year,occ_month,occ_day\n");
+				}
+				OutputData = &outputrows_da;
+			} else {
+				if (skipHeader == false) {
+					printf("type,summary_id,period_no,event_id,mean,standard_deviation,exposure_value,occ_date_id\n");
+				}
+				OutputData = &outputrows;
+			}
+			outFile = stdout;
 		}
 
 		if (firstOutput == true) {
@@ -223,12 +357,15 @@ namespace pltcalc {
 					sampleslevelRec sr;
 					i = fread(&sr, sizeof(sr), 1, stdin);
 					if (i == 0 || sr.sidx == 0) {
-						dopltcalc(sh, vrec);
+						dopltcalc(sh, vrec, OutputData, outFile);
 						vrec.clear();
 						break;
+					} else {
+						outputrows_splt(sh, sr, fout[SPLT]);
 					}
+
 					if (sr.sidx == -1) {
-						domeanout(sh, sr.loss);
+						domeanout(sh, sr.loss, OutputData, outFile);
 					}else {
 						vrec.push_back(sr);
 					}

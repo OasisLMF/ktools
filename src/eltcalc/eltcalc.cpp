@@ -42,6 +42,8 @@ Author: Ben Matharu  email : ben.matharu@oasislmf.org
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include <map>
+#include <vector>
 
 #include <chrono>
 #include <thread>
@@ -60,6 +62,8 @@ using namespace std;
 namespace eltcalc {
 	
 	bool firstOutput = true;
+	std::map<int, double> event_rate_;
+	enum { MELT = 0, QELT };
 
 	bool isSummaryCalcStream(unsigned int stream_type)
 	{
@@ -67,29 +71,47 @@ namespace eltcalc {
 		return (stype == summarycalc_id);
 	}
 
-	void OutputRows(const summarySampleslevelHeader& sh, const int type,
-			const OASIS_FLOAT mean, const OASIS_FLOAT stdDev=0)
+	void GetEventRates()
 	{
-
-		char buffer[4096];
-		char * bufPtr = buffer;
-		int strLen;
-		if (type == 1) {
-			strLen = sprintf(buffer, "%d,1,%d,%f,0,%f\n",
-					 sh.summary_id, sh.event_id, mean,
-					 sh.expval);
-		} else {   // type == 2
-			strLen = sprintf(buffer, "%d,2,%d,%f,%f,%f\n",
-					 sh.summary_id, sh.event_id, mean,
-					 stdDev, sh.expval);
+		FILE * fin = fopen(OCCURRENCE_FILE, "rb");
+		if (fin == NULL) {
+			fprintf(stderr, "FATAL: %s: Error opening file %s\n",
+				__func__, OCCURRENCE_FILE);
+			exit(EXIT_FAILURE);
 		}
+
+		int date_algorithm = 0;
+		int no_of_periods = 0;
+		occurrence occ;
+		int max_period_no = 0;
+		int i = fread(&date_algorithm, sizeof(date_algorithm), 1, fin);
+		i = fread(&no_of_periods, sizeof(no_of_periods), 1, fin);
+		i = fread(&occ, sizeof(occ), 1, fin);
+		while (i != 0) {
+			event_rate_[occ.event_id] += 1 / (double)no_of_periods;
+			if (max_period_no < occ.period_no)
+				max_period_no = occ.period_no;
+			i = fread(&occ, sizeof(occ), 1, fin);
+		}
+		fclose(fin);
+
+		if (max_period_no > no_of_periods) {
+			fprintf(stderr, "FATAL: Maximum period number in occurrence file exceeds that in header.\n");
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	inline void WriteOutput(const char * buffer, int strLen, FILE * outFile)
+	{
+		const char * bufPtr = buffer;
 		int num;
 		int counter = 0;
 		do {
 
-			num = printf("%s", bufPtr);
+			num = fprintf(outFile, "%s", bufPtr);
 			if (num < 0) {   // Write error
-				fprintf(stderr, "FATAL: Error writing %s: %s\n", buffer, strerror(errno));
+				fprintf(stderr, "FATAL: Error writing %s: %s\n",
+					buffer, strerror(errno));
 				exit(EXIT_FAILURE);
 			} else if (num < strLen) {   // Incomplete write
 				bufPtr += num;
@@ -101,19 +123,70 @@ namespace eltcalc {
 
 		} while (counter < 10);
 
-		fprintf(stderr, "FATAL: Maximum attempts to write %s exceeded\n", buffer);
+		fprintf(stderr, "FATAL: Maximum attempts to write %s exceeded\n",
+			buffer);
 		exit(EXIT_FAILURE);
+	}
+
+	void OutputRows(const summarySampleslevelHeader& sh, const int type,
+			const OASIS_FLOAT mean, const OASIS_FLOAT stdDev,
+			FILE * outFile)
+	{
+
+		char buffer[4096];
+		int strLen;
+		strLen = sprintf(buffer, "%d,%d,%d,%f,%f,%f\n", sh.summary_id,
+				 type, sh.event_id, mean, stdDev, sh.expval);
+
+		WriteOutput(buffer, strLen, outFile);
 
 	}
 
-	void doetloutput(int samplesize, bool skipHeader)
+	void OutputRowsORD(const summarySampleslevelHeader& sh, const int type,
+			   const OASIS_FLOAT mean, const OASIS_FLOAT stdDev,
+			   FILE * outFile)
+	{
+
+		if (outFile == nullptr) return;
+		char buffer[4096];
+		int strLen;
+		strLen = sprintf(buffer, "%d,%d,%d,%f,%f,%f,%f\n", sh.event_id,
+				sh.summary_id, type, event_rate_[sh.event_id],
+				mean, stdDev, sh.expval);
+		WriteOutput(buffer, strLen, outFile);
+
+	}
+
+	void doetloutput(int samplesize, bool skipHeader, bool ordOutput, FILE **fout)
 	{
 		OASIS_FLOAT sumloss = 0.0;
 		OASIS_FLOAT sample_mean = 0.0;
 		OASIS_FLOAT analytical_mean = 0.0;
 		OASIS_FLOAT sd = 0;
 		OASIS_FLOAT sumlosssqr = 0.0;
-		if (skipHeader == false) printf("summary_id,type,event_id,mean,standard_deviation,exposure_value\n");
+		void (*OutputData)(const summarySampleslevelHeader&, const int,
+				   const OASIS_FLOAT, const OASIS_FLOAT, FILE*);
+		FILE * outFile = nullptr;
+		if (ordOutput) {
+			if (skipHeader == false) {
+				if (fout[MELT] != nullptr) {
+					fprintf(fout[MELT], "EventId,SummaryId,SampleType,EventRate,MeanLoss,SDLoss,FootprintExposure\n");
+				}
+				// TODO: Implement Quantile Event Loss Table
+			/*	if (fout[QELT] != nullptr) {
+					fprintf(fout[QELT], "EventId,SummaryId,Quantile,Loss\n");
+				}*/
+			}
+			OutputData = &eltcalc::OutputRowsORD;
+			outFile = fout[MELT];
+		} else {
+			if (skipHeader == false) {
+				printf("summary_id,type,event_id,mean,standard_deviation,exposure_value\n");
+			}
+			OutputData = &eltcalc::OutputRows;
+			outFile = stdout;
+		}
+
 		summarySampleslevelHeader sh;
 		size_t i = fread(&sh, sizeof(sh), 1, stdin);
 		while (i != 0) {
@@ -144,13 +217,13 @@ namespace eltcalc {
 					sd = 0;
 				}
 			}
-			if (sh.expval > 0) {	// only output rows with a none zero exposure value
-				OutputRows(sh, 1, analytical_mean);
+			if (sh.expval > 0) {   // only output rows with a non-zero exposure value
+				OutputData(sh, 1, analytical_mean, 0, outFile);
 				if (firstOutput == true) {
 					std::this_thread::sleep_for(std::chrono::milliseconds(PIPE_DELAY)); // used to stop possible race condition with kat
 					firstOutput = false;
 				}
-				if (samplesize) OutputRows(sh, 2, sample_mean, sd);
+				if (samplesize) OutputData(sh, 2, sample_mean, sd, outFile);
 			}
 
 
@@ -163,10 +236,12 @@ namespace eltcalc {
 		}
 
 	}
-	void doit(bool skipHeader)
+	void doit(bool skipHeader, bool ordOutput, FILE **fout)
 	{
 		unsigned int stream_type = 0;
 		size_t i = fread(&stream_type, sizeof(stream_type), 1, stdin);
+
+		if (ordOutput) GetEventRates();
 
 		if (isSummaryCalcStream(stream_type) == true) {
 			unsigned int samplesize;
@@ -174,7 +249,7 @@ namespace eltcalc {
 			i = fread(&samplesize, sizeof(samplesize), 1, stdin);
 			if (i == 1) i = fread(&summaryset_id, sizeof(summaryset_id), 1, stdin);
 			if (i == 1) {
-				doetloutput(samplesize, skipHeader);
+				doetloutput(samplesize, skipHeader, ordOutput, fout);
 			}
 			else {
 				fprintf(stderr, "FATAL: Stream read error\n");

@@ -113,7 +113,7 @@ int main(int argc, char* argv[])
 	FILE * fout[] = { nullptr, nullptr };
 	int opt;
 	int processid = 0;
-	while ((opt = getopt(argc, argv, "voshP:M:")) != -1) {
+	while ((opt = getopt(argc, argv, "vshP:M:")) != -1) {
 		switch (opt) {
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);

@@ -191,6 +191,8 @@ namespace pltcalc {
 		writeoutput(buffer, strLen, outFile);
 	}
 	void outputrows_ord(const outrec& o, const int type, FILE * outFile) {
+		if (outFile == nullptr) return;
+
 		int occ_year, occ_month, occ_day;
 		d(o.occ_date_id, occ_year, occ_month, occ_day);
 
@@ -203,6 +205,34 @@ namespace pltcalc {
 				 o.summary_id, type, o.mean,
 				 o.standard_deviation, o.exp_value);
 		writeoutput(buffer, strLen, outFile);
+	}
+
+	void outputrows_splt(const summarySampleslevelHeader& sh,
+			     const sampleslevelRec &sr, FILE * outFile)
+	{
+		if (outFile == nullptr) return;
+
+		std::vector<period_occ>& vp = m_occ[sh.event_id];
+		for (auto p : vp) {
+			int occ_year, occ_month, occ_day;
+			d(p.occ_date_id, occ_year, occ_month, occ_day);
+
+			OASIS_FLOAT impacted_exposure = 0;
+			if (sr.loss > 0) {
+				impacted_exposure = sh.expval;
+			}
+
+			char buffer[4096];
+			int strLen;
+			strLen = sprintf(buffer,
+					 "%d,%f,%d,%d,%d,%d,%d,%d,%0.2f,%0.2f\n",
+					 p.period_no,
+					 period_weights_[p.period_no],
+					 sh.event_id, occ_year, occ_month,
+					 occ_day, sh.summary_id, sr.sidx,
+					 sr.loss, impacted_exposure);
+			writeoutput(buffer, strLen, outFile);
+		}
 	}
 
 	void domeanout(const summarySampleslevelHeader& sh,
@@ -289,6 +319,9 @@ namespace pltcalc {
 					fprintf(fout[MPLT],
 						"Period,PeriodWeight,EventId,Year,Month,Day,SummaryId,SampleType,MeanLoss,SDLoss,FootprintExposure\n");
 				}
+				if (fout[SPLT] != nullptr) {
+					fprintf(fout[SPLT], "Period,PeriodWeight,EventId,Year,Month,Day,SummaryId,SampleId,Loss,ImpactedExposure\n");
+				}
 			}
 			OutputData = &outputrows_ord;
 			outFile = fout[MPLT];
@@ -327,7 +360,10 @@ namespace pltcalc {
 						dopltcalc(sh, vrec, OutputData, outFile);
 						vrec.clear();
 						break;
+					} else {
+						outputrows_splt(sh, sr, fout[SPLT]);
 					}
+
 					if (sr.sidx == -1) {
 						domeanout(sh, sr.loss, OutputData, outFile);
 					}else {

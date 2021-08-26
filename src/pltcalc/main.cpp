@@ -83,8 +83,8 @@ void openpipe(int output_id, const std::string& pipe, FILE** fout)
 void help()
 {
 	fprintf(stderr,
-	"-o Open Results Data (ORD) output\n"
 	"-M [filename] output Moment Period Loss Table (MPLT)\n"
+	"-S [filename] output Sample Period Loss Table (SPLT)\n"
 	"-h help\n"
 	"-v version\n"
 	"-s skip header\n"
@@ -101,18 +101,19 @@ int main(int argc, char *argv[])
 	bool skipHeader = false;
 	bool ordOutput = false;
 	FILE * fout[] = { nullptr, nullptr, nullptr };
-	while ((opt = getopt(argc, argv, "osvhM:")) != -1) {
+	while ((opt = getopt(argc, argv, "svhM:S:")) != -1) {
 		switch (opt) {
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
 			::exit(EXIT_FAILURE);
 			break;
-		case 'o':
-			ordOutput = true;
-			break;
 		case 'M':
 			ordOutput = true;
 			openpipe(MPLT, optarg, fout);
+			break;
+		case 'S':
+			ordOutput = true;
+			openpipe(SPLT, optarg, fout);
 			break;
 		case 's':
 			skipHeader = true;

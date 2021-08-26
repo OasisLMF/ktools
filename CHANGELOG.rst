@@ -1,6 +1,12 @@
 Ktools Changelog
 ================
 
+`v3.6.4rc1`_
+ ---------
+* [#227](https://github.com/OasisLMF/ktools/pull/228) - Redefine ImpactedExposure in Sample Event Loss Table (SELT)
+* [#229](https://github.com/OasisLMF/ktools/pull/229) - Add options to write Moment Event Loss Table (MELT) with eltcalc and Moment Period Loss Table (MPLT) & Sample Period Loss Table (SPLT) with pltcalc
+.. _`v3.6.4rc1`:  https://github.com/OasisLMF/ktools/compare/v3.6.3...v3.6.4rc1
+
 `v3.6.3`_
  ---------
 * [#219](https://github.com/OasisLMF/ktools/pull/224) - Calculate Standard Deviation in aalcalc using less memory

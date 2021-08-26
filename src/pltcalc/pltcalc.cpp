@@ -63,7 +63,9 @@ namespace pltcalc {
 	bool firstOutput = true;
 	std::map<int, std::vector<period_occ> > m_occ;
 	int date_algorithm_ = 0;
+	int no_of_periods_ = 0;
 	int samplesize_ = 0;
+	std::map<int, double> period_weights_;
 
 	void d(long long g, int& y, int& mm, int& dd)
 	{
@@ -80,6 +82,29 @@ namespace pltcalc {
 		return;
 	}
 
+	void getperiodweights()
+	{
+
+		FILE *fin = fopen(PERIODS_FILE, "rb");
+
+		// If there is no periods file, period weights are reciprocal
+		// of number of periods
+		if (fin == nullptr) {
+			for (int i = 1; i <= no_of_periods_; i++) {
+				period_weights_[i] = 1 / (double)no_of_periods_;
+			}
+			return;
+		}
+
+		Periods p;
+		while (fread(&p, sizeof(Periods), 1, fin) != 0){
+			period_weights_[p.period_no] = p.weighting;
+		}
+
+		fclose(fin);
+
+	}
+
 	void loadoccurrence()
 	{
 		FILE* fin = fopen(OCCURRENCE_FILE, "rb");
@@ -88,17 +113,15 @@ namespace pltcalc {
 			exit(-1);
 		}
 
-		int no_of_periods = 0;
 		occurrence occ;
 		int i = fread(&date_algorithm_, sizeof(date_algorithm_), 1, fin);
-		i = fread(&no_of_periods, sizeof(no_of_periods), 1, fin);
+		i = fread(&no_of_periods_, sizeof(no_of_periods_), 1, fin);
 		i = fread(&occ, sizeof(occ), 1, fin);
 		while (i != 0) {
 			period_occ p;
 			p.occ_date_id = occ.occ_date_id;
 			p.period_no = occ.period_no;
 			m_occ[occ.event_id].push_back(p);
-			//event_to_periods[occ.event_id].push_back(occ.period_no);
 			i = fread(&occ, sizeof(occ), 1, fin);
 		}
 
@@ -172,9 +195,10 @@ namespace pltcalc {
 		char buffer[4096];
 		int strLen;
 		strLen = sprintf(buffer,
-				 "%d,%d,%d,%d,%d,%d,%d,%0.2f,%0.2f,%0.2f\n",
-				 o.period_no, o.event_id, occ_year, occ_month,
-				 occ_day, o.summary_id, type, o.mean,
+				 "%d,%f,%d,%d,%d,%d,%d,%d,%0.2f,%0.2f,%0.2f\n",
+				 o.period_no, period_weights_[o.period_no],
+				 o.event_id, occ_year, occ_month, occ_day,
+				 o.summary_id, type, o.mean,
 				 o.standard_deviation, o.exp_value);
 		writeoutput(buffer, strLen);
 	}
@@ -239,6 +263,7 @@ namespace pltcalc {
 	void doit(bool skipHeader, bool ordOutput)
 	{
 		loadoccurrence();
+		if (ordOutput) getperiodweights();
 		int summarycalcstream_type = 0;
 		int i = fread(&summarycalcstream_type, sizeof(summarycalcstream_type), 1, stdin);
 		int stream_type = summarycalcstream_type & summarycalc_id;
@@ -251,7 +276,7 @@ namespace pltcalc {
 		void (*OutputData)(const outrec&, const int);
 		if (ordOutput) {
 			if (skipHeader == false) {
-				printf("Period,EventId,Year,Month,Day,SummaryId,SampleType,MeanLoss,SDLoss,FootprintExposure\n");
+				printf("Period,PeriodWeight,EventId,Year,Month,Day,SummaryId,SampleType,MeanLoss,SDLoss,FootprintExposure\n");
 				OutputData = &outputrows_ord;
 			}
 		} else {

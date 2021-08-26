@@ -53,7 +53,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 
 namespace pltcalc {
-	void doit(bool skipHeader, bool ordOutput);
+	void doit(bool skipHeader, bool ordOutput, FILE** fout);
 }
 char* progname;
 
@@ -64,11 +64,27 @@ void segfault_sigaction(int, siginfo_t *si, void *) {
 }
 #endif
 
+void openpipe(int output_id, const std::string& pipe, FILE** fout)
+{
+        if (pipe == "-") {
+                fout[output_id] = stdout;
+        } else {
+                FILE * f = fopen(pipe.c_str(), "wb");
+                if (f != nullptr) {
+                        fout[output_id] = f;
+                } else {
+                        fprintf(stderr, "FATAL: Cannot open %s for output\n",
+                                pipe.c_str());
+                        exit(EXIT_FAILURE);
+                }
+        }
+}
 
 void help()
 {
 	fprintf(stderr,
 	"-o Open Results Data (ORD) output\n"
+	"-M [filename] output Moment Period Loss Table (MPLT)\n"
 	"-h help\n"
 	"-v version\n"
 	"-s skip header\n"
@@ -78,10 +94,14 @@ void help()
 
 int main(int argc, char *argv[])
 {
+
+	enum { MPLT = 0, SPLT, QPLT };
+
 	int opt;
 	bool skipHeader = false;
 	bool ordOutput = false;
-	while ((opt = getopt(argc, argv, "osvh")) != -1) {
+	FILE * fout[] = { nullptr, nullptr, nullptr };
+	while ((opt = getopt(argc, argv, "osvhM:")) != -1) {
 		switch (opt) {
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
@@ -89,6 +109,10 @@ int main(int argc, char *argv[])
 			break;
 		case 'o':
 			ordOutput = true;
+			break;
+		case 'M':
+			ordOutput = true;
+			openpipe(MPLT, optarg, fout);
 			break;
 		case 's':
 			skipHeader = true;
@@ -113,7 +137,7 @@ int main(int argc, char *argv[])
 
 	try {
 		initstreams();
-		pltcalc::doit(skipHeader, ordOutput);
+		pltcalc::doit(skipHeader, ordOutput, fout);
 	}
 	catch (std::bad_alloc&) {
 		fprintf(stderr, "FATAL: %s: Memory allocation failed\n", progname);

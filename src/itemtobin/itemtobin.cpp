@@ -61,7 +61,7 @@ namespace itemtobin {
 #ifdef AREAPERIL_TYPE_UNSIGNED_LONG_LONG
 			int ret = sscanf(line, "%d,%d,%llu,%d,%d", &q.id, &q.coverage_id, &q.areaperil_id, &q.vulnerability_id, &q.group_id);
 #else
-			int ret = sscanf(line, "%d,%d,%d,%d,%d", &q.id, &q.coverage_id, &q.areaperil_id, &q.vulnerability_id, &q.group_id);
+			int ret = sscanf(line, "%d,%d,%u,%d,%d", &q.id, &q.coverage_id, &q.areaperil_id, &q.vulnerability_id, &q.group_id);
 #endif 
 
 			if (ret != 5) {

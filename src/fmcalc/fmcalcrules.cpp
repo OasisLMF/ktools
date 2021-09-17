@@ -69,12 +69,44 @@ void deductible_over_max(LossRec& x,OASIS_FLOAT max_ded)
 
 void deductible_under_min(LossRec& x, OASIS_FLOAT min_ded, OASIS_FLOAT ded)
 { //If effective deductible + current deductible is less than the minimum, deductible will be increased to the minimum
-	OASIS_FLOAT loss_delta;
-	OASIS_FLOAT loss;
-	loss_delta = 0;
-	loss = 0;
+	OASIS_FLOAT loss_delta =0;
+	OASIS_FLOAT loss =0;
+	OASIS_FLOAT loss_not_over_limit = 0;
 	loss_delta = min_ded - ded - x.effective_deductible ; // loss to increase by the loss_delta	
-	
+	if (loss_delta <= x.over_limit) {
+		if (x.loss > ded) {
+			loss = x.loss;
+			x.over_limit = x.over_limit - loss_delta;
+			x.effective_deductible = min_ded;
+		}
+		else if (x.over_limit - loss_delta + x.loss > ded) {
+			loss = 0;
+			x.over_limit = x.over_limit - loss_delta + ded;
+			x.effective_deductible = min_ded;
+			x.under_limit = x.under_limit + x.loss;
+		}
+		else {
+			x.effective_deductible = x.effective_deductible + x.loss + x.over_limit;
+			loss = 0;
+			x.over_limit = 0;
+			x.under_limit = x.under_limit + x.loss;
+		}
+	}
+	else {
+		loss_not_over_limit = loss_delta - x.over_limit;
+		if (x.loss > (loss_not_over_limit + ded)) {
+			loss = x.loss - loss_not_over_limit - ded;
+			x.over_limit = 0;
+			x.effective_deductible = min_ded;
+			x.under_limit = x.under_limit + loss_not_over_limit;
+		}
+		else {
+			loss = 0;
+			x.effective_deductible = x.effective_deductible + x.loss + x.over_limit;
+			x.under_limit = x.under_limit + x.loss;
+			x.over_limit = 0;
+		}
+	}
 	x.loss = loss;
 }
 
@@ -906,36 +938,16 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			OASIS_FLOAT loss = 0;
 			OASIS_FLOAT loss_delta = 0;
 			if ((x.effective_deductible + ded1) < ded2) { // If effective deductible is less than the minimum, deductible will be increased to the minimum
-				loss_delta = x.effective_deductible - ded2; // negative loss change
-				if (x.over_limit + x.under_limit > 0) { // If there are prior level limits to reapply
-					if (x.over_limit > 0) { // If there is carried loss exceeding prior level limit
-						if (-loss_delta > x.over_limit) { // if the loss decrease will take the loss back through the prior level limits
-							loss = x.loss + x.over_limit + x.effective_deductible - ded2; //let the loss decrease by the difference between the overlimit and the loss delta
-							x.over_limit = 0; //update the overlimit
-						}
-						else {
-							loss = x.loss; // no change to the loss because the adjusted loss is still overlimit
-							x.over_limit = x.over_limit + loss_delta; // reduce the overlimit by the loss delta
-						}
-					}
-					else {
-						loss = x.loss + loss_delta; // loss decreases by the full difference between effective deductible and min deductible
-						if (loss < 0) loss = 0; //loss can't go negative
-						x.under_limit = x.under_limit + (x.loss - loss); // underlimit increases by the change in loss
-					}
-				}
-
-				else {
-					loss = x.loss + loss_delta; // loss decreases by the full difference between effective deductible and min deductible
-				}
-				if (loss < 0) loss = 0; //loss can't go negative
-				x.effective_deductible = x.effective_deductible + (x.loss - loss); //update the deductible to carry forward
+				deductible_under_min(x, ded2, ded1);
 			}
 			else {
 				loss = x.loss - ded1; //no change to loss if carried deductible is more than the min ded.
 				if (loss < 0) loss = 0;
+				x.effective_deductible = x.effective_deductible + (x.loss - loss); //update the deductible to carry forward
+				if (x.effective_deductible > x.under_limit) x.under_limit = x.effective_deductible;
+				x.loss = loss;
 			}
-			x.loss = loss;
+			
 		}
 		break;
 		case 12:
@@ -973,38 +985,16 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			}
 			else {
 				if (x.effective_deductible + ded1 < ded2) { // If effective deductible is less than the minimum, deductible will be increased to the minimum
-					loss_delta = x.effective_deductible - ded2; // negative loss change
-					if (x.over_limit + x.under_limit > 0) { // If there are prior level limits to reapply
-						if (x.over_limit > 0) { // If there is carried loss exceeding prior level limit
-							if (-loss_delta > x.over_limit) { // if the loss decrease will take the loss back through the prior level limits
-								loss = x.loss + x.over_limit + x.effective_deductible - ded2; //let the loss decrease by the difference between the overlimit and the loss delta
-								x.over_limit = 0; //update the overlimit
-							}
-							else {
-								loss = x.loss; // no change to the loss because the adjusted loss is still overlimit
-								x.over_limit = x.over_limit + loss_delta; // reduce the overlimit by the loss delta
-							}
-						}
-						else {
-							loss = x.loss + loss_delta; // loss decreases by the full difference between effective deductible and min deductible
-							if (loss < 0) loss = 0; //loss can't go negative
-							x.under_limit = x.under_limit + (x.loss - loss); // underlimit increases by the change in loss
-						}
-					}
-					else {
-						loss = x.loss + loss_delta; // loss decreases by the full difference between effective deductible and min deductible
-					}
-					if (loss < 0) loss = 0; //loss can't go negative
-					x.effective_deductible = x.effective_deductible + (x.loss - loss); //update the deductible to carry forward
+					deductible_under_min(x, ded2, ded1);
 				}
 				else {
 					loss = x.loss - ded1; // adjust loss for the normal deducitble only
 					if (loss < 0) loss = 0;
 					x.effective_deductible = x.effective_deductible + (x.loss - loss); //update the deductible to carry forward
 					if (x.effective_deductible > x.under_limit) x.under_limit = x.effective_deductible;
+					x.loss = loss;
 				}
-			}
-			x.loss = loss;
+			}	
 		}
 		break;
 		case 14:
@@ -1135,43 +1125,18 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 			}
 			// Function 19: Applies a min and max deductible on deductible % loss
 			OASIS_FLOAT loss = 0;
-			OASIS_FLOAT loss_delta = 0;
+			OASIS_FLOAT ded = 0;
 			if (ded3 == 0) ded3 = 9999999999;
-			if ((x.effective_deductible + (x.loss * ded1)) > ded3) { //If effective deductible is more than the maximum, deductible will be reduced to the maximum		
+			ded = ded1 * x.loss;
+			if ((x.effective_deductible + ded) > ded3) { //If effective deductible is more than the maximum, deductible will be reduced to the maximum		
 				deductible_over_max(x, ded3);
 			}
 			else {
-				if ((x.loss * ded1) + x.effective_deductible < ded2) {
-					loss_delta =  x.effective_deductible - ded2; // negative loss change
-					if (x.over_limit + x.under_limit > 0) { // If there are prior level limits
-						if (x.over_limit > 0) { // If there is carried loss exceeding prior level limit
-							if (-loss_delta > x.over_limit) { // if the loss decrease will take the loss back through the prior level limits
-								loss = x.loss + x.over_limit + x.effective_deductible - ded2; //let the loss decrease by the difference between the overlimit and the loss delta
-								x.over_limit = 0; //update the overlimit
-								x.loss = loss;
-							}
-							else {
-								loss = x.loss; // no change to the loss because the adjusted loss is still overlimit
-								x.over_limit = x.over_limit + loss_delta; // reduce the overlimit by the loss delta
-								x.loss = loss;
-							}
-						}
-						else {
-							loss = x.loss + loss_delta; // loss decreases by the full difference between effective deductible and min deductible
-							if (loss < 0) loss = 0; //loss can't go negative
-							x.under_limit = x.under_limit + (x.loss - loss); // underlimit increases by the change in loss
-							x.loss = loss;
-						}
-					}
-					else {
-						loss = x.loss + loss_delta; // loss decreases by the full difference between effective deductible and min deductible
-					}
-					if (loss < 0) loss = 0; //loss can't go negative
-					x.effective_deductible = x.effective_deductible + (x.loss - loss); //update the deductible to carry forward
-					x.loss = loss;
+				if (ded + x.effective_deductible < ded2) {
+					deductible_under_min(x, ded2, ded);
 				}
 				else {
-					loss = x.loss - (x.loss * ded1);
+					loss = x.loss - ded;
 					if (loss < 0) loss = 0;
 					x.effective_deductible = x.effective_deductible + (x.loss - loss);
 					if (x.effective_deductible > x.under_limit) x.under_limit = x.effective_deductible;
@@ -1212,49 +1177,26 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 				if (y.tc_id == deductible_3) ded3 = y.tc_val;
 			}
 			OASIS_FLOAT loss = 0;
-			OASIS_FLOAT effective_ded = 0;
-			OASIS_FLOAT loss_delta = 0;
+			OASIS_FLOAT ded = 0;
 
-			effective_ded = x.accumulated_tiv * ded1;
-			if (effective_ded > x.loss) effective_ded = x.loss;
-				if ((effective_ded + x.effective_deductible) > ded3) { //If effective deductible is more than the maximum, deductible will be reduced to the maximum		
+			ded = x.accumulated_tiv * ded1;
+			if (ded > x.loss) ded = x.loss;
+				if ((ded + x.effective_deductible) > ded3) { //If effective deductible is more than the maximum, deductible will be reduced to the maximum		
 					deductible_over_max(x, ded3);
 				}
 				else {
-				if ((effective_ded + x.effective_deductible) < ded2) {
-					loss_delta = x.effective_deductible - ded2;
-					if (x.over_limit + x.under_limit > 0) { // If there are prior level limits to reapply
-						if (x.over_limit > 0) { // If there is carried loss exceeding prior level limit
-							if (-loss_delta > x.over_limit) { // if the loss decrease will take the loss back through the prior level limits
-								loss = x.loss + x.over_limit + x.effective_deductible - ded2; //let the loss decrease by the difference between the overlimit and the loss delta
-								x.over_limit = 0; //update the overlimit
-							}
-							else {
-								loss = x.loss; // no change to the loss because the adjusted loss is still overlimit
-								x.over_limit = x.over_limit + loss_delta; // reduce the overlimit by the loss delta
-							}
-						}
-						else {
-							loss = x.loss + loss_delta; // loss decreases by the full difference between effective deductible and min deductible
-							if (loss < 0) loss = 0; //loss can't go negative
-							x.under_limit = x.under_limit + (x.loss - loss); // underlimit increases by the change in loss
-						}
-					}
-					else {
-						loss = x.loss + loss_delta; // loss decreases by the full difference between effective deductible and min deductible
-					}
-					if (loss < 0) loss = 0; //loss can't go negative
-					x.effective_deductible = x.effective_deductible + (x.loss - loss); //update the deductible to carry forward
+				if ((ded + x.effective_deductible) < ded2) {
+					deductible_under_min(x, ded2, ded);
 				}
 				else {
-					loss = x.loss - effective_ded;
+					loss = x.loss - ded;
 					if (loss < 0) loss = 0;
 					x.effective_deductible = x.effective_deductible + (x.loss - loss);
 					if (x.effective_deductible > x.under_limit) x.under_limit = x.effective_deductible;
+					x.loss = loss;
 					//x.retained_loss = x.retained_loss + (x.loss - loss);		
 				}
 			}
-			x.loss = loss;
 		}
 
 		break;
@@ -1366,57 +1308,30 @@ void applycalcrule(const profile_rec_new &profile,LossRec &x,int layer)
 				if (y.tc_id == limit_1) lim = y.tc_val;
 			}
 			OASIS_FLOAT loss = 0;
-			OASIS_FLOAT loss_delta = 0;
+			OASIS_FLOAT ded = 0;
+			ded = ded1 * x.loss;
 			if (ded3 == 0) ded3 = 9999999999;
 			// Applies a min and max ded on effective deductible plus a deductible as a % loss.
-			if ((x.effective_deductible + (x.loss * ded1)) > ded3) { //If effective deductible is more than the maximum, deductible will be reduced to the maximum		
+			if ((x.effective_deductible + ded) > ded3) { //If effective deductible is more than the maximum, deductible will be reduced to the maximum		
 				deductible_over_max(x, ded3);
 			}
 			else {
-				if (((x.loss * ded1) + x.effective_deductible) < ded2) { //If carried + ded < min ded
-					loss_delta = x.effective_deductible - ded2;
-					if (x.over_limit + x.under_limit > 0) { // If there are prior level limits to reapply
-						if (x.over_limit > 0) { // If there is carried loss exceeding prior level limit
-							if (-loss_delta > x.over_limit) { // if the loss decrease will take the loss back through the prior level limits
-								loss = x.loss + x.over_limit + x.effective_deductible - ded2; //let the loss decrease by the difference between the overlimit and the loss delta
-								x.over_limit = 0; //update the overlimit
-							}
-							else {
-								loss = x.loss; // no change to the loss because the adjusted loss is still overlimit
-								x.over_limit = x.over_limit + loss_delta; // reduce the overlimit by the loss delta
-							}
-						}
-						else {
-							loss = x.loss + loss_delta; // loss decreases by the full difference between effective deductible and min deductible
-							if (loss < 0) loss = 0; //loss can't go negative
-							x.under_limit = x.under_limit + (x.loss - loss); // underlimit increases by the change in loss
-						}
-					}
-					else {
-						loss = x.loss + loss_delta; // loss decreases by the full difference between effective deductible and min deductible
-					}
-					if (loss < 0) loss = 0; //loss can't go negative
-					x.effective_deductible = x.effective_deductible + (x.loss - loss); //update the deductible to carry forward
+				if ((ded + x.effective_deductible) < ded2) { //If carried + ded < min ded
+					deductible_under_min(x, ded2, ded);
 				}
 				else { // min ded < carried ded + ded < max ded
-					loss = x.loss - (x.loss * ded1);
+					loss = x.loss - ded;
 					if (loss < 0) loss = 0;
 					x.effective_deductible = x.effective_deductible + (x.loss - loss);
 					if (x.effective_deductible > x.under_limit) x.under_limit = x.effective_deductible;
+					x.loss = loss;
 					//x.retained_loss = x.retained_loss + (x.loss - loss);		
 				}
-			if (loss > lim) {
-				x.over_limit = loss - lim;
-				loss = lim;
+				if (x.loss > lim) {
+					x.over_limit = x.loss - lim;
+					x.loss = lim;
+				}
 			}
-			OASIS_FLOAT under_limit = 0;
-			under_limit = x.under_limit;
-			if (x.effective_deductible > under_limit) under_limit = x.effective_deductible;
-			if (lim - loss < under_limit) under_limit = lim - loss;
-			x.under_limit = under_limit;
-			x.loss = loss;
-			}
-			x.loss = loss;
 		}
 		break;
 		case 33: // insurance only

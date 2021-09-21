@@ -150,7 +150,7 @@ namespace footprinttobin {
 #ifdef AREAPERIL_TYPE_UNSIGNED_LONG_LONG
 					fprintf(stderr, "FATAL: Error (%d): areaperil_id %llu data is not contiguous for event_id %d \n", lineno, r.areaperil_id, event_id);
 #else
-					::fprintf(stderr, "FATAL: Error (%d): areaperil_id %d data is not contiguous for event_id %d \n", lineno, r.areaperil_id, event_id);
+					::fprintf(stderr, "FATAL: Error (%d): areaperil_id %u data is not contiguous for event_id %d \n", lineno, r.areaperil_id, event_id);
 #endif
 					::exit(-1);
 				}
@@ -241,7 +241,7 @@ namespace footprinttobin {
 #ifdef AREAPERIL_TYPE_UNSIGNED_LONG_LONG
 					fprintf(stderr, "FATAL: Error (%d): areaperil_id %llu data is not contiguous for event_id %d \n", lineno, r.areaperil_id, event_id);
 #else
-					fprintf(stderr, "FATAL: Error (%d): areaperil_id %d data is not contiguous for event_id %d \n", lineno, r.areaperil_id, event_id);
+					fprintf(stderr, "FATAL: Error (%d): areaperil_id %u data is not contiguous for event_id %d \n", lineno, r.areaperil_id, event_id);
 #endif
 					exit(-1);
 				}

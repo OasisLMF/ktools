@@ -50,7 +50,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include "../include/oasis.h"
 
 int date_algorithm_ = 0;
-
+int granular_date_ = 0;
 
 void d(long long g, int &y, int &mm, int &dd)
 {
@@ -78,30 +78,61 @@ void no_occ_doit(bool skipheader)
 	}
 }
 
-void occ_doit(void)
+template<typename T>
+void occ_doit(T &q)
 {
-	printf("event_id,period_no,occ_year,occ_month,occ_day\n");
-	occurrence q;
+
 	int occ_year, occ_month, occ_day;
+	int occ_hour = 0;
+	int occ_minute = 0;
 	int i = fread(&q, sizeof(q), 1, stdin);
 	while (i != 0) {
-		switch (date_algorithm_) {
-		case 1:		
-			d(q.occ_date_id,occ_year, occ_month, occ_day);
-			break;
-		default:
-			printf("ERROR");
+		int days = q.occ_date_id / (1440 - 1439 * !granular_date_);
+		d(days, occ_year, occ_month, occ_day);
+		if (granular_date_) {
+			int minutes = q.occ_date_id % 1440;
+			occ_hour = minutes / 60;
+			occ_minute = minutes % 60;
+			printf("%d,%d,%d,%d,%d,%d,%d\n", q.event_id,
+			       q.period_no, occ_year, occ_month, occ_day,
+			       occ_hour, occ_minute);
+		} else {
+			printf("%d,%d,%d,%d,%d\n",  q.event_id, q.period_no,
+			       occ_year, occ_month, occ_day);
 		}
-
-		printf("%d, %d, %d, %d, %d\n",  q.event_id, q.period_no, occ_year, occ_month,occ_day);
 		i = fread(&q, sizeof(q), 1, stdin);
 	}
 
 }
+
+void occ_doit()
+{
+
+	printf("event_id,period_no,occ_year,occ_month,occ_day");
+	if (granular_date_) {
+		printf(",occ_hour,occ_minute\n");
+		occurrence_granular q;
+		occ_doit(q);
+	} else {
+		printf("\n");
+		occurrence q;
+		occ_doit(q);
+	}
+
+}
+
 void doit(bool skipheader)
 {
+
 	int no_of_periods=0;
-    fread(&date_algorithm_, sizeof(date_algorithm_), 1, stdin);
+	int date_opts;
+	fread(&date_opts, sizeof(date_opts), 1, stdin);
+	date_algorithm_ = date_opts & 1;
+	granular_date_ = date_opts >> 1;
+	if (granular_date_ && !date_algorithm_) {
+		fprintf(stderr, "FATAL: Unknown date algorithm\n");
+		exit(EXIT_FAILURE);
+	}
 	fread(&no_of_periods, sizeof(no_of_periods), 1, stdin);
 	if (date_algorithm_) occ_doit();
 	else no_occ_doit(skipheader);

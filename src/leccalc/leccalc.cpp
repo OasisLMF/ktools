@@ -99,25 +99,42 @@ namespace leccalc {
 	}
 
 
-	void loadoccurence(std::map<int, std::vector<int> >& event_to_periods, int& totalperiods)
+	template<typename T>
+	void loadoccurrence(std::map<int, std::vector<int> >& event_to_periods,
+			    T &occ, FILE * fin)
 	{
-		FILE* fin = fopen(OCCURRENCE_FILE, "rb");
-		if (fin == NULL) {
-			fprintf(stderr, "FATAL: Error reading file %s\n", OCCURRENCE_FILE);
-			exit(-1);
-		}
-		int date_algorithm;
-		occurrence occ;
-		size_t i = fread(&date_algorithm, sizeof(date_algorithm), 1, fin);
-		i = fread(&totalperiods, sizeof(totalperiods), 1, fin);
-		i = fread(&occ, sizeof(occ), 1, fin);
+
+		size_t i = fread(&occ, sizeof(occ), 1, fin);
 		while (i != 0) {
 			event_to_periods[occ.event_id].push_back(occ.period_no);
 			i = fread(&occ, sizeof(occ), 1, fin);
 		}
+	}
+
+
+	void loadoccurrence(std::map<int, std::vector<int> >& event_to_periods,
+			    int& totalperiods)
+	{
+		FILE* fin = fopen(OCCURRENCE_FILE, "rb");
+		if (fin == NULL) {
+			fprintf(stderr, "FATAL: Error reading file %s\n",
+				OCCURRENCE_FILE);
+			exit(-1);
+		}
+
+		int date_opts = 0;
+		size_t i = fread(&date_opts, sizeof(date_opts), 1, fin);
+		i = fread(&totalperiods, sizeof(totalperiods), 1, fin);
+		int granular_date = date_opts >> 1;
+		if (granular_date) {
+			occurrence_granular occ;
+			loadoccurrence(event_to_periods, occ, fin);
+		} else {
+			occurrence occ;
+			loadoccurrence(event_to_periods, occ, fin);
+		}
 
 		fclose(fin);
-
 	}
 
 
@@ -247,7 +264,7 @@ namespace leccalc {
 		}
 		std::map<int, std::vector<int> > event_to_periods;
 		int totalperiods;
-		loadoccurence(event_to_periods, totalperiods);
+		loadoccurrence(event_to_periods, totalperiods);
 		std::vector<std::map<outkey2, OutLosses>> out_loss(2);
 
 		std::vector<std::string> files;

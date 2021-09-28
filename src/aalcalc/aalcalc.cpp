@@ -105,19 +105,12 @@ void aalcalc::loadperiodtoweigthing()
 
 }
 
-void aalcalc::loadoccurrence()
+template<typename T>
+void aalcalc::loadoccurrence(T &occ, FILE * fin)
 {
 
-	int date_algorithm_ = 0;
-	FILE *fin = fopen(OCCURRENCE_FILE, "rb");
-	if (fin == NULL) {
-		fprintf(stderr, "FATAL: %s: cannot open %s\n", __func__, OCCURRENCE_FILE);
-		exit(-1);
-	}
-	std::set<int>  periods;
-	size_t i = fread(&date_algorithm_, sizeof(date_algorithm_), 1, fin);	// discard date algorithm
-	i = fread(&no_of_periods_, sizeof(no_of_periods_), 1, fin);
-	occurrence occ;
+	size_t i = fread(&no_of_periods_, sizeof(no_of_periods_), 1, fin);
+	std::set<int> periods;
 	i = fread(&occ, sizeof(occ), 1, fin);
 	while (i != 0) {
 		event_count_[occ.event_id] = event_count_[occ.event_id] + 1;
@@ -132,6 +125,30 @@ void aalcalc::loadoccurrence()
 		exit(-1);
 	}
 	fclose(fin);
+
+}
+
+void aalcalc::loadoccurrence()
+{
+
+	int date_opts;
+	int granular_date = 0;
+	FILE *fin = fopen(OCCURRENCE_FILE, "rb");
+	if (fin == NULL) {
+		fprintf(stderr, "FATAL: %s: cannot open %s\n", __func__, OCCURRENCE_FILE);
+		exit(-1);
+	}
+	std::set<int> periods;
+	size_t i = fread(&date_opts, sizeof(date_opts), 1, fin);
+	granular_date = date_opts >> 1;
+	if (granular_date) {
+		occurrence_granular occ;
+		loadoccurrence(occ, fin);
+	} else {
+		occurrence occ;
+		loadoccurrence(occ, fin);
+	}
+
 }
 
 void aalcalc::indexevents(const std::string& fullfilename, std::string& filename) {

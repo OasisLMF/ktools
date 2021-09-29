@@ -366,7 +366,7 @@ code {
     });
   </script>
 <p><img src="../img/banner.jpg" alt="alt text" title="banner"></p>
-<h1 id="43-data-conversion-components-a-id%22dataconversioncomponents%22a">4.3 Data conversion components <a id="dataconversioncomponents"></a></h1>
+<h1 id="44-data-conversion-components-a-id%22dataconversioncomponents%22a">4.4 Data conversion components <a id="dataconversioncomponents"></a></h1>
 <p>The following components convert input data in csv format to the binary format required by the calculation components in the reference model;</p>
 <p><strong>Static data</strong></p>
 <ul>
@@ -1722,6 +1722,7 @@ $ fmprofiletocsv -S &lt; fm_profile_step.bin &gt; fm_profile_step.csv
 <p>The occurrence file also includes date fields.</p>
 <ul>
 <li>occ_year, occ_month, occ_day. These are all integers representing occurrence year, month and day.</li>
+<li>occ_hour, occ_monute. These are optional and are all integers representing occurrence hour and minute.</li>
 </ul>
 <h5 id="file-format">File format</h5>
 <p>The csv file should contain the following fields and include a header row.</p>
@@ -1774,9 +1775,41 @@ $ fmprofiletocsv -S &lt; fm_profile_step.bin &gt; fm_profile_step.csv
 </tbody>
 </table>
 <p>The occurrence year in this example is a scenario numbered year, which cannot be expressed as a real date in a standard calendar.</p>
+<p>In addition, the following fields are optional and should comprise the sixth and seventh column respectively:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Name</th>
+<th>Type</th>
+<th>Bytes</th>
+<th style="text-align:left">Description</th>
+<th style="text-align:right">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">occ_hour</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align:left">The hour of the event occurrence</td>
+<td style="text-align:right">13</td>
+</tr>
+<tr>
+<td style="text-align:left">occ_minute</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align:left">The minute of the event occurrence</td>
+<td style="text-align:right">52</td>
+</tr>
+</tbody>
+</table>
+<p>The date fields are converted to a single number through an algorithm for efficient storage in the binary file. The data type for this field is either an integer when the optional date fields are not included or a long long integer when the these date fields are included. This should not be confused with the deprecated occ_date_id field.</p>
 <h5 id="occurrencetobin">occurrencetobin</h5>
 <p>A required parameter is -P, the total number of periods of event occurrences. The total number of periods is held in the header of the binary file and used in output calculations.</p>
 <pre class="hljs"><code><div>$ occurrencetobin -P10000 &lt; occurrence.csv &gt; occurrence.bin
+</div></code></pre>
+<p>If it is desirable to include the occ_hour and occ_minute fields in the binary file, the -H argument should be given. A flag to signify the presence of these fields is set in the header of the binary file, which is read by other kiools components. If these fields do not exist in the csv file, both are assigned the value of 0 when written to the binary file.</p>
+<pre class="hljs"><code><div>$ occurrencetobin -P10000 -H &lt; occurrence.csv &gt; occurrence.bin
 </div></code></pre>
 <h5 id="occurrencetocsv">occurrencetocsv</h5>
 <pre class="hljs"><code><div>$ occurrencetocsv &lt; occurrence.bin &gt; occurrence.csv
@@ -1864,7 +1897,7 @@ $ fmprofiletocsv -S &lt; fm_profile_step.bin &gt; fm_profile_step.csv
 <pre class="hljs"><code><div>$ periodstocsv &lt; periods.bin &gt; periods.csv
 </div></code></pre>
 <p><a href="#dataconversioncomponents">Return to top</a></p>
-<p><a href="StreamConversionComponents.md">Go to 4.4 Stream conversion components section</a></p>
+<p><a href="StreamConversionComponents.md">Go to 4.5 Stream conversion components section</a></p>
 <p><a href="Contents.md">Back to Contents</a></p>
 
 </body>

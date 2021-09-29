@@ -65,7 +65,7 @@ namespace footprinttocsv {
 #ifdef AREAPERIL_TYPE_UNSIGNED_LONG_LONG
 			printf("%d, %llu, %d, %.10e\n", event_id, row.areaperil_id, row.intensity_bin_id, row.probability);
 #else
-			printf("%d, %d, %d, %.10e\n", event_id, row.areaperil_id, row.intensity_bin_id, row.probability);
+			printf("%d, %u, %d, %.10e\n", event_id, row.areaperil_id, row.intensity_bin_id, row.probability);
 #endif
 			i += sizeof(row);
 		}
@@ -97,7 +97,7 @@ namespace footprinttocsv {
 #ifdef AREAPERIL_TYPE_UNSIGNED_LONG_LONG
 			printf("%d, %llu, %d, %.10e\n", event_id, row->areaperil_id, row->intensity_bin_id, row->probability);
 #else
-			printf("%d, %d, %d, %.10e\n", event_id, row->areaperil_id, row->intensity_bin_id, row->probability);
+			printf("%d, %u, %d, %.10e\n", event_id, row->areaperil_id, row->intensity_bin_id, row->probability);
 #endif
 			row++;
 			i += sizeof(EventRow);

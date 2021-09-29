@@ -60,7 +60,7 @@ void doit(bool skipheader)
 #ifdef AREAPERIL_TYPE_UNSIGNED_LONG_LONG
 		printf("%d, %d, %llu, %d, %d\n", q.id, q.coverage_id, q.areaperil_id, q.vulnerability_id, q.group_id);
 #else
-		printf("%d, %d, %d, %d, %d\n", q.id, q.coverage_id, q.areaperil_id, q.vulnerability_id, q.group_id);
+		printf("%d, %d, %u, %d, %d\n", q.id, q.coverage_id, q.areaperil_id, q.vulnerability_id, q.group_id);
 #endif // 		
 		i = fread(&q, sizeof(q), 1, stdin);
 	}

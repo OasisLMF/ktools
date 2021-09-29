@@ -51,6 +51,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 int date_algorithm_ = 0;
 int number_of_periods_ = 0;
+int granular_date_ = 0;
 
 // return number of years since epoch date
 int g(int y, int m, int d)
@@ -104,51 +105,81 @@ void no_occ_doit()
 		lineno++;
 	}
 }
-void occ_doit()
+
+template<typename T>
+void occ_doit(T &p)
 {
 
-	occurrence p;
 	char line[4096];
 	int lineno = 0;
 
 	fgets(line, sizeof(line), stdin);
 	lineno++;
-    while (fgets(line, sizeof(line), stdin) != 0)
-    {
+	while (fgets(line, sizeof(line), stdin) != 0)
+	{
 		int occ_year;
 		int occ_month;
-		int occ_day;		
+		int occ_day;
+		int occ_hour;
+		int occ_minute;
 		int occ_yearx;
 		int occ_monthx;
 		int occ_dayx;
-		if (sscanf(line, "%d,%d,%d,%d,%d", &p.event_id,&p.period_no,&occ_year,&occ_month,&occ_day) != 5){
-           fprintf(stderr, "FATAL: Invalid data in line %d:\n%s", lineno, line);
-           return;
-       }else
-       {
+		if (sscanf(line, "%d,%d,%d,%d,%d,%d,%d", &p.event_id,
+			   &p.period_no, &occ_year, &occ_month, &occ_day,
+			   &occ_hour, &occ_minute) != 7) {
+			if (sscanf(line, "%d,%d,%d,%d,%d", &p.event_id,
+				   &p.period_no, &occ_year, &occ_month,
+				   &occ_day) != 5) {
+				fprintf(stderr,
+					"FATAL: Invalid data in line %d:\n%s",
+					lineno, line);
+					return;
+			} else {
+				occ_hour = 0;
+				occ_minute = 0;
+			}
+		}
+
        		if (number_of_periods_ < p.period_no) {
-       			fprintf(stderr,"FATAL: Period number exceeds maximum supplied\n");
+       			fprintf(stderr,
+				"FATAL: Period number exceeds maximum supplied\n");
        			exit(EXIT_FAILURE);
        		}
-		   switch (date_algorithm_) {
-			case 1:
-				p.occ_date_id = g(occ_year, occ_month, occ_day);
-				break;
-		   }
 
-		   d(p.occ_date_id, occ_yearx, occ_monthx, occ_dayx);
-		   if (occ_yearx != occ_year) {
-			   std::cerr << "FATAL: We have an error";
-		   }
-           fwrite(&p, sizeof(p), 1, stdout);
-       }
-       lineno++;
-    }
+		p.occ_date_id = g(occ_year, occ_month, occ_day);
+
+		d(p.occ_date_id, occ_yearx, occ_monthx, occ_dayx);
+		if (occ_yearx != occ_year) {
+			std::cerr << "FATAL: We have an error";
+		}
+		// Convert to minutes if applicable
+		// 24 hours per day * 60 minutes per hour = 1440 minutes
+		p.occ_date_id *= (1440 / (1440 - 1439 * granular_date_));
+		p.occ_date_id += (60 * occ_hour + occ_minute);
+
+		fwrite(&p, sizeof(p), 1, stdout);
+	}
+	lineno++;
+}
+
+void occ_doit()
+{
+
+	if (granular_date_) {
+		occurrence_granular p;
+		occ_doit(p);
+	} else {
+		occurrence p;
+		occ_doit(p);
+	}
 
 }
+
 void doit()
-{		
-	fwrite(&date_algorithm_, sizeof(date_algorithm_), 1, stdout);
+{
+	int date_opts = granular_date_ << 1 | date_algorithm_;
+	fwrite(&date_opts, sizeof(date_opts), 1, stdout);
 	fwrite(&number_of_periods_, sizeof(number_of_periods_), 1, stdout);
 	if (date_algorithm_)  occ_doit();
 	else  no_occ_doit();
@@ -157,9 +188,11 @@ void doit()
 void help()
 {
 	fprintf(stderr,
-		"option 1: format is event_id, period_no,occ_year, occ_month, occ_day\n"
-		"option 2: format is event_id, period_no, occ_date_id\n" 		
+		"option 1: format is event_id, period_no, occ_year, occ_month, occ_day\n"
+		"option 2: format is event_id, period_no, occ_date_id\n"
+		"option 3: format is event_id, period_no, occ_year, occ_month, occ_day, occ_hour, occ_minute\n"
 		"-D use occ_date_id\n"
+		"-H use occ_hour and occ_minute fields (set to 0 if not in csv file)\n"
 		"-P number of periods\n"
 		"-v version\n"
 		"-h help\n"
@@ -170,14 +203,18 @@ int main(int argc, char* argv[])
 {
 	int opt;
 	date_algorithm_ = 1;
+	granular_date_ = 0;
 
-	while ((opt = getopt(argc, argv, "vhDP:")) != -1) {
+	while ((opt = getopt(argc, argv, "vhDHP:")) != -1) {
 		switch (opt) {
 		case 'D':
 		{			
 			date_algorithm_ = 0;
 		}
 		break;
+		case 'H':
+			granular_date_ = 1;
+			break;
 		case 'P':
 			number_of_periods_ = atoi(optarg);
 			break;
@@ -196,6 +233,10 @@ int main(int argc, char* argv[])
 	initstreams();
 	if (number_of_periods_ == 0) {
 		fprintf(stderr, "FATAL: Number of periods not supplied\n");
+		exit(-1);
+	}
+	if (!date_algorithm_ && granular_date_) {
+		fprintf(stderr, "FATAL: occ_date_id not compatible with occ_hour and occ_minute fields\n");
 		exit(-1);
 	}
 	doit();

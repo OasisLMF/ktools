@@ -71,21 +71,12 @@ namespace eltcalc {
 		return (stype == summarycalc_id);
 	}
 
-	void GetEventRates()
+	template<typename T>
+	void GetEventRates(T &occ, FILE * fin)
 	{
-		FILE * fin = fopen(OCCURRENCE_FILE, "rb");
-		if (fin == NULL) {
-			fprintf(stderr, "FATAL: %s: Error opening file %s\n",
-				__func__, OCCURRENCE_FILE);
-			exit(EXIT_FAILURE);
-		}
-
-		int date_algorithm = 0;
-		int no_of_periods = 0;
-		occurrence occ;
 		int max_period_no = 0;
-		int i = fread(&date_algorithm, sizeof(date_algorithm), 1, fin);
-		i = fread(&no_of_periods, sizeof(no_of_periods), 1, fin);
+		int no_of_periods = 0;
+		size_t i = fread(&no_of_periods, sizeof(no_of_periods), 1, fin);
 		i = fread(&occ, sizeof(occ), 1, fin);
 		while (i != 0) {
 			event_rate_[occ.event_id] += 1 / (double)no_of_periods;
@@ -98,6 +89,27 @@ namespace eltcalc {
 		if (max_period_no > no_of_periods) {
 			fprintf(stderr, "FATAL: Maximum period number in occurrence file exceeds that in header.\n");
 			exit(EXIT_FAILURE);
+		}
+	}
+
+	void GetEventRates()
+	{
+		FILE * fin = fopen(OCCURRENCE_FILE, "rb");
+		if (fin == NULL) {
+			fprintf(stderr, "FATAL: %s: Error opening file %s\n",
+				__func__, OCCURRENCE_FILE);
+			exit(EXIT_FAILURE);
+		}
+
+		int date_opts = 0;
+		size_t i = fread(&date_opts, sizeof(date_opts), 1, fin);
+		int granular_date = date_opts >> 1;
+		if (granular_date) {
+			occurrence_granular occ;
+			GetEventRates(occ, fin);
+		} else {
+			occurrence occ;
+			GetEventRates(occ, fin);
 		}
 	}
 

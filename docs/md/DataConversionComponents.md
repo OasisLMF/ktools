@@ -702,6 +702,7 @@ The occurrence file is required for certain output components which, in the refe
 
 The occurrence file also includes date fields.  
 * occ_year, occ_month, occ_day. These are all integers representing occurrence year, month and day.
+* occ_hour, occ_monute. These are optional and are all integers representing occurrence hour and minute.
 
 
 ##### File format
@@ -717,6 +718,14 @@ The csv file should contain the following fields and include a header row.
 
 The occurrence year in this example is a scenario numbered year, which cannot be expressed as a real date in a standard calendar.
 
+In addition, the following fields are optional and should comprise the sixth and seventh column respectively:
+
+| Name              | Type   |  Bytes | Description                                                         | Example     |
+|:------------------|--------|--------| :-------------------------------------------------------------------|------------:|
+| occ_hour          | int    |    4   | The hour of the event occurrence                                    |   13        |
+| occ_minute        | int    |    4   | The minute of the event occurrence                                  |   52        |
+
+The date fields are converted to a single number through an algorithm for efficient storage in the binary file. The data type for this field is either an integer when the optional date fields are not included or a long long integer when the these date fields are included. This should not be confused with the deprecated occ_date_id field.
 
 ##### occurrencetobin
 A required parameter is -P, the total number of periods of event occurrences. The total number of periods is held in the header of the binary file and used in output calculations.
@@ -724,6 +733,11 @@ A required parameter is -P, the total number of periods of event occurrences. Th
 ```
 $ occurrencetobin -P10000 < occurrence.csv > occurrence.bin
 ```
+If it is desirable to include the occ_hour and occ_minute fields in the binary file, the -H argument should be given. A flag to signify the presence of these fields is set in the header of the binary file, which is read by other kiools components. If these fields do not exist in the csv file, both are assigned the value of 0 when written to the binary file.
+```
+$ occurrencetobin -P10000 -H < occurrence.csv > occurrence.bin
+```
+
 ##### occurrencetocsv
 ```
 $ occurrencetocsv < occurrence.bin > occurrence.csv

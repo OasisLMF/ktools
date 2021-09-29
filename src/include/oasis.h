@@ -202,6 +202,12 @@ struct occurrence {
 	int occ_date_id;		// occurrence year, month and day	
 };
 
+struct occurrence_granular {
+	int event_id;
+	int period_no;
+	long long occ_date_id;   // occurrence year, month, day, hour and minute
+};
+
 struct gulsummaryxref {
 	int coverage_id;
 	int summary_id;

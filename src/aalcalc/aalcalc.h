@@ -101,6 +101,8 @@ private:
 	bool skipheader_ = false;
 	bool ord_output_ = false;
 // private functions
+	template<typename T>
+	void loadoccurrence(T &occ, FILE * fin);
 	void loadoccurrence();
 	void indexevents(const std::string& fullfilename, std::string& filename);
 	void load_event_to_summary_index(const std::string& subfolder);

@@ -36,6 +36,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 */
 
 #include "../include/oasis.h"
+#include <algorithm>
 #include <iostream>
 #include <vector>
 #include <map>
@@ -64,6 +65,14 @@ struct period_occ_granular {
 	long long occ_date_id;
 };
 
+bool operator<(const sampleslevelRec &lhs, const sampleslevelRec &rhs) {
+	if (lhs.loss != rhs.loss) {
+		return lhs.loss < rhs.loss;
+	} else {
+		return lhs.sidx < rhs.sidx;
+	}
+}
+
 namespace pltcalc {
 	bool firstOutput = true;
 	std::map<int, std::vector<period_occ> > m_occ_legacy;
@@ -73,6 +82,7 @@ namespace pltcalc {
 	int no_of_periods_ = 0;
 	int samplesize_ = 0;
 	std::map<int, double> period_weights_;
+	std::map<float, interval> intervals_;
 	enum { MPLT = 0, SPLT, QPLT };
 
 	void d(long long g, int& y, int& mm, int& dd)
@@ -107,6 +117,31 @@ namespace pltcalc {
 		Periods p;
 		while (fread(&p, sizeof(Periods), 1, fin) != 0){
 			period_weights_[p.period_no] = p.weighting;
+		}
+
+		fclose(fin);
+
+	}
+
+	void getintervals()
+	{
+
+		FILE * fin = fopen(QUANTILE_FILE, "rb");
+		if (fin == NULL) {
+			fprintf(stderr, "FATAL: %s: Error opening file %s\n",
+				__func__, QUANTILE_FILE);
+			exit(EXIT_FAILURE);
+		}
+
+		float q;
+		size_t i = fread(&q, sizeof(q), 1, fin);
+		while (i != 0) {
+			interval idx;
+			float pos = (samplesize_ - 1) * q + 1;
+			idx.integer_part = (int)pos;
+			idx.fractional_part = pos - idx.integer_part;
+			intervals_[q] = idx;
+			i = fread(&q, sizeof(q), 1, fin);
 		}
 
 		fclose(fin);
@@ -261,7 +296,7 @@ namespace pltcalc {
 	{
 		if (outFile == nullptr) return;
 
-		vp = m_occ[sh.event_id];   // HC
+		vp = m_occ[sh.event_id];
 		for (auto p : vp) {
 			int occ_year, occ_month, occ_day, occ_hour, occ_minute;
 			int days = p.occ_date_id / (1440 - 1439 * !granular_date_);
@@ -287,6 +322,58 @@ namespace pltcalc {
 					 impacted_exposure);
 			writeoutput(buffer, strLen, outFile);
 		}
+	}
+
+	template<typename moccT, typename periodT>
+	void outputrows_qplt(const summarySampleslevelHeader& sh,
+			     std::vector<sampleslevelRec>& vrec, FILE *outFile,
+			     moccT& m_occ, std::vector<periodT>& vp)
+	{
+		if (outFile == nullptr) return;
+
+		sampleslevelRec emptyRec = { 0, 0.0 };
+		vrec.resize(samplesize_, emptyRec);   // Pad with zero losses
+		std::sort(vrec.begin(), vrec.end());
+
+		std::map<float, OASIS_FLOAT> quantile_to_loss;
+		for (std::map<float, interval>::iterator it = intervals_.begin();
+		     it != intervals_.end(); ++it) {
+
+			int idx = it->second.integer_part;
+			OASIS_FLOAT loss = 0;
+			if (idx == samplesize_) {
+				loss = vrec[idx-1].loss;
+			} else {
+				loss = (vrec[idx].loss - vrec[idx-1].loss) * it->second.fractional_part + vrec[idx-1].loss;
+			}
+			quantile_to_loss[it->first] = loss;
+		}
+
+		vp = m_occ[sh.event_id];
+		for (auto p : vp) {
+			int occ_year, occ_month, occ_day, occ_hour, occ_minute;
+			int days = p.occ_date_id / (1440 - 1439 * !granular_date_);
+			d(days, occ_year, occ_month, occ_day);
+			int minutes = (p.occ_date_id % 1440) * granular_date_;
+			occ_hour = minutes / 60;
+			occ_minute = minutes % 60;
+
+			for (std::map<float, OASIS_FLOAT>::iterator it = quantile_to_loss.begin();
+			     it != quantile_to_loss.end(); ++it) {
+				char buffer[4096];
+				int strLen;
+				strLen = sprintf(buffer,
+						 "%d,%f,%d,%d,%d,%d,%d,%d,%d,%0.2f,%0.2f\n",
+						 p.period_no,
+						 period_weights_[p.period_no],
+						 sh.event_id, occ_year,
+						 occ_month, occ_day, occ_hour,
+						 occ_minute, sh.summary_id,
+						 it->first, it->second);
+				writeoutput(buffer, strLen, outFile);
+			}
+		}
+
 	}
 
 	template<typename outrecT, typename moccT, typename periodT>
@@ -355,13 +442,11 @@ namespace pltcalc {
 
 	template<typename T, typename moccT, typename periodT>
 	inline void read_input(void (*OutputData)(const T&, const int, FILE*),
-			       FILE * outFile, FILE * outFile_splt,
+			       FILE * outFile, FILE ** fout,
 			       moccT &m_occ, periodT &vp)
 	{
 		int summary_set = 0;
-		size_t i = fread(&samplesize_, sizeof(samplesize_), 1, stdin);
-		if (i != 0) i = fread(&summary_set, sizeof(summary_set), 1,
-				      stdin);
+		size_t i = fread(&summary_set, sizeof(summary_set), 1, stdin);
 		std::vector<sampleslevelRec> vrec;
 		summarySampleslevelHeader sh;
 		while (i != 0) {
@@ -372,10 +457,12 @@ namespace pltcalc {
 				if (i == 0 || sr.sidx == 0) {
 					dopltcalc(sh, vrec, OutputData, outFile,
 						  m_occ, vp);
+					outputrows_qplt(sh, vrec, fout[QPLT],
+							m_occ, vp);
 					vrec.clear();
 					break;
 				} else {
-					outputrows_splt(sh, sr, outFile_splt,
+					outputrows_splt(sh, sr, fout[SPLT],
 							m_occ, vp);
 				}
 
@@ -403,6 +490,9 @@ namespace pltcalc {
 			exit(-1);
 		}
 		stream_type = streamno_mask & summarycalcstream_type;
+		i = fread(&samplesize_, sizeof(samplesize_), 1, stdin);
+		if (fout[QPLT] != nullptr) getintervals();
+
 		void (*OutputDataGranular)(const outrec_granular&, const int,
 					   FILE*) = nullptr;
 		void (*OutputDataLegacy)(const outrec&, const int,
@@ -423,6 +513,12 @@ namespace pltcalc {
 						"Year,Month,Day,Hour,Minute,"
 						"SummaryId,SampleId,Loss,"
 						"ImpactedExposure\n");
+				}
+				if (fout[QPLT] != nullptr) {
+					fprintf(fout[QPLT],
+						"Period,PeriodWeight,EventId,"
+						"Year,Month,Day,Hour,Minute,"
+						"SummaryId,Quantile,Loss\n");
 				}
 			}
 			if (granular_date_) {
@@ -462,13 +558,13 @@ namespace pltcalc {
 		if (stream_type == 1) {
 			if (granular_date_) {
 				std::vector<period_occ_granular> vp_granular;
-				read_input(OutputDataGranular, outFile,
-					   fout[SPLT], m_occ_granular, vp_granular);
+				read_input(OutputDataGranular, outFile, fout,
+					   m_occ_granular, vp_granular);
 			} else {
 
 				std::vector<period_occ> vp_legacy;
-				read_input(OutputDataLegacy, outFile,
-					   fout[SPLT], m_occ_legacy, vp_legacy);
+				read_input(OutputDataLegacy, outFile, fout,
+					   m_occ_legacy, vp_legacy);
 			}
 		}
 	}

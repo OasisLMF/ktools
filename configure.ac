@@ -127,6 +127,8 @@ AC_CONFIG_FILES([
 		 src/fmprogrammetobin/Makefile
 		 src/fmprogrammetocsv/Makefile
                  src/fmtocsv/Makefile
+		 src/quantiletocsv/Makefile
+		 src/quantiletobin/Makefile
                  src/randtocsv/Makefile
                  src/randtobin/Makefile
                  src/evetocsv/Makefile

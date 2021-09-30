@@ -346,6 +346,11 @@ struct Ensemble
 	int ensemble_id;
 };
 
+struct interval {
+	int integer_part;
+	float fractional_part;
+};
+
 #pragma pack(pop)
 
 
@@ -432,6 +437,7 @@ inline  void logprintf(const std::string &program_name,const std::string &msgtyp
 #define OCCURRENCE_FILE "input/occurrence.bin"
 #define PERIODS_FILE "input/periods.bin"		// period to weighting mapping
 #define ENSEMBLE_FILE "input/ensemble.bin"
+#define QUANTILE_FILE "input/quantile.bin"
 
 #define DAMAGE_BIN_DICT_FILE "static/damage_bin_dict.bin"
 #define DAMAGE_CDF_BIN_FILE "static/damage_cdf.bin"

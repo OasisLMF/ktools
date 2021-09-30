@@ -84,6 +84,7 @@ void help()
 {
 	fprintf(stderr,
 	"-M [filename] output Moment Period Loss Table (MPLT)\n"
+	"-Q [filename] output Quantile Period Loss Table (QPLT)\n"
 	"-S [filename] output Sample Period Loss Table (SPLT)\n"
 	"-h help\n"
 	"-v version\n"
@@ -101,7 +102,7 @@ int main(int argc, char *argv[])
 	bool skipHeader = false;
 	bool ordOutput = false;
 	FILE * fout[] = { nullptr, nullptr, nullptr };
-	while ((opt = getopt(argc, argv, "svhM:S:")) != -1) {
+	while ((opt = getopt(argc, argv, "svhM:Q:S:")) != -1) {
 		switch (opt) {
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
@@ -110,6 +111,10 @@ int main(int argc, char *argv[])
 		case 'M':
 			ordOutput = true;
 			openpipe(MPLT, optarg, fout);
+			break;
+		case 'Q':
+			ordOutput = true;
+			openpipe(QPLT, optarg, fout);
 			break;
 		case 'S':
 			ordOutput = true;

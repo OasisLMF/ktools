@@ -34,6 +34,7 @@
 /*
 Author: Ben Matharu  email : ben.matharu@oasislmf.org
 */
+#include <algorithm>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -63,6 +64,7 @@ namespace eltcalc {
 	
 	bool firstOutput = true;
 	std::map<int, double> event_rate_;
+	std::map<float, interval> intervals_;
 	enum { MELT = 0, QELT };
 
 	bool isSummaryCalcStream(unsigned int stream_type)
@@ -111,6 +113,29 @@ namespace eltcalc {
 			occurrence occ;
 			GetEventRates(occ, fin);
 		}
+	}
+
+	void GetIntervals(int samplesize)
+	{
+		FILE * fin = fopen(QUANTILE_FILE, "rb");
+		if (fin == NULL) {
+			fprintf(stderr, "FATAL: %s: Error opening file %s\n",
+				__func__, QUANTILE_FILE);
+			exit(EXIT_FAILURE);
+		}
+
+		float q;
+		size_t i = fread(&q, sizeof(q), 1, fin);
+		while (i != 0) {
+			interval idx;
+			float pos = (samplesize - 1) * q + 1;
+			idx.integer_part = (int)pos;
+			idx.fractional_part = pos - idx.integer_part;
+			intervals_[q] = idx;
+			i = fread(&q, sizeof(q), 1, fin);
+		}
+
+		fclose(fin);
 	}
 
 	inline void WriteOutput(const char * buffer, int strLen, FILE * outFile)
@@ -169,6 +194,34 @@ namespace eltcalc {
 
 	}
 
+	void OutputQuantiles(const summarySampleslevelHeader& sh,
+			     std::vector<OASIS_FLOAT>& losses_vec,
+			     FILE * outFile)
+	{
+
+		std::sort(losses_vec.begin(), losses_vec.end());
+
+		for (std::map<float, interval>::iterator it = intervals_.begin();
+		     it != intervals_.end(); ++it) {
+
+			int idx = it->second.integer_part;
+			OASIS_FLOAT loss = 0;
+			if (idx == losses_vec.size()) {
+				loss = losses_vec[idx-1];
+			} else {
+				loss = (losses_vec[idx] - losses_vec[idx-1]) * it->second.fractional_part + losses_vec[idx-1];
+			}
+
+			char buffer[4096];
+			int strLen;
+			strLen = sprintf(buffer, "%d,%d,%f,%f\n", sh.event_id,
+					 sh.summary_id, it->first, loss);
+			WriteOutput(buffer, strLen, outFile);
+
+		}
+
+	}
+
 	void doetloutput(int samplesize, bool skipHeader, bool ordOutput, FILE **fout)
 	{
 		OASIS_FLOAT sumloss = 0.0;
@@ -184,10 +237,9 @@ namespace eltcalc {
 				if (fout[MELT] != nullptr) {
 					fprintf(fout[MELT], "EventId,SummaryId,SampleType,EventRate,MeanLoss,SDLoss,FootprintExposure\n");
 				}
-				// TODO: Implement Quantile Event Loss Table
-			/*	if (fout[QELT] != nullptr) {
+				if (fout[QELT] != nullptr) {
 					fprintf(fout[QELT], "EventId,SummaryId,Quantile,Loss\n");
-				}*/
+				}
 			}
 			OutputData = &eltcalc::OutputRowsORD;
 			outFile = fout[MELT];
@@ -199,6 +251,10 @@ namespace eltcalc {
 			outFile = stdout;
 		}
 
+		// Losses for calculating quantiles
+		std::vector<OASIS_FLOAT> losses_vec;
+		if (fout[QELT] != nullptr) losses_vec.resize(samplesize, 0);
+
 		summarySampleslevelHeader sh;
 		size_t i = fread(&sh, sizeof(sh), 1, stdin);
 		while (i != 0) {
@@ -208,6 +264,7 @@ namespace eltcalc {
 				if (sr.sidx > 0) {
 					sumloss += sr.loss;
 					sumlosssqr += (sr.loss * sr.loss);
+					if (fout[QELT] != nullptr) losses_vec[sr.sidx-1] = sr.loss;
 				}
 				if (sr.sidx == -1) analytical_mean = sr.loss;
 				i = fread(&sr, sizeof(sr), 1, stdin);
@@ -235,7 +292,13 @@ namespace eltcalc {
 					std::this_thread::sleep_for(std::chrono::milliseconds(PIPE_DELAY)); // used to stop possible race condition with kat
 					firstOutput = false;
 				}
-				if (samplesize) OutputData(sh, 2, sample_mean, sd, outFile);
+				if (samplesize) {
+					OutputData(sh, 2, sample_mean, sd, outFile);
+					if (fout[QELT] != nullptr) {
+						OutputQuantiles(sh, losses_vec, fout[QELT]);
+						std::fill(losses_vec.begin(), losses_vec.end(), 0);
+					}
+				}
 			}
 
 
@@ -253,12 +316,19 @@ namespace eltcalc {
 		unsigned int stream_type = 0;
 		size_t i = fread(&stream_type, sizeof(stream_type), 1, stdin);
 
-		if (ordOutput) GetEventRates();
+		if (ordOutput) {
+			if (fout[MELT] != nullptr) GetEventRates();
+		}
 
 		if (isSummaryCalcStream(stream_type) == true) {
 			unsigned int samplesize;
 			unsigned int summaryset_id;
 			i = fread(&samplesize, sizeof(samplesize), 1, stdin);
+
+			if (ordOutput && fout[QELT] != nullptr) {
+				GetIntervals(samplesize);
+			}
+
 			if (i == 1) i = fread(&summaryset_id, sizeof(summaryset_id), 1, stdin);
 			if (i == 1) {
 				doetloutput(samplesize, skipHeader, ordOutput, fout);

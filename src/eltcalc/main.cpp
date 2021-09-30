@@ -96,6 +96,7 @@ void help()
 {
 	fprintf(stderr,
 		"-M [filename] output Moment Event Loss Table (MELT)\n"
+		"-Q [filename] output Quantile Event Loss Table (QELT)\n"
 		"-v version\n"
 		"-s skip header\n"
 		"-h help\n"
@@ -113,7 +114,7 @@ int main(int argc, char* argv[])
 	FILE * fout[] = { nullptr, nullptr };
 	int opt;
 	int processid = 0;
-	while ((opt = getopt(argc, argv, "vshP:M:")) != -1) {
+	while ((opt = getopt(argc, argv, "vshP:M:Q:")) != -1) {
 		switch (opt) {
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
@@ -122,6 +123,10 @@ int main(int argc, char* argv[])
 		case 'M':
 			ordOutput = true;
 			openpipe(MELT, optarg, fout);
+			break;
+		case 'Q':
+			ordOutput = true;
+			openpipe(QELT, optarg, fout);
 			break;
 		case 'P':
 			processid = atoi(optarg);

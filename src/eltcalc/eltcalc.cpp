@@ -60,11 +60,6 @@ Author: Ben Matharu  email : ben.matharu@oasislmf.org
 
 using namespace std;
 
-struct interval {
-	int integer_part;
-	float fractional_part;
-};
-
 namespace eltcalc {
 	
 	bool firstOutput = true;

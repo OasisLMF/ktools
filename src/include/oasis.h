@@ -346,6 +346,11 @@ struct Ensemble
 	int ensemble_id;
 };
 
+struct interval {
+	int integer_part;
+	float fractional_part;
+};
+
 #pragma pack(pop)
 
 

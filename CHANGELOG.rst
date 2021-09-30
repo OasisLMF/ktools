@@ -1,6 +1,14 @@
 Ktools Changelog
 ================
 
+`v3.7.0rc1`_
+ ---------
+* [#236](https://github.com/OasisLMF/ktools/pull/236) - Fix/235 redefine underlimit
+* [#226](https://github.com/OasisLMF/ktools/pull/237) - Inclusion of Hour and Minute fields in the occurrence file
+* [#238](https://github.com/OasisLMF/ktools/pull/238) - Add options to write Quantile Event Loss Table (QELT) with eltcalc and Quantile Period Loss Table (QPLT) with pltcalc
+* [#230](https://github.com/OasisLMF/ktools/pull/231) - Invalid conversions of unsigned int to signed int
+.. _`v3.7.0rc1`:  https://github.com/OasisLMF/ktools/compare/v3.6.4...v3.7.0rc1
+
 `v3.6.4`_
  ---------
 * [#227](https://github.com/OasisLMF/ktools/pull/228) - Redefine ImpactedExposure in Sample Event Loss Table (SELT)

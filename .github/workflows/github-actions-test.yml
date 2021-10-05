@@ -1,0 +1,8 @@
+name: compile-ktools
+on: [push]
+jobs:
+  osx-11-build:
+    runs-on: macos-11
+    steps:
+      - uses: actions/checkout@v2
+      - run:  ./jenkins/travis_osx_build.sh 

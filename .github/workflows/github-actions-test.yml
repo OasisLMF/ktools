@@ -47,7 +47,7 @@ jobs:
     - name: (MacOS) Build ktools arm64
       run: |
         BIN_TARGET=$(pwd)/arm64
-        make clean
+        #make clean
         ./autogen.sh
         ./configure --enable-osx --enable-osx-arm --enable-o3 --prefix=$BIN_TARGET
         make check

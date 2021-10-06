@@ -10,16 +10,6 @@ jobs:
         shell: bash
     steps:
     - uses: actions/checkout@v2
-
-#    - name: (Ubuntu) Install dependencies  
-#      run: |-
-#        sudo apt-get install --yes --no-install-recommends -V \
-#            build-essential \
-#            libtool \
-#            zlib1g-dev \
-#            autoconf \
-#            clang 
-
     - name: (MacOS) Install dependencies         
       run: |
         ln -s /usr/bin/shasum5.18 /usr/local/bin/sha1sum

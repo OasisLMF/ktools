@@ -69,7 +69,8 @@ AC_ARG_ENABLE([arm],
     AS_HELP_STRING([--enable-osx-arm], [Set target for ARM]))
 
 AS_IF([test "x$enable_osx_arm" = "xyes"], [
-	CXXFLAGSZ="-target arm64-apple-macos11"
+	#CXXFLAGSZ="-target arm64-apple-macos11"
+	CXXFLAGSZ="--target aarch64-apple-darwin"
 ],
 [
 	CXXFLAGSZ=""

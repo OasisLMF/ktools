@@ -45,5 +45,5 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: macos-binaires
-        path: $BIN_TARGET/Darwin_x86_64.tar.gz
+        path: Darwin_x86_64.tar.gz
         retention-days: 5

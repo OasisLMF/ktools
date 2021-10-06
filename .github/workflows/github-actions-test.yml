@@ -9,7 +9,7 @@ jobs:
       run:
         shell: bash
     steps:
-    - uses: actions/checkout@v2.3.4
+    - uses: actions/checkout@v2
 
 #    - name: (Ubuntu) Install dependencies  
 #      run: |-
@@ -30,10 +30,23 @@ jobs:
 
     - name: (MacOS) Build ktools 
       run: |
+        ln -s /usr/bin/shasum5.18 /usr/local/bin/sha1sum
         BIN_TARGET=$(pwd)
         TAR_TARGET='Darwin_x86_64.tar.gz'
         ./autogen.sh
         ./configure --enable-osx --enable-o3 --prefix=$BIN_TARGET
         make check
 
-        
+    - name: Create Tar 
+      run: |
+        make install
+        cd $BIN_TARGET/bin
+        tar -zcvf $BIN_TARGET/$TAR_TARGET ./
+        cd $BIN_TARGET
+
+    - name: 'Upload Ktool binaries'
+      uses: actions/upload-artifact@v2
+      with:
+        name: macos-binaires
+        path: $BIN_TARGET/Darwin_x86_64.tar.gz
+        retention-days: 5

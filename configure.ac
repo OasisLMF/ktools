@@ -33,13 +33,12 @@ dnl Enable static linking
 AC_ARG_ENABLE([static],
     AS_HELP_STRING([--enable-static], [Enable static link]))
 
-
 AS_IF([test "x$enable_static" = "xyes"], [
 	LDFLAGS=-static
 ])
 
 
-dnl Enable osx compatibility 
+dnl Enable static linking
 AC_ARG_ENABLE([osx],
     AS_HELP_STRING([--enable-osx], [Enable OSX build]))
 
@@ -64,21 +63,8 @@ AS_IF([test "x$enable_o3" = "xyes"], [
 ]
 )
 
-dnl Enable osx compatibility (M1 arm) 
-AC_ARG_ENABLE([arm],
-    AS_HELP_STRING([--enable-osx-arm], [Set target for ARM]))
 
-AS_IF([test "x$enable_osx_arm" = "xyes"], [
-	#CXXFLAGSZ="-target arm64-apple-macos11"
-	#CXXFLAGSZ="-target aarch64-apple-darwin"
-	CXXFLAGSZ="-arch aarch64"
-],
-[
-	CXXFLAGSZ=""
-]
-)
-
-:${CXXFLAGS="$CXXFLAGSX $CXXFLAGSY $CXXFLAGSZ"}
+:${CXXFLAGS="$CXXFLAGSX $CXXFLAGSY"}
 
 AM_CONDITIONAL(DEBUG, test x"$debug" = x"true")
 

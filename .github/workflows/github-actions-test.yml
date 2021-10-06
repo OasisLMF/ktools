@@ -32,7 +32,6 @@ jobs:
       run: |
         ln -s /usr/bin/shasum5.18 /usr/local/bin/sha1sum
         BIN_TARGET=$(pwd)
-        TAR_TARGET='Darwin_x86_64.tar.gz'
         ./autogen.sh
         ./configure --enable-osx --enable-o3 --prefix=$BIN_TARGET
         make check
@@ -40,9 +39,7 @@ jobs:
     - name: Create Tar 
       run: |
         make install
-        cd $BIN_TARGET/bin
-        tar -zcvf ../$TAR_TARGET ./
-        cd ..
+        tar -zcvf Darwin_x86_64.tar.gz ./bin
 
     - name: 'Upload Ktool binaries'
       uses: actions/upload-artifact@v2

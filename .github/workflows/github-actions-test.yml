@@ -22,28 +22,40 @@ jobs:
 
     - name: (MacOS) Install dependencies         
       run: |
+        ln -s /usr/bin/shasum5.18 /usr/local/bin/sha1sum
         brew install \
             autoconf \
             automake \
             libtool \
             zlib-ng
 
-    - name: (MacOS) Build ktools 
+    - name: (MacOS) Build ktools x86
       run: |
-        ln -s /usr/bin/shasum5.18 /usr/local/bin/sha1sum
-        BIN_TARGET=$(pwd)
+        BIN_TARGET=$(pwd)/x86
         ./autogen.sh
         ./configure --enable-osx --enable-o3 --prefix=$BIN_TARGET
         make check
-
-    - name: Create Tar 
-      run: |
         make install
-        tar -zcvf Darwin_x86_64.tar.gz ./bin
 
-    - name: 'Upload Ktool binaries'
+    - name: 'Upload Ktool binaries - x86'
       uses: actions/upload-artifact@v2
       with:
-        name: macos-binaires
-        path: Darwin_x86_64.tar.gz
+        name: Darwin_x86_64
+        path: x86/bin
+        retention-days: 5
+
+    - name: (MacOS) Build ktools arm64
+      run: |
+        BIN_TARGET=$(pwd)/arm64
+        make clean
+        ./autogen.sh
+        ./configure --enable-osx --enable-osx-arm --enable-o3 --prefix=$BIN_TARGET
+        make check
+        make install
+
+    - name: 'Upload Ktool binaries - arm64'
+      uses: actions/upload-artifact@v2
+      with:
+        name: Darwin_arm64
+        path: arm64/bin
         retention-days: 5

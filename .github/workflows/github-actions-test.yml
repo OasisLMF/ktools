@@ -41,8 +41,8 @@ jobs:
       run: |
         make install
         cd $BIN_TARGET/bin
-        tar -zcvf $BIN_TARGET/$TAR_TARGET ./
-        cd $BIN_TARGET
+        tar -zcvf ../$TAR_TARGET ./
+        cd ..
 
     - name: 'Upload Ktool binaries'
       uses: actions/upload-artifact@v2

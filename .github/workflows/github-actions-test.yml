@@ -25,7 +25,6 @@ jobs:
         brew install \
             autoconf \
             automake \
-            clang \
             libtool \
             zlib1g-dev
 

@@ -43,6 +43,8 @@ This section specifies the attributes and rules for the following list of Financ
 |deductible with attachment and share                                |   34       |
 |deductible % loss with min and/or max deductible and limit % loss   |   35       |
 |deductible with min and/or max deductible and limit % loss          |   36       |
+|% tiv trigger and % loss step payout with limit                     |   37       |
+|conditional coverage payouts based on prior step payouts            |   38       |
 
 |calcrule_id |d1|d2|d3|a1|l1|sh1|sh2|sh3|st|ts|te|ps|pe|l2|sc1|sc2|  
 |:-----------|--|--|--|--|--|---|---|---|--|--|--|--|--|--|---|--:|
@@ -83,6 +85,8 @@ This section specifies the attributes and rules for the following list of Financ
 |   34       |x |  |  |x |  |x  |   |   |  |  |  |  |  |  |   |   |
 |   35       |x |x |x |  |x |   |   |   |  |  |  |  |  |  |   |   |
 |   36       |x |x |x |  |x |   |   |   |  |  |  |  |  |  |   |   |
+|   37       |x |  |  |  |x |   |   |   |x |x |x |x |  |x |x  |x  |
+|   38       |  |  |  |  |  |   |   |   |x |x |x |  |  |x |x  |x  |
 
 The fields with an x are those which are required by the profile. The full names of the fields are as follows;
 
@@ -136,7 +140,7 @@ Loss adjustments due to minimum and maximum deductibles may lead to breaching or
 We introduce the following variables;
 
 * **over limit** is the sum of the amount by which limits are exceeded at the prior level calculation (positive measure)
-* **under limit** is the sum of the amount by which losses fall short of limits at the prior level calculation (positive measure)
+* **under limit** is the smaller of the effective deductible and sum of the amount by which losses fall short of limits at the prior level calculation (positive measure). It represents the amount by which the loss can be adjusted upwards due to the enforcement of a maximum deductible at the current level.
 * **loss delta** is the amount by which the loss would change due to the enforcement of a minimum or maximum ignoring prior level limits (positive for loss increase and negative for loss decrease). The loss is adjusted by an amount up to the loss delta depending on the values carried in the under and over limit variables
 
 ### Scenarios for under and over limit

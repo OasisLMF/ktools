@@ -289,10 +289,7 @@ void applycalcrule_stepped(const profile_rec_new& profile, LossRec& x, int layer
 				if (loss >= tstart) {
 					loss = (payout * x.loss) - deductible1; //calculate primary payout
 					if (loss < 0) loss = 0;
-					if (payout == 0) {
-						condloss = x.step_loss * scale2; //special case to calculate only the conditional coverage loss (extra expenses) based on full input loss where there is no primary payout
-					}
-					else condloss = loss * scale2; //calculate conditional payout based on primary coverage payout (extra expenses)
+					condloss = loss * scale2; //calculate conditional payout based on primary coverage payout (extra expenses)
 					if (condloss > limit2) condloss = limit2; //limit conditional payout
 					loss = loss + condloss; // main coverage + extra expense payout
 					loss = loss * (1 + scale1); // gross up for debris removal
@@ -304,10 +301,7 @@ void applycalcrule_stepped(const profile_rec_new& profile, LossRec& x, int layer
 					if (loss >= tstart) {
 						loss = (payout * x.loss) - deductible1; //calculate primary payout
 						if (loss < 0) loss = 0;
-						if (payout == 0) {
-							condloss = x.step_loss * scale2; //special case to calculate only the conditional coverage loss (extra expenses) based on the step loss brought forward.
-						}
-						else condloss = loss * scale2; //calculate conditional payout (extra expenses)
+						condloss = loss * scale2; //calculate conditional payout (extra expenses)
 						if (condloss > limit2) condloss = limit2; //limit conditional payout
 						loss = loss + condloss; // main coverage + extra expense payout
 						loss = loss * (1 + scale1); // gross up for debris removal

@@ -1,6 +1,12 @@
 Ktools Changelog
 ================
 
+`v3.7.1rc1`_
+ ---------
+* [#239](https://github.com/OasisLMF/ktools/pull/244) - Build error on macOS with clang version 13.0.0 due to VERSION file
+* [#243](https://github.com/OasisLMF/ktools/pull/245) - Add MaxImpactedExposure and MeanImpactedExposure Fields to Moment Event Loss Table (MELT) and Moment Period Loss Table (MPLT)
+.. _`v3.7.1rc1`:  https://github.com/OasisLMF/ktools/compare/v3.7.0...v3.7.1rc1
+
 `v3.7.0`_
  ---------
 * [#236](https://github.com/OasisLMF/ktools/pull/236) - Fix/235 redefine underlimit

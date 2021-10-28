@@ -197,6 +197,8 @@ namespace pltcalc {
 		OASIS_FLOAT mean;
 		OASIS_FLOAT standard_deviation;
 		OASIS_FLOAT exp_value;
+		OASIS_FLOAT max_impact_exp;
+		OASIS_FLOAT mean_impact_exp;
 		int occ_date_id;
 	};
 
@@ -208,6 +210,8 @@ namespace pltcalc {
 		OASIS_FLOAT mean;
 		OASIS_FLOAT standard_deviation;
 		OASIS_FLOAT exp_value;
+		OASIS_FLOAT max_impact_exp;
+		OASIS_FLOAT mean_impact_exp;
 		long long occ_date_id;
 	};
 
@@ -281,18 +285,20 @@ namespace pltcalc {
 		char buffer[4096];
 		int strLen;
 		strLen = sprintf(buffer,
-				 "%d,%f,%d,%d,%d,%d,%d,%d,%d,%d,%0.2f,%0.2f,%0.2f\n",
+				 "%d,%f,%d,%d,%d,%d,%d,%d,%d,%d,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f\n",
 				 o.period_no, period_weights_[o.period_no],
 				 o.event_id, occ_year, occ_month, occ_day,
 				 occ_hour, occ_minute, o.summary_id, type,
-				 o.mean, o.standard_deviation, o.exp_value);
+				 o.mean, o.standard_deviation, o.exp_value,
+				 o.mean_impact_exp, o.max_impact_exp);
 		writeoutput(buffer, strLen, outFile);
 	}
 
 	template<typename moccT, typename periodT>
 	void outputrows_splt(const summarySampleslevelHeader& sh,
 			     const sampleslevelRec &sr, FILE * outFile,
-			     moccT &m_occ, std::vector<periodT> &vp)
+			     moccT &m_occ, std::vector<periodT> &vp,
+			     const OASIS_FLOAT impacted_exposure)
 	{
 		if (outFile == nullptr) return;
 
@@ -305,10 +311,10 @@ namespace pltcalc {
 			occ_hour = minutes / 60;
 			occ_minute = minutes % 60;
 
-			OASIS_FLOAT impacted_exposure = 0;
+/*			OASIS_FLOAT impacted_exposure = 0;
 			if (sr.loss > 0) {
 				impacted_exposure = sh.expval;
-			}
+			}*/
 
 			char buffer[4096];
 			int strLen;
@@ -387,6 +393,8 @@ namespace pltcalc {
 		o.event_id = sh.event_id;
 		o.summary_id = sh.summary_id;
 		o.exp_value = sh.expval;
+		o.max_impact_exp = sh.expval;
+		o.mean_impact_exp = sh.expval;
 		o.mean = mean_val;
 		o.standard_deviation = 0;
 		for (auto p : vp) {
@@ -400,7 +408,9 @@ namespace pltcalc {
 	void dopltcalc(const summarySampleslevelHeader& sh,
 		       const std::vector<sampleslevelRec>& vrec,
 		       void (*OutputData)(const outrecT&, const int, FILE*),
-		       FILE * outFile, moccT &m_occ, std::vector<periodT> &vp)
+		       FILE * outFile, moccT &m_occ, std::vector<periodT> &vp,
+		       const OASIS_FLOAT max_impacted_exposure,
+		       const OASIS_FLOAT mean_impacted_exposure)
 	{
 		vp = m_occ[sh.event_id];
 		bool hasrec = false;
@@ -409,6 +419,8 @@ namespace pltcalc {
 		o.event_id = sh.event_id;
 		o.summary_id = sh.summary_id;
 		o.exp_value = sh.expval;
+		o.max_impact_exp = max_impacted_exposure;
+		o.mean_impact_exp = mean_impacted_exposure;
 		o.mean = 0;
 		o.standard_deviation = 0;
 
@@ -450,20 +462,27 @@ namespace pltcalc {
 		std::vector<sampleslevelRec> vrec;
 		summarySampleslevelHeader sh;
 		while (i != 0) {
+			OASIS_FLOAT max_impacted_exposure = 0;
+			OASIS_FLOAT mean_impacted_exposure = 0;
 			i = fread(&sh, sizeof(sh), 1, stdin);
 			while (i != 0) {
+				OASIS_FLOAT impacted_exposure = 0;
 				sampleslevelRec sr;
 				i = fread(&sr, sizeof(sr), 1, stdin);
 				if (i == 0 || sr.sidx == 0) {
 					dopltcalc(sh, vrec, OutputData, outFile,
-						  m_occ, vp);
+						  m_occ, vp,
+						  max_impacted_exposure,
+						  mean_impacted_exposure);
 					outputrows_qplt(sh, vrec, fout[QPLT],
 							m_occ, vp);
 					vrec.clear();
 					break;
 				} else {
+					impacted_exposure = sh.expval * (sr.loss > 0);
 					outputrows_splt(sh, sr, fout[SPLT],
-							m_occ, vp);
+							m_occ, vp,
+							impacted_exposure);
 				}
 
 				if (sr.sidx == -1) {
@@ -471,6 +490,10 @@ namespace pltcalc {
 						  outFile, m_occ, vp);
 				} else {
 					vrec.push_back(sr);
+					mean_impacted_exposure += impacted_exposure / samplesize_;
+					if (impacted_exposure > max_impacted_exposure) {
+						max_impacted_exposure = impacted_exposure;
+					}
 				}
 			}
 		}
@@ -505,7 +528,9 @@ namespace pltcalc {
 						"Period,PeriodWeight,EventId,"
 						"Year,Month,Day,Hour,Minute,"
 						"SummaryId,SampleType,MeanLoss,"
-						"SDLoss,FootprintExposure\n");
+						"SDLoss,FootprintExposure,"
+						"MeanImpactedExposure,"
+						"MaxImpactedExposure\n");
 				}
 				if (fout[SPLT] != nullptr) {
 					fprintf(fout[SPLT],

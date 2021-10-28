@@ -167,7 +167,9 @@ namespace eltcalc {
 
 	void OutputRows(const summarySampleslevelHeader& sh, const int type,
 			const OASIS_FLOAT mean, const OASIS_FLOAT stdDev,
-			FILE * outFile)
+			FILE * outFile,
+			const OASIS_FLOAT mean_impacted_exposure,
+			const OASIS_FLOAT max_impacted_exposure)
 	{
 
 		char buffer[4096];
@@ -181,15 +183,19 @@ namespace eltcalc {
 
 	void OutputRowsORD(const summarySampleslevelHeader& sh, const int type,
 			   const OASIS_FLOAT mean, const OASIS_FLOAT stdDev,
-			   FILE * outFile)
+			   FILE * outFile,
+			   const OASIS_FLOAT mean_impacted_exposure,
+			   const OASIS_FLOAT max_impacted_exposure)
 	{
 
 		if (outFile == nullptr) return;
 		char buffer[4096];
 		int strLen;
-		strLen = sprintf(buffer, "%d,%d,%d,%f,%f,%f,%f\n", sh.event_id,
-				sh.summary_id, type, event_rate_[sh.event_id],
-				mean, stdDev, sh.expval);
+		strLen = sprintf(buffer, "%d,%d,%d,%f,%f,%f,%f,%f,%f\n",
+				sh.event_id, sh.summary_id, type,
+				event_rate_[sh.event_id], mean, stdDev,
+				sh.expval, mean_impacted_exposure,
+				max_impacted_exposure);
 		WriteOutput(buffer, strLen, outFile);
 
 	}
@@ -230,12 +236,13 @@ namespace eltcalc {
 		OASIS_FLOAT sd = 0;
 		OASIS_FLOAT sumlosssqr = 0.0;
 		void (*OutputData)(const summarySampleslevelHeader&, const int,
-				   const OASIS_FLOAT, const OASIS_FLOAT, FILE*);
+				   const OASIS_FLOAT, const OASIS_FLOAT, FILE*,
+				   const OASIS_FLOAT, const OASIS_FLOAT);
 		FILE * outFile = nullptr;
 		if (ordOutput) {
 			if (skipHeader == false) {
 				if (fout[MELT] != nullptr) {
-					fprintf(fout[MELT], "EventId,SummaryId,SampleType,EventRate,MeanLoss,SDLoss,FootprintExposure\n");
+					fprintf(fout[MELT], "EventId,SummaryId,SampleType,EventRate,MeanLoss,SDLoss,FootprintExposure,MeanImpactedExposure,MaxImpactedExposure\n");
 				}
 				if (fout[QELT] != nullptr) {
 					fprintf(fout[QELT], "EventId,SummaryId,Quantile,Loss\n");
@@ -258,6 +265,8 @@ namespace eltcalc {
 		summarySampleslevelHeader sh;
 		size_t i = fread(&sh, sizeof(sh), 1, stdin);
 		while (i != 0) {
+			OASIS_FLOAT mean_impacted_exposure = 0;
+			OASIS_FLOAT max_impacted_exposure = 0;
 			sampleslevelRec sr;
 			i = fread(&sr, sizeof(sr), 1, stdin);
 			while (i != 0 && sr.sidx != 0) {
@@ -265,6 +274,12 @@ namespace eltcalc {
 					sumloss += sr.loss;
 					sumlosssqr += (sr.loss * sr.loss);
 					if (fout[QELT] != nullptr) losses_vec[sr.sidx-1] = sr.loss;
+					if (sr.loss > 0) {
+						mean_impacted_exposure += sh.expval;
+						if (sh.expval > max_impacted_exposure) {
+							max_impacted_exposure = sh.expval;
+						}
+					}
 				}
 				if (sr.sidx == -1) analytical_mean = sr.loss;
 				i = fread(&sr, sizeof(sr), 1, stdin);
@@ -275,6 +290,7 @@ namespace eltcalc {
 				OASIS_FLOAT x = sd / sumlosssqr;
 				if (x < 0.0000001) sd = 0;   // fix OASIS_FLOATing point precision problems caused by using large numbers
 				sd = sqrt(sd);
+				mean_impacted_exposure /= samplesize;
 			}
 			else {
 				if (samplesize == 0) {
@@ -287,13 +303,14 @@ namespace eltcalc {
 				}
 			}
 			if (sh.expval > 0) {   // only output rows with a non-zero exposure value
-				OutputData(sh, 1, analytical_mean, 0, outFile);
+				OutputData(sh, 1, analytical_mean, 0, outFile,
+					   sh.expval, sh.expval);
 				if (firstOutput == true) {
 					std::this_thread::sleep_for(std::chrono::milliseconds(PIPE_DELAY)); // used to stop possible race condition with kat
 					firstOutput = false;
 				}
 				if (samplesize) {
-					OutputData(sh, 2, sample_mean, sd, outFile);
+					OutputData(sh, 2, sample_mean, sd, outFile, mean_impacted_exposure, max_impacted_exposure);
 					if (fout[QELT] != nullptr) {
 						OutputQuantiles(sh, losses_vec, fout[QELT]);
 						std::fill(losses_vec.begin(), losses_vec.end(), 0);

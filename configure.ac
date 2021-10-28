@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.68])
-AC_INIT([ktools],  m4_esyscmd([tr -d '\n' < VERSION]), [support@oasislmf.org])
+AC_INIT([ktools],  m4_esyscmd([tr -d '\n' < VERSION.txt]), [support@oasislmf.org])
 #AM_INIT_AUTOMAKE([gnu])
 AM_INIT_AUTOMAKE([foreign subdir-objects])
 AC_CONFIG_MACRO_DIR([m4])

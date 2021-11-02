@@ -78,9 +78,9 @@
 ######################################################################
 
 if [ -d ".git" ]; then
-	(cat VERSION.in  && git log -1 --pretty=format:%cdt) |  tr '\n' 'A' | sed 's/A/ - git update: /' > VERSION
+	(cat VERSION.in  && git log -1 --pretty=format:%cdt) |  tr '\n' 'A' | sed 's/A/ - git update: /' > VERSION.txt
 else
-    cat VERSION.in  > VERSION
+    cat VERSION.in  > VERSION.txt
 fi
 
 uname -a

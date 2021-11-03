@@ -37,7 +37,7 @@ The Quantile report requires the quantile.bin file
 ##### Calculation
 
 ###### MELT
-For each summary_id and event_id, the sample mean and standard deviation is calculated from the sampled losses in the summarycalc stream and output to file.  The analytical mean is also output as a seperate record, differentiated by a 'SampleType' field. Variations of the exposure value are also output (see below for details).
+For each SummaryId and EventId, the sample mean and standard deviation is calculated from the sampled losses in the summarycalc stream and output to file.  The analytical mean is also output as a seperate record, differentiated by a 'SampleType' field. Variations of the exposure value are also output (see below for details).
 
 ###### QELT
 For each SummaryId and EventId, this report provides the probability and the corresponding loss quantile computed from the samples.  The list of probabilities is provided as input in the quantile.bin file.

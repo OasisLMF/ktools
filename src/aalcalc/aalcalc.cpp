@@ -469,7 +469,7 @@ void aalcalc::outputresultscsv_new(std::vector<aal_rec>& vec_aal, int periods,in
 					  mean, sd_dev);
 			if (ord_output_ == false) {
 				strLen += snprintf(buffer+strLen,
-						   bufferSize-strLen, "%f",
+						   bufferSize-strLen, ",%f",
 						   v_iter->max_exposure_value);
 			}
 			// If relevant use ensemble ID = 0 for calculations

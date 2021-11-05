@@ -464,10 +464,14 @@ void aalcalc::outputresultscsv_new(std::vector<aal_rec>& vec_aal, int periods,in
 			const int bufferSize = 4096;
 			char buffer[bufferSize];
 			int strLen;
-			strLen = snprintf(buffer, bufferSize, "%d,%d,%f,%f,%f",
+			strLen = snprintf(buffer, bufferSize, "%d,%d,%f,%f",
 					  v_iter->summary_id, v_iter->type,
-					  mean, sd_dev,
-					  v_iter->max_exposure_value);
+					  mean, sd_dev);
+			if (ord_output_ == false) {
+				strLen += snprintf(buffer+strLen,
+						   bufferSize-strLen, ",%f",
+						   v_iter->max_exposure_value);
+			}
 			// If relevant use ensemble ID = 0 for calculations
 			// across all ensembles
 			if (sidxtoensemble_.size() > 0)
@@ -482,7 +486,7 @@ void aalcalc::outputresultscsv_new()
 {
 	if (skipheader_ == false) {
 		if (ord_output_ == true) {
-			printf("SummaryID,SampleType,MeanLoss,SDLoss,SourceExposure");
+			printf("SummaryID,SampleType,MeanLoss,SDLoss");
 		} else {
 			printf("summary_id,type,mean,standard_deviation,exposure_value");
 			if (sidxtoensemble_.size() > 0) printf(",ensemble_id");

@@ -175,7 +175,6 @@ AC_CONFIG_FILES([
 		 src/validatevulnerability/Makefile
 		 src/summarycalctobin/Makefile
 		 src/summaryindex/Makefile
-		 src/kunit/Makefile
                  ])
 AC_OUTPUT
 

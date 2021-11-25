@@ -1,6 +1,13 @@
 Ktools Changelog
 ================
 
+`v3.7.2`_
+ ---------
+* [#247](https://github.com/OasisLMF/ktools/pull/248) - exposure value in ORD ALT report
+* [#253](https://github.com/OasisLMF/ktools/pull/253) - Bug/fix osx arm make catch del kunit
+* [#246](https://github.com/OasisLMF/ktools/pull/246) - Feature/927 step calcrules
+.. _`v3.7.2`:  https://github.com/OasisLMF/ktools/compare/v3.7.1...v3.7.2
+
 `v3.7.1`_
  ---------
 * [#239](https://github.com/OasisLMF/ktools/pull/244) - Build error on macOS with clang version 13.0.0 due to VERSION file

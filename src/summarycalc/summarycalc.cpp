@@ -422,8 +422,8 @@ OASIS_FLOAT summarycalc::add_losses(const OASIS_FLOAT loss,
 OASIS_FLOAT summarycalc::calculate_chanceofloss(const OASIS_FLOAT loss,
 						const OASIS_FLOAT gul)
 {
-	if (loss == 0.0) return gul;
-	else return loss * gul;
+	if (loss == 0.0) return 1 - (1 - gul);
+	else return loss * (1 - gul);
 }
 
 

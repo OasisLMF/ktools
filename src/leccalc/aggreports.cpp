@@ -360,7 +360,7 @@ inline void aggreports::DoSetUp(int &eptype, int &eptype_tvar, int &epcalc,
   if (eptype == AEP) eptype_tvar = AEPTVAR;
   else if (eptype == OEP) eptype_tvar = OEPTVAR;
 
-  if (epcalc == MEANDR && eptHeader_ == true && skipheader_ == false) {
+    if (eptHeader_ == true && skipheader_ == false) {
     std::string fileHeader;
     if (ordFlag_) {
       fileHeader = "SummaryID,EPCalc,EPType,ReturnPeriod,Loss\n";
@@ -372,7 +372,9 @@ inline void aggreports::DoSetUp(int &eptype, int &eptype_tvar, int &epcalc,
     }
     for (std::vector<int>::const_iterator it = fileIDs.begin();
 	 it != fileIDs.end(); ++it) {
+      if (ordFlag_ == false && fileHeaders_[*it] == true) continue;
       fprintf(fout_[*it], "%s", fileHeader.c_str());
+      if (ordFlag_ == false) fileHeaders_[*it] = true;
     }
   }
 

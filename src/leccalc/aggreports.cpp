@@ -360,7 +360,7 @@ inline void aggreports::DoSetUp(int &eptype, int &eptype_tvar, int &epcalc,
   if (eptype == AEP) eptype_tvar = AEPTVAR;
   else if (eptype == OEP) eptype_tvar = OEPTVAR;
 
-    if (eptHeader_ == true && skipheader_ == false) {
+  if (eptHeader_ == true && skipheader_ == false) {
     std::string fileHeader;
     if (ordFlag_) {
       fileHeader = "SummaryID,EPCalc,EPType,ReturnPeriod,Loss\n";

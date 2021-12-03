@@ -472,7 +472,8 @@ void summarycalc::dosummary_chanceofloss_maxloss(int sample_size, int event_id,
 						 int coverage_or_output_id,
 						 int sidx, OASIS_FLOAT gul)
 {
-	first_idx_ = 0;   // ChanceOfLoss & MaxLoss fields exist
+	// TODO: Check veracity of and add MaxLoss field to output
+	first_idx_ = 1;   // ChanceOfLoss & MaxLoss fields exist
 	if (last_event_id_ != event_id)
 		reset_for_new_event(sample_size, event_id);
 	if (sidx == chance_of_loss_idx) {

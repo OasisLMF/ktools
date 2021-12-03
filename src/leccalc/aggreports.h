@@ -74,6 +74,12 @@ private:
 	std::map<int, std::vector<int>> ensembletosidx_;
 	const bool skipheader_;
 	const bool ordFlag_;
+	std::map<int, bool> fileHeaders_ = {
+		{ AGG_FULL_UNCERTAINTY, false }, { AGG_WHEATSHEAF, false },
+		{ AGG_SAMPLE_MEAN, false }, { AGG_WHEATSHEAF_MEAN, false },
+		{ OCC_FULL_UNCERTAINTY, false }, { OCC_WHEATSHEAF, false },
+		{ OCC_SAMPLE_MEAN, false }, { OCC_WHEATSHEAF_MEAN, false }
+	};
 
 	OASIS_FLOAT (OutLosses::*GetAgg)() = &OutLosses::GetAggOutLoss;
 	OASIS_FLOAT (OutLosses::*GetMax)() = &OutLosses::GetMaxOutLoss;

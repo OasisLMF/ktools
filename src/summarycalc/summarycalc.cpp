@@ -422,8 +422,9 @@ OASIS_FLOAT summarycalc::add_losses(const OASIS_FLOAT loss,
 OASIS_FLOAT summarycalc::calculate_chanceofloss(const OASIS_FLOAT loss,
 						const OASIS_FLOAT gul)
 {
+	// Chance of loss = 1 - (1 - C_1)(1 - C_2)...(1 - C_n)
 	if (loss == 0.0) return 1 - (1 - gul);
-	else return loss * (1 - gul);
+	else return 1 + ((loss - 1) * (1 - gul));
 }
 
 

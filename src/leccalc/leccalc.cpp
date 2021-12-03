@@ -184,7 +184,8 @@ namespace leccalc {
 		unsigned int& samplesize,
 		const std::map<int, std::vector<int> >& event_to_periods,
 		std::set<int> &summaryids,
-		std::vector<std::map<outkey2, OutLosses>> &out_loss)
+		std::vector<std::map<outkey2, OutLosses>> &out_loss,
+		const bool useReturnPeriodFile)
 	{
 		checkinputfile(samplesize, stdin);
 
@@ -228,7 +229,7 @@ namespace leccalc {
 					continue;
 				}
 
-				if (sr.loss > 0.0)
+				if (sr.loss > 0.0 || useReturnPeriodFile)
 				{
 					dolecoutputaggsummary(sh.summary_id, sr.sidx, sr.loss, iter->second, out_loss);
 				}
@@ -277,7 +278,7 @@ namespace leccalc {
 		unsigned int samplesize=0;
 		std::set<int> summaryids;
 		if (subfolder.size() == 0) {
-			processinputfile(samplesize, event_to_periods, summaryids, out_loss);
+			processinputfile(samplesize, event_to_periods, summaryids, out_loss, useReturnPeriodFile);
 			outputaggreports(totalperiods, summaryids, out_loss, fout, useReturnPeriodFile, samplesize, skipheader, outputFlags, ordFlag);
 			return;
 		} else {
@@ -413,7 +414,7 @@ namespace leccalc {
 			}
 			for (std::vector<std::string>::iterator it = files.begin(); it != files.end(); ++it) {
 				setinputstream(*it);
-				processinputfile(samplesize, event_to_periods, summaryids, out_loss);
+				processinputfile(samplesize, event_to_periods, summaryids, out_loss, useReturnPeriodFile);
 			}
 			outputaggreports(totalperiods, summaryids, out_loss, fout, useReturnPeriodFile, samplesize, skipheader, outputFlags, ordFlag);
 		}

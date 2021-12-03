@@ -1,6 +1,13 @@
 Ktools Changelog
 ================
 
+`v3.7.3`_
+ ---------
+* [#257](https://github.com/OasisLMF/ktools/pull/257) - Feature/docs
+* [#259](https://github.com/OasisLMF/ktools/pull/260) - Missing header record when no type 1 losses in leccalc
+* [#242](https://github.com/OasisLMF/ktools/pull/254) - Propagate ChanceOfLoss field through stream
+.. _`v3.7.3`:  https://github.com/OasisLMF/ktools/compare/v3.7.2...v3.7.3
+
 `v3.7.2`_
  ---------
 * [#247](https://github.com/OasisLMF/ktools/pull/248) - exposure value in ORD ALT report

@@ -4,7 +4,245 @@ As well as the set of legacy outputs described in OutputComponents.md, ktools al
 
 Open Results Data is a data standard for catastrophe loss model results developed as part of Open Data Standards "ODS". ODS is curated by OasisLMF and governed by the Open Data Standards Steering Committee (SC), comprised of industry experts representing (re)insurers, brokers, service providers and catastrophe model vendors. More information about ODS can be found [here](https://github.com/OasisLMF/OpenDataStandards).
 
-### ordleccalc <a id="leccalc"></a>
+ktools supports a subset of the fields in each of the ORD reports, which are given in more detail below.  In most cases, the existing components for legacy outputs are used to generate ORD format outputs when called with extra command line switches, although there is a dedicated component call ordleccalc to generate all of the EPT reports.  In overview, here are the mappings from component to ORD report:
+
+* **summarycalctocsv** generates SELT
+* **eltcalc** generates MELT, QELT
+* **pltcalc** generates SPLT, MPLT, QPLT
+* **ordleccalc** generates EPT and PSEPT
+* **aalcalc** generates ALT
+
+<a id="summarycalc"></a>
+### summarycalctocsv 
+***
+Summarycalctocsv takes the summarycalc loss stream, which contains the individual loss samples by event and summary_id, and outputs them in ORD format. Summarycalc is a core component that aggregates the individual building or coverage loss samples into groups that are of interest from a reporting perspective. This is covered in [Core Components](DataConversionComponents.md)
+
+##### Parameters
+
+* -o The ORD output flag
+
+##### Usage
+```
+$ [stdin component] | summarycalctocsv [parameters] > selt.csv
+$ summarycalctocsv [parameters] > selt.csv < [stdin].bin
+```
+
+##### Example
+
+```
+$ eve 1 1 | getmodel | gulcalc -r -S100 -a1 -i - | summarycalc -i -1 - | summarycalctocsv -o > selt.csv
+$ summarycalctocsv -o > selt.csv < summarycalc.bin
+```
+
+##### Internal data
+None.
+
+##### Output
+
+The Sample ELT output is a csv file with the following fields;
+
+| Name              	| Type   |  Bytes | Description                                                 				| Example     |
+|:----------------------|--------|--------| :---------------------------------------------------------------------------|------------:|
+| EventId           	| int    |    4   | Model event_id                                             					|  45567      |
+| SummaryId         	| int    |    4   | SummaryId  representing a grouping of losses                           	 	|   10        |
+| SampleId 	        	| int    |    4   | The sample number						                               	 	|  2          |
+| Loss          		| float  |    4   | The loss sample                                                           	|   13645.78  |
+| ImpactedExposure  	| float  |    4   | Exposure value impacted by the event for the sample 						|   70000     |
+
+### eltcalc <a id="eltcalc"></a>
+***
+The program calculates loss by SummaryId and EventId. There are two variants (in addition to the sample variant SELT output by summarycalc, above);
+
+* Moment ELT (MELT) outputs Mean and Standard deviation of loss, as well as EventRate, ChanceOfLoss, FootprintExposure, MeanImpactedExposure and MaxImpactedExposure
+* Quantile ELT (QELT) outputs loss quantiles for the provided set of probabilites. 
+
+##### Parameters
+
+* -M {filename.csv} outputs the MELT in csv format
+* -Q {filename.csv} outputs the QELT in csv format
+
+##### Usage
+```
+$ [stdin component] | eltcalc -M [filename.csv] -Q [filename.csv]
+$ eltcalc  -M [filename.csv] -Q [filename.csv] < [stdin].bin
+```
+
+##### Example
+```
+$ eve 1 1 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - | eltcalc -M MELT.csv -Q QELT.csv
+$ eltcalc  -M MELT.csv -Q QELT.csv < summarycalc.bin
+```
+
+##### Internal data
+
+The Quantile report requires the quantile.bin file
+
+* input/quantile.bin
+
+##### Calculation
+
+###### MELT
+For each SummaryId and EventId, the sample mean and standard deviation is calculated from the sampled losses in the summarycalc stream and output to file.  The analytical mean is also output as a seperate record, differentiated by a 'SampleType' field. Variations of the exposure value are also output (see below for details).
+
+###### QELT
+For each SummaryId and EventId, this report provides the probability and the corresponding loss quantile computed from the samples.  The list of probabilities is provided as input in the quantile.bin file.
+
+Quantiles are cut points dividing the range of a probability distribution into continuous intervals with equal probabilities, or dividing the observations in a sample set in the same way. In this case we are computing the quantiles of loss from the sampled losses by event and summary for a user-provided list of probabilities. For each provided probability p, the loss quantile is the sampled loss which is bigger than the proportion p of the observed samples. 
+
+In practice this is calculated by sorting the samples in ascending order of loss and using linear interpolation between the ordered observations to compute the precise loss quantile for the required probability.
+
+The algorithm used for the quantile estimate type and interpolation scheme from a finite sample set is R-7 referred to in Wikipedia https://en.wikipedia.org/wiki/Quantile
+
+If p is the probability, and the sample size is N, then the position of the ordered samples required for the quantile is computed by;
+
+(N-1)p + 1
+
+In general, this value will be a fraction rather than an integer, representing a value in between two ordered samples. Therefore for an integer value of k between 1 and N-1 with k < (N-1)p + 1 < k+1 , the loss quantile Q(p) is calculated by a linear interpolation of the kth ordered sample X(k) and the k+1 th ordered sample X(k+1) as follows;
+
+Q(p) = X(k) * (1-h) + X(k+1) * h
+
+where h = (N-1)p + 1 - k
+
+##### Output
+
+The Moment ELT output is a csv file with the following fields;
+
+| Name              	| Type   |  Bytes | Description                                                 				| Example     |
+|:----------------------|--------|--------| :---------------------------------------------------------------------------|------------:|
+| EventId           	| int    |    4   | Model event_id                                             					|  45567      |
+| SummaryId         	| int    |    4   | SummaryId  representing a grouping of losses                           	 	|   10        |
+| SampleType        	| int    |    4   | 1 for analytical mean, 2 for sample mean                               	 	|  2          |
+| EventRate			 	| float  |    4   | Annual frequency of event computed by relative frequency of occurrence 		|   0.01      | 
+| ChanceOfLoss		 	| float  |    4   | Probability of a loss calculated from the effective damage distributions	|   0.95      | 
+| MeanLoss          	| float  |    4   | Mean                                                                    	|   1345.678  |
+| SDLoss            	| float  |    4   | Sample standard deviation for SampleType=2                              	|    945.89   |
+| FootprintExposure 	| float  |    4   | Exposure value impacted by the model's event footprint                 		|   80000     |
+| MeanImpactedExposure  | float  |    4   | Mean exposure impacted by the event across the samples (where loss > 0 )    |   65000     |
+| MaxImpactedExposure  	| float  |    4   | Maximum exposure impacted by the event across the samples (where loss > 0)  |   80000     |
+
+The Quantile ELT output is a csv file with the following fields;
+
+| Name              	| Type   |  Bytes | Description                                                 				| Example     |
+|:----------------------|--------|--------| :---------------------------------------------------------------------------|------------:|
+| EventId           	| int    |    4   | Model event_id                                             					|  45567      |
+| SummaryId         	| int    |    4   | SummaryId  representing a grouping of losses                           	 	|   10        |
+| Quantile 	        	| float  |    4   | The probability associated with the loss quantile                     	 	|    0.9      |
+| Loss 		          	| float  |    4   | The loss quantile                                                          	|   1345.678  |
+
+[Return to top](#ordoutputcomponents)
+
+### pltcalc <a id="pltcalc"></a>
+***
+The program calculates loss by Period, EventId and SummaryId and outputs the results in ORD format. There are three variants;
+
+* Sample PLT (SPLT) outputs individual loss samples by SampleId, as well as PeriodWeight, Year, Month, Day, Hour, Minute and ImpactedExposure
+* Moment PLT (MPLT) outputs Mean and Standard deviation of loss, as well as PeriodWeight, Year, Month, Day, Hour, Minute, ChanceOfLoss, FootprintExposure, MeanImpactedExposure and MaxImpactedExposure
+* Quantile PLT (QPLT) outputs loss quantiles for the provided set of probabilites as well as PeriodWeight, Year, Month, Day, Hour, Minute 
+
+##### Parameters
+
+* -S {filename.csv} outputs the SPLT in csv format
+* -M {filename.csv} outputs the MPLT in csv format
+* -Q {filename.csv} outputs the QPLT in csv format
+
+##### Usage
+```
+$ [stdin component] | pltcalc -S [filename.csv] -M [filename.csv] -Q [filename.csv]
+$ pltcalc -S [filename.csv] -M [filename.csv] -Q [filename.csv] < [stdin].bin
+```
+
+##### Example
+```
+$ eve 1 1 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - | pltcalc -S SPLT.csv -M MPLT.csv -Q QPLT.csv
+$ pltcalc -S SPLT.csv -M MPLT.csv -Q QPLT.csv < summarycalc.bin
+```
+
+##### Internal data
+
+pltcalc requires the occurrence.bin file
+
+* input/occurrence.bin
+
+The Quantile report additionally requires the quantile.bin file
+
+* input/quantile.bin
+
+pltcalc will optionally use the following file if present
+
+* input/periods.bin
+
+##### Calculation
+
+###### SPLT
+For each Period, EventId and SummaryId, the individual loss samples are output by SampleId. The sampled event losses from the summarycalc stream are assigned to a Period for each occurrence of the EventId in the occurrence file.
+
+###### MPLT
+For each Period, EventId and SummaryId, the sample mean and standard deviation is calculated from the sampled event losses in the summarycalc stream and output to file.  The analytical mean is also output as a seperate record, differentiated by a 'SampleType' field. Variations of the exposure value are also output (see below for more details).
+
+###### QPLT
+For each Period, EventId and SummaryId, this report provides the probability and the corresponding loss quantile computed from the samples.  The list of probabilities is provided in the quantile.bin file.
+
+See QELT for the method of computing the loss quantiles.
+
+##### Output
+
+The Sample PLT output is a csv with the folling fields
+
+| Name              	| Type   |  Bytes | Description                                                 				| Example     |
+|:----------------------|--------|--------| :---------------------------------------------------------------------------|------------:|
+| Period            	| int    |    4   | The period in which the event occurs                      					|  500        |
+| PeriodWeight        	| int    |    4   | The weight of the period (frequency relative to the total number of periods)|  0.001      |
+| EventId           	| int    |    4   | Model event_id                                             					|  45567      |
+| Year 		        	| int    |    4   | The year in which the event occurs			                           	 	|   1970      |
+| Month		         	| int    |    4   | The month number in which the event occurs                           	 	|    5        |
+| Day 		         	| int    |    4   | The day number in which the event occurs	                           	 	|   22        |
+| Hour		         	| int    |    4   | The hour in which the event occurs			                           	 	|   11        |
+| Minute	         	| int    |    4   | The minute in which the event occurs		                           	 	|   45        |
+| SummaryId         	| int    |    4   | SummaryId  representing a grouping of losses                           	 	|   10        |
+| SampleId 	        	| int    |    4   | The sample number						                               	 	|  2          |
+| Loss          		| float  |    4   | The loss sample                                                           	|   13645.78  |
+| ImpactedExposure  	| float  |    4   | Exposure impacted by the event for the sample 								|   70000     |
+
+The Moment PLT output is a csv file with the following fields;
+
+| Name              	| Type   |  Bytes | Description                                                 				| Example     |
+|:----------------------|--------|--------| :---------------------------------------------------------------------------|------------:|
+| Period            	| int    |    4   | The period in which the event occurs                      					|  500        |
+| PeriodWeight        	| int    |    4   | The weight of the period (frequency relative to the total number of periods)|  0.001      |
+| EventId           	| int    |    4   | Model event_id                                             					|  45567      |
+| Year 		        	| int    |    4   | The year in which the event occurs			                           	 	|   1970      |
+| Month		         	| int    |    4   | The month number in which the event occurs                           	 	|    5        |
+| Day 		         	| int    |    4   | The day number in which the event occurs	                           	 	|   22        |
+| Hour		         	| int    |    4   | The hour in which the event occurs			                           	 	|   11        |
+| Minute	         	| int    |    4   | The minute in which the event occurs		                           	 	|   45        |
+| SummaryId         	| int    |    4   | SummaryId  representing a grouping of losses                           	 	|   10        |
+| SampleType        	| int    |    4   | 1 for analytical mean, 2 for sample mean                               	 	|  2          |
+| ChanceOfLoss		 	| float  |    4   | Probability of a loss calculated from the effective damage distributions	|   0.95      |
+| MeanLoss          	| float  |    4   | Mean                                                                    	|   1345.678  |
+| SDLoss            	| float  |    4   | Sample standard deviation for SampleType=2                              	|    945.89   |
+| FootprintExposure 	| float  |    4   | Exposure value impacted by the model's event footprint                 		|   80000     |
+| MeanImpactedExposure  | float  |    4   | Mean exposure impacted by the event across the samples (where loss > 0 )    |   65000     |
+| MaxImpactedExposure  	| float  |    4   | Maximum exposure impacted by the event across the samples (where loss > 0)  |   80000     |
+
+The Quantile PLT output is a csv file with the following fields;
+
+| Name              	| Type   |  Bytes | Description                                                 				| Example     |
+|:----------------------|--------|--------| :---------------------------------------------------------------------------|------------:|
+| Period            	| int    |    4   | The period in which the event occurs                      					|  500        |
+| PeriodWeight        	| int    |    4   | The weight of the period (frequency relative to the total number of periods)|  0.001      |
+| EventId           	| int    |    4   | Model event_id                                             					|  45567      |
+| Year 		        	| int    |    4   | The year in which the event occurs			                           	 	|   1970      |
+| Month		         	| int    |    4   | The month number in which the event occurs                           	 	|    5        |
+| Day 		         	| int    |    4   | The day number in which the event occurs	                           	 	|   22        |
+| Hour		         	| int    |    4   | The hour in which the event occurs			                           	 	|   11        |
+| Minute	         	| int    |    4   | The minute in which the event occurs		                           	 	|   45        |
+| SummaryId         	| int    |    4   | SummaryId representing a grouping of losses                           	 	|   10        |
+| Quantile 	        	| float  |    4   | The probability associated with the loss quantile                     	 	|    0.9      |
+| Loss 		          	| float  |    4   | The loss quantile                                                          	|   1345.678  |
+
+[Return to top](#ordoutputcomponents)
+
+### ordleccalc <a id="ordleccalc"></a>
 ***
 This component produces several variants of loss exceedance curves, known as Exceedance Probability Tables "EPT" under ORD. 
 
@@ -156,7 +394,83 @@ All period_nos must appear in the file from 1 to P (no gaps). There is no constr
 
 This feature will be invoked automatically if the periods.bin file is present in the input directory.
 
-[Return to top](#outputcomponents)
+[Return to top](#ordoutputcomponents)
+
+### aalcalc <a id="aalcalc"></a>
+***
+aalcalc outputs the Average Loss Table (ALT) which contains the average annual loss and standard deviation of annual loss by SummaryId.
+
+Two types of average and standard deviation of loss are calculated; analytical (SampleType 1) and sample (SampleType 2).  If the analysis is run with zero samples, then only SampleType 1 statistics are returned.
+
+##### Internal data
+
+aalcalc requires the occurrence.bin file 
+
+* input/occurrence.bin
+
+aalcalc does not have a standard input that can be streamed in. Instead, it reads in summarycalc binary data from a file in a fixed location.  The format of the binaries must match summarycalc standard output. The location is in the 'work' subdirectory of the present working directory. For example;
+
+* work/summarycalc1.bin
+* work/summarycalc2.bin
+* work/summarycalc3.bin
+
+The user must ensure the work subdirectory exists.  The user may also specify a subdirectory of /work to store these files. e.g.
+
+* work/summaryset1/summarycalc1.bin
+* work/summaryset1/summarycalc2.bin
+* work/summaryset1/summarycalc3.bin
+
+The reason for aalcalc not having an input stream is that the calculation is not valid on a subset of events, i.e. within a single process when the calculation has been distributed across multiple processes.  It must bring together all event losses before assigning event losses to periods and finally computing the final statistics.  
+
+##### Parameters
+
+* -K{sub-directory}. The sub-directory of /work containing the input aalcalc binary files.
+* -o. The ORD format flag
+
+##### Usage
+
+```
+$ aalcalc [parameters] > alt.csv
+```
+
+##### Examples
+
+```
+'First generate summarycalc binaries by running the core workflow, for the required summary set
+$ eve 1 2 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - > work/summary1/summarycalc1.bin
+$ eve 2 2 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - > work/summary1/summarycalc2.bin
+'Then run aalcalc, pointing to the specified sub-directory of work containing summarycalc binaries.
+$ aalcalc -o -Ksummary1 > alt.csv  
+```
+
+##### Output
+
+csv file containing the following fields;
+
+| Name                | Type   |  Bytes | Description                                                         | Example     |
+|:--------------------|--------|--------| :-------------------------------------------------------------------|------------:|
+| SummaryId           | int    |    4   | SummaryId representing a grouping of losses                         |   10        |
+| SampleType          | int    |    4   | 1 for analytical statistics, 2 for sample statistics                |    1        |
+| MeanLoss            | float  |    8   | average annual loss                                                 |    6785.9   |
+| SDLoss			  | float  |    8   | standard deviation of loss                                          |    54657.8  |
+
+
+##### Calculation
+
+The occurrence file and summarycalc files from the specified subdirectory are read into memory. Event losses are assigned to period according to which period the events occur in and summed by period and by sample.
+
+For type 1, the mean and standard deviation of numerically integrated mean period losses are calculated across the periods. For type 2 the mean and standard deviation of the sampled period losses are calculated across all samples (sidx > 1) and periods. 
+
+
+##### Period weightings
+
+An additional feature of aalcalc is available to vary the relative importance of the period losses by providing a period weightings file to the calculation. In this file, a weight can be assigned to each period make it more or less important than neutral weighting (1 divided by the total number of periods). For example, if the neutral weight for period 1 is 1 in 10000 years, or 0.0001, then doubling the weighting to 0.0002 will mean that period's loss reoccurrence rate would double and the loss contribution to the average annual loss would double.  
+
+All period_nos must appear in the file from 1 to P (no gaps). There is no constraint on the sum of weights. Periods with zero weight will not contribute any losses to the AAL.
+
+This feature will be invoked automatically if the periods.bin file is present in the input directory.
+
+[Return to top](#ordoutputcomponents)
 
 [Go to 4.4 Data conversion components section](DataConversionComponents.md)
 

@@ -681,6 +681,7 @@ void aalcalc::doit(const std::string& subfolder)
 					sampleslevelRec sr;
 					i = fread(&sr, sizeof(sr), 1, summary_fin);
 					if (i == 0 || sr.sidx == 0) break;
+					if (sr.sidx == chance_of_loss_idx || sr.sidx == max_loss_idx) continue;
 					vrec.push_back(sr);
 				}
 				do_calc_by_period(sh, vrec);

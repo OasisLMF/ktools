@@ -43,12 +43,6 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 
 #define MAX_SUMMARY_SETS 10
-
-struct loss_exp {
-	OASIS_FLOAT loss;			// gul total
-						//OASIS_FLOAT exposure;		// tiv total
-};
-
 #define MAX_SUMMARY_ID 2147483647
 
 typedef std::vector<int> coverage_id_or_output_id_to_Summary_id;	// will turn into vectors once code is working
@@ -64,7 +58,7 @@ private:
 	FILE *idxout[MAX_SUMMARY_SETS] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 	coverage_id_or_output_id_to_Summary_id *co_to_s_[MAX_SUMMARY_SETS] = { nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr };
 	//output_id_to_Summary_id *o_to_s[MAX_SUMMARY_SETS] = { nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr };
-	loss_exp **sssl[MAX_SUMMARY_SETS] = { nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr }; // three dimensional array sssl[summary_set][summary_id][sidx] to loss exposure
+	OASIS_FLOAT **sssl[MAX_SUMMARY_SETS] = { nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr }; // three dimensional array sssl[summary_set][summary_id][sidx] to loss exposure
 	OASIS_FLOAT *sse[MAX_SUMMARY_SETS] = { nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr };         // s[summary_set][summary_id] to exposure
 	//bool *bsummary;
 	std::vector<OASIS_FLOAT> coverages_;
@@ -75,6 +69,10 @@ private:
 	bool zerooutput_ = false;
 	std::map<int, std::string> indexFiles;
 	long long offset_[MAX_SUMMARY_SETS] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };   // for index file
+	const int num_idx_ = 5;
+	int first_idx_ = 2;
+	int last_event_id_ = -1;
+	int last_coverage_or_output_id_ = -1;
 // functions
 	void reset_sssl_array(int sample_size);
 	void alloc_sssl_array(int sample_size);
@@ -88,12 +86,18 @@ private:
 	void outputstreamtype(int summary_set);
 	void outputstreamtype();
 	void outputsamplesizeandsummaryset(int summary_set, int sample_size);
-	void reset_ssl_array(int summary_set, int sample_size, loss_exp **ssl);
-	loss_exp **alloc_ssl_arrays(int summary_set, int sample_size);
+	void reset_ssl_array(int summary_set, int sample_size, OASIS_FLOAT **ssl);
+	OASIS_FLOAT **alloc_ssl_arrays(int summary_set, int sample_size);
 	OASIS_FLOAT *alloc_sse_arrays(int summary_set);
 	void outputsamplesize(int samplesize);
 	void outputsummary(int sample_size, int event_id);
-	void processsummeryset(int summaryset, int coverage_id, int sidx, OASIS_FLOAT gul);
+	OASIS_FLOAT add_losses(const OASIS_FLOAT loss, const OASIS_FLOAT gul);
+	OASIS_FLOAT calculate_chanceofloss(const OASIS_FLOAT loss, const OASIS_FLOAT gul);
+	OASIS_FLOAT (summarycalc::*PropagateLosses)(const OASIS_FLOAT, const OASIS_FLOAT);
+	void processsummaryset(int summaryset, int coverage_id, int sidx, OASIS_FLOAT gul, OASIS_FLOAT (summarycalc::*PropagateLosses)(const OASIS_FLOAT, const OASIS_FLOAT));
+	inline void reset_for_new_event(const int sample_size, const int event_id);
+	inline void processsummarysets(const int coverage_or_output_id, const int sidx, const OASIS_FLOAT gul, OASIS_FLOAT (summarycalc::*PropagateLosses)(const OASIS_FLOAT, const OASIS_FLOAT));
+	void dosummary_chanceofloss_maxloss(int sample_size, int event_id, int coverage_or_output_id, int sidx, OASIS_FLOAT gul);
 	void dosummary(int sample_size, int event_id, int coverage_id, int sidx, OASIS_FLOAT gul, OASIS_FLOAT expval);
 	bool loadcoverages();
 	void loaditemtocoverage();

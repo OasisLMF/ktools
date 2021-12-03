@@ -286,7 +286,7 @@ void gulcalc::clearmode1_data() {
 // Set losses for alloc rule where total peril loss = maximum subperil loss
 void gulcalc::setmaxloss(std::vector<std::vector<gulItemIDLoss>> &gilv) {
 
-	for (size_t i = 1; i < gilv.size(); i++) {
+	for (size_t i = 3; i < gilv.size(); i++) {
 
 		OASIS_FLOAT max_loss = 0.0;
 		int max_loss_count = 0;
@@ -335,7 +335,7 @@ void gulcalc::writemode1output(const int event_id, const OASIS_FLOAT tiv,
 		while (iter != gilv[i].end()) {
 
 			gulSampleslevelRec gg;
-			gg.sidx = i - 3;
+			gg.sidx = i - num_idx_;
 			gg.loss = iter->loss;
 
 			gxi[iter->item_id].push_back(gg);
@@ -374,8 +374,8 @@ void gulcalc::outputmode1data(int event_id) {
 
 		std::vector<std::vector<gulItemIDLoss>> gilv;
 		std::vector<std::vector<gulItemIDLoss>> gilv0;
-		gilv.resize(samplesize_ + 4);
-		if (correlatedWriter_) gilv0.resize(samplesize_ + 4);
+		gilv.resize(samplesize_ + num_idx_ + 1);
+		if (correlatedWriter_) gilv0.resize(samplesize_ + num_idx_ + 1);
 		int j = *cov_iter;
 		OASIS_FLOAT tiv = 0.0;
 		OASIS_FLOAT exposureValue = 0.0;
@@ -391,21 +391,36 @@ void gulcalc::outputmode1data(int event_id) {
 			gulItemIDLoss gi;
 			gi.item_id = mode1_stats_[j][i].item_id;
 
+			// maximum loss
+			gi.loss = mode1_stats_[j][i].max_loss;
+			gilv[max_loss_idx + num_idx_].push_back(gi);
+			if (correlatedWriter_)
+				gilv0[max_loss_idx + num_idx_].push_back(gi);
+
+			// chance of loss
+			gi.loss = mode1_stats_[j][i].chance_of_loss;
+			gilv[chance_of_loss_idx + num_idx_].push_back(gi);
+			if (correlatedWriter_)
+				gilv0[chance_of_loss_idx + num_idx_].push_back(gi);
+
 			// exposure value record
 			// tiv / count(tuple(event_id-coverage_id))
 			gi.loss = exposureValue;
-			gilv[tiv_idx+3].push_back(gi);
-			if (correlatedWriter_) gilv0[tiv_idx+3].push_back(gi);
+			gilv[tiv_idx + num_idx_].push_back(gi);
+			if (correlatedWriter_)
+				gilv0[tiv_idx + num_idx_].push_back(gi);
 
 			// standard deviation
 			gi.loss = mode1_stats_[j][i].std_dev;
-			gilv[std_dev_idx+3].push_back(gi);
-			if (correlatedWriter_) gilv0[std_dev_idx+3].push_back(gi);
+			gilv[std_dev_idx + num_idx_].push_back(gi);
+			if (correlatedWriter_)
+				gilv0[std_dev_idx + num_idx_].push_back(gi);
 
 			// mean
 			gi.loss = mode1_stats_[j][i].gul_mean;
-			gilv[mean_idx+3].push_back(gi);
-			if (correlatedWriter_) gilv0[mean_idx+3].push_back(gi);
+			gilv[mean_idx + num_idx_].push_back(gi);
+			if (correlatedWriter_)
+				gilv0[mean_idx + num_idx_].push_back(gi);
 
 			int ridx = 0;
 			int ridx0 = 0;
@@ -660,7 +675,7 @@ void gulcalc::fillgulitemloss(const int item_id, const OASIS_FLOAT tiv,
 	g.prob_to = p.prob_to;
 	g.bin_mean = p.bin_mean;
 	g.rval = rval;
-	g.sidx = sample_id + 3;
+	g.sidx = sample_id + num_idx_;
 
 	damagebindictionary b = (*damagebindictionary_vec_)[g.bin_index];
 	gulItemIDLoss gg;
@@ -676,6 +691,8 @@ void gulcalc::fillgulitemloss(const int item_id, const OASIS_FLOAT tiv,
 void gulcalc::output_mean_mode1(const OASIS_FLOAT tiv, prob_mean *pp,
 				const int bin_count, OASIS_FLOAT &gul_mean,
 				OASIS_FLOAT &std_dev,
+				OASIS_FLOAT &chance_of_loss,
+				OASIS_FLOAT &max_loss,
 				std::vector<int> &bin_ids) {
 
 	OASIS_FLOAT last_prob_to = 0;
@@ -694,8 +711,16 @@ void gulcalc::output_mean_mode1(const OASIS_FLOAT tiv, prob_mean *pp,
 		bin_ids.push_back(bin_map_[*pp]);
 
 		probrec p;
-		if (bin_index == 0) p.prob_from = 0;
-		else p.prob_from = last_prob_to;
+		if (bin_index == 0) {
+			p.prob_from = 0;
+			if (pp->bin_mean == 0) {
+				chance_of_loss = 1 - pp->prob_to;
+			} else {
+				chance_of_loss = 1;
+			}
+		} else {
+			p.prob_from = last_prob_to;
+		}
 		p.prob_to = pp->prob_to;
 		p.bin_mean = pp->bin_mean;
 		last_prob_to = pp->prob_to;
@@ -709,19 +734,31 @@ void gulcalc::output_mean_mode1(const OASIS_FLOAT tiv, prob_mean *pp,
 	if (std_dev < 0) std_dev = 0;
 	std_dev = sqrt(std_dev);
 
+	max_loss = tiv * (*damagebindictionary_vec_)[bin_count - 1].bin_to;
 }
 
-void gulcalc::output_mean(OASIS_FLOAT tiv, prob_mean *pp, int bin_count, OASIS_FLOAT &gul_mean,  OASIS_FLOAT &std_dev)
+void gulcalc::output_mean(OASIS_FLOAT tiv, prob_mean *pp, int bin_count,
+			  OASIS_FLOAT &gul_mean,  OASIS_FLOAT &std_dev,
+			  OASIS_FLOAT &chance_of_loss, OASIS_FLOAT &max_loss)
 {
 	OASIS_FLOAT last_prob_to = 0;
 	gul_mean = 0;
 	std_dev = 0;
 	OASIS_FLOAT ctr_var = 0;
 
-	for (int bin_index = 0; bin_index < bin_count; bin_index++){
+	for (int bin_index = 0; bin_index < bin_count; bin_index++)
+	{
 		probrec p;
-		if (bin_index == 0) p.prob_from = 0;
-		else p.prob_from = last_prob_to;
+		if (bin_index == 0) {
+			p.prob_from = 0;
+			if (pp->bin_mean == 0) {
+				chance_of_loss = 1 - pp->prob_to;
+			} else {
+				chance_of_loss = 1;
+			}
+		} else {
+			p.prob_from = last_prob_to;
+		}
 		p.prob_to = pp->prob_to;
 		p.bin_mean = pp->bin_mean;
 		last_prob_to = pp->prob_to;
@@ -731,8 +768,10 @@ void gulcalc::output_mean(OASIS_FLOAT tiv, prob_mean *pp, int bin_count, OASIS_F
 	}
 	OASIS_FLOAT g2 = gul_mean * gul_mean;
 	std_dev = ctr_var - g2;
-    if (std_dev < 0) std_dev  = 0;
+	if (std_dev < 0) std_dev  = 0;
 	std_dev = sqrt(std_dev);
+
+	max_loss = tiv * (*damagebindictionary_vec_)[bin_count - 1].bin_to;
 }
 
 void gulcalc::processrec_mode1(char* rec, int recsize) {
@@ -759,12 +798,17 @@ void gulcalc::processrec_mode1(char* rec, int recsize) {
 			prob_mean* pp = (prob_mean*)b;
 			OASIS_FLOAT gul_mean;
 			OASIS_FLOAT std_dev;
+			OASIS_FLOAT chance_of_loss;
+			OASIS_FLOAT max_loss;
 			OASIS_FLOAT tiv = (*coverages_)[iter->coverage_id];
 			vector<int> bin_ids;
 			output_mean_mode1(tiv, pp, *bin_count, gul_mean,
-					  std_dev, bin_ids);
+					  std_dev, chance_of_loss, max_loss,
+					  bin_ids);
 			recData.gul_mean = gul_mean;
 			recData.std_dev = std_dev;
+			recData.chance_of_loss = chance_of_loss;
+			recData.max_loss = max_loss;
 			recData.bin_map_ids = bin_ids;
 
 			if (mode1_stats_[iter->coverage_id].size() == 0) {
@@ -805,10 +849,21 @@ damagecdfrec *d = (damagecdfrec *)rec;
 			int *bin_count = (int *)b;
 			b = b + sizeof(int);
 			prob_mean *pp = (prob_mean *)b;
+			OASIS_FLOAT max_loss;
+			OASIS_FLOAT chance_of_loss;
 			OASIS_FLOAT std_dev;
 			OASIS_FLOAT gul_mean;
 			OASIS_FLOAT tiv = (*coverages_)[iter->coverage_id];
-			output_mean(tiv, pp, *bin_count, gul_mean, std_dev);
+			output_mean(tiv, pp, *bin_count, gul_mean, std_dev,
+				    chance_of_loss, max_loss);
+			gx.sidx = max_loss_idx;
+			gx.loss = max_loss;
+			itemoutputgul(gx);
+			if (correlatedWriter_) correlatedoutputgul(gx);
+			gx.sidx = chance_of_loss_idx;
+			gx.loss = chance_of_loss;
+			itemoutputgul(gx);
+			if (correlatedWriter_) correlatedoutputgul(gx);
 			gx.sidx = tiv_idx;
 			gx.loss = tiv;
 			itemoutputgul(gx);

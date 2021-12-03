@@ -4,6 +4,51 @@ As well as the set of legacy outputs described in OutputComponents.md, ktools al
 
 Open Results Data is a data standard for catastrophe loss model results developed as part of Open Data Standards "ODS". ODS is curated by OasisLMF and governed by the Open Data Standards Steering Committee (SC), comprised of industry experts representing (re)insurers, brokers, service providers and catastrophe model vendors. More information about ODS can be found [here](https://github.com/OasisLMF/OpenDataStandards).
 
+ktools supports a subset of the fields in each of the ORD reports, which are given in more detail below.  In most cases, the existing components for legacy outputs are used to generate ORD format outputs when called with extra command line switches, although there is a dedicated component call ordleccalc to generate all of the EPT reports.  In overview, here are the mappings from component to ORD report:
+
+* **summarycalctocsv** generates SELT
+* **eltcalc** generates MELT, QELT
+* **pltcalc** generates SPLT, MPLT, QPLT
+* **ordleccalc** generates EPT and PSEPT
+* **aalcalc** generates ALT
+
+<a id="summarycalc"></a>
+### summarycalctocsv 
+***
+Summarycalctocsv takes the summarycalc loss stream, which contains the individual loss samples by event and summary_id, and outputs them in ORD format. Summarycalc is a core component that aggregates the individual building or coverage loss samples into groups that are of interest from a reporting perspective. This is covered in [Core Components](DataConversionComponents.md)
+
+##### Parameters
+
+* -o The ORD output flag
+
+##### Usage
+```
+$ [stdin component] | summarycalctocsv [parameters] > selt.csv
+$ summarycalctocsv [parameters] > selt.csv < [stdin].bin
+```
+
+##### Example
+
+```
+$ eve 1 1 | getmodel | gulcalc -r -S100 -a1 -i - | summarycalc -i -1 - | summarycalctocsv -o > selt.csv
+$ summarycalctocsv -o > selt.csv < summarycalc.bin
+```
+
+##### Internal data
+None.
+
+##### Output
+
+The Sample ELT output is a csv file with the following fields;
+
+| Name              	| Type   |  Bytes | Description                                                 				| Example     |
+|:----------------------|--------|--------| :---------------------------------------------------------------------------|------------:|
+| EventId           	| int    |    4   | Model event_id                                             					|  45567      |
+| SummaryId         	| int    |    4   | SummaryId  representing a grouping of losses                           	 	|   10        |
+| SampleId 	        	| int    |    4   | The sample number						                               	 	|  2          |
+| Loss          		| float  |    4   | The loss sample                                                           	|   13645.78  |
+| ImpactedExposure  	| float  |    4   | Exposure value impacted by the event for the sample 						|   70000     |
+
 ### eltcalc <a id="eltcalc"></a>
 ***
 The program calculates loss by SummaryId and EventId. There are two variants (in addition to the sample variant SELT output by summarycalc, above);
@@ -52,7 +97,7 @@ If p is the probability, and the sample size is N, then the position of the orde
 
 (N-1)p + 1
 
-In general, this value will be a fraction rather than an integer, representing a value in between two ordered samples. Therefore for an integer value of k where k < (N-1)p + 1 < k+1 , the loss quantile Q(p) is calculated by a linear interpolation of the kth ordered sample X(k) and the k+1 th ordered sample X(k+1) as follows;
+In general, this value will be a fraction rather than an integer, representing a value in between two ordered samples. Therefore for an integer value of k between 1 and N-1 with k < (N-1)p + 1 < k+1 , the loss quantile Q(p) is calculated by a linear interpolation of the kth ordered sample X(k) and the k+1 th ordered sample X(k+1) as follows;
 
 Q(p) = X(k) * (1-h) + X(k+1) * h
 
@@ -82,6 +127,8 @@ The Quantile ELT output is a csv file with the following fields;
 | SummaryId         	| int    |    4   | SummaryId  representing a grouping of losses                           	 	|   10        |
 | Quantile 	        	| float  |    4   | The probability associated with the loss quantile                     	 	|    0.9      |
 | Loss 		          	| float  |    4   | The loss quantile                                                          	|   1345.678  |
+
+[Return to top](#ordoutputcomponents)
 
 ### pltcalc <a id="pltcalc"></a>
 ***
@@ -151,7 +198,7 @@ The Sample PLT output is a csv with the folling fields
 | Hour		         	| int    |    4   | The hour in which the event occurs			                           	 	|   11        |
 | Minute	         	| int    |    4   | The minute in which the event occurs		                           	 	|   45        |
 | SummaryId         	| int    |    4   | SummaryId  representing a grouping of losses                           	 	|   10        |
-| SampleId 	        	| int    |    4   | 1 for analytical mean, 2 for sample mean                               	 	|  2          |
+| SampleId 	        	| int    |    4   | The sample number						                               	 	|  2          |
 | Loss          		| float  |    4   | The loss sample                                                           	|   13645.78  |
 | ImpactedExposure  	| float  |    4   | Exposure impacted by the event for the sample 								|   70000     |
 
@@ -190,6 +237,8 @@ The Quantile PLT output is a csv file with the following fields;
 | SummaryId         	| int    |    4   | SummaryId representing a grouping of losses                           	 	|   10        |
 | Quantile 	        	| float  |    4   | The probability associated with the loss quantile                     	 	|    0.9      |
 | Loss 		          	| float  |    4   | The loss quantile                                                          	|   1345.678  |
+
+[Return to top](#ordoutputcomponents)
 
 ### ordleccalc <a id="ordleccalc"></a>
 ***
@@ -343,7 +392,83 @@ All period_nos must appear in the file from 1 to P (no gaps). There is no constr
 
 This feature will be invoked automatically if the periods.bin file is present in the input directory.
 
-[Return to top](#outputcomponents)
+[Return to top](#ordoutputcomponents)
+
+### aalcalc <a id="aalcalc"></a>
+***
+aalcalc outputs the Average Loss Table (ALT) which contains the average annual loss and standard deviation of annual loss by SummaryId.
+
+Two types of average and standard deviation of loss are calculated; analytical (SampleType 1) and sample (SampleType 2).  If the analysis is run with zero samples, then only SampleType 1 statistics are returned.
+
+##### Internal data
+
+aalcalc requires the occurrence.bin file 
+
+* input/occurrence.bin
+
+aalcalc does not have a standard input that can be streamed in. Instead, it reads in summarycalc binary data from a file in a fixed location.  The format of the binaries must match summarycalc standard output. The location is in the 'work' subdirectory of the present working directory. For example;
+
+* work/summarycalc1.bin
+* work/summarycalc2.bin
+* work/summarycalc3.bin
+
+The user must ensure the work subdirectory exists.  The user may also specify a subdirectory of /work to store these files. e.g.
+
+* work/summaryset1/summarycalc1.bin
+* work/summaryset1/summarycalc2.bin
+* work/summaryset1/summarycalc3.bin
+
+The reason for aalcalc not having an input stream is that the calculation is not valid on a subset of events, i.e. within a single process when the calculation has been distributed across multiple processes.  It must bring together all event losses before assigning event losses to periods and finally computing the final statistics.  
+
+##### Parameters
+
+* -K{sub-directory}. The sub-directory of /work containing the input aalcalc binary files.
+* -o. The ORD format flag
+
+##### Usage
+
+```
+$ aalcalc [parameters] > alt.csv
+```
+
+##### Examples
+
+```
+'First generate summarycalc binaries by running the core workflow, for the required summary set
+$ eve 1 2 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - > work/summary1/summarycalc1.bin
+$ eve 2 2 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - > work/summary1/summarycalc2.bin
+'Then run aalcalc, pointing to the specified sub-directory of work containing summarycalc binaries.
+$ aalcalc -o -Ksummary1 > alt.csv  
+```
+
+##### Output
+
+csv file containing the following fields;
+
+| Name                | Type   |  Bytes | Description                                                         | Example     |
+|:--------------------|--------|--------| :-------------------------------------------------------------------|------------:|
+| SummaryId           | int    |    4   | SummaryId representing a grouping of losses                         |   10        |
+| SampleType          | int    |    4   | 1 for analytical statistics, 2 for sample statistics                |    1        |
+| MeanLoss            | float  |    8   | average annual loss                                                 |    6785.9   |
+| SDLoss			  | float  |    8   | standard deviation of loss                                          |    54657.8  |
+
+
+##### Calculation
+
+The occurrence file and summarycalc files from the specified subdirectory are read into memory. Event losses are assigned to period according to which period the events occur in and summed by period and by sample.
+
+For type 1, the mean and standard deviation of numerically integrated mean period losses are calculated across the periods. For type 2 the mean and standard deviation of the sampled period losses are calculated across all samples (sidx > 1) and periods. 
+
+
+##### Period weightings
+
+An additional feature of aalcalc is available to vary the relative importance of the period losses by providing a period weightings file to the calculation. In this file, a weight can be assigned to each period make it more or less important than neutral weighting (1 divided by the total number of periods). For example, if the neutral weight for period 1 is 1 in 10000 years, or 0.0001, then doubling the weighting to 0.0002 will mean that period's loss reoccurrence rate would double and the loss contribution to the average annual loss would double.  
+
+All period_nos must appear in the file from 1 to P (no gaps). There is no constraint on the sum of weights. Periods with zero weight will not contribute any losses to the AAL.
+
+This feature will be invoked automatically if the periods.bin file is present in the input directory.
+
+[Return to top](#ordoutputcomponents)
 
 [Go to 4.4 Data conversion components section](DataConversionComponents.md)
 

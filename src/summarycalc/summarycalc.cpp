@@ -38,6 +38,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <functional>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -78,12 +79,12 @@ summarycalc::summarycalc()
 #endif
 
 }
-void summarycalc::reset_ssl_array(int summary_set, int sample_size, loss_exp **ssl)
+void summarycalc::reset_ssl_array(int summary_set, int sample_size, OASIS_FLOAT **ssl)
 {
 	int maxsummaryids = max_summary_id_[summary_set] - min_summary_id_[summary_set]+1;
 	for (int i = 0; i <= maxsummaryids; i++) {
-		for(int j = 0; j < sample_size + 3; j++) {
-			ssl[i][j].loss = 0;
+		for (int j = 0; j < sample_size + num_idx_ + 1; j++) {
+			ssl[i][j] = 0;
 		}
 	}
 }
@@ -92,21 +93,21 @@ void summarycalc::reset_sssl_array(int sample_size)
 {
 	for (int i = 0; i < MAX_SUMMARY_SETS; i++) {		
 		if (fout[i] != nullptr) {
-			loss_exp **ssl = sssl[i];		// OASIS_FLOAT **ssl two dimensional array of ssl[summary_id][sidx] to loss
+			OASIS_FLOAT **ssl = sssl[i];		// OASIS_FLOAT **ssl two dimensional array of ssl[summary_id][sidx] to loss
 			reset_ssl_array(i, sample_size, ssl);
 		}
 	}
 }
-loss_exp **summarycalc::alloc_ssl_arrays(int summary_set, int sample_size)
+OASIS_FLOAT **summarycalc::alloc_ssl_arrays(int summary_set, int sample_size)
 {
 	if (min_summary_id_[summary_set] != 1) {
 		fprintf(stderr, "FATAL: summarycalc: Minimum summary ID is not equal to one\n");
 		exit(-1);
 	}
 	int maxsummaryids = max_summary_id_[summary_set] ;
-	loss_exp **ssl = new loss_exp*[maxsummaryids + 1];
+	OASIS_FLOAT **ssl = new OASIS_FLOAT*[maxsummaryids + 1];
 	for (int i = 0; i <= maxsummaryids; i++){
-		ssl[i] = new loss_exp[sample_size + 4];	// allocate for -3,-2,-1,0 as well as samplesize
+		ssl[i] = new OASIS_FLOAT[sample_size + num_idx_ + 1];   // allocate for -5, -4, -3, -2, -1, 0 as well as samplesize
 	}
 	return ssl;
 }
@@ -250,7 +251,6 @@ void summarycalc::loadgulsummaryxref()
 		if (fout[s.summaryset_id] != nullptr) {
 			if (s.summary_id < min_summary_id_[s.summaryset_id]) min_summary_id_[s.summaryset_id] = s.summary_id;
 			if (s.summary_id > max_summary_id_[s.summaryset_id]) max_summary_id_[s.summaryset_id] = s.summary_id;
-			//co_to_s[s.summaryset_id]->insert({ s.coverage_id,s.summary_id });
 			(*co_to_s_[s.summaryset_id])[s.coverage_id] = s.summary_id ;
 		}
 		i = (int) fread(&s, sizeof(gulsummaryxref), 1, fin);
@@ -261,7 +261,6 @@ void summarycalc::loadgulsummaryxref()
 
 void summarycalc::loadsummaryxref(const std::string& filename)
 {
-	//std::string file = FMSUMMARYXREF_FILE;
 	std::string file = filename;
 	if (inputpath_.length() > 0) {
 		file = inputpath_ + file.substr(5);
@@ -284,7 +283,6 @@ void summarycalc::loadsummaryxref(const std::string& filename)
 		if (fout[s.summaryset_id] != nullptr) {
 			if (s.summary_id < min_summary_id_[s.summaryset_id]) min_summary_id_[s.summaryset_id] = s.summary_id;
 			if (s.summary_id > max_summary_id_[s.summaryset_id]) max_summary_id_[s.summaryset_id] = s.summary_id;
-			// co_to_s[s.summaryset_id]->insert({ s.output_id,s.summary_id });
 			if ( (*co_to_s_[s.summaryset_id]).size() < (size_t)(s.output_id + 1)) (*co_to_s_[s.summaryset_id]).resize(s.output_id + 1, 0);
 			(*co_to_s_[s.summaryset_id])[s.output_id] = s.summary_id ;
 		}
@@ -296,7 +294,7 @@ void summarycalc::loadsummaryxref(const std::string& filename)
 
 void summarycalc::outputsummaryset(int sample_size, int summary_set, int event_id)
 {
-	loss_exp **ssl = sssl[summary_set]; // OASIS_FLOAT **ssl two dimensional array of ssl[summary_id][sidx] to loss
+	OASIS_FLOAT **ssl = sssl[summary_set]; // OASIS_FLOAT **ssl two dimensional array of ssl[summary_id][sidx] to loss
 	OASIS_FLOAT *se = sse[summary_set];
 	int maxsummaryids = max_summary_id_[summary_set];
 	int minsummaryids = min_summary_id_[summary_set];
@@ -311,15 +309,15 @@ void summarycalc::outputsummaryset(int sample_size, int summary_set, int event_i
 			}
 			fwrite(&sh, sizeof(sh), 1, fout[summary_set]);
 			offset_[summary_set] += sizeof(sh);
-			for (int j = 0; j < sample_size + 3; j++) {
-				if (j != 2) {
+			for (int j = first_idx_; j < sample_size + num_idx_ + 1; j++) {
+				if (j != num_idx_) {   // sidx = 0
 					sampleslevelRec s;
-					s.sidx = j - 2;
-					if (s.sidx == -2) {
+					s.sidx = j - num_idx_;
+					if (s.sidx == tiv_idx || s.sidx == std_dev_idx) {
 						// skip
 					}
 					else {
-						s.loss = ssl[i][j].loss;
+						s.loss = ssl[i][j];
 						if (zerooutput_ == false) {
 							if (s.loss > 0.0) {
 								fwrite(&s, sizeof(s), 1, fout[summary_set]);
@@ -412,30 +410,87 @@ void summarycalc::outputsummary(int sample_size,int event_id)
 		}
 	}
 }
-void summarycalc::processsummeryset(int summaryset, int coverage_id, int sidx, OASIS_FLOAT gul)
+
+
+OASIS_FLOAT summarycalc::add_losses(const OASIS_FLOAT loss,
+				    const OASIS_FLOAT gul)
 {
-	loss_exp **ssl = sssl[summaryset];
+	return loss + gul;
+}
+
+
+OASIS_FLOAT summarycalc::calculate_chanceofloss(const OASIS_FLOAT loss,
+						const OASIS_FLOAT gul)
+{
+	// Chance of loss = 1 - (1 - C_1)(1 - C_2)...(1 - C_n)
+	if (loss == 0.0) return 1 - (1 - gul);
+	else return 1 + ((loss - 1) * (1 - gul));
+}
+
+
+void summarycalc::processsummaryset(int summaryset, int coverage_id, int sidx,
+				    OASIS_FLOAT gul,
+				    OASIS_FLOAT (summarycalc::*PropagateLosses)(const OASIS_FLOAT, const OASIS_FLOAT))
+{
+	OASIS_FLOAT **ssl = sssl[summaryset];
 	coverage_id_or_output_id_to_Summary_id &p = *co_to_s_[summaryset];
-	int summary_id = p[coverage_id];	
-	ssl[summary_id][sidx+2].loss += gul;
+	int summary_id = p[coverage_id];
+	ssl[summary_id][sidx+num_idx_] = (this->*PropagateLosses)(ssl[summary_id][sidx+num_idx_], gul);
+}
+
+
+inline void summarycalc::reset_for_new_event(const int sample_size,
+					     const int event_id)
+{
+	if (last_event_id_ != -1) {
+		outputsummary(sample_size, last_event_id_);
+		reset_sssl_array(sample_size);
+	}
+	last_event_id_ = event_id;
+	last_coverage_or_output_id_ = -1;
+	reset_sse_array();
+}
+
+
+inline void summarycalc::processsummarysets(const int coverage_or_output_id,
+					    const int sidx,
+					    const OASIS_FLOAT gul,
+					    OASIS_FLOAT (summarycalc::*PropagateLosses)(const OASIS_FLOAT, const OASIS_FLOAT))
+{
+	for (int i = 0; i < MAX_SUMMARY_SETS; i++) {
+		int cov_id = coverage_or_output_id;
+		if (item_to_coverage_.size() > 0) {
+			cov_id = item_to_coverage_[coverage_or_output_id];
+		}
+		if (fout[i] != nullptr) processsummaryset(i, cov_id, sidx, gul,
+							  PropagateLosses);
+	}
+}
+
+
+void summarycalc::dosummary_chanceofloss_maxloss(int sample_size, int event_id,
+						 int coverage_or_output_id,
+						 int sidx, OASIS_FLOAT gul)
+{
+	// TODO: Check veracity of and add MaxLoss field to output
+	first_idx_ = 1;   // ChanceOfLoss & MaxLoss fields exist
+	if (last_event_id_ != event_id)
+		reset_for_new_event(sample_size, event_id);
+	if (sidx == chance_of_loss_idx) {
+		PropagateLosses = &summarycalc::calculate_chanceofloss;
+	} else {
+		PropagateLosses = &summarycalc::add_losses;
+	}
+	processsummarysets(coverage_or_output_id, sidx, gul, PropagateLosses);
 }
 
 
 void summarycalc::dosummary(int sample_size,int event_id,int coverage_or_output_id,int sidx, OASIS_FLOAT gul, OASIS_FLOAT expval)
 {
-	static int last_event_id = -1;
-	static int last_coverage_or_output_id = -1;
-		
-	if (last_event_id != event_id) {		
-		if (last_event_id != -1) {
-			outputsummary(sample_size,last_event_id);
-			reset_sssl_array(sample_size);
-		}
-		last_event_id = event_id;
-		last_coverage_or_output_id = -1;
-		reset_sse_array();
-	}
-	if (coverage_or_output_id != last_coverage_or_output_id) {
+	if (last_event_id_ != event_id)
+		reset_for_new_event(sample_size, event_id);
+
+	if (coverage_or_output_id != last_coverage_or_output_id_) {
   		for (int i = 0; i < MAX_SUMMARY_SETS; i++) {
 			if (fout[i] != nullptr) {
 				coverage_id_or_output_id_to_Summary_id &p = *co_to_s_[i];
@@ -443,23 +498,19 @@ void summarycalc::dosummary(int sample_size,int event_id,int coverage_or_output_
 				if (item_to_coverage_.size() > 0) {
 					int cov_id = item_to_coverage_[coverage_or_output_id];
 					summary_id = p[cov_id];
-				}
-				else {
+				} else {
 					summary_id = p[coverage_or_output_id];
 				}
 				OASIS_FLOAT *se = sse[i];
 				se[summary_id] += expval;
 			}
 		}
-		last_coverage_or_output_id = coverage_or_output_id;
+		last_coverage_or_output_id_ = coverage_or_output_id;
 	}
-	for (int i = 0; i < MAX_SUMMARY_SETS; i++) {
-		int cov_id = last_coverage_or_output_id;
-		if (item_to_coverage_.size() > 0) {
-			cov_id = item_to_coverage_[last_coverage_or_output_id];
-		}
-		if (fout[i] != nullptr) processsummeryset(i, cov_id, sidx, gul);
-	}
+
+	PropagateLosses = &summarycalc::add_losses;
+	processsummarysets(last_coverage_or_output_id_, sidx, gul,
+			   PropagateLosses);
 }
 // item like stream
 void summarycalc::dogulitemxsummary()
@@ -563,10 +614,11 @@ void summarycalc::dosummaryprocessing(int samplesize)
 			i = (int)fread(&sr, sizeof(sr), 1, stdin);
 			if (i == 0) break;
 			if (sr.sidx == 0) break;
-			if (sr.sidx == -3) {
+			if (sr.sidx == tiv_idx) {
 				expure_val = sr.loss;
-			}
-			else {
+			} else if (sr.sidx == chance_of_loss_idx || sr.sidx == max_loss_idx) {
+				dosummary_chanceofloss_maxloss(samplesize, fh.event_id, fh.output_id, sr.sidx, sr.loss);
+			} else {
 				dosummary(samplesize, fh.event_id, fh.output_id, sr.sidx, sr.loss, expure_val);
 			}
 		}

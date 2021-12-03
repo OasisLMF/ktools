@@ -54,7 +54,7 @@ bool firstOutput = true;
 
 int rowcount = 0;
 
-void doitz(bool skipheader, bool fullprecision, bool show_exposure_value, bool ord_output)
+void doitz(bool skipheader, bool fullprecision, bool show_exposure_value, bool ord_output, bool all_idx)
 {
 	int summarycalcstream_type = 0;
 	size_t i = fread(&summarycalcstream_type, sizeof(summarycalcstream_type), 1, stdin);
@@ -89,7 +89,11 @@ void doitz(bool skipheader, bool fullprecision, bool show_exposure_value, bool o
 				i = fread(&sr, sizeof(sr), 1, stdin);
 				if (i == 0) break;
 				if (sr.sidx == 0) break;
-				bool showRecord = false;
+				if (!all_idx) {   // Only output ChanceOfLoss and MaxLoss if flag set
+					if (sr.sidx == chance_of_loss_idx || sr.sidx == max_loss_idx) {
+						continue;
+					}
+				}
 
 				// Do not output records with exposure value = 0
 				if (sh.expval == 0) continue;
@@ -127,10 +131,10 @@ void doitz(bool skipheader, bool fullprecision, bool show_exposure_value, bool o
 	}
 	fprintf(stderr, "FATAL: Unsupported summarycalc stream type\n");
 }
-void doit(bool skipheader, bool fullprecision,bool show_exposure_value, bool remove_zero_exposure_records, bool ord_output)
+void doit(bool skipheader, bool fullprecision,bool show_exposure_value, bool remove_zero_exposure_records, bool ord_output, bool all_idx)
 {
 	if (remove_zero_exposure_records == true) {
-		doitz(skipheader, fullprecision, show_exposure_value, ord_output);
+		doitz(skipheader, fullprecision, show_exposure_value, ord_output, all_idx);
 		return;
 	}
 	int summarycalcstream_type = 0;
@@ -166,6 +170,11 @@ void doit(bool skipheader, bool fullprecision,bool show_exposure_value, bool rem
 				i = fread(&sr, sizeof(sr), 1, stdin);
 				if (i == 0) break;	
 				if (sr.sidx == 0) break;
+				if (!all_idx) {   // Only output ChanceOfLoss and MaxLoss if flag set
+					if (sr.sidx == chance_of_loss_idx || sr.sidx == max_loss_idx) {
+						continue;
+					}
+				}
 				rowcount++;
 				if (fullprecision == true) {
 					// ORD output flag takes priority over exposure value flag
@@ -209,6 +218,7 @@ void help()
 		"-f full precision\n"
 		"-e show exposure_value\n"
 		"-v version\n"
+		"-a include ChanceOfLoss and MaxLoss sample IDs\n"
 		"-z remove records with zero exposure values\n"
 		"-o Open Results Data (ORD) output\n"
 		"-h help\n"
@@ -224,7 +234,8 @@ int main(int argc, char* argv[])
 	bool show_exposure_value = false;
 	bool remove_zero_exposure_records = false;
 	bool ord_output = false;
-	while ((opt = getopt(argc, argv, "zvhfseo")) != -1) {
+	bool all_idx = false;
+	while ((opt = getopt(argc, argv, "zvhfseoa")) != -1) {
 		switch (opt) {
 		case 's':
 			skipheader = true;
@@ -241,6 +252,9 @@ int main(int argc, char* argv[])
 		case 'o':
 			ord_output = true;
 			break;
+		case 'a':
+			all_idx = true;
+			break;
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
 			exit(EXIT_FAILURE);
@@ -252,6 +266,6 @@ int main(int argc, char* argv[])
 	}
 
 	initstreams();
-	doit(skipheader, fullprecision, show_exposure_value, remove_zero_exposure_records, ord_output);
+	doit(skipheader, fullprecision, show_exposure_value, remove_zero_exposure_records, ord_output, all_idx);
 	return EXIT_SUCCESS;
 }

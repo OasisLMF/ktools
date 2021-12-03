@@ -169,7 +169,9 @@ namespace eltcalc {
 			const OASIS_FLOAT mean, const OASIS_FLOAT stdDev,
 			FILE * outFile,
 			const OASIS_FLOAT mean_impacted_exposure,
-			const OASIS_FLOAT max_impacted_exposure)
+			const OASIS_FLOAT max_impacted_exposure,
+			const OASIS_FLOAT chance_of_loss,
+			const OASIS_FLOAT max_loss)
 	{
 
 		char buffer[4096];
@@ -185,16 +187,19 @@ namespace eltcalc {
 			   const OASIS_FLOAT mean, const OASIS_FLOAT stdDev,
 			   FILE * outFile,
 			   const OASIS_FLOAT mean_impacted_exposure,
-			   const OASIS_FLOAT max_impacted_exposure)
+			   const OASIS_FLOAT max_impacted_exposure,
+			   const OASIS_FLOAT chance_of_loss,
+			   const OASIS_FLOAT max_loss)
 	{
 
 		if (outFile == nullptr) return;
 		char buffer[4096];
 		int strLen;
-		strLen = sprintf(buffer, "%d,%d,%d,%f,%f,%f,%f,%f,%f\n",
+		// TODO: Insert MaxLoss
+		strLen = sprintf(buffer, "%d,%d,%d,%f,%f,%f,%f,%f,%f,%f\n",
 				sh.event_id, sh.summary_id, type,
-				event_rate_[sh.event_id], mean, stdDev,
-				sh.expval, mean_impacted_exposure,
+				event_rate_[sh.event_id], chance_of_loss, mean,
+				stdDev, sh.expval, mean_impacted_exposure,
 				max_impacted_exposure);
 		WriteOutput(buffer, strLen, outFile);
 
@@ -228,7 +233,7 @@ namespace eltcalc {
 
 	}
 
-	void doetloutput(int samplesize, bool skipHeader, bool ordOutput, FILE **fout)
+	void doeltoutput(int samplesize, bool skipHeader, bool ordOutput, FILE **fout)
 	{
 		OASIS_FLOAT sumloss = 0.0;
 		OASIS_FLOAT sample_mean = 0.0;
@@ -237,12 +242,20 @@ namespace eltcalc {
 		OASIS_FLOAT sumlosssqr = 0.0;
 		void (*OutputData)(const summarySampleslevelHeader&, const int,
 				   const OASIS_FLOAT, const OASIS_FLOAT, FILE*,
+				   const OASIS_FLOAT, const OASIS_FLOAT,
 				   const OASIS_FLOAT, const OASIS_FLOAT);
 		FILE * outFile = nullptr;
 		if (ordOutput) {
 			if (skipHeader == false) {
 				if (fout[MELT] != nullptr) {
-					fprintf(fout[MELT], "EventId,SummaryId,SampleType,EventRate,MeanLoss,SDLoss,FootprintExposure,MeanImpactedExposure,MaxImpactedExposure\n");
+					// TODO: Insert MaxLoss
+					fprintf(fout[MELT],
+						"EventId,SummaryId,SampleType,"
+						"EventRate,ChanceOfLoss,"
+						"MeanLoss,SDLoss,"
+						"FootprintExposure,"
+						"MeanImpactedExposure,"
+						"MaxImpactedExposure\n");
 				}
 				if (fout[QELT] != nullptr) {
 					fprintf(fout[QELT], "EventId,SummaryId,Quantile,Loss\n");
@@ -267,6 +280,8 @@ namespace eltcalc {
 		while (i != 0) {
 			OASIS_FLOAT mean_impacted_exposure = 0;
 			OASIS_FLOAT max_impacted_exposure = 0;
+			OASIS_FLOAT chance_of_loss = 0;
+			OASIS_FLOAT max_loss = 0;
 			sampleslevelRec sr;
 			i = fread(&sr, sizeof(sr), 1, stdin);
 			while (i != 0 && sr.sidx != 0) {
@@ -280,8 +295,13 @@ namespace eltcalc {
 							max_impacted_exposure = sh.expval;
 						}
 					}
+				} else if (sr.sidx == -1) {
+					analytical_mean = sr.loss;
+				} else if (sr.sidx == chance_of_loss_idx) {
+					chance_of_loss = sr.loss;
+				} else if (sr.sidx == max_loss_idx) {
+					max_loss = sr.loss;
 				}
-				if (sr.sidx == -1) analytical_mean = sr.loss;
 				i = fread(&sr, sizeof(sr), 1, stdin);
 			}
 			if (samplesize > 1) {
@@ -304,13 +324,18 @@ namespace eltcalc {
 			}
 			if (sh.expval > 0) {   // only output rows with a non-zero exposure value
 				OutputData(sh, 1, analytical_mean, 0, outFile,
-					   sh.expval, sh.expval);
+					   sh.expval, sh.expval, chance_of_loss,
+					   max_loss);
 				if (firstOutput == true) {
 					std::this_thread::sleep_for(std::chrono::milliseconds(PIPE_DELAY)); // used to stop possible race condition with kat
 					firstOutput = false;
 				}
 				if (samplesize) {
-					OutputData(sh, 2, sample_mean, sd, outFile, mean_impacted_exposure, max_impacted_exposure);
+					OutputData(sh, 2, sample_mean, sd,
+						   outFile,
+						   mean_impacted_exposure,
+						   max_impacted_exposure,
+						   chance_of_loss, max_loss);
 					if (fout[QELT] != nullptr) {
 						OutputQuantiles(sh, losses_vec, fout[QELT]);
 						std::fill(losses_vec.begin(), losses_vec.end(), 0);
@@ -348,7 +373,7 @@ namespace eltcalc {
 
 			if (i == 1) i = fread(&summaryset_id, sizeof(summaryset_id), 1, stdin);
 			if (i == 1) {
-				doetloutput(samplesize, skipHeader, ordOutput, fout);
+				doeltoutput(samplesize, skipHeader, ordOutput, fout);
 			}
 			else {
 				fprintf(stderr, "FATAL: Stream read error\n");

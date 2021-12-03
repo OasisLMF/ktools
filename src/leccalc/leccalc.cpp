@@ -224,6 +224,10 @@ namespace leccalc {
 					break;
 				}
 
+				if (sr.sidx == chance_of_loss_idx || sr.sidx == max_loss_idx) {
+					continue;
+				}
+
 				if (sr.loss > 0.0)
 				{
 					dolecoutputaggsummary(sh.summary_id, sr.sidx, sr.loss, iter->second, out_loss);
@@ -393,6 +397,7 @@ namespace leccalc {
 						sampleslevelRec sr;
 						i = fread(&sr, sizeof(sr), 1, summary_fin);
 						if (i != 1 || sr.sidx == 0) break;
+						if (sr.sidx == chance_of_loss_idx || sr.sidx == max_loss_idx) continue;
 						dolecoutputaggsummary(sh.summary_id, sr.sidx, sr.loss, iter->second, out_loss);
 					}
 				}

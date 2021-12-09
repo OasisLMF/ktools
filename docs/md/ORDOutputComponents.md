@@ -53,7 +53,7 @@ The Sample ELT output is a csv file with the following fields;
 ***
 The program calculates loss by SummaryId and EventId. There are two variants (in addition to the sample variant SELT output by summarycalc, above);
 
-* Moment ELT (MELT) outputs Mean and Standard deviation of loss, as well as EventRate, ChanceOfLoss, FootprintExposure, MeanImpactedExposure and MaxImpactedExposure
+* Moment ELT (MELT) outputs Mean and Standard deviation of loss, as well as EventRate, ChanceOfLoss, MaxLoss, FootprintExposure, MeanImpactedExposure and MaxImpactedExposure
 * Quantile ELT (QELT) outputs loss quantiles for the provided set of probabilites. 
 
 ##### Parameters
@@ -116,9 +116,10 @@ The Moment ELT output is a csv file with the following fields;
 | ChanceOfLoss		 	| float  |    4   | Probability of a loss calculated from the effective damage distributions	|   0.95      | 
 | MeanLoss          	| float  |    4   | Mean                                                                    	|   1345.678  |
 | SDLoss            	| float  |    4   | Sample standard deviation for SampleType=2                              	|    945.89   |
+| MaxLoss     	     	| float  |    4   | Maximum possible loss calculated from the effective damage distribution     |   75000     |
 | FootprintExposure 	| float  |    4   | Exposure value impacted by the model's event footprint                 		|   80000     |
 | MeanImpactedExposure  | float  |    4   | Mean exposure impacted by the event across the samples (where loss > 0 )    |   65000     |
-| MaxImpactedExposure  	| float  |    4   | Maximum exposure impacted by the event across the samples (where loss > 0)  |   80000     |
+| MaxImpactedExposure  	| float  |    4   | Maximum exposure impacted by the event across the samples (where loss > 0)  |   70000     |
 
 The Quantile ELT output is a csv file with the following fields;
 
@@ -136,7 +137,7 @@ The Quantile ELT output is a csv file with the following fields;
 The program calculates loss by Period, EventId and SummaryId and outputs the results in ORD format. There are three variants;
 
 * Sample PLT (SPLT) outputs individual loss samples by SampleId, as well as PeriodWeight, Year, Month, Day, Hour, Minute and ImpactedExposure
-* Moment PLT (MPLT) outputs Mean and Standard deviation of loss, as well as PeriodWeight, Year, Month, Day, Hour, Minute, ChanceOfLoss, FootprintExposure, MeanImpactedExposure and MaxImpactedExposure
+* Moment PLT (MPLT) outputs Mean and Standard deviation of loss, as well as PeriodWeight, Year, Month, Day, Hour, Minute, ChanceOfLoss, MaxLoss, FootprintExposure, MeanImpactedExposure and MaxImpactedExposure
 * Quantile PLT (QPLT) outputs loss quantiles for the provided set of probabilites as well as PeriodWeight, Year, Month, Day, Hour, Minute 
 
 ##### Parameters
@@ -220,9 +221,10 @@ The Moment PLT output is a csv file with the following fields;
 | ChanceOfLoss		 	| float  |    4   | Probability of a loss calculated from the effective damage distributions	|   0.95      |
 | MeanLoss          	| float  |    4   | Mean                                                                    	|   1345.678  |
 | SDLoss            	| float  |    4   | Sample standard deviation for SampleType=2                              	|    945.89   |
+| MaxLoss     	     	| float  |    4   | Maximum possible loss calculated from the effective damage distribution     |   75000     |
 | FootprintExposure 	| float  |    4   | Exposure value impacted by the model's event footprint                 		|   80000     |
 | MeanImpactedExposure  | float  |    4   | Mean exposure impacted by the event across the samples (where loss > 0 )    |   65000     |
-| MaxImpactedExposure  	| float  |    4   | Maximum exposure impacted by the event across the samples (where loss > 0)  |   80000     |
+| MaxImpactedExposure  	| float  |    4   | Maximum exposure impacted by the event across the samples (where loss > 0)  |   70000     |
 
 The Quantile PLT output is a csv file with the following fields;
 

@@ -195,12 +195,11 @@ namespace eltcalc {
 		if (outFile == nullptr) return;
 		char buffer[4096];
 		int strLen;
-		// TODO: Insert MaxLoss
-		strLen = sprintf(buffer, "%d,%d,%d,%f,%f,%f,%f,%f,%f,%f\n",
+		strLen = sprintf(buffer, "%d,%d,%d,%f,%f,%f,%f,%f,%f,%f,%f\n",
 				sh.event_id, sh.summary_id, type,
 				event_rate_[sh.event_id], chance_of_loss, mean,
-				stdDev, sh.expval, mean_impacted_exposure,
-				max_impacted_exposure);
+				stdDev, max_loss, sh.expval,
+				mean_impacted_exposure, max_impacted_exposure);
 		WriteOutput(buffer, strLen, outFile);
 
 	}
@@ -248,11 +247,10 @@ namespace eltcalc {
 		if (ordOutput) {
 			if (skipHeader == false) {
 				if (fout[MELT] != nullptr) {
-					// TODO: Insert MaxLoss
 					fprintf(fout[MELT],
 						"EventId,SummaryId,SampleType,"
 						"EventRate,ChanceOfLoss,"
-						"MeanLoss,SDLoss,"
+						"MeanLoss,SDLoss,MaxLoss,"
 						"FootprintExposure,"
 						"MeanImpactedExposure,"
 						"MaxImpactedExposure\n");

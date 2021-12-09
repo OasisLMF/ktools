@@ -319,7 +319,7 @@ void summarycalc::outputsummaryset(int sample_size, int summary_set, int event_i
 					else {
 						s.loss = ssl[i][j];
 						if (zerooutput_ == false) {
-							if (s.loss > 0.0) {
+							if (s.loss > 0.0 || s.sidx == mean_idx) {
 								fwrite(&s, sizeof(s), 1, fout[summary_set]);
 								offset_[summary_set] += sizeof(s);
 							}

@@ -403,9 +403,11 @@ namespace pltcalc {
 		o.mean = mean_val;
 		o.standard_deviation = 0;
 		for (auto p : vp) {
-			o.period_no = p.period_no;
-			o.occ_date_id = p.occ_date_id;
-			OutputData(o, 1, outFile);
+			if (o.mean > 0 || o.standard_deviation > 0) {
+				o.period_no = p.period_no;
+				o.occ_date_id = p.occ_date_id;
+				OutputData(o, 1, outFile);
+			}
 		}
 	}
 

@@ -61,6 +61,18 @@ installertest()
 	../src/eltcalc/eltcalc < ../ktest/testout/fmsummarycalc1.bin > ../ktest/testout/fmelt1.csv
 	../src/eltcalc/eltcalc < ../ktest/testout/fmsummarycalc2.bin > ../ktest/testout/fmelt2.csv
 
+	# test melt
+	../src/eltcalc/eltcalc -M ../ktest/testout/gulmelt1.csv < ../ktest/testout/gulsummarycalc1.bin 
+	../src/eltcalc/eltcalc -M ../ktest/testout/gulmelt2.csv < ../ktest/testout/gulsummarycalc2.bin 
+	#../src/eltcalc/eltcalc -M ../ktest/testout/fmmelt1.csv < ../ktest/testout/fmsummarycalc1.bin 
+	#../src/eltcalc/eltcalc -M ../ktest/testout/fmmelt2.csv < ../ktest/testout/fmsummarycalc2.bin 
+
+	# test mplt
+	../src/pltcalc/pltcalc -M ../ktest/testout/gulmplt1.csv < ../ktest/testout/gulsummarycalc1.bin 
+	../src/pltcalc/pltcalc -M ../ktest/testout/gulmplt2.csv < ../ktest/testout/gulsummarycalc2.bin 
+	#../src/pltcalc/pltcalc -M ../ktest/testout/fmmplt1.csv < ../ktest/testout/fmsummarycalc1.bin 
+	#../src/pltcalc/pltcalc -M ../ktest/testout/fmmplt2.csv < ../ktest/testout/fmsummarycalc2.bin
+
 	# test leccalc
 	cp ../ktest/testout/gulsummarycalc2.bin work/gul2/summary/gulsummarycalc2.bin
 	cp ../ktest/testout/fmsummarycalc2.bin work/fm2/summary/fmsummarycalc2.bin

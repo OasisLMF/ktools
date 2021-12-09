@@ -137,7 +137,7 @@ The Quantile ELT output is a csv file with the following fields;
 The program calculates loss by Period, EventId and SummaryId and outputs the results in ORD format. There are three variants;
 
 * Sample PLT (SPLT) outputs individual loss samples by SampleId, as well as PeriodWeight, Year, Month, Day, Hour, Minute and ImpactedExposure
-* Moment PLT (MPLT) outputs Mean and Standard deviation of loss, as well as PeriodWeight, Year, Month, Day, Hour, Minute, ChanceOfLoss, FootprintExposure, MeanImpactedExposure and MaxImpactedExposure
+* Moment PLT (MPLT) outputs Mean and Standard deviation of loss, as well as PeriodWeight, Year, Month, Day, Hour, Minute, ChanceOfLoss, MaxLoss, FootprintExposure, MeanImpactedExposure and MaxImpactedExposure
 * Quantile PLT (QPLT) outputs loss quantiles for the provided set of probabilites as well as PeriodWeight, Year, Month, Day, Hour, Minute 
 
 ##### Parameters

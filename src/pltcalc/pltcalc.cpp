@@ -200,6 +200,7 @@ namespace pltcalc {
 		OASIS_FLOAT max_impact_exp;
 		OASIS_FLOAT mean_impact_exp;
 		OASIS_FLOAT chance_of_loss;
+		OASIS_FLOAT max_loss;
 		int occ_date_id;
 	};
 
@@ -214,6 +215,7 @@ namespace pltcalc {
 		OASIS_FLOAT max_impact_exp;
 		OASIS_FLOAT mean_impact_exp;
 		OASIS_FLOAT chance_of_loss;
+		OASIS_FLOAT max_loss;
 		long long occ_date_id;
 	};
 
@@ -287,12 +289,12 @@ namespace pltcalc {
 		char buffer[4096];
 		int strLen;
 		strLen = sprintf(buffer,
-				 "%d,%f,%d,%d,%d,%d,%d,%d,%d,%d,%0.4f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f\n",
+				 "%d,%f,%d,%d,%d,%d,%d,%d,%d,%d,%0.4f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f,%0.2f\n",
 				 o.period_no, period_weights_[o.period_no],
 				 o.event_id, occ_year, occ_month, occ_day,
 				 occ_hour, occ_minute, o.summary_id, type,
 				 o.chance_of_loss, o.mean, o.standard_deviation,
-				 o.exp_value, o.mean_impact_exp,
+				 o.max_loss, o.exp_value, o.mean_impact_exp,
 				 o.max_impact_exp);
 		writeoutput(buffer, strLen, outFile);
 	}
@@ -390,7 +392,8 @@ namespace pltcalc {
 		       OASIS_FLOAT mean_val,
 		       void (*OutputData)(const outrecT&, const int, FILE*),
 		       FILE * outFile, moccT &m_occ, std::vector<periodT> &vp,
-		       const OASIS_FLOAT chance_of_loss)
+		       const OASIS_FLOAT chance_of_loss,
+		       const OASIS_FLOAT max_loss)
 	{
 		vp = m_occ[sh.event_id];
 		outrecT o;
@@ -400,6 +403,7 @@ namespace pltcalc {
 		o.max_impact_exp = sh.expval;
 		o.mean_impact_exp = sh.expval;
 		o.chance_of_loss = chance_of_loss;
+		o.max_loss = max_loss;
 		o.mean = mean_val;
 		o.standard_deviation = 0;
 		for (auto p : vp) {
@@ -418,7 +422,8 @@ namespace pltcalc {
 		       FILE * outFile, moccT &m_occ, std::vector<periodT> &vp,
 		       const OASIS_FLOAT max_impacted_exposure,
 		       const OASIS_FLOAT mean_impacted_exposure,
-		       const OASIS_FLOAT chance_of_loss)
+		       const OASIS_FLOAT chance_of_loss,
+		       const OASIS_FLOAT max_loss)
 	{
 		vp = m_occ[sh.event_id];
 		bool hasrec = false;
@@ -430,6 +435,7 @@ namespace pltcalc {
 		o.max_impact_exp = max_impacted_exposure;
 		o.mean_impact_exp = mean_impacted_exposure;
 		o.chance_of_loss = chance_of_loss;
+		o.max_loss = max_loss;
 		o.mean = 0;
 		o.standard_deviation = 0;
 
@@ -474,6 +480,7 @@ namespace pltcalc {
 			OASIS_FLOAT max_impacted_exposure = 0;
 			OASIS_FLOAT mean_impacted_exposure = 0;
 			OASIS_FLOAT chance_of_loss = 0;
+			OASIS_FLOAT max_loss = 0;
 			i = fread(&sh, sizeof(sh), 1, stdin);
 			while (i != 0) {
 				OASIS_FLOAT impacted_exposure = 0;
@@ -484,7 +491,7 @@ namespace pltcalc {
 						  m_occ, vp,
 						  max_impacted_exposure,
 						  mean_impacted_exposure,
-						  chance_of_loss);
+						  chance_of_loss, max_loss);
 					outputrows_qplt(sh, vrec, fout[QPLT],
 							m_occ, vp);
 					vrec.clear();
@@ -498,12 +505,14 @@ namespace pltcalc {
 
 				if (sr.sidx == chance_of_loss_idx) {
 					chance_of_loss = sr.loss;
+				} else if (sr.sidx == max_loss_idx) {
+					max_loss = sr.loss;
 				}
 
 				if (sr.sidx == -1) {
 					domeanout(sh, sr.loss, OutputData,
 						  outFile, m_occ, vp,
-						  chance_of_loss);
+						  chance_of_loss, max_loss);
 				} else {
 					vrec.push_back(sr);
 					mean_impacted_exposure += impacted_exposure / samplesize_;
@@ -545,7 +554,7 @@ namespace pltcalc {
 						"Year,Month,Day,Hour,Minute,"
 						"SummaryId,SampleType,"
 						"ChanceOfLoss,MeanLoss,SDLoss,"
-						"FootprintExposure,"
+						"MaxLoss,FootprintExposure,"
 						"MeanImpactedExposure,"
 						"MaxImpactedExposure\n");
 				}

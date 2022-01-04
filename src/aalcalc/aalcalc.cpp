@@ -320,7 +320,6 @@ void aalcalc::do_calc_end(const int period_no) {
 			aal_rec& a = vec_sample_aal_[current_summary_id_];
 			a.type = 2;
 			a.summary_id = current_summary_id_;
-			a.max_exposure_value = max_exposure_val_[1][0];
 			a.mean += mean * weighting;
 			a.mean_squared += mean * mean * weighting;
 			// By ensemble ID
@@ -330,7 +329,6 @@ void aalcalc::do_calc_end(const int period_no) {
 				ea.summary_id = current_summary_id_;
 				ea.type = 2;
 				ea.ensemble_id = current_ensemble_id;
-				ea.max_exposure_value = max_exposure_val_[1][current_ensemble_id];
 				ea.mean += mean * weighting;
 				ea.mean_squared += mean * mean * weighting;
 			}
@@ -338,7 +336,6 @@ void aalcalc::do_calc_end(const int period_no) {
 			aal_rec& a = vec_analytical_aal_[current_summary_id_];
 			a.type = 1;
 			a.summary_id = current_summary_id_;
-			a.max_exposure_value = max_exposure_val_[0][0];
 			a.mean += mean * weighting;
 			a.mean_squared += mean * mean * weighting;
 		}
@@ -355,14 +352,8 @@ void aalcalc::do_calc_by_period(const summarySampleslevelHeader &sh,
 	for (auto x : vrec) {
 		if (x.loss > 0) {
 			int type_idx = (x.sidx != -1);
-			if (max_exposure_val_[type_idx][0] < sh.expval) {
-				max_exposure_val_[type_idx][0] = sh.expval;
-			}
 			if (sidxtoensemble_.size() > 0 && type_idx == 1) {
 				int ensemble_id = sidxtoensemble_[x.sidx];
-				if(max_exposure_val_[type_idx][ensemble_id] < sh.expval) {
-					max_exposure_val_[type_idx][ensemble_id] = sh.expval;
-				}
 			}
 			int sidx = (type_idx == 0) ? 0 : x.sidx;
 			vec_sample_sum_loss_[sidx] += x.loss;
@@ -431,11 +422,9 @@ void aalcalc::outputresultscsv_new(const std::vector<aal_rec_ensemble> &vec_aal,
 
 			char buffer[4096];
 			int strLen;
-			strLen = sprintf(buffer, "%d,%d,%f,%f,%f,%d\n",
-					 v_iter->summary_id, v_iter->type,
-					 mean, sd_dev,
-					 v_iter->max_exposure_value,
-					 v_iter->ensemble_id);
+			strLen = sprintf(buffer, "%d,%d,%f,%f,%d\n",
+					v_iter->summary_id, v_iter->type,
+					mean, sd_dev, v_iter->ensemble_id);
 			outputrows(buffer, strLen);
 
 		}
@@ -467,11 +456,6 @@ void aalcalc::outputresultscsv_new(std::vector<aal_rec>& vec_aal, int periods,in
 			strLen = snprintf(buffer, bufferSize, "%d,%d,%f,%f",
 					  v_iter->summary_id, v_iter->type,
 					  mean, sd_dev);
-			if (ord_output_ == false) {
-				strLen += snprintf(buffer+strLen,
-						   bufferSize-strLen, ",%f",
-						   v_iter->max_exposure_value);
-			}
 			// If relevant use ensemble ID = 0 for calculations
 			// across all ensembles
 			if (sidxtoensemble_.size() > 0)
@@ -488,7 +472,7 @@ void aalcalc::outputresultscsv_new()
 		if (ord_output_ == true) {
 			printf("SummaryID,SampleType,MeanLoss,SDLoss");
 		} else {
-			printf("summary_id,type,mean,standard_deviation,exposure_value");
+			printf("summary_id,type,mean,standard_deviation");
 			if (sidxtoensemble_.size() > 0) printf(",ensemble_id");
 		}
 		printf("\n");
@@ -502,36 +486,7 @@ void aalcalc::outputresultscsv_new()
 	}
 
 }
-void aalcalc::outputresultscsv()
-{
-	if (skipheader_ == false) printf("summary_id,type,mean,standard_deviation,exposure_value\n");
-	int p1 = no_of_periods_ ;
-	int p2 = p1 - 1;
 
-	for (auto x : map_analytical_aal_) {
-		double mean = x.second.mean;
-		double mean_squared = x.second.mean * x.second.mean;
-		double s1 = x.second.mean_squared - mean_squared / p1;
-		double s2 = s1 / p2;
-		double sd_dev = sqrt(s2);
-		mean = mean / no_of_periods_;
-		printf("%d,%d,%f,%f,%f\n", x.first, x.second.type, mean, sd_dev, x.second.max_exposure_value);
-	}
-
-	p1 = no_of_periods_ * samplesize_;
-	p2 = p1 - 1;
-
-	for (auto x : map_sample_aal_) {
-		double mean = x.second.mean / samplesize_;
-		double mean_squared = x.second.mean * x.second.mean;
-		double s1 = x.second.mean_squared - mean_squared / p1;
-		double s2 = s1 / p2;
-		double sd_dev = sqrt(s2);
-		mean = mean / no_of_periods_;
-		printf("%d,%d,%f,%f,%f\n", x.first, x.second.type, mean, sd_dev, x.second.max_exposure_value);
-	}
-
-}
 void aalcalc::initsameplsize(const std::string &path)
 {
 	DIR *dir;
@@ -591,9 +546,6 @@ void aalcalc::doit(const std::string& subfolder)
 	loadperiodtoweigthing();	// move this to after the samplesize_ variable has been set i.e.  after reading the first 8 bytes of the first summary file
 	loadensemblemapping();
 	char line[4096];
-	for (int type = 0; type < 2; type++) {
-		max_exposure_val_[type].resize(max_ensemble_id_ + 1, 0.0);
-	}
 	vec_sample_sum_loss_.resize(samplesize_+1, 0.0);
 	vec_sample_aal_.resize(max_summary_id_ + 1);
 	vec_ensemble_aal_.resize(max_summary_id_ * max_ensemble_id_ + 1);
@@ -657,9 +609,6 @@ void aalcalc::doit(const std::string& subfolder)
 				last_period_no = -1;   // Reset
 				current_summary_id_ = summary_id;
 				last_summary_id = summary_id;
-				for (int type = 0; type < 2; type++) {
-					std::fill(max_exposure_val_[type].begin(), max_exposure_val_[type].end(), 0.0);
-				}
 			}
 			if (last_period_no != period_no) {
 				if (last_period_no != -1) {

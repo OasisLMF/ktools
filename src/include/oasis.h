@@ -293,7 +293,6 @@ struct aal_rec {
 	int type;
 	double mean;
 	double mean_squared;
-	double max_exposure_value;
 };
 
 struct aal_rec_ensemble : aal_rec {

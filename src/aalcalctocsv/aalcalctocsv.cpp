@@ -49,11 +49,11 @@ namespace aalcalctocsv {
 		int samplesize = 0;
 		size_t i = fread(&samplesize, sizeof(int), 1, stdin);
 
-		if (skipheader == false) printf("summary_id,type,mean, mean_squared,max_exposure_value\n");
+		if (skipheader == false) printf("summary_id,type,mean,mean_squared\n");
 		aal_rec q;
 		i = fread(&q, sizeof(q), 1, stdin);
 		while (i != 0) {
-			printf("%d, %d, %f, %f, %f\n", q.summary_id, q.type, q.mean, q.mean_squared, q.max_exposure_value);
+			printf("%d, %d, %f, %f\n", q.summary_id, q.type, q.mean, q.mean_squared);
 
 			i = fread(&q, sizeof(q), 1, stdin);
 		}

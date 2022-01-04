@@ -44,10 +44,6 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <string>
 #include <map>
 #include <vector>
-struct aal_rec_vec {
-	std::vector<float> v;
-	double max_exposure_value;
-};
 // key for analytic data
 struct period_map_key {
 	int summary_id;

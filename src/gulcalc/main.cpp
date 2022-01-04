@@ -76,7 +76,6 @@ void help()
 		"-l legacy mechanism driven by random numbers generated dynamically per group - will be removed in future\n"
 		"-L Loss threshold (default 0)\n"
 		"-a alloc rule (default 0)\n"
-		"-m execution mode (default 0) mode 1\n"
 		"-b benchmark (in development)\n"
 		"-v version\n"
 		"-h help\n"
@@ -89,7 +88,7 @@ int main(int argc, char *argv[])
 	gulcalcopts gopt;
 	gopt.loss_threshold = 0.000001;
 	progname = argv[0];
-	while ((opt = getopt(argc, argv, "Alvhdrba:L:S:c:i:j:R:s:m:")) != -1) {
+	while ((opt = getopt(argc, argv, "Alvhdrba:L:S:c:i:j:R:s:")) != -1) {
 		switch (opt) {
 		case 'S':
 			gopt.samplesize = atoi(optarg);
@@ -102,9 +101,6 @@ int main(int argc, char *argv[])
 			break;
 		case 'a':
 			gopt.allocRule = atoi(optarg);
-			// Set mode according to alloc rule
-			if (gopt.allocRule > 0) gopt.mode = 1;
-			else gopt.mode = 0;   // alloc rule = 0 loss stream is equivalent to deprecated item stream
 			break;
 		case 'b':
 			gopt.benchmark = true;
@@ -125,9 +121,6 @@ int main(int argc, char *argv[])
 		case 'j':
 			gopt.correlated_output = optarg;
 			gopt.correlatedLevelOutput = true;
-			break;
-		case 'm':
-			gopt.mode = atoi(optarg);
 			break;
 		case 'c':
 			gopt.coverage_output = optarg;
@@ -166,9 +159,13 @@ int main(int argc, char *argv[])
 		else gopt.itemout = fopen(gopt.item_output.c_str(), "wb");
 	}
 	if (gopt.coverageLevelOutput == true) {
-		gopt.mode = 0;	// mode is always zero for coverage level output -c is to be deprecated
-		if (gopt.coverage_output == "-") gopt.covout = stdout;
-		else gopt.covout = fopen(gopt.coverage_output.c_str(), "wb");
+		if (gopt.allocRule <= 0) {
+			if (gopt.coverage_output == "-") gopt.covout = stdout;
+			else gopt.covout = fopen(gopt.coverage_output.c_str(), "wb");
+		} else {
+			fprintf(stderr, "WARNING: Alloc rule %d and coverage output are incompatible - ignoring coverage output\n", gopt.allocRule);
+			gopt.coverageLevelOutput == false;
+		}
 	}
 	if(gopt.correlatedLevelOutput == true) {
 		gopt.corrout = fopen(gopt.correlated_output.c_str(), "wb");
@@ -181,10 +178,10 @@ int main(int argc, char *argv[])
 	if (gopt.itemLevelOutput == false && gopt.coverageLevelOutput == false) {
 		fprintf(stderr, "FATAL: S%s: No output option selected\n", argv[0]);
 		exit(EXIT_FAILURE);
-	}	
+	}
 
-	if (gopt.mode > 1 || gopt.mode < 0) {
-		fprintf(stderr, "FATAL:%s: Invalid mode %d valid modes are 0 and 1\n", argv[0],gopt.mode);
+	if (gopt.allocRule > 2) {
+		fprintf(stderr, "FATAL: Invalid alloc rule %d\n", gopt.allocRule);
 		exit(EXIT_FAILURE);
 	}
 

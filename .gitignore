@@ -17,6 +17,7 @@ depcomp
 install-sh
 missing
 VERSION
+VERSION.txt
 build
 examples2
 .gdbinit*

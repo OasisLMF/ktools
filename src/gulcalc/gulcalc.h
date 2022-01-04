@@ -110,7 +110,6 @@ struct gulcalcopts {
 	FILE *itemout = stdout;
 	FILE *covout = stdout;
 	FILE *corrout = stdout;
-	int mode = 0;		// default mode = 0
 	int allocRule = -1;   // default is unset
 	bool benchmark = false;
 };
@@ -214,7 +213,7 @@ public:
 			damagebindictionary_vec_ = &damagebindictionary_vec;
 			coverages_ = &tivs;
 			cov_.resize(coverages_->size());
-			if (opt.mode == 1) {
+			if (opt.allocRule > 0) {
 				mode1_.resize(coverages_->size());
 				mode1_stats_.resize(coverages_->size());
 			}

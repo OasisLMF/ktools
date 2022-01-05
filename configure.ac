@@ -156,7 +156,6 @@ AC_CONFIG_FILES([
                  src/leccalc/Makefile
 		 src/ordleccalc/Makefile
                  src/aalcalc/Makefile
-                 src/aalcalctocsv/Makefile
                  src/vulnerabilitytobin/Makefile
                  src/vulnerabilitytocsv/Makefile
                  src/footprinttobin/Makefile

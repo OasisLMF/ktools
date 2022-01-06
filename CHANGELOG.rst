@@ -1,6 +1,15 @@
 Ktools Changelog
 ================
 
+`v3.7.4`_
+ ---------
+* [#252](https://github.com/OasisLMF/ktools/pull/261) - Zero loss EP curves should output records for required return periods
+* [#258](https://github.com/OasisLMF/ktools/pull/262) - Propagate MaxLoss field through stream
+* [#205](https://github.com/OasisLMF/ktools/pull/263) - Is mode flag surplus to requirements in gulcalc?
+* [#101](https://github.com/OasisLMF/ktools/pull/264) - remove exposure value from aalcalc output
+* [#265](https://github.com/OasisLMF/ktools/pull/266) - Remove ktools component aalcalctocsv
+.. _`v3.7.4`:  https://github.com/OasisLMF/ktools/compare/v3.7.3...v3.7.4
+
 `v3.7.3`_
  ---------
 * [#257](https://github.com/OasisLMF/ktools/pull/257) - Feature/docs

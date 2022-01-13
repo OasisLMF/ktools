@@ -62,7 +62,7 @@ struct OutLosses {
 };
 
 struct TVaR {
-	OASIS_FLOAT retperiod;
+	double retperiod;
 	OASIS_FLOAT tvar;
 };
 

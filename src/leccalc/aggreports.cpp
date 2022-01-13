@@ -136,10 +136,10 @@ void aggreports::LoadEnsembleMapping() {
 }
 
 
-OASIS_FLOAT aggreports::GetLoss(const OASIS_FLOAT next_return_period,
-				const OASIS_FLOAT last_return_period,
+OASIS_FLOAT aggreports::GetLoss(const double next_return_period,
+				const double last_return_period,
 				const OASIS_FLOAT last_loss,
-				const OASIS_FLOAT current_return_period,
+				const double current_return_period,
 				const OASIS_FLOAT current_loss) const {
 
   if (current_return_period == 0.0) return 0.0;
@@ -165,7 +165,7 @@ OASIS_FLOAT aggreports::GetLoss(const OASIS_FLOAT next_return_period,
 
 void aggreports::FillTVaR(std::map<int, std::vector<TVaR>> &tail,
 			  const int summary_id, const int epcalc,
-			  const OASIS_FLOAT nextreturnperiod_value,
+			  const double nextreturnperiod_value,
 			  const OASIS_FLOAT tvar) {
 
   tail[summary_id].push_back({nextreturnperiod_value, tvar});
@@ -175,7 +175,7 @@ void aggreports::FillTVaR(std::map<int, std::vector<TVaR>> &tail,
 
 void aggreports::FillTVaR(std::map<wheatkey, std::vector<TVaR>> &tail,
 			  const int summary_id, const int sidx,
-			  const OASIS_FLOAT nextreturnperiod_value,
+			  const double nextreturnperiod_value,
 			  const OASIS_FLOAT tvar) {
 
   wheatkey wk;
@@ -189,17 +189,17 @@ void aggreports::FillTVaR(std::map<wheatkey, std::vector<TVaR>> &tail,
 // epcalc = sidx for Wheatsheaf (Per Sample Exceedance Probability Table)
 template<typename T>
 void aggreports::WriteReturnPeriodOut(const std::vector<int> fileIDs,
-	size_t &nextreturnperiod_index, OASIS_FLOAT &last_return_period,
-	OASIS_FLOAT &last_loss, const OASIS_FLOAT current_return_period,
+	size_t &nextreturnperiod_index, double &last_return_period,
+	OASIS_FLOAT &last_loss, const double current_return_period,
 	const OASIS_FLOAT current_loss, const int summary_id, const int eptype,
-	const int epcalc, const OASIS_FLOAT max_retperiod, int counter,
+	const int epcalc, const double max_retperiod, int counter,
 	OASIS_FLOAT tvar, T &tail,
 	void (aggreports::*WriteOutput)(const std::vector<int>, const int,
-					const int, const int,
-					const OASIS_FLOAT, const OASIS_FLOAT))
+					const int, const int, const double,
+					const OASIS_FLOAT))
 {
 
-  OASIS_FLOAT nextreturnperiod_value = 0;
+  double nextreturnperiod_value = 0;
 
   do {
 
@@ -277,7 +277,7 @@ inline void aggreports::OutputRows(const std::vector<int> fileIDs,
 void aggreports::WriteLegacyOutput(const std::vector<int> fileIDs,
 				   const int summary_id, const int type,
 				   const int ensemble_id,
-				   const OASIS_FLOAT retperiod,
+				   const double retperiod,
 				   const OASIS_FLOAT loss) {
 
   const int bufferSize = 4096;
@@ -296,7 +296,7 @@ void aggreports::WriteLegacyOutput(const std::vector<int> fileIDs,
 
 void aggreports::WriteORDOutput(const std::vector<int> fileIDs,
 				const int summary_id, const int epcalc,
-				const int eptype, const OASIS_FLOAT retperiod,
+				const int eptype, const double retperiod,
 				const OASIS_FLOAT loss) {
 
   const int bufferSize = 4096;
@@ -353,8 +353,8 @@ void aggreports::WriteTVaR(const std::vector<int> fileIDs,
 inline void aggreports::DoSetUp(int &eptype, int &eptype_tvar, int &epcalc,
 	const int ensemble_id, const std::vector<int> fileIDs,
 	void (aggreports::*&WriteOutput)(const std::vector<int>, const int,
-					 const int, const int,
-					 const OASIS_FLOAT, const OASIS_FLOAT))
+					 const int, const int, const double,
+					 const OASIS_FLOAT))
 {
 
   if (eptype == AEP) eptype_tvar = AEPTVAR;
@@ -399,16 +399,15 @@ inline void aggreports::DoSetUp(int &eptype, int &eptype_tvar, int &epcalc,
 // No weighting
 void aggreports::WriteExceedanceProbabilityTable(
 	const std::vector<int> fileIDs, std::map<int, lossvec> &items,
-	const OASIS_FLOAT max_retperiod, int epcalc, int eptype,
-	int samplesize, int ensemble_id) {
+	const double max_retperiod, int epcalc, int eptype, int samplesize,
+	int ensemble_id) {
 
   if (items.size() == 0) return;
   if (samplesize == 0) return;
 
   int eptype_tvar = 0;
   void (aggreports::*WriteOutput)(const std::vector<int>, const int, const int,
-				  const int, const OASIS_FLOAT,
-				  const OASIS_FLOAT);
+				  const int, const double, const OASIS_FLOAT);
   DoSetUp(eptype, eptype_tvar, epcalc, ensemble_id, fileIDs, WriteOutput);
 
   std::map<int, std::vector<TVaR>> tail;
@@ -417,13 +416,13 @@ void aggreports::WriteExceedanceProbabilityTable(
     lossvec &lpv = s.second;
     std::sort(lpv.rbegin(), lpv.rend());
     size_t nextreturnperiodindex = 0;
-    OASIS_FLOAT last_computed_rp = 0;
+    double last_computed_rp = 0;
     OASIS_FLOAT last_computed_loss = 0;
     OASIS_FLOAT tvar = 0;
     int i = 1;
 
     for (auto lp : lpv) {
-      OASIS_FLOAT retperiod = max_retperiod / i;
+      double retperiod = max_retperiod / i;
 
       if (useReturnPeriodFile_) {
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
@@ -441,7 +440,7 @@ void aggreports::WriteExceedanceProbabilityTable(
     }
     if (useReturnPeriodFile_) {
       do {
-	OASIS_FLOAT retperiod = max_retperiod / i;
+	double retperiod = max_retperiod / i;
 	if (returnperiods_[nextreturnperiodindex] <= 0) retperiod = 0;
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, 0, s.first, eptype,
@@ -473,8 +472,7 @@ void aggreports::WriteExceedanceProbabilityTable(
 
   int eptype_tvar = 0;
   void (aggreports::*WriteOutput)(const std::vector<int>, const int, const int,
-				  const int, const OASIS_FLOAT,
-				  const OASIS_FLOAT);
+				  const int, const double, const OASIS_FLOAT);
   DoSetUp(eptype, eptype_tvar, epcalc, ensemble_id, fileIDs, WriteOutput);
 
   std::map<int, std::vector<TVaR>> tail;
@@ -483,19 +481,19 @@ void aggreports::WriteExceedanceProbabilityTable(
     lossvec2 &lpv = s.second;
     std::sort(lpv.rbegin(), lpv.rend());
     size_t nextreturnperiodindex = 0;
-    OASIS_FLOAT last_computed_rp = 0;
+    double last_computed_rp = 0;
     OASIS_FLOAT last_computed_loss = 0;
     OASIS_FLOAT tvar = 0;
     int i = 1;
-    OASIS_FLOAT cumulative_weighting = 0;
-    OASIS_FLOAT max_retperiod = 0;
+    double cumulative_weighting = 0;
+    double max_retperiod = 0;
     bool largest_loss = false;
 
     for (auto lp : lpv) {
       cumulative_weighting += (lp.period_weighting * cum_weight_constant);
 
       if (lp.period_weighting) {
-	OASIS_FLOAT retperiod = 1 / cumulative_weighting;
+	double retperiod = 1 / cumulative_weighting;
 
 	if (!largest_loss) {
 	  max_retperiod = retperiod + 0.0001;   // Add for floating point errors
@@ -520,7 +518,7 @@ void aggreports::WriteExceedanceProbabilityTable(
     if (useReturnPeriodFile_) {
       auto iter = unusedperiodstoweighting.begin();
       do {
-	OASIS_FLOAT retperiod = 0;
+	double retperiod = 0;
 	if (iter != unusedperiodstoweighting.end()) {
 	  cumulative_weighting += (iter->second * cum_weight_constant);
 	  retperiod = 1 / cumulative_weighting;
@@ -546,8 +544,8 @@ void aggreports::WriteExceedanceProbabilityTable(
 inline void aggreports::DoSetUpWheatsheaf(int &eptype, int &eptype_tvar,
 	const int ensemble_id, const std::vector<int> fileIDs,
 	void (aggreports::*&WriteOutput)(const std::vector<int>, const int,
-					 const int, const int,
-					 const OASIS_FLOAT, const OASIS_FLOAT))
+					 const int, const int, const double,
+					 const OASIS_FLOAT))
 {
 
   if (eptype == AEP) eptype_tvar = AEPTVAR;
@@ -589,24 +587,23 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
 
   int eptype_tvar = 0;
   void (aggreports::*WriteOutput)(const std::vector<int>, const int, const int,
-				  const int, const OASIS_FLOAT,
-				  const OASIS_FLOAT);
+				  const int, const double, const OASIS_FLOAT);
   DoSetUpWheatsheaf(eptype, eptype_tvar, ensemble_id, fileIDs, WriteOutput);
 
   std::map<wheatkey, std::vector<TVaR>> tail;
-  const OASIS_FLOAT max_retperiod = totalperiods_;
+  const double max_retperiod = totalperiods_;
 
   for (auto s : items) {
     lossvec &lpv = s.second;
     std::sort(lpv.rbegin(), lpv.rend());
     size_t nextreturnperiodindex = 0;
-    OASIS_FLOAT last_computed_rp = 0;
+    double last_computed_rp = 0;
     OASIS_FLOAT last_computed_loss = 0;
     OASIS_FLOAT tvar = 0;
     int i = 1;
 
     for (auto lp : lpv) {
-      OASIS_FLOAT retperiod = max_retperiod / i;
+      double retperiod = max_retperiod / i;
 
       if (useReturnPeriodFile_) {
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
@@ -624,7 +621,7 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
     }
     if (useReturnPeriodFile_) {
       do {
-	OASIS_FLOAT retperiod = max_retperiod / i;
+	double retperiod = max_retperiod / i;
 	if (returnperiods_[nextreturnperiodindex] <= 0) retperiod = 0;
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, 0,
@@ -653,8 +650,7 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
 
   int eptype_tvar = 0;
   void (aggreports::*WriteOutput)(const std::vector<int>, const int, const int,
-				  const int, const OASIS_FLOAT,
-				  const OASIS_FLOAT);
+				  const int, const double, const OASIS_FLOAT);
   DoSetUpWheatsheaf(eptype, eptype_tvar, ensemble_id, fileIDs, WriteOutput);
 
   std::map<wheatkey, std::vector<TVaR>> tail;
@@ -663,19 +659,19 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
     lossvec2 &lpv = s.second;
     std::sort(lpv.rbegin(), lpv.rend());
     size_t nextreturnperiodindex = 0;
-    OASIS_FLOAT last_computed_rp = 0;
+    double last_computed_rp = 0;
     OASIS_FLOAT last_computed_loss = 0;
     OASIS_FLOAT tvar = 0;
     int i = 1;
-    OASIS_FLOAT cumulative_weighting = 0;
-    OASIS_FLOAT max_retperiod = 0;
+    double cumulative_weighting = 0;
+    double max_retperiod = 0;
     bool largest_loss = false;
 
     for (auto lp : lpv) {
       cumulative_weighting += (OASIS_FLOAT)lp.period_weighting * samplesize_;
 
       if (lp.period_weighting) {
-	OASIS_FLOAT retperiod = 1 / cumulative_weighting;
+	double retperiod = 1 / cumulative_weighting;
 
 	if (!largest_loss) {
 	  max_retperiod = retperiod + 0.0001;   // Add for floating point errors
@@ -701,7 +697,7 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
     if (useReturnPeriodFile_) {
       auto iter = unusedperiodstoweighting.begin();
       do {
-	OASIS_FLOAT retperiod = 0;
+	double retperiod = 0;
 	if (iter != unusedperiodstoweighting.end()) {
 	  cumulative_weighting += (iter->second * samplesize_);
 	  retperiod = 1 / cumulative_weighting;

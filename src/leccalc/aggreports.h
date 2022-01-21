@@ -87,41 +87,40 @@ private:
 	void LoadReturnPeriods();
 	void LoadPeriodsToWeighting();
 	void LoadEnsembleMapping();
-	OASIS_FLOAT GetLoss(const OASIS_FLOAT next_return_period,
-			    const OASIS_FLOAT last_return_period,
+	OASIS_FLOAT GetLoss(const double next_return_period,
+			    const double last_return_period,
 			    const OASIS_FLOAT last_loss,
-			    const OASIS_FLOAT current_return_period,
+			    const double current_return_period,
 			    const OASIS_FLOAT current_loss) const;
 	void FillTVaR(std::map<int, std::vector<TVaR>> &tail,
 		      const int summary_id, const int epcalc,
-		      const OASIS_FLOAT nextreturnperiod_value,
+		      const double nextreturnperiod_value,
 		      const OASIS_FLOAT tvar);
 	void FillTVaR(std::map<wheatkey, std::vector<TVaR>> &tail,
 		      const int summary_id, const int sidx,
-		      const OASIS_FLOAT nextreturnperiod_value,
+		      const double nextreturnperiod_value,
 		      const OASIS_FLOAT tvar);
 	template<typename T>
 	void WriteReturnPeriodOut(const std::vector<int> fileIDs,
-		size_t &nextreturnperiod_index, OASIS_FLOAT &last_return_period,
-		OASIS_FLOAT &last_loss, const OASIS_FLOAT current_return_period,
+		size_t &nextreturnperiod_index, double &last_return_period,
+		OASIS_FLOAT &last_loss, const double current_return_period,
 		const OASIS_FLOAT current_loss, const int summary_id,
-		const int eptype, const int epcalc,
-		const OASIS_FLOAT max_retperiod, int counter, OASIS_FLOAT tvar,
-		T &tail,
+		const int eptype, const int epcalc, const double max_retperiod,
+		int counter, OASIS_FLOAT tvar, T &tail,
 		void (aggreports::*WriteOutput)(const std::vector<int>,
 						const int, const int, const int,
-						const OASIS_FLOAT,
+						const double,
 						const OASIS_FLOAT));
 	inline void OutputRows(const std::vector<int> fileIDs,
 			       const char * buffer, int strLen);
 	void WriteLegacyOutput(const std::vector<int> fileIDs,
 			       const int summary_id, const int type,
 			       const int ensemble_id,
-			       const OASIS_FLOAT retperiod,
+			       const double retperiod,
 			       const OASIS_FLOAT loss);
 	void WriteORDOutput(const std::vector<int> fileIDs,
 			    const int summary_id, const int epcalc,
-			    const int eptype, const OASIS_FLOAT retperiod,
+			    const int eptype, const double retperiod,
 			    const OASIS_FLOAT loss);
 	void WriteTVaR(const std::vector<int> fileIDs, const int epcalc,
 		       const int eptype_tvar,
@@ -132,11 +131,11 @@ private:
 		const int ensemble_id, const std::vector<int> fileIDs,
 		void (aggreports::*&WriteOutput)(const std::vector<int>,
 						 const int, const int,
-						 const int, const OASIS_FLOAT,
+						 const int, const double,
 						 const OASIS_FLOAT));
 	void WriteExceedanceProbabilityTable(const std::vector<int> fileIDs,
 					     std::map<int, lossvec> &items,
-					     const OASIS_FLOAT max_retperiod,
+					     const double max_retperiod,
 					     int epcalc, int eptype,
 					     int samplesize=1,
 					     int ensemble_id=0);
@@ -149,7 +148,7 @@ private:
 		const int ensemble_id, const std::vector<int> fileIDs,
 		void (aggreports::*&WriteOutput)(const std::vector<int>,
 						 const int, const int,
-						 const int, const OASIS_FLOAT,
+						 const int, const double,
 						 const OASIS_FLOAT));
 	void WritePerSampleExceedanceProbabilityTable(
 		const std::vector<int> fileIDs,

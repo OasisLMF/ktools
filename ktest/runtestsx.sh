@@ -72,7 +72,19 @@ installertest()
 	../src/pltcalc/pltcalc -M ../ktest/testout/gulmplt2.csv < ../ktest/testout/gulsummarycalc2.bin 
 	#../src/pltcalc/pltcalc -M ../ktest/testout/fmmplt1.csv < ../ktest/testout/fmsummarycalc1.bin 
 	#../src/pltcalc/pltcalc -M ../ktest/testout/fmmplt2.csv < ../ktest/testout/fmsummarycalc2.bin
-	
+
+	# test qelt
+	../src/eltcalc/eltcalc -Q ../ktest/testout/gulqelt1.csv < ../ktest/testout/gulsummarycalc1.bin 
+	../src/eltcalc/eltcalc -Q ../ktest/testout/gulqelt2.csv < ../ktest/testout/gulsummarycalc2.bin 
+	#../src/eltcalc/eltcalc -Q ../ktest/testout/fmmelt1.csv < ../ktest/testout/fmsummarycalc1.bin 
+	#../src/eltcalc/eltcalc -Q ../ktest/testout/fmmelt2.csv < ../ktest/testout/fmsummarycalc2.bin 
+
+	# test qplt
+	../src/pltcalc/pltcalc -Q ../ktest/testout/gulqplt1.csv < ../ktest/testout/gulsummarycalc1.bin 
+	../src/pltcalc/pltcalc -Q ../ktest/testout/gulqplt2.csv < ../ktest/testout/gulsummarycalc2.bin 
+	#../src/pltcalc/pltcalc -Q ../ktest/testout/fmmplt1.csv < ../ktest/testout/fmsummarycalc1.bin 
+	#../src/pltcalc/pltcalc -Q ../ktest/testout/fmmplt2.csv < ../ktest/testout/fmsummarycalc2.bin
+
 	# test leccalc
 	cp ../ktest/testout/gulsummarycalc2.bin work/gul2/summary/gulsummarycalc2.bin
 	cp ../ktest/testout/fmsummarycalc2.bin work/fm2/summary/fmsummarycalc2.bin
@@ -98,7 +110,7 @@ installertest()
 	../src/leccalc/leccalc -r -Kfm2/summary -F ../ktest/testout/fm_full_uncertainty_aep_2_r.csv  -W ../ktest/testout/fm_wheatsheaf_aep_2_r.csv -S ../ktest/testout/fm_sample_mean_aep_2_r.csv -M ../ktest/testout/fm_wheatsheaf_mean_aep_2_r.csv \
     									    -f ../ktest/testout/fm_full_uncertainty_oep_2_r.csv -w ../ktest/testout/fm_wheatsheaf_oep_2_r.csv -s ../ktest/testout/fm_sample_mean_oep_2_r.csv -m ../ktest/testout/fm_wheatsheaf_mean_oep_2_r.csv
 
-    # test ORD ept and psept (to do)
+    # test ORD ept and psept 
  	../src/ordleccalc/ordleccalc  -Kgul1/summary -F -f -W -w -M -m -S -s -O ../ktest/testout/gul_ept_1.csv -o ../ktest/testout/gul_psept_1.csv
 	 ../src/ordleccalc/ordleccalc  -Kgul2/summary -F -f -W -w -M -m -S -s -O ../ktest/testout/gul_ept_2.csv -o ../ktest/testout/gul_psept_2.csv
 	 ../src/ordleccalc/ordleccalc  -Kfm1/summary -F -f -W -w -M -m -S -s -O ../ktest/testout/fm_ept_1.csv -o ../ktest/testout/fm_psept_1.csv
@@ -168,6 +180,8 @@ installertest()
 	../src/occurrencetocsv/occurrencetocsv < ../examples/input/occurrence.bin | ../src/occurrencetobin/occurrencetobin -P10000 > ../ktest/testout/occurrence.bin
 
 	../src/vulnerabilitytocsv/vulnerabilitytocsv < ../examples/static/vulnerability.bin | ../src/vulnerabilitytobin/vulnerabilitytobin -d 102 > ../ktest/testout/vulnerability.bin
+	
+	../src/quantiletocsv/quantiletocsv < ../examples/input/quantile.bin | ../src/quantiletobin/quantiletobin  > ../ktest/testout/quantile.bin
 	
 	cp static/footprint.bin ../ktest/testout/footprint.bin
     cp static/footprint.idx ../ktest/testout/footprint.idx

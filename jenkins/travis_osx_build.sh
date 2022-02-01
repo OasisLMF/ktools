@@ -5,7 +5,7 @@ ln -s /usr/bin/shasum5.18 /usr/local/bin/sha1sum
 
 # Set env
 set -eux
-BIN_TARGET=$(realpath ./)
+BIN_TARGET=$(pwd)
 TAR_TARGET='Darwin_x86_64.tar.gz'
 
 # Config

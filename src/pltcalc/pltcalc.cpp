@@ -507,9 +507,7 @@ namespace pltcalc {
 					chance_of_loss = sr.loss;
 				} else if (sr.sidx == max_loss_idx) {
 					max_loss = sr.loss;
-				}
-
-				if (sr.sidx == -1) {
+				} else if (sr.sidx == mean_idx) {
 					domeanout(sh, sr.loss, OutputData,
 						  outFile, m_occ, vp,
 						  chance_of_loss, max_loss);

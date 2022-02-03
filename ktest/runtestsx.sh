@@ -61,29 +61,14 @@ installertest()
 	../src/eltcalc/eltcalc < ../ktest/testout/fmsummarycalc1.bin > ../ktest/testout/fmelt1.csv
 	../src/eltcalc/eltcalc < ../ktest/testout/fmsummarycalc2.bin > ../ktest/testout/fmelt2.csv
 
-	# test melt
-	../src/eltcalc/eltcalc -M ../ktest/testout/gulmelt1.csv < ../ktest/testout/gulsummarycalc1.bin 
-	../src/eltcalc/eltcalc -M ../ktest/testout/gulmelt2.csv < ../ktest/testout/gulsummarycalc2.bin 
-	#../src/eltcalc/eltcalc -M ../ktest/testout/fmmelt1.csv < ../ktest/testout/fmsummarycalc1.bin 
-	#../src/eltcalc/eltcalc -M ../ktest/testout/fmmelt2.csv < ../ktest/testout/fmsummarycalc2.bin 
+	# test melt qelt
+	../src/eltcalc/eltcalc -M ../ktest/testout/gulmelt1.csv -Q ../ktest/testout/gulqelt1.csv < ../ktest/testout/gulsummarycalc1.bin 
+	../src/eltcalc/eltcalc -M ../ktest/testout/gulmelt2.csv -Q ../ktest/testout/gulqelt2.csv < ../ktest/testout/gulsummarycalc2.bin 
 
-	# test mplt
-	../src/pltcalc/pltcalc -M ../ktest/testout/gulmplt1.csv < ../ktest/testout/gulsummarycalc1.bin 
-	../src/pltcalc/pltcalc -M ../ktest/testout/gulmplt2.csv < ../ktest/testout/gulsummarycalc2.bin 
-	#../src/pltcalc/pltcalc -M ../ktest/testout/fmmplt1.csv < ../ktest/testout/fmsummarycalc1.bin 
-	#../src/pltcalc/pltcalc -M ../ktest/testout/fmmplt2.csv < ../ktest/testout/fmsummarycalc2.bin
+	# test mplt qplt
+	../src/pltcalc/pltcalc -M ../ktest/testout/gulmplt1.csv -Q ../ktest/testout/gulqplt1.csv < ../ktest/testout/gulsummarycalc1.bin 
+	../src/pltcalc/pltcalc -M ../ktest/testout/gulmplt2.csv -Q ../ktest/testout/gulqplt2.csv < ../ktest/testout/gulsummarycalc2.bin 
 
-	# test qelt
-	../src/eltcalc/eltcalc -Q ../ktest/testout/gulqelt1.csv < ../ktest/testout/gulsummarycalc1.bin 
-	../src/eltcalc/eltcalc -Q ../ktest/testout/gulqelt2.csv < ../ktest/testout/gulsummarycalc2.bin 
-	#../src/eltcalc/eltcalc -Q ../ktest/testout/fmmelt1.csv < ../ktest/testout/fmsummarycalc1.bin 
-	#../src/eltcalc/eltcalc -Q ../ktest/testout/fmmelt2.csv < ../ktest/testout/fmsummarycalc2.bin 
-
-	# test qplt
-	../src/pltcalc/pltcalc -Q ../ktest/testout/gulqplt1.csv < ../ktest/testout/gulsummarycalc1.bin 
-	../src/pltcalc/pltcalc -Q ../ktest/testout/gulqplt2.csv < ../ktest/testout/gulsummarycalc2.bin 
-	#../src/pltcalc/pltcalc -Q ../ktest/testout/fmmplt1.csv < ../ktest/testout/fmsummarycalc1.bin 
-	#../src/pltcalc/pltcalc -Q ../ktest/testout/fmmplt2.csv < ../ktest/testout/fmsummarycalc2.bin
 
 	# test leccalc
 	cp ../ktest/testout/gulsummarycalc2.bin work/gul2/summary/gulsummarycalc2.bin

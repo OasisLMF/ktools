@@ -1,6 +1,15 @@
 Ktools Changelog
 ================
 
+`v3.7.5`_
+ ---------
+* [#267](https://github.com/OasisLMF/ktools/pull/268) - period weighting file affects leccalc accuracy
+* [#241](https://github.com/OasisLMF/ktools/pull/241) - Add OSX build via Github Actions
+* [#274](https://github.com/OasisLMF/ktools/pull/274) - Ignore chance of loss and maximum loss values when filling losses vec…
+* [#275](https://github.com/OasisLMF/ktools/pull/275) - Feature/271 quantile
+* [#273](https://github.com/OasisLMF/ktools/pull/273) - Fix quantile losses in Quantile Period Loss Tables (QPLT)
+.. _`v3.7.5`:  https://github.com/OasisLMF/ktools/compare/v3.7.4...v3.7.5
+
 `v3.7.4`_
  ---------
 * [#252](https://github.com/OasisLMF/ktools/pull/261) - Zero loss EP curves should output records for required return periods

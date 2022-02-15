@@ -88,7 +88,6 @@ AM_CONDITIONAL(DEBUG, test x"$debug" = x"true")
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADERS([config.h])
 
-
 # Checks for programs.
 AC_PROG_CXX([c++ g++])
 AC_PROG_CC([cc gcc])
@@ -99,6 +98,15 @@ AX_CXX_COMPILE_STDCXX_11
 
 AX_CHECK_ZLIB()
 # Checks for libraries.
+
+# Check for arrow and parquet libraries
+AH_TEMPLATE([HAVE_PARQUET])
+PKG_CHECK_MODULES([PARQUET], [arrow parquet], [HAVE_PARQUET=yes], [HAVE_PARQUET=no])
+AS_IF([test "$HAVE_PARQUET" = "yes"],
+      [AC_DEFINE([HAVE_PARQUET], [1],
+		 [Define to 1 if you have Apache arrow (-larrow) and parquet (-lparquet) libraries])
+      ])
+AM_CONDITIONAL([HAVE_PARQUET], [test "$HAVE_PARQUET" = "yes"])
 
 # Checks for header files.
 AC_CHECK_HEADERS([fcntl.h inttypes.h memory.h stdlib.h unistd.h])

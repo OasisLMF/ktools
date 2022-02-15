@@ -26,6 +26,7 @@ void help()
 {
 	fprintf(stderr, "-K workspace sub folder\n");
 	fprintf(stderr, "-o Open Results Data (ORD) output\n");
+	fprintf(stderr, "-p [filename] ORD output in parquet format\n");
 	fprintf(stderr, "-s skip header\n");
 	fprintf(stderr, "-v version\n");
 	fprintf(stderr, "-h help\n");
@@ -39,8 +40,10 @@ int main(int argc, char* argv[])
 	int opt;
 	bool debug = false;
 	bool skipheader = false;
-	bool ord_output = false;
-	while ((opt = getopt(argc, argv, (char *)"swvdohK:")) != -1) {
+	bool ord_output = false;   // csv output
+	std::string parquet_outFile;   // parquet output
+	bool parquet_output = false;   // parquet output
+	while ((opt = getopt(argc, argv, (char *)"swvdohK:p:")) != -1) {
 		switch (opt) {
 		case 'v':
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
@@ -54,6 +57,10 @@ int main(int argc, char* argv[])
 			break;
 		case 'o':
 			ord_output = true;
+			break;
+		case 'p':
+			parquet_output = true;
+			parquet_outFile = optarg;
 			break;
 		case 'd':
 			debug = true;			
@@ -70,6 +77,14 @@ int main(int argc, char* argv[])
 		exit(EXIT_FAILURE);
 	}
 
+#ifndef HAVE_PARQUET
+	if (parquet_output) {
+		fprintf(stderr, "FATAL: Apache arrow libraries for parquet output are missing.\n"
+				"Please install libraries and recompile to use this option.\n");
+		exit(EXIT_FAILURE);
+	}
+#endif
+
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
 	struct sigaction sa;
 
@@ -85,13 +100,14 @@ int main(int argc, char* argv[])
 
 	
 	try {
-		aalcalc a(skipheader, ord_output);
+		aalcalc a(skipheader, ord_output, parquet_output,
+			  parquet_outFile);
 		if (debug == true) {
 			a.debug(subfolder);
 		}
-        logprintf(progname, "INFO", "starting process..\n");
-        a.doit(subfolder);				
-        logprintf(progname, "INFO", "finishing process..\n");
+        	logprintf(progname, "INFO", "starting process..\n");
+        	a.doit(subfolder);
+        	logprintf(progname, "INFO", "finishing process..\n");
 	}
 	catch (std::bad_alloc&) {
 		fprintf(stderr, "FATAL: %s: Memory allocation failed\n", progname);

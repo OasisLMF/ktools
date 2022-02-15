@@ -111,7 +111,8 @@ private:
 	void do_calc_end(int period_no);
 	void do_sample_calc_newx(const summarySampleslevelHeader& sh, const std::vector<sampleslevelRec>& vrec);
 	void do_sample_calc_new(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec);
-	inline void calculatemeansddev(const aal_rec_ensemble &record,
+	template<typename aal_rec_T>
+	inline void calculatemeansddev(const aal_rec_T &record,
 				       const int sample_size, const int p1,
 				       const int p2, const int periods,
 				       double &mean, double &sd_dev);

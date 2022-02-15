@@ -363,7 +363,9 @@ void aalcalc::do_calc_by_period(const summarySampleslevelHeader &sh,
 }
 
 
-inline void aalcalc::calculatemeansddev(const aal_rec_ensemble &record,
+template<typename aal_rec_T>
+//inline void aalcalc::calculatemeansddev(const aal_rec_ensemble &record,
+inline void aalcalc::calculatemeansddev(const aal_rec_T &record,
 					const int sample_size, const int p1,
 					const int p2, const int periods,
 					double &mean, double &sd_dev) {
@@ -443,12 +445,9 @@ void aalcalc::outputresultscsv_new(std::vector<aal_rec>& vec_aal, int periods,in
 	auto v_iter = vec_aal.begin();
 	while (v_iter != vec_aal.end()) {
 		if (v_iter->summary_id > 0) {
-			double mean = v_iter->mean / sample_size;
-			double mean_squared = v_iter->mean * v_iter->mean;
-			double s1 = v_iter->mean_squared - mean_squared / p1;
-			double s2 = s1 / p2;
-			double sd_dev = sqrt(s2);
-			mean = mean / periods;
+			double mean, sd_dev;
+			calculatemeansddev(*v_iter, sample_size, p1, p2,
+					   periods, mean, sd_dev);
 
 			const int bufferSize = 4096;
 			char buffer[bufferSize];

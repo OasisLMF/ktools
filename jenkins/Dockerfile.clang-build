@@ -1,7 +1,12 @@
 FROM rsmmr/clang:latest
 
 RUN apt update && \
-    apt-get install -y  build-essential libtool zlib1g-dev autoconf wget pkg-config libparquet-dev && \
+    apt-get install -y  build-essential libtool zlib1g-dev autoconf wget && \
+    apt-get install -y  ca-certificates lsb-release && \
+    wget https://apache.jfrog.io/artifactory/arrow/$(lsb_release --id --short | tr 'A-Z' 'a-z')/apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb && \
+    apt-get install -y  ./apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb && \
+    apt update && \
+    apt-get install -y  pkg-config libparquet-dev && \
     rm -rf /var/lib/apt/lists/*
 
 RUN wget https://github.com/Kitware/CMake/releases/download/v3.16.3/cmake-3.16.3-Linux-x86_64.sh -O install-cmake.sh && \

@@ -9,15 +9,18 @@ ENV PATH /opt/clang/bin:$PATH
 
 CMD bash
 
-RUN apt-get update && \
-    apt-get install -y cmake git build-essential vim python python-dev swig libncurses5-dev libedit-dev libpthread-stubs0-dev
+RUN apt update && \
+    apt-get install -y clang-9 --install-suggests
 
-COPY jenkins/install-clang /opt/install-clang/
+#RUN apt-get update && \
+#    apt-get install -y cmake git build-essential vim python python-dev swig libncurses5-dev libedit-dev libpthread-stubs0-dev
 
-RUN ls /opt/install-clang
-RUN ls /opt
+#COPY jenkins/install-clang /opt/install-clang/
 
-RUN /opt/install-clang/install-clang -j 6 -C /opt/clang
+#RUN ls /opt/install-clang
+#RUN ls /opt
+
+#RUN /opt/install-clang/install-clang -j 6 -C /opt/clang
 
 RUN apt update && \
     apt-get install -y  build-essential libtool zlib1g-dev autoconf wget && \

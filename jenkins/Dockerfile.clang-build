@@ -10,7 +10,7 @@ ENV PATH /opt/clang/bin:$PATH
 CMD bash
 
 RUN apt update && \
-    apt-get install -y clang-9 --install-suggests
+    apt-get install -y clang-9
 
 #RUN apt-get update && \
 #    apt-get install -y cmake git build-essential vim python python-dev swig libncurses5-dev libedit-dev libpthread-stubs0-dev

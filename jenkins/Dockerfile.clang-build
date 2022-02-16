@@ -40,4 +40,5 @@ COPY ./jenkins/entrypoint_clang-cmake.sh /usr/local/bin/build-cmake.sh
 #COPY . /var/ktools
 
 WORKDIR /var/ktools
+RUN echo $PATH
 ENTRYPOINT build-autotools.sh

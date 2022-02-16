@@ -14,7 +14,10 @@ RUN apt-get update && \
 
 ADD . /opt/install-clang
 
-RUN /opt/install-clang/install-clang - j 6 -C /opt/clang
+RUN ls /opt/install-clang
+RUN ls /opt
+
+RUN /opt/install-clang/install-clang -j 6 -C /opt/clang
 
 RUN apt update && \
     apt-get install -y  build-essential libtool zlib1g-dev autoconf wget && \

@@ -12,7 +12,7 @@ CMD bash
 RUN apt-get update && \
     apt-get install -y cmake git build-essential vim python python-dev swig libncurses5-dev libedit-dev libpthread-stubs0-dev
 
-COPY jenkins/install-clang /opt/install-clang
+COPY jenkins/install-clang /opt/install-clang/
 
 RUN ls /opt/install-clang
 RUN ls /opt

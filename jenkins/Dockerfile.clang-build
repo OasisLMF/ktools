@@ -1,6 +1,10 @@
 #FROM rsmmr/clang:latest
 FROM ubuntu:focal
 
+# Create variable to hold timezone for configuring tzdata
+ENV TZ=Europe/London
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 ENV PATH /opt/clang/bin:$PATH
 
 CMD bash

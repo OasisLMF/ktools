@@ -5,7 +5,7 @@ FROM ubuntu:focal
 ENV TZ=Europe/London
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-ENV PATH /opt/clang/bin:$PATH
+ENV PATH /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 
 CMD bash
 
@@ -40,5 +40,4 @@ COPY ./jenkins/entrypoint_clang-cmake.sh /usr/local/bin/build-cmake.sh
 #COPY . /var/ktools
 
 WORKDIR /var/ktools
-RUN echo $PATH
 ENTRYPOINT build-autotools.sh

@@ -1,9 +1,7 @@
 #!/bin/bash
 
-#export CC=/opt/clang/bin/clang
-#export CXX=/opt/clang/bin/clang++
-export CC=/usr/bin/clang-9
-export CXX=CXX=/usr/bin/clang++
+export CC=/usr/local/bin/clang
+export CXX=/usr/local/bin/clang++
 
 LOG_BUILD='/tmp/log/ktools-build.log'
 ARCH_TARGET=$(uname --m)

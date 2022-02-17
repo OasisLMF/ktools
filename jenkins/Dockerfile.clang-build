@@ -1,39 +1,47 @@
 #FROM rsmmr/clang:latest
-FROM ubuntu:focal
+FROM ubuntu:20.04
 
 # Create variable to hold timezone for configuring tzdata
 ENV TZ=Europe/London
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
-ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-
-CMD bash
-
-RUN apt update && \
-    apt-get install -y clang-9
+#ENV PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+#CMD bash
 
 #RUN apt-get update && \
 #    apt-get install -y cmake git build-essential vim python python-dev swig libncurses5-dev libedit-dev libpthread-stubs0-dev
-
 #COPY jenkins/install-clang /opt/install-clang/
-
 #RUN ls /opt/install-clang
 #RUN ls /opt
-
 #RUN /opt/install-clang/install-clang -j 6 -C /opt/clang
 
-RUN apt update && \
-    apt-get install -y  build-essential libtool zlib1g-dev autoconf wget && \
-    apt-get install -y  ca-certificates lsb-release && \
-    wget https://apache.jfrog.io/artifactory/arrow/$(lsb_release --id --short | tr 'A-Z' 'a-z')/apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb && \
-    apt-get install -y  ./apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb && \
-    apt update && \
-    apt-get install -y  pkg-config libparquet-dev && \
-    rm -rf /var/lib/apt/lists/*
 
-RUN wget https://github.com/Kitware/CMake/releases/download/v3.16.3/cmake-3.16.3-Linux-x86_64.sh -O install-cmake.sh && \
-    chmod +x install-cmake.sh && \
-    ./install-cmake.sh --skip-license
+# Install Base packages 
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libtool \
+    zlib1g-dev \
+    autoconf \
+    wget \
+    ca-certificates \
+    lsb-release \
+    pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Clang-9
+RUN apt-get update && apt-get install -y clang-9
+ENV CC=/usr/bin/clang-9
+ENV CXX=/usr/bin/clang++
+
+# Install lib-parquet
+RUN wget https://apache.jfrog.io/artifactory/arrow/$(lsb_release --id --short | tr 'A-Z' 'a-z')/apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb && \
+    dpkg -i /apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb && \
+    apt-get update --fix-missing && apt-get install -f -y
+
+# Install cmake (Breaks bash??)
+#RUN wget https://github.com/Kitware/CMake/releases/download/v3.16.3/cmake-3.16.3-Linux-x86_64.sh -O install-cmake.sh && \
+#    chmod +x install-cmake.sh && \
+#   ./install-cmake.sh --skip-license
 
 COPY ./jenkins/entrypoint_clang-autotools.sh /usr/local/bin/build-autotools.sh
 COPY ./jenkins/entrypoint_clang-cmake.sh /usr/local/bin/build-cmake.sh

@@ -1,7 +1,8 @@
 #!/bin/bash
 
-export CC=/opt/clang/bin/clang
-export CXX=/opt/clang/bin/clang++
+#export CC=/opt/clang/bin/clang
+#export CXX=/opt/clang/bin/clang++
+
 
 LOG_BUILD='/tmp/log/ktools-build.log'
 ARCH_TARGET=$(uname --m)
@@ -12,7 +13,7 @@ mkdir -p $(dirname $TAR_TARGET)
 
 ./autogen.sh
 ./configure --enable-o3 --enable-static --prefix=$BIN_TARGET
-make clean 
+make clean
 make check | tee /tmp/log/ktools-build.log
 
 set +exu
@@ -27,7 +28,7 @@ else
     echo "Ktools installed successfully"
 
     # Create tar
-    make install 
+    make install
     cd $BIN_TARGET/bin
     tar -zcvf $TAR_TARGET ./
     exit 0

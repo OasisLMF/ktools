@@ -44,10 +44,12 @@ COPY ./jenkins/install-clang.sh .
 RUN ./install-clang.sh
 
 # Install lib-parquet
-RUN wget https://apache.jfrog.io/artifactory/arrow/$(lsb_release --id --short | tr 'A-Z' 'a-z')/apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb && \
-    dpkg -i /apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb && \
-    apt-get update --fix-missing && apt-get install -f -y && \
-    apt-get install -y libparquet-dev
+RUN apt-get update && wget https://apache.jfrog.io/artifactory/arrow/$(lsb_release --id --short | tr 'A-Z' 'a-z')/apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb && \
+    apt-get install -y ./apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb && \
+    apt-get update && apt-get install -y libparquet-dev
+#    dpkg -i /apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb && \
+#    apt-get update --fix-missing && apt-get install -f -y && \
+#    apt-get update && apt-get install -y libparquet-dev
 
 COPY ./jenkins/entrypoint_clang-autotools.sh /usr/local/bin/build-autotools.sh
 COPY ./jenkins/entrypoint_clang-cmake.sh /usr/local/bin/build-cmake.sh

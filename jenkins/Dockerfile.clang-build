@@ -23,6 +23,7 @@ RUN apt-get update && apt-get install -y \
     zlib1g-dev \
     autoconf \
     wget \
+    git \
     ca-certificates \
     lsb-release \
     pkg-config \
@@ -30,8 +31,8 @@ RUN apt-get update && apt-get install -y \
 
 # Install Clang-9
 RUN apt-get update && apt-get install -y clang-9
-ENV CC=/usr/bin/clang-9
-ENV CXX=/usr/bin/clang++
+#ENV CC=/usr/bin/clang-9
+#ENV CXX=/usr/bin/clang++
 
 # Install lib-parquet
 RUN wget https://apache.jfrog.io/artifactory/arrow/$(lsb_release --id --short | tr 'A-Z' 'a-z')/apache-arrow-apt-source-latest-$(lsb_release --codename --short).deb && \

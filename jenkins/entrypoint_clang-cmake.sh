@@ -1,7 +1,7 @@
 #!/bin/bash
 
-export CC=/opt/clang/bin/clang
-export CXX=/opt/clang/bin/clang++
+export CC=/usr/local/bin/clang
+export CXX=/usr/local/bin/clang++
 
 LOG_BUILD='/tmp/log/ktools-cmake-build.log'
 ARCH_TARGET=$(uname --m)

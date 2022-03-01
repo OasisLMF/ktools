@@ -100,15 +100,18 @@ AX_CHECK_ZLIB()
 # Checks for libraries.
 
 # Check for arrow and parquet libraries
+# Provide option to disable search for parquet libraries for debugging
+AC_ARG_ENABLE([parquet],
+	      [AS_HELP_STRING[--disable-parquet], [disable search for Parquet libraries]],
+	      [enable_parquet=no], [enable_parquet=yes])
 AH_TEMPLATE([HAVE_PARQUET])
-AS_IF([test "x$enable_static" = "xyes"], [
-        PKG_CHECK_MODULES_STATIC([PARQUET], [arrow parquet], [HAVE_PARQUET=yes],
-                                [HAVE_PARQUET=no])
-],
-[
-        PKG_CHECK_MODULES([PARQUET], [arrow parquet], [HAVE_PARQUET=yes],
-                          [HAVE_PARQUET=no])
-])
+AS_IF([test "x$enable_parquet" = "xyes"],
+      [AS_IF([test "x$enable_static" = "xyes"],
+	     [PKG_CHECK_MODULES_STATIC([PARQUET], [arrow parquet],
+				       [HAVE_PARQUET=yes], [HAVE_PARQUET=no])],
+	     [PKG_CHECK_MODULES([PARQUET], [arrow parquet], [HAVE_PARQUET=yes],
+				[HAVE_PARQUET=no])])
+      ])
 AS_IF([test "$HAVE_PARQUET" = "yes"],
       [AC_DEFINE([HAVE_PARQUET], [1],
 		 [Define to 1 if you have Apache arrow (-larrow) and parquet (-lparquet) libraries])

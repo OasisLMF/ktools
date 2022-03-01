@@ -101,7 +101,14 @@ AX_CHECK_ZLIB()
 
 # Check for arrow and parquet libraries
 AH_TEMPLATE([HAVE_PARQUET])
-PKG_CHECK_MODULES_STATIC([PARQUET], [arrow parquet], [HAVE_PARQUET=yes], [HAVE_PARQUET=no])
+AS_IF([test "x$enable_static" = "xyes"], [
+        PKG_CHECK_MODULES_STATIC([PARQUET], [arrow parquet], [HAVE_PARQUET=yes],
+                                [HAVE_PARQUET=no])
+],
+[
+        PKG_CHECK_MODULES([PARQUET], [arrow parquet], [HAVE_PARQUET=yes],
+                          [HAVE_PARQUET=no])
+])
 AS_IF([test "$HAVE_PARQUET" = "yes"],
       [AC_DEFINE([HAVE_PARQUET], [1],
 		 [Define to 1 if you have Apache arrow (-larrow) and parquet (-lparquet) libraries])

@@ -15,7 +15,7 @@ if (Parquet_FOUND)
                 PRIVATE
                         aalcalc.cpp aalcalc.h main.cpp summaryindex.cpp ../include/useparquet.cpp
         )
-        target_link_libraries(aalcalc PRIVATE arrow_static parquet_static)
+        target_link_libraries(aalcalc PRIVATE arrow_shared parquet_shared)
 else()
         target_sources(aalcalc
                 PRIVATE

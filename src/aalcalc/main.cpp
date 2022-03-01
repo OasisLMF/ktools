@@ -46,7 +46,13 @@ int main(int argc, char* argv[])
 	while ((opt = getopt(argc, argv, (char *)"swvdohK:p:")) != -1) {
 		switch (opt) {
 		case 'v':
+#ifdef HAVE_PARQUET
+			fprintf(stderr, "%s : version: %s : "
+					"Parquet output enabled\n",
+				argv[0], VERSION);
+#else
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+#endif
 			exit(EXIT_FAILURE);
 			break;
 		case 's':

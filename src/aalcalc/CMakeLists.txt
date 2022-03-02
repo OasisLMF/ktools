@@ -13,7 +13,7 @@ if (Parquet_FOUND)
         add_definitions(-DHAVE_PARQUET)
         target_sources(aalcalc
                 PRIVATE
-                        aalcalc.cpp aalcalc.h main.cpp summaryindex.cpp ../include/useparquet.cpp
+                        aalcalc.cpp aalcalc.h main.cpp summaryindex.cpp ../include/useparquet.cpp ../include/useparquet.h
         )
         target_link_libraries(aalcalc PRIVATE arrow_shared parquet_shared)
 else()

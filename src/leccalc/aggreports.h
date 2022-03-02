@@ -40,8 +40,13 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 #include <map>
 #include <set>
+#include <string>
 #include <vector>
 #include "leccalc.h"
+
+#ifdef ORD_OUTPUT
+#include "../include/useparquet.h"
+#endif
 
 enum { MEANDR = 1, FULL, PERSAMPLEMEAN, MEANSAMPLE };
 enum { OEP = 1, OEPTVAR, AEP, AEPTVAR };
@@ -62,6 +67,7 @@ private:
 	std::vector<std::map<outkey2, OutLosses>> &out_loss_;
 	const bool *outputFlags_;
 	FILE **fout_;
+	const std::string *parquetFileNames_;
 	bool eptHeader_ = true;
 	bool pseptHeader_ = true;
 	std::map<int, bool> wheatSheaf_ = {
@@ -100,6 +106,20 @@ private:
 		      const int summary_id, const int sidx,
 		      const double nextreturnperiod_value,
 		      const OASIS_FLOAT tvar);
+#ifdef ORD_OUTPUT
+	template<typename T>
+	void WriteReturnPeriodOut(const std::vector<int> fileIDs,
+		size_t &nextreturnperiod_index, double &last_return_period,
+		OASIS_FLOAT &last_loss, const double current_return_period,
+		const OASIS_FLOAT current_loss, const int summary_id,
+		const int eptype, const int epcalc, const double max_retperiod,
+		int counter, OASIS_FLOAT tvar, T &tail,
+		void (aggreports::*WriteOutput)(const std::vector<int>,
+						const int, const int, const int,
+						const double,
+						const OASIS_FLOAT),
+		parquet::StreamWriter& os);
+#else
 	template<typename T>
 	void WriteReturnPeriodOut(const std::vector<int> fileIDs,
 		size_t &nextreturnperiod_index, double &last_return_period,
@@ -111,6 +131,7 @@ private:
 						const int, const int, const int,
 						const double,
 						const OASIS_FLOAT));
+#endif
 	inline void OutputRows(const std::vector<int> fileIDs,
 			       const char * buffer, int strLen);
 	void WriteLegacyOutput(const std::vector<int> fileIDs,
@@ -122,11 +143,26 @@ private:
 			    const int summary_id, const int epcalc,
 			    const int eptype, const double retperiod,
 			    const OASIS_FLOAT loss);
+	void WriteNoOutput(const std::vector<int> fileIDs, const int summary_id,
+			   const int epcalc, const int eptype,
+			   const double retperiod, const OASIS_FLOAT loss);
 	void WriteTVaR(const std::vector<int> fileIDs, const int epcalc,
 		       const int eptype_tvar,
 		       const std::map<int, std::vector<TVaR>> &tail);
 	void WriteTVaR(const std::vector<int> fileIDs, const int eptype_tvar,
 		       const std::map<wheatkey, std::vector<TVaR>> &tail);
+#ifdef ORD_OUTPUT
+	inline void WriteParquetOutput(parquet::StreamWriter& os,
+				       const int summary_id, const int epcalc,
+				       const int eptype, const double retperiod,
+				       const OASIS_FLOAT loss);
+	inline void WriteTVaR(parquet::StreamWriter& os, const int epcalc,
+			      const int eptype_tvar,
+			      const std::map<int, std::vector<TVaR>> &tail);
+	inline void WriteTVaR(parquet::StreamWriter& os, const int eptype_tvar,
+			      const std::map<wheatkey, std::vector<TVaR>> &tail);
+	inline parquet::StreamWriter GetParquetStreamWriter(const int fileStream);
+#endif
 	inline void DoSetUp(int &eptype, int &eptype_tvar, int &epcalc,
 		const int ensemble_id, const std::vector<int> fileIDs,
 		void (aggreports::*&WriteOutput)(const std::vector<int>,
@@ -194,7 +230,7 @@ private:
 				     const int eptype);
 
 public:
-	aggreports(const int totalperiods, const std::set<int> &summaryids, std::vector<std::map<outkey2, OutLosses>> &out_loss, FILE **fout, const bool useReturnPeriodFile, const int samplesize, const bool skipheader, const bool *outputFlags, const bool ordFlag);
+	aggreports(const int totalperiods, const std::set<int> &summaryids, std::vector<std::map<outkey2, OutLosses>> &out_loss, FILE **fout, const bool useReturnPeriodFile, const int samplesize, const bool skipheader, const bool *outputFlags, const bool ordFlag, const std::string *parquetFileNames);
 	void OutputAggMeanDamageRatio();
 	void OutputOccMeanDamageRatio();
 	void OutputAggFullUncertainty();

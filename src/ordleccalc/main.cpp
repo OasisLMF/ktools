@@ -37,8 +37,6 @@ Loss exceedance curve
 Author: Ben Matharu  email : ben.matharu@oasislmf.org
 */
 
-
-
 #include <vector>
 #include "../leccalc/leccalc.h"
 
@@ -63,7 +61,10 @@ void segfault_sigaction(int, siginfo_t *si, void *) {
 #endif
 
 namespace leccalc {
-	void doit(const std::string &subfolder, FILE **fout, const bool useReturnPeriodFile, const bool skipheader, bool *outputFlags, bool ordFlag);
+	void doit(const std::string &subfolder, FILE **fout,
+		  const bool useReturnPeriodFile, const bool skipheader,
+		  bool *outputFlags, bool ordFlag,
+		  const std::string *parquetFileNames);
 }
 
 
@@ -83,8 +84,10 @@ void openpipe(int output_id, const std::string& pipe, FILE** fout)
 
 void help()
 {
-	fprintf(stderr, "-O [filename] Exceedance Probability Table\n");
-	fprintf(stderr, "-o [filename] Per Sample Exceedance Probability Table\n");
+	fprintf(stderr, "-O [filename] Exceedance Probability Table (EPT)\n");
+	fprintf(stderr, "-o [filename] Per Sample Exceedance Probability Table (PSEPT)\n");
+	fprintf(stderr, "-P [filename] EPT output in parquet format\n");
+	fprintf(stderr, "-p [filename] PSEPT output in parquet format\n");
 	fprintf(stderr, "-F Aggregate Full Uncertainty\n");
 	fprintf(stderr, "-W Aggregate Wheatsheaf\n");
 	fprintf(stderr, "-S Aggregate Sample Mean\n");
@@ -108,13 +111,14 @@ int main(int argc, char* argv[])
 	bool outputFlags[8] = { false, false, false, false,
 				false, false, false, false };
 	const int maxStreams = 2;
+	std::string parquetOutFiles[maxStreams] = { "", "" };
 	bool outputStreams[maxStreams] = { false, false };
 	const bool ordFlag = true;   // Turn on ORD output
 
 	std::string subfolder;
 	int opt;
 	bool skipheader = false;
-	while ((opt = getopt(argc, argv, "vhrHFWMSK:fwsmO:o:")) != -1) {
+	while ((opt = getopt(argc, argv, "vhrHFWMSK:fwsmO:o:P:p:")) != -1) {
 		switch (opt) {
 		case 'K':
 			subfolder = optarg;
@@ -163,8 +167,20 @@ int main(int argc, char* argv[])
 		case 'o':
 			openpipe(PSEPT, optarg, fout);
 			break;
+		case 'P':
+			parquetOutFiles[EPT] = optarg;
+			break;
+		case 'p':
+			parquetOutFiles[PSEPT] = optarg;
+			break;
 		case 'v':
+#ifdef HAVE_PARQUET
+			fprintf(stderr, "%s : version: %s : "
+					"Parquet output enabled\n",
+				argv[0], VERSION);
+#else
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+#endif
 			exit(EXIT_FAILURE);
 			break;
 		case 'h':
@@ -189,14 +205,25 @@ int main(int argc, char* argv[])
 		else if (i == PSEPT) streamName = "PSEPT";
 		else streamName = "Error";   // Should never get here
 
-		if (outputStreams[i] == false && fout[i] != nullptr) {
+		if (outputStreams[i] == false && 
+		    (fout[i] != nullptr || parquetOutFiles[i] != "")) {
 			fprintf(stderr, "WARNING: no valid output stream to fill %s file.\n",
 				streamName.c_str());
-		} else if (outputStreams[i] == true && fout[i] == nullptr) {
+		} else if (outputStreams[i] == true && fout[i] == nullptr
+			   && parquetOutFiles[i] == "") {
 			fprintf(stderr, "FATAL: no destination for %s output.\n",
 				streamName.c_str());
 			exit(EXIT_FAILURE);
 		}
+#ifndef HAVE_PARQUET
+		if (parquetOutFiles[i] != "") {
+			fprintf(stderr, "FATAL: Apache arrow libraries for "
+					"parquet output are missing.\n Please "
+					"install libraries and recompile to "
+					"use this option.\n");
+			exit(EXIT_FAILURE);
+		}
+#endif
 	}
 
 	progname = argv[0];
@@ -214,12 +241,13 @@ int main(int argc, char* argv[])
 	try {
 		initstreams();
         	logprintf(progname, "INFO", "starting process..\n");
-		leccalc::doit(subfolder, fout, useReturnPeriodFile, skipheader, outputFlags, ordFlag);
+		leccalc::doit(subfolder, fout, useReturnPeriodFile, skipheader,
+			      outputFlags, ordFlag, parquetOutFiles);
         	logprintf(progname, "INFO", "finishing process..\n");
 		return EXIT_SUCCESS;
 	} catch (std::bad_alloc&) {
 		fprintf(stderr, "FATAL: %s: Memory allocation failed\n", progname);
 		exit(EXIT_FAILURE);
 	}
-	
+
 }

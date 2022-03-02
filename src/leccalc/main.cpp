@@ -63,7 +63,10 @@ void segfault_sigaction(int, siginfo_t *si, void *) {
 #endif
 
 namespace leccalc {
-	void doit(const std::string &subfolder, FILE** fout, const bool useReturnPeriodFile, bool skipheader, bool *outputFlags, bool ordFlag);
+	void doit(const std::string &subfolder, FILE** fout,
+		  const bool useReturnPeriodFile, bool skipheader,
+		  bool *outputFlags, bool ordFlag,
+		  const std::string *parquetFileNames);
 }
 
 
@@ -106,6 +109,7 @@ int main(int argc, char* argv[])
 	bool outputFlags[8] = { false, false, false, false,
 				false, false, false, false };
 	const bool ordFlag = false;   // Turn off ORD output
+	const std::string parquetOutFiles[2] = { "", "" };
 
 	std::string subfolder;
 	int opt;
@@ -187,7 +191,8 @@ int main(int argc, char* argv[])
 	try {
 		initstreams();
         	logprintf(progname, "INFO", "starting process..\n");
-		leccalc::doit(subfolder, fout, useReturnPeriodFile, skipheader, outputFlags, ordFlag);
+		leccalc::doit(subfolder, fout, useReturnPeriodFile, skipheader,
+			      outputFlags, ordFlag, parquetOutFiles);
         	logprintf(progname, "INFO", "finishing process..\n");
 		return EXIT_SUCCESS;
 	}catch (std::bad_alloc&) {

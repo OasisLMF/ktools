@@ -1,11 +1,18 @@
 #ifndef USEPARQUET_H_
 #define USEPARQUET_H_
 
+#include "oasis.h"
+
 #include "arrow/io/file.h"
 #include "parquet/exception.h"
-#include "parquet/stream_reader.h"
 #include "parquet/stream_writer.h"
 
+
+#ifdef OASIS_FLOAT_TYPE_DOUBLE
+const parquet::Type:type OASIS_PARQUET_FLOAT = parquet::Type::DOUBLE;
+#else
+const parquet::Type::type OASIS_PARQUET_FLOAT = parquet::Type::FLOAT;
+#endif
 
 struct ParquetFields {
   std::string name;

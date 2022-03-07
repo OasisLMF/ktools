@@ -86,6 +86,12 @@ private:
 		{ OCC_FULL_UNCERTAINTY, false }, { OCC_WHEATSHEAF, false },
 		{ OCC_SAMPLE_MEAN, false }, { OCC_WHEATSHEAF_MEAN, false }
 	};
+#ifdef ORD_OUTPUT
+	bool os_ept_exists_ = false;
+	parquet::StreamWriter os_ept_;
+	bool os_psept_exists_ = false;
+	parquet::StreamWriter os_psept_;
+#endif
 
 	OASIS_FLOAT (OutLosses::*GetAgg)() = &OutLosses::GetAggOutLoss;
 	OASIS_FLOAT (OutLosses::*GetMax)() = &OutLosses::GetMaxOutLoss;

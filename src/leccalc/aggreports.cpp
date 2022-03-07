@@ -406,7 +406,7 @@ inline void aggreports::WriteTVaR(parquet::StreamWriter& os, const int epcalc,
 }
 
 
-inline void aggreports::WriteTVaR(parquet::StreamWriter&os,
+inline void aggreports::WriteTVaR(parquet::StreamWriter& os,
 				  const int eptype_tvar,
 				  const std::map<wheatkey, std::vector<TVaR>> &tail)
 {
@@ -508,8 +508,12 @@ void aggreports::WriteExceedanceProbabilityTable(
   DoSetUp(eptype, eptype_tvar, epcalc, ensemble_id, fileIDs, WriteOutput);
 
 #ifdef ORD_OUTPUT
-  parquet::StreamWriter os;
-  if (parquetFileNames_[EPT] != "") os = GetParquetStreamWriter(EPT);
+  if (os_ept_exists_ == false) {
+  	if (parquetFileNames_[EPT] != "") {
+		os_ept_ = GetParquetStreamWriter(EPT);
+		os_ept_exists_ = true;
+	}
+  }
 #endif
 
   std::map<int, std::vector<TVaR>> tail;
@@ -531,7 +535,7 @@ void aggreports::WriteExceedanceProbabilityTable(
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, lp / samplesize,
 			     s.first, eptype, epcalc, max_retperiod, i, tvar,
-			     tail, WriteOutput, os);
+			     tail, WriteOutput, os_ept_);
 #else
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, lp / samplesize,
@@ -550,7 +554,7 @@ void aggreports::WriteExceedanceProbabilityTable(
 	// parquet::StreamWriter and implement the ios::setstate() function. In
 	// this way, the state can be set to std::ios_base::badbit if needed.
 	if (parquetFileNames_[EPT] != "") {
-	  WriteParquetOutput(os, s.first, epcalc, eptype, retperiod,
+	  WriteParquetOutput(os_ept_, s.first, epcalc, eptype, retperiod,
 			     lp / samplesize);
 	}
 #endif
@@ -565,7 +569,7 @@ void aggreports::WriteExceedanceProbabilityTable(
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, 0, s.first, eptype,
 			     epcalc, max_retperiod, i, tvar, tail,
-			     WriteOutput, os);
+			     WriteOutput, os_ept_);
 #else
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, 0, s.first, eptype,
@@ -582,7 +586,9 @@ void aggreports::WriteExceedanceProbabilityTable(
   if (!ordFlag_) return;
   if (fout_[EPT] != nullptr) WriteTVaR(fileIDs, epcalc, eptype_tvar, tail);
 #ifdef ORD_OUTPUT
-  if (parquetFileNames_[EPT] != "") WriteTVaR(os, epcalc, eptype_tvar, tail);
+  if (parquetFileNames_[EPT] != "") {
+    WriteTVaR(os_ept_, epcalc, eptype_tvar, tail);
+  }
 #endif
 
 }
@@ -605,8 +611,12 @@ void aggreports::WriteExceedanceProbabilityTable(
   DoSetUp(eptype, eptype_tvar, epcalc, ensemble_id, fileIDs, WriteOutput);
 
 #ifdef ORD_OUTPUT
-  parquet::StreamWriter os;
-  if (parquetFileNames_[EPT] != "") os = GetParquetStreamWriter(EPT);
+  if (os_ept_exists_ == false) {
+  	if (parquetFileNames_[EPT] != "") {
+		os_ept_ = GetParquetStreamWriter(EPT);
+		os_ept_exists_ = true;
+	}
+  }
 #endif
 
   std::map<int, std::vector<TVaR>> tail;
@@ -639,7 +649,8 @@ void aggreports::WriteExceedanceProbabilityTable(
 	  WriteReturnPeriodOut(fileIDs, nextreturnperiodindex,
 			       last_computed_rp, last_computed_loss, retperiod,
 			       lp.value / samplesize, s.first, eptype, epcalc,
-			       max_retperiod, i, tvar, tail, WriteOutput, os);
+			       max_retperiod, i, tvar, tail, WriteOutput,
+			       os_ept_);
 #else
 	  WriteReturnPeriodOut(fileIDs, nextreturnperiodindex,
 			       last_computed_rp, last_computed_loss, retperiod,
@@ -658,7 +669,7 @@ void aggreports::WriteExceedanceProbabilityTable(
 	// parquet::StreamWriter and implement the ios::setstate() function. In
 	// this way, the state can be set to std::ios_base::badbit if needed.
 	  if (parquetFileNames_[EPT] != "") {
-	    WriteParquetOutput(os, s.first, epcalc, eptype, retperiod,
+	    WriteParquetOutput(os_ept_, s.first, epcalc, eptype, retperiod,
 			       lp.value / samplesize);
 	  }
 #endif
@@ -679,7 +690,7 @@ void aggreports::WriteExceedanceProbabilityTable(
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, 0, s.first, eptype,
 			     epcalc, max_retperiod, i, tvar, tail,
-			     WriteOutput, os);
+			     WriteOutput, os_ept_);
 #else
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, 0, s.first, eptype,
@@ -696,7 +707,9 @@ void aggreports::WriteExceedanceProbabilityTable(
   if (!ordFlag_) return;
   if (fout_[EPT] != nullptr) WriteTVaR(fileIDs, epcalc, eptype_tvar, tail);
 #ifdef ORD_OUTPUT
-  if (parquetFileNames_[EPT] != "") WriteTVaR(os, epcalc, eptype_tvar, tail);
+  if (parquetFileNames_[EPT] != "") {
+    WriteTVaR(os_ept_, epcalc, eptype_tvar, tail);
+  }
 #endif
 
 }
@@ -753,8 +766,12 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
   DoSetUpWheatsheaf(eptype, eptype_tvar, ensemble_id, fileIDs, WriteOutput);
 
 #ifdef ORD_OUTPUT
-  parquet::StreamWriter os;
-  if (parquetFileNames_[PSEPT] != "") os = GetParquetStreamWriter(PSEPT);
+  if (os_psept_exists_ == false) {
+  	if (parquetFileNames_[PSEPT] != "") {
+		os_psept_ = GetParquetStreamWriter(PSEPT);
+		os_psept_exists_ = true;
+	}
+  }
 #endif
 
   std::map<wheatkey, std::vector<TVaR>> tail;
@@ -777,7 +794,8 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, lp,
 			     s.first.summary_id, eptype, s.first.sidx,
-			     max_retperiod, i, tvar, tail, WriteOutput, os);
+			     max_retperiod, i, tvar, tail, WriteOutput,
+			     os_psept_);
 #else
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, lp,
@@ -796,8 +814,8 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
 	// parquet::StreamWriter and implement the ios::setstate() function. In
 	// this way, the state can be set to std::ios_base::badbit if needed.
 	if (parquetFileNames_[PSEPT] != "") {
-	  WriteParquetOutput(os, s.first.summary_id, s.first.sidx, eptype,
-			     retperiod, lp);
+	  WriteParquetOutput(os_psept_, s.first.summary_id, s.first.sidx,
+			     eptype, retperiod, lp);
 	}
 #endif
       }
@@ -811,7 +829,8 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, 0,
 			     s.first.summary_id, eptype, s.first.sidx,
-			     max_retperiod, i, tvar, tail, WriteOutput, os);
+			     max_retperiod, i, tvar, tail, WriteOutput,
+			     os_psept_);
 #else
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, 0,
@@ -828,7 +847,7 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
   if (!ordFlag_) return;
   if (fout_[PSEPT] != nullptr) WriteTVaR(fileIDs, eptype_tvar, tail);
 #ifdef ORD_OUTPUT
-  if (parquetFileNames_[PSEPT] != "") WriteTVaR(os, eptype_tvar, tail);
+  if (parquetFileNames_[PSEPT] != "") WriteTVaR(os_psept_, eptype_tvar, tail);
 #endif
 
 }
@@ -848,8 +867,12 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
   DoSetUpWheatsheaf(eptype, eptype_tvar, ensemble_id, fileIDs, WriteOutput);
 
 #ifdef ORD_OUTPUT
-  parquet::StreamWriter os;
-  if (parquetFileNames_[PSEPT] != "") os = GetParquetStreamWriter(PSEPT);
+  if (os_psept_exists_ == false) {
+  	if (parquetFileNames_[PSEPT] != "") {
+		os_psept_ = GetParquetStreamWriter(PSEPT);
+		os_psept_exists_ = true;
+	}
+  }
 #endif
 
   std::map<wheatkey, std::vector<TVaR>> tail;
@@ -883,7 +906,7 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
 			       last_computed_rp, last_computed_loss, retperiod,
 			       lp.value, s.first.summary_id, eptype,
 			       s.first.sidx, max_retperiod, i, tvar, tail,
-			       WriteOutput, os);
+			       WriteOutput, os_psept_);
 #else
 	  WriteReturnPeriodOut(fileIDs, nextreturnperiodindex,
 			       last_computed_rp, last_computed_loss, retperiod,
@@ -903,8 +926,8 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
 	// parquet::StreamWriter and implement the ios::setstate() function. In
 	// this way, the state can be set to std::ios_base::badbit if needed.
 	  if (parquetFileNames_[PSEPT] != "") {
-	    WriteParquetOutput(os, s.first.summary_id, s.first.sidx, eptype,
-			       retperiod, lp.value);
+	    WriteParquetOutput(os_psept_, s.first.summary_id, s.first.sidx,
+			       eptype, retperiod, lp.value);
 	  }
 #endif
 	}
@@ -924,7 +947,8 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, 0,
 			     s.first.summary_id, eptype, s.first.sidx,
-			     max_retperiod, i, tvar, tail, WriteOutput, os);
+			     max_retperiod, i, tvar, tail, WriteOutput,
+			     os_psept_);
 #else
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, 0,
@@ -941,7 +965,7 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
   if (!ordFlag_) return;
   if (fout_[PSEPT] != nullptr) WriteTVaR(fileIDs, eptype_tvar, tail);
 #ifdef ORD_OUTPUT
-  if (parquetFileNames_[PSEPT] != "") WriteTVaR(os, eptype_tvar, tail);
+  if (parquetFileNames_[PSEPT] != "") WriteTVaR(os_psept_, eptype_tvar, tail);
 #endif
 
 }

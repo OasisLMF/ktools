@@ -55,6 +55,10 @@ installertest()
 	 ../src/summarycalc/summarycalc -f -1 ../ktest/testout/fmsummarycalc1.bin   < ../ktest/testout/fmcalc.bin
 	 ../src/summarycalc/summarycalc -f -2 ../ktest/testout/fmsummarycalc2.bin   < ../ktest/testout/fmcalc.bin
 
+  	# test selt
+  	../src/summarycalctocsv/summarycalctocsv -o > ../ktest/testout/gulselt1.csv < ../ktest/testout/gulsummarycalc1.bin
+	../src/summarycalctocsv/summarycalctocsv -o > ../ktest/testout/gulselt2.csv < ../ktest/testout/gulsummarycalc2.bin
+
 	# test eltcalc
 	../src/eltcalc/eltcalc < ../ktest/testout/gulsummarycalc1.bin > ../ktest/testout/gulelt1.csv
 	../src/eltcalc/eltcalc < ../ktest/testout/gulsummarycalc2.bin > ../ktest/testout/gulelt2.csv
@@ -65,9 +69,9 @@ installertest()
 	../src/eltcalc/eltcalc -M ../ktest/testout/gulmelt1.csv -Q ../ktest/testout/gulqelt1.csv < ../ktest/testout/gulsummarycalc1.bin 
 	../src/eltcalc/eltcalc -M ../ktest/testout/gulmelt2.csv -Q ../ktest/testout/gulqelt2.csv < ../ktest/testout/gulsummarycalc2.bin 
 
-	# test mplt qplt
-	../src/pltcalc/pltcalc -M ../ktest/testout/gulmplt1.csv -Q ../ktest/testout/gulqplt1.csv < ../ktest/testout/gulsummarycalc1.bin 
-	../src/pltcalc/pltcalc -M ../ktest/testout/gulmplt2.csv -Q ../ktest/testout/gulqplt2.csv < ../ktest/testout/gulsummarycalc2.bin 
+	# test mplt qplt splt
+	../src/pltcalc/pltcalc -M ../ktest/testout/gulmplt1.csv -Q ../ktest/testout/gulqplt1.csv -S ../ktest/testout/gulsplt1.csv < ../ktest/testout/gulsummarycalc1.bin 
+	../src/pltcalc/pltcalc -M ../ktest/testout/gulmplt2.csv -Q ../ktest/testout/gulqplt2.csv -S ../ktest/testout/gulsplt2.csv < ../ktest/testout/gulsummarycalc2.bin 
 
 
 	# test leccalc
@@ -124,6 +128,11 @@ installertest()
 	../src/aalcalc/aalcalc -Kfm1/summary > ../ktest/testout/fmaalcalc1.csv
 	../src/aalcalc/aalcalc -Kfm2/summary > ../ktest/testout/fmaalcalc2.csv
 
+	# test alt	
+	../src/aalcalc/aalcalc -o -Kgul1/summary > ../ktest/testout/gulalt1.csv
+	../src/aalcalc/aalcalc -o -Kgul2/summary > ../ktest/testout/gulalt2.csv
+	../src/aalcalc/aalcalc -o -Kfm1/summary > ../ktest/testout/fmalt1.csv
+	../src/aalcalc/aalcalc -o -Kfm2/summary > ../ktest/testout/fmalt2.csv
 	
 	# test stream conversion components
 	# stdout to csv

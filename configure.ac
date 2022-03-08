@@ -108,9 +108,18 @@ AH_TEMPLATE([HAVE_PARQUET])
 AS_IF([test "x$enable_parquet" = "xyes"],
       [AS_IF([test "x$enable_static" = "xyes"],
 	     [PKG_CHECK_MODULES_STATIC([PARQUET], [arrow parquet],
-				       [HAVE_PARQUET=yes], [HAVE_PARQUET=no])],
+				       [HAVE_PARQUET=yes], [HAVE_PARQUET=no])
+	     WL_WHOLE_ARCHIVE_PREFIX="-Wl,--whole-archive"
+             LIBPTHREAD_LINK="-lpthread"
+             WL_NO_WHOLE_ARCHIVE_SUFFIX="-Wl,--no-whole-archive"],
 	     [PKG_CHECK_MODULES([PARQUET], [arrow parquet], [HAVE_PARQUET=yes],
-				[HAVE_PARQUET=no])])
+				[HAVE_PARQUET=no])
+	     WL_WHOLE_ARCHIVE_PREFIX=""
+             LIBPTHREAD_LINK=""
+             WL_NO_WHOLE_ARCHIVE_SUFFIX=""])
+      AC_SUBST(WL_WHOLE_ARCHIVE_PREFIX)
+      AC_SUBST(LIBPTHREAD_LINK)
+      AC_SUBST(WL_NO_WHOLE_ARCHIVE_SUFFIX)
       ])
 AS_IF([test "$HAVE_PARQUET" = "yes"],
       [AC_DEFINE([HAVE_PARQUET], [1],

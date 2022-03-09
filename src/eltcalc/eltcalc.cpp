@@ -361,7 +361,7 @@ namespace eltcalc {
 			}
 			OutputData = &eltcalc::OutputRowsORD;
 			outFile = fout[MELT];
-		} else if (parquetOutput == "") {
+		} else if (parquetOutput == false) {
 			if (skipHeader == false) {
 				printf("summary_id,type,event_id,mean,standard_deviation,exposure_value\n");
 			}

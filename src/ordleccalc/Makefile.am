@@ -5,6 +5,6 @@ ordleccalc_SOURCES = ../leccalc/leccalc.cpp ../leccalc/aggreports.cpp main.cpp
 if HAVE_PARQUET
 ordleccalc_CFLAGS = $(PARQUET_CFLAGS)
 ordleccalc_CPPFLAGS = -DORD_OUTPUT
-ordleccalc_LDADD = $(PARQUET_LIBS) @WL_WHOLE_ARCHIVE_PREFIX@ @LIBPTHREAD_LINK@ @WL_NO_WHOLE_ARCHIVE_SUFFIX@
+ordleccalc_LDADD = $(PARQUET_LIBS) @LIBPTHREAD_LINK@
 ordleccalc_SOURCES += ../include/useparquet.cpp
 endif

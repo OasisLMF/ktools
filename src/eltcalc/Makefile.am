@@ -4,6 +4,6 @@ eltcalc_SOURCES = eltcalc.cpp main.cpp
 
 if HAVE_PARQUET
 eltcalc_CFLAGS = $(PARQUET_CFLAGS)
-eltcalc_LDADD = $(PARQUET_LIBS) @WL_WHOLE_ARCHIVE_PREFIX@ @LIBPTHREAD_LINK@ @WL_NO_WHOLE_ARCHIVE_SUFFIX@
+eltcalc_LDADD = $(PARQUET_LIBS) @LIBPTHREAD_LINK@
 eltcalc_SOURCES += ../include/useparquet.cpp
 endif

@@ -58,6 +58,10 @@ Author: Ben Matharu  email : ben.matharu@oasislmf.org
 
 #include "../include/oasis.h"
 
+#ifdef HAVE_PARQUET
+#include "../include/useparquet.h"
+#endif
+
 using namespace std;
 
 namespace eltcalc {
@@ -204,6 +208,53 @@ namespace eltcalc {
 
 	}
 
+	inline void OutputQuantilesCsv(FILE * outFile,
+				       const summarySampleslevelHeader& sh,
+				       const float quantile,
+				       const OASIS_FLOAT loss)
+	{
+			char buffer[4096];
+			int strLen;
+			strLen = sprintf(buffer, "%d,%d,%f,%f\n", sh.event_id,
+					 sh.summary_id, quantile, loss);
+			WriteOutput(buffer, strLen, outFile);
+	}
+
+	inline OASIS_FLOAT GetQuantileLoss(const interval &i, const std::vector<OASIS_FLOAT>& losses_vec)
+	{
+		int idx = i.integer_part;
+		OASIS_FLOAT loss = 0;
+		if (idx == losses_vec.size()) {
+			loss = losses_vec[idx-1];
+		} else {
+			loss = (losses_vec[idx] - losses_vec[idx-1]) * i.fractional_part + losses_vec[idx-1];
+		}
+
+		return loss;
+	}
+
+#ifdef HAVE_PARQUET
+	void OutputQuantiles(const summarySampleslevelHeader& sh,
+			     std::vector<OASIS_FLOAT>& losses_vec,
+			     FILE * ordFile, const std::string parquetFileName,
+			     parquet::StreamWriter &os)
+	{
+		for (std::map<float, interval>::iterator it = intervals_.begin();
+		     it != intervals_.end(); ++it) {
+
+			OASIS_FLOAT loss = GetQuantileLoss(it->second, losses_vec);
+
+			if (ordFile != nullptr) {
+				OutputQuantilesCsv(ordFile, sh, it->first, loss);
+			}
+			if (parquetFileName != "") {
+				os << sh.event_id << sh.summary_id << it->first
+				   << loss << parquet::EndRow;
+			}
+
+		}
+	}
+#else
 	void OutputQuantiles(const summarySampleslevelHeader& sh,
 			     std::vector<OASIS_FLOAT>& losses_vec,
 			     FILE * outFile)
@@ -214,25 +265,74 @@ namespace eltcalc {
 		for (std::map<float, interval>::iterator it = intervals_.begin();
 		     it != intervals_.end(); ++it) {
 
-			int idx = it->second.integer_part;
-			OASIS_FLOAT loss = 0;
-			if (idx == losses_vec.size()) {
-				loss = losses_vec[idx-1];
-			} else {
-				loss = (losses_vec[idx] - losses_vec[idx-1]) * it->second.fractional_part + losses_vec[idx-1];
-			}
-
-			char buffer[4096];
-			int strLen;
-			strLen = sprintf(buffer, "%d,%d,%f,%f\n", sh.event_id,
-					 sh.summary_id, it->first, loss);
-			WriteOutput(buffer, strLen, outFile);
+			OASIS_FLOAT loss = GetQuantileLoss(it->second, losses_vec);
+			OutputQuantilesCsv(outFile, sh, it->first, loss);
 
 		}
 
 	}
+#endif
 
-	void doeltoutput(int samplesize, bool skipHeader, bool ordOutput, FILE **fout)
+#ifdef HAVE_PARQUET
+	inline void OutputRowsParquet(const summarySampleslevelHeader& sh,
+		const int type, const OASIS_FLOAT mean,
+		const OASIS_FLOAT stdDev, parquet::StreamWriter &os,
+		const OASIS_FLOAT mean_impacted_exposure,
+		const OASIS_FLOAT max_impacted_exposure,
+		const OASIS_FLOAT chance_of_loss, const OASIS_FLOAT max_loss)
+	{
+		os << sh.event_id << sh.summary_id << type
+		   << event_rate_[sh.event_id] << chance_of_loss << mean
+		   << stdDev << max_loss << sh.expval << mean_impacted_exposure
+		   << max_impacted_exposure << parquet::EndRow;
+	}
+
+	inline parquet::StreamWriter GetParquetStreamWriter(const int fileStream, const std::string parquetFileName)
+	{
+		std::vector<ParquetFields> parquetFields;
+		parquetFields.push_back({"EventId", parquet::Type::INT32,
+					parquet::ConvertedType::INT_32});
+		parquetFields.push_back({"SummaryId", parquet::Type::INT32,
+					parquet::ConvertedType::INT_32});
+		if (fileStream == MELT) {
+			parquetFields.push_back({"SampleType", parquet::Type::INT32,
+						parquet::ConvertedType::INT_32});
+			parquetFields.push_back({"EVentRate", parquet::Type::DOUBLE,
+						parquet::ConvertedType::NONE});
+			parquetFields.push_back({"ChanceOfLoss", OASIS_PARQUET_FLOAT,
+						parquet::ConvertedType::NONE});
+			parquetFields.push_back({"MeanLoss", OASIS_PARQUET_FLOAT,
+						parquet::ConvertedType::NONE});
+			parquetFields.push_back({"SDLoss", OASIS_PARQUET_FLOAT,
+						parquet::ConvertedType::NONE});
+			parquetFields.push_back({"MaxLoss", OASIS_PARQUET_FLOAT,
+						parquet::ConvertedType::NONE});
+			parquetFields.push_back({"FootprintExposure", OASIS_PARQUET_FLOAT,
+						parquet::ConvertedType::NONE});
+			parquetFields.push_back({"MeanImpactedExposure", OASIS_PARQUET_FLOAT,
+						parquet::ConvertedType::NONE});
+			parquetFields.push_back({"MaxImpactedExposure", OASIS_PARQUET_FLOAT,
+						parquet::ConvertedType::NONE});
+		} else if (fileStream == QELT) {
+			parquetFields.push_back({"Quantile", parquet::Type::FLOAT,
+						parquet::ConvertedType::NONE});
+			parquetFields.push_back({"Loss", OASIS_PARQUET_FLOAT,
+						parquet::ConvertedType::NONE});
+		} else {
+			fprintf(stderr, "FATAL: Unrecognised parquet file stream %d\n", fileStream);
+			exit(EXIT_FAILURE);
+		}
+
+		parquet::StreamWriter os = SetupParquetOutputStream(parquetFileName, parquetFields);
+
+		return os;
+	}
+
+#endif
+
+	void doeltoutput(int samplesize, bool skipHeader, bool ordOutput,
+			 FILE **fout, bool parquetOutput,
+			 std::string *parquetFileNames)
 	{
 		OASIS_FLOAT sumloss = 0.0;
 		OASIS_FLOAT sample_mean = 0.0;
@@ -269,9 +369,20 @@ namespace eltcalc {
 			outFile = stdout;
 		}
 
+#ifdef HAVE_PARQUET
+		parquet::StreamWriter os[QELT+1];
+		if (parquetOutput == true) {
+			for (int i = MELT; i < QELT+1; i++) {
+				if (parquetFileNames[i] != "") {
+					os[i] = GetParquetStreamWriter(i, parquetFileNames[i]);
+				}
+			}
+		}
+#endif
+
 		// Losses for calculating quantiles
 		std::vector<OASIS_FLOAT> losses_vec;
-		if (fout[QELT] != nullptr) losses_vec.resize(samplesize, 0);
+		if (fout[QELT] != nullptr || parquetFileNames[QELT] != "") losses_vec.resize(samplesize, 0);
 
 		summarySampleslevelHeader sh;
 		size_t i = fread(&sh, sizeof(sh), 1, stdin);
@@ -324,6 +435,12 @@ namespace eltcalc {
 				OutputData(sh, 1, analytical_mean, 0, outFile,
 					   sh.expval, sh.expval, chance_of_loss,
 					   max_loss);
+#ifdef HAVE_PARQUET
+				if (parquetFileNames[MELT] != "") {
+					OutputRowsParquet(sh, 1, analytical_mean, 0, os[MELT], sh.expval,
+							  sh.expval, chance_of_loss, max_loss);
+				}
+#endif
 				if (firstOutput == true) {
 					std::this_thread::sleep_for(std::chrono::milliseconds(PIPE_DELAY)); // used to stop possible race condition with kat
 					firstOutput = false;
@@ -334,8 +451,20 @@ namespace eltcalc {
 						   mean_impacted_exposure,
 						   max_impacted_exposure,
 						   chance_of_loss, max_loss);
-					if (fout[QELT] != nullptr) {
+#ifdef HAVE_PARQUET
+					if (parquetFileNames[MELT] != "") {
+						OutputRowsParquet(sh, 2, sample_mean, sd, os[MELT], mean_impacted_exposure,
+								  max_impacted_exposure, chance_of_loss, max_loss);
+					}
+#endif
+					if (fout[QELT] != nullptr || parquetFileNames[QELT] != "") {
+						std::sort(losses_vec.begin(), losses_vec.end());
+#ifdef HAVE_PARQUET
+						OutputQuantiles(sh, losses_vec, fout[QELT],
+								parquetFileNames[QELT], os[QELT]);
+#else
 						OutputQuantiles(sh, losses_vec, fout[QELT]);
+#endif
 						std::fill(losses_vec.begin(), losses_vec.end(), 0);
 					}
 				}
@@ -351,13 +480,15 @@ namespace eltcalc {
 		}
 
 	}
-	void doit(bool skipHeader, bool ordOutput, FILE **fout)
+	void doit(bool skipHeader, bool ordOutput, FILE **fout,
+		  bool parquetOutput, std::string *parquetFileNames)
 	{
 		unsigned int stream_type = 0;
 		size_t i = fread(&stream_type, sizeof(stream_type), 1, stdin);
 
-		if (ordOutput) {
-			if (fout[MELT] != nullptr) GetEventRates();
+		if ((ordOutput && fout[MELT] != nullptr) ||
+		    (parquetOutput && parquetFileNames[MELT] != "")) {
+			GetEventRates();
 		}
 
 		if (isSummaryCalcStream(stream_type) == true) {
@@ -365,13 +496,17 @@ namespace eltcalc {
 			unsigned int summaryset_id;
 			i = fread(&samplesize, sizeof(samplesize), 1, stdin);
 
-			if (ordOutput && fout[QELT] != nullptr) {
+			if ((ordOutput && fout[QELT] != nullptr) ||
+			    (parquetOutput && parquetFileNames[QELT] != "")) {
 				GetIntervals(samplesize);
 			}
 
-			if (i == 1) i = fread(&summaryset_id, sizeof(summaryset_id), 1, stdin);
+			if (i == 1) i = fread(&summaryset_id,
+					      sizeof(summaryset_id), 1, stdin);
 			if (i == 1) {
-				doeltoutput(samplesize, skipHeader, ordOutput, fout);
+				doeltoutput(samplesize, skipHeader, ordOutput,
+					    fout, parquetOutput,
+					    parquetFileNames);
 			}
 			else {
 				fprintf(stderr, "FATAL: Stream read error\n");

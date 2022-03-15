@@ -343,6 +343,7 @@ namespace eltcalc {
 				   const OASIS_FLOAT, const OASIS_FLOAT, FILE*,
 				   const OASIS_FLOAT, const OASIS_FLOAT,
 				   const OASIS_FLOAT, const OASIS_FLOAT);
+		OutputData = nullptr;
 		FILE * outFile = nullptr;
 		if (ordOutput) {
 			if (skipHeader == false) {
@@ -397,7 +398,7 @@ namespace eltcalc {
 				if (sr.sidx > 0) {
 					sumloss += sr.loss;
 					sumlosssqr += (sr.loss * sr.loss);
-					if (fout[QELT] != nullptr) losses_vec[sr.sidx-1] = sr.loss;
+					if (fout[QELT] != nullptr || parquetFileNames[QELT] != "") losses_vec[sr.sidx-1] = sr.loss;
 					if (sr.loss > 0) {
 						mean_impacted_exposure += sh.expval;
 						if (sh.expval > max_impacted_exposure) {
@@ -432,9 +433,12 @@ namespace eltcalc {
 				}
 			}
 			if (sh.expval > 0) {   // only output rows with a non-zero exposure value
-				OutputData(sh, 1, analytical_mean, 0, outFile,
-					   sh.expval, sh.expval, chance_of_loss,
-					   max_loss);
+				if (OutputData != nullptr) {
+					OutputData(sh, 1, analytical_mean, 0,
+						   outFile, sh.expval,
+						   sh.expval, chance_of_loss,
+						   max_loss);
+				}
 #ifdef HAVE_PARQUET
 				if (parquetFileNames[MELT] != "") {
 					OutputRowsParquet(sh, 1, analytical_mean, 0, os[MELT], sh.expval,
@@ -446,11 +450,14 @@ namespace eltcalc {
 					firstOutput = false;
 				}
 				if (samplesize) {
-					OutputData(sh, 2, sample_mean, sd,
-						   outFile,
-						   mean_impacted_exposure,
-						   max_impacted_exposure,
-						   chance_of_loss, max_loss);
+					if (OutputData != nullptr) {
+						OutputData(sh, 2, sample_mean,
+							   sd, outFile,
+							   mean_impacted_exposure,
+							   max_impacted_exposure,
+							   chance_of_loss,
+							   max_loss);
+					}
 #ifdef HAVE_PARQUET
 					if (parquetFileNames[MELT] != "") {
 						OutputRowsParquet(sh, 2, sample_mean, sd, os[MELT], mean_impacted_exposure,

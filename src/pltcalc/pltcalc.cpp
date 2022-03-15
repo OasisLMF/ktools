@@ -302,11 +302,6 @@ namespace pltcalc {
 		int occ_year, occ_month, occ_day, occ_hour, occ_minute;
 		getdates(o.occ_date_id, occ_year, occ_month, occ_day, occ_hour,
 			 occ_minute);
-		/*int days = o.occ_date_id / (1440 - 1439 * !granular_date_);
-		d(days, occ_year, occ_month, occ_day);
-		int minutes = (o.occ_date_id % 1440) * granular_date_;
-		occ_hour = minutes / 60;
-		occ_minute = minutes % 60;*/
 
 		if (outFile != nullptr) {
 			char buffer[4096];
@@ -351,12 +346,6 @@ namespace pltcalc {
 			int occ_year, occ_month, occ_day, occ_hour, occ_minute;
 			getdates(p.occ_date_id, occ_year, occ_month, occ_day,
 				 occ_hour, occ_minute);
-/*			int occ_year, occ_month, occ_day, occ_hour, occ_minute;
-			int days = p.occ_date_id / (1440 - 1439 * !granular_date_);
-			d(days, occ_year, occ_month, occ_day);
-			int minutes = (p.occ_date_id % 1440) * granular_date_;
-			occ_hour = minutes / 60;
-			occ_minute = minutes % 60;*/
 			
 			if (outFile != nullptr) {
 				char buffer[4096];
@@ -418,12 +407,6 @@ namespace pltcalc {
 			int occ_year, occ_month, occ_day, occ_hour, occ_minute;
 			getdates(p.occ_date_id, occ_year, occ_month, occ_day,
 				 occ_hour, occ_minute);
-/*			int occ_year, occ_month, occ_day, occ_hour, occ_minute;
-			int days = p.occ_date_id / (1440 - 1439 * !granular_date_);
-			d(days, occ_year, occ_month, occ_day);
-			int minutes = (p.occ_date_id % 1440) * granular_date_;
-			occ_hour = minutes / 60;
-			occ_minute = minutes % 60;*/
 
 			for (std::map<float, OASIS_FLOAT>::iterator it = quantile_to_loss.begin();
 			     it != quantile_to_loss.end(); ++it) {
@@ -661,7 +644,7 @@ namespace pltcalc {
 		  bool parquetOutput, std::string *parquetFileNames)
 	{
 		loadoccurrence();
-		if (ordOutput) getperiodweights();
+		if (ordOutput || parquetOutput) getperiodweights();
 		int summarycalcstream_type = 0;
 		int i = fread(&summarycalcstream_type,
 			      sizeof(summarycalcstream_type), 1, stdin);
@@ -673,7 +656,7 @@ namespace pltcalc {
 		}
 		stream_type = streamno_mask & summarycalcstream_type;
 		i = fread(&samplesize_, sizeof(samplesize_), 1, stdin);
-		if (fout[QPLT] != nullptr) getintervals();
+		if (fout[QPLT] != nullptr || parquetFileNames[QPLT] != "") getintervals();
 
 		void (*OutputDataGranular)(const outrec_granular&, const int,
 					   FILE*) = nullptr;
@@ -714,11 +697,6 @@ namespace pltcalc {
 						"SummaryId,Quantile,Loss\n");
 				}
 			}
-/*			if (granular_date_) {
-				OutputDataGranular = outputrows_ord<const outrec_granular&>;
-			} else {
-				OutputDataLegacy = outputrows_ord<const outrec&>;
-			}*/
 			outFile = fout[MPLT];
 		} else if (parquetOutput == false) {
 			if (date_algorithm_) {

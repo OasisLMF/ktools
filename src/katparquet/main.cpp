@@ -1,4 +1,8 @@
 #include "../include/oasis.h"
+#ifdef HAVE_PARQUET
+#include "../include/oasisparquet.h"
+#endif
+
 #include <algorithm>
 #include <vector>
 #include <sys/stat.h>
@@ -77,12 +81,11 @@ int main(int argc, char *argv[]) {
   exit(EXIT_FAILURE);
 #else
 
-  enum { NONE = 0, MPLT, QPLT, SPLT, MELT, QELT, SELT };
   progname = argv[0];
   int opt;
   std::string path = "";
   std::string outFile = "";
-  int tableName = NONE;
+  int tableName = OasisParquet::NONE;
   while ((opt = getopt(argc, argv, "d:o:MmQqSsvh")) != -1) {
     switch (opt) {
       case 'd':
@@ -92,22 +95,22 @@ int main(int argc, char *argv[]) {
 	outFile = optarg;
 	break;
       case 'M':
-	tableName = setTableName(tableName, MPLT);
+	tableName = setTableName(tableName, OasisParquet::MPLT);
 	break;
       case 'm':
-	tableName = setTableName(tableName, MELT);
+	tableName = setTableName(tableName, OasisParquet::MELT);
 	break;
       case 'Q':
-	tableName = setTableName(tableName, QPLT);
+	tableName = setTableName(tableName, OasisParquet::QPLT);
 	break;
       case 'q':
-	tableName = setTableName(tableName, QELT);
+	tableName = setTableName(tableName, OasisParquet::QELT);
 	break;
       case 'S':
-	tableName = setTableName(tableName, SPLT);
+	tableName = setTableName(tableName, OasisParquet::SPLT);
 	break;
       case 's':
-	tableName = setTableName(tableName, SELT);
+	tableName = setTableName(tableName, OasisParquet::SELT);
 	break;
       case 'v':
 	fprintf(stderr, "%s : version: %s : Parquet output enabled\n",

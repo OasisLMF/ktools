@@ -16,6 +16,7 @@ namespace OasisParquet {
   const parquet::Type::type OASIS_PARQUET_FLOAT = parquet::Type::FLOAT;
 #endif
 
+  enum { NONE = 0, MPLT, QPLT, SPLT, MELT, QELT, SELT };
 
   struct ParquetFields {
     std::string name;

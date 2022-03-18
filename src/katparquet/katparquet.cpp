@@ -61,29 +61,27 @@ namespace katparquet {
   void doit(const std::vector<std::string> &inFiles,
 	    const std::string outFile, const int tableName) {
 
-    enum { NONE = 0, MPLT, QPLT, SPLT, MELT, QELT, SELT };
-
     parquet::StreamWriter osOut = OasisParquet::GetParquetStreamWriter_(tableName, outFile);
 
-    if (tableName == MPLT) {
+    if (tableName == OasisParquet::MPLT) {
       std::vector<OasisParquet::MomentPLTEntry> rows;
       DoKat(inFiles, osOut, rows);
-    } else if (tableName == QPLT) {
+    } else if (tableName == OasisParquet::QPLT) {
       std::vector<OasisParquet::QuantilePLTEntry> rows;
       DoKat(inFiles, osOut, rows);
-    } else if (tableName == SPLT) {
+    } else if (tableName == OasisParquet::SPLT) {
       std::vector<OasisParquet::SamplePLTEntry> rows;
       DoKat(inFiles, osOut, rows);
-    } else if (tableName == MELT) {
+    } else if (tableName == OasisParquet::MELT) {
       std::vector<OasisParquet::MomentELTEntry> rows;
       DoKat(inFiles, osOut, rows);
-    } else if (tableName == QELT) {
+    } else if (tableName == OasisParquet::QELT) {
       std::vector<OasisParquet::QuantileELTEntry> rows;
       DoKat(inFiles, osOut, rows);
-    } else if (tableName == SELT) {
+    } else if (tableName == OasisParquet::SELT) {
       std::vector<OasisParquet::SampleELTEntry> rows;
       DoKat(inFiles, osOut, rows);
-    } else if (tableName == NONE) {
+    } else if (tableName == OasisParquet::NONE) {
       fprintf(stderr, "FATAL: No table type selected - please select table "
 		      "type for files to be concatenated.\n");
       exit(EXIT_FAILURE);

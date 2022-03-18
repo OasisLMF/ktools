@@ -188,6 +188,7 @@ AC_CONFIG_FILES([
 		 src/returnperiodtobin/Makefile
 		 src/returnperiodtocsv/Makefile
 		 src/kat/Makefile
+		 src/katparquet/Makefile
 		 src/footprintconv/Makefile
 		 src/fmprofilebinconv/Makefile
 		 src/validateitems/Makefile

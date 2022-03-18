@@ -13,7 +13,7 @@ if (Parquet_FOUND)
 	add_definitions(-DHAVE_PARQUET -DORD_OUTPUT)
         target_sources(ordleccalc
                 PRIVATE
-                        ../leccalc/leccalc.cpp ../leccalc/leccalc.h ../leccalc/aggreports.cpp ../leccalc/aggreports.h ../include/useparquet.cpp ../include/useparquet.h main.cpp
+                        ../leccalc/leccalc.cpp ../leccalc/leccalc.h ../leccalc/aggreports.cpp ../leccalc/aggreports.h ../include/oasisparquet.cpp ../include/oasisparquet.h main.cpp
         )
         target_link_libraries(ordleccalc PRIVATE arrow_shared parquet_shared)
 else()

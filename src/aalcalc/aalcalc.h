@@ -42,7 +42,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include "../include/oasis.h"
 
 #ifdef HAVE_PARQUET
-#include "../include/useparquet.h"
+#include "../include/oasisparquet.h"
 #endif
 
 #include <string>

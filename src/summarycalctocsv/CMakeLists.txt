@@ -13,7 +13,7 @@ if (Parquet_FOUND)
         add_definitions(-DHAVE_PARQUET)
         target_sources(summarycalctocsv
                 PRIVATE
-                        summarycalctocsv.cpp ../include/useparquet.cpp ../include/useparquet.h
+                        summarycalctocsv.cpp ../include/oasisparquet.cpp ../include/oasisparquet.h
         )
         target_link_libraries(summarycalctocsv PRIVATE arrow_shared parquet_shared)
 else()

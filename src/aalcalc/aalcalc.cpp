@@ -511,7 +511,7 @@ void aalcalc::outputresultscsv_new()
 #ifdef HAVE_PARQUET
 	// Write parquet file
 	if (parquet_output_) {
-		std::vector<ParquetFields> parquetFields;
+		std::vector<OasisParquet::ParquetFields> parquetFields;
 		parquetFields.push_back(
 			{"SummaryID", parquet::Type::INT32,
 			parquet::ConvertedType::INT_32});
@@ -525,8 +525,9 @@ void aalcalc::outputresultscsv_new()
 			{"SDLoss", parquet::Type::DOUBLE,
 			parquet::ConvertedType::NONE});
 
-		parquet::StreamWriter os = SetupParquetOutputStream(
-			parquet_outFile_, parquetFields);
+		parquet::StreamWriter os =
+		  OasisParquet::SetupParquetOutputStream(parquet_outFile_,
+							 parquetFields);
 
 		outputresultsparquet(vec_analytical_aal_, no_of_periods_, 1,
 				     os);

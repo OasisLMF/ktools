@@ -45,7 +45,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include "leccalc.h"
 
 #ifdef ORD_OUTPUT
-#include "../include/useparquet.h"
+#include "../include/oasisparquet.h"
 #endif
 
 enum { MEANDR = 1, FULL, PERSAMPLEMEAN, MEANSAMPLE };

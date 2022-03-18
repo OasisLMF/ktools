@@ -421,7 +421,7 @@ inline void aggreports::WriteTVaR(parquet::StreamWriter& os,
 
 inline parquet::StreamWriter aggreports::GetParquetStreamWriter(const int fileStream)
 {
-  std::vector<ParquetFields> parquetFields;
+  std::vector<OasisParquet::ParquetFields> parquetFields;
   parquetFields.push_back({"SummaryID", parquet::Type::INT32,
 			  parquet::ConvertedType::INT_32});
   if (fileStream == EPT) {
@@ -435,11 +435,12 @@ inline parquet::StreamWriter aggreports::GetParquetStreamWriter(const int fileSt
 			  parquet::ConvertedType::INT_32});
   parquetFields.push_back({"ReturnPeriod", parquet::Type::DOUBLE,
 			  parquet::ConvertedType::NONE});
-  parquetFields.push_back({"Loss", OASIS_PARQUET_FLOAT,
+  parquetFields.push_back({"Loss", OasisParquet::OASIS_PARQUET_FLOAT,
 			  parquet::ConvertedType::NONE});
 
-  parquet::StreamWriter os = SetupParquetOutputStream(parquetFileNames_[fileStream],
-						      parquetFields);
+  parquet::StreamWriter os =
+    OasisParquet::SetupParquetOutputStream(parquetFileNames_[fileStream],
+					   parquetFields);
 
   return os;
 }

@@ -51,14 +51,14 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 using namespace std;
 #include "../include/oasis.h"
 #ifdef HAVE_PARQUET
-#include "../include/useparquet.h"
+#include "../include/oasisparquet.h"
 #endif
 
 bool firstOutput = true;
 
 int rowcount = 0;
 
-#ifdef HAVE_PARQUET
+/*#ifdef HAVE_PARQUET
 inline parquet::StreamWriter GetParquetStreamWriter(const std::string parquetOutFile)
 {
 	std::vector<ParquetFields> parquetFields;
@@ -78,7 +78,7 @@ inline parquet::StreamWriter GetParquetStreamWriter(const std::string parquetOut
 
 	return os;
 }
-#endif
+#endif*/
 
 void doitz(bool skipheader, bool fullprecision, bool show_exposure_value,
 	   bool ord_output, bool all_idx, bool parquet_output,
@@ -109,7 +109,8 @@ void doitz(bool skipheader, bool fullprecision, bool show_exposure_value,
 #ifdef HAVE_PARQUET
 		parquet::StreamWriter os;
 		if (parquet_output == true)
-			os = GetParquetStreamWriter(parquetOutFile);
+			os = OasisParquet::GetParquetStreamWriter_(OasisParquet::SELT,
+								   parquetOutFile);
 #endif
 		int samplesize = 0;
 		int summary_set = 0;
@@ -209,7 +210,8 @@ void doit(bool skipheader, bool fullprecision,bool show_exposure_value,
 #ifdef HAVE_PARQUET
 		parquet::StreamWriter os;
 		if (parquet_output == true)
-			os = GetParquetStreamWriter(parquetOutFile);
+			os = OasisParquet::GetParquetStreamWriter_(OasisParquet::SELT,
+								   parquetOutFile);
 #endif
 		int samplesize=0;
 		int summary_set = 0;

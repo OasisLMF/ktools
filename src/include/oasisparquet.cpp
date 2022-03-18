@@ -71,7 +71,6 @@ parquet::StreamWriter OasisParquet::SetupParquetOutputStream(const std::string& 
 parquet::StreamWriter OasisParquet::GetParquetStreamWriter_(const int ordTableName,
 					     const std::string outFile) {
 
-  enum { NONE = 0, MPLT, QPLT, SPLT, MELT, QELT, SELT };
   std::vector<ParquetFields> parquetFields;
 
   // Period Loss Tables

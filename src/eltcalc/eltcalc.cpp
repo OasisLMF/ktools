@@ -353,7 +353,12 @@ namespace eltcalc {
 				if (sr.sidx > 0) {
 					sumloss += sr.loss;
 					sumlosssqr += (sr.loss * sr.loss);
-					if (fout[QELT] != nullptr || parquetFileNames.find(OasisParquet::QELT) != parquetFileNames.end()) {
+#ifdef HAVE_PARQUET
+					if (fout[QELT] != nullptr || parquetFileNames.find(OasisParquet::QELT) != parquetFileNames.end())
+#else
+					if (fout[QELT] != nullptr)
+#endif
+					{
 						losses_vec[sr.sidx-1] = sr.loss;
 					}
 					if (sr.loss > 0) {
@@ -420,8 +425,11 @@ namespace eltcalc {
 						OutputRowsParquet(sh, 2, sample_mean, sd, os[MELT], mean_impacted_exposure,
 								  max_impacted_exposure, chance_of_loss, max_loss);
 					}
+					if (fout[QELT] != nullptr || parquetFileNames.find(OasisParquet::QELT) != parquetFileNames.end())
+#else
+					if (fout[QELT] != nullptr)
 #endif
-					if (fout[QELT] != nullptr || parquetFileNames.find(OasisParquet::QELT) != parquetFileNames.end()) {
+					{
 						std::sort(losses_vec.begin(), losses_vec.end());
 #ifdef HAVE_PARQUET
 						OutputQuantiles(sh, losses_vec, fout[QELT], os);
@@ -449,20 +457,28 @@ namespace eltcalc {
 		unsigned int stream_type = 0;
 		size_t i = fread(&stream_type, sizeof(stream_type), 1, stdin);
 
+#ifdef HAVE_PARQUET
 		if ((ordOutput && fout[MELT] != nullptr) ||
-		    (parquetFileNames.find(OasisParquet::MELT) != parquetFileNames.end())) {
+		    parquetFileNames.find(OasisParquet::MELT) != parquetFileNames.end()) {
 			GetEventRates();
 		}
+#else
+		if (ordOutput && fout[MELT] != nullptr) GetEventRates();
+#endif
 
 		if (isSummaryCalcStream(stream_type) == true) {
 			unsigned int samplesize;
 			unsigned int summaryset_id;
 			i = fread(&samplesize, sizeof(samplesize), 1, stdin);
 
+#ifdef HAVE_PARQUET
 			if ((ordOutput && fout[QELT] != nullptr) ||
-			    (parquetFileNames.find(OasisParquet::QELT) != parquetFileNames.end())) {
+			    parquetFileNames.find(OasisParquet::QELT) != parquetFileNames.end()) {
 				GetIntervals(samplesize);
 			}
+#else
+			if (ordOutput && fout[QELT] != nullptr) GetIntervals(samplesize);
+#endif
 
 			if (i == 1) i = fread(&summaryset_id,
 					      sizeof(summaryset_id), 1, stdin);

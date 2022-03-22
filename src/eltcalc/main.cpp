@@ -46,6 +46,8 @@ Author: Ben Matharu  email : ben.matharu@oasislmf.org
 #include <chrono>
 #include <thread>
 
+#include <map>
+
 #if defined(_MSC_VER)
 #include "../wingetopt/wingetopt.h"
 #else
@@ -54,6 +56,9 @@ Author: Ben Matharu  email : ben.matharu@oasislmf.org
 
 
 #include "../include/oasis.h"
+#ifdef HAVE_PARQUET
+#include "../include/oasisparquet.h"
+#endif
 
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
 #include <signal.h>
@@ -73,7 +78,7 @@ void segfault_sigaction(int, siginfo_t *si, void *)
 
 namespace eltcalc {
 	void doit(bool skipHeader, bool ordOutput, FILE** fout,
-		  bool parquetOutput, std::string *parquetFileNames);
+		  std::map<int, std::string> &parquetFileNames);
 	void setinitdone(int processid);
 }
 
@@ -116,7 +121,7 @@ int main(int argc, char* argv[])
 	bool ordOutput = false;
 	FILE * fout[] = { nullptr, nullptr };
 	bool parquetOutput = false;
-	std::string parquetOutFile[2] = { "", "" };
+	std::map<int, std::string> parquetOutFiles;
 	int opt;
 	int processid = 0;
 	while ((opt = getopt(argc, argv, "vshP:M:m:Q:q:")) != -1) {
@@ -137,7 +142,9 @@ int main(int argc, char* argv[])
 			break;
 		case 'm':
 			parquetOutput = true;
-			parquetOutFile[MELT] = optarg;
+#ifdef HAVE_PARQUET
+			parquetOutFiles[OasisParquet::MELT] = optarg;
+#endif
 			break;
 		case 'Q':
 			ordOutput = true;
@@ -145,7 +152,9 @@ int main(int argc, char* argv[])
 			break;
 		case 'q':
 			parquetOutput = true;
-			parquetOutFile[QELT] = optarg;
+#ifdef HAVE_PARQUET
+			parquetOutFiles[OasisParquet::QELT] = optarg;
+#endif
 			break;
 		case 'P':
 			processid = atoi(optarg);
@@ -183,8 +192,7 @@ int main(int argc, char* argv[])
 		initstreams();
 		eltcalc::setinitdone(processid);
         	logprintf(progname, "INFO", "starting process..\n");
-		eltcalc::doit(skipHeader, ordOutput, fout, parquetOutput,
-			      parquetOutFile);
+		eltcalc::doit(skipHeader, ordOutput, fout, parquetOutFiles);
         	logprintf(progname, "INFO", "finishing process..\n");
 		return EXIT_SUCCESS;
 	}

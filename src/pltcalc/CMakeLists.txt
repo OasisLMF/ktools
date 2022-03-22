@@ -13,7 +13,7 @@ if (Parquet_FOUND)
         add_definitions(-DHAVE_PARQUET)
         target_sources(pltcalc
                 PRIVATE
-                        pltcalc.cpp main.cpp ../include/useparquet.cpp ../include/useparquet.h
+                        pltcalc.cpp main.cpp ../include/oasisparquet.cpp ../include/oasisparquet.h
         )
         target_link_libraries(pltcalc PRIVATE arrow_shared parquet_shared)
 else()

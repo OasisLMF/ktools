@@ -52,7 +52,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #endif
 
 #ifdef HAVE_PARQUET
-#include "../include/useparquet.h"
+#include "../include/oasisparquet.h"
 #endif
 
 
@@ -86,9 +86,8 @@ namespace pltcalc {
 	std::map<int, double> period_weights_;
 	std::map<float, interval> intervals_;
 	enum { MPLT = 0, SPLT, QPLT };
-	std::string parquetFileNames_[3] = { "",  "", "" };
 #ifdef HAVE_PARQUET
-	parquet::StreamWriter os_[3];
+	std::map<int, parquet::StreamWriter> os_;
 #endif
 
 	void d(long long g, int& y, int& mm, int& dd)
@@ -297,7 +296,14 @@ namespace pltcalc {
 	template<typename T>
 	void outputrows_ord(const T& o, const int type, FILE * outFile)
 	{
-		if (outFile == nullptr && parquetFileNames_[MPLT] == "") return;
+#ifdef HAVE_PARQUET
+		if (outFile == nullptr && os_.find(OasisParquet::MPLT) != os_.end())
+#else
+		if (outFile == nullptr)
+#endif
+		{
+			return;
+		}
 
 		int occ_year, occ_month, occ_day, occ_hour, occ_minute;
 		getdates(o.occ_date_id, occ_year, occ_month, occ_day, occ_hour,
@@ -319,7 +325,7 @@ namespace pltcalc {
 			writeoutput(buffer, strLen, outFile);
 		}
 #ifdef HAVE_PARQUET
-		if (parquetFileNames_[MPLT] != "") {
+		if (os_.find(OasisParquet::MPLT) != os_.end()) {
 			os_[MPLT] << o.period_no
 				  << period_weights_[o.period_no] << o.event_id
 				  << occ_year << occ_month << occ_day
@@ -330,7 +336,6 @@ namespace pltcalc {
 				  << o.max_impact_exp << parquet::EndRow;
 		}
 #endif
-
 	}
 
 	template<typename moccT, typename periodT>
@@ -339,7 +344,14 @@ namespace pltcalc {
 			     moccT &m_occ, std::vector<periodT> &vp,
 			     const OASIS_FLOAT impacted_exposure)
 	{
-		if (outFile == nullptr && parquetFileNames_[SPLT] == "") return;
+#ifdef HAVE_PARQUET
+		if (outFile == nullptr && os_.find(OasisParquet::SPLT) != os_.end())
+#else
+		if (outFile == nullptr)
+#endif
+		{
+			return;
+		}
 
 		vp = m_occ[sh.event_id];
 		for (auto p : vp) {
@@ -362,7 +374,7 @@ namespace pltcalc {
 				writeoutput(buffer, strLen, outFile);
 			}
 #ifdef HAVE_PARQUET
-			if (parquetFileNames_[SPLT] != "") {
+			if (os_.find(OasisParquet::SPLT) != os_.end()) {
 				os_[SPLT] << p.period_no
 					  << period_weights_[p.period_no]
 					  << sh.event_id << occ_year
@@ -382,7 +394,14 @@ namespace pltcalc {
 			     std::vector<sampleslevelRec>& vrec, FILE *outFile,
 			     moccT& m_occ, std::vector<periodT>& vp)
 	{
-		if (outFile == nullptr && parquetFileNames_[QPLT] == "") return;
+#ifdef HAVE_PARQUET
+		if (outFile == nullptr && os_.find(OasisParquet::QPLT) != os_.end())
+#else
+		if (outFile == nullptr)
+#endif
+		{
+			return;
+		}
 
 		sampleslevelRec emptyRec = { 0, 0.0 };
 		vrec.resize(samplesize_, emptyRec);   // Pad with zero losses
@@ -427,7 +446,7 @@ namespace pltcalc {
 				}
 
 #ifdef HAVE_PARQUET
-				if (parquetFileNames_[QPLT] != "") {
+				if (os_.find(OasisParquet::QPLT) != os_.end()) {
 					os_[QPLT] << p.period_no
 						  << period_weights_[p.period_no]
 						  << sh.event_id << occ_year
@@ -578,73 +597,11 @@ namespace pltcalc {
 		}
 	}
 
-#ifdef HAVE_PARQUET
-	inline parquet::StreamWriter GetParquetStreamWriter(const int fileStream, const std::string parquetFileName)
-	{
-		std::vector<ParquetFields> parquetFields;
-		parquetFields.push_back({"Period", parquet::Type::INT32,
-					parquet::ConvertedType::INT_32});
-		parquetFields.push_back({"PeriodWeight", parquet::Type::DOUBLE,
-					parquet::ConvertedType::NONE});
-		parquetFields.push_back({"EventId", parquet::Type::INT32,
-					parquet::ConvertedType::INT_32});
-		parquetFields.push_back({"Year", parquet::Type::INT32,
-					parquet::ConvertedType::INT_32});
-		parquetFields.push_back({"Month", parquet::Type::INT32,
-					parquet::ConvertedType::INT_32});
-		parquetFields.push_back({"Day", parquet::Type::INT32,
-					parquet::ConvertedType::INT_32});
-		parquetFields.push_back({"Hour", parquet::Type::INT32,
-					parquet::ConvertedType::INT_32});
-		parquetFields.push_back({"Minute", parquet::Type::INT32,
-					parquet::ConvertedType::INT_32});
-		parquetFields.push_back({"SummaryId", parquet::Type::INT32,
-					parquet::ConvertedType::INT_32});
-		if (fileStream == MPLT) {
-			parquetFields.push_back({"SampleType", parquet::Type::INT32,
-						parquet::ConvertedType::INT_32});
-			parquetFields.push_back({"ChanceOfLoss", OASIS_PARQUET_FLOAT,
-						parquet::ConvertedType::NONE});
-			parquetFields.push_back({"MeanLoss", OASIS_PARQUET_FLOAT,
-						parquet::ConvertedType::NONE});
-			parquetFields.push_back({"SDLoss", OASIS_PARQUET_FLOAT,
-						parquet::ConvertedType::NONE});
-			parquetFields.push_back({"MaxLoss", OASIS_PARQUET_FLOAT,
-						parquet::ConvertedType::NONE});
-			parquetFields.push_back({"FootprintExposure", OASIS_PARQUET_FLOAT,
-						parquet::ConvertedType::NONE});
-			parquetFields.push_back({"MeanImpactedExposure", OASIS_PARQUET_FLOAT,
-						parquet::ConvertedType::NONE});
-			parquetFields.push_back({"MaxImpactedExposure", OASIS_PARQUET_FLOAT,
-						parquet::ConvertedType::NONE});
-		} else if (fileStream == SPLT) {
-			parquetFields.push_back({"SampleId", parquet::Type::INT32,
-						parquet::ConvertedType::INT_32});
-			parquetFields.push_back({"Loss", OASIS_PARQUET_FLOAT,
-						parquet::ConvertedType::NONE});
-			parquetFields.push_back({"ImpactedExposure", OASIS_PARQUET_FLOAT,
-						parquet::ConvertedType::NONE});
-		} else if (fileStream == QPLT) {
-			parquetFields.push_back({"Quantile", parquet::Type::FLOAT,
-						parquet::ConvertedType::NONE});
-			parquetFields.push_back({"Loss", OASIS_PARQUET_FLOAT,
-						parquet::ConvertedType::NONE});
-		} else {
-			fprintf(stderr, "FATAL: Unrecognised parquet file stream %d\n", fileStream);
-			exit(EXIT_FAILURE);
-		}
-
-		parquet::StreamWriter os = SetupParquetOutputStream(parquetFileName, parquetFields);
-
-		return os;
-	}
-#endif
-
 	void doit(bool skipHeader, bool ordOutput, FILE **fout,
-		  bool parquetOutput, std::string *parquetFileNames)
+		  std::map<int, std::string> &parquetFileNames)
 	{
 		loadoccurrence();
-		if (ordOutput || parquetOutput) getperiodweights();
+		if (ordOutput || parquetFileNames.size() != 0) getperiodweights();
 		int summarycalcstream_type = 0;
 		int i = fread(&summarycalcstream_type,
 			      sizeof(summarycalcstream_type), 1, stdin);
@@ -656,14 +613,16 @@ namespace pltcalc {
 		}
 		stream_type = streamno_mask & summarycalcstream_type;
 		i = fread(&samplesize_, sizeof(samplesize_), 1, stdin);
-		if (fout[QPLT] != nullptr || parquetFileNames[QPLT] != "") getintervals();
+		if (fout[QPLT] != nullptr || parquetFileNames.find(OasisParquet::QPLT) != parquetFileNames.end()) {
+			getintervals();
+		}
 
 		void (*OutputDataGranular)(const outrec_granular&, const int,
 					   FILE*) = nullptr;
 		void (*OutputDataLegacy)(const outrec&, const int,
 					 FILE*) = nullptr;
 		FILE * outFile = nullptr;
-		if (ordOutput || parquetOutput) {
+		if (ordOutput || parquetFileNames.size() != 0) {
 			if (granular_date_) {
 				OutputDataGranular = outputrows_ord<const outrec_granular&>;
 			} else {
@@ -698,7 +657,7 @@ namespace pltcalc {
 				}
 			}
 			outFile = fout[MPLT];
-		} else if (parquetOutput == false) {
+		} else if (parquetFileNames.size() == 0) {
 			if (date_algorithm_) {
 				if (skipHeader == false) {
 					printf("type,summary_id,period_no,event_id,mean,standard_deviation,exposure_value,occ_year,occ_month,occ_day\n");
@@ -723,13 +682,9 @@ namespace pltcalc {
 		}
 
 #ifdef HAVE_PARQUET
-		if (parquetOutput) {
-			for (int i = MPLT; i < QPLT+1; i++) {
-				parquetFileNames_[i] = parquetFileNames[i];
-				if (parquetFileNames_[i] != "") {
-					os_[i] = GetParquetStreamWriter(i, parquetFileNames[i]);
-				}
-			}
+		for (auto iter = parquetFileNames.begin();
+		  iter != parquetFileNames.end(); ++iter) {
+			os_[iter->first] = OasisParquet::GetParquetStreamWriter_(iter->first, iter->second);
 		}
 #endif
 

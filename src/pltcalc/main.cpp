@@ -36,6 +36,10 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 */
 
 #include "../include/oasis.h"
+#ifdef HAVE_PARQUET
+#include "../include/oasisparquet.h"
+#endif
+
 #include <iostream>
 #include <vector>
 #include <map>
@@ -54,7 +58,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 namespace pltcalc {
 	void doit(bool skipHeader, bool ordOutput, FILE** fout,
-		  bool parquetOutput, std::string *parquetFileNames);
+		  std::map<int, std::string> &parquetFileNames);
 }
 char* progname;
 
@@ -107,7 +111,7 @@ int main(int argc, char *argv[])
 	bool ordOutput = false;
 	FILE * fout[] = { nullptr, nullptr, nullptr };
 	bool parquetOutput = false;
-	std::string parquetOutFile[3] = { "", "", ""};
+	std::map<int, std::string> parquetOutFiles;
 	while ((opt = getopt(argc, argv, "HvhM:m:Q:q:S:s:")) != -1) {
 		switch (opt) {
 		case 'v':
@@ -126,7 +130,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'm':
 			parquetOutput = true;
-			parquetOutFile[MPLT] = optarg;
+#ifdef HAVE_PARQUET
+			parquetOutFiles[OasisParquet::MPLT] = optarg;
+#endif
 			break;
 		case 'Q':
 			ordOutput = true;
@@ -134,7 +140,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'q':
 			parquetOutput = true;
-			parquetOutFile[QPLT] = optarg;
+#ifdef HAVE_PARQUET
+			parquetOutFiles[OasisParquet::QPLT] = optarg;
+#endif
 			break;
 		case 'S':
 			ordOutput = true;
@@ -142,7 +150,9 @@ int main(int argc, char *argv[])
 			break;
 		case 's':
 			parquetOutput = true;
-			parquetOutFile[SPLT] = optarg;
+#ifdef HAVE_PARQUET
+			parquetOutFiles[OasisParquet::SPLT] = optarg;
+#endif
 			break;
 		case 'H':
 			skipHeader = true;
@@ -176,8 +186,7 @@ int main(int argc, char *argv[])
 
 	try {
 		initstreams();
-		pltcalc::doit(skipHeader, ordOutput, fout, parquetOutput,
-			      parquetOutFile);
+		pltcalc::doit(skipHeader, ordOutput, fout, parquetOutFiles);
 	}
 	catch (std::bad_alloc&) {
 		fprintf(stderr, "FATAL: %s: Memory allocation failed\n", progname);

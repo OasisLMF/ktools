@@ -689,7 +689,7 @@ namespace pltcalc {
 #ifdef HAVE_PARQUET
 		for (auto iter = parquetFileNames.begin();
 		  iter != parquetFileNames.end(); ++iter) {
-			os_[iter->first] = OasisParquet::GetParquetStreamWriter_(iter->first, iter->second);
+			os_[iter->first] = OasisParquet::GetParquetStreamWriter(iter->first, iter->second);
 		}
 #endif
 

@@ -10,11 +10,6 @@
 
 
 namespace OasisParquet {
-#ifdef OASIS_FLOAT_TYPE_DOUBLE
-  const parquet::Type:type OASIS_PARQUET_FLOAT = parquet::Type::DOUBLE;
-#else
-  const parquet::Type::type OASIS_PARQUET_FLOAT = parquet::Type::FLOAT;
-#endif
 
   enum { NONE = 0, MPLT, QPLT, SPLT, MELT, QELT, SELT };
 
@@ -190,7 +185,7 @@ namespace OasisParquet {
   parquet::StreamReader SetupParquetInputStream(const std::string& fileName);
   parquet::StreamWriter SetupParquetOutputStream(const std::string& fileName,
 	const std::vector<ParquetFields>& parquetFields);
-  parquet::StreamWriter GetParquetStreamWriter_(const int ordTableName,
-						const std::string outFile);
+  parquet::StreamWriter GetParquetStreamWriter(const int ordTableName,
+					       const std::string outFile);
 }
 #endif

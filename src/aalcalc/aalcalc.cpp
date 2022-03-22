@@ -513,16 +513,16 @@ void aalcalc::outputresultscsv_new()
 	if (parquet_output_) {
 		std::vector<OasisParquet::ParquetFields> parquetFields;
 		parquetFields.push_back(
-			{"SummaryID", parquet::Type::INT32,
+			{"SummaryId", parquet::Type::INT32,
 			parquet::ConvertedType::INT_32});
 		parquetFields.push_back(
 			{"SampleType", parquet::Type::INT32,
 			parquet::ConvertedType::INT_32});
 		parquetFields.push_back(
-			{"MeanLoss", parquet::Type::DOUBLE,
+			{"MeanLoss", parquet::Type::FLOAT,
 			parquet::ConvertedType::NONE});
 		parquetFields.push_back(
-			{"SDLoss", parquet::Type::DOUBLE,
+			{"SDLoss", parquet::Type::FLOAT,
 			parquet::ConvertedType::NONE});
 
 		parquet::StreamWriter os =

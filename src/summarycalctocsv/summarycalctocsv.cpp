@@ -88,8 +88,8 @@ void doitz(bool skipheader, bool fullprecision, bool show_exposure_value,
 #ifdef HAVE_PARQUET
 		parquet::StreamWriter os;
 		if (parquet_output == true)
-			os = OasisParquet::GetParquetStreamWriter_(OasisParquet::SELT,
-								   parquetOutFile);
+			os = OasisParquet::GetParquetStreamWriter(OasisParquet::SELT,
+								  parquetOutFile);
 #endif
 		int samplesize = 0;
 		int summary_set = 0;
@@ -189,8 +189,8 @@ void doit(bool skipheader, bool fullprecision,bool show_exposure_value,
 #ifdef HAVE_PARQUET
 		parquet::StreamWriter os;
 		if (parquet_output == true)
-			os = OasisParquet::GetParquetStreamWriter_(OasisParquet::SELT,
-								   parquetOutFile);
+			os = OasisParquet::GetParquetStreamWriter(OasisParquet::SELT,
+								  parquetOutFile);
 #endif
 		int samplesize=0;
 		int summary_set = 0;

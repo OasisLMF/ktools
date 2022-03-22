@@ -68,7 +68,7 @@ parquet::StreamWriter OasisParquet::SetupParquetOutputStream(const std::string& 
 
 }
 
-parquet::StreamWriter OasisParquet::GetParquetStreamWriter_(const int ordTableName,
+parquet::StreamWriter OasisParquet::GetParquetStreamWriter(const int ordTableName,
 					     const std::string outFile) {
 
   std::vector<ParquetFields> parquetFields;
@@ -78,7 +78,7 @@ parquet::StreamWriter OasisParquet::GetParquetStreamWriter_(const int ordTableNa
 
     parquetFields.push_back({"Period", parquet::Type::INT32,
 			    parquet::ConvertedType::INT_32});
-    parquetFields.push_back({"PeriodWeight", parquet::Type::DOUBLE,
+    parquetFields.push_back({"PeriodWeight", parquet::Type::FLOAT,
 			    parquet::ConvertedType::NONE});
     parquetFields.push_back({"EventId", parquet::Type::INT32,
 			    parquet::ConvertedType::INT_32});
@@ -97,31 +97,31 @@ parquet::StreamWriter OasisParquet::GetParquetStreamWriter_(const int ordTableNa
     if (ordTableName == MPLT) {
       parquetFields.push_back({"SampleType", parquet::Type::INT32,
 			      parquet::ConvertedType::INT_32});
-      parquetFields.push_back({"ChanceOfLoss", OASIS_PARQUET_FLOAT,
+      parquetFields.push_back({"ChanceOfLoss", parquet::Type::FLOAT,
 			      parquet::ConvertedType::NONE});
-      parquetFields.push_back({"MeanLoss", OASIS_PARQUET_FLOAT,
+      parquetFields.push_back({"MeanLoss", parquet::Type::FLOAT,
 			      parquet::ConvertedType::NONE});
-      parquetFields.push_back({"SDLoss", OASIS_PARQUET_FLOAT,
+      parquetFields.push_back({"SDLoss", parquet::Type::FLOAT,
 			      parquet::ConvertedType::NONE});
-      parquetFields.push_back({"MaxLoss", OASIS_PARQUET_FLOAT,
+      parquetFields.push_back({"MaxLoss", parquet::Type::FLOAT,
 			      parquet::ConvertedType::NONE});
-      parquetFields.push_back({"FootprintExposure", OASIS_PARQUET_FLOAT,
+      parquetFields.push_back({"FootprintExposure", parquet::Type::FLOAT,
 			      parquet::ConvertedType::NONE});
-      parquetFields.push_back({"MeanImpactedExposure", OASIS_PARQUET_FLOAT,
+      parquetFields.push_back({"MeanImpactedExposure", parquet::Type::FLOAT,
 			      parquet::ConvertedType::NONE});
-      parquetFields.push_back({"MaxImpactedExposure", OASIS_PARQUET_FLOAT,
+      parquetFields.push_back({"MaxImpactedExposure", parquet::Type::FLOAT,
 			      parquet::ConvertedType::NONE});
     } else if (ordTableName == SPLT) {
       parquetFields.push_back({"SampleId", parquet::Type::INT32,
 			      parquet::ConvertedType::INT_32});
-      parquetFields.push_back({"Loss", OASIS_PARQUET_FLOAT,
+      parquetFields.push_back({"Loss", parquet::Type::FLOAT,
 			      parquet::ConvertedType::NONE});
-      parquetFields.push_back({"ImpactedExposure", OASIS_PARQUET_FLOAT,
+      parquetFields.push_back({"ImpactedExposure", parquet::Type::FLOAT,
 			      parquet::ConvertedType::NONE});
     } else if (ordTableName == QPLT) {
       parquetFields.push_back({"Quantile", parquet::Type::FLOAT,
 			      parquet::ConvertedType::NONE});
-      parquetFields.push_back({"Loss", OASIS_PARQUET_FLOAT,
+      parquetFields.push_back({"Loss", parquet::Type::FLOAT,
 			      parquet::ConvertedType::NONE});
     }
 
@@ -135,33 +135,33 @@ parquet::StreamWriter OasisParquet::GetParquetStreamWriter_(const int ordTableNa
     if (ordTableName == MELT) {
       parquetFields.push_back({"SampleType", parquet::Type::INT32,
 			      parquet::ConvertedType::INT_32});
-      parquetFields.push_back({"EventRate", parquet::Type::DOUBLE,
+      parquetFields.push_back({"EventRate", parquet::Type::FLOAT,
 			      parquet::ConvertedType::NONE});
-      parquetFields.push_back({"ChanceOfLoss", OASIS_PARQUET_FLOAT,
+      parquetFields.push_back({"ChanceOfLoss", parquet::Type::FLOAT,
 			      parquet::ConvertedType::NONE});
-      parquetFields.push_back({"MeanLoss", OASIS_PARQUET_FLOAT,
+      parquetFields.push_back({"MeanLoss", parquet::Type::FLOAT,
 			      parquet::ConvertedType::NONE});
-      parquetFields.push_back({"SDLoss", OASIS_PARQUET_FLOAT,
+      parquetFields.push_back({"SDLoss", parquet::Type::FLOAT,
 			      parquet::ConvertedType::NONE});
-      parquetFields.push_back({"MaxLoss", OASIS_PARQUET_FLOAT,
+      parquetFields.push_back({"MaxLoss", parquet::Type::FLOAT,
 			      parquet::ConvertedType::NONE});
-      parquetFields.push_back({"FootprintExposure", OASIS_PARQUET_FLOAT,
+      parquetFields.push_back({"FootprintExposure", parquet::Type::FLOAT,
 			      parquet::ConvertedType::NONE});
-      parquetFields.push_back({"MeanImpactedExposure", OASIS_PARQUET_FLOAT,
+      parquetFields.push_back({"MeanImpactedExposure", parquet::Type::FLOAT,
 			      parquet::ConvertedType::NONE});
-      parquetFields.push_back({"MaxImpactedExposure", OASIS_PARQUET_FLOAT,
+      parquetFields.push_back({"MaxImpactedExposure", parquet::Type::FLOAT,
 			      parquet::ConvertedType::NONE});
     } else if (ordTableName == QELT) {
       parquetFields.push_back({"Quantile", parquet::Type::FLOAT,
 			      parquet::ConvertedType::NONE});
-      parquetFields.push_back({"Loss", OASIS_PARQUET_FLOAT,
+      parquetFields.push_back({"Loss", parquet::Type::FLOAT,
 			      parquet::ConvertedType::NONE});
     } else if (ordTableName == SELT) {
       parquetFields.push_back({"SampleId", parquet::Type::INT32,
 			      parquet::ConvertedType::INT_32});
-      parquetFields.push_back({"Loss", OASIS_PARQUET_FLOAT,
+      parquetFields.push_back({"Loss", parquet::Type::FLOAT,
 			      parquet::ConvertedType::NONE});
-      parquetFields.push_back({"ImpactedExposure", OASIS_PARQUET_FLOAT,
+      parquetFields.push_back({"ImpactedExposure", parquet::Type::FLOAT,
 			      parquet::ConvertedType::NONE});
     }
 

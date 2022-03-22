@@ -331,7 +331,7 @@ namespace eltcalc {
 		std::map<int, parquet::StreamWriter> os;
 		for (auto iter = parquetFileNames.begin();
 		  iter != parquetFileNames.end(); ++iter)  {
-			os[iter->first] = OasisParquet::GetParquetStreamWriter_(iter->first, iter->second);
+			os[iter->first] = OasisParquet::GetParquetStreamWriter(iter->first, iter->second);
 		}
 #endif
 

@@ -422,20 +422,20 @@ inline void aggreports::WriteTVaR(parquet::StreamWriter& os,
 inline parquet::StreamWriter aggreports::GetParquetStreamWriter(const int fileStream)
 {
   std::vector<OasisParquet::ParquetFields> parquetFields;
-  parquetFields.push_back({"SummaryID", parquet::Type::INT32,
+  parquetFields.push_back({"SummaryId", parquet::Type::INT32,
 			  parquet::ConvertedType::INT_32});
   if (fileStream == EPT) {
     parquetFields.push_back({"EPCalc", parquet::Type::INT32,
 			    parquet::ConvertedType::INT_32});
   } else if (fileStream == PSEPT) {
-    parquetFields.push_back({"SampleID", parquet::Type::INT32,
+    parquetFields.push_back({"SampleId", parquet::Type::INT32,
 			    parquet::ConvertedType::INT_32});
   }
   parquetFields.push_back({"EPType", parquet::Type::INT32,
 			  parquet::ConvertedType::INT_32});
-  parquetFields.push_back({"ReturnPeriod", parquet::Type::DOUBLE,
+  parquetFields.push_back({"ReturnPeriod", parquet::Type::FLOAT,
 			  parquet::ConvertedType::NONE});
-  parquetFields.push_back({"Loss", OasisParquet::OASIS_PARQUET_FLOAT,
+  parquetFields.push_back({"Loss", parquet::Type::FLOAT,
 			  parquet::ConvertedType::NONE});
 
   parquet::StreamWriter os =

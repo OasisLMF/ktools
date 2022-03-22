@@ -58,27 +58,6 @@ bool firstOutput = true;
 
 int rowcount = 0;
 
-/*#ifdef HAVE_PARQUET
-inline parquet::StreamWriter GetParquetStreamWriter(const std::string parquetOutFile)
-{
-	std::vector<ParquetFields> parquetFields;
-	parquetFields.push_back({"EventID", parquet::Type::INT32,
-				parquet::ConvertedType::INT_32});
-	parquetFields.push_back({"SummaryID", parquet::Type::INT32,
-				parquet::ConvertedType::INT_32});
-	parquetFields.push_back({"SampleID", parquet::Type::INT32,
-				parquet::ConvertedType::INT_32});
-	parquetFields.push_back({"Loss", OASIS_PARQUET_FLOAT,
-				parquet::ConvertedType::NONE});
-	parquetFields.push_back({"ImpactedExposure", OASIS_PARQUET_FLOAT,
-				parquet::ConvertedType::NONE});
-
-	parquet::StreamWriter os = SetupParquetOutputStream(parquetOutFile,
-							    parquetFields);
-
-	return os;
-}
-#endif*/
 
 void doitz(bool skipheader, bool fullprecision, bool show_exposure_value,
 	   bool ord_output, bool all_idx, bool parquet_output,

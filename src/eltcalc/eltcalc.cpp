@@ -337,8 +337,14 @@ namespace eltcalc {
 
 		// Losses for calculating quantiles
 		std::vector<OASIS_FLOAT> losses_vec;
+#ifdef HAVE_PARQUET
 		if (fout[QELT] != nullptr || parquetFileNames.find(OasisParquet::QELT) != parquetFileNames.end())
+#else
+		if (fout[QELT] != nullptr)
+#endif
+		{
 			losses_vec.resize(samplesize, 0);
+		}
 
 		summarySampleslevelHeader sh;
 		size_t i = fread(&sh, sizeof(sh), 1, stdin);

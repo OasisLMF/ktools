@@ -613,7 +613,12 @@ namespace pltcalc {
 		}
 		stream_type = streamno_mask & summarycalcstream_type;
 		i = fread(&samplesize_, sizeof(samplesize_), 1, stdin);
-		if (fout[QPLT] != nullptr || parquetFileNames.find(OasisParquet::QPLT) != parquetFileNames.end()) {
+#ifdef HAVE_PARQUET
+		if (fout[QPLT] != nullptr || parquetFileNames.find(OasisParquet::QPLT) != parquetFileNames.end())
+#else
+		if (fout[QPLT] != nullptr)
+#endif
+		{
 			getintervals();
 		}
 

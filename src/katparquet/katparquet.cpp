@@ -61,7 +61,7 @@ namespace katparquet {
   void doit(const std::vector<std::string> &inFiles,
 	    const std::string outFile, const int tableName) {
 
-    parquet::StreamWriter osOut = OasisParquet::GetParquetStreamWriter_(tableName, outFile);
+    parquet::StreamWriter osOut = OasisParquet::GetParquetStreamWriter(tableName, outFile);
 
     if (tableName == OasisParquet::MPLT) {
       std::vector<OasisParquet::MomentPLTEntry> rows;

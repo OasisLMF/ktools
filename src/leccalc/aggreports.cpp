@@ -388,7 +388,8 @@ inline void aggreports::WriteParquetOutput(parquet::StreamWriter& os,
 					   const double retperiod,
 					   const OASIS_FLOAT loss)
 {
-  os << summary_id << epcalc << eptype << retperiod << loss << parquet::EndRow;
+  os << summary_id << epcalc << eptype << (float)retperiod << (float)loss
+     << parquet::EndRow;
 }
 
 
@@ -398,8 +399,8 @@ inline void aggreports::WriteTVaR(parquet::StreamWriter& os, const int epcalc,
 {
   for (auto s : tail) {
     for (auto t : s.second) {
-      os << s.first << epcalc << eptype_tvar << t.retperiod << t.tvar
-	 << parquet::EndRow;
+      os << s.first << epcalc << eptype_tvar << (float)t.retperiod
+	 << (float)t.tvar << parquet::EndRow;
     }
   }
 
@@ -412,8 +413,8 @@ inline void aggreports::WriteTVaR(parquet::StreamWriter& os,
 {
   for (auto s : tail) {
     for (auto t : s.second) {
-      os << s.first.summary_id << s.first.sidx << eptype_tvar << t.retperiod
-	 << t.tvar << parquet::EndRow;
+      os << s.first.summary_id << s.first.sidx << eptype_tvar
+	 << (float)t.retperiod << (float)t.tvar << parquet::EndRow;
     }
   }
 }

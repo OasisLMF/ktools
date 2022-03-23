@@ -114,9 +114,11 @@ void doitz(bool skipheader, bool fullprecision, bool show_exposure_value,
 			
 #ifdef HAVE_PARQUET
 				if (parquet_output == true) {
-					OASIS_FLOAT impacted_exp = sh.expval;
+					float impacted_exp = sh.expval;
 					if (sr.loss == 0) impacted_exp = 0;
-					os << sh.event_id << sh.summary_id << sr.sidx << sr.loss << impacted_exp << parquet::EndRow;
+					os << sh.event_id << sh.summary_id
+					   << sr.sidx << (float)sr.loss
+					   << impacted_exp << parquet::EndRow;
 				}
 #endif
 				if (fullprecision == true) {
@@ -212,9 +214,11 @@ void doit(bool skipheader, bool fullprecision,bool show_exposure_value,
 				rowcount++;
 #ifdef HAVE_PARQUET
 				if (parquet_output == true) {
-					OASIS_FLOAT impacted_exp = sh.expval;
+					float impacted_exp = sh.expval;
 					if (sr.loss == 0) impacted_exp = 0;
-					os << sh.event_id << sh.summary_id << sr.sidx << sr.loss << impacted_exp << parquet::EndRow;
+					os << sh.event_id << sh.summary_id
+					   << sr.sidx << (float)sr.loss
+					   << impacted_exp << parquet::EndRow;
 				}
 #endif
 				if (fullprecision == true) {

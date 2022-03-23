@@ -422,8 +422,8 @@ void aalcalc::outputresultsparquet(const std::vector<aal_rec>& vec_aal,
 			double mean, sd_dev;
 			calculatemeansddev(*v_iter, sample_size, p1, p2,
 					   periods, mean, sd_dev);
-			os << v_iter->summary_id << v_iter->type << mean
-			   << sd_dev << parquet::EndRow;
+			os << v_iter->summary_id << v_iter->type << (float)mean
+			   << (float)sd_dev << parquet::EndRow;
 		}
 		v_iter++;
 	}

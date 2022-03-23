@@ -297,7 +297,7 @@ namespace pltcalc {
 	void outputrows_ord(const T& o, const int type, FILE * outFile)
 	{
 #ifdef HAVE_PARQUET
-		if (outFile == nullptr && os_.find(OasisParquet::MPLT) != os_.end())
+		if (outFile == nullptr && os_.find(OasisParquet::MPLT) == os_.end())
 #else
 		if (outFile == nullptr)
 #endif
@@ -326,14 +326,20 @@ namespace pltcalc {
 		}
 #ifdef HAVE_PARQUET
 		if (os_.find(OasisParquet::MPLT) != os_.end()) {
-			os_[MPLT] << o.period_no
-				  << period_weights_[o.period_no] << o.event_id
-				  << occ_year << occ_month << occ_day
-				  << occ_hour << occ_minute << o.summary_id
-				  << type << o.chance_of_loss << o.mean
-				  << o.standard_deviation << o.max_loss
-				  << o.exp_value << o.mean_impact_exp
-				  << o.max_impact_exp << parquet::EndRow;
+			os_[OasisParquet::MPLT] << o.period_no
+						<< (float)period_weights_[o.period_no]
+						<< o.event_id << occ_year
+						<< occ_month << occ_day
+						<< occ_hour << occ_minute
+						<< o.summary_id << type
+						<< (float)o.chance_of_loss
+						<< (float)o.mean
+						<< (float)o.standard_deviation
+						<< (float)o.max_loss
+						<< (float)o.exp_value
+						<< (float)o.mean_impact_exp
+						<< (float)o.max_impact_exp
+						<< parquet::EndRow;
 		}
 #endif
 	}
@@ -345,7 +351,7 @@ namespace pltcalc {
 			     const OASIS_FLOAT impacted_exposure)
 	{
 #ifdef HAVE_PARQUET
-		if (outFile == nullptr && os_.find(OasisParquet::SPLT) != os_.end())
+		if (outFile == nullptr && os_.find(OasisParquet::SPLT) == os_.end())
 #else
 		if (outFile == nullptr)
 #endif
@@ -375,14 +381,17 @@ namespace pltcalc {
 			}
 #ifdef HAVE_PARQUET
 			if (os_.find(OasisParquet::SPLT) != os_.end()) {
-				os_[SPLT] << p.period_no
-					  << period_weights_[p.period_no]
-					  << sh.event_id << occ_year
-					  << occ_month << occ_day << occ_hour
-					  << occ_minute << sh.summary_id
-					  << sr.sidx << sr.loss
-					  << impacted_exposure
-					  << parquet::EndRow;
+				os_[OasisParquet::SPLT] << p.period_no
+							<< (float)period_weights_[p.period_no]
+							<< sh.event_id
+							<< occ_year << occ_month
+							<< occ_day << occ_hour
+							<< occ_minute
+							<< sh.summary_id
+							<< sr.sidx
+							<< (float)sr.loss
+							<< (float)impacted_exposure
+							<< parquet::EndRow;
 			}
 #endif
 
@@ -395,7 +404,7 @@ namespace pltcalc {
 			     moccT& m_occ, std::vector<periodT>& vp)
 	{
 #ifdef HAVE_PARQUET
-		if (outFile == nullptr && os_.find(OasisParquet::QPLT) != os_.end())
+		if (outFile == nullptr && os_.find(OasisParquet::QPLT) == os_.end())
 #else
 		if (outFile == nullptr)
 #endif
@@ -447,14 +456,18 @@ namespace pltcalc {
 
 #ifdef HAVE_PARQUET
 				if (os_.find(OasisParquet::QPLT) != os_.end()) {
-					os_[QPLT] << p.period_no
-						  << period_weights_[p.period_no]
-						  << sh.event_id << occ_year
-						  << occ_month << occ_day
-						  << occ_hour << occ_minute
-						  << sh.summary_id << it->first
-						  << it->second
-						  << parquet::EndRow;
+					os_[OasisParquet::QPLT] << p.period_no
+								<< (float)period_weights_[p.period_no]
+								<< sh.event_id
+								<< occ_year
+								<< occ_month
+								<< occ_day
+								<< occ_hour
+								<< occ_minute
+								<< sh.summary_id
+								<< it->first
+								<< (float)it->second
+								<< parquet::EndRow;
 				}
 #endif
 			}

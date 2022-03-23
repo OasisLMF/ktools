@@ -242,9 +242,10 @@ namespace eltcalc {
 		const OASIS_FLOAT chance_of_loss, const OASIS_FLOAT max_loss)
 	{
 		os << sh.event_id << sh.summary_id << type
-		   << event_rate_[sh.event_id] << chance_of_loss << mean
-		   << stdDev << max_loss << sh.expval << mean_impacted_exposure
-		   << max_impacted_exposure << parquet::EndRow;
+		   << (float)event_rate_[sh.event_id] << (float)chance_of_loss
+		   << (float)mean << (float)stdDev << (float)max_loss
+		   << (float)sh.expval << (float)mean_impacted_exposure
+		   << (float)max_impacted_exposure << parquet::EndRow;
 	}
 
 	void OutputQuantiles(const summarySampleslevelHeader& sh,
@@ -261,9 +262,11 @@ namespace eltcalc {
 				OutputQuantilesCsv(ordFile, sh, it->first, loss);
 			}
 			if (os.find(OasisParquet::QELT) != os.end()) {
-				os[QELT] << sh.event_id << sh.summary_id
-					 << it->first << loss
-					 << parquet::EndRow;
+				os[OasisParquet::QELT] << sh.event_id
+						       << sh.summary_id
+						       << it->first
+						       << (float)loss
+						       << parquet::EndRow;
 			}
 
 		}
@@ -409,8 +412,12 @@ namespace eltcalc {
 				}
 #ifdef HAVE_PARQUET
 				if (parquetFileNames.find(OasisParquet::MELT) != parquetFileNames.end()) {
-					OutputRowsParquet(sh, 1, analytical_mean, 0, os[MELT], sh.expval,
-							  sh.expval, chance_of_loss, max_loss);
+					OutputRowsParquet(sh, 1,
+							  analytical_mean, 0,
+							  os[OasisParquet::MELT],
+							  sh.expval, sh.expval,
+							  chance_of_loss,
+							  max_loss);
 				}
 #endif
 				if (firstOutput == true) {
@@ -428,8 +435,14 @@ namespace eltcalc {
 					}
 #ifdef HAVE_PARQUET
 					if (parquetFileNames.find(OasisParquet::MELT) != parquetFileNames.end()) {
-						OutputRowsParquet(sh, 2, sample_mean, sd, os[MELT], mean_impacted_exposure,
-								  max_impacted_exposure, chance_of_loss, max_loss);
+						OutputRowsParquet(sh, 2,
+								  sample_mean,
+								  sd,
+								  os[OasisParquet::MELT],
+								  mean_impacted_exposure,
+								  max_impacted_exposure,
+								  chance_of_loss,
+								  max_loss);
 					}
 					if (fout[QELT] != nullptr || parquetFileNames.find(OasisParquet::QELT) != parquetFileNames.end())
 #else

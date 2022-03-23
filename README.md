@@ -49,6 +49,11 @@ On OS X add an extra flag:
 $ ./configure --enable-osx
 ```
 
+The configure script will attempt to find and link the appropriate Apache libraries to enable Parquet format output from the components `aalcalc`, `eltcalc`, `ordleccalc`, `pltcalc` and `summarycalctocsv`. If they are not found, this option will be disabled. These libraries can be either [built from source](https://arrow.apache.org/docs/developers/cpp/building.html) or [installed from precompiled binaries](https://arrow.apache.org/install/#c-and-glib-c-packages-for-debian-gnulinux-ubuntu-almalinux-centos-and-amazon-linux). This search for these libraries can be disabled manually with an extra flag:
+```
+$ ./configure --disable-parquet
+```
+
 Make using the following command;
 ``` sh
 $ make

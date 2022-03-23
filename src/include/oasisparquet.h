@@ -22,7 +22,7 @@ namespace OasisParquet {
 
   struct PLTEntry {
     int32_t period;
-    double periodWeight;
+    float periodWeight;
     int32_t eventID;
     int32_t year;
     int32_t month;
@@ -34,13 +34,13 @@ namespace OasisParquet {
 
   struct MomentPLTEntry : PLTEntry {
     int32_t sampleType;
-    OASIS_FLOAT chanceOfLoss;
-    OASIS_FLOAT meanLoss;
-    OASIS_FLOAT sdLoss;
-    OASIS_FLOAT maxLoss;
-    OASIS_FLOAT footprintExposure;
-    OASIS_FLOAT meanImpactedExposure;
-    OASIS_FLOAT maxImpactedExposure;
+    float chanceOfLoss;
+    float meanLoss;
+    float sdLoss;
+    float maxLoss;
+    float footprintExposure;
+    float meanImpactedExposure;
+    float maxImpactedExposure;
 
     friend parquet::StreamReader &operator>>(parquet::StreamReader &is,
 					     MomentPLTEntry &row) {
@@ -65,8 +65,8 @@ namespace OasisParquet {
 
   struct SamplePLTEntry : PLTEntry {
     int32_t sampleID;
-    OASIS_FLOAT loss;
-    OASIS_FLOAT impactedExposure;
+    float loss;
+    float impactedExposure;
 
     friend parquet::StreamReader &operator>>(parquet::StreamReader &is,
 					     SamplePLTEntry &row) {
@@ -87,7 +87,7 @@ namespace OasisParquet {
 
   struct QuantilePLTEntry : PLTEntry {
     float quantile;
-    OASIS_FLOAT loss;
+    float loss;
 
     friend parquet::StreamReader &operator>>(parquet::StreamReader &is,
 					     QuantilePLTEntry &row) {
@@ -114,14 +114,14 @@ namespace OasisParquet {
 
   struct MomentELTEntry : ELTEntry {
     int32_t sampleType;
-    double eventRate;
-    OASIS_FLOAT chanceOfLoss;
-    OASIS_FLOAT meanLoss;
-    OASIS_FLOAT sdLoss;
-    OASIS_FLOAT maxLoss;
-    OASIS_FLOAT footprintExposure;
-    OASIS_FLOAT meanImpactedExposure;
-    OASIS_FLOAT maxImpactedExposure;
+    float eventRate;
+    float chanceOfLoss;
+    float meanLoss;
+    float sdLoss;
+    float maxLoss;
+    float footprintExposure;
+    float meanImpactedExposure;
+    float maxImpactedExposure;
 
     friend parquet::StreamReader &operator>>(parquet::StreamReader &is,
 					     MomentELTEntry &row) {
@@ -144,7 +144,7 @@ namespace OasisParquet {
 
   struct QuantileELTEntry : ELTEntry {
     float quantile;
-    OASIS_FLOAT loss;
+    float loss;
 
     friend parquet::StreamReader &operator>>(parquet::StreamReader &is,
 					     QuantileELTEntry &row) {
@@ -161,8 +161,8 @@ namespace OasisParquet {
 
   struct SampleELTEntry : ELTEntry {
     int32_t sampleID;
-    OASIS_FLOAT loss;
-    OASIS_FLOAT impactedExposure;
+    float loss;
+    float impactedExposure;
 
     friend parquet::StreamReader &operator>>(parquet::StreamReader &is,
 					     SampleELTEntry &row) {

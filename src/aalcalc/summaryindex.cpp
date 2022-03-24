@@ -96,9 +96,12 @@ namespace summaryindex {
 				summary_period k;
 				k.summary_id = sh.summary_id;
 				k.fileindex = file_id;
-				for (auto period : eventtoperiods.at(sh.event_id)) {
-					k.period_no = period;
-					summaryfileperiod_to_offset[k].push_back(offset);
+				auto iter = eventtoperiods.find(sh.event_id);
+				if (iter != eventtoperiods.end()) {
+					for (auto period : iter->second) {
+						k.period_no = period;
+						summaryfileperiod_to_offset[k].push_back(offset);
+					}
 				}
 				offset += sizeof(sh);
 			}

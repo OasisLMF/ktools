@@ -56,8 +56,8 @@ installertest()
 	 ../src/summarycalc/summarycalc -f -2 ../ktest/testout/fmsummarycalc2.bin   < ../ktest/testout/fmcalc.bin
 
   	# test selt
-  	../src/summarycalctocsv/summarycalctocsv -o > ../ktest/testout/gulselt1.csv < ../ktest/testout/gulsummarycalc1.bin
-	../src/summarycalctocsv/summarycalctocsv -o > ../ktest/testout/gulselt2.csv < ../ktest/testout/gulsummarycalc2.bin
+ 	../src/summarycalctocsv/summarycalctocsv -p ../ktest/testout/gulselt1.parquet -o > ../ktest/testout/gulselt1.csv < ../ktest/testout/gulsummarycalc1.bin
+	../src/summarycalctocsv/summarycalctocsv -p ../ktest/testout/gulselt2.parquet -o > ../ktest/testout/gulselt2.csv < ../ktest/testout/gulsummarycalc2.bin
 
 	# test eltcalc
 	../src/eltcalc/eltcalc < ../ktest/testout/gulsummarycalc1.bin > ../ktest/testout/gulelt1.csv
@@ -66,12 +66,12 @@ installertest()
 	../src/eltcalc/eltcalc < ../ktest/testout/fmsummarycalc2.bin > ../ktest/testout/fmelt2.csv
 
 	# test melt qelt
-	../src/eltcalc/eltcalc -M ../ktest/testout/gulmelt1.csv -Q ../ktest/testout/gulqelt1.csv < ../ktest/testout/gulsummarycalc1.bin 
-	../src/eltcalc/eltcalc -M ../ktest/testout/gulmelt2.csv -Q ../ktest/testout/gulqelt2.csv < ../ktest/testout/gulsummarycalc2.bin 
+	../src/eltcalc/eltcalc -M ../ktest/testout/gulmelt1.csv -Q ../ktest/testout/gulqelt1.csv -m ../ktest/testout/gulmelt1.parquet -q ../ktest/testout/gulqelt1.parquet < ../ktest/testout/gulsummarycalc1.bin  
+	../src/eltcalc/eltcalc -M ../ktest/testout/gulmelt2.csv -Q ../ktest/testout/gulqelt2.csv -m ../ktest/testout/gulmelt2.parquet -q ../ktest/testout/gulqelt2.parquet < ../ktest/testout/gulsummarycalc2.bin  
 
 	# test mplt qplt splt
-	../src/pltcalc/pltcalc -M ../ktest/testout/gulmplt1.csv -Q ../ktest/testout/gulqplt1.csv -S ../ktest/testout/gulsplt1.csv < ../ktest/testout/gulsummarycalc1.bin 
-	../src/pltcalc/pltcalc -M ../ktest/testout/gulmplt2.csv -Q ../ktest/testout/gulqplt2.csv -S ../ktest/testout/gulsplt2.csv < ../ktest/testout/gulsummarycalc2.bin 
+	../src/pltcalc/pltcalc -M ../ktest/testout/gulmplt1.csv -Q ../ktest/testout/gulqplt1.csv -S ../ktest/testout/gulsplt1.csv -m ../ktest/testout/gulmplt1.parquet -q ../ktest/testout/gulqplt1.parquet -s ../ktest/testout/gulsplt1.parquet < ../ktest/testout/gulsummarycalc1.bin 
+	../src/pltcalc/pltcalc -M ../ktest/testout/gulmplt2.csv -Q ../ktest/testout/gulqplt2.csv -S ../ktest/testout/gulsplt2.csv -m ../ktest/testout/gulmplt2.parquet -q ../ktest/testout/gulqplt2.parquet -s ../ktest/testout/gulsplt2.parquet < ../ktest/testout/gulsummarycalc2.bin 
 
 
 	# test leccalc
@@ -100,14 +100,14 @@ installertest()
     									    -f ../ktest/testout/fm_full_uncertainty_oep_2_r.csv -w ../ktest/testout/fm_wheatsheaf_oep_2_r.csv -s ../ktest/testout/fm_sample_mean_oep_2_r.csv -m ../ktest/testout/fm_wheatsheaf_mean_oep_2_r.csv
 
     # test ORD ept and psept 
- 	../src/ordleccalc/ordleccalc  -Kgul1/summary -F -f -W -w -M -m -S -s -O ../ktest/testout/gul_ept_1.csv -o ../ktest/testout/gul_psept_1.csv
-	 ../src/ordleccalc/ordleccalc  -Kgul2/summary -F -f -W -w -M -m -S -s -O ../ktest/testout/gul_ept_2.csv -o ../ktest/testout/gul_psept_2.csv
-	 ../src/ordleccalc/ordleccalc  -Kfm1/summary -F -f -W -w -M -m -S -s -O ../ktest/testout/fm_ept_1.csv -o ../ktest/testout/fm_psept_1.csv
-	 ../src/ordleccalc/ordleccalc  -Kfm2/summary -F -f -W -w -M -m -S -s -O ../ktest/testout/fm_ept_2.csv -o ../ktest/testout/fm_psept_2.csv
- 	 ../src/ordleccalc/ordleccalc -r -Kgul1/summary -F -f -W -w -M -m -S -s -O ../ktest/testout/gul_ept_1_r.csv -o ../ktest/testout/gul_psept_1_r.csv
-	 ../src/ordleccalc/ordleccalc -r -Kgul2/summary -F -f -W -w -M -m -S -s -O ../ktest/testout/gul_ept_2_r.csv -o ../ktest/testout/gul_psept_2_r.csv
-	 ../src/ordleccalc/ordleccalc -r -Kfm1/summary -F -f -W -w -M -m -S -s -O ../ktest/testout/fm_ept_1_r.csv -o ../ktest/testout/fm_psept_1_r.csv
-	 ../src/ordleccalc/ordleccalc -r -Kfm2/summary -F -f -W -w -M -m -S -s -O ../ktest/testout/fm_ept_2_r.csv -o ../ktest/testout/fm_psept_2_r.csv
+ 	../src/ordleccalc/ordleccalc  -Kgul1/summary -F -f -W -w -M -m -S -s -O ../ktest/testout/gul_ept_1.csv -o ../ktest/testout/gul_psept_1.csv -P ../ktest/testout/gul_ept_1.parquet -p ../ktest/testout/gul_psept_1.parquet
+	 ../src/ordleccalc/ordleccalc  -Kgul2/summary -F -f -W -w -M -m -S -s -O ../ktest/testout/gul_ept_2.csv -o ../ktest/testout/gul_psept_2.csv -P ../ktest/testout/gul_ept_2.parquet -p ../ktest/testout/gul_psept_2.parquet
+	 ../src/ordleccalc/ordleccalc  -Kfm1/summary -F -f -W -w -M -m -S -s -O ../ktest/testout/fm_ept_1.csv -o ../ktest/testout/fm_psept_1.csv -P ../ktest/testout/fm_ept_1.parquet -p ../ktest/testout/fm_psept_1.parquet
+	 ../src/ordleccalc/ordleccalc  -Kfm2/summary -F -f -W -w -M -m -S -s -O ../ktest/testout/fm_ept_2.csv -o ../ktest/testout/fm_psept_2.csv -P ../ktest/testout/fm_ept_2.parquet -p ../ktest/testout/fm_psept_2.parquet
+ 	 ../src/ordleccalc/ordleccalc -r -Kgul1/summary -F -f -W -w -M -m -S -s -O ../ktest/testout/gul_ept_1_r.csv -o ../ktest/testout/gul_psept_1_r.csv -P ../ktest/testout/gul_ept_1_r.parquet -p ../ktest/testout/gul_psept_1_r.parquet
+	 ../src/ordleccalc/ordleccalc -r -Kgul2/summary -F -f -W -w -M -m -S -s -O ../ktest/testout/gul_ept_2_r.csv -o ../ktest/testout/gul_psept_2_r.csv -P ../ktest/testout/gul_ept_2_r.parquet -p ../ktest/testout/gul_psept_2_r.parquet
+	 ../src/ordleccalc/ordleccalc -r -Kfm1/summary -F -f -W -w -M -m -S -s -O ../ktest/testout/fm_ept_1_r.csv -o ../ktest/testout/fm_psept_1_r.csv -P ../ktest/testout/fm_ept_1_r.parquet -p ../ktest/testout/fm_psept_1_r.parquet
+	 ../src/ordleccalc/ordleccalc -r -Kfm2/summary -F -f -W -w -M -m -S -s -O ../ktest/testout/fm_ept_2_r.csv -o ../ktest/testout/fm_psept_2_r.csv -P ../ktest/testout/fm_ept_2_r.parquet -p ../ktest/testout/fm_psept_2_r.parquet
 	
 
 	# test pltcalc
@@ -129,10 +129,10 @@ installertest()
 	../src/aalcalc/aalcalc -Kfm2/summary > ../ktest/testout/fmaalcalc2.csv
 
 	# test alt	
-	../src/aalcalc/aalcalc -o -Kgul1/summary > ../ktest/testout/gulalt1.csv
-	../src/aalcalc/aalcalc -o -Kgul2/summary > ../ktest/testout/gulalt2.csv
-	../src/aalcalc/aalcalc -o -Kfm1/summary > ../ktest/testout/fmalt1.csv
-	../src/aalcalc/aalcalc -o -Kfm2/summary > ../ktest/testout/fmalt2.csv
+	../src/aalcalc/aalcalc -o -p ../ktest/testout/gulalt1.parquet -Kgul1/summary > ../ktest/testout/gulalt1.csv
+	../src/aalcalc/aalcalc -o -p ../ktest/testout/gulalt2.parquet -Kgul2/summary > ../ktest/testout/gulalt2.csv
+	../src/aalcalc/aalcalc -o -p ../ktest/testout/fmalt1.parquet -Kfm1/summary > ../ktest/testout/fmalt1.csv
+	../src/aalcalc/aalcalc -o -p ../ktest/testout/fmalt2.parquet -Kfm2/summary > ../ktest/testout/fmalt2.csv
 	
 	# test stream conversion components
 	# stdout to csv

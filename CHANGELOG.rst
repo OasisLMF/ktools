@@ -1,6 +1,14 @@
 Ktools Changelog
 ================
 
+`v3.8.0`_
+ ---------
+* [#280](https://github.com/OasisLMF/ktools/pull/280) - ORD outputs tests
+* [#270](https://github.com/OasisLMF/ktools/pull/283) - Output ORD tables in parquet format
+* [#276](https://github.com/OasisLMF/ktools/pull/276) - Update Clang builder image (ubuntu:focal)
+* [#282](https://github.com/OasisLMF/ktools/pull/284) - events not in occurrence file
+.. _`v3.8.0`:  https://github.com/OasisLMF/ktools/compare/v3.7.5...v3.8.0
+
 `v3.7.5`_
  ---------
 * [#267](https://github.com/OasisLMF/ktools/pull/268) - period weighting file affects leccalc accuracy

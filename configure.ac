@@ -88,7 +88,6 @@ AM_CONDITIONAL(DEBUG, test x"$debug" = x"true")
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADERS([config.h])
 
-
 # Checks for programs.
 AC_PROG_CXX([c++ g++])
 AC_PROG_CC([cc gcc])
@@ -99,6 +98,30 @@ AX_CXX_COMPILE_STDCXX_11
 
 AX_CHECK_ZLIB()
 # Checks for libraries.
+
+# Check for arrow and parquet libraries
+# Provide option to disable search for parquet libraries for debugging
+AC_ARG_ENABLE([parquet],
+	      [AS_HELP_STRING[--disable-parquet], [disable search for Parquet libraries]],
+	      [enable_parquet=no], [enable_parquet=yes])
+AH_TEMPLATE([HAVE_PARQUET])
+AS_IF([test "x$enable_parquet" = "xyes"],
+      [AS_IF([test "x$enable_static" = "xyes"],
+	     [PKG_CHECK_MODULES_STATIC([PARQUET], [arrow parquet],
+				       [HAVE_PARQUET=yes], [HAVE_PARQUET=no])
+             LIBPTHREAD_LINK="-Wl,--whole-archive -lpthread -Wl,--no-whole-archive"
+	     ],
+	     [PKG_CHECK_MODULES([PARQUET], [arrow parquet], [HAVE_PARQUET=yes],
+				[HAVE_PARQUET=no])
+             LIBPTHREAD_LINK=""
+	     ])
+      AC_SUBST(LIBPTHREAD_LINK)
+      ])
+AS_IF([test "$HAVE_PARQUET" = "yes"],
+      [AC_DEFINE([HAVE_PARQUET], [1],
+		 [Define to 1 if you have Apache arrow (-larrow) and parquet (-lparquet) libraries])
+      ])
+AM_CONDITIONAL([HAVE_PARQUET], [test "$HAVE_PARQUET" = "yes"])
 
 # Checks for header files.
 AC_CHECK_HEADERS([fcntl.h inttypes.h memory.h stdlib.h unistd.h])
@@ -165,6 +188,7 @@ AC_CONFIG_FILES([
 		 src/returnperiodtobin/Makefile
 		 src/returnperiodtocsv/Makefile
 		 src/kat/Makefile
+		 src/katparquet/Makefile
 		 src/footprintconv/Makefile
 		 src/fmprofilebinconv/Makefile
 		 src/validateitems/Makefile

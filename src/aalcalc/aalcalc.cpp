@@ -6,6 +6,7 @@
 #else
 #include <dirent.h>
 #endif
+
 #include <algorithm>
 #include <math.h>
 #include <string.h>
@@ -363,7 +364,9 @@ void aalcalc::do_calc_by_period(const summarySampleslevelHeader &sh,
 }
 
 
-inline void aalcalc::calculatemeansddev(const aal_rec_ensemble &record,
+template<typename aal_rec_T>
+//inline void aalcalc::calculatemeansddev(const aal_rec_ensemble &record,
+inline void aalcalc::calculatemeansddev(const aal_rec_T &record,
 					const int sample_size, const int p1,
 					const int p2, const int periods,
 					double &mean, double &sd_dev) {
@@ -405,6 +408,29 @@ inline void aalcalc::outputrows(const char * buffer, int strLen) {
 
 }
 
+#ifdef HAVE_PARQUET
+void aalcalc::outputresultsparquet(const std::vector<aal_rec>& vec_aal,
+				   int periods, int sample_size,
+				   parquet::StreamWriter& os)
+{
+	int p1 = periods * sample_size;
+	int p2 = p1 - 1;
+
+	auto v_iter = vec_aal.begin();
+	while (v_iter != vec_aal.end()) {
+		if (v_iter->summary_id > 0) {
+			double mean, sd_dev;
+			calculatemeansddev(*v_iter, sample_size, p1, p2,
+					   periods, mean, sd_dev);
+			os << v_iter->summary_id << v_iter->type << (float)mean
+			   << (float)sd_dev << parquet::EndRow;
+		}
+		v_iter++;
+	}
+}
+#endif
+
+
 void aalcalc::outputresultscsv_new(const std::vector<aal_rec_ensemble> &vec_aal,
 				   const int periods) {
 
@@ -443,12 +469,9 @@ void aalcalc::outputresultscsv_new(std::vector<aal_rec>& vec_aal, int periods,in
 	auto v_iter = vec_aal.begin();
 	while (v_iter != vec_aal.end()) {
 		if (v_iter->summary_id > 0) {
-			double mean = v_iter->mean / sample_size;
-			double mean_squared = v_iter->mean * v_iter->mean;
-			double s1 = v_iter->mean_squared - mean_squared / p1;
-			double s2 = s1 / p2;
-			double sd_dev = sqrt(s2);
-			mean = mean / periods;
+			double mean, sd_dev;
+			calculatemeansddev(*v_iter, sample_size, p1, p2,
+					   periods, mean, sd_dev);
 
 			const int bufferSize = 4096;
 			char buffer[bufferSize];
@@ -468,21 +491,61 @@ void aalcalc::outputresultscsv_new(std::vector<aal_rec>& vec_aal, int periods,in
 }
 void aalcalc::outputresultscsv_new()
 {
+	/* parquet_output_ | ord_output_ | output files
+	 * ---------------------------------------------------
+	 *        1        |      1      | ORD parquet and csv
+	 *        1        |      0      | ORD parquet
+	 *        0        |      1      | ORD csv
+	 *        0        |      0      | legacy csv
+	 */
 	if (skipheader_ == false) {
 		if (ord_output_ == true) {
-			printf("SummaryID,SampleType,MeanLoss,SDLoss");
-		} else {
+			printf("SummaryID,SampleType,MeanLoss,SDLoss\n");
+		} else if (parquet_output_ == false) {
 			printf("summary_id,type,mean,standard_deviation");
 			if (sidxtoensemble_.size() > 0) printf(",ensemble_id");
+			printf("\n");
 		}
-		printf("\n");
 	}
 
-	outputresultscsv_new(vec_analytical_aal_, no_of_periods_,1);
-	outputresultscsv_new(vec_sample_aal_, no_of_periods_ , samplesize_);
+#ifdef HAVE_PARQUET
+	// Write parquet file
+	if (parquet_output_) {
+		std::vector<OasisParquet::ParquetFields> parquetFields;
+		parquetFields.push_back(
+			{"SummaryId", parquet::Type::INT32,
+			parquet::ConvertedType::INT_32});
+		parquetFields.push_back(
+			{"SampleType", parquet::Type::INT32,
+			parquet::ConvertedType::INT_32});
+		parquetFields.push_back(
+			{"MeanLoss", parquet::Type::FLOAT,
+			parquet::ConvertedType::NONE});
+		parquetFields.push_back(
+			{"SDLoss", parquet::Type::FLOAT,
+			parquet::ConvertedType::NONE});
 
-	if (sidxtoensemble_.size() > 0) {
-		outputresultscsv_new(vec_ensemble_aal_, no_of_periods_);
+		parquet::StreamWriter os =
+		  OasisParquet::SetupParquetOutputStream(parquet_outFile_,
+							 parquetFields);
+
+		outputresultsparquet(vec_analytical_aal_, no_of_periods_, 1,
+				     os);
+		outputresultsparquet(vec_sample_aal_, no_of_periods_,
+				     samplesize_, os);
+	}
+#endif
+
+	// Write csv file
+	if (!(parquet_output_ == true && ord_output_ == false)) {
+		outputresultscsv_new(vec_analytical_aal_, no_of_periods_,1);
+		outputresultscsv_new(vec_sample_aal_, no_of_periods_,
+				     samplesize_);
+
+		if (sidxtoensemble_.size() > 0) {
+			outputresultscsv_new(vec_ensemble_aal_,
+					     no_of_periods_);
+		}
 	}
 
 }

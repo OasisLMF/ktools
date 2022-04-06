@@ -46,6 +46,8 @@ Author: Ben Matharu  email : ben.matharu@oasislmf.org
 #include <chrono>
 #include <thread>
 
+#include <map>
+
 #if defined(_MSC_VER)
 #include "../wingetopt/wingetopt.h"
 #else
@@ -54,6 +56,9 @@ Author: Ben Matharu  email : ben.matharu@oasislmf.org
 
 
 #include "../include/oasis.h"
+#ifdef HAVE_PARQUET
+#include "../include/oasisparquet.h"
+#endif
 
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
 #include <signal.h>
@@ -72,7 +77,8 @@ void segfault_sigaction(int, siginfo_t *si, void *)
 
 
 namespace eltcalc {
-	void doit(bool skipHeader, bool ordOutput, FILE** fout);
+	void doit(bool skipHeader, bool ordOutput, FILE** fout,
+		  std::map<int, std::string> &parquetFileNames);
 	void setinitdone(int processid);
 }
 
@@ -96,7 +102,9 @@ void help()
 {
 	fprintf(stderr,
 		"-M [filename] output Moment Event Loss Table (MELT)\n"
+		"-m [filename] output MELT in parquet format\n"
 		"-Q [filename] output Quantile Event Loss Table (QELT)\n"
+		"-q [filename] output QELT in parquet format\n"
 		"-v version\n"
 		"-s skip header\n"
 		"-h help\n"
@@ -112,21 +120,41 @@ int main(int argc, char* argv[])
 	bool skipHeader = false;
 	bool ordOutput = false;
 	FILE * fout[] = { nullptr, nullptr };
+	bool parquetOutput = false;
+	std::map<int, std::string> parquetOutFiles;
 	int opt;
 	int processid = 0;
-	while ((opt = getopt(argc, argv, "vshP:M:Q:")) != -1) {
+	while ((opt = getopt(argc, argv, "vshP:M:m:Q:q:")) != -1) {
 		switch (opt) {
 		case 'v':
+#ifdef HAVE_PARQUET
+			fprintf(stderr, "%s : version: %s : "
+					"Parquet output enabled\n",
+				argv[0], VERSION);
+#else
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+#endif
 			exit(EXIT_FAILURE);
 			break;
 		case 'M':
 			ordOutput = true;
 			openpipe(MELT, optarg, fout);
 			break;
+		case 'm':
+			parquetOutput = true;
+#ifdef HAVE_PARQUET
+			parquetOutFiles[OasisParquet::MELT] = optarg;
+#endif
+			break;
 		case 'Q':
 			ordOutput = true;
 			openpipe(QELT, optarg, fout);
+			break;
+		case 'q':
+			parquetOutput = true;
+#ifdef HAVE_PARQUET
+			parquetOutFiles[OasisParquet::QELT] = optarg;
+#endif
 			break;
 		case 'P':
 			processid = atoi(optarg);
@@ -141,6 +169,15 @@ int main(int argc, char* argv[])
 		}
 	}
 
+#ifndef HAVE_PARQUET
+	if (parquetOutput) {
+		fprintf(stderr, "FATAL: Apache arrow libraries for parquet "
+				"output are missing.\nPlease install libraries "
+				"and recompile to use this option.\n");
+		exit(EXIT_FAILURE);
+	}
+#endif
+
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
 	struct sigaction sa;
 
@@ -154,9 +191,9 @@ int main(int argc, char* argv[])
 	try {
 		initstreams();
 		eltcalc::setinitdone(processid);
-        logprintf(progname, "INFO", "starting process..\n");
-		eltcalc::doit(skipHeader, ordOutput, fout);
-        logprintf(progname, "INFO", "finishing process..\n");
+        	logprintf(progname, "INFO", "starting process..\n");
+		eltcalc::doit(skipHeader, ordOutput, fout, parquetOutFiles);
+        	logprintf(progname, "INFO", "finishing process..\n");
 		return EXIT_SUCCESS;
 	}
 	catch (std::bad_alloc&) {
@@ -165,4 +202,3 @@ int main(int argc, char* argv[])
 	}
 
 }
-

@@ -47,11 +47,12 @@ aggreports::aggreports(const int totalperiods, const std::set<int> &summaryids,
 		       std::vector<std::map<outkey2, OutLosses>> &out_loss,
 		       FILE **fout, const bool useReturnPeriodFile,
 		       const int samplesize, const bool skipheader,
-		       const bool *outputFlags, const bool ordFlag) :
+		       const bool *outputFlags, const bool ordFlag,
+		       const std::string *parquetFileNames) :
   totalperiods_(totalperiods), summaryids_(summaryids),
   out_loss_(out_loss), fout_(fout), useReturnPeriodFile_(useReturnPeriodFile),
   samplesize_(samplesize), skipheader_(skipheader), outputFlags_(outputFlags),
-  ordFlag_(ordFlag)
+  ordFlag_(ordFlag), parquetFileNames_(parquetFileNames)
 {
 
   LoadReturnPeriods();
@@ -187,6 +188,20 @@ void aggreports::FillTVaR(std::map<wheatkey, std::vector<TVaR>> &tail,
 
 
 // epcalc = sidx for Wheatsheaf (Per Sample Exceedance Probability Table)
+// TODO: There is probably a tidier way of doing this.
+#ifdef ORD_OUTPUT
+template<typename T>
+void aggreports::WriteReturnPeriodOut(const std::vector<int> fileIDs,
+	size_t &nextreturnperiod_index, double &last_return_period,
+	OASIS_FLOAT &last_loss, const double current_return_period,
+	const OASIS_FLOAT current_loss, const int summary_id, const int eptype,
+	const int epcalc, const double max_retperiod, int counter,
+	OASIS_FLOAT tvar, T &tail,
+	void (aggreports::*WriteOutput)(const std::vector<int>, const int,
+					const int, const int, const double,
+					const OASIS_FLOAT),
+	parquet::StreamWriter& os)
+#else
 template<typename T>
 void aggreports::WriteReturnPeriodOut(const std::vector<int> fileIDs,
 	size_t &nextreturnperiod_index, double &last_return_period,
@@ -197,6 +212,7 @@ void aggreports::WriteReturnPeriodOut(const std::vector<int> fileIDs,
 	void (aggreports::*WriteOutput)(const std::vector<int>, const int,
 					const int, const int, const double,
 					const OASIS_FLOAT))
+#endif
 {
 
   double nextreturnperiod_value = 0;
@@ -218,6 +234,12 @@ void aggreports::WriteReturnPeriodOut(const std::vector<int> fileIDs,
 			       last_loss, current_return_period, current_loss);
     (this->*WriteOutput)(fileIDs, summary_id, epcalc, eptype,
 			 nextreturnperiod_value, loss);
+#ifdef ORD_OUTPUT
+    if (parquetFileNames_[EPT] != "") {
+      WriteParquetOutput(os, summary_id, epcalc, eptype,
+			 nextreturnperiod_value, loss);
+    }
+#endif
 
     // Tail Value at Risk makes no sense for return period = 0
     if (current_return_period != 0) {
@@ -309,6 +331,15 @@ void aggreports::WriteORDOutput(const std::vector<int> fileIDs,
 }
 
 
+void aggreports::WriteNoOutput(const std::vector<int> fileIDs,
+			       const int summary_id, const int epcalc,
+			       const int eptype, const double retperiod,
+			       const OASIS_FLOAT loss)
+{
+  return;
+}
+
+
 void aggreports::WriteTVaR(const std::vector<int> fileIDs, const int epcalc,
 			   const int eptype_tvar,
 			   const std::map<int, std::vector<TVaR>> &tail) {
@@ -350,6 +381,73 @@ void aggreports::WriteTVaR(const std::vector<int> fileIDs,
 }
 
 
+#ifdef ORD_OUTPUT
+inline void aggreports::WriteParquetOutput(parquet::StreamWriter& os,
+					   const int summary_id,
+					   const int epcalc, const int eptype,
+					   const double retperiod,
+					   const OASIS_FLOAT loss)
+{
+  os << summary_id << epcalc << eptype << (float)retperiod << (float)loss
+     << parquet::EndRow;
+}
+
+
+inline void aggreports::WriteTVaR(parquet::StreamWriter& os, const int epcalc,
+				  const int eptype_tvar,
+				  const std::map<int, std::vector<TVaR>> &tail)
+{
+  for (auto s : tail) {
+    for (auto t : s.second) {
+      os << s.first << epcalc << eptype_tvar << (float)t.retperiod
+	 << (float)t.tvar << parquet::EndRow;
+    }
+  }
+
+}
+
+
+inline void aggreports::WriteTVaR(parquet::StreamWriter& os,
+				  const int eptype_tvar,
+				  const std::map<wheatkey, std::vector<TVaR>> &tail)
+{
+  for (auto s : tail) {
+    for (auto t : s.second) {
+      os << s.first.summary_id << s.first.sidx << eptype_tvar
+	 << (float)t.retperiod << (float)t.tvar << parquet::EndRow;
+    }
+  }
+}
+
+
+inline parquet::StreamWriter aggreports::GetParquetStreamWriter(const int fileStream)
+{
+  std::vector<OasisParquet::ParquetFields> parquetFields;
+  parquetFields.push_back({"SummaryId", parquet::Type::INT32,
+			  parquet::ConvertedType::INT_32});
+  if (fileStream == EPT) {
+    parquetFields.push_back({"EPCalc", parquet::Type::INT32,
+			    parquet::ConvertedType::INT_32});
+  } else if (fileStream == PSEPT) {
+    parquetFields.push_back({"SampleId", parquet::Type::INT32,
+			    parquet::ConvertedType::INT_32});
+  }
+  parquetFields.push_back({"EPType", parquet::Type::INT32,
+			  parquet::ConvertedType::INT_32});
+  parquetFields.push_back({"ReturnPeriod", parquet::Type::FLOAT,
+			  parquet::ConvertedType::NONE});
+  parquetFields.push_back({"Loss", parquet::Type::FLOAT,
+			  parquet::ConvertedType::NONE});
+
+  parquet::StreamWriter os =
+    OasisParquet::SetupParquetOutputStream(parquetFileNames_[fileStream],
+					   parquetFields);
+
+  return os;
+}
+#endif
+
+
 inline void aggreports::DoSetUp(int &eptype, int &eptype_tvar, int &epcalc,
 	const int ensemble_id, const std::vector<int> fileIDs,
 	void (aggreports::*&WriteOutput)(const std::vector<int>, const int,
@@ -380,6 +478,7 @@ inline void aggreports::DoSetUp(int &eptype, int &eptype_tvar, int &epcalc,
 
   if (ordFlag_) {
     WriteOutput = &aggreports::WriteORDOutput;
+    if (fileIDs.size() == 0) WriteOutput = &aggreports::WriteNoOutput;
   } else {
     WriteOutput = &aggreports::WriteLegacyOutput;
     // epcalc = type in legacy output
@@ -410,6 +509,15 @@ void aggreports::WriteExceedanceProbabilityTable(
 				  const int, const double, const OASIS_FLOAT);
   DoSetUp(eptype, eptype_tvar, epcalc, ensemble_id, fileIDs, WriteOutput);
 
+#ifdef ORD_OUTPUT
+  if (os_ept_exists_ == false) {
+  	if (parquetFileNames_[EPT] != "") {
+		os_ept_ = GetParquetStreamWriter(EPT);
+		os_ept_exists_ = true;
+	}
+  }
+#endif
+
   std::map<int, std::vector<TVaR>> tail;
 
   for (auto s : items) {
@@ -425,16 +533,33 @@ void aggreports::WriteExceedanceProbabilityTable(
       double retperiod = max_retperiod / i;
 
       if (useReturnPeriodFile_) {
+#ifdef ORD_OUTPUT
+	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
+			     last_computed_loss, retperiod, lp / samplesize,
+			     s.first, eptype, epcalc, max_retperiod, i, tvar,
+			     tail, WriteOutput, os_ept_);
+#else
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, lp / samplesize,
 			     s.first, eptype, epcalc, max_retperiod, i, tvar,
 			     tail, WriteOutput);
+#endif
 	tvar = tvar - ((tvar - (lp / samplesize)) / i);
       } else {
 	tvar = tvar - ((tvar - (lp / samplesize)) / i);
 	tail[s.first].push_back({retperiod, tvar});
 	(this->*WriteOutput)(fileIDs, s.first, epcalc, eptype, retperiod,
 			     lp / samplesize);
+#ifdef ORD_OUTPUT
+	// TODO: Rather than checking for this on every iteration, it may be
+	// more efficient to create a new class that inherits from
+	// parquet::StreamWriter and implement the ios::setstate() function. In
+	// this way, the state can be set to std::ios_base::badbit if needed.
+	if (parquetFileNames_[EPT] != "") {
+	  WriteParquetOutput(os_ept_, s.first, epcalc, eptype, retperiod,
+			     lp / samplesize);
+	}
+#endif
       }
       i++;
     }
@@ -442,10 +567,17 @@ void aggreports::WriteExceedanceProbabilityTable(
       do {
 	double retperiod = max_retperiod / i;
 	if (returnperiods_[nextreturnperiodindex] <= 0) retperiod = 0;
+#ifdef ORD_OUTPUT
+	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
+			     last_computed_loss, retperiod, 0, s.first, eptype,
+			     epcalc, max_retperiod, i, tvar, tail,
+			     WriteOutput, os_ept_);
+#else
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, 0, s.first, eptype,
 			     epcalc, max_retperiod, i, tvar, tail,
 			     WriteOutput);
+#endif
 	tvar = tvar - (tvar / i);
 	i++;
       } while (nextreturnperiodindex < returnperiods_.size());
@@ -454,7 +586,12 @@ void aggreports::WriteExceedanceProbabilityTable(
 
   // Only write Tail Value at Risk (TVaR) for ORD output
   if (!ordFlag_) return;
-  WriteTVaR(fileIDs, epcalc, eptype_tvar, tail);
+  if (fout_[EPT] != nullptr) WriteTVaR(fileIDs, epcalc, eptype_tvar, tail);
+#ifdef ORD_OUTPUT
+  if (parquetFileNames_[EPT] != "") {
+    WriteTVaR(os_ept_, epcalc, eptype_tvar, tail);
+  }
+#endif
 
 }
 
@@ -474,6 +611,15 @@ void aggreports::WriteExceedanceProbabilityTable(
   void (aggreports::*WriteOutput)(const std::vector<int>, const int, const int,
 				  const int, const double, const OASIS_FLOAT);
   DoSetUp(eptype, eptype_tvar, epcalc, ensemble_id, fileIDs, WriteOutput);
+
+#ifdef ORD_OUTPUT
+  if (os_ept_exists_ == false) {
+  	if (parquetFileNames_[EPT] != "") {
+		os_ept_ = GetParquetStreamWriter(EPT);
+		os_ept_exists_ = true;
+	}
+  }
+#endif
 
   std::map<int, std::vector<TVaR>> tail;
 
@@ -501,16 +647,34 @@ void aggreports::WriteExceedanceProbabilityTable(
 	}
 
 	if (useReturnPeriodFile_) {
+#ifdef ORD_OUTPUT
+	  WriteReturnPeriodOut(fileIDs, nextreturnperiodindex,
+			       last_computed_rp, last_computed_loss, retperiod,
+			       lp.value / samplesize, s.first, eptype, epcalc,
+			       max_retperiod, i, tvar, tail, WriteOutput,
+			       os_ept_);
+#else
 	  WriteReturnPeriodOut(fileIDs, nextreturnperiodindex,
 			       last_computed_rp, last_computed_loss, retperiod,
 			       lp.value / samplesize, s.first, eptype, epcalc,
 			       max_retperiod, i, tvar, tail, WriteOutput);
+#endif
 	  tvar = tvar - ((tvar - (lp.value / samplesize)) / i);
 	} else {
 	  tvar = tvar - ((tvar - (lp.value / samplesize)) / i);
 	  tail[s.first].push_back({retperiod, tvar});
 	  (this->*WriteOutput)(fileIDs, s.first, epcalc, eptype, retperiod,
 			       lp.value / samplesize);
+#ifdef ORD_OUTPUT
+	// TODO: Rather than checking for this on every iteration, it may be
+	// more efficient to create a new class that inherits from
+	// parquet::StreamWriter and implement the ios::setstate() function. In
+	// this way, the state can be set to std::ios_base::badbit if needed.
+	  if (parquetFileNames_[EPT] != "") {
+	    WriteParquetOutput(os_ept_, s.first, epcalc, eptype, retperiod,
+			       lp.value / samplesize);
+	  }
+#endif
 	}
 	i++;
       }
@@ -524,10 +688,17 @@ void aggreports::WriteExceedanceProbabilityTable(
 	  retperiod = 1 / cumulative_weighting;
 	  ++iter;
 	}
+#ifdef ORD_OUTPUT
+	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
+			     last_computed_loss, retperiod, 0, s.first, eptype,
+			     epcalc, max_retperiod, i, tvar, tail,
+			     WriteOutput, os_ept_);
+#else
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, 0, s.first, eptype,
 			     epcalc, max_retperiod, i, tvar, tail,
 			     WriteOutput);
+#endif
 	tvar = tvar - (tvar / i);
 	i++;
       } while (nextreturnperiodindex < returnperiods_.size());
@@ -536,7 +707,12 @@ void aggreports::WriteExceedanceProbabilityTable(
 
   // Only write Tail Value at Risk (TVaR) for ORD output
   if (!ordFlag_) return;
-  WriteTVaR(fileIDs, epcalc, eptype_tvar, tail);
+  if (fout_[EPT] != nullptr) WriteTVaR(fileIDs, epcalc, eptype_tvar, tail);
+#ifdef ORD_OUTPUT
+  if (parquetFileNames_[EPT] != "") {
+    WriteTVaR(os_ept_, epcalc, eptype_tvar, tail);
+  }
+#endif
 
 }
 
@@ -570,6 +746,7 @@ inline void aggreports::DoSetUpWheatsheaf(int &eptype, int &eptype_tvar,
 
   if (ordFlag_) {
     WriteOutput = &aggreports::WriteORDOutput;
+    if (fileIDs.size() == 0) WriteOutput = &aggreports::WriteNoOutput;
   } else {
     WriteOutput = &aggreports::WriteLegacyOutput;
     eptype = ensemble_id;
@@ -590,6 +767,15 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
 				  const int, const double, const OASIS_FLOAT);
   DoSetUpWheatsheaf(eptype, eptype_tvar, ensemble_id, fileIDs, WriteOutput);
 
+#ifdef ORD_OUTPUT
+  if (os_psept_exists_ == false) {
+  	if (parquetFileNames_[PSEPT] != "") {
+		os_psept_ = GetParquetStreamWriter(PSEPT);
+		os_psept_exists_ = true;
+	}
+  }
+#endif
+
   std::map<wheatkey, std::vector<TVaR>> tail;
   const double max_retperiod = totalperiods_;
 
@@ -606,16 +792,34 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
       double retperiod = max_retperiod / i;
 
       if (useReturnPeriodFile_) {
+#ifdef ORD_OUTPUT
+	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
+			     last_computed_loss, retperiod, lp,
+			     s.first.summary_id, eptype, s.first.sidx,
+			     max_retperiod, i, tvar, tail, WriteOutput,
+			     os_psept_);
+#else
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, lp,
 			     s.first.summary_id, eptype, s.first.sidx,
 			     max_retperiod, i, tvar, tail, WriteOutput);
+#endif
 	tvar = tvar - ((tvar - lp) / i);
       } else {
 	tvar = tvar - ((tvar - lp) / i);
 	tail[s.first].push_back({retperiod, tvar});
 	(this->*WriteOutput)(fileIDs, s.first.summary_id, s.first.sidx, eptype,
 			     retperiod, lp);
+#ifdef ORD_OUTPUT
+	// TODO: Rather than checking for this on every iteration, it may be
+	// more efficient to create a new class that inherits from
+	// parquet::StreamWriter and implement the ios::setstate() function. In
+	// this way, the state can be set to std::ios_base::badbit if needed.
+	if (parquetFileNames_[PSEPT] != "") {
+	  WriteParquetOutput(os_psept_, s.first.summary_id, s.first.sidx,
+			     eptype, retperiod, lp);
+	}
+#endif
       }
       i++;
     }
@@ -623,10 +827,18 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
       do {
 	double retperiod = max_retperiod / i;
 	if (returnperiods_[nextreturnperiodindex] <= 0) retperiod = 0;
+#ifdef ORD_OUTPUT
+	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
+			     last_computed_loss, retperiod, 0,
+			     s.first.summary_id, eptype, s.first.sidx,
+			     max_retperiod, i, tvar, tail, WriteOutput,
+			     os_psept_);
+#else
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, 0,
 			     s.first.summary_id, eptype, s.first.sidx,
 			     max_retperiod, i, tvar, tail, WriteOutput);
+#endif
 	tvar = tvar - (tvar / i);
 	i++;
       } while (nextreturnperiodindex < returnperiods_.size());
@@ -635,7 +847,10 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
 
   // Only write Tail Value at Risk (TVaR) for ORD output
   if (!ordFlag_) return;
-  WriteTVaR(fileIDs, eptype_tvar, tail);
+  if (fout_[PSEPT] != nullptr) WriteTVaR(fileIDs, eptype_tvar, tail);
+#ifdef ORD_OUTPUT
+  if (parquetFileNames_[PSEPT] != "") WriteTVaR(os_psept_, eptype_tvar, tail);
+#endif
 
 }
 
@@ -652,6 +867,15 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
   void (aggreports::*WriteOutput)(const std::vector<int>, const int, const int,
 				  const int, const double, const OASIS_FLOAT);
   DoSetUpWheatsheaf(eptype, eptype_tvar, ensemble_id, fileIDs, WriteOutput);
+
+#ifdef ORD_OUTPUT
+  if (os_psept_exists_ == false) {
+  	if (parquetFileNames_[PSEPT] != "") {
+		os_psept_ = GetParquetStreamWriter(PSEPT);
+		os_psept_exists_ = true;
+	}
+  }
+#endif
 
   std::map<wheatkey, std::vector<TVaR>> tail;
 
@@ -679,17 +903,35 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
 	}
 
 	if (useReturnPeriodFile_) {
+#ifdef ORD_OUTPUT
+	  WriteReturnPeriodOut(fileIDs, nextreturnperiodindex,
+			       last_computed_rp, last_computed_loss, retperiod,
+			       lp.value, s.first.summary_id, eptype,
+			       s.first.sidx, max_retperiod, i, tvar, tail,
+			       WriteOutput, os_psept_);
+#else
 	  WriteReturnPeriodOut(fileIDs, nextreturnperiodindex,
 			       last_computed_rp, last_computed_loss, retperiod,
 			       lp.value, s.first.summary_id, eptype,
 			       s.first.sidx, max_retperiod, i, tvar, tail,
 			       WriteOutput);
+#endif
 	  tvar = tvar - ((tvar - lp.value) / i);
 	} else {
 	  tvar = tvar - ((tvar - lp.value) / i);
 	  tail[s.first].push_back({retperiod, tvar});
 	  (this->*WriteOutput)(fileIDs, s.first.summary_id, s.first.sidx,
 			       eptype, retperiod, lp.value);
+#ifdef ORD_OUTPUT
+	// TODO: Rather than checking for this on every iteration, it may be
+	// more efficient to create a new class that inherits from
+	// parquet::StreamWriter and implement the ios::setstate() function. In
+	// this way, the state can be set to std::ios_base::badbit if needed.
+	  if (parquetFileNames_[PSEPT] != "") {
+	    WriteParquetOutput(os_psept_, s.first.summary_id, s.first.sidx,
+			       eptype, retperiod, lp.value);
+	  }
+#endif
 	}
 	i++;
       }
@@ -703,10 +945,18 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
 	  retperiod = 1 / cumulative_weighting;
 	  ++iter;
 	}
+#ifdef ORD_OUTPUT
+	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
+			     last_computed_loss, retperiod, 0,
+			     s.first.summary_id, eptype, s.first.sidx,
+			     max_retperiod, i, tvar, tail, WriteOutput,
+			     os_psept_);
+#else
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, 0,
 			     s.first.summary_id, eptype, s.first.sidx,
 			     max_retperiod, i, tvar, tail, WriteOutput);
+#endif
 	tvar = tvar - (tvar / i);
 	i++;
       } while (nextreturnperiodindex < returnperiods_.size());
@@ -715,7 +965,10 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
 
   // Only write Tail Value at Risk (TVaR) for ORD output
   if (!ordFlag_) return;
-  WriteTVaR(fileIDs, eptype_tvar, tail);
+  if (fout_[PSEPT] != nullptr) WriteTVaR(fileIDs, eptype_tvar, tail);
+#ifdef ORD_OUTPUT
+  if (parquetFileNames_[PSEPT] != "") WriteTVaR(os_psept_, eptype_tvar, tail);
+#endif
 
 }
 
@@ -776,7 +1029,7 @@ void aggreports::OutputAggMeanDamageRatio() {
 
   if (ordFlag_) {
     fileIDs.clear();
-    fileIDs.push_back(EPT);
+    if (fout_[EPT] != nullptr) fileIDs.push_back(EPT);
   }
 
   if (periodstoweighting_.size() == 0) {
@@ -804,7 +1057,7 @@ void aggreports::OutputOccMeanDamageRatio() {
 
   if (ordFlag_) {
     fileIDs.clear();
-    fileIDs.push_back(EPT);
+    if (fout_[EPT] != nullptr) fileIDs.push_back(EPT);
   }
 
   if (periodstoweighting_.size() == 0) {
@@ -819,7 +1072,11 @@ void aggreports::OutputOccMeanDamageRatio() {
 inline std::vector<int> aggreports::GetFileIDs(const int handle, int table) {
 
   if (ordFlag_) {
-    return std::vector<int>(1, table);
+    if (fout_[table] == nullptr) {
+      return std::vector<int>();
+    } else {
+      return std::vector<int>(1, table);
+    }
   } else {
     return std::vector<int>(1, handle);
   }

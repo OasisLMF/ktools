@@ -40,6 +40,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <stdlib.h>
 #include <chrono>
 #include <thread>
+#include <string>
 
 #if defined(_MSC_VER)
 #include "../wingetopt/wingetopt.h"
@@ -49,12 +50,18 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 using namespace std;
 #include "../include/oasis.h"
+#ifdef HAVE_PARQUET
+#include "../include/oasisparquet.h"
+#endif
 
 bool firstOutput = true;
 
 int rowcount = 0;
 
-void doitz(bool skipheader, bool fullprecision, bool show_exposure_value, bool ord_output, bool all_idx)
+
+void doitz(bool skipheader, bool fullprecision, bool show_exposure_value,
+	   bool ord_output, bool all_idx, bool parquet_output,
+	   std::string parquetOutFile)
 {
 	int summarycalcstream_type = 0;
 	size_t i = fread(&summarycalcstream_type, sizeof(summarycalcstream_type), 1, stdin);
@@ -70,13 +77,20 @@ void doitz(bool skipheader, bool fullprecision, bool show_exposure_value, bool o
 		if (skipheader == false) {
 			// ORD output flag takes priority over exposure value flag
 			// ImpactedNumLocs not currently supported in ORD output
-			if (ord_output == true)
+			if (ord_output == true) {
 				printf("EventID,SummaryID,SampleID,Loss,ImpactedExposure\n");
-			else if (show_exposure_value == true)
-				printf("event_id,exposure_value,summary_id,sidx,loss\n");
-			else
-				printf("event_id,summary_id,sidx,loss\n");
+			} else if (parquet_output == false) {
+				if (show_exposure_value == true)
+					printf("event_id,exposure_value,summary_id,sidx,loss\n");
+				else printf("event_id,summary_id,sidx,loss\n");
+			}
 		}
+#ifdef HAVE_PARQUET
+		parquet::StreamWriter os;
+		if (parquet_output == true)
+			os = OasisParquet::GetParquetStreamWriter(OasisParquet::SELT,
+								  parquetOutFile);
+#endif
 		int samplesize = 0;
 		int summary_set = 0;
 		i = fread(&samplesize, sizeof(samplesize), 1, stdin);
@@ -98,16 +112,27 @@ void doitz(bool skipheader, bool fullprecision, bool show_exposure_value, bool o
 				// Do not output records with exposure value = 0
 				if (sh.expval == 0) continue;
 			
+#ifdef HAVE_PARQUET
+				if (parquet_output == true) {
+					float impacted_exp = sh.expval;
+					if (sr.loss == 0) impacted_exp = 0;
+					os << sh.event_id << sh.summary_id
+					   << sr.sidx << (float)sr.loss
+					   << impacted_exp << parquet::EndRow;
+				}
+#endif
 				if (fullprecision == true) {
 					// ORD output flag takes priority over exposure value flag
 					if (ord_output == true) {
 						OASIS_FLOAT impacted_exp = sh.expval;
 						if (sr.loss == 0) impacted_exp = 0;
 						printf("%d,%d,%d,%f,%f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss, impacted_exp);
-					} else if (show_exposure_value == true) {
-						printf("%d,%f,%d,%d,%f\n", sh.event_id, sh.expval, sh.summary_id, sr.sidx, sr.loss);
-					} else {
-						printf("%d,%d,%d,%f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
+					} else if (parquet_output == false) {
+						if (show_exposure_value == true) {
+							printf("%d,%f,%d,%d,%f\n", sh.event_id, sh.expval, sh.summary_id, sr.sidx, sr.loss);
+						} else {
+							printf("%d,%d,%d,%f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
+						}
 					}
 				} else {
 					// ORD output flag takes priority over exposure value flag
@@ -115,10 +140,12 @@ void doitz(bool skipheader, bool fullprecision, bool show_exposure_value, bool o
 						OASIS_FLOAT impacted_exp = sh.expval;
 						if (sr.loss == 0) impacted_exp = 0;
 						printf("%d,%d,%d,%.2f,%.2f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss, impacted_exp);
-					} else if (show_exposure_value == true) {
-						printf("%d,%.2f,%d,%d,%.2f\n", sh.event_id, sh.expval, sh.summary_id, sr.sidx, sr.loss);
-					} else {
-						printf("%d,%d,%d,%.2f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
+					} else if (parquet_output == false) {
+						if (show_exposure_value == true) {
+							printf("%d,%.2f,%d,%d,%.2f\n", sh.event_id, sh.expval, sh.summary_id, sr.sidx, sr.loss);
+						} else {
+							printf("%d,%d,%d,%.2f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
+						}
 					}
 				}
 				if (firstOutput == true) {
@@ -131,10 +158,12 @@ void doitz(bool skipheader, bool fullprecision, bool show_exposure_value, bool o
 	}
 	fprintf(stderr, "FATAL: Unsupported summarycalc stream type\n");
 }
-void doit(bool skipheader, bool fullprecision,bool show_exposure_value, bool remove_zero_exposure_records, bool ord_output, bool all_idx)
+void doit(bool skipheader, bool fullprecision,bool show_exposure_value,
+	  bool remove_zero_exposure_records, bool ord_output, bool all_idx,
+	  bool parquet_output, std::string parquetOutFile)
 {
 	if (remove_zero_exposure_records == true) {
-		doitz(skipheader, fullprecision, show_exposure_value, ord_output, all_idx);
+		doitz(skipheader, fullprecision, show_exposure_value, ord_output, all_idx, parquet_output, parquetOutFile);
 		return;
 	}
 	int summarycalcstream_type = 0;
@@ -151,13 +180,20 @@ void doit(bool skipheader, bool fullprecision,bool show_exposure_value, bool rem
 		if (skipheader == false) {
 			// ORD output flag takes priority over exposure value flag
 			// ImpactedNumLocs not currently supported in ORD output
-			if (ord_output == true)
+			if (ord_output == true) {
 				printf("EventID,SummaryID,SampleID,Loss,ImpactedExposure\n");
-			else if (show_exposure_value == true)
-				printf("event_id,exposure_value,summary_id,sidx,loss\n");
-			else
-				printf("event_id,summary_id,sidx,loss\n");
+			} else if (parquet_output == false) {
+				if (show_exposure_value == true)
+					printf("event_id,exposure_value,summary_id,sidx,loss\n");
+				else printf("event_id,summary_id,sidx,loss\n");
+			}
 		}
+#ifdef HAVE_PARQUET
+		parquet::StreamWriter os;
+		if (parquet_output == true)
+			os = OasisParquet::GetParquetStreamWriter(OasisParquet::SELT,
+								  parquetOutFile);
+#endif
 		int samplesize=0;
 		int summary_set = 0;
 		i=fread(&samplesize, sizeof(samplesize), 1, stdin);
@@ -176,16 +212,27 @@ void doit(bool skipheader, bool fullprecision,bool show_exposure_value, bool rem
 					}
 				}
 				rowcount++;
+#ifdef HAVE_PARQUET
+				if (parquet_output == true) {
+					float impacted_exp = sh.expval;
+					if (sr.loss == 0) impacted_exp = 0;
+					os << sh.event_id << sh.summary_id
+					   << sr.sidx << (float)sr.loss
+					   << impacted_exp << parquet::EndRow;
+				}
+#endif
 				if (fullprecision == true) {
 					// ORD output flag takes priority over exposure value flag
 					if (ord_output == true) {
 						OASIS_FLOAT impacted_exp = sh.expval;
 						if (sr.loss == 0) impacted_exp = 0;
 						printf("%d,%d,%d,%f,%f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss, impacted_exp);
-					} else if (show_exposure_value == true) {
-						printf("%d,%f,%d,%d,%f\n", sh.event_id, sh.expval, sh.summary_id, sr.sidx, sr.loss);
-					} else {
-						printf("%d,%d,%d,%f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
+					} else if (parquet_output == false) {
+						if (show_exposure_value == true) {
+							printf("%d,%f,%d,%d,%f\n", sh.event_id, sh.expval, sh.summary_id, sr.sidx, sr.loss);
+						} else {
+							printf("%d,%d,%d,%f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
+						}
 					}
 				} else {
 					// ORD output flag takes priority over exposure value flag
@@ -193,10 +240,12 @@ void doit(bool skipheader, bool fullprecision,bool show_exposure_value, bool rem
 						OASIS_FLOAT impacted_exp = sh.expval;
 						if (sr.loss == 0) impacted_exp = 0;
 						printf("%d,%d,%d,%.2f,%.2f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss, impacted_exp);
-					} else if (show_exposure_value == true) {
-						printf("%d,%.2f,%d,%d,%.2f\n", sh.event_id, sh.expval, sh.summary_id, sr.sidx, sr.loss);
-					} else {
-						printf("%d,%d,%d,%.2f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
+					} else if (parquet_output == false) {
+						if (show_exposure_value == true) {
+							printf("%d,%.2f,%d,%d,%.2f\n", sh.event_id, sh.expval, sh.summary_id, sr.sidx, sr.loss);
+						} else {
+							printf("%d,%d,%d,%.2f\n", sh.event_id, sh.summary_id, sr.sidx, sr.loss);
+						}
 					}
 				}
 				if (firstOutput==true){
@@ -221,6 +270,7 @@ void help()
 		"-a include ChanceOfLoss and MaxLoss sample IDs\n"
 		"-z remove records with zero exposure values\n"
 		"-o Open Results Data (ORD) output\n"
+		"-p [filename] ORD output in parquet format\n"
 		"-h help\n"
 	);
 }
@@ -233,9 +283,11 @@ int main(int argc, char* argv[])
 	bool fullprecision = false;
 	bool show_exposure_value = false;
 	bool remove_zero_exposure_records = false;
-	bool ord_output = false;
+	bool ord_output = false;   // csv output
+	bool parquet_output = false;   // parquet output
+	std::string parquetOutFile;   // parquet output
 	bool all_idx = false;
-	while ((opt = getopt(argc, argv, "zvhfseoa")) != -1) {
+	while ((opt = getopt(argc, argv, "zvhfseoap:")) != -1) {
 		switch (opt) {
 		case 's':
 			skipheader = true;
@@ -252,11 +304,21 @@ int main(int argc, char* argv[])
 		case 'o':
 			ord_output = true;
 			break;
+		case 'p':
+			parquet_output = true;
+			parquetOutFile = optarg;
+			break;
 		case 'a':
 			all_idx = true;
 			break;
 		case 'v':
+#ifdef HAVE_PARQUET
+			fprintf(stderr, "%s : version: %s : "
+					"Parquet output enabled\n",
+				argv[0], VERSION);
+#else
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+#endif
 			exit(EXIT_FAILURE);
 			break;
 		case 'h':
@@ -265,7 +327,18 @@ int main(int argc, char* argv[])
 		}
 	}
 
+#ifndef HAVE_PARQUET
+	if (parquet_output) {
+		fprintf(stderr, "FATAL: Apache arrow libraries for parquet "
+				"output are missing.\nPlease install libraries "
+				"and recompile to use this option.\n");
+		exit(EXIT_FAILURE);
+	}
+#endif
+
 	initstreams();
-	doit(skipheader, fullprecision, show_exposure_value, remove_zero_exposure_records, ord_output, all_idx);
+	doit(skipheader, fullprecision, show_exposure_value,
+	     remove_zero_exposure_records, ord_output, all_idx, parquet_output,
+	     parquetOutFile);
 	return EXIT_SUCCESS;
 }

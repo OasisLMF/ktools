@@ -334,6 +334,36 @@ Files are concatenated in the order in which they are presented on the command l
 
 [Return to top](#outputcomponents)
 
+### katparquet <a id="katparquet"></a>
+***
+The output parquet files from multiple processes can be concatenated to a single parquet file. The results are automatically sorted by event ID. Unlike [kat](#kat), the [ORD table name](ORDOutputComponents.md) for the input files must be specified on the command line.
+
+#### Parameters
+
+* -d {file path} - The directory containing output files to be concatenated.
+* -M - Concatenate MPLT files
+* -Q - Concatenate QPLT files
+* -S - Concatenate SPLT files
+* -m - Concatenate MELT files
+* -q - Concatenate QELT files
+* -s - Concatenate SELT files
+* -o {filename} - Output concatenated file
+
+#### Usage
+
+```
+$ katparquet [parameters] -o [filename.parquet] [file]...
+```
+
+#### Examples
+
+```
+$ katparquet -d mplt_files/ -M -o MPLT.parquet
+$ katparquet -q -o QPLT.parquet qplt_P1.parquet qplt_P2.parquet qplt_P3.parquet
+```
+
+[Return to top](#outputcomponents)
+
 [Go to 4.3 Data conversion components section](DataConversionComponents.md)
 
 [Back to Contents](Contents.md)

@@ -1,4 +1,4 @@
-add_executable(summarycalctocsv)
+add_executable(katparquet "")
 
 # Known bug where ParquetConfig.cmake is not found - workaround is to find
 # directory that contains ArrowConfig.cmake and search this directory for
@@ -11,20 +11,20 @@ if (Arrow_FOUND)
 endif()
 if (Parquet_FOUND)
         add_definitions(-DHAVE_PARQUET)
-        target_sources(summarycalctocsv
+        target_sources(katparquet
                 PRIVATE
-                        summarycalctocsv.cpp ../include/oasisparquet.cpp ../include/oasisparquet.h
+                        katparquet.cpp main.cpp ../include/oasisparquet.cpp ../include/oasisparquet.h
         )
-        target_link_libraries(summarycalctocsv PRIVATE arrow_shared parquet_shared)
+        target_link_libraries(katparquet PRIVATE arrow_shared parquet_shared)
 else()
-        target_sources(summarycalctocsv
+        target_sources(katparquet
                 PRIVATE
-                        summarycalctocsv.cpp
+                        main.cpp
         )
 endif()
 
 if (WIN32)
-	target_link_libraries(summarycalctocsv wingetopt)
+	target_link_libraries(katparquet wingetopt)
 endif()
 
-install(TARGETS summarycalctocsv RUNTIME DESTINATION bin)
+install(TARGETS katparquet RUNTIME DESTINATION bin)

@@ -20,6 +20,7 @@ Summarycalctocsv takes the summarycalc loss stream, which contains the individua
 ##### Parameters
 
 * -o The ORD output flag
+* -p {filename.parquet} outputs the SELT in parquet format
 
 ##### Usage
 ```
@@ -31,7 +32,11 @@ $ summarycalctocsv [parameters] > selt.csv < [stdin].bin
 
 ```
 $ eve 1 1 | getmodel | gulcalc -r -S100 -a1 -i - | summarycalc -i -1 - | summarycalctocsv -o > selt.csv
+$ eve 1 1 | getmodel | gulcalc -r -S100 -a1 -i - | summarycalc -i -1 - | summarycalctocsv -p selt.parquet
+$ eve 1 1 | getmodel | gulcalc -r -S100 -a1 -i - | summarycalc -i -1 - | summarycalctocsv -p selt.parquet -o > selt.csv
 $ summarycalctocsv -o > selt.csv < summarycalc.bin
+$ summarycalctocsv -p selt.parquet < summarycalc.bin
+$ summarycalctocsv -p selt.parquet -o > selt.csv < summarycalc.bin
 ```
 
 ##### Internal data
@@ -60,17 +65,23 @@ The program calculates loss by SummaryId and EventId. There are two variants (in
 
 * -M {filename.csv} outputs the MELT in csv format
 * -Q {filename.csv} outputs the QELT in csv format
+* -m {filename.parquet} outputs the MELT in parquet format
+* -q {filename.parquet} outputs the QELT in parquet format
 
 ##### Usage
 ```
-$ [stdin component] | eltcalc -M [filename.csv] -Q [filename.csv]
-$ eltcalc  -M [filename.csv] -Q [filename.csv] < [stdin].bin
+$ [stdin component] | eltcalc -M [filename.csv] -Q [filename.csv] -m [filename.parquet] -q [filename.parquet]
+$ eltcalc  -M [filename.csv] -Q [filename.csv] -m [filename.parquet] -q [filename.parquet] < [stdin].bin
 ```
 
 ##### Example
 ```
 $ eve 1 1 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - | eltcalc -M MELT.csv -Q QELT.csv
+$ eve 1 1 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - | eltcalc -m MELT.parquet -q QELT.parquet
+$ eve 1 1 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - | eltcalc -M MELT.csv -Q QELT.csv -m MELT.parquet -q QELT.parquet
 $ eltcalc  -M MELT.csv -Q QELT.csv < summarycalc.bin
+$ eltcalc  -m MELT.parquet -Q QELT.parquet < summarycalc.bin
+$ eltcalc  -M MELT.csv -Q QELT.csv -m MELT.parquet -q QELT.parquet < summarycalc.bin
 ```
 
 ##### Internal data
@@ -145,17 +156,24 @@ The program calculates loss by Period, EventId and SummaryId and outputs the res
 * -S {filename.csv} outputs the SPLT in csv format
 * -M {filename.csv} outputs the MPLT in csv format
 * -Q {filename.csv} outputs the QPLT in csv format
+* -s {filename.parquet} outputs the SPLT in parquet format
+* -m {filename.parquet} outputs the MPLT in parquet format
+* -q {filename.parquet} outputs the QPLT in parquet format
 
 ##### Usage
 ```
-$ [stdin component] | pltcalc -S [filename.csv] -M [filename.csv] -Q [filename.csv]
-$ pltcalc -S [filename.csv] -M [filename.csv] -Q [filename.csv] < [stdin].bin
+$ [stdin component] | pltcalc -S [filename.csv] -M [filename.csv] -Q [filename.csv] -s [filename.parquet] -m [filename.parquet] -q [filename.parquet]
+$ pltcalc -S [filename.csv] -M [filename.csv] -Q [filename.csv] -s [filename.parquet] -m [filename.parquet] -q [filename.parquet] < [stdin].bin
 ```
 
 ##### Example
 ```
 $ eve 1 1 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - | pltcalc -S SPLT.csv -M MPLT.csv -Q QPLT.csv
+$ eve 1 1 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - | pltcalc -s SPLT.parquet -m MPLT.parquet -q QPLT.parquet
+$ eve 1 1 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - | pltcalc -S SPLT.csv -M MPLT.csv -Q QPLT.csv -s SPLT.parquet -m MPLT.parquet -q QPLT.parquet
 $ pltcalc -S SPLT.csv -M MPLT.csv -Q QPLT.csv < summarycalc.bin
+$ pltcalc -s SPLT.parquet -m MPLT.parquet -q QPLT.parquet < summarycalc.bin
+$ pltcalc -S SPLT.csv -M MPLT.csv -Q QPLT.csv -s SPLT.parquet -m MPLT.parquet -q QPLT.parquet < summarycalc.bin
 ```
 
 ##### Internal data
@@ -270,8 +288,10 @@ Exceedance Probability Tables are further generalised in Oasis to represent not 
 * -K{sub-directory}. The subdirectory of /work containing the input summarycalc binary files.
 Then the following parameters must be specified for at least one analysis type;
 * Analysis type. Use -F for Full Uncertainty Aggregate, -f for Full Uncertainty Occurrence, -W for Per Sample Aggregate,  -w for Per Sample Occurrence, -S for Sample Mean Aggregate, -s for Sample Mean Occurrence, -M for Per Sample Mean Aggregate, -m for Per Sample Mean Occurrence
-* -O {ept.csv} is the output flag for the EPT csv ( for analysis types -F, -f, -S, -s, -M, -m)
+* -O {ept.csv} is the output flag for the EPT csv (for analysis types -F, -f, -S, -s, -M, -m)
 * -o {psept.csv} is the output flag for the PSEPT csv (for analysis types -W or -w)
+* -P {ept.parquet} is the output flag for the EPT parquet file (for analysis types -F, -f, -S, -s, -M, -m)
+* -p {psept.parquet} is the output flag for the PSEPT parquet file (for analysis types -W or -w)
 
 An optional parameter is; 
 * -r. Use return period file - use this parameter if you are providing a file with a specific list of return periods. If this file is not present then all calculated return periods will be returned, for losses greater than zero.
@@ -292,15 +312,23 @@ $ eve 2 2 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - > work/summar
 'Then run ordleccalc, pointing to the specified sub-directory of work containing summarycalc binaries.
 'Write aggregate and occurrence full uncertainty
 $ ordleccalc -Ksummary1 -F -f -O ept.csv
+$ ordleccalc -Ksummary1 -F -f -P ept.parquet
+$ ordleccalc -Ksummary1 -F -f -O ept.csv -P ept.parquet
 
 'Write occurrence per sample (PSEPT)
 $ ordleccalc -Ksummary1 -w -o psept.csv
+$ ordleccalc -Ksummary1 -w -p psept.parquet
+$ ordleccalc -Ksummary1 -w -o psept.csv -p psept.parquet
 
 'Write aggregate and occurrence per sample (written to PSEPT) and per sample mean (written to EPT file)
 $ ordleccalc -Ksummary1 -W -w -M -m -O ept.csv -o psept.csv
+$ ordleccalc -Ksummary1 -W -w -M -m -P ept.parquet -p psept.parquet
+$ ordleccalc -Ksummary1 -W -w -M -m -O ept.csv -o psept.csv -P ept.parquet -p psept.parquet
 
 'Write full output
 $ ordleccalc -Ksummary1 -F -f -W -w -S -s -M -m -O ept.csv -o psept.csv
+$ ordleccalc -Ksummary1 -F -f -W -w -S -s -M -m -P ept.parquet -p psept.parquet
+$ ordleccalc -Ksummary1 -F -f -W -w -S -s -M -m -O ept.csv -o pseept.csv -P ept.parquet -p psept.parquet
 ```
 
 ##### Internal data
@@ -428,6 +456,7 @@ The reason for aalcalc not having an input stream is that the calculation is not
 
 * -K{sub-directory}. The sub-directory of /work containing the input aalcalc binary files.
 * -o. The ORD format flag
+* -p {filename}. The ORD parquet format flag
 
 ##### Usage
 
@@ -441,8 +470,11 @@ $ aalcalc [parameters] > alt.csv
 'First generate summarycalc binaries by running the core workflow, for the required summary set
 $ eve 1 2 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - > work/summary1/summarycalc1.bin
 $ eve 2 2 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - > work/summary1/summarycalc2.bin
+
 'Then run aalcalc, pointing to the specified sub-directory of work containing summarycalc binaries.
-$ aalcalc -o -Ksummary1 > alt.csv  
+$ aalcalc -o -Ksummary1 > alt.csv
+$ aalcalc -p alt.parquet -Ksummary1
+$ allcalc -o -p alt.parquet -Ksummary1 > alt.csv
 ```
 
 ##### Output

@@ -36,6 +36,10 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 */
 
 #include "../include/oasis.h"
+#ifdef HAVE_PARQUET
+#include "../include/oasisparquet.h"
+#endif
+
 #include <iostream>
 #include <vector>
 #include <map>
@@ -53,7 +57,8 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 
 namespace pltcalc {
-	void doit(bool skipHeader, bool ordOutput, FILE** fout);
+	void doit(bool skipHeader, bool ordOutput, FILE** fout,
+		  std::map<int, std::string> &parquetFileNames);
 }
 char* progname;
 
@@ -84,11 +89,14 @@ void help()
 {
 	fprintf(stderr,
 	"-M [filename] output Moment Period Loss Table (MPLT)\n"
+	"-m [filename] output MPLT in parquet format\n"
 	"-Q [filename] output Quantile Period Loss Table (QPLT)\n"
+	"-q [filename] output QPLT in parquet format\n"
 	"-S [filename] output Sample Period Loss Table (SPLT)\n"
+	"-s [filename] output SPLT in parquet format\n"
 	"-h help\n"
 	"-v version\n"
-	"-s skip header\n"
+	"-H skip header\n"
 	);
 }
 
@@ -102,25 +110,51 @@ int main(int argc, char *argv[])
 	bool skipHeader = false;
 	bool ordOutput = false;
 	FILE * fout[] = { nullptr, nullptr, nullptr };
-	while ((opt = getopt(argc, argv, "svhM:Q:S:")) != -1) {
+	bool parquetOutput = false;
+	std::map<int, std::string> parquetOutFiles;
+	while ((opt = getopt(argc, argv, "HvhM:m:Q:q:S:s:")) != -1) {
 		switch (opt) {
 		case 'v':
+#ifdef HAVE_PARQUET
+			fprintf(stderr, "%s : version: %s : "
+					"Parquet output enabled\n",
+				argv[0], VERSION);
+#else
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
+#endif
 			::exit(EXIT_FAILURE);
 			break;
 		case 'M':
 			ordOutput = true;
 			openpipe(MPLT, optarg, fout);
 			break;
+		case 'm':
+			parquetOutput = true;
+#ifdef HAVE_PARQUET
+			parquetOutFiles[OasisParquet::MPLT] = optarg;
+#endif
+			break;
 		case 'Q':
 			ordOutput = true;
 			openpipe(QPLT, optarg, fout);
+			break;
+		case 'q':
+			parquetOutput = true;
+#ifdef HAVE_PARQUET
+			parquetOutFiles[OasisParquet::QPLT] = optarg;
+#endif
 			break;
 		case 'S':
 			ordOutput = true;
 			openpipe(SPLT, optarg, fout);
 			break;
 		case 's':
+			parquetOutput = true;
+#ifdef HAVE_PARQUET
+			parquetOutFiles[OasisParquet::SPLT] = optarg;
+#endif
+			break;
+		case 'H':
 			skipHeader = true;
 			break;
 		case 'h':
@@ -129,6 +163,15 @@ int main(int argc, char *argv[])
 			::exit(EXIT_FAILURE);
 		}
 	}
+
+#ifndef HAVE_PARQUET
+	if (parquetOutput) {
+		fprintf(stderr, "FATAL: Apache arrow libraries for parquet "
+				"output are missing.\nPlease install libraries "
+				"and recompile to use this option.\n");
+		exit(EXIT_FAILURE);
+	}
+#endif
 
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
 	struct sigaction sa;
@@ -143,7 +186,7 @@ int main(int argc, char *argv[])
 
 	try {
 		initstreams();
-		pltcalc::doit(skipHeader, ordOutput, fout);
+		pltcalc::doit(skipHeader, ordOutput, fout, parquetOutFiles);
 	}
 	catch (std::bad_alloc&) {
 		fprintf(stderr, "FATAL: %s: Memory allocation failed\n", progname);

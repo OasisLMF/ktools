@@ -41,6 +41,10 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 
 #include "../include/oasis.h"
 
+#ifdef HAVE_PARQUET
+#include "../include/oasisparquet.h"
+#endif
+
 #include <string>
 #include <map>
 #include <vector>
@@ -96,6 +100,8 @@ private:
 	std::vector<int> ensemblecount_;
 	bool skipheader_ = false;
 	bool ord_output_ = false;
+	bool parquet_output_ = false;
+	std::string parquet_outFile_;
 // private functions
 	template<typename T>
 	void loadoccurrence(T &occ, FILE * fin);
@@ -111,7 +117,8 @@ private:
 	void do_calc_end(int period_no);
 	void do_sample_calc_newx(const summarySampleslevelHeader& sh, const std::vector<sampleslevelRec>& vrec);
 	void do_sample_calc_new(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec);
-	inline void calculatemeansddev(const aal_rec_ensemble &record,
+	template<typename aal_rec_T>
+	inline void calculatemeansddev(const aal_rec_T &record,
 				       const int sample_size, const int p1,
 				       const int p2, const int periods,
 				       double &mean, double &sd_dev);
@@ -119,10 +126,19 @@ private:
 	void outputresultscsv_new(std::vector<aal_rec> &vec_aal, int periods, int sample_size);
 	void outputresultscsv_new(const std::vector<aal_rec_ensemble> &vec_aal, const int periods);
 	void outputresultscsv_new();
+#ifdef HAVE_PARQUET
+	void outputresultsparquet(const std::vector<aal_rec>& vec_aal,
+				  int periods, int sample_size,
+				  parquet::StreamWriter& os);
+#endif
 	inline void outputrows(const char * buffer, int strLen);
 	void getmaxsummaryid(std::string& path);
 public:
-	aalcalc(bool skipheader, bool ord_output) : skipheader_(skipheader), ord_output_(ord_output) {};
+	aalcalc(bool skipheader, bool ord_output, bool parquet_output,
+		std::string parquet_outFile)
+		: skipheader_(skipheader), ord_output_(ord_output),
+		parquet_output_(parquet_output),
+		parquet_outFile_(parquet_outFile) {};
 	void doit(const std::string& subfolder);		// experimental
 	void debug(const std::string &subfolder);
 };

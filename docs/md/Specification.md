@@ -7,7 +7,7 @@ This section specifies the data stream structures and core components in the in-
 
 The data stream structures are;
 * **[cdf stream](#cdf)**
-* **[gulcalc stream](#gulstream)**
+* gulcalc stream(deprecated)
 * **[loss stream](#loss)**
 * **[summary stream](#summary)**
 
@@ -187,14 +187,14 @@ getmodel is the component which generates a stream of effective damageability cd
 <a id="gulcalc"></a>
 ### gulcalc 
 
-gulcalc is the component which calculates ground up loss. It takes the getmodel output as standard input and based on the sampling parameters specified, performs Monte Carlo sampling and numerical integration. The output is a stream of ground up loss samples in Oasis kernel format with random samples identified by positive sample indexes (sidx 1 and greater), and special meaning samples defined as follows; numerical integration mean (sidx=-1), numerical integration standard deviation (sidx=-2), impacted exposure (sidx =-3), chance of loss (sidx =-4) and maximum loss (sidx =-5).
+gulcalc is the component which calculates ground up loss. It takes the getmodel output as standard input and based on the sampling parameters specified, performs Monte Carlo sampling and numerical integration. The output is a stream of ground up loss samples in Oasis kernel format with random samples identified by positive sample indexes (sidx 1 and greater), and special meaning samples assigned to negative sample indexes.
 
-gulcalc also supports the combining and back-allocation of losses arising from multiple subperils impacting the same coverage with a few options.
+gulcalc also supports the combining and back-allocation of losses arising from multiple subperils impacting the same coverage with some options.
 
 <a id="fmcalc"></a>
 ### fmcalc 
 
-fmcalc is the component which takes the loss stream as standard input and output and applies the policy terms and conditions to produce insured loss samples. fmcalc can be called recursively to perform multiple sequential applications of financial terms (e.g for inuring reinsurance following direct insurance). The output is a table of loss samples in Oasis kernel format, including the (re)insured loss for the numerical integration mean ground up loss (sidx=-1), the impacted exposure (sidx=-3) and the maximum loss (sidx -5).
+fmcalc is the component which takes the loss stream as standard input and output and applies the policy terms and conditions to produce insured loss samples. fmcalc can be called recursively to perform multiple sequential applications of financial terms (e.g for inuring reinsurance following direct insurance). The output is a table of loss samples in Oasis kernel format, including the (re)insured loss for the numerical integration mean (sidx=-1), and the impacted exposure (sidx=-3). 
 
 <a id="summarycalc"></a>
 ### summarycalc
@@ -204,7 +204,7 @@ summarycalc is a component which sums the sampled losses from either gulcalc or 
 <a id="outputcalc"></a>
 ### outputcalc 
 
-Outputcalc is a general term for an end-of-pipeline component which represents one of a potentially unlimited set of output components. Four examples are provided in the Reference Model. These are; 
+Outputcalc is a general term for an end-of-pipeline component which represents one of a potentially unlimited set of output components. Some examples are provided in the Reference Model. These are; 
 
 * eltcalc
 * leccalc

@@ -244,9 +244,9 @@ installertest()
 
      # checksums		
 	if [ "$SYSTEMNAME" == "Darwin" ]; then
-	 	shasum -c ../$CTRL.sha1
+	 	shasum -c --ignore-missing ../$CTRL.sha1
 	else
-	 	sha1sum -c ../$CTRL.sha1
+	 	sha1sum -c --ignore-missing ../$CTRL.sha1
 	fi
 
 	 if [ "$?" -ne "0" ]; then

@@ -86,35 +86,27 @@ The program requires the footprint binary and index file for the model, the vuln
 The getmodel output stream is ordered by event and streamed out in blocks for each event. 
 
 ##### Calculation
-The program filters the footprint binary file for all 'areaperil_id's which appear in the items file. This selects the event footprints that affect the exposures on the basis on their location.  Similarly the program filters the vulnerability file for 'vulnerability_id's that appear in the items file. This selects damage distributions which are relevant for the exposures. Then the intensity distributions from the footprint file and conditional damage distributions from the vulnerability file are convolved for every combination of areaperil_id and vulnerability_id in the items file. The effective damage probabilities are calculated by a sum product of conditional damage probabilities with intensity probabilities for each event, areaperil, vulnerability combination and each damage bin.  The resulting discrete probability distributions are converted into discrete cumulative distribution functions 'cdfs'.  Finally, the damage bin mid-point from the damage bin dictionary ('interpolation' field) is read in as a new field in the cdf stream as 'bin_mean'.  This field is the conditional mean damage for the bin and it is used to facilitate the calculation of mean and standard deviation in the gulcalc component. 
+The program filters the footprint binary file for all areaperil_id's which appear in the items file. This selects the event footprints that impact the exposures on the basis on their location.  Similarly the program filters the vulnerability file for vulnerability_id's that appear in the items file. This selects conditional damage distributions which are relevant for the exposures. Then the intensity distributions from the footprint file and conditional damage distributions from the vulnerability file are convolved for every combination of areaperil_id and vulnerability_id in the items file. The effective damage probabilities are calculated by a sum product of conditional damage probabilities with intensity probabilities for each event, areaperil, vulnerability combination and for each damage bin.  The resulting discrete probability distributions are converted into discrete cumulative distribution functions 'cdfs'.  Finally, the damage bin mid-point from the damage bin dictionary ('interpolation' field) is read in as a new field in the cdf stream as 'bin_mean'.  This field is the conditional mean damage for the bin and it is used to facilitate the calculation of mean and standard deviation in the gulcalc component. 
 
 [Return to top](#corecomponents)
 
 <a id="gulcalc"></a>
 ### gulcalc
 ***
-The gulcalc program performs Monte Carlo sampling of ground up loss using interpolation of uniform random numbers against the effective damage cdf, and calculates mean and standard deviation by numerical integration of the cdfs. The sampling methodology has been extended beyond linear interpolation to include point value sampling and quadratic interpolation. This supports damage bin intervals which represent a single discrete damage value, and damage distributions with cdfs that are described by a piecewise quadratic function. 
+The gulcalc program performs Monte Carlo sampling of ground up loss by randomly sampling the cumulative probability of damage from the uniform distribution and generating damage factors by interpolation of the random numbers against the effective damage cdf. Other loss metrics are computed and assigned to special meaning sample index values as descibed below. The sampling methodology has been extended beyond linear interpolation to include point value sampling and quadratic interpolation. This supports damage bin intervals which represent a single discrete damage value, and damage distributions with cdfs that are described by a piecewise quadratic function. 
 
-Gulcalc also performs back-allocation of total coverage losses to the contributing subperil item losses (for multi-subperil models).  This occurs when there are two or more items representing losses from different subperils to the same coverage, such as wind loss and storm surge loss, for example. In these cases, because the subperil losses are generated independently from each other it is possible to result in a total damage ratio of > 1 for the coverage, or a total loss of > TIV. gulcalc provides the following options for summing and back-allocating the total coverage ground up loss;
-
-| Allocation option | Description                                                                                         | 
-|:------------------|:----------------------------------------------------------------------------------------------------|
-| 1                 | Sum damage ratios and cap to 1. Back-allocate in proportion to contributing subperil damage ratio   |
+Gulcalc also performs back-allocation of total coverage losses to the contributing subperil item losses (for multi-subperil models).  This occurs when there are two or more items representing losses from different subperils to the same coverage, such as wind loss and storm surge loss, for example. In these cases, because the subperil losses are generated independently from each other it is possible to result in a total damage ratio greater than 1 for the coverage, or a total loss greated than the Total Insured Value "TIV". Back-allocation ensures that the total loss for a coverage (before any post-analysis adjustments) cannot exceed the input TIV.
 
 ##### Stream output
 
 | Byte 1 | Bytes 2-4 |  Description                                   |
 |:-------|-----------|:-----------------------------------------------|
-|    1   |     1     |  gulcalc item stream **(deprecated)**          |
-|    1   |     2     |  gulcalc coverage stream **(deprecated)**      |
 |    2   |     1     |  loss stream                                   |
 
 ##### Parameters
 Required parameters are;
 * -S{number}. Number of samples
-* -a{number} -i{destination} . Specifies stdout option 2/1 loss stream with an allocation option
-**or**
-* -c and/or -i {destination}. Specifies stdout option 1/1 gulcalc coverage or 1/2 gulcalc item stream respectively. 
+* -a{number} -i{destination}
 
 The destination is either a filename or named pipe, or use - for standard output.
 
@@ -135,16 +127,10 @@ $ gulcalc [parameters] < [stdin].bin
 
 ##### Example
 ```
-'To stdout loss stream
 $ eve 1 1 | getmodel | gulcalc -R1000000 -S100 -a1 -i - | fmcalc > fmcalc.bin
 $ eve 1 1 | getmodel | gulcalc -R1000000 -S100 -a1 -i - | summarycalc -i -1 summarycalc1.bin
 $ eve 1 1 | getmodel | gulcalc -r -S100 -a1 -i gulcalci.bin
 $ gulcalc -r -S100 -i -a1 gulcalci.bin < getmodel.bin 
-'To stdout gulcalc coverage and item stream (deprecated)
-$ eve 1 1 | getmodel | gulcalc -R1000000 -S100 -c - | summarycalc -g -1 summarycalc1.bin
-$ eve 1 1 | getmodel | gulcalc -R1000000 -S100 -i - | fmcalc > fmcalc.bin
-$ eve 1 1 | getmodel | gulcalc -r -S100 -i gulcalci.bin -c gulcalcc.bin
-$ gulcalc -r -S100 -i gulcalci.bin -c gulcalcc.bin < getmodel.bin 
 ```
 
 ##### Internal data
@@ -158,14 +144,17 @@ If the user specifies -r as a parameter, then the program also picks up a random
 * static/random.bin
 
 ##### Calculation
-The stdin stream is a block of cdfs which are ordered by event_id, areaperil_id, vulnerability_id and bin_index asccending, from getmodel. The gulcalc program constructs a cdf for each item, based on matching the areaperil_id and vulnerability_id from the stdin and the item file.
+The stdin stream is a block of cdfs which are ordered by event_id, areaperil_id, vulnerability_id and bin_index ascending, from getmodel. The gulcalc program constructs a cdf for each item, based on matching the areaperil_id and vulnerability_id from the stdin and the item file.
 
-For each item cdf and for the number of samples specified, the program draws a random number and uses it to sample ground up loss from the cdf using one of three methods, as follows;
+###### Random sampling
+Random samples are indexed using positive integers starting from 1, called the 'sidx', or sample index.
+
+For each item cdf and for the number of samples specified, the program draws a uniformly distributed random number and uses it to sample ground up loss from the cdf using one of three methods, as follows;
 
 For a given damage interval corresponding to a cumulative probability interval that each random number falls within;
 * If the conditional mean damage (of the cdf) is the mid-point of the damage bin interval (of the damage bin dictionary) then the gulcalc program performs linear interpolation. 
-* If the conditional mean damage is equal to the lower and upper damage threshold of the damage bin interval (i.e the bin represents a damage value, not a range) then that value is sampled.
-* Else, the gulcalc program performs quadrative interpolation using the bin_mean to calculate the quadratic equation in the damage interval.
+* If the conditional mean damage is equal to the lower and upper damage threshold of the damage bin interval (i.e the bin represents a point value, not a range) then that point value is sampled.
+* Else, the gulcalc program performs quadrative interpolation using the bin_mean to calculate the quadratic equation in the damage interval. The bin mean must lie within the middle third of the damage interval to generate a valid quadrative cdf. This requirement comes from the necessary condition that the probability density function must be >= 0 across the entire damage interval.
 
 An example of the three cases and methods is given below;
  
@@ -183,22 +172,46 @@ The default random number behaviour (no additional parameters) is to generate ra
 
 Each sampled damage is multiplied by the item TIV, looked up from the coverage file.
 
-The mean and standard deviation of ground up loss is also calculated. For each cdf, the mean and standard deviation of damage is calculated by numerical integration of the effective damageability probability distribution and the result is multiplied by the TIV. The results are included in the output to the stdout stream as sidx=-1 (mean) and sidx=-2 (standard deviation), for each event and item (or coverage).
+###### Special samples
 
-At this stage, there are three possible output streams, as follows;
+Samples with negative indexes have special meanings as follows;
 
-* stream 1/1: If the -i parameter is specified, then the ground up losses for the items are output to the gulcalc item stream.
-* stream 1/2: If the -c parameter is specified, then the ground up losses for the items are grouped by coverage_id and capped to the coverage TIV, and the ground up losses for the coverages are output to the stream.
-* stream 2/1: If the -i and -a{} parameters are specified, then the ground up losses for the items are capped by coverage and back-allocated to items using the allocation method specified by the number provided to parameter a, and output to the loss stream.
+| sidx     | description                               |
+|:---------| :-----------------------------------------|
+|    -1    | Numerical integration mean                |
+|    -2    | Numerical integration standard deviation  |
+|    -3    | Impacted exposure 						   |
+|    -4    | Chance of loss                            |
+|    -5    | Maximum loss                              |
 
-Stream 2/1 also contains a loss sample for sidx -3, which is the 100% damage scenario for all items with the specified allocation method applied to it.
+* The numerical integration mean, sidx=-1, is computed by a sum across all damage bins of the product of the damage bin mean, the probability density (the difference between consecutive damage bin prob_to values) and the item TIV looked up from the coverage file.
+* The numerical integration standard deviation, sidx=-2, is not currently computed.
+* The impacted exposure, sidx=-3 represents the 100% damage scenario to all items impacted by (within the footprint of) an event. It is 1 multiplied by the item TIV looked up from the coverage file.
+* The chance of loss, sidx -4, is the probability that, conditional on the event occurring, the damage/loss is greater than zero. This value is computed directly from the damage distribution. Its value is 1 if the upper threshold of the first damage bin is non-zero (meaning no chance of zero damage), else it is 1 - prob_to of the first damage bin.
+* The maximum loss, sidx -5, represents the maximum possible loss computed from the damage distribution. This is the upper damage threshold of the first damage bin which has prob_to = 1, multiplied by the item TIV from the coverage file. 
+
+###### Allocation method
+
+The allocation method determines how item losses are adjusted when a coverage is subject to losses from multiple perils, because the total loss to a coverage from mutiple perils cannot exceed the input TIV. This situation is identified when multiple item_ids in the item file share the same coverage_id.  The TIV is held in the coverages file against the coverage_id and the item_id TIV is looked up from its relationship to coverage_id in the item file.
+
+The allocation methods are as follows;
+
+|  	a         | description                                                                  |
+|:------------| :-----------------------------------------------------------------------------------------------------------------------------|
+| 0           | Pass losses through unadjusted (used for single peril models)                                                                 |
+| 1           | Sum the losses and cap them to the TIV. Back-allocate TIV to the contributing items in proportion to the unadjusted losses    |
+| 2           | Keep the maximum subperil loss and set the others to zero. Back-allocate equally when there are equal maximum losses          |
+
+The mean, impacted exposure and maximum loss special samples are also subject to these allocation rules. 
+The impacted exposure value, sidx -3, is always back-allocated equally to the items, for allocation rules 1 and 2, since by definition it is the same value for all items related to the same coverage.
+
 
 [Return to top](#corecomponents)
 
 <a id="fmcalc"></a>
 ### fmcalc
 ***
-fmcalc is the reference implementation of the Oasis Financial Module. It applies policy terms and conditions to the ground up losses and produces loss sample output.  It reads in losses from gulcalc at item level (gulcalc item stream 1/1 or loss stream 2/1) and it can run recursively on losses output from fmcalc (loss stream 2/1) and apply several consecutive sets of policy terms and conditions. 
+fmcalc is the reference implementation of the Oasis Financial Module. It applies policy terms and conditions to the ground up losses and produces loss sample output.  It reads in the loss stream from either gulcalc or from another fmcalc and can be called recursively and apply several consecutive sets of policy terms and conditions. 
 
 ##### Stream output
 
@@ -248,7 +261,8 @@ For loss stream input from either gulcalc or fmcalc, the program requires only t
 The location of the files can be changed by using the -p parameter followed by the path location relative to the present working directory. eg -p ri1
 
 ##### Calculation
-See [Financial Module](FinancialModule.md)
+
+fmcalc passes the loss samples, including the numerical integration mean, sidx -1, and impacted exposure, sidx -3, through a set of financial calculations which are defined by the input files. The special samples -2, -4 and -5 are ignored and dropped in the output. For more information about the calculation see [Financial Module](FinancialModule.md)
 
 [Return to top](#corecomponents)
 
@@ -267,7 +281,7 @@ The output is similar to the gulcalc or fmcalc input which are losses are by sam
 
 ##### Parameters
 
-The input stream should be identified explicitly as -g for gulcalc item stream, -i for gulcalc loss stream or -f for fmcalc loss stream.
+The input stream should be identified explicitly as -i input from gulcalc or -f input from fmcalc.
 
 summarycalc supports up to 10 concurrent outputs.  This is achieved by explictly directing each output to a named pipe, file, or to standard output.  
 
@@ -304,15 +318,20 @@ $ summarycalc -f -1 fmsummarycalc.bin < fmcalc.bin
 ```
 
 ##### Internal data
-The program requires the gulsummaryxref file for gulcalc input (-g or -i option), or the fmsummaryxref file for fmcalc input (-f option). This data is picked up from the following files relative to the working directory;
+The program requires the gulsummaryxref file for gulcalc input (-i option), or the fmsummaryxref file for fmcalc input (-f option). This data is picked up from the following files relative to the working directory;
 
 * input/gulsummaryxref.bin
 * input/fmsummaryxref.bin
 
 ##### Calculation
-summarycalc takes either ground up loss (by coverage_id -g or by item_id -i) or insured loss samples (by output_id -f) as input and aggregates them to a user-defined summary reporting level. The output is similar to the input which are losses are by sample index and by event, but the ground up or insured losses are grouped to an abstract level represented by a summary_id.  The relationship between the input identifier, item_id or coverage_id for gulcalc or output_id for fmcalc, and the summary_id are defined in the internal data files.
+summarycalc takes either ground up loss from gulcalc or financial loss samples from fmcalc as input and aggregates them to a user-defined summary reporting level. The output is similar to the input which are losses are by sample index and by event, but the ground up or financial losses are summed to an abstract level represented by a summary_id.  The relationship between the input identifier, item_id for gulcalc or output_id for fmcalc, and the summary_id are defined in the input files.
 
-For gulcalc coverage stream (1/2) input, summarycalc also calculates the maximum exposure value by summary_id and event_id. This is carried through in the stream header and output by eltcalc, aalcalc and pltcalc. For gulcalc coverage stream this is the sum of TIV for all coverages which intersect with a given event footprint on the basis of areaperil_id (regardless or not of whether there are any sampled losses). For gulcalc or fmcalc loss stream (2/1) input , this is the sum of the losses for sample index -3.  Sample index -3 is the 100% loss scenario for all impacted items passed through the financial module calculations.  Because the event footprints vary geographically, the value can be different for each event.
+The special samples are computed as follows;
+
+* The numerical integration mean, sidx -1, impacted exposure, sidx -3, maximum loss value, sidx -5, are treated as normal samples and summed to each summary_id.
+* The numerical integration standard deviation, sidx -2, is dropped.
+* From gulcalc input only, the chance of loss, sidx -4, at a given summary level is aggregated using the law of total probability, evaluated as  1 - probability all items under a summary_id have zero loss.
+1- (1-C1)(1-C2)...(1-CN) where C1, C2, ..CN represents the chance of loss for item 1,2..N under each summary_id, which are present in the gulcalc stream.
 
 [Return to top](#corecomponents)
 

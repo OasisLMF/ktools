@@ -142,7 +142,6 @@ namespace kat {
 
 	void DoKatSort(std::vector<FILE*>& inFiles) {
 
-		char line[4096];
 		std::map<int, fin_data> data_elt;
 		std::map<period_event, fin_data> data_plt;
 		int expectedNArgs = 0;

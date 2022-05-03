@@ -190,8 +190,8 @@ Samples with negative indexes have special meanings as follows;
 |    -4    | Chance of loss                            |
 |    -5    | Maximum loss                              |
 
-* The numerical integration mean, sidx=-1, is computed by a sum across all damage bins of the product of the damage bin mean, the probability density (the difference between consecutive damage bin prob_to values) and the item TIV looked up from the coverage file.
-* The numerical integration standard deviation, sidx=-2, is not currently computed.
+* The numerical integration mean loss, sidx=-1, is computed by multiplying the item TIV looked up from the coverage file with the mean damage. The mean damage is computed by a sum across all damage bins of the product of the damage bin mean and the probability density (the difference between consecutive damage bin prob_to values).
+* The numerical integration standard deviation of loss, sidx=-2, is computed by multiplying the item TIV looked up from the coverage file with the standard deviation of damage. The standard deviation of damage is the sqrt of the sum across all damage bins of the product of the squared errors between the numerical integration mean damage and each damage bin mean with the probability density (the difference between consecutive damage bin prob_to values).
 * The impacted exposure, sidx=-3 represents the 100% damage scenario to all items impacted by (within the footprint of) an event. It is 1 multiplied by the item TIV looked up from the coverage file.
 * The chance of loss, sidx -4, is the probability that, conditional on the event occurring, the damage/loss is greater than zero. This value is computed directly from the damage distribution. Its value is 1 if the upper threshold of the first damage bin is non-zero (meaning no chance of zero damage), else it is 1 - prob_to of the first damage bin.
 * The maximum loss, sidx -5, represents the maximum possible loss computed from the damage distribution. This is the upper damage threshold of the first damage bin which has prob_to = 1, multiplied by the item TIV from the coverage file. 
@@ -330,7 +330,7 @@ The program requires the gulsummaryxref file for gulcalc input (-i option), or t
 * input/fmsummaryxref.bin
 
 ##### Calculation
-summarycalc takes either ground up loss from gulcalc or financial loss samples from fmcalc as input and aggregates them to a user-defined summary reporting level. The output is similar to the input which are losses are by sample index and by event, but the ground up or financial losses are summed to an abstract level represented by a summary_id.  The relationship between the input identifier, item_id for gulcalc or output_id for fmcalc, and the summary_id are defined in the input files.
+summarycalc takes either ground up loss from gulcalc or financial loss samples from fmcalc as input and aggregates them to a user-defined summary reporting level. The output is similar to the input, individual losses by sample index and by event, but the ground up or financial losses are summed to an abstract level represented by a summary_id.  The relationship between the input identifier, item_id for gulcalc or output_id for fmcalc, and the summary_id are defined in the input files.
 
 The special samples are computed as follows;
 

@@ -50,11 +50,11 @@ Reserved stream_ids;
 |:---------|--------------|:---------------------------------------------------------------------------------|
 |    0     |     1        |  cdf - Oasis format effective damageability CDF output                           |
 |	 1     |     1        |  gulcalc - Oasis format item level ground up loss sample output (deprecated)     |
-|    1     |     1        |  gulcalc - Oasis format coverage level ground up loss sample output (deprecated) |
+|    1     |     2        |  gulcalc - Oasis format coverage level ground up loss sample output (deprecated) |
 |    2     |     1        |  loss -  Oasis format loss sample output (any loss perspective)                  |
 |    3     |     1        |  summary - Oasis format summary level loss sample output                         |
 
-The supported standard input and output streams of the Reference model components are summarized here;
+The supported standard input and output streams of the reference model components are summarized here;
 
 | Component    | Standard input                        |  Standard output                      | Stream option parameters          			|
 |:-------------|:--------------------------------------|:--------------------------------------|:-------------------------------------------|

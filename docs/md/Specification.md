@@ -7,7 +7,7 @@ This section specifies the data stream structures and core components in the in-
 
 The data stream structures are;
 * **[cdf stream](#cdf)**
-* **[gulcalc stream](#gulstream)**
+* gulcalc stream(deprecated)
 * **[loss stream](#loss)**
 * **[summary stream](#summary)**
 
@@ -37,36 +37,32 @@ The current reserved values are as follows;
 
 Higher byte;
 
-| Byte 1 |  Stream name  |
-|:-------|:--------------|
-|    0   | cdf           |
-|    1   | gulcalc       |
-|    2   | loss          |
-|    3   | summary       |
+| Byte 1 |  Stream name  		|
+|:-------|:---------------------|
+|    0   | cdf          		|
+|    1   | gulcalc (deprecated) |
+|    2   | loss          		|
+|    3   | summary       		|
 
 Reserved stream_ids;
 
 | Byte 1   | Bytes 2-4    |  Description                                                             		         
-|:---------|--------------|:-------------------------------------------------------------------------------------|
-|    0     |     1        |  cdf - Oasis format effective damageability CDF output                               |
-|    1     |     1        |  gulcalc -  Oasis format item level ground up loss sample output **(deprecated)**    |
-|    1     |     2        |  gulcalc - Oasis format coverage level ground up loss sample output **(deprecated)** |
-|    2     |     1        |  loss -  Oasis format loss sample output (any loss perspective)                      |
-|    3     |     1        |  summary - Oasis format summary level loss sample output                             |
+|:---------|--------------|:---------------------------------------------------------------------------------|
+|    0     |     1        |  cdf - Oasis format effective damageability CDF output                           |
+|	 1     |     1        |  gulcalc - Oasis format item level ground up loss sample output (deprecated)     |
+|    1     |     2        |  gulcalc - Oasis format coverage level ground up loss sample output (deprecated) |
+|    2     |     1        |  loss -  Oasis format loss sample output (any loss perspective)                  |
+|    3     |     1        |  summary - Oasis format summary level loss sample output                         |
 
-The supported standard input and output streams of the Reference model components are summarized here;
+The supported standard input and output streams of the reference model components are summarized here;
 
-| Component    | Standard input                        |  Standard output                      | Stream option parameters          |
-|:-------------|:--------------------------------------|:--------------------------------------|:----------------------------------|
-| getmodel     | none                                  | 0/1 cdf                               | none                              |
-| gulcalc      | 0/1 cdf                               | 1/1 gulcalc item **(deprecated)**     | -i                                |
-| gulcalc      | 0/1 cdf                               | 1/2 gulcalc coverage **(deprecated)** | -c                                |
-| gulcalc      | 0/1 cdf                               | 2/1 loss                              | -i -a{}                           |
-| fmcalc       | 1/1 gulcalc item  **(deprecated)**    | 2/1 loss                              | none                              |
-| fmcalc       | 2/1 loss                              | 2/1 loss                              | none                              |
-| summarycalc  | 1/2 gulcalc coverage  **(deprecated)**| 3/1 summary                           | -g                                | 
-| summarycalc  | 2/1 loss                              | 3/1 summary                           | -i gulcalc input, -f fmcalc input | 
-| outputcalc   | 3/1 summary                           | none                                  | none                              | 
+| Component    | Standard input                        |  Standard output                      | Stream option parameters          			|
+|:-------------|:--------------------------------------|:--------------------------------------|:-------------------------------------------|
+| getmodel     | none                                  | 0/1 cdf                               | none                              			|
+| gulcalc      | 0/1 cdf                               | 2/1 loss                              | -i -a{}                           			|
+| fmcalc       | 2/1 loss                              | 2/1 loss                              | none                              			|
+| summarycalc  | 2/1 loss                              | 3/1 summary                           | -i input from gulcalc, -f input from fmcalc| 
+| outputcalc   | 3/1 summary                           | none                                  | none                              			| 
 
 
 ## Stream structure
@@ -98,76 +94,6 @@ Data packet structure (record repeated no_of_bin times)
 
 [Return to top](#specification)
 
-<a id="gulstream"></a>
-### gulcalc item stream (deprecated)
-
-Stream header packet structure
-
-| Name              | Type   |  Bytes | Description                                                         | Example     |
-|:------------------|--------|--------| :-------------------------------------------------------------------|------------:|
-| stream_id         | int    |   1/3  | Identifier of the data stream type.                                 |    1/1      |
-| no_of_samples     | int    |   4    | Number of samples                                                   |    100      |
-
-Data header packet structure
-
-| Name              | Type   |  Bytes | Description                                                         | Example     |
-|:------------------|--------|--------| :-------------------------------------------------------------------|------------:|
-| event_id          | int    |    4   | Oasis event_id                                                      |   4545      |
-| item_id           | int    |    4   | Oasis item_id                                                       |    300      |
-
-Data packet structure
-
-| Name              | Type   |  Bytes | Description                                                         | Example     |
-|:------------------|--------|--------| :-------------------------------------------------------------------|------------:|
-| sidx              | int    |    4   | Sample index                                                        |    10       |
-| loss              | float  |    4   | The ground up loss for the sample                                   | 5675.675    |
-
-The data packet may be a variable length and so an sidx of 0 identifies the end of the data packet.
-
-There are two values of sidx with special meaning as follows;
-
-| sidx   |  Meaning                                      | Required / optional |
-|:-------|:----------------------------------------------|---------------------|
-|   -1   | numerical integration mean loss               |   required          |
-|   -2   | numerical integration standard deviation loss |   required          |
-
-sidx -1 and -2 must come at the beginning of the data packet before the other samples.
-
-### gulcalc coverage stream (deprecated)
-
-The main difference from the gulcalc item stream is that the field in the gulcalc header packet structure is coverage_id, representing a grouping of item_id, rather than item_id. The distinction and rationale for having this as a alternative stream is explained in the Reference Model section.  
-
-Stream header packet structure
-
-| Name              | Type   |  Bytes | Description                                                         | Example     |
-|:------------------|--------|--------| :-------------------------------------------------------------------|------------:|
-| stream_id         | int    |   1/3  | Identifier of the data stream type.                                 |    1/2      |
-| no_of_samples     | int    |   4    | Number of samples                                                   |    100      |
-
-Data header packet structure
-
-| Name              | Type   |  Bytes | Description                                                         | Example     |
-|:------------------|--------|--------| :-------------------------------------------------------------------|------------:|
-| event_id          | int    |    4   | Oasis event_id                                                      |   4545      |
-| coverage_id       | int    |    4   | Oasis coverage_id                                                   |    150      |
-
-Data packet structure
-
-| Name              | Type   |  Bytes | Description                                                         | Example     |
-|:------------------|--------|--------| :-------------------------------------------------------------------|------------:|
-| sidx              | int    |    4   | Sample index                                                        |    10       |
-| loss              | float  |    4   | The ground up loss for the sample                                   | 5675.675    |
-
-Only the numerical integration mean loss is output.
-
-| sidx   |  Meaning                                 | Required / optional |
-|:-------|:-----------------------------------------|---------------------|
-|   -1   | numerical integration mean loss          |      required       |
-
-sidx -1 must come at the beginning of the data packet before the other samples.
-
-[Return to top](#specification)
-
 <a id="loss"></a>
 ### loss stream
 
@@ -194,17 +120,17 @@ Data packet structure
 
 The data packet may be a variable length and so a sidx of 0 identifies the end of the data packet.
 
-There are three values of sidx with special meaning as follows;
+There are five values of sidx with special meaning as follows;
 
 | sidx   |  Meaning                                      | Required / optional|
 |:-------|:----------------------------------------------|--------------------|
-|   -3   | maximum exposure value                        |   required         |
+|   -5   | maximum loss                                  |   optional         |
+|	-4	 | chance of loss                                |   optional         |
+|   -3   | impacted exposure                             |   required         |
 |   -2   | numerical integration standard deviation loss |   optional         |
 |   -1   | numerical integration mean loss               |   required         |
 
-sidx -3 to -1 must come at the beginning of the data packet before the other samples.  
-Note: because exposure value (sidx = -3) is state information used by the other samples it must be the first
-sidx in the stream.
+sidx -5 to -1 must come at the beginning of the data packet before the other samples in ascending order (-5 to -1).  
 
 [Return to top](#specification)
 
@@ -216,14 +142,15 @@ Stream header packet structure
 |:------------------|--------|--------| :------------------------------------|------------:|
 | stream_id         | int    |   1/3  | Identifier of the data stream type.  |    3/1      |
 | no_of_samples     | int    |   4    | Number of samples                    |    100      |
+| summary_set       | int    |   4    | Identifier of the summary set        |    2        |
 
 Data header packet structure
 
-| Name              | Type   |  Bytes | Description                                          | Example     |
-|:------------------|--------|--------| :----------------------------------------------------|------------:|
-| event_id          | int    |    4   | Oasis event_id                                       |   4545      |
-| summary_id        | int    |    4   | Oasis summary_id                                     |    300      |
-| exposure_value    | float  |    4   | Exposure value (sum of sidx -3 losses for summary_id)|    987878   |
+| Name              | Type   |  Bytes | Description                                             | Example     |
+|:------------------|--------|--------| :-------------------------------------------------------|------------:|
+| event_id          | int    |    4   | Oasis event_id                                          |   4545      |
+| summary_id        | int    |    4   | Oasis summary_id                                        |    300      |
+| exposure_value    | float  |    4   | Impacted exposure (sum of sidx -3 losses for summary_id)|    987878   |
 
 Data packet structure
 
@@ -260,16 +187,14 @@ getmodel is the component which generates a stream of effective damageability cd
 <a id="gulcalc"></a>
 ### gulcalc 
 
-gulcalc is the component which calculates ground up loss. It takes the getmodel output as standard input and based on the sampling parameters specified, performs Monte Carlo sampling and numerical integration. The output is a stream of ground up loss samples in Oasis kernel format, with numerical integration mean (sidx=-1), standard deviation (sidx=-2) and exposure_value (sidx =-3).
+gulcalc is the component which calculates ground up loss. It takes the getmodel output as standard input and based on the sampling parameters specified, performs Monte Carlo sampling and numerical integration. The output is a stream of ground up loss samples in Oasis kernel format with random samples identified by positive sample indexes (sidx 1 and greater), and special meaning samples assigned to negative sample indexes.
 
-The maximum exposed value, sidx=-3 represents the 100% ground up loss scenario to all items impacted by an event and is used by outputs that require an exposure value.
+gulcalc also supports the combining and back-allocation of losses arising from multiple subperils impacting the same coverage with some options.
 
 <a id="fmcalc"></a>
 ### fmcalc 
 
-fmcalc is the component which takes the gulcalc output stream as standard input and applies the policy terms and conditions to produce insured loss samples. fmcalc can also take the fmcalc output stream as input to perform recursive financial module calculations (e.g for the application of reinsurance terms). The output is a table of loss samples in Oasis kernel format, including the (re)insured loss for the numerical integration mean ground up loss (sidx=-1) and the maximum exposed value (sidx=-3).
-
-The maximum exposed value, sidx=-3 represents the 100% loss scenario to all items impacted by an event after applying the (re)insurance terms and conditions and is used by outputs that require an exposure value.
+fmcalc is the component which takes the loss stream as standard input and output and applies the policy terms and conditions to produce insured loss samples. fmcalc can be called recursively to perform multiple sequential applications of financial terms (e.g for inuring reinsurance following direct insurance). The output is a table of loss samples in Oasis kernel format, including the (re)insured loss for the numerical integration mean (sidx=-1), and the impacted exposure (sidx=-3). 
 
 <a id="summarycalc"></a>
 ### summarycalc
@@ -279,14 +204,15 @@ summarycalc is a component which sums the sampled losses from either gulcalc or 
 <a id="outputcalc"></a>
 ### outputcalc 
 
-Outputcalc is a general term for an end-of-pipeline component which represents one of a potentially unlimited set of output components. Four examples are provided in the Reference Model. These are; 
+Outputcalc is a general term for an end-of-pipeline component which represents one of a potentially unlimited set of output components. Some examples are provided in the Reference Model. These are; 
 
 * eltcalc
 * leccalc
 * aalcalc
 * pltcalc
+* ordleccalc
 
-outputcalc performs results analysis such as an event loss table or loss exceedance curve on the sampled output from summarycalc.  The output is a results table in csv format. 
+The output components generate results such as an event loss table or loss exceedance curve from the sampled output from summarycalc.  The output is a results table in csv format or parquet format. 
 
 [Return to top](#specification)
 

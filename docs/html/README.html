@@ -379,7 +379,18 @@ code {
 <p>This issue will be handled in future releases by implementing the rdrand random number generator in all environments.</p>
 <h2 id="linux-installation">Linux Installation</h2>
 <h3 id="pre-requisites">Pre-requisites</h3>
-<p>The g++ compiler build-essential, libtool, zlib1g-dev autoconf on debian distros or 'Development Tools' and zlib-devel on red hat  needs to be installed in Linux.</p>
+<p>The g++ compiler build-essential, libtool, zlib1g-dev, autoconf, pkg-config on debian distros or 'Development Tools' and zlib-devel on red hat  needs to be installed in Linux.</p>
+<p>To enable Parquet format outputs (optional), version 7.0.0 of the Arrow Apache library is required. The recommended method is to build the library from source as follows;</p>
+<pre class="hljs"><code><div>$ mkdir build
+$ cd build
+$ git clone https://github.com/apache/arrow.git -b release-7.0.0
+$ mkdir -p arrow/cpp/build-release
+$ cd build/arrow/cpp/build-release
+$ cmake -DARROW_PARQUET=ON -DARROW_BUILD_STATIC=ON -DARROW_OPTIONAL_INSTALL=ON ..
+$ make -j$(nproc)
+$ make install
+</div></code></pre>
+<p><a href="https://arrow.apache.org/docs/developers/cpp/building.html">More information on Arrow Apache</a>.</p>
 <h3 id="instructions">Instructions</h3>
 <p>Copy ktools-[version].tar.gz onto your machine and untar.</p>
 <pre class="hljs"><code><div>$ tar -xvf ktools-[version].tar.gz
@@ -390,6 +401,9 @@ $ ./autogen.sh
 </div></code></pre>
 <p>Configure using the following command;</p>
 <pre class="hljs"><code><div>$ ./configure
+</div></code></pre>
+<p>The configure script will attempt to find and link the appropriate Apache libraries to enable Parquet format output.  This search for these libraries can be disabled manually with an extra flag:</p>
+<pre class="hljs"><code><div>$ ./configure --disable-parquet
 </div></code></pre>
 <p>On OS X add an extra flag:</p>
 <pre class="hljs"><code><div>$ ./configure --<span class="hljs-built_in">enable</span>-osx

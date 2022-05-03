@@ -24,7 +24,21 @@ This issue will be handled in future releases by implementing the rdrand random 
 
 ### Pre-requisites
 
-The g++ compiler build-essential, libtool, zlib1g-dev autoconf on debian distros or 'Development Tools' and zlib-devel on red hat  needs to be installed in Linux.
+The g++ compiler build-essential, libtool, zlib1g-dev, autoconf, pkg-config on debian distros or 'Development Tools' and zlib-devel on red hat  needs to be installed in Linux.
+
+To enable Parquet format outputs (optional), version 7.0.0 of the Arrow Apache library is required. The recommended method is to build the library from source as follows; 
+
+```
+$ mkdir build
+$ cd build
+$ git clone https://github.com/apache/arrow.git -b release-7.0.0
+$ mkdir -p arrow/cpp/build-release
+$ cd build/arrow/cpp/build-release
+$ cmake -DARROW_PARQUET=ON -DARROW_BUILD_STATIC=ON -DARROW_OPTIONAL_INSTALL=ON ..
+$ make -j$(nproc)
+$ make install
+```
+[More information on Arrow Apache](https://arrow.apache.org/docs/developers/cpp/building.html).
 
 ### Instructions
 
@@ -44,14 +58,14 @@ Configure using the following command;
 $ ./configure
 ```
 
+The configure script will attempt to find and link the appropriate Apache libraries to enable Parquet format output.  This search for these libraries can be disabled manually with an extra flag:
+```
+$ ./configure --disable-parquet
+```
+
 On OS X add an extra flag:
 ``` sh
 $ ./configure --enable-osx
-```
-
-The configure script will attempt to find and link the appropriate Apache libraries to enable Parquet format output from the components `aalcalc`, `eltcalc`, `ordleccalc`, `pltcalc` and `summarycalctocsv`. If they are not found, this option will be disabled. These libraries can be either [built from source](https://arrow.apache.org/docs/developers/cpp/building.html) or [installed from precompiled binaries](https://arrow.apache.org/install/#c-and-glib-c-packages-for-debian-gnulinux-ubuntu-almalinux-centos-and-amazon-linux). This search for these libraries can be disabled manually with an extra flag:
-```
-$ ./configure --disable-parquet
 ```
 
 Make using the following command;

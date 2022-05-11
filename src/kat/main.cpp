@@ -57,7 +57,7 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #endif
 
 namespace kat {
-	void doitsort(std::vector <FILE*>& infiles);
+	void DoKatSort(std::vector<FILE*> &inFiles);
 	void doit(std::vector <FILE*>& infiles);
 	void setinitdone(int processid);
 } // namespace kat
@@ -81,7 +81,7 @@ void help()
 	fprintf(stderr,
 		"-P process_id\n"
 		"-d path for concatenation\n"
-		"-s sort by event ID (only supported for eltcalc output)\n"
+		"-u do not sort by event/period ID\n"
 		"-h help\n"
 		"-v version\n"
 	);
@@ -94,9 +94,9 @@ int main(int argc, char* argv[])
 
 	int opt;
 	int processid = 0;
-	bool sortevents = false;
+	bool noSort = false;
 	std::string path;
-	while ((opt = getopt(argc, argv, "d:P:svh")) != -1) {
+	while ((opt = getopt(argc, argv, "d:P:uvh")) != -1) {
 		switch (opt) {
 		case 'P':
 			processid = atoi(optarg);
@@ -105,8 +105,8 @@ int main(int argc, char* argv[])
 			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
 			::exit(EXIT_FAILURE);
 			break;
-		case 's':
-			sortevents = true;
+		case 'u':
+			noSort = true;
 			break;
 		case 'd':
 			path = optarg;
@@ -176,12 +176,8 @@ int main(int argc, char* argv[])
 	try {
 		initstreams();
 		kat::setinitdone(processid);
-		if (sortevents) {
-			// No need to sort if there is only one input file
-			if (infiles.size() == 1) kat::doit(infiles);
-			else kat::doitsort(infiles);
-		}
-		else kat::doit(infiles);
+		if (noSort) kat::doit(infiles);
+		else kat::DoKatSort(infiles);
 	}
 	catch (std::bad_alloc&) {
 		fprintf(stderr, "FATAL: %s: Memory allocation failed\n", progname);

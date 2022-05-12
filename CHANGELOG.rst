@@ -1,6 +1,14 @@
 Ktools Changelog
 ================
 
+`v3.8.1`_
+ ---------
+* [#285](https://github.com/OasisLMF/ktools/pull/288) - Investigate failure of output parquet file validation tests
+* [#289](https://github.com/OasisLMF/ktools/pull/289) - Fix/286 docs
+* [#281, #182](https://github.com/OasisLMF/ktools/pull/290) - Sort all table types by event/period ID by default with kat
+* [#297](https://github.com/OasisLMF/ktools/pull/298) - katparquet sorts Period Loss Tables by event ID only
+.. _`v3.8.1`:  https://github.com/OasisLMF/ktools/compare/v3.8.0...v3.8.1
+
 `v3.8.0`_
  ---------
 * [#280](https://github.com/OasisLMF/ktools/pull/280) - ORD outputs tests

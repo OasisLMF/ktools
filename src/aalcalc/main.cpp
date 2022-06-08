@@ -27,6 +27,7 @@ void help()
 	fprintf(stderr, "-K workspace sub folder\n");
 	fprintf(stderr, "-o Open Results Data (ORD) output\n");
 	fprintf(stderr, "-p [filename] ORD output in parquet format\n");
+	fprintf(stderr, "-c [filename] Average Loss Convergence Table (ALCT)\n");
 	fprintf(stderr, "-s skip header\n");
 	fprintf(stderr, "-v version\n");
 	fprintf(stderr, "-h help\n");
@@ -43,7 +44,9 @@ int main(int argc, char* argv[])
 	bool ord_output = false;   // csv output
 	std::string parquet_outFile;   // parquet output
 	bool parquet_output = false;   // parquet output
-	while ((opt = getopt(argc, argv, (char *)"swvdohK:p:")) != -1) {
+	std::string alct_outFile;   // Average Loss Convergence Table (ALCT)
+	bool alct_output = false;   // ALCT
+	while ((opt = getopt(argc, argv, (char *)"svdohK:p:c:")) != -1) {
 		switch (opt) {
 		case 'v':
 #ifdef HAVE_PARQUET
@@ -67,6 +70,10 @@ int main(int argc, char* argv[])
 		case 'p':
 			parquet_output = true;
 			parquet_outFile = optarg;
+			break;
+		case 'c':
+			alct_output = true;
+			alct_outFile = optarg;
 			break;
 		case 'd':
 			debug = true;			
@@ -107,7 +114,7 @@ int main(int argc, char* argv[])
 	
 	try {
 		aalcalc a(skipheader, ord_output, parquet_output,
-			  parquet_outFile);
+			  parquet_outFile, alct_output, alct_outFile);
 		if (debug == true) {
 			a.debug(subfolder);
 		}

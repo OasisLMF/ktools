@@ -152,6 +152,29 @@ void aalcalc::loadoccurrence()
 
 }
 
+void aalcalc::getsamplesizes()
+{
+	// Sample size subsets are fixed and non-overlapping, increasing in size
+	// by a factor of 2^n, where n = subset number,
+	// i.e. for 10 samples, sets are (1), (2, 3), (4, 5, 6, 7)
+	// for 20 samples, sets are (1), (2, 3), (4, 5, 6, 7),
+	//                          (8, 9, 10, 11, 12, 13, 14, 15)
+	//                          
+	// (1 << 0) + ((1 << 0) >> 1) = 1 + 0 = 1
+	// (1 << 1) + ((1 << 1) >> 1) = 2 + 1 = 3
+	// (1 << 2) + ((1 << 2) >> 1) = 4 + 2 = 6
+	// (1 << 3) + ((1 << 3) >> 1) = 8 + 4 = 12
+	if (alct_output_) {
+		int i = 0;
+		while (((1 << i) + ((1 << i) >> 1)) <= samplesize_) {
+			vec_sample_aal_[1 << i].resize(max_summary_id_ + 1);
+			i++;
+		}
+	}
+	if (samplesize_ != 1)
+		vec_sample_aal_[samplesize_].resize(max_summary_id_ + 1);
+}
+
 void aalcalc::indexevents(const std::string& fullfilename, std::string& filename) {
 	FILE* fin = fopen(fullfilename.c_str(), "rb");
 	if (fin == NULL) {
@@ -241,7 +264,6 @@ void savesummaryIndex(const std::string& subfolder,const std::map<int, std::vect
 			xx.event_id = iter2->event_id;
 			xx.fileindex = iter2->fileindex;
 			xx.offset = iter2->offset;
-			//fprintf(fout, "%d,%d,%d,%lld\n", iter->first, iter2->event_id,iter2->fileindex,iter2->offset);
 			fwrite(&xx, sizeof(xx),1, fout);
 			iter2++;
 		}
@@ -301,6 +323,17 @@ void aalcalc::load_event_to_summary_index(const std::string& subfolder)
 	exit(-1);
 }
 
+inline void aalcalc::fillensemblerec(const int sidx, const double mean,
+				     const double weighting)
+{
+	int current_ensemble_id = sidxtoensemble_[sidx];
+	aal_rec_ensemble& ea = vec_ensemble_aal_[max_ensemble_id_ * (current_summary_id_ - 1) + current_ensemble_id];
+	ea.summary_id = current_summary_id_;
+	ea.type = 2;
+	ea.ensemble_id = current_ensemble_id;
+	ea.mean += mean * weighting;
+	ea.mean_squared += mean * mean * weighting;
+}
 
 void aalcalc::do_calc_end(const int period_no) {
 
@@ -315,31 +348,39 @@ void aalcalc::do_calc_end(const int period_no) {
 		}
 	}
 
-	for (int sidx= 0; sidx < samplesize_ + 1; sidx++) {
-		double mean = vec_sample_sum_loss_[sidx];
-		if (sidx > 0) {
-			aal_rec& a = vec_sample_aal_[current_summary_id_];
-			a.type = 2;
-			a.summary_id = current_summary_id_;
-			a.mean += mean * weighting;
-			a.mean_squared += mean * mean * weighting;
-			// By ensemble ID
-			if (sidxtoensemble_.size() > 0) {
-				int current_ensemble_id = sidxtoensemble_[sidx];
-				aal_rec_ensemble& ea = vec_ensemble_aal_[max_ensemble_id_ * (current_summary_id_ - 1) + current_ensemble_id];
-				ea.summary_id = current_summary_id_;
-				ea.type = 2;
-				ea.ensemble_id = current_ensemble_id;
-				ea.mean += mean * weighting;
-				ea.mean_squared += mean * mean * weighting;
+	// There is always an analytical mean
+	double mean = vec_sample_sum_loss_[0];
+	aal_rec& aa = vec_analytical_aal_[current_summary_id_];
+	aa.type = 1;
+	aa.summary_id = current_summary_id_;
+	aa.mean += mean * weighting;
+	aa.mean_squared += mean * mean * weighting;
+
+	aal_rec& a_total = vec_sample_aal_[samplesize_][current_summary_id_];
+	a_total.type = 2;
+	a_total.summary_id = samplesize_ != 0 ? current_summary_id_ : 0;
+	auto iter = vec_sample_aal_.begin();
+	for (int sidx = 1; sidx < samplesize_ + 1; sidx++) {
+		while (iter->first != samplesize_) {
+			aal_rec& a = iter->second[current_summary_id_];
+			for (sidx = iter->first; sidx < (iter->first << 1); sidx++) {
+				mean = vec_sample_sum_loss_[sidx];
+				a.type = 2;
+				a.summary_id = current_summary_id_;
+				a.mean += mean * weighting;
+				a_total.mean += mean * weighting;
+				a.mean_squared += mean * mean * weighting;
+				a_total.mean_squared += mean * mean * weighting;
+				if (sidxtoensemble_.size() > 0)
+					fillensemblerec(sidx, mean, weighting);
 			}
-		} else {
-			aal_rec& a = vec_analytical_aal_[current_summary_id_];
-			a.type = 1;
-			a.summary_id = current_summary_id_;
-			a.mean += mean * weighting;
-			a.mean_squared += mean * mean * weighting;
+			iter++;
 		}
+		mean = vec_sample_sum_loss_[sidx];
+		a_total.mean += mean * weighting;
+		a_total.mean_squared += mean * mean * weighting;
+		if (sidxtoensemble_.size() > 0)
+			fillensemblerec(sidx, mean, weighting);
 	}
 
 	std::fill(vec_sample_sum_loss_.begin(), vec_sample_sum_loss_.end(), 0.0);
@@ -365,7 +406,6 @@ void aalcalc::do_calc_by_period(const summarySampleslevelHeader &sh,
 
 
 template<typename aal_rec_T>
-//inline void aalcalc::calculatemeansddev(const aal_rec_ensemble &record,
 inline void aalcalc::calculatemeansddev(const aal_rec_T &record,
 					const int sample_size, const int p1,
 					const int p2, const int periods,
@@ -380,14 +420,15 @@ inline void aalcalc::calculatemeansddev(const aal_rec_T &record,
 
 }
 
-inline void aalcalc::outputrows(const char * buffer, int strLen) {
+inline void aalcalc::outputrows(const char * buffer, int strLen, FILE * fout) {
 
 	const char * bufPtr = buffer;
 	int num;
 	int counter = 0;
 	do {
 
-		num = printf("%s", bufPtr);
+	//	num = printf("%s", bufPtr);
+		num = fprintf(fout, "%s", bufPtr);
 		if (num < 0) {   // Write error
 			fprintf(stderr, "FATAL: Error writing %s: %s\n",
 				buffer, strerror(errno));
@@ -489,6 +530,36 @@ void aalcalc::outputresultscsv_new(std::vector<aal_rec>& vec_aal, int periods,in
 		v_iter++;
 	}
 }
+
+void aalcalc::output_alct(std::map<int, std::vector<aal_rec>>& vec_aal)
+{
+
+	FILE * fout = fopen(alct_outFile_.c_str(), "wb");
+	fprintf(fout, "SummaryId,MeanLoss,SDLoss,SampleSize\n");
+
+	for (int summary_id = 1; summary_id < max_summary_id_ + 1; summary_id++) {
+		for (auto iter = vec_aal.begin(); iter != vec_aal.end(); ++iter)
+		{
+			double mean, sd_dev;
+			int p1 = no_of_periods_ * iter->first;
+			int p2 = p1 - 1;
+			calculatemeansddev(iter->second[summary_id],
+					   iter->first, p1, p2, no_of_periods_,
+					   mean, sd_dev);
+
+			const int bufferSize = 4096;
+			char buffer[bufferSize];
+			int strLen;
+			strLen = snprintf(buffer, bufferSize, "%d,%f,%f,%d\n",
+					  summary_id, mean, sd_dev, iter->first);
+			outputrows(buffer, strLen, fout);
+		}
+	}
+
+	fclose(fout);
+
+}
+
 void aalcalc::outputresultscsv_new()
 {
 	/* parquet_output_ | ord_output_ | output files
@@ -531,20 +602,24 @@ void aalcalc::outputresultscsv_new()
 
 		outputresultsparquet(vec_analytical_aal_, no_of_periods_, 1,
 				     os);
-		outputresultsparquet(vec_sample_aal_, no_of_periods_,
-				     samplesize_, os);
+		outputresultsparquet(vec_sample_aal_[samplesize_],
+				     no_of_periods_, samplesize_, os);
 	}
 #endif
 
 	// Write csv file
 	if (!(parquet_output_ == true && ord_output_ == false)) {
 		outputresultscsv_new(vec_analytical_aal_, no_of_periods_,1);
-		outputresultscsv_new(vec_sample_aal_, no_of_periods_,
-				     samplesize_);
+		outputresultscsv_new(vec_sample_aal_[samplesize_],
+				     no_of_periods_, samplesize_);
 
 		if (sidxtoensemble_.size() > 0) {
 			outputresultscsv_new(vec_ensemble_aal_,
 					     no_of_periods_);
+		}
+
+		if (alct_output_) {
+			output_alct(vec_sample_aal_);
 		}
 	}
 
@@ -606,11 +681,11 @@ void aalcalc::doit(const std::string& subfolder)
 	summaryindex::doit(subfolder, event_to_period_);
 	initsameplsize(path);
 	getmaxsummaryid(path);
+	getsamplesizes();
 	loadperiodtoweigthing();	// move this to after the samplesize_ variable has been set i.e.  after reading the first 8 bytes of the first summary file
 	loadensemblemapping();
 	char line[4096];
 	vec_sample_sum_loss_.resize(samplesize_+1, 0.0);
-	vec_sample_aal_.resize(max_summary_id_ + 1);
 	vec_ensemble_aal_.resize(max_summary_id_ * max_ensemble_id_ + 1);
 	vec_analytical_aal_.resize(max_summary_id_ + 1);
 	std::vector<std::string> filelist;

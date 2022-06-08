@@ -356,32 +356,40 @@ void aalcalc::do_calc_end(const int period_no) {
 	aa.mean += mean * weighting;
 	aa.mean_squared += mean * mean * weighting;
 
-	aal_rec& a_total = vec_sample_aal_[samplesize_][current_summary_id_];
+	aal_rec_period& a_total = vec_sample_aal_[samplesize_][current_summary_id_];
 	a_total.type = 2;
 	a_total.summary_id = samplesize_ != 0 ? current_summary_id_ : 0;
+	double total_mean_by_period = 0;
 	auto iter = vec_sample_aal_.begin();
 	for (int sidx = 1; sidx < samplesize_ + 1; sidx++) {
 		while (iter->first != samplesize_) {
-			aal_rec& a = iter->second[current_summary_id_];
-			for (sidx = iter->first; sidx < (iter->first << 1); sidx++) {
+			aal_rec_period& a = iter->second[current_summary_id_];
+			double mean_by_period = 0;
+			for (sidx = iter->first; sidx < (iter->first << 1); sidx++)
+			{
 				mean = vec_sample_sum_loss_[sidx];
 				a.type = 2;
 				a.summary_id = current_summary_id_;
+				mean_by_period += mean * weighting;
 				a.mean += mean * weighting;
+				total_mean_by_period += mean * weighting;
 				a_total.mean += mean * weighting;
 				a.mean_squared += mean * mean * weighting;
 				a_total.mean_squared += mean * mean * weighting;
 				if (sidxtoensemble_.size() > 0)
 					fillensemblerec(sidx, mean, weighting);
 			}
+			a.mean_period += mean_by_period * mean_by_period;
 			iter++;
 		}
 		mean = vec_sample_sum_loss_[sidx];
+		total_mean_by_period += mean * weighting;
 		a_total.mean += mean * weighting;
 		a_total.mean_squared += mean * mean * weighting;
 		if (sidxtoensemble_.size() > 0)
 			fillensemblerec(sidx, mean, weighting);
 	}
+	a_total.mean_period += total_mean_by_period * total_mean_by_period;
 
 	std::fill(vec_sample_sum_loss_.begin(), vec_sample_sum_loss_.end(), 0.0);
 
@@ -420,6 +428,27 @@ inline void aalcalc::calculatemeansddev(const aal_rec_T &record,
 
 }
 
+inline void aalcalc::calculatemeansddev(const aal_rec_period &record,
+					const int sample_size, const int p1,
+					const int p2, const int periods,
+					double &mean, double &sd_dev,
+					double &var_vuln, double &var_haz) {
+
+	calculatemeansddev(record, sample_size, p1, p2, periods, mean, sd_dev);
+	double mean_period = record.mean_period / (sample_size * sample_size);
+
+	// Vulnerability contribution
+	double v1 = record.mean_squared - sample_size * mean_period;
+	double v2 = v1 / (sample_size * periods - sample_size);
+	var_vuln = v2 / (sample_size * periods);
+
+	// Hazard contribution
+	double h1 = mean_period - periods * mean * mean;
+	double h2 = sample_size * h1 / (periods - 1);
+	var_haz = h2 / (sample_size * periods);
+
+}
+
 inline void aalcalc::outputrows(const char * buffer, int strLen, FILE * fout) {
 
 	const char * bufPtr = buffer;
@@ -450,7 +479,8 @@ inline void aalcalc::outputrows(const char * buffer, int strLen, FILE * fout) {
 }
 
 #ifdef HAVE_PARQUET
-void aalcalc::outputresultsparquet(const std::vector<aal_rec>& vec_aal,
+template<typename aal_rec_T>
+void aalcalc::outputresultsparquet(const std::vector<aal_rec_T>& vec_aal,
 				   int periods, int sample_size,
 				   parquet::StreamWriter& os)
 {
@@ -502,7 +532,9 @@ void aalcalc::outputresultscsv_new(const std::vector<aal_rec_ensemble> &vec_aal,
 
 }
 
-void aalcalc::outputresultscsv_new(std::vector<aal_rec>& vec_aal, int periods,int sample_size)
+template<typename aal_rec_T>
+void aalcalc::outputresultscsv_new(std::vector<aal_rec_T>& vec_aal, int periods,
+				   int sample_size)
 {
 	int p1 = periods * sample_size;
 	int p2 = p1 - 1;
@@ -531,27 +563,38 @@ void aalcalc::outputresultscsv_new(std::vector<aal_rec>& vec_aal, int periods,in
 	}
 }
 
-void aalcalc::output_alct(std::map<int, std::vector<aal_rec>>& vec_aal)
+void aalcalc::output_alct(std::map<int, std::vector<aal_rec_period>>& vec_aal)
 {
 
 	FILE * fout = fopen(alct_outFile_.c_str(), "wb");
-	fprintf(fout, "SummaryId,MeanLoss,SDLoss,SampleSize\n");
+	fprintf(fout, "SummaryId,MeanLoss,SDLoss,SampleSize,StandardError,"
+		      "RelativeError,VarElementHaz,StandardErrorHaz,"
+		      "RelativeErrorHaz,VarElemntVuln,StandardErrorVuln,"
+		      "RelativeErrorVuln\n");
 
 	for (int summary_id = 1; summary_id < max_summary_id_ + 1; summary_id++) {
 		for (auto iter = vec_aal.begin(); iter != vec_aal.end(); ++iter)
 		{
-			double mean, sd_dev;
+			double mean, sd_dev, var_vuln, var_haz;
 			int p1 = no_of_periods_ * iter->first;
 			int p2 = p1 - 1;
 			calculatemeansddev(iter->second[summary_id],
 					   iter->first, p1, p2, no_of_periods_,
-					   mean, sd_dev);
+					   mean, sd_dev, var_vuln, var_haz);
+			double std_err = sqrt(var_haz + var_vuln);
+			double std_err_haz = sqrt(var_haz);
+			double std_err_vuln = sqrt(var_vuln);
 
 			const int bufferSize = 4096;
 			char buffer[bufferSize];
 			int strLen;
-			strLen = snprintf(buffer, bufferSize, "%d,%f,%f,%d\n",
-					  summary_id, mean, sd_dev, iter->first);
+			strLen = snprintf(buffer, bufferSize,
+					  "%d,%f,%f,%d,%f,%f,%f,%f,%f,%f,%f,%f\n",
+					  summary_id, mean, sd_dev, iter->first,
+					  std_err, std_err/mean, var_haz,
+					  std_err_haz, std_err_haz/mean,
+					  var_vuln, std_err_vuln,
+					  std_err_vuln/mean);
 			outputrows(buffer, strLen, fout);
 		}
 	}

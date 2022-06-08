@@ -89,10 +89,9 @@ private:
 	std::map<int, aal_rec> map_analytical_aal_w_;
 	std::map<int, aal_rec> map_sample_aal_;
 	std::vector<double> vec_sample_sum_loss_;
-	std::map<int, std::vector<aal_rec>> vec_sample_aal_;
+	std::map<int, std::vector<aal_rec_period>> vec_sample_aal_;
 	std::vector<aal_rec_ensemble> vec_ensemble_aal_;
 	std::vector<aal_rec> vec_analytical_aal_;
-	std::vector<int> sampleSizes_;
 	int max_summary_id_ = 0;
 
 	int current_summary_id_ = 0;
@@ -127,13 +126,20 @@ private:
 				       const int sample_size, const int p1,
 				       const int p2, const int periods,
 				       double &mean, double &sd_dev);
+	inline void calculatemeansddev(const aal_rec_period &record,
+				       const int sample_size, const int p1,
+				       const int p2, const int periods,
+				       double &mean, double &sd_dev,
+				       double &var_vuln, double &var_haz);
 	void outputresultscsv();
-	void outputresultscsv_new(std::vector<aal_rec> &vec_aal, int periods, int sample_size);
+	template<typename aal_rec_T>
+	void outputresultscsv_new(std::vector<aal_rec_T> &vec_aal, int periods, int sample_size);
 	void outputresultscsv_new(const std::vector<aal_rec_ensemble> &vec_aal, const int periods);
-	void output_alct(std::map<int, std::vector<aal_rec>>& vec_aal);
+	void output_alct(std::map<int, std::vector<aal_rec_period>>& vec_aal);
 	void outputresultscsv_new();
 #ifdef HAVE_PARQUET
-	void outputresultsparquet(const std::vector<aal_rec>& vec_aal,
+	template<typename aal_rec_T>
+	void outputresultsparquet(const std::vector<aal_rec_T>& vec_aal,
 				  int periods, int sample_size,
 				  parquet::StreamWriter& os);
 #endif

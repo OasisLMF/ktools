@@ -144,6 +144,8 @@ private:
 	void outputresultsparquet(const std::vector<aal_rec_T>& vec_aal,
 				  int periods, int sample_size,
 				  parquet::StreamWriter& os);
+	void output_alct_parquet(std::map<int, std::vector<aal_rec_period>>& vec_aal,
+				 parquet::StreamWriter& os);
 #endif
 	inline void outputrows(const char * buffer, int strLen, FILE * fout=stdout);
 	void getmaxsummaryid(std::string& path);

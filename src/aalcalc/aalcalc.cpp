@@ -585,6 +585,11 @@ void aalcalc::outputresultscsv_new(std::vector<aal_rec_T>& vec_aal, int periods,
 void aalcalc::output_alct(std::map<int, std::vector<aal_rec_period>>& vec_aal)
 {
 
+	// Ensure file has csv extension to prevent conflict with potential
+	// parquet format output file
+	if (alct_outFile_.length() < 4 || alct_outFile_.substr(alct_outFile_.length() - 4, 4) != ".csv") {
+		alct_outFile_ += ".csv";
+	}
 	FILE * fout = fopen(alct_outFile_.c_str(), "wb");
 	fprintf(fout, "SummaryId,MeanLoss,SDLoss,SampleSize,LowerCI,UpperCI,"
 		      "StandardError,RelativeError,VarElementHaz,"
@@ -622,6 +627,36 @@ void aalcalc::output_alct(std::map<int, std::vector<aal_rec_period>>& vec_aal)
 	fclose(fout);
 
 }
+
+#ifdef HAVE_PARQUET
+void aalcalc::output_alct_parquet(std::map<int, std::vector<aal_rec_period>>& vec_aal,
+				  parquet::StreamWriter& os) {
+
+	for (int summary_id = 1; summary_id < max_summary_id_ + 1; summary_id++) {
+		for (auto iter = vec_aal.begin(); iter != vec_aal.end(); ++iter)
+		{
+			double mean, sd_dev, var_vuln, var_haz;
+			int p1 = no_of_periods_ * iter->first;
+			int p2 = p1 - 1;
+			calculatemeansddev(iter->second[summary_id],
+					   iter->first, p1, p2, no_of_periods_,
+					   mean, sd_dev, var_vuln, var_haz);
+			double std_err = sqrt(var_haz + var_vuln);
+			double ci = calculateconfidenceinterval(std_err);
+			double std_err_haz = sqrt(var_haz);
+			double std_err_vuln = sqrt(var_vuln);
+
+			os << summary_id << (float)mean << (float)sd_dev
+			   << (float)iter->first << (float)(mean - ci)
+			   << (float)(mean + ci) << (float)std_err
+			   << (float)(std_err/mean) << (float)var_haz
+			   << (float)std_err_haz << (float)(std_err_haz/mean)
+			   << (float)var_vuln << (float)std_err_vuln
+			   << (float)(std_err_vuln/mean) << parquet::EndRow;
+		}
+	}
+}
+#endif
 
 void aalcalc::outputresultscsv_new()
 {
@@ -667,6 +702,66 @@ void aalcalc::outputresultscsv_new()
 				     os);
 		outputresultsparquet(vec_sample_aal_[samplesize_],
 				     no_of_periods_, samplesize_, os);
+
+		if (alct_output_) {
+			std::vector<OasisParquet::ParquetFields> parquetFields_alct;
+			parquetFields_alct.push_back(
+				{"SummaryId", parquet::Type::INT32,
+				parquet::ConvertedType::INT_32});
+			parquetFields_alct.push_back(
+				{"MeanLoss", parquet::Type::FLOAT,
+				parquet::ConvertedType::NONE});
+			parquetFields_alct.push_back(
+				{"SDLoss", parquet::Type::FLOAT,
+				parquet::ConvertedType::NONE});
+			parquetFields_alct.push_back(
+				{"SampleSize", parquet::Type::INT32,
+				parquet::ConvertedType::NONE});
+			parquetFields_alct.push_back(
+				{"LowerCI", parquet::Type::FLOAT,
+				parquet::ConvertedType::NONE});
+			parquetFields_alct.push_back(
+				{"UpperCI", parquet::Type::FLOAT,
+				parquet::ConvertedType::NONE});
+			parquetFields_alct.push_back(
+				{"StandardError", parquet::Type::FLOAT,
+				parquet::ConvertedType::NONE});
+			parquetFields_alct.push_back(
+				{"RelativeError", parquet::Type::FLOAT,
+				parquet::ConvertedType::NONE});
+			parquetFields_alct.push_back(
+				{"VarElementHaz", parquet::Type::FLOAT,
+				parquet::ConvertedType::NONE});
+			parquetFields_alct.push_back(
+				{"StandardErrorHaz", parquet::Type::FLOAT,
+				parquet::ConvertedType::NONE});
+			parquetFields_alct.push_back(
+				{"RelativeErrorHaz", parquet::Type::FLOAT,
+				parquet::ConvertedType::NONE});
+			parquetFields_alct.push_back(
+				{"VarElementVuln", parquet::Type::FLOAT,
+				parquet::ConvertedType::NONE});
+			parquetFields_alct.push_back(
+				{"StandardErrorVuln", parquet::Type::FLOAT,
+				parquet::ConvertedType::NONE});
+			parquetFields_alct.push_back(
+				{"RelativeErrorVuln", parquet::Type::FLOAT,
+				parquet::ConvertedType::NONE});
+
+			
+			// Ensure file has parquet extension to prevent conflict
+			// with potential csv format output file
+			std::string parquet_alct_outFile = alct_outFile_;
+			if (parquet_alct_outFile.length() < 8 || parquet_alct_outFile.substr(parquet_alct_outFile.length() -8, 8) != ".parquet") {
+				parquet_alct_outFile += ".parquet";
+			}
+			parquet::StreamWriter os_alct =
+			  OasisParquet::SetupParquetOutputStream(parquet_alct_outFile,
+								 parquetFields_alct);
+
+			output_alct_parquet(vec_sample_aal_, os_alct);
+
+		}
 	}
 #endif
 
@@ -681,9 +776,7 @@ void aalcalc::outputresultscsv_new()
 					     no_of_periods_);
 		}
 
-		if (alct_output_) {
-			output_alct(vec_sample_aal_);
-		}
+		if (alct_output_) output_alct(vec_sample_aal_);
 	}
 
 }

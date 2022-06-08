@@ -449,6 +449,25 @@ inline void aalcalc::calculatemeansddev(const aal_rec_period &record,
 
 }
 
+double aalcalc::calculateconfidenceinterval(const double std_err) {
+
+	// Find p-value above 0.5
+	// F^-1(p) = -G^-1(1-p)
+	double p_value = (1 + confidence_level_) / 2.;
+	p_value = sqrt(-2. * log(1 - p_value));
+
+	// Approximation formula for z-value from Abramowitz & Stegun, Handbook
+	// of Mathematical Functions: with Formulas, Graphs, and Mathematical
+	// Tables, Dover Publications (1965), eq. 26.2.23
+	// Also see John D. Cook Consulting, https://www.johndcook.com/blog/cpp_phi_inverse/
+	double c[3] = { 2.515517, 0.802853, 0.010328 };
+	double d[3] = { 1.432788, 0.189269, 0.001308 };
+	double z_value = p_value - ((c[2] * p_value + c[1]) * p_value + c[0]) /
+			 (((d[2] * p_value + d[1]) * p_value + d[0]) * p_value + 1.);
+	return std_err * z_value;
+
+}
+
 inline void aalcalc::outputrows(const char * buffer, int strLen, FILE * fout) {
 
 	const char * bufPtr = buffer;
@@ -567,10 +586,10 @@ void aalcalc::output_alct(std::map<int, std::vector<aal_rec_period>>& vec_aal)
 {
 
 	FILE * fout = fopen(alct_outFile_.c_str(), "wb");
-	fprintf(fout, "SummaryId,MeanLoss,SDLoss,SampleSize,StandardError,"
-		      "RelativeError,VarElementHaz,StandardErrorHaz,"
-		      "RelativeErrorHaz,VarElemntVuln,StandardErrorVuln,"
-		      "RelativeErrorVuln\n");
+	fprintf(fout, "SummaryId,MeanLoss,SDLoss,SampleSize,LowerCI,UpperCI,"
+		      "StandardError,RelativeError,VarElementHaz,"
+		      "StandardErrorHaz,RelativeErrorHaz,VarElemntVuln,"
+		      "StandardErrorVuln,RelativeErrorVuln\n");
 
 	for (int summary_id = 1; summary_id < max_summary_id_ + 1; summary_id++) {
 		for (auto iter = vec_aal.begin(); iter != vec_aal.end(); ++iter)
@@ -582,6 +601,7 @@ void aalcalc::output_alct(std::map<int, std::vector<aal_rec_period>>& vec_aal)
 					   iter->first, p1, p2, no_of_periods_,
 					   mean, sd_dev, var_vuln, var_haz);
 			double std_err = sqrt(var_haz + var_vuln);
+			double ci = calculateconfidenceinterval(std_err);
 			double std_err_haz = sqrt(var_haz);
 			double std_err_vuln = sqrt(var_vuln);
 
@@ -589,12 +609,12 @@ void aalcalc::output_alct(std::map<int, std::vector<aal_rec_period>>& vec_aal)
 			char buffer[bufferSize];
 			int strLen;
 			strLen = snprintf(buffer, bufferSize,
-					  "%d,%f,%f,%d,%f,%f,%f,%f,%f,%f,%f,%f\n",
+					  "%d,%f,%f,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
 					  summary_id, mean, sd_dev, iter->first,
-					  std_err, std_err/mean, var_haz,
-					  std_err_haz, std_err_haz/mean,
-					  var_vuln, std_err_vuln,
-					  std_err_vuln/mean);
+					  mean - ci, mean + ci, std_err,
+					  std_err/mean, var_haz, std_err_haz,
+					  std_err_haz/mean, var_vuln,
+					  std_err_vuln, std_err_vuln/mean);
 			outputrows(buffer, strLen, fout);
 		}
 	}

@@ -28,6 +28,7 @@ void help()
 	fprintf(stderr, "-o Open Results Data (ORD) output\n");
 	fprintf(stderr, "-p [filename] ORD output in parquet format\n");
 	fprintf(stderr, "-c [filename] Average Loss Convergence Table (ALCT)\n");
+	fprintf(stderr, "-l [value] 0 <= confidence level <= 1, default 0.95\n");
 	fprintf(stderr, "-s skip header\n");
 	fprintf(stderr, "-v version\n");
 	fprintf(stderr, "-h help\n");
@@ -46,7 +47,8 @@ int main(int argc, char* argv[])
 	bool parquet_output = false;   // parquet output
 	std::string alct_outFile;   // Average Loss Convergence Table (ALCT)
 	bool alct_output = false;   // ALCT
-	while ((opt = getopt(argc, argv, (char *)"svdohK:p:c:")) != -1) {
+	float confidence_level = 0.95;
+	while ((opt = getopt(argc, argv, (char *)"svdohK:p:c:l:")) != -1) {
 		switch (opt) {
 		case 'v':
 #ifdef HAVE_PARQUET
@@ -75,6 +77,9 @@ int main(int argc, char* argv[])
 			alct_output = true;
 			alct_outFile = optarg;
 			break;
+		case 'l':
+			confidence_level = atof(optarg);
+			break;
 		case 'd':
 			debug = true;			
 			break;
@@ -87,6 +92,11 @@ int main(int argc, char* argv[])
 
 	if (subfolder.length() == 0) {
 		fprintf(stderr, "FATAL: No folder supplied for summarycalc files\n");
+		exit(EXIT_FAILURE);
+	}
+
+	if (confidence_level < 0.0 || confidence_level > 1.0) {
+		fprintf(stderr, "FATAL: Confidence level must lie between 0 and 1\n");
 		exit(EXIT_FAILURE);
 	}
 
@@ -114,7 +124,8 @@ int main(int argc, char* argv[])
 	
 	try {
 		aalcalc a(skipheader, ord_output, parquet_output,
-			  parquet_outFile, alct_output, alct_outFile);
+			  parquet_outFile, alct_output, alct_outFile,
+			  confidence_level);
 		if (debug == true) {
 			a.debug(subfolder);
 		}

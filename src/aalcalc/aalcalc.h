@@ -104,6 +104,7 @@ private:
 	std::string parquet_outFile_;
 	bool alct_output_ = false;
 	std::string alct_outFile_;
+	float confidence_level_;
 // private functions
 	template<typename T>
 	void loadoccurrence(T &occ, FILE * fin);
@@ -131,6 +132,7 @@ private:
 				       const int p2, const int periods,
 				       double &mean, double &sd_dev,
 				       double &var_vuln, double &var_haz);
+	double calculateconfidenceinterval(const double std_err);
 	void outputresultscsv();
 	template<typename aal_rec_T>
 	void outputresultscsv_new(std::vector<aal_rec_T> &vec_aal, int periods, int sample_size);
@@ -148,11 +150,12 @@ private:
 public:
 	aalcalc(bool skipheader, bool ord_output, bool parquet_output,
 		std::string parquet_outFile, bool alct_output,
-		std::string alct_outFile)
+		std::string alct_outFile, float confidence_level)
 		: skipheader_(skipheader), ord_output_(ord_output),
 		parquet_output_(parquet_output),
 		parquet_outFile_(parquet_outFile), alct_output_(alct_output),
-		alct_outFile_(alct_outFile) {};
+		alct_outFile_(alct_outFile),
+		confidence_level_(confidence_level) {};
 	void doit(const std::string& subfolder);		// experimental
 	void debug(const std::string &subfolder);
 };

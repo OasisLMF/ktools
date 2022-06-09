@@ -133,17 +133,16 @@ private:
 				       double &mean, double &sd_dev,
 				       double &var_vuln, double &var_haz);
 	double calculateconfidenceinterval(const double std_err);
-	void outputresultscsv();
 	template<typename aal_rec_T>
-	void outputresultscsv_new(std::vector<aal_rec_T> &vec_aal, int periods, int sample_size);
-	void outputresultscsv_new(const std::vector<aal_rec_ensemble> &vec_aal, const int periods);
+	void outputresultscsv_new(std::vector<aal_rec_T> &vec_aal,
+				  int sample_size);
+	void outputresultscsv_new(const std::vector<aal_rec_ensemble> &vec_aal);
 	void output_alct(std::map<int, std::vector<aal_rec_period>>& vec_aal);
 	void outputresultscsv_new();
 #ifdef HAVE_PARQUET
 	template<typename aal_rec_T>
 	void outputresultsparquet(const std::vector<aal_rec_T>& vec_aal,
-				  int periods, int sample_size,
-				  parquet::StreamWriter& os);
+				  int sample_size, parquet::StreamWriter& os);
 	void output_alct_parquet(std::map<int, std::vector<aal_rec_period>>& vec_aal,
 				 parquet::StreamWriter& os);
 #endif

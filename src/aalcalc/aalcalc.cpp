@@ -500,10 +500,9 @@ inline void aalcalc::outputrows(const char * buffer, int strLen, FILE * fout) {
 #ifdef HAVE_PARQUET
 template<typename aal_rec_T>
 void aalcalc::outputresultsparquet(const std::vector<aal_rec_T>& vec_aal,
-				   int periods, int sample_size,
-				   parquet::StreamWriter& os)
+				   int sample_size, parquet::StreamWriter& os)
 {
-	int p1 = periods * sample_size;
+	int p1 = no_of_periods_ * sample_size;
 	int p2 = p1 - 1;
 
 	auto v_iter = vec_aal.begin();
@@ -511,7 +510,7 @@ void aalcalc::outputresultsparquet(const std::vector<aal_rec_T>& vec_aal,
 		if (v_iter->summary_id > 0) {
 			double mean, sd_dev;
 			calculatemeansddev(*v_iter, sample_size, p1, p2,
-					   periods, mean, sd_dev);
+					   no_of_periods_, mean, sd_dev);
 			os << v_iter->summary_id << v_iter->type << (float)mean
 			   << (float)sd_dev << parquet::EndRow;
 		}
@@ -521,20 +520,19 @@ void aalcalc::outputresultsparquet(const std::vector<aal_rec_T>& vec_aal,
 #endif
 
 
-void aalcalc::outputresultscsv_new(const std::vector<aal_rec_ensemble> &vec_aal,
-				   const int periods) {
-
+void aalcalc::outputresultscsv_new(const std::vector<aal_rec_ensemble> &vec_aal)
+{
 	auto v_iter = vec_aal.begin();
 	while (v_iter != vec_aal.end()) {
 
 		if(v_iter->summary_id > 0) {
 
 			int sample_size = ensemblecount_[v_iter->ensemble_id];
-			int p1 = periods * sample_size;
+			int p1 = no_of_periods_ * sample_size;
 			int p2 = p1 - 1;
 			double mean, sd_dev;
 			calculatemeansddev(*v_iter, sample_size, p1, p2,
-					   periods, mean, sd_dev);
+					   no_of_periods_, mean, sd_dev);
 
 			char buffer[4096];
 			int strLen;
@@ -548,14 +546,13 @@ void aalcalc::outputresultscsv_new(const std::vector<aal_rec_ensemble> &vec_aal,
 		v_iter++;
 
 	}
-
 }
 
 template<typename aal_rec_T>
-void aalcalc::outputresultscsv_new(std::vector<aal_rec_T>& vec_aal, int periods,
+void aalcalc::outputresultscsv_new(std::vector<aal_rec_T>& vec_aal,
 				   int sample_size)
 {
-	int p1 = periods * sample_size;
+	int p1 = no_of_periods_ * sample_size;
 	int p2 = p1 - 1;
 
 	auto v_iter = vec_aal.begin();
@@ -563,7 +560,7 @@ void aalcalc::outputresultscsv_new(std::vector<aal_rec_T>& vec_aal, int periods,
 		if (v_iter->summary_id > 0) {
 			double mean, sd_dev;
 			calculatemeansddev(*v_iter, sample_size, p1, p2,
-					   periods, mean, sd_dev);
+					   no_of_periods_, mean, sd_dev);
 
 			const int bufferSize = 4096;
 			char buffer[bufferSize];
@@ -595,6 +592,8 @@ void aalcalc::output_alct(std::map<int, std::vector<aal_rec_period>>& vec_aal)
 		      "StandardError,RelativeError,VarElementHaz,"
 		      "StandardErrorHaz,RelativeErrorHaz,VarElemntVuln,"
 		      "StandardErrorVuln,RelativeErrorVuln\n");
+
+	if (!samplesize_) return;
 
 	for (int summary_id = 1; summary_id < max_summary_id_ + 1; summary_id++) {
 		for (auto iter = vec_aal.begin(); iter != vec_aal.end(); ++iter)
@@ -698,10 +697,9 @@ void aalcalc::outputresultscsv_new()
 		  OasisParquet::SetupParquetOutputStream(parquet_outFile_,
 							 parquetFields);
 
-		outputresultsparquet(vec_analytical_aal_, no_of_periods_, 1,
+		outputresultsparquet(vec_analytical_aal_, 1, os);
+		outputresultsparquet(vec_sample_aal_[samplesize_], samplesize_,
 				     os);
-		outputresultsparquet(vec_sample_aal_[samplesize_],
-				     no_of_periods_, samplesize_, os);
 
 		if (alct_output_) {
 			std::vector<OasisParquet::ParquetFields> parquetFields_alct;
@@ -767,13 +765,11 @@ void aalcalc::outputresultscsv_new()
 
 	// Write csv file
 	if (!(parquet_output_ == true && ord_output_ == false)) {
-		outputresultscsv_new(vec_analytical_aal_, no_of_periods_,1);
-		outputresultscsv_new(vec_sample_aal_[samplesize_],
-				     no_of_periods_, samplesize_);
+		outputresultscsv_new(vec_analytical_aal_, 1);
+		outputresultscsv_new(vec_sample_aal_[samplesize_], samplesize_);
 
 		if (sidxtoensemble_.size() > 0) {
-			outputresultscsv_new(vec_ensemble_aal_,
-					     no_of_periods_);
+			outputresultscsv_new(vec_ensemble_aal_);
 		}
 
 		if (alct_output_) output_alct(vec_sample_aal_);

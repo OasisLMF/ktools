@@ -140,7 +140,7 @@ void aalcalc::loadoccurrence()
 		exit(-1);
 	}
 	std::set<int> periods;
-	size_t i = fread(&date_opts, sizeof(date_opts), 1, fin);
+	fread(&date_opts, sizeof(date_opts), 1, fin);
 	granular_date = date_opts >> 1;
 	if (granular_date) {
 		occurrence_granular occ;
@@ -402,9 +402,6 @@ void aalcalc::do_calc_by_period(const summarySampleslevelHeader &sh,
 	for (auto x : vrec) {
 		if (x.loss > 0) {
 			int type_idx = (x.sidx != -1);
-			if (sidxtoensemble_.size() > 0 && type_idx == 1) {
-				int ensemble_id = sidxtoensemble_[x.sidx];
-			}
 			int sidx = (type_idx == 0) ? 0 : x.sidx;
 			vec_sample_sum_loss_[sidx] += x.loss;
 		}

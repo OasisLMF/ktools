@@ -89,7 +89,6 @@ namespace summaryindex {
 		if (i != 0) i = fread(&summary_set, sizeof(summary_set), 1, fin);
 		if (i != 0) offset += sizeof(summary_set);
 		summarySampleslevelHeader sh;
-		int last_event_id = -1;
 		while (i != 0) {
 			i = fread(&sh, sizeof(sh), 1, fin);
 			if (i != 0) {
@@ -143,7 +142,7 @@ namespace summaryindex {
 			// Get period numbers from event IDs
 			flseek(fbin, offset, SEEK_SET);
 			summarySampleslevelHeader sh;
-			size_t i = fread(&sh, sizeof(sh), 1, fbin);
+			fread(&sh, sizeof(sh), 1, fbin);
 			std::map<int, std::vector<int>>::const_iterator iter = eventtoperiods.find(sh.event_id);
 			if (iter == eventtoperiods.end()) continue;   // Event not found so don't process it
 			for (auto period : iter->second) {

@@ -31,6 +31,7 @@ fin()
 installertest()
 {
 	CTRL=ctrl
+	CTRL_PARQUET=ctrl_parquet
 	SYSTEMNAME="$(uname -s)"
 
 	cd examples
@@ -244,9 +245,15 @@ installertest()
 
      # checksums		
 	if [ "$SYSTEMNAME" == "Darwin" ]; then
-	 	shasum -c --ignore-missing ../$CTRL.sha1
+	 	shasum -c ../$CTRL.sha1
+		if ../../src/katparquet/katparquet -v 2>&1 | grep -q 'Parquet output enabled'; then
+			shasum -c ../$CTRL_PARQUET.sha1
+		fi
 	else
-	 	sha1sum -c --ignore-missing ../$CTRL.sha1
+	 	sha1sum -c ../$CTRL.sha1
+		if ../../src/katparquet/katparquet -v 2>&1 | grep -q 'Parquet output enabled'; then
+			sha1sum -c ../$CTRL_PARQUET.sha1
+		fi
 	fi
 
 	 if [ "$?" -ne "0" ]; then

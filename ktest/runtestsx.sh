@@ -33,6 +33,7 @@ fin()
 installertest()
 {
 	CTRL=ctrl
+	CTRL_PARQUET=ctrl_parquet
 	cd examples
 
 	# test eve
@@ -203,7 +204,10 @@ installertest()
 	../../src/footprinttobin/footprinttobin -i 121 < footprint.csv
 
      # checksums		
-	 sha1sum -c --ignore-missing ../$CTRL.sha1
+	 sha1sum -c ../$CTRL.sha1
+	 if ../../src/katparquet/katparquet -v 2>&1 | grep -q 'Parquet output enabled'; then
+		 sha1sum -c ../$CTRL_PARQUET.sha1
+	 fi
 
 	 if [ "$?" -ne "0" ]; then
 	   echo "Sorry check failed\n"

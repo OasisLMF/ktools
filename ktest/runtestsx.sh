@@ -205,7 +205,7 @@ installertest()
 
      # checksums		
 	 sha1sum -c ../$CTRL.sha1
-	 if ../src/katparquet/katparquet -v 2>&1 | grep -q 'Parquet output enabled'; then
+	 if ../../src/katparquet/katparquet -v 2>&1 | grep -q 'Parquet output enabled'; then
 		 sha1sum -c ../$CTRL_PARQUET.sha1
 	 fi
 

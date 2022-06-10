@@ -643,7 +643,7 @@ void aalcalc::output_alct_parquet(std::map<int, std::vector<aal_rec_period>>& ve
 			double std_err_vuln = sqrt(var_vuln);
 
 			os << summary_id << (float)mean << (float)sd_dev
-			   << (float)iter->first << (float)(mean - ci)
+			   << iter->first << (float)(mean - ci)
 			   << (float)(mean + ci) << (float)std_err
 			   << (float)(std_err/mean) << (float)var_haz
 			   << (float)std_err_haz << (float)(std_err_haz/mean)
@@ -711,7 +711,7 @@ void aalcalc::outputresultscsv_new()
 				parquet::ConvertedType::NONE});
 			parquetFields_alct.push_back(
 				{"SampleSize", parquet::Type::INT32,
-				parquet::ConvertedType::NONE});
+				parquet::ConvertedType::INT_32});
 			parquetFields_alct.push_back(
 				{"LowerCI", parquet::Type::FLOAT,
 				parquet::ConvertedType::NONE});

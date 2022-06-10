@@ -1,6 +1,12 @@
 Ktools Changelog
 ================
 
+`v3.9.0`_
+ ---------
+* [#296, #292, #294, #295](https://github.com/OasisLMF/ktools/pull/301) - Add option to produce the Average Convergence Loss Table (ALCT) in aalcalc
+* [#299](https://github.com/OasisLMF/ktools/pull/302) - Potential for missing files during testing to go unnoticed
+.. _`v3.9.0`:  https://github.com/OasisLMF/ktools/compare/v3.8.1...v3.9.0
+
 `v3.8.1`_
  ---------
 * [#285](https://github.com/OasisLMF/ktools/pull/288) - Investigate failure of output parquet file validation tests

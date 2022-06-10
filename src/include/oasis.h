@@ -299,6 +299,10 @@ struct aal_rec_ensemble : aal_rec {
 	int ensemble_id;
 };
 
+struct aal_rec_period : aal_rec {
+	double mean_period;
+};
+
 struct Vulnerability
 {
 	int vulnerability_id;

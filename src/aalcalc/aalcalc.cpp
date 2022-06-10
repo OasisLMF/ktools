@@ -140,7 +140,7 @@ void aalcalc::loadoccurrence()
 		exit(-1);
 	}
 	std::set<int> periods;
-	size_t i = fread(&date_opts, sizeof(date_opts), 1, fin);
+	fread(&date_opts, sizeof(date_opts), 1, fin);
 	granular_date = date_opts >> 1;
 	if (granular_date) {
 		occurrence_granular occ;
@@ -150,6 +150,29 @@ void aalcalc::loadoccurrence()
 		loadoccurrence(occ, fin);
 	}
 
+}
+
+void aalcalc::getsamplesizes()
+{
+	// Sample size subsets are fixed and non-overlapping, increasing in size
+	// by a factor of 2^n, where n = subset number,
+	// i.e. for 10 samples, sets are (1), (2, 3), (4, 5, 6, 7)
+	// for 20 samples, sets are (1), (2, 3), (4, 5, 6, 7),
+	//                          (8, 9, 10, 11, 12, 13, 14, 15)
+	//                          
+	// (1 << 0) + ((1 << 0) >> 1) = 1 + 0 = 1
+	// (1 << 1) + ((1 << 1) >> 1) = 2 + 1 = 3
+	// (1 << 2) + ((1 << 2) >> 1) = 4 + 2 = 6
+	// (1 << 3) + ((1 << 3) >> 1) = 8 + 4 = 12
+	if (alct_output_) {
+		int i = 0;
+		while (((1 << i) + ((1 << i) >> 1)) <= samplesize_) {
+			vec_sample_aal_[1 << i].resize(max_summary_id_ + 1);
+			i++;
+		}
+	}
+	if (samplesize_ != 1)
+		vec_sample_aal_[samplesize_].resize(max_summary_id_ + 1);
 }
 
 void aalcalc::indexevents(const std::string& fullfilename, std::string& filename) {
@@ -241,7 +264,6 @@ void savesummaryIndex(const std::string& subfolder,const std::map<int, std::vect
 			xx.event_id = iter2->event_id;
 			xx.fileindex = iter2->fileindex;
 			xx.offset = iter2->offset;
-			//fprintf(fout, "%d,%d,%d,%lld\n", iter->first, iter2->event_id,iter2->fileindex,iter2->offset);
 			fwrite(&xx, sizeof(xx),1, fout);
 			iter2++;
 		}
@@ -301,6 +323,17 @@ void aalcalc::load_event_to_summary_index(const std::string& subfolder)
 	exit(-1);
 }
 
+inline void aalcalc::fillensemblerec(const int sidx, const double mean,
+				     const double weighting)
+{
+	int current_ensemble_id = sidxtoensemble_[sidx];
+	aal_rec_ensemble& ea = vec_ensemble_aal_[max_ensemble_id_ * (current_summary_id_ - 1) + current_ensemble_id];
+	ea.summary_id = current_summary_id_;
+	ea.type = 2;
+	ea.ensemble_id = current_ensemble_id;
+	ea.mean += mean * weighting;
+	ea.mean_squared += mean * mean * weighting;
+}
 
 void aalcalc::do_calc_end(const int period_no) {
 
@@ -315,32 +348,48 @@ void aalcalc::do_calc_end(const int period_no) {
 		}
 	}
 
-	for (int sidx= 0; sidx < samplesize_ + 1; sidx++) {
-		double mean = vec_sample_sum_loss_[sidx];
-		if (sidx > 0) {
-			aal_rec& a = vec_sample_aal_[current_summary_id_];
-			a.type = 2;
-			a.summary_id = current_summary_id_;
-			a.mean += mean * weighting;
-			a.mean_squared += mean * mean * weighting;
-			// By ensemble ID
-			if (sidxtoensemble_.size() > 0) {
-				int current_ensemble_id = sidxtoensemble_[sidx];
-				aal_rec_ensemble& ea = vec_ensemble_aal_[max_ensemble_id_ * (current_summary_id_ - 1) + current_ensemble_id];
-				ea.summary_id = current_summary_id_;
-				ea.type = 2;
-				ea.ensemble_id = current_ensemble_id;
-				ea.mean += mean * weighting;
-				ea.mean_squared += mean * mean * weighting;
+	// There is always an analytical mean
+	double mean = vec_sample_sum_loss_[0];
+	aal_rec& aa = vec_analytical_aal_[current_summary_id_];
+	aa.type = 1;
+	aa.summary_id = current_summary_id_;
+	aa.mean += mean * weighting;
+	aa.mean_squared += mean * mean * weighting;
+
+	aal_rec_period& a_total = vec_sample_aal_[samplesize_][current_summary_id_];
+	a_total.type = 2;
+	a_total.summary_id = samplesize_ != 0 ? current_summary_id_ : 0;
+	double total_mean_by_period = 0;
+	auto iter = vec_sample_aal_.begin();
+	for (int sidx = 1; sidx < samplesize_ + 1; sidx++) {
+		while (iter->first != samplesize_) {
+			aal_rec_period& a = iter->second[current_summary_id_];
+			double mean_by_period = 0;
+			for (sidx = iter->first; sidx < (iter->first << 1); sidx++)
+			{
+				mean = vec_sample_sum_loss_[sidx];
+				a.type = 2;
+				a.summary_id = current_summary_id_;
+				mean_by_period += mean * weighting;
+				a.mean += mean * weighting;
+				total_mean_by_period += mean * weighting;
+				a_total.mean += mean * weighting;
+				a.mean_squared += mean * mean * weighting;
+				a_total.mean_squared += mean * mean * weighting;
+				if (sidxtoensemble_.size() > 0)
+					fillensemblerec(sidx, mean, weighting);
 			}
-		} else {
-			aal_rec& a = vec_analytical_aal_[current_summary_id_];
-			a.type = 1;
-			a.summary_id = current_summary_id_;
-			a.mean += mean * weighting;
-			a.mean_squared += mean * mean * weighting;
+			a.mean_period += mean_by_period * mean_by_period;
+			iter++;
 		}
+		mean = vec_sample_sum_loss_[sidx];
+		total_mean_by_period += mean * weighting;
+		a_total.mean += mean * weighting;
+		a_total.mean_squared += mean * mean * weighting;
+		if (sidxtoensemble_.size() > 0)
+			fillensemblerec(sidx, mean, weighting);
 	}
+	a_total.mean_period += total_mean_by_period * total_mean_by_period;
 
 	std::fill(vec_sample_sum_loss_.begin(), vec_sample_sum_loss_.end(), 0.0);
 
@@ -353,9 +402,6 @@ void aalcalc::do_calc_by_period(const summarySampleslevelHeader &sh,
 	for (auto x : vrec) {
 		if (x.loss > 0) {
 			int type_idx = (x.sidx != -1);
-			if (sidxtoensemble_.size() > 0 && type_idx == 1) {
-				int ensemble_id = sidxtoensemble_[x.sidx];
-			}
 			int sidx = (type_idx == 0) ? 0 : x.sidx;
 			vec_sample_sum_loss_[sidx] += x.loss;
 		}
@@ -365,7 +411,6 @@ void aalcalc::do_calc_by_period(const summarySampleslevelHeader &sh,
 
 
 template<typename aal_rec_T>
-//inline void aalcalc::calculatemeansddev(const aal_rec_ensemble &record,
 inline void aalcalc::calculatemeansddev(const aal_rec_T &record,
 					const int sample_size, const int p1,
 					const int p2, const int periods,
@@ -380,14 +425,55 @@ inline void aalcalc::calculatemeansddev(const aal_rec_T &record,
 
 }
 
-inline void aalcalc::outputrows(const char * buffer, int strLen) {
+inline void aalcalc::calculatemeansddev(const aal_rec_period &record,
+					const int sample_size, const int p1,
+					const int p2, const int periods,
+					double &mean, double &sd_dev,
+					double &var_vuln, double &var_haz) {
+
+	calculatemeansddev(record, sample_size, p1, p2, periods, mean, sd_dev);
+	double mean_period = record.mean_period / (sample_size * sample_size);
+
+	// Vulnerability contribution
+	double v1 = record.mean_squared - sample_size * mean_period;
+	double v2 = v1 / (sample_size * periods - sample_size);
+	var_vuln = v2 / (sample_size * periods);
+
+	// Hazard contribution
+	double h1 = mean_period - periods * mean * mean;
+	double h2 = sample_size * h1 / (periods - 1);
+	var_haz = h2 / (sample_size * periods);
+
+}
+
+double aalcalc::calculateconfidenceinterval(const double std_err) {
+
+	// Find p-value above 0.5
+	// F^-1(p) = -G^-1(1-p)
+	double p_value = (1 + confidence_level_) / 2.;
+	p_value = sqrt(-2. * log(1 - p_value));
+
+	// Approximation formula for z-value from Abramowitz & Stegun, Handbook
+	// of Mathematical Functions: with Formulas, Graphs, and Mathematical
+	// Tables, Dover Publications (1965), eq. 26.2.23
+	// Also see John D. Cook Consulting, https://www.johndcook.com/blog/cpp_phi_inverse/
+	double c[3] = { 2.515517, 0.802853, 0.010328 };
+	double d[3] = { 1.432788, 0.189269, 0.001308 };
+	double z_value = p_value - ((c[2] * p_value + c[1]) * p_value + c[0]) /
+			 (((d[2] * p_value + d[1]) * p_value + d[0]) * p_value + 1.);
+	return std_err * z_value;
+
+}
+
+inline void aalcalc::outputrows(const char * buffer, int strLen, FILE * fout) {
 
 	const char * bufPtr = buffer;
 	int num;
 	int counter = 0;
 	do {
 
-		num = printf("%s", bufPtr);
+	//	num = printf("%s", bufPtr);
+		num = fprintf(fout, "%s", bufPtr);
 		if (num < 0) {   // Write error
 			fprintf(stderr, "FATAL: Error writing %s: %s\n",
 				buffer, strerror(errno));
@@ -409,11 +495,11 @@ inline void aalcalc::outputrows(const char * buffer, int strLen) {
 }
 
 #ifdef HAVE_PARQUET
-void aalcalc::outputresultsparquet(const std::vector<aal_rec>& vec_aal,
-				   int periods, int sample_size,
-				   parquet::StreamWriter& os)
+template<typename aal_rec_T>
+void aalcalc::outputresultsparquet(const std::vector<aal_rec_T>& vec_aal,
+				   int sample_size, parquet::StreamWriter& os)
 {
-	int p1 = periods * sample_size;
+	int p1 = no_of_periods_ * sample_size;
 	int p2 = p1 - 1;
 
 	auto v_iter = vec_aal.begin();
@@ -421,7 +507,7 @@ void aalcalc::outputresultsparquet(const std::vector<aal_rec>& vec_aal,
 		if (v_iter->summary_id > 0) {
 			double mean, sd_dev;
 			calculatemeansddev(*v_iter, sample_size, p1, p2,
-					   periods, mean, sd_dev);
+					   no_of_periods_, mean, sd_dev);
 			os << v_iter->summary_id << v_iter->type << (float)mean
 			   << (float)sd_dev << parquet::EndRow;
 		}
@@ -431,20 +517,19 @@ void aalcalc::outputresultsparquet(const std::vector<aal_rec>& vec_aal,
 #endif
 
 
-void aalcalc::outputresultscsv_new(const std::vector<aal_rec_ensemble> &vec_aal,
-				   const int periods) {
-
+void aalcalc::outputresultscsv_new(const std::vector<aal_rec_ensemble> &vec_aal)
+{
 	auto v_iter = vec_aal.begin();
 	while (v_iter != vec_aal.end()) {
 
 		if(v_iter->summary_id > 0) {
 
 			int sample_size = ensemblecount_[v_iter->ensemble_id];
-			int p1 = periods * sample_size;
+			int p1 = no_of_periods_ * sample_size;
 			int p2 = p1 - 1;
 			double mean, sd_dev;
 			calculatemeansddev(*v_iter, sample_size, p1, p2,
-					   periods, mean, sd_dev);
+					   no_of_periods_, mean, sd_dev);
 
 			char buffer[4096];
 			int strLen;
@@ -458,12 +543,13 @@ void aalcalc::outputresultscsv_new(const std::vector<aal_rec_ensemble> &vec_aal,
 		v_iter++;
 
 	}
-
 }
 
-void aalcalc::outputresultscsv_new(std::vector<aal_rec>& vec_aal, int periods,int sample_size)
+template<typename aal_rec_T>
+void aalcalc::outputresultscsv_new(std::vector<aal_rec_T>& vec_aal,
+				   int sample_size)
 {
-	int p1 = periods * sample_size;
+	int p1 = no_of_periods_ * sample_size;
 	int p2 = p1 - 1;
 
 	auto v_iter = vec_aal.begin();
@@ -471,7 +557,7 @@ void aalcalc::outputresultscsv_new(std::vector<aal_rec>& vec_aal, int periods,in
 		if (v_iter->summary_id > 0) {
 			double mean, sd_dev;
 			calculatemeansddev(*v_iter, sample_size, p1, p2,
-					   periods, mean, sd_dev);
+					   no_of_periods_, mean, sd_dev);
 
 			const int bufferSize = 4096;
 			char buffer[bufferSize];
@@ -489,6 +575,85 @@ void aalcalc::outputresultscsv_new(std::vector<aal_rec>& vec_aal, int periods,in
 		v_iter++;
 	}
 }
+
+void aalcalc::output_alct(std::map<int, std::vector<aal_rec_period>>& vec_aal)
+{
+
+	// Ensure file has csv extension to prevent conflict with potential
+	// parquet format output file
+	if (alct_outFile_.length() < 4 || alct_outFile_.substr(alct_outFile_.length() - 4, 4) != ".csv") {
+		alct_outFile_ += ".csv";
+	}
+	FILE * fout = fopen(alct_outFile_.c_str(), "wb");
+	fprintf(fout, "SummaryId,MeanLoss,SDLoss,SampleSize,LowerCI,UpperCI,"
+		      "StandardError,RelativeError,VarElementHaz,"
+		      "StandardErrorHaz,RelativeErrorHaz,VarElemntVuln,"
+		      "StandardErrorVuln,RelativeErrorVuln\n");
+
+	if (!samplesize_) return;
+
+	for (int summary_id = 1; summary_id < max_summary_id_ + 1; summary_id++) {
+		for (auto iter = vec_aal.begin(); iter != vec_aal.end(); ++iter)
+		{
+			double mean, sd_dev, var_vuln, var_haz;
+			int p1 = no_of_periods_ * iter->first;
+			int p2 = p1 - 1;
+			calculatemeansddev(iter->second[summary_id],
+					   iter->first, p1, p2, no_of_periods_,
+					   mean, sd_dev, var_vuln, var_haz);
+			double std_err = sqrt(var_haz + var_vuln);
+			double ci = calculateconfidenceinterval(std_err);
+			double std_err_haz = sqrt(var_haz);
+			double std_err_vuln = sqrt(var_vuln);
+
+			const int bufferSize = 4096;
+			char buffer[bufferSize];
+			int strLen;
+			strLen = snprintf(buffer, bufferSize,
+					  "%d,%f,%f,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
+					  summary_id, mean, sd_dev, iter->first,
+					  mean - ci, mean + ci, std_err,
+					  std_err/mean, var_haz, std_err_haz,
+					  std_err_haz/mean, var_vuln,
+					  std_err_vuln, std_err_vuln/mean);
+			outputrows(buffer, strLen, fout);
+		}
+	}
+
+	fclose(fout);
+
+}
+
+#ifdef HAVE_PARQUET
+void aalcalc::output_alct_parquet(std::map<int, std::vector<aal_rec_period>>& vec_aal,
+				  parquet::StreamWriter& os) {
+
+	for (int summary_id = 1; summary_id < max_summary_id_ + 1; summary_id++) {
+		for (auto iter = vec_aal.begin(); iter != vec_aal.end(); ++iter)
+		{
+			double mean, sd_dev, var_vuln, var_haz;
+			int p1 = no_of_periods_ * iter->first;
+			int p2 = p1 - 1;
+			calculatemeansddev(iter->second[summary_id],
+					   iter->first, p1, p2, no_of_periods_,
+					   mean, sd_dev, var_vuln, var_haz);
+			double std_err = sqrt(var_haz + var_vuln);
+			double ci = calculateconfidenceinterval(std_err);
+			double std_err_haz = sqrt(var_haz);
+			double std_err_vuln = sqrt(var_vuln);
+
+			os << summary_id << (float)mean << (float)sd_dev
+			   << iter->first << (float)(mean - ci)
+			   << (float)(mean + ci) << (float)std_err
+			   << (float)(std_err/mean) << (float)var_haz
+			   << (float)std_err_haz << (float)(std_err_haz/mean)
+			   << (float)var_vuln << (float)std_err_vuln
+			   << (float)(std_err_vuln/mean) << parquet::EndRow;
+		}
+	}
+}
+#endif
+
 void aalcalc::outputresultscsv_new()
 {
 	/* parquet_output_ | ord_output_ | output files
@@ -529,23 +694,82 @@ void aalcalc::outputresultscsv_new()
 		  OasisParquet::SetupParquetOutputStream(parquet_outFile_,
 							 parquetFields);
 
-		outputresultsparquet(vec_analytical_aal_, no_of_periods_, 1,
+		outputresultsparquet(vec_analytical_aal_, 1, os);
+		outputresultsparquet(vec_sample_aal_[samplesize_], samplesize_,
 				     os);
-		outputresultsparquet(vec_sample_aal_, no_of_periods_,
-				     samplesize_, os);
+
+		if (alct_output_) {
+			std::vector<OasisParquet::ParquetFields> parquetFields_alct;
+			parquetFields_alct.push_back(
+				{"SummaryId", parquet::Type::INT32,
+				parquet::ConvertedType::INT_32});
+			parquetFields_alct.push_back(
+				{"MeanLoss", parquet::Type::FLOAT,
+				parquet::ConvertedType::NONE});
+			parquetFields_alct.push_back(
+				{"SDLoss", parquet::Type::FLOAT,
+				parquet::ConvertedType::NONE});
+			parquetFields_alct.push_back(
+				{"SampleSize", parquet::Type::INT32,
+				parquet::ConvertedType::INT_32});
+			parquetFields_alct.push_back(
+				{"LowerCI", parquet::Type::FLOAT,
+				parquet::ConvertedType::NONE});
+			parquetFields_alct.push_back(
+				{"UpperCI", parquet::Type::FLOAT,
+				parquet::ConvertedType::NONE});
+			parquetFields_alct.push_back(
+				{"StandardError", parquet::Type::FLOAT,
+				parquet::ConvertedType::NONE});
+			parquetFields_alct.push_back(
+				{"RelativeError", parquet::Type::FLOAT,
+				parquet::ConvertedType::NONE});
+			parquetFields_alct.push_back(
+				{"VarElementHaz", parquet::Type::FLOAT,
+				parquet::ConvertedType::NONE});
+			parquetFields_alct.push_back(
+				{"StandardErrorHaz", parquet::Type::FLOAT,
+				parquet::ConvertedType::NONE});
+			parquetFields_alct.push_back(
+				{"RelativeErrorHaz", parquet::Type::FLOAT,
+				parquet::ConvertedType::NONE});
+			parquetFields_alct.push_back(
+				{"VarElementVuln", parquet::Type::FLOAT,
+				parquet::ConvertedType::NONE});
+			parquetFields_alct.push_back(
+				{"StandardErrorVuln", parquet::Type::FLOAT,
+				parquet::ConvertedType::NONE});
+			parquetFields_alct.push_back(
+				{"RelativeErrorVuln", parquet::Type::FLOAT,
+				parquet::ConvertedType::NONE});
+
+			
+			// Ensure file has parquet extension to prevent conflict
+			// with potential csv format output file
+			std::string parquet_alct_outFile = alct_outFile_;
+			if (parquet_alct_outFile.length() < 8 || parquet_alct_outFile.substr(parquet_alct_outFile.length() -8, 8) != ".parquet") {
+				parquet_alct_outFile += ".parquet";
+			}
+			parquet::StreamWriter os_alct =
+			  OasisParquet::SetupParquetOutputStream(parquet_alct_outFile,
+								 parquetFields_alct);
+
+			output_alct_parquet(vec_sample_aal_, os_alct);
+
+		}
 	}
 #endif
 
 	// Write csv file
 	if (!(parquet_output_ == true && ord_output_ == false)) {
-		outputresultscsv_new(vec_analytical_aal_, no_of_periods_,1);
-		outputresultscsv_new(vec_sample_aal_, no_of_periods_,
-				     samplesize_);
+		outputresultscsv_new(vec_analytical_aal_, 1);
+		outputresultscsv_new(vec_sample_aal_[samplesize_], samplesize_);
 
 		if (sidxtoensemble_.size() > 0) {
-			outputresultscsv_new(vec_ensemble_aal_,
-					     no_of_periods_);
+			outputresultscsv_new(vec_ensemble_aal_);
 		}
+
+		if (alct_output_) output_alct(vec_sample_aal_);
 	}
 
 }
@@ -606,11 +830,11 @@ void aalcalc::doit(const std::string& subfolder)
 	summaryindex::doit(subfolder, event_to_period_);
 	initsameplsize(path);
 	getmaxsummaryid(path);
+	getsamplesizes();
 	loadperiodtoweigthing();	// move this to after the samplesize_ variable has been set i.e.  after reading the first 8 bytes of the first summary file
 	loadensemblemapping();
 	char line[4096];
 	vec_sample_sum_loss_.resize(samplesize_+1, 0.0);
-	vec_sample_aal_.resize(max_summary_id_ + 1);
 	vec_ensemble_aal_.resize(max_summary_id_ * max_ensemble_id_ + 1);
 	vec_analytical_aal_.resize(max_summary_id_ + 1);
 	std::vector<std::string> filelist;

@@ -89,7 +89,7 @@ private:
 	std::map<int, aal_rec> map_analytical_aal_w_;
 	std::map<int, aal_rec> map_sample_aal_;
 	std::vector<double> vec_sample_sum_loss_;
-	std::vector<aal_rec> vec_sample_aal_;
+	std::map<int, std::vector<aal_rec_period>> vec_sample_aal_;
 	std::vector<aal_rec_ensemble> vec_ensemble_aal_;
 	std::vector<aal_rec> vec_analytical_aal_;
 	int max_summary_id_ = 0;
@@ -102,6 +102,9 @@ private:
 	bool ord_output_ = false;
 	bool parquet_output_ = false;
 	std::string parquet_outFile_;
+	bool alct_output_ = false;
+	std::string alct_outFile_;
+	float confidence_level_;
 // private functions
 	template<typename T>
 	void loadoccurrence(T &occ, FILE * fin);
@@ -111,8 +114,10 @@ private:
 	void initsameplsize(const std::string &path);
 	void loadperiodtoweigthing();
 	void loadensemblemapping();
+	void getsamplesizes();
 	void process_summaryfilew(const std::string &filename);
 	void debug_process_summaryfile(const std::string &filename);
+	inline void fillensemblerec(const int sidx, const double mean, const double weighting);
 	void do_calc_by_period(const summarySampleslevelHeader &sh, const std::vector<sampleslevelRec> &vrec);
 	void do_calc_end(int period_no);
 	void do_sample_calc_newx(const summarySampleslevelHeader& sh, const std::vector<sampleslevelRec>& vrec);
@@ -122,23 +127,36 @@ private:
 				       const int sample_size, const int p1,
 				       const int p2, const int periods,
 				       double &mean, double &sd_dev);
-	void outputresultscsv();
-	void outputresultscsv_new(std::vector<aal_rec> &vec_aal, int periods, int sample_size);
-	void outputresultscsv_new(const std::vector<aal_rec_ensemble> &vec_aal, const int periods);
+	inline void calculatemeansddev(const aal_rec_period &record,
+				       const int sample_size, const int p1,
+				       const int p2, const int periods,
+				       double &mean, double &sd_dev,
+				       double &var_vuln, double &var_haz);
+	double calculateconfidenceinterval(const double std_err);
+	template<typename aal_rec_T>
+	void outputresultscsv_new(std::vector<aal_rec_T> &vec_aal,
+				  int sample_size);
+	void outputresultscsv_new(const std::vector<aal_rec_ensemble> &vec_aal);
+	void output_alct(std::map<int, std::vector<aal_rec_period>>& vec_aal);
 	void outputresultscsv_new();
 #ifdef HAVE_PARQUET
-	void outputresultsparquet(const std::vector<aal_rec>& vec_aal,
-				  int periods, int sample_size,
-				  parquet::StreamWriter& os);
+	template<typename aal_rec_T>
+	void outputresultsparquet(const std::vector<aal_rec_T>& vec_aal,
+				  int sample_size, parquet::StreamWriter& os);
+	void output_alct_parquet(std::map<int, std::vector<aal_rec_period>>& vec_aal,
+				 parquet::StreamWriter& os);
 #endif
-	inline void outputrows(const char * buffer, int strLen);
+	inline void outputrows(const char * buffer, int strLen, FILE * fout=stdout);
 	void getmaxsummaryid(std::string& path);
 public:
 	aalcalc(bool skipheader, bool ord_output, bool parquet_output,
-		std::string parquet_outFile)
+		std::string parquet_outFile, bool alct_output,
+		std::string alct_outFile, float confidence_level)
 		: skipheader_(skipheader), ord_output_(ord_output),
 		parquet_output_(parquet_output),
-		parquet_outFile_(parquet_outFile) {};
+		parquet_outFile_(parquet_outFile), alct_output_(alct_output),
+		alct_outFile_(alct_outFile),
+		confidence_level_(confidence_level) {};
 	void doit(const std::string& subfolder);		// experimental
 	void debug(const std::string &subfolder);
 };

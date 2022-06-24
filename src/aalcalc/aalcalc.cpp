@@ -582,7 +582,7 @@ void aalcalc::output_alct(std::map<int, std::vector<aal_rec_period>>& vec_aal)
 	FILE * fout = fopen(alct_outFile_.c_str(), "wb");
 	fprintf(fout, "SummaryId,MeanLoss,SDLoss,SampleSize,LowerCI,UpperCI,"
 		      "StandardError,RelativeError,VarElementHaz,"
-		      "StandardErrorHaz,RelativeErrorHaz,VarElemntVuln,"
+		      "StandardErrorHaz,RelativeErrorHaz,VarElementVuln,"
 		      "StandardErrorVuln,RelativeErrorVuln\n");
 
 	if (!samplesize_) return;

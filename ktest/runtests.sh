@@ -65,7 +65,7 @@ installertest()
   	# test selt
   	../src/summarycalctocsv/summarycalctocsv -o > ../ktest/testout/gulselt1.csv < ../ktest/testout/gulsummarycalc1.bin
 	../src/summarycalctocsv/summarycalctocsv -o > ../ktest/testout/gulselt2.csv < ../ktest/testout/gulsummarycalc2.bin
-	if [ PARQUET_OUTPUT -eq 1 ]; then
+	if [ ${PARQUET_OUTPUT} -eq 1 ]; then
   		../src/summarycalctocsv/summarycalctocsv -p ../ktest/testout/gulselt1.parquet < ../ktest/testout/gulsummarycalc1.bin
 		../src/summarycalctocsv/summarycalctocsv -p ../ktest/testout/gulselt2.parquet < ../ktest/testout/gulsummarycalc2.bin
 	fi
@@ -77,7 +77,7 @@ installertest()
 	../src/eltcalc/eltcalc < ../ktest/testout/fmsummarycalc2.bin > ../ktest/testout/fmelt2.csv
 
 	# test melt qelt
-	if [ PARQUET_OUTPUT -eq 1 ]; then
+	if [ ${PARQUET_OUTPUT} -eq 1 ]; then
 		../src/eltcalc/eltcalc -m ../ktest/testout/gulmelt1.parquet -q ../ktest/testout/gulqelt1.parquet < ../ktest/testout/gulsummarycalc1.bin  
 		../src/eltcalc/eltcalc -m ../ktest/testout/gulmelt2.parquet -q ../ktest/testout/gulqelt2.parquet < ../ktest/testout/gulsummarycalc2.bin 
 	fi
@@ -85,7 +85,7 @@ installertest()
 	../src/eltcalc/eltcalc -M ../ktest/testout/gulmelt2.csv -Q ../ktest/testout/gulqelt2.csv < ../ktest/testout/gulsummarycalc2.bin
 
 	# test mplt qplt splt
-	if [ PARQUET_OUTPUT -eq 1 ]; then
+	if [ ${PARQUET_OUTPUT} -eq 1 ]; then
 		../src/pltcalc/pltcalc -m ../ktest/testout/gulmplt1.parquet -q ../ktest/testout/gulqplt1.parquet -s ../ktest/testout/gulsplt1.parquet < ../ktest/testout/gulsummarycalc1.bin
 		../src/pltcalc/pltcalc -m ../ktest/testout/gulmplt2.parquet -q ../ktest/testout/gulqplt2.parquet -s ../ktest/testout/gulsplt2.parquet < ../ktest/testout/gulsummarycalc2.bin
 	fi
@@ -171,7 +171,7 @@ installertest()
 	 ../src/ordleccalc/ordleccalc -r -Kgul2/summary -F -f -W -w -M -m -S -s -O ../ktest/testout/gul_ept_2_r.csv -o ../ktest/testout/gul_psept_2_r.csv
 	 ../src/ordleccalc/ordleccalc -r -Kfm1/summary -F -f -W -w -M -m -S -s -O ../ktest/testout/fm_ept_1_r.csv -o ../ktest/testout/fm_psept_1_r.csv
 	 ../src/ordleccalc/ordleccalc -r -Kfm2/summary -F -f -W -w -M -m -S -s -O ../ktest/testout/fm_ept_2_r.csv -o ../ktest/testout/fm_psept_2_r.csv
-	 if [ PARQUET_OUTPUT -eq 1 ]; then
+	 if [ ${PARQUET_OUTPUT} -eq 1 ]; then
  		../src/ordleccalc/ordleccalc  -Kgul1/summary -F -f -W -w -M -m -S -s -P ../ktest/testout/gul_ept_1.parquet -p ../ktest/testout/gul_psept_1.parquet
 	 	../src/ordleccalc/ordleccalc  -Kgul2/summary -F -f -W -w -M -m -S -s -P ../ktest/testout/gul_ept_2.parquet -p ../ktest/testout/gul_psept_2.parquet
 	 	../src/ordleccalc/ordleccalc  -Kfm1/summary -F -f -W -w -M -m -S -s -P ../ktest/testout/fm_ept_1.parquet -p ../ktest/testout/fm_psept_1.parquet
@@ -200,7 +200,7 @@ installertest()
 	../src/aalcalc/aalcalc -o -Kgul2/summary > ../ktest/testout/gulalt2.csv
 	../src/aalcalc/aalcalc -o -Kfm1/summary > ../ktest/testout/fmalt1.csv
 	../src/aalcalc/aalcalc -o -Kfm2/summary > ../ktest/testout/fmalt2.csv
-	if [ PARQUET_OUTPUT -eq 1 ]; then
+	if [ ${PARQUET_OUTPUT} -eq 1 ]; then
 		../src/aalcalc/aalcalc -p ../ktest/testout/gulalt1.parquet -Kgul1/summary
 		../src/aalcalc/aalcalc -p ../ktest/testout/gulalt2.parquet -Kgul2/summary
 		../src/aalcalc/aalcalc -p ../ktest/testout/fmalt1.parquet -Kfm1/summary
@@ -262,12 +262,12 @@ installertest()
      # checksums		
 	if [ "$SYSTEMNAME" == "Darwin" ]; then
 	 	shasum -c ../$CTRL.sha1
-		if [ PARQUET_OUTPUT -eq 1 ]; then
+		if [ ${PARQUET_OUTPUT} -eq 1 ]; then
 			shasum -c ../$CTRL_PARQUET.sha1
 		fi
 	else
 	 	sha1sum -c ../$CTRL.sha1
-		if [ PARQUET_OUTPUT -eq 1 ]; then
+		if [ ${PARQUET_OUTPUT} -eq 1 ]; then
 			sha1sum -c ../$CTRL_PARQUET.sha1
 		fi
 	fi

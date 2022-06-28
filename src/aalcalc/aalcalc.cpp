@@ -159,14 +159,9 @@ void aalcalc::getsamplesizes()
 	// i.e. for 10 samples, sets are (1), (2, 3), (4, 5, 6, 7)
 	// for 20 samples, sets are (1), (2, 3), (4, 5, 6, 7),
 	//                          (8, 9, 10, 11, 12, 13, 14, 15)
-	//                          
-	// (1 << 0) + ((1 << 0) >> 1) = 1 + 0 = 1
-	// (1 << 1) + ((1 << 1) >> 1) = 2 + 1 = 3
-	// (1 << 2) + ((1 << 2) >> 1) = 4 + 2 = 6
-	// (1 << 3) + ((1 << 3) >> 1) = 8 + 4 = 12
 	if (alct_output_) {
 		int i = 0;
-		while (((1 << i) + ((1 << i) >> 1)) <= samplesize_) {
+		while (((1 << i) + ((1 << i) - 1)) <= samplesize_) {
 			vec_sample_aal_[1 << i].resize(max_summary_id_ + 1);
 			i++;
 		}
@@ -587,7 +582,7 @@ void aalcalc::output_alct(std::map<int, std::vector<aal_rec_period>>& vec_aal)
 	FILE * fout = fopen(alct_outFile_.c_str(), "wb");
 	fprintf(fout, "SummaryId,MeanLoss,SDLoss,SampleSize,LowerCI,UpperCI,"
 		      "StandardError,RelativeError,VarElementHaz,"
-		      "StandardErrorHaz,RelativeErrorHaz,VarElemntVuln,"
+		      "StandardErrorHaz,RelativeErrorHaz,VarElementVuln,"
 		      "StandardErrorVuln,RelativeErrorVuln\n");
 
 	if (!samplesize_) return;

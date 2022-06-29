@@ -448,7 +448,7 @@ void gulcalc::outputmode1data(int event_id) {
 			for (int k = 0; k < samplesize_; k++) {
 
 				OASIS_FLOAT rval;
-				OASIS_FLOAT rval0;
+				OASIS_FLOAT rval0 = 0;
 
 				if (rndopt_ == rd_option::usehashedseed) {
 					rval = rnd_->nextrnd();
@@ -471,7 +471,8 @@ void gulcalc::outputmode1data(int event_id) {
 				OASIS_FLOAT last_prob_to = 0;
 				bool hit_rval = false;
 				bool hit_rval0 = false;
-				for (int bin_index = 0; bin_index < mode1_stats_[j][i].bin_map_ids.size(); bin_index++) {
+				int max_bin_end = (int)mode1_stats_[j][i].bin_map_ids.size();
+				for (int bin_index = 0; bin_index < max_bin_end; bin_index++) {
 
 					prob_mean pp = bin_lookup_[mode1_stats_[j][i].bin_map_ids[bin_index]];
 					probrec p;
@@ -759,7 +760,6 @@ void gulcalc::output_mean(OASIS_FLOAT tiv, prob_mean *pp, int bin_count,
 void gulcalc::processrec_mode1(char* rec, int recsize) {
 
 	damagecdfrec * d = (damagecdfrec*)rec;
-	char * endofRec = rec + recsize;
 
 	item_map_key k;
 	k.areaperil_id = d->areaperil_id;
@@ -889,7 +889,7 @@ damagecdfrec *d = (damagecdfrec *)rec;
 			for (int i = 0; i < samplesize_; i++) {
 
 				OASIS_FLOAT  rval;
-				OASIS_FLOAT rval0;
+				OASIS_FLOAT rval0 = 0;
 
 				if (rndopt_ == rd_option::usehashedseed) {
 					rval = rnd_->nextrnd();

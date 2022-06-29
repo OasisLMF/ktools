@@ -164,7 +164,7 @@ int main(int argc, char *argv[])
 			else gopt.covout = fopen(gopt.coverage_output.c_str(), "wb");
 		} else {
 			fprintf(stderr, "WARNING: Alloc rule %d and coverage output are incompatible - ignoring coverage output\n", gopt.allocRule);
-			gopt.coverageLevelOutput == false;
+			gopt.coverageLevelOutput = false;
 		}
 	}
 	if(gopt.correlatedLevelOutput == true) {

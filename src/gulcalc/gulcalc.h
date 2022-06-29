@@ -84,7 +84,6 @@ struct gulGulSamples {
 struct processrecData {
 	OASIS_FLOAT gul_mean;
 	OASIS_FLOAT std_dev;
-	OASIS_FLOAT chance_of_loss;
 	OASIS_FLOAT max_loss;
 	int item_id;
 	int group_id;
@@ -169,12 +168,10 @@ private:
 	OASIS_FLOAT getgul(damagebindictionary &b, gulGulSamples &g);
 	void output_mean(OASIS_FLOAT tiv, prob_mean *pp, int bin_count,
 			 OASIS_FLOAT &gul_mean, OASIS_FLOAT &std_dev,
-			 OASIS_FLOAT &chance_of_loss, OASIS_FLOAT &max_loss);
+			 OASIS_FLOAT &max_loss);
 	void output_mean_mode1(const OASIS_FLOAT tiv, prob_mean *pp,
 			       const int bin_count, OASIS_FLOAT &gul_mean,
-			       OASIS_FLOAT &std_dev,
-			       OASIS_FLOAT &chance_of_loss,
-			       OASIS_FLOAT &max_loss,
+			       OASIS_FLOAT &std_dev, OASIS_FLOAT &max_loss,
 			       std::vector<int> &bin_ids);
 	void init();
 	unsigned char *ibuf_;	// item level buffer

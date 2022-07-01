@@ -108,7 +108,7 @@ namespace eltcalc {
 		}
 
 		int date_opts = 0;
-		size_t i = fread(&date_opts, sizeof(date_opts), 1, fin);
+		fread(&date_opts, sizeof(date_opts), 1, fin);
 		int granular_date = date_opts >> 1;
 		if (granular_date) {
 			occurrence_granular occ;
@@ -224,7 +224,7 @@ namespace eltcalc {
 	{
 		int idx = i.integer_part;
 		OASIS_FLOAT loss = 0;
-		if (idx == losses_vec.size()) {
+		if (idx == (int)losses_vec.size()) {
 			loss = losses_vec[idx-1];
 		} else {
 			loss = (losses_vec[idx] - losses_vec[idx-1]) * i.fractional_part + losses_vec[idx-1];

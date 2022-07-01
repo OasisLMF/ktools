@@ -310,7 +310,7 @@ void summarycalc::outputsummaryset(int sample_size, int summary_set, int event_i
 			fwrite(&sh, sizeof(sh), 1, fout[summary_set]);
 			offset_[summary_set] += sizeof(sh);
 			for (int j = first_idx_; j < sample_size + num_idx_ + 1; j++) {
-				if (j != num_idx_) {   // sidx = 0
+				if (j != num_idx_ && j != chance_of_loss_idx + num_idx_) {   // sidx = 0 AND sidx = chance_of_loss_idx
 					sampleslevelRec s;
 					s.sidx = j - num_idx_;
 					if (s.sidx == tiv_idx || s.sidx == std_dev_idx) {
@@ -412,30 +412,20 @@ void summarycalc::outputsummary(int sample_size,int event_id)
 }
 
 
-OASIS_FLOAT summarycalc::add_losses(const OASIS_FLOAT loss,
-				    const OASIS_FLOAT gul)
+inline OASIS_FLOAT summarycalc::add_losses(const OASIS_FLOAT loss,
+					   const OASIS_FLOAT gul)
 {
 	return loss + gul;
 }
 
 
-OASIS_FLOAT summarycalc::calculate_chanceofloss(const OASIS_FLOAT loss,
-						const OASIS_FLOAT gul)
-{
-	// Chance of loss = 1 - (1 - C_1)(1 - C_2)...(1 - C_n)
-	if (loss == 0.0) return 1 - (1 - gul);
-	else return 1 + ((loss - 1) * (1 - gul));
-}
-
-
 void summarycalc::processsummaryset(int summaryset, int coverage_id, int sidx,
-				    OASIS_FLOAT gul,
-				    OASIS_FLOAT (summarycalc::*PropagateLosses)(const OASIS_FLOAT, const OASIS_FLOAT))
+				    OASIS_FLOAT gul)
 {
 	OASIS_FLOAT **ssl = sssl[summaryset];
 	coverage_id_or_output_id_to_Summary_id &p = *co_to_s_[summaryset];
 	int summary_id = p[coverage_id];
-	ssl[summary_id][sidx+num_idx_] = (this->*PropagateLosses)(ssl[summary_id][sidx+num_idx_], gul);
+	ssl[summary_id][sidx+num_idx_] = add_losses(ssl[summary_id][sidx+num_idx_], gul);
 }
 
 
@@ -454,33 +444,26 @@ inline void summarycalc::reset_for_new_event(const int sample_size,
 
 inline void summarycalc::processsummarysets(const int coverage_or_output_id,
 					    const int sidx,
-					    const OASIS_FLOAT gul,
-					    OASIS_FLOAT (summarycalc::*PropagateLosses)(const OASIS_FLOAT, const OASIS_FLOAT))
+					    const OASIS_FLOAT gul)
 {
 	for (int i = 0; i < MAX_SUMMARY_SETS; i++) {
 		int cov_id = coverage_or_output_id;
 		if (item_to_coverage_.size() > 0) {
 			cov_id = item_to_coverage_[coverage_or_output_id];
 		}
-		if (fout[i] != nullptr) processsummaryset(i, cov_id, sidx, gul,
-							  PropagateLosses);
+		if (fout[i] != nullptr) processsummaryset(i, cov_id, sidx, gul);
 	}
 }
 
 
-void summarycalc::dosummary_chanceofloss_maxloss(int sample_size, int event_id,
-						 int coverage_or_output_id,
-						 int sidx, OASIS_FLOAT gul)
+void summarycalc::dosummary_maxloss(int sample_size, int event_id,
+				    int coverage_or_output_id, int sidx,
+				    OASIS_FLOAT gul)
 {
 	first_idx_ = 0;   // ChanceOfLoss & MaxLoss fields exist
 	if (last_event_id_ != event_id)
 		reset_for_new_event(sample_size, event_id);
-	if (sidx == chance_of_loss_idx) {
-		PropagateLosses = &summarycalc::calculate_chanceofloss;
-	} else {
-		PropagateLosses = &summarycalc::add_losses;
-	}
-	processsummarysets(coverage_or_output_id, sidx, gul, PropagateLosses);
+	processsummarysets(coverage_or_output_id, sidx, gul);
 }
 
 
@@ -507,9 +490,7 @@ void summarycalc::dosummary(int sample_size,int event_id,int coverage_or_output_
 		last_coverage_or_output_id_ = coverage_or_output_id;
 	}
 
-	PropagateLosses = &summarycalc::add_losses;
-	processsummarysets(last_coverage_or_output_id_, sidx, gul,
-			   PropagateLosses);
+	processsummarysets(last_coverage_or_output_id_, sidx, gul);
 }
 // item like stream
 void summarycalc::dogulitemxsummary()
@@ -613,10 +594,11 @@ void summarycalc::dosummaryprocessing(int samplesize)
 			i = (int)fread(&sr, sizeof(sr), 1, stdin);
 			if (i == 0) break;
 			if (sr.sidx == 0) break;
+			if (sr.sidx == chance_of_loss_idx) continue;   // Ignore chance of loss
 			if (sr.sidx == tiv_idx) {
 				expure_val = sr.loss;
-			} else if (sr.sidx == chance_of_loss_idx || sr.sidx == max_loss_idx) {
-				dosummary_chanceofloss_maxloss(samplesize, fh.event_id, fh.output_id, sr.sidx, sr.loss);
+			} else if (sr.sidx == max_loss_idx) {
+				dosummary_maxloss(samplesize, fh.event_id, fh.output_id, sr.sidx, sr.loss);
 			} else {
 				dosummary(samplesize, fh.event_id, fh.output_id, sr.sidx, sr.loss, expure_val);
 			}

@@ -265,7 +265,7 @@ void help()
 		"-f full precision\n"
 		"-e show exposure_value\n"
 		"-v version\n"
-		"-a include ChanceOfLoss and MaxLoss sample IDs\n"
+		"-a include MaxLoss sample IDs\n"
 		"-z remove records with zero exposure values\n"
 		"-o Open Results Data (ORD) output\n"
 		"-p [filename] ORD output in parquet format\n"

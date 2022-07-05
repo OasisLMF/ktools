@@ -108,7 +108,7 @@ namespace eltcalc {
 		}
 
 		int date_opts = 0;
-		size_t i = fread(&date_opts, sizeof(date_opts), 1, fin);
+		fread(&date_opts, sizeof(date_opts), 1, fin);
 		int granular_date = date_opts >> 1;
 		if (granular_date) {
 			occurrence_granular occ;
@@ -224,7 +224,7 @@ namespace eltcalc {
 	{
 		int idx = i.integer_part;
 		OASIS_FLOAT loss = 0;
-		if (idx == losses_vec.size()) {
+		if (idx == (int)losses_vec.size()) {
 			loss = losses_vec[idx-1];
 		} else {
 			loss = (losses_vec[idx] - losses_vec[idx-1]) * i.fractional_part + losses_vec[idx-1];
@@ -355,6 +355,7 @@ namespace eltcalc {
 			OASIS_FLOAT mean_impacted_exposure = 0;
 			OASIS_FLOAT max_impacted_exposure = 0;
 			OASIS_FLOAT chance_of_loss = 0;
+			int non_zero_samples = 0;
 			OASIS_FLOAT max_loss = 0;
 			sampleslevelRec sr;
 			i = fread(&sr, sizeof(sr), 1, stdin);
@@ -375,11 +376,10 @@ namespace eltcalc {
 						if (sh.expval > max_impacted_exposure) {
 							max_impacted_exposure = sh.expval;
 						}
+						non_zero_samples++;
 					}
 				} else if (sr.sidx == -1) {
 					analytical_mean = sr.loss;
-				} else if (sr.sidx == chance_of_loss_idx) {
-					chance_of_loss = sr.loss;
 				} else if (sr.sidx == max_loss_idx) {
 					max_loss = sr.loss;
 				}
@@ -392,6 +392,7 @@ namespace eltcalc {
 				if (x < 0.0000001) sd = 0;   // fix OASIS_FLOATing point precision problems caused by using large numbers
 				sd = sqrt(sd);
 				mean_impacted_exposure /= samplesize;
+				chance_of_loss = non_zero_samples / (OASIS_FLOAT)samplesize;   // relative frequency
 			}
 			else {
 				if (samplesize == 0) {
@@ -407,8 +408,7 @@ namespace eltcalc {
 				if (OutputData != nullptr) {
 					OutputData(sh, 1, analytical_mean, 0,
 						   outFile, sh.expval,
-						   sh.expval, chance_of_loss,
-						   max_loss);
+						   sh.expval, 0.0, max_loss);
 				}
 #ifdef HAVE_PARQUET
 				if (parquetFileNames.find(OasisParquet::MELT) != parquetFileNames.end()) {
@@ -416,8 +416,7 @@ namespace eltcalc {
 							  analytical_mean, 0,
 							  os[OasisParquet::MELT],
 							  sh.expval, sh.expval,
-							  chance_of_loss,
-							  max_loss);
+							  0.0, max_loss);
 				}
 #endif
 				if (firstOutput == true) {

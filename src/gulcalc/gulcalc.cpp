@@ -397,12 +397,6 @@ void gulcalc::outputmode1data(int event_id) {
 			if (correlatedWriter_)
 				gilv0[max_loss_idx + num_idx_].push_back(gi);
 
-			// chance of loss
-			gi.loss = mode1_stats_[j][i].chance_of_loss;
-			gilv[chance_of_loss_idx + num_idx_].push_back(gi);
-			if (correlatedWriter_)
-				gilv0[chance_of_loss_idx + num_idx_].push_back(gi);
-
 			// exposure value record
 			// tiv / count(tuple(event_id-coverage_id))
 			gi.loss = exposureValue;
@@ -454,7 +448,7 @@ void gulcalc::outputmode1data(int event_id) {
 			for (int k = 0; k < samplesize_; k++) {
 
 				OASIS_FLOAT rval;
-				OASIS_FLOAT rval0;
+				OASIS_FLOAT rval0 = 0;
 
 				if (rndopt_ == rd_option::usehashedseed) {
 					rval = rnd_->nextrnd();
@@ -477,7 +471,8 @@ void gulcalc::outputmode1data(int event_id) {
 				OASIS_FLOAT last_prob_to = 0;
 				bool hit_rval = false;
 				bool hit_rval0 = false;
-				for (int bin_index = 0; bin_index < mode1_stats_[j][i].bin_map_ids.size(); bin_index++) {
+				int max_bin_end = (int)mode1_stats_[j][i].bin_map_ids.size();
+				for (int bin_index = 0; bin_index < max_bin_end; bin_index++) {
 
 					prob_mean pp = bin_lookup_[mode1_stats_[j][i].bin_map_ids[bin_index]];
 					probrec p;
@@ -690,9 +685,7 @@ void gulcalc::fillgulitemloss(const int item_id, const OASIS_FLOAT tiv,
 
 void gulcalc::output_mean_mode1(const OASIS_FLOAT tiv, prob_mean *pp,
 				const int bin_count, OASIS_FLOAT &gul_mean,
-				OASIS_FLOAT &std_dev,
-				OASIS_FLOAT &chance_of_loss,
-				OASIS_FLOAT &max_loss,
+				OASIS_FLOAT &std_dev, OASIS_FLOAT &max_loss,
 				std::vector<int> &bin_ids) {
 
 	OASIS_FLOAT last_prob_to = 0;
@@ -713,11 +706,6 @@ void gulcalc::output_mean_mode1(const OASIS_FLOAT tiv, prob_mean *pp,
 		probrec p;
 		if (bin_index == 0) {
 			p.prob_from = 0;
-			if (pp->bin_mean == 0) {
-				chance_of_loss = 1 - pp->prob_to;
-			} else {
-				chance_of_loss = 1;
-			}
 		} else {
 			p.prob_from = last_prob_to;
 		}
@@ -739,7 +727,7 @@ void gulcalc::output_mean_mode1(const OASIS_FLOAT tiv, prob_mean *pp,
 
 void gulcalc::output_mean(OASIS_FLOAT tiv, prob_mean *pp, int bin_count,
 			  OASIS_FLOAT &gul_mean,  OASIS_FLOAT &std_dev,
-			  OASIS_FLOAT &chance_of_loss, OASIS_FLOAT &max_loss)
+			  OASIS_FLOAT &max_loss)
 {
 	OASIS_FLOAT last_prob_to = 0;
 	gul_mean = 0;
@@ -751,11 +739,6 @@ void gulcalc::output_mean(OASIS_FLOAT tiv, prob_mean *pp, int bin_count,
 		probrec p;
 		if (bin_index == 0) {
 			p.prob_from = 0;
-			if (pp->bin_mean == 0) {
-				chance_of_loss = 1 - pp->prob_to;
-			} else {
-				chance_of_loss = 1;
-			}
 		} else {
 			p.prob_from = last_prob_to;
 		}
@@ -777,7 +760,6 @@ void gulcalc::output_mean(OASIS_FLOAT tiv, prob_mean *pp, int bin_count,
 void gulcalc::processrec_mode1(char* rec, int recsize) {
 
 	damagecdfrec * d = (damagecdfrec*)rec;
-	char * endofRec = rec + recsize;
 
 	item_map_key k;
 	k.areaperil_id = d->areaperil_id;
@@ -798,16 +780,13 @@ void gulcalc::processrec_mode1(char* rec, int recsize) {
 			prob_mean* pp = (prob_mean*)b;
 			OASIS_FLOAT gul_mean;
 			OASIS_FLOAT std_dev;
-			OASIS_FLOAT chance_of_loss;
 			OASIS_FLOAT max_loss;
 			OASIS_FLOAT tiv = (*coverages_)[iter->coverage_id];
 			vector<int> bin_ids;
 			output_mean_mode1(tiv, pp, *bin_count, gul_mean,
-					  std_dev, chance_of_loss, max_loss,
-					  bin_ids);
+					  std_dev, max_loss, bin_ids);
 			recData.gul_mean = gul_mean;
 			recData.std_dev = std_dev;
-			recData.chance_of_loss = chance_of_loss;
 			recData.max_loss = max_loss;
 			recData.bin_map_ids = bin_ids;
 
@@ -850,18 +829,13 @@ damagecdfrec *d = (damagecdfrec *)rec;
 			b = b + sizeof(int);
 			prob_mean *pp = (prob_mean *)b;
 			OASIS_FLOAT max_loss;
-			OASIS_FLOAT chance_of_loss;
 			OASIS_FLOAT std_dev;
 			OASIS_FLOAT gul_mean;
 			OASIS_FLOAT tiv = (*coverages_)[iter->coverage_id];
 			output_mean(tiv, pp, *bin_count, gul_mean, std_dev,
-				    chance_of_loss, max_loss);
+				    max_loss);
 			gx.sidx = max_loss_idx;
 			gx.loss = max_loss;
-			itemoutputgul(gx);
-			if (correlatedWriter_) correlatedoutputgul(gx);
-			gx.sidx = chance_of_loss_idx;
-			gx.loss = chance_of_loss;
 			itemoutputgul(gx);
 			if (correlatedWriter_) correlatedoutputgul(gx);
 			gx.sidx = tiv_idx;
@@ -915,7 +889,7 @@ damagecdfrec *d = (damagecdfrec *)rec;
 			for (int i = 0; i < samplesize_; i++) {
 
 				OASIS_FLOAT  rval;
-				OASIS_FLOAT rval0;
+				OASIS_FLOAT rval0 = 0;
 
 				if (rndopt_ == rd_option::usehashedseed) {
 					rval = rnd_->nextrnd();

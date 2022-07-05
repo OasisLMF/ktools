@@ -91,13 +91,12 @@ private:
 	OASIS_FLOAT *alloc_sse_arrays(int summary_set);
 	void outputsamplesize(int samplesize);
 	void outputsummary(int sample_size, int event_id);
-	OASIS_FLOAT add_losses(const OASIS_FLOAT loss, const OASIS_FLOAT gul);
-	OASIS_FLOAT calculate_chanceofloss(const OASIS_FLOAT loss, const OASIS_FLOAT gul);
+	inline OASIS_FLOAT add_losses(const OASIS_FLOAT loss, const OASIS_FLOAT gul);
 	OASIS_FLOAT (summarycalc::*PropagateLosses)(const OASIS_FLOAT, const OASIS_FLOAT);
-	void processsummaryset(int summaryset, int coverage_id, int sidx, OASIS_FLOAT gul, OASIS_FLOAT (summarycalc::*PropagateLosses)(const OASIS_FLOAT, const OASIS_FLOAT));
+	void processsummaryset(int summaryset, int coverage_id, int sidx, OASIS_FLOAT gul);
 	inline void reset_for_new_event(const int sample_size, const int event_id);
-	inline void processsummarysets(const int coverage_or_output_id, const int sidx, const OASIS_FLOAT gul, OASIS_FLOAT (summarycalc::*PropagateLosses)(const OASIS_FLOAT, const OASIS_FLOAT));
-	void dosummary_chanceofloss_maxloss(int sample_size, int event_id, int coverage_or_output_id, int sidx, OASIS_FLOAT gul);
+	inline void processsummarysets(const int coverage_or_output_id, const int sidx, const OASIS_FLOAT gul);
+	void dosummary_maxloss(int sample_size, int event_id, int coverage_or_output_id, int sidx, OASIS_FLOAT gul);
 	void dosummary(int sample_size, int event_id, int coverage_id, int sidx, OASIS_FLOAT gul, OASIS_FLOAT expval);
 	bool loadcoverages();
 	void loaditemtocoverage();

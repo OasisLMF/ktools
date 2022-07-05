@@ -177,7 +177,7 @@ namespace pltcalc {
 		}
 
 		int date_opts;
-		size_t i = fread(&date_opts, sizeof(date_opts), 1, fin);
+		fread(&date_opts, sizeof(date_opts), 1, fin);
 		date_algorithm_ = date_opts & 1;
 		granular_date_ = date_opts >> 1;
 
@@ -574,6 +574,7 @@ namespace pltcalc {
 				OASIS_FLOAT impacted_exposure = 0;
 				sampleslevelRec sr;
 				i = fread(&sr, sizeof(sr), 1, stdin);
+				if (sr.sidx == chance_of_loss_idx) continue;   // Ignore chance of loss
 				if (i == 0 || sr.sidx == 0) {
 					dopltcalc(sh, vrec, OutputData, outFile,
 						  m_occ, vp,
@@ -591,20 +592,19 @@ namespace pltcalc {
 							impacted_exposure);
 				}
 
-				if (sr.sidx == chance_of_loss_idx) {
-					chance_of_loss = sr.loss;
-				} else if (sr.sidx == max_loss_idx) {
+				if (sr.sidx == max_loss_idx) {
 					max_loss = sr.loss;
 				} else if (sr.sidx == mean_idx) {
 					domeanout(sh, sr.loss, OutputData,
-						  outFile, m_occ, vp,
-						  chance_of_loss, max_loss);
+						  outFile, m_occ, vp, 0.0,
+						  max_loss);
 				} else {
 					vrec.push_back(sr);
 					mean_impacted_exposure += impacted_exposure / samplesize_;
 					if (impacted_exposure > max_impacted_exposure) {
 						max_impacted_exposure = impacted_exposure;
 					}
+					chance_of_loss += (sr.loss > 0) / (OASIS_FLOAT)samplesize_;   // Relative frequency
 				}
 			}
 		}
@@ -616,8 +616,8 @@ namespace pltcalc {
 		loadoccurrence();
 		if (ordOutput || parquetFileNames.size() != 0) getperiodweights();
 		int summarycalcstream_type = 0;
-		int i = fread(&summarycalcstream_type,
-			      sizeof(summarycalcstream_type), 1, stdin);
+		fread(&summarycalcstream_type, sizeof(summarycalcstream_type),
+		      1, stdin);
 		int stream_type = summarycalcstream_type & summarycalc_id;
 
 		if (stream_type != summarycalc_id) {
@@ -625,7 +625,7 @@ namespace pltcalc {
 			exit(-1);
 		}
 		stream_type = streamno_mask & summarycalcstream_type;
-		i = fread(&samplesize_, sizeof(samplesize_), 1, stdin);
+		fread(&samplesize_, sizeof(samplesize_), 1, stdin);
 #ifdef HAVE_PARQUET
 		if (fout[QPLT] != nullptr || parquetFileNames.find(OasisParquet::QPLT) != parquetFileNames.end())
 #else

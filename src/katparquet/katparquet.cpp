@@ -78,9 +78,7 @@ namespace katparquet {
 	isIn[iter->second] >> rows[iter->second];
       }
 
-      if (!isIn[iter->second].eof()) {
-	GetRow(event_to_file, rows[iter->second], iter->second);
-      }
+      GetRow(event_to_file, rows[iter->second], iter->second);
 
       event_to_file.erase(iter);
 
@@ -111,9 +109,7 @@ namespace katparquet {
 	periodEventID.eventID = rows[iter->second].eventID;
       }
 
-      if (!isIn[iter->second].eof()) {
-	GetRow(period_to_file, rows[iter->second], iter->second);
-      }
+      GetRow(period_to_file, rows[iter->second], iter->second);
 
       period_to_file.erase(iter);
 

@@ -1,6 +1,14 @@
 Ktools Changelog
 ================
 
+`v3.9.1`_
+ ---------
+* [#303](https://github.com/OasisLMF/ktools/pull/305) - Wrong CALT outputs for sample size 512 and 1000
+* [#300](https://github.com/OasisLMF/ktools/pull/306) - suppress fatal error messages for missing parquet libraries in make check -  msys2 build
+* [#291](https://github.com/OasisLMF/ktools/pull/307) - Convergence Task 1. Chance of Loss
+* [#308](https://github.com/OasisLMF/ktools/pull/309) - Dropping rows when concatenating parquet files with katparquet
+.. _`v3.9.1`:  https://github.com/OasisLMF/ktools/compare/v3.9.0...v3.9.1
+
 `v3.9.0`_
  ---------
 * [#296, #292, #294, #295](https://github.com/OasisLMF/ktools/pull/301) - Add option to produce the Average Convergence Loss Table (ALCT) in aalcalc

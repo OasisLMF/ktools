@@ -159,15 +159,14 @@ void aalcalc::getsamplesizes()
 	// i.e. for 10 samples, sets are (1), (2, 3), (4, 5, 6, 7)
 	// for 20 samples, sets are (1), (2, 3), (4, 5, 6, 7),
 	//                          (8, 9, 10, 11, 12, 13, 14, 15)
-	if (alct_output_) {
+	if (alct_output_ && samplesize_ > 1) {
 		int i = 0;
 		while (((1 << i) + ((1 << i) - 1)) <= samplesize_) {
 			vec_sample_aal_[1 << i].resize(max_summary_id_ + 1);
 			i++;
 		}
 	}
-	if (samplesize_ != 1)
-		vec_sample_aal_[samplesize_].resize(max_summary_id_ + 1);
+	vec_sample_aal_[samplesize_].resize(max_summary_id_ + 1);
 }
 
 void aalcalc::indexevents(const std::string& fullfilename, std::string& filename) {

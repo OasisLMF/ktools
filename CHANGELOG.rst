@@ -1,6 +1,12 @@
 Ktools Changelog
 ================
 
+`v3.9.2`_
+ ---------
+* [#308](https://github.com/OasisLMF/ktools/pull/309) - Dropping rows when concatenating parquet files with katparquet
+* [#310](https://github.com/OasisLMF/ktools/pull/311) - Sample size of 1 causes segmentation fault in aalcalc when no Average Loss Convergence Table is requested
+.. _`v3.9.2`:  https://github.com/OasisLMF/ktools/compare/v3.9.1...v3.9.2
+
 `v3.9.1`_
  ---------
 * [#303](https://github.com/OasisLMF/ktools/pull/305) - Wrong CALT outputs for sample size 512 and 1000

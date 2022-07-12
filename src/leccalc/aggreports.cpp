@@ -461,7 +461,7 @@ inline void aggreports::DoSetUp(int &eptype, int &eptype_tvar, int &epcalc,
   if (eptHeader_ == true && skipheader_ == false) {
     std::string fileHeader;
     if (ordFlag_) {
-      fileHeader = "SummaryID,EPCalc,EPType,ReturnPeriod,Loss\n";
+      fileHeader = "SummaryId,EPCalc,EPType,ReturnPeriod,Loss\n";
       eptHeader_ = false;
     } else {
       fileHeader = "summary_id,type,return_period,loss";
@@ -730,7 +730,7 @@ inline void aggreports::DoSetUpWheatsheaf(int &eptype, int &eptype_tvar,
   std::string fileHeader;
   if (skipheader_ == false) {
     if (ordFlag_ && pseptHeader_) {
-      fileHeader = "SummaryID,SampleID,EPType,ReturnPeriod,Loss\n";
+      fileHeader = "SummaryId,SampleId,EPType,ReturnPeriod,Loss\n";
       pseptHeader_ = false;
     } else if (!ordFlag_ && wheatSheaf_[eptype] == false) {
       fileHeader = "summary_id,sidx,return_period,loss";

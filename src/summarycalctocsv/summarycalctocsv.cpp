@@ -78,7 +78,7 @@ void doitz(bool skipheader, bool fullprecision, bool show_exposure_value,
 			// ORD output flag takes priority over exposure value flag
 			// ImpactedNumLocs not currently supported in ORD output
 			if (ord_output == true) {
-				printf("EventID,SummaryID,SampleID,Loss,ImpactedExposure\n");
+				printf("EventId,SummaryId,SampleId,Loss,ImpactedExposure\n");
 			} else if (parquet_output == false) {
 				if (show_exposure_value == true)
 					printf("event_id,exposure_value,summary_id,sidx,loss\n");
@@ -180,7 +180,7 @@ void doit(bool skipheader, bool fullprecision,bool show_exposure_value,
 			// ORD output flag takes priority over exposure value flag
 			// ImpactedNumLocs not currently supported in ORD output
 			if (ord_output == true) {
-				printf("EventID,SummaryID,SampleID,Loss,ImpactedExposure\n");
+				printf("EventId,SummaryId,SampleId,Loss,ImpactedExposure\n");
 			} else if (parquet_output == false) {
 				if (show_exposure_value == true)
 					printf("event_id,exposure_value,summary_id,sidx,loss\n");

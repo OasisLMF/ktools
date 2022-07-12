@@ -659,7 +659,7 @@ void aalcalc::outputresultscsv_new()
 	 */
 	if (skipheader_ == false) {
 		if (ord_output_ == true) {
-			printf("SummaryID,SampleType,MeanLoss,SDLoss\n");
+			printf("SummaryId,SampleType,MeanLoss,SDLoss\n");
 		} else if (parquet_output_ == false) {
 			printf("summary_id,type,mean,standard_deviation");
 			if (sidxtoensemble_.size() > 0) printf(",ensemble_id");

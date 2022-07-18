@@ -46,8 +46,6 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #define MAX_SUMMARY_ID 2147483647
 
 typedef std::vector<int> coverage_id_or_output_id_to_Summary_id;	// will turn into vectors once code is working
-//typedef std::map<int, int> coverage_id_or_output_id_to_Summary_id;	// will turn into vectors once code is working
-//typedef std::map<int, int> output_id_to_Summary_id;		// will turn into vectors once code is working
 
 class summarycalc {
 	enum input_type {UNKNOWN,GUL_COVERAGE_STREAM,GUL_ITEM_STREAM,FM_STREAM,GUL_ITEMX_STREAM};
@@ -57,10 +55,8 @@ private:
 	FILE *fout[MAX_SUMMARY_SETS] = { nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr };
 	FILE *idxout[MAX_SUMMARY_SETS] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 	coverage_id_or_output_id_to_Summary_id *co_to_s_[MAX_SUMMARY_SETS] = { nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr };
-	//output_id_to_Summary_id *o_to_s[MAX_SUMMARY_SETS] = { nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr };
 	OASIS_FLOAT **sssl[MAX_SUMMARY_SETS] = { nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr }; // three dimensional array sssl[summary_set][summary_id][sidx] to loss exposure
 	OASIS_FLOAT *sse[MAX_SUMMARY_SETS] = { nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr };         // s[summary_set][summary_id] to exposure
-	//bool *bsummary;
 	std::vector<OASIS_FLOAT> coverages_;
 	std::vector<OASIS_FLOAT> outputs_;
 	std::vector<int> item_to_coverage_;
@@ -72,7 +68,7 @@ private:
 	const int num_idx_ = 5;
 	int first_idx_ = 2;
 	int last_event_id_ = -1;
-	int last_coverage_or_output_id_ = -1;
+	int last_item_id_ = -1;
 // functions
 	void reset_sssl_array(int sample_size);
 	void alloc_sssl_array(int sample_size);
@@ -93,11 +89,12 @@ private:
 	void outputsummary(int sample_size, int event_id);
 	inline OASIS_FLOAT add_losses(const OASIS_FLOAT loss, const OASIS_FLOAT gul);
 	OASIS_FLOAT (summarycalc::*PropagateLosses)(const OASIS_FLOAT, const OASIS_FLOAT);
-	void processsummaryset(int summaryset, int coverage_id, int sidx, OASIS_FLOAT gul);
+	inline void processsummaryset(int summaryset, int coverage_id, int sidx, OASIS_FLOAT gul);
 	inline void reset_for_new_event(const int sample_size, const int event_id);
 	inline void processsummarysets(const int coverage_or_output_id, const int sidx, const OASIS_FLOAT gul);
+	inline int getcovid(int coverage_or_output_id);
 	void dosummary_maxloss(int sample_size, int event_id, int coverage_or_output_id, int sidx, OASIS_FLOAT gul);
-	void dosummary(int sample_size, int event_id, int coverage_id, int sidx, OASIS_FLOAT gul, OASIS_FLOAT expval);
+	void dosummary(int sample_size, int event_id, int item_id, int coverage_id, int sidx, OASIS_FLOAT gul, OASIS_FLOAT expval);
 	bool loadcoverages();
 	void loaditemtocoverage();
 	bool isGulStream(unsigned int stream_type);

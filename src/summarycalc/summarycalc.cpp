@@ -419,8 +419,8 @@ inline OASIS_FLOAT summarycalc::add_losses(const OASIS_FLOAT loss,
 }
 
 
-void summarycalc::processsummaryset(int summaryset, int coverage_id, int sidx,
-				    OASIS_FLOAT gul)
+inline void summarycalc::processsummaryset(int summaryset, int coverage_id,
+					   int sidx, OASIS_FLOAT gul)
 {
 	OASIS_FLOAT **ssl = sssl[summaryset];
 	coverage_id_or_output_id_to_Summary_id &p = *co_to_s_[summaryset];
@@ -437,7 +437,7 @@ inline void summarycalc::reset_for_new_event(const int sample_size,
 		reset_sssl_array(sample_size);
 	}
 	last_event_id_ = event_id;
-	last_coverage_or_output_id_ = -1;
+	last_item_id_ = -1;
 	reset_sse_array();
 }
 
@@ -447,11 +447,9 @@ inline void summarycalc::processsummarysets(const int coverage_or_output_id,
 					    const OASIS_FLOAT gul)
 {
 	for (int i = 0; i < MAX_SUMMARY_SETS; i++) {
-		int cov_id = coverage_or_output_id;
-		if (item_to_coverage_.size() > 0) {
-			cov_id = item_to_coverage_[coverage_or_output_id];
+		if (fout[i] != nullptr) {
+			processsummaryset(i, coverage_or_output_id, sidx, gul);
 		}
-		if (fout[i] != nullptr) processsummaryset(i, cov_id, sidx, gul);
 	}
 }
 
@@ -467,31 +465,36 @@ void summarycalc::dosummary_maxloss(int sample_size, int event_id,
 }
 
 
-void summarycalc::dosummary(int sample_size,int event_id,int coverage_or_output_id,int sidx, OASIS_FLOAT gul, OASIS_FLOAT expval)
+inline int summarycalc::getcovid(int coverage_or_output_id)
+{
+	if (item_to_coverage_.size() > 0) {
+		return item_to_coverage_[coverage_or_output_id];
+	} else return coverage_or_output_id;
+}
+
+
+void summarycalc::dosummary(int sample_size, int event_id, int item_id,
+			    int coverage_or_output_id, int sidx,
+			    OASIS_FLOAT gul, OASIS_FLOAT expval)
 {
 	if (last_event_id_ != event_id)
 		reset_for_new_event(sample_size, event_id);
 
-	if (coverage_or_output_id != last_coverage_or_output_id_) {
+	if (item_id != last_item_id_) {
   		for (int i = 0; i < MAX_SUMMARY_SETS; i++) {
 			if (fout[i] != nullptr) {
 				coverage_id_or_output_id_to_Summary_id &p = *co_to_s_[i];
-				int summary_id = 0;
-				if (item_to_coverage_.size() > 0) {
-					int cov_id = item_to_coverage_[coverage_or_output_id];
-					summary_id = p[cov_id];
-				} else {
-					summary_id = p[coverage_or_output_id];
-				}
+				int summary_id = p[coverage_or_output_id];
 				OASIS_FLOAT *se = sse[i];
 				se[summary_id] += expval;
 			}
 		}
-		last_coverage_or_output_id_ = coverage_or_output_id;
+		last_item_id_ = item_id;
 	}
 
-	processsummarysets(last_coverage_or_output_id_, sidx, gul);
+	processsummarysets(coverage_or_output_id, sidx, gul);
 }
+
 // item like stream
 void summarycalc::dogulitemxsummary()
 {
@@ -516,13 +519,18 @@ void summarycalc::dogulitemxsummary()
 			while (i == 1) {
 				i = (int)fread(&gh, sizeof(gh), 1, stdin);
 				if (i > 0 && havedata == false) havedata = true;
+				if (i == 0) break;
+				int coverage_id = item_to_coverage_[gh.item_id];
+				int cov_id = getcovid(coverage_id);
 				while (i != 0) {
 					gulSampleslevelRec gr;
 					i = (int) fread(&gr, sizeof(gr), 1, stdin);
 					if (i == 0) break;
 					if (gr.sidx == 0) break;
-					int coverage_id = item_to_coverage_[gh.item_id];
-					dosummary(samplesize, gh.event_id, coverage_id, gr.sidx, gr.loss, coverages_[coverage_id]);
+					dosummary(samplesize, gh.event_id,
+						  coverage_id, cov_id, gr.sidx,
+						  gr.loss,
+						  coverages_[coverage_id]);
 				}
 			}
 			return;
@@ -551,15 +559,19 @@ void summarycalc::dogulcoveragesummary()
 			outputsamplesize(samplesize);
 			gulSampleslevelHeader gh;
 			bool havedata = false;
-			while (i == 1) {
-				i = (int) fread(&gh, sizeof(gh), 1, stdin);
-				if (i > 0 && havedata == false) havedata = true;
+			while ((i = (int)fread(&gh, sizeof(gh), 1, stdin)) == 1) {
+				int cov_id = getcovid(gh.item_id);
+				if (havedata == false) havedata = true;
+				
 				while (i != 0) {
 					gulSampleslevelRec gr;
 					i = (int)fread(&gr, sizeof(gr), 1, stdin);
 					if (i == 0) break;
 					if (gr.sidx == 0) break;
-					dosummary(samplesize, gh.event_id, gh.item_id, gr.sidx, gr.loss, coverages_[gh.item_id]);
+					dosummary(samplesize, gh.event_id,
+						  gh.item_id, cov_id, gr.sidx,
+						  gr.loss,
+						  coverages_[gh.item_id]);
 				}
 			}
 			if (havedata) outputsummary(samplesize, gh.event_id);
@@ -585,9 +597,9 @@ void summarycalc::dosummaryprocessing(int samplesize)
 	fmlevelhdr fh;	
 	bool havedata = false;
 	int i = 1;
-	while (i == 1) {
-		i = (int) fread(&fh, sizeof(fh), 1, stdin);
+	while ((i = (int)fread(&fh, sizeof(fh), 1, stdin)) == 1) {
 		OASIS_FLOAT expure_val = 0;
+		int cov_id = getcovid(fh.output_id);
 		if (i > 0 && havedata == false) havedata = true;
 		while (i != 0) {
 			sampleslevelRec sr;
@@ -598,9 +610,11 @@ void summarycalc::dosummaryprocessing(int samplesize)
 			if (sr.sidx == tiv_idx) {
 				expure_val = sr.loss;
 			} else if (sr.sidx == max_loss_idx) {
-				dosummary_maxloss(samplesize, fh.event_id, fh.output_id, sr.sidx, sr.loss);
+				dosummary_maxloss(samplesize, fh.event_id,
+						  cov_id, sr.sidx, sr.loss);
 			} else {
-				dosummary(samplesize, fh.event_id, fh.output_id, sr.sidx, sr.loss, expure_val);
+				dosummary(samplesize, fh.event_id, fh.output_id,
+					  cov_id, sr.sidx, sr.loss, expure_val);
 			}
 		}
 	}

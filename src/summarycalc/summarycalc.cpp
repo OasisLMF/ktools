@@ -35,6 +35,7 @@
 Author: Ben Matharu  email: ben.matharu@oasislmf.org
 */
 
+#include <algorithm>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -359,6 +360,13 @@ void summarycalc::openpipe(int summary_id, const std::string &pipe)
 			::exit(-1);
 		}
 	}
+	auto it = std::find(foutIndex_.begin(), foutIndex_.end(), summary_id);
+	if (it != foutIndex_.end()) {
+		fprintf(stderr, "FATAL: %s: Summary set ID %d requested at least twice\n",
+			__func__, summary_id);
+		exit(EXIT_FAILURE);
+	}
+	foutIndex_.push_back(summary_id);
 }
 
 
@@ -402,7 +410,7 @@ void summarycalc::outputsamplesize(int samplesize)
 	}
 }
 
-void summarycalc::outputsummary(int sample_size,int event_id)
+void summarycalc::outputsummary(int sample_size, int event_id)
 {
 	for (int i = 0; i < MAX_SUMMARY_SETS; i++) {
 		if (fout[i] != nullptr) {
@@ -446,10 +454,8 @@ inline void summarycalc::processsummarysets(const int coverage_or_output_id,
 					    const int sidx,
 					    const OASIS_FLOAT gul)
 {
-	for (int i = 0; i < MAX_SUMMARY_SETS; i++) {
-		if (fout[i] != nullptr) {
-			processsummaryset(i, coverage_or_output_id, sidx, gul);
-		}
+	for (auto it = foutIndex_.begin(); it != foutIndex_.end(); ++it) {
+		processsummaryset(*it, coverage_or_output_id, sidx, gul);
 	}
 }
 
@@ -481,13 +487,11 @@ void summarycalc::dosummary(int sample_size, int event_id, int item_id,
 		reset_for_new_event(sample_size, event_id);
 
 	if (item_id != last_item_id_) {
-  		for (int i = 0; i < MAX_SUMMARY_SETS; i++) {
-			if (fout[i] != nullptr) {
-				coverage_id_or_output_id_to_Summary_id &p = *co_to_s_[i];
-				int summary_id = p[coverage_or_output_id];
-				OASIS_FLOAT *se = sse[i];
-				se[summary_id] += expval;
-			}
+		for (auto it = foutIndex_.begin(); it != foutIndex_.end(); ++it) {
+			coverage_id_or_output_id_to_Summary_id &p = *co_to_s_[*it];
+			int summary_id = p[coverage_or_output_id];
+			OASIS_FLOAT *se = sse[*it];
+			se[summary_id] += expval;
 		}
 		last_item_id_ = item_id;
 	}

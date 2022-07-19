@@ -57,6 +57,7 @@ private:
 	coverage_id_or_output_id_to_Summary_id *co_to_s_[MAX_SUMMARY_SETS] = { nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr };
 	OASIS_FLOAT **sssl[MAX_SUMMARY_SETS] = { nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr }; // three dimensional array sssl[summary_set][summary_id][sidx] to loss exposure
 	OASIS_FLOAT *sse[MAX_SUMMARY_SETS] = { nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr };         // s[summary_set][summary_id] to exposure
+	std::vector<int> foutIndex_;
 	std::vector<OASIS_FLOAT> coverages_;
 	std::vector<OASIS_FLOAT> outputs_;
 	std::vector<int> item_to_coverage_;

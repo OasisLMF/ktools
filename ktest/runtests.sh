@@ -33,6 +33,7 @@ installertest()
 	CTRL=ctrl
 	CTRL_PARQUET=ctrl_parquet
 	SYSTEMNAME="$(uname -s)"
+	TESTS_PASS=1
 
 	cd examples
 
@@ -259,29 +260,34 @@ installertest()
     mv footprint.idx footprintin.idx 
 	../../src/footprinttobin/footprinttobin -i 121 < footprint.csv
 
-     # checksums		
+     # checksums
+ 	SHA_SUM_EXE='sha1sum'
 	if [ "$SYSTEMNAME" == "Darwin" ]; then
-	 	shasum -c ../$CTRL.sha1
-		if [ ${PARQUET_OUTPUT} -eq 1 ]; then
-			shasum -c ../$CTRL_PARQUET.sha1
-		fi
-	else
-	 	sha1sum -c ../$CTRL.sha1
-		if [ ${PARQUET_OUTPUT} -eq 1 ]; then
-			sha1sum -c ../$CTRL_PARQUET.sha1
+		SHA_SUM_EXE='shasum'
+	fi
+	
+	$SHA_SUM_EXE -c ../$CTRL.sha1
+	if [ "$?" -ne "0" ]; then
+		TESTS_PASS=0
+	fi
+
+	if [ ${PARQUET_OUTPUT} -eq 1 ]; then
+		$SHA_SUM_EXE -c ../$CTRL_PARQUET.sha1
+		if [ "$?" -ne "0" ]; then
+			TESTS_PASS=0
 		fi
 	fi
 
-	 if [ "$?" -ne "0" ]; then
-	   echo "Sorry check failed\n"
-	   cd ../..
-	   exit 1
-	 else
-	   echo "All tests passed.\n"
-	  cd ../..
-	  return
-	 fi
-	
+	if [ ${TESTS_PASS} -ne 1 ]; then
+		echo "Sorry some checks failed.\n"
+		cd ../..
+		exit 1
+	else
+		echo "All tests passed.\n"
+		cd ../..
+		return
+	fi
+
 }
 
 SCRIPT=$(readlink -f "$0")

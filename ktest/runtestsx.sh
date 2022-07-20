@@ -34,6 +34,7 @@ installertest()
 {
 	CTRL=ctrl
 	CTRL_PARQUET=ctrl_parquet
+	TESTS_PASS=1
 	cd examples
 
 	# establish whether binaries have been linked to parquet libraries
@@ -220,20 +221,27 @@ installertest()
 	../../src/footprinttobin/footprinttobin -i 121 < footprint.csv
 
      # checksums		
-	 sha1sum -c ../$CTRL.sha1
-	 if [ ${PARQUET_OUTPUT} -eq 1 ]; then
-		 sha1sum -c ../$CTRL_PARQUET.sha1
-	 fi
+	sha1sum -c ../$CTRL.sha1
+	if [ "$?" -ne 0 ]; then
+		TESTS_PASS=0
+	fi
 
-	 if [ "$?" -ne "0" ]; then
-	   echo "Sorry check failed\n"
-	   cd ../..
-	   exit 1
-	 else
-	   echo "All tests passed.\n"
-	  cd ../..
-	  return
-	 fi
+	if [ ${PARQUET_OUTPUT} -eq 1 ]; then
+		sha1sum -c ../$CTRL_PARQUET.sha1
+		if [ "$?" -ne 0 ]; then
+			TESTS_PASS=0
+		fi
+	fi
+
+	if [ ${TESTS_PASS} -ne 1 ]; then
+		echo "Sorry check failed.\n"
+		cd ../..
+		exit 1
+	else
+		echo "All tests passed.\n"
+		cd ../..
+		return
+	fi
 	
 }
 

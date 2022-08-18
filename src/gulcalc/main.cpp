@@ -180,7 +180,7 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
-	if (gopt.allocRule > 2) {
+	if (gopt.allocRule > 3) {
 		fprintf(stderr, "FATAL: Invalid alloc rule %d\n", gopt.allocRule);
 		exit(EXIT_FAILURE);
 	}

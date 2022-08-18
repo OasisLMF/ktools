@@ -205,7 +205,7 @@ OASIS_FLOAT gulcalc::getgul(damagebindictionary &b, gulGulSamples &g)
 
 	return gul;
 }
-void splittiv(std::vector<gulItemIDLoss> &gulitems, OASIS_FLOAT tiv)
+void split_tiv_classic(std::vector<gulItemIDLoss> &gulitems, OASIS_FLOAT tiv)
 {
 // if the total loss exceeds the tiv 
 // then split tiv in the same proportions to the losses
@@ -225,6 +225,34 @@ void splittiv(std::vector<gulItemIDLoss> &gulitems, OASIS_FLOAT tiv)
 			}
 		}
 	}
+}
+
+
+void split_tiv_multiplicative(std::vector<gulItemIDLoss> &gulitems, OASIS_FLOAT tiv){
+//Split the total insured value (TIV) using a multiplicative formula for the
+//total loss as tiv * (1 - (1-A)*(1-B)*(1-C)...), where A, B, C are damage ratios
+//computed as the ratio between a sub-peril loss and the tiv. Sub-peril losses
+//in gulitems are always back-allocated proportionally to the losses.
+    OASIS_FLOAT sum_loss = 0;
+    double undamaged_value = 1;
+    double multiplicative_loss = 0;
+
+    auto iter = gulitems.begin();
+	while (iter != gulitems.end()) {
+	    undamaged_value *= 1 - iter->loss / tiv;
+        sum_loss += iter->loss;
+        iter++;
+	}
+    multiplicative_loss = tiv * (1. - undamaged_value);
+
+    if (sum_loss > 0) {
+        double percentage = multiplicative_loss / sum_loss;
+        iter = gulitems.begin();
+        while (iter != gulitems.end()) {
+            iter->loss *= percentage;
+            iter++;
+        }
+    }
 }
 
 void gulcalc::writemode0output(const item_map_rec &er, const OASIS_FLOAT tiv,
@@ -326,11 +354,15 @@ void gulcalc::writemode1output(const int event_id, const OASIS_FLOAT tiv,
 
 	std::map<int, std::vector<gulSampleslevelRec>> gxi;
 
+    // select tiv split method depending on alloc_rule_
+    void (*split_tiv)(std::vector<gulItemIDLoss> &, OASIS_FLOAT);
+    if (alloc_rule_==3) split_tiv = &split_tiv_multiplicative;
+    else split_tiv = &split_tiv_classic;
 	// Check whether the sum of losses per sample exceed TIV
 	// If so, split TIV in proportion to losses
 	for (size_t i = 0; i < gilv.size(); i++) {
 
-		splittiv(gilv[i], tiv);
+		split_tiv(gilv[i], tiv);
 		auto iter = gilv[i].begin();
 		while (iter != gilv[i].end()) {
 

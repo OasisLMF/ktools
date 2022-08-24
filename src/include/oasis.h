@@ -356,6 +356,12 @@ struct interval {
 	float fractional_part;
 };
 
+struct EventDict {
+	int event_id;
+	float event_rate;
+	int description_size;
+};
+
 #pragma pack(pop)
 
 

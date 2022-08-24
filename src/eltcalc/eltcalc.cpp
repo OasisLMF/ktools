@@ -77,9 +77,23 @@ namespace eltcalc {
 		return (stype == summarycalc_id);
 	}
 
+	void GetEventRates(FILE * fin)
+	{
+		// Extract event rates from events dictionary file
+		EventDict row;
+		size_t i = fread(&row, sizeof(row), 1, fin);
+		while (i != 0) {
+			event_rate_[row.event_id] = row.event_rate;
+			fseek(fin, row.description_size, SEEK_CUR);   // Ignore description
+			i = fread(&row, sizeof(row), 1, fin);
+		}
+		fclose(fin);
+	}
+
 	template<typename T>
 	void GetEventRates(T &occ, FILE * fin)
 	{
+		// Calculate event rates from occurrence file
 		int max_period_no = 0;
 		int no_of_periods = 0;
 		size_t i = fread(&no_of_periods, sizeof(no_of_periods), 1, fin);
@@ -100,8 +114,16 @@ namespace eltcalc {
 
 	void GetEventRates()
 	{
-		FILE * fin = fopen(OCCURRENCE_FILE, "rb");
-		if (fin == NULL) {
+		// Extract event rates from events dictionary file if it exists
+		FILE * fin = fopen(EVENTSDICT_FILE, "rb");
+		if (fin != nullptr) {
+			GetEventRates(fin);
+			return;
+		}
+
+		// Otherwise calculate event rates from occurrence file
+		fin = fopen(OCCURRENCE_FILE, "rb");
+		if (fin == nullptr) {
 			fprintf(stderr, "FATAL: %s: Error opening file %s\n",
 				__func__, OCCURRENCE_FILE);
 			exit(EXIT_FAILURE);

@@ -115,7 +115,7 @@ namespace eltcalc {
 	void GetEventRates()
 	{
 		// Extract event rates from events dictionary file if it exists
-		FILE * fin = fopen(EVENTSDICT_FILE, "rb");
+		FILE * fin = fopen(EVENTDICT_FILE, "rb");
 		if (fin != nullptr) {
 			GetEventRates(fin);
 			return;

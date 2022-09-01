@@ -107,9 +107,33 @@ inline void getmodel::assignProbabilities(const int vulnerability_id,
 
 }
 
+size_t getmodel::getSizeOfVulnerabilities() {
+
+  size_t vec_size = 0;
+  for (auto it = _vulnerabilities.begin(); it != _vulnerabilities.end(); ++it) {
+    vec_size += it->second.size();
+  }
+  return sizeof(std::map<int, std::vector<OASIS_FLOAT>>) +
+	 sizeof(int) * _vulnerabilities.size() + sizeof(OASIS_FLOAT) * vec_size;
+
+}
+
+size_t getmodel::getSizeOfVulnerabilityIDsByAreaPeril() {
+
+  size_t set_size = 0;
+  for (auto it = _vulnerability_ids_by_area_peril.begin();
+       it != _vulnerability_ids_by_area_peril.end(); ++it) {
+    set_size += it->second.size();
+  }
+  return sizeof(std::map<AREAPERIL_INT, std::set<int>>) +
+	 sizeof(AREAPERIL_INT) * _vulnerability_ids_by_area_peril.size() +
+	 sizeof(int) * set_size;
+
+}
+
 // only get those vulnerabilities that exist in the items file - so reduce
 // memory footprint
-void getmodel::getVulnerabilities(const std::set<int> &v) {
+void getmodel::getVulnerabilities(const std::set<int> &v, char *progname) {
   // Read the vulnerabilities
 
   char vulnerabilityFilename[4096];
@@ -132,6 +156,8 @@ void getmodel::getVulnerabilities(const std::set<int> &v) {
   }
   int current_vulnerability_id = -1;
   fread(&_num_damage_bins, sizeof(_num_damage_bins), 1, fin);
+  logprintf(progname, "INFO", "%s: Number of damage bins = %d\n", __func__,
+	    _num_damage_bins);
 
   if (fidx == nullptr) {   // no index file
     Vulnerability vulnerability;
@@ -205,9 +231,12 @@ void getmodel::getVulnerabilities(const std::set<int> &v) {
   }
   fclose(fin);
 
+  logprintf(progname, "INFO", "%s: Size of vulnerabilities map = %lu\n",
+	    __func__, getSizeOfVulnerabilities());
+
 }
 
-void getmodel::getIntensityInfo() {
+void getmodel::getIntensityInfo(char *progname) {
 
 	std::string filename = FOOTPRINT_FILE;
 
@@ -234,10 +263,16 @@ void getmodel::getIntensityInfo() {
 		_has_intensity_uncertainty =
 		    (_has_intensity_uncertainty & intensityMask);
 	}
+	logprintf(progname, "INFO", "%s: Number of intensity bins = %d\n",
+		  __func__, _num_intensity_bins);
+	logprintf(progname, "INFO", "%s: Uncompressed sizes = %d\n", __func__,
+		  _uncompressed_size);
+	logprintf(progname, "INFO", "%s: Intensity uncertainty = %d\n",
+		  __func__, _has_intensity_uncertainty);
 
 }
 
-void getmodel::getItems(std::set<int> &v) {
+void getmodel::getItems(std::set<int> &v, char *progname) {
   // Read the exposures and generate a set of vulnerabilities by area peril
   item item_rec;
 
@@ -256,9 +291,14 @@ void getmodel::getItems(std::set<int> &v) {
     v.insert(item_rec.vulnerability_id);
   }
   fclose(fin);
+
+  logprintf(progname, "INFO", "%s: Size of vulnerability set = %lu\n", __func__,
+	    sizeof(std::set<int>) + sizeof(int) * v.size());
+  logprintf(progname, "INFO", "%s: Size of vulnerability IDs by area peril = %lu\n",
+	    __func__, getSizeOfVulnerabilityIDsByAreaPeril());
 }
 
-void getmodel::getDamageBinDictionary() {
+void getmodel::getDamageBinDictionary(char *progname) {
   FILE *fin = fopen(DAMAGE_BIN_DICT_FILE, "rb");
   if (fin == nullptr) {
     fprintf(stderr, "FATAL: %s: cannot open %s\n", __func__, DAMAGE_BIN_DICT_FILE);
@@ -285,11 +325,13 @@ void getmodel::getDamageBinDictionary() {
   for (size_t i = 0; i < nrec; i++) {
     _mean_damage_bins[i] = damage_bins[i].interpolation;
   }
+  logprintf(progname, "INFO", "%s: Size of mean damage bins = %lu\n", __func__,
+	    sizeof(std::vector<OASIS_FLOAT>) + sizeof(OASIS_FLOAT) * _mean_damage_bins.size());
 
   //delete[] damage_bins;
 }
 
-void getmodel::getFootPrints(){
+void getmodel::getFootPrints(char *progname){
 	FILE *fin;
 	std:: string filename = FOOTPRINT_IDX_FILE;
 
@@ -314,6 +356,14 @@ void getmodel::getFootPrints(){
 			    uncompressedSize;
 		}
 	}
+	logprintf(progname, "INFO", "%s: Size of event index by event ID = %lu\n", __func__,
+		  sizeof(std::map<int, EventIndex>) +
+		  sizeof(int) * _event_index_by_event_id.size() +
+		  sizeof(EventIndex) * _event_index_by_event_id.size());
+	logprintf(progname, "INFO", "%s: Size of uncompressed size by event ID = %lu\n", __func__,
+		  sizeof(std::map<int, long long>) +
+		  sizeof(int) * _uncompressed_size_by_event_id.size() +
+		  sizeof(long long) * _uncompressed_size_by_event_id.size());
 
 	fclose(fin);
 }
@@ -403,17 +453,20 @@ int getmodel::getVulnerabilityIndex(int intensity_bin_index,
          ((damage_bin_index - 1) * _num_intensity_bins);
 }
 
-void getmodel::init(bool zip) {
+void getmodel::init(bool zip, char *progname) {
   _zip = zip;
+  logprintf(progname, "INFO", "%s: Value of zip = %d\n", __func__, _zip);
 
-  getIntensityInfo();
+  getIntensityInfo(progname);
 
   std::set<int> v; // set of vulnerabilities;
-  getItems(v);
-  getVulnerabilities(v);
+  getItems(v, progname);
+  getVulnerabilities(v, progname);
   v.clear(); // set no longer required release memory
-  getDamageBinDictionary();
-  getFootPrints();
+  logprintf(progname, "INFO", "%s: Size of vulnerability set = %lu\n", __func__,
+	    sizeof(std::set<int>) + sizeof(int) * v.size());
+  getDamageBinDictionary(progname);
+  getFootPrints(progname);
   initOutputStream();
 
   //_temp_results = new Result[_num_damage_bins];
@@ -422,13 +475,15 @@ void getmodel::init(bool zip) {
     _temp_results[damage_bin_index - 1] =
         Result(0.0, _mean_damage_bins[damage_bin_index - 1]);
   }
+  logprintf(progname, "INFO", "%s: Size of temp results = %lu\n", __func__,
+	    sizeof(std::vector<Result>) + sizeof(Result) * _temp_results.size());
 }
 
-void getmodel::doCdf(FILE* fin, int event_id) {
+void getmodel::doCdf(FILE* fin, int event_id, char *progname) {
   if (_has_intensity_uncertainty) {
 	  if (_zip) {
 #ifndef _MSC_VER
-		  doCdfInnerz(fin, event_id);
+		  doCdfInnerz(fin, event_id, progname);
 #else
 		  fprintf(stderr, "FATAL: zip not supported with microsoft build\n");
 		  exit(-1);
@@ -451,7 +506,7 @@ void getmodel::doCdf(FILE* fin, int event_id) {
   }
 }
 #ifndef _MSC_VER
-void getmodel::doCdfInnerz(FILE* fin, int event_id) {
+void getmodel::doCdfInnerz(FILE* fin, int event_id, char *progname) {
   auto sizeof_EventKey = sizeof(EventRow);
   std::map<int, OASIS_FLOAT> intensity;
   bool do_cdf_for_area_peril = false;
@@ -463,10 +518,20 @@ void getmodel::doCdfInnerz(FILE* fin, int event_id) {
   _compressed_buf.resize(size + 1);
   // If uncompressed size available, use that for length of destination buffer
   if (_uncompressed_size) {
+    logprintf(progname, "INFO", "%d\t%lld\t%lld\t%lld ... ",
+	      _event_index_by_event_id[event_id].event_id,
+	      _event_index_by_event_id[event_id].offset,
+	      _event_index_by_event_id[event_id].size,
+	      _uncompressed_size_by_event_id[event_id]);
     _uncompressed_buf.resize(_uncompressed_size_by_event_id[event_id]);
   } else {   // Otherwise assume compression ratio no greater than 20:1
+    logprintf(progname, "INFO", "%d\t%lld\t%lld\t0 ...",
+	      _event_index_by_event_id[event_id].event_id,
+	      _event_index_by_event_id[event_id].offset,
+	      _event_index_by_event_id[event_id].size);
     _uncompressed_buf.resize(size * 20);
   }
+  logprintf(progname, "INFO", "good!\n");
   fread(&_compressed_buf[0], size, 1, fin);
   uLong dest_length = _uncompressed_buf.size();
   int ret = uncompress(&_uncompressed_buf[0], &dest_length, &_compressed_buf[0], size);
@@ -482,10 +547,20 @@ void getmodel::doCdfInnerz(FILE* fin, int event_id) {
     if (event_key->areaperil_id != current_areaperil_id) {
       if (do_cdf_for_area_peril) {
         // Generate and write the results
+	logprintf(progname, "INFO", "Before doResults: areaperil_id = %d: Size of intensity = %lu\n",
+		  event_key->areaperil_id,
+		  sizeof(std::map<int, OASIS_FLOAT>) +
+		  sizeof(int) * intensity.size() +
+		  sizeof(OASIS_FLOAT) * intensity.size());
         doResults(event_id, current_areaperil_id,
                   _vulnerability_ids_by_area_peril, _vulnerabilities,
                   intensity);
 	intensity.clear();
+	logprintf(progname, "INFO", "After doResults: areaperil_id = %d: Size of intensity = %lu\n",
+		  event_key->areaperil_id,
+		  sizeof(std::map<int, OASIS_FLOAT>) +
+		  sizeof(int) * intensity.size() +
+		  sizeof(OASIS_FLOAT) * intensity.size());
       }
       current_areaperil_id = event_key->areaperil_id;
       do_cdf_for_area_peril = (_area_perils.count(current_areaperil_id) == 1);
@@ -606,12 +681,12 @@ void getmodel::doCdfInnerNoIntensityUncertainty(FILE* fin, int event_id) {
   }
 }
 
-void doIt(bool zip)
+void doIt(bool zip, char *progname)
 {
 
 	getmodel cdf_generator;
 
-	cdf_generator.init(zip);
+	cdf_generator.init(zip, progname);
 
   std::string footprint_filename = FOOTPRINT_FILE;
 
@@ -626,10 +701,13 @@ void doIt(bool zip)
   }
 
 	int event_id = -1;
+	logprintf(progname, "INFO", "Start going through event by event...\n");
+	logprintf(progname, "INFO", "Event ID\tOffset\tSize\tUncompressed size\n");
 	while (fread(&event_id, sizeof(event_id), 1, stdin) != 0)
 	{
-		cdf_generator.doCdf(fin, event_id);
+		cdf_generator.doCdf(fin, event_id, progname);
 	}
+	logprintf(progname, "INFO", "End going through event by event...\n");
 
   fclose(fin);
 }

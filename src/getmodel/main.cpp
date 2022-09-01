@@ -52,7 +52,7 @@ Author: Mark Pinkerton  email: mark.pinkerton@oasislmf.org
 #include <chrono>
 #include <thread>
 
-void doIt(bool zip);
+void doIt(bool zip, char *progname);
 
 char *progname = 0;
 
@@ -93,7 +93,12 @@ int main(int argc, char** argv)
 
 	bool zip = false;
 	FILE *fin = fopen(ZFOOTPRINT_FILE, "rb");
-	if (fin != nullptr) zip=true;
+	if (fin != nullptr) {
+		zip=true;
+		logprintf(progname, "INFO", "Zipped footprint file found\n");
+	} else {
+		logprintf(progname, "INFO", "No zipped footprint file\n");
+	}
 
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
 	struct sigaction sa;
@@ -110,10 +115,11 @@ int main(int argc, char** argv)
 		initstreams();
 		std::this_thread::sleep_for(std::chrono::milliseconds(250));	// time for eve to flush its message	
 		logprintf(progname, "INFO", "starting process..\n");
-		doIt(zip);
+		doIt(zip, progname);
 		logprintf(progname, "INFO", "finishing process..\n");
 		fflush(stderr);
 	}catch (std::bad_alloc&) {
+		logprintf(progname, "INFO", "Memory allocation failed\n");
 		fprintf(stderr, "FATAL:%s: Memory allocation failed\n", progname);
 		exit(EXIT_FAILURE);
 	}

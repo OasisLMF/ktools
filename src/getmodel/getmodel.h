@@ -55,8 +55,8 @@ public:
 
     getmodel();
     ~getmodel();
-    void init(bool zip);
-	void doCdf(FILE* fin, int event_id);
+    void init(bool zip, char *progname);
+	void doCdf(FILE* fin, int event_id, char *progname);
 
 private:
 	
@@ -79,15 +79,17 @@ private:
     inline void assignProbabilities(const int vulnerability_id,
       int& current_vulnerability_id, const int intensity_bin_id,
       const int damage_bin_id, OASIS_FLOAT probability);
-    void getVulnerabilities(const std::set<int> &v);
-    void getDamageBinDictionary();
-    void getFootPrints();
-    void getItems(std::set<int> &v);
-	void getIntensityInfo();
+    size_t getSizeOfVulnerabilities();
+    size_t getSizeOfVulnerabilityIDsByAreaPeril();
+    void getVulnerabilities(const std::set<int> &v, char *progname);
+    void getDamageBinDictionary(char *progname);
+    void getFootPrints(char *progname);
+    void getItems(std::set<int> &v, char *progname);
+	void getIntensityInfo(char *progname);
     void doCdfInner(FILE* fin, int event_id);
     void doCdfInnerNoIntensityUncertainty(FILE* fin, int event_id);
 #ifndef _MSC_VER
-    void doCdfInnerz(FILE* fin, int event_id);
+    void doCdfInnerz(FILE* fin, int event_id, char *progname);
     void doCdfInnerNoIntensityUncertaintyz(FILE* fin, int event_id);
 #endif
     void  doResults(

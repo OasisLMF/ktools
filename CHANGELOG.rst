@@ -1,6 +1,14 @@
 Ktools Changelog
 ================
 
+`v3.9.3`_
+ ---------
+* [#312](https://github.com/OasisLMF/ktools/pull/314) - make ORD csv headers consistent with parquet
+* [#316](https://github.com/OasisLMF/ktools/pull/317) - summarycalc performance improvements
+* [#313](https://github.com/OasisLMF/ktools/pull/318) - Results from tests of non-parquet output files are ignored in build system
+* [#118](https://github.com/OasisLMF/ktools/pull/319) - new gulcalc allocrule for total peril loss using the multiplicative method
+.. _`v3.9.3`:  https://github.com/OasisLMF/ktools/compare/v3.9.2...v3.9.3
+
 `v3.9.2`_
  ---------
 * [#308](https://github.com/OasisLMF/ktools/pull/309) - Dropping rows when concatenating parquet files with katparquet

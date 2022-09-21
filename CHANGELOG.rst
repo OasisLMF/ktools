@@ -1,6 +1,8 @@
 Ktools Changelog
 ================
 
+.. _`v3.9.4rc1`:  https://github.com/OasisLMF/ktools/compare/v3.9.3...v3.9.4rc1
+
 `v3.9.3`_
  ---------
 * [#312](https://github.com/OasisLMF/ktools/pull/314) - make ORD csv headers consistent with parquet

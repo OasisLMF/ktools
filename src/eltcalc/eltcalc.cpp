@@ -79,13 +79,22 @@ namespace eltcalc {
 
 	void GetEventRates(FILE * fin)
 	{
-		// Extract event rates from events dictionary file
-		EventDict row;
-		size_t i = fread(&row, sizeof(row), 1, fin);
-		while (i != 0) {
-			event_rate_[row.event_id] = row.event_rate;
-			fseek(fin, row.description_size, SEEK_CUR);   // Ignore description
-			i = fread(&row, sizeof(row), 1, fin);
+		// Extract event rates from event rates file
+		char line[4096];
+		EventRates row;
+		fgets(line, sizeof(line), fin);   // Read header
+		int lineno = 2;
+		while (fgets(line, sizeof(line), fin) != 0) {
+			int ret = sscanf(line, "%d,%f", &row.event_id,
+					 &row.event_rate);
+			if (ret == 2) {
+				event_rate_[row.event_id] = row.event_rate;
+			} else {
+				fprintf(stderr, "FATAL: Invalid data in line %d:\n%s",
+					lineno, line);
+				exit(EXIT_FAILURE);
+			}
+			lineno++;
 		}
 		fclose(fin);
 	}
@@ -114,8 +123,8 @@ namespace eltcalc {
 
 	void GetEventRates()
 	{
-		// Extract event rates from events dictionary file if it exists
-		FILE * fin = fopen(EVENTDICT_FILE, "rb");
+		// Extract event rates from event rates file if it exists
+		FILE *fin = fopen(EVENTRATES_FILE, "r");
 		if (fin != nullptr) {
 			GetEventRates(fin);
 			return;

@@ -356,12 +356,6 @@ struct interval {
 	float fractional_part;
 };
 
-struct EventDict {
-	int event_id;
-	float event_rate;
-	int description_size;
-};
-
 #pragma pack(pop)
 
 
@@ -444,7 +438,6 @@ inline  void logprintf(const std::string &program_name,const std::string &msgtyp
 #define FMXREF_FILE_A0 "input/fm_xref_a0.bin"
 #define ITEMS_FILE "input/items.bin"
 #define EVENTS_FILE "input/events.bin"
-#define EVENTDICT_FILE "input/event_dict.bin"
 #define RETURNPERIODS_FILE "input/returnperiods.bin"
 #define OCCURRENCE_FILE "input/occurrence.bin"
 #define PERIODS_FILE "input/periods.bin"		// period to weighting mapping

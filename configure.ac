@@ -156,8 +156,6 @@ AC_CONFIG_FILES([
                  src/randtobin/Makefile
                  src/evetocsv/Makefile
                  src/evetobin/Makefile
-		 src/evedicttobin/Makefile
-		 src/evedicttocsv/Makefile
                  src/gultobin/Makefile
                  src/getmodel/Makefile
                  src/gulcalc/Makefile

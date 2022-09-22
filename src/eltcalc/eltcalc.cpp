@@ -85,7 +85,7 @@ namespace eltcalc {
 		fgets(line, sizeof(line), fin);   // Read header
 		int lineno = 2;
 		while (fgets(line, sizeof(line), fin) != 0) {
-			int ret = sscanf(line, "%d,%f", &row.event_id,
+			int ret = sscanf(line, "%d,%lf", &row.event_id,
 					 &row.event_rate);
 			if (ret == 2) {
 				event_rate_[row.event_id] = row.event_rate;

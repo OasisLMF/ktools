@@ -1,6 +1,8 @@
 Ktools Changelog
 ================
 
+.. _`v3.9.4rc3`:  https://github.com/OasisLMF/ktools/compare/v3.9.3...v3.9.4rc3
+
 .. _`v3.9.4rc1`:  https://github.com/OasisLMF/ktools/compare/v3.9.3...v3.9.4rc1
 
 `v3.9.3`_

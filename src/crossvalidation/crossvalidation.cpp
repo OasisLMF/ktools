@@ -43,12 +43,14 @@ namespace crossvalidation {
     damageBins.clear();
     while(fgets(line, sizeof(line), damagebinFile) != 0) {
 
+      // No need to check for deprecated format here as this is done by
+      // validatedamagebin; the bin indexes are the only values required
 #ifdef OASIS_FLOAT_TYPE_DOUBLE
-      if(sscanf(line, "%d,%lf,%lf,%lf,%d", &d.bin_index, &d.bin_from,
-		&d.bin_to, &d.interpolation, &d.interval_type) != 5) {
+      if(sscanf(line, "%d,%lf,%lf,%lf", &d.bin_index, &d.bin_from, &d.bin_to,
+		&d.interpolation) != 4) {
 #else
-      if(sscanf(line, "%d,%f,%f,%f,%d", &d.bin_index, &d.bin_from,
-		&d.bin_to, &d.interpolation, &d.interval_type) != 5) {
+      if(sscanf(line, "%d,%f,%f,%f", &d.bin_index, &d.bin_from, &d.bin_to,
+		&d.interpolation) != 4) {
 #endif
 
 	fprintf(stderr, "File %s\n", damagebinFileName);

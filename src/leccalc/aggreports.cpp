@@ -124,6 +124,7 @@ void aggreports::LoadEnsembleMapping() {
     ensembletosidx_[e.ensemble_id].push_back(e.sidx);
     i = fread(&e, sizeof(Ensemble), 1, fin);
   }
+  fclose(fin);
 
   // Check all sidx have ensemble IDs
   for (std::vector<int>::const_iterator it = std::next(sidxtoensemble.begin());

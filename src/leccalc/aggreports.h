@@ -78,7 +78,6 @@ private:
 	std::vector<int> returnperiods_;
 	std::map <int, double> periodstoweighting_;
 	std::map<int, std::vector<int>> ensembletosidx_;
-	const bool skipheader_;
 	const bool ordFlag_;
 	std::map<int, bool> fileHeaders_ = {
 		{ AGG_FULL_UNCERTAINTY, false }, { AGG_WHEATSHEAF, false },
@@ -236,7 +235,7 @@ private:
 				     const int eptype);
 
 public:
-	aggreports(const int totalperiods, const std::set<int> &summaryids, std::vector<std::map<outkey2, OutLosses>> &out_loss, FILE **fout, const bool useReturnPeriodFile, const int samplesize, const bool skipheader, const bool *outputFlags, const bool ordFlag, const std::string *parquetFileNames);
+	aggreports(const int totalperiods, const std::set<int> &summaryids, std::vector<std::map<outkey2, OutLosses>> &out_loss, FILE **fout, const bool useReturnPeriodFile, const int samplesize, const bool *outputFlags, const bool ordFlag, const std::string *parquetFileNames);
 	void OutputAggMeanDamageRatio();
 	void OutputOccMeanDamageRatio();
 	void OutputAggFullUncertainty();

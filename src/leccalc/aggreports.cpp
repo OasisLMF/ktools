@@ -46,13 +46,13 @@ bool operator<(const wheatkey &lhs, const wheatkey &rhs) {
 aggreports::aggreports(const int totalperiods, const std::set<int> &summaryids,
 		       std::vector<std::map<outkey2, OutLosses>> &out_loss,
 		       FILE **fout, const bool useReturnPeriodFile,
-		       const int samplesize, const bool skipheader,
-		       const bool *outputFlags, const bool ordFlag,
+		       const int samplesize, const bool *outputFlags,
+		       const bool ordFlag,
 		       const std::string *parquetFileNames) :
   totalperiods_(totalperiods), summaryids_(summaryids),
   out_loss_(out_loss), fout_(fout), useReturnPeriodFile_(useReturnPeriodFile),
-  samplesize_(samplesize), skipheader_(skipheader), outputFlags_(outputFlags),
-  ordFlag_(ordFlag), parquetFileNames_(parquetFileNames)
+  samplesize_(samplesize), outputFlags_(outputFlags), ordFlag_(ordFlag),
+  parquetFileNames_(parquetFileNames)
 {
 
   LoadReturnPeriods();
@@ -124,7 +124,6 @@ void aggreports::LoadEnsembleMapping() {
     ensembletosidx_[e.ensemble_id].push_back(e.sidx);
     i = fread(&e, sizeof(Ensemble), 1, fin);
   }
-  fclose(fin);
 
   // Check all sidx have ensemble IDs
   for (std::vector<int>::const_iterator it = std::next(sidxtoensemble.begin());
@@ -459,24 +458,6 @@ inline void aggreports::DoSetUp(int &eptype, int &eptype_tvar, int &epcalc,
   if (eptype == AEP) eptype_tvar = AEPTVAR;
   else if (eptype == OEP) eptype_tvar = OEPTVAR;
 
-  if (eptHeader_ == true && skipheader_ == false) {
-    std::string fileHeader;
-    if (ordFlag_) {
-      fileHeader = "SummaryId,EPCalc,EPType,ReturnPeriod,Loss\n";
-      eptHeader_ = false;
-    } else {
-      fileHeader = "summary_id,type,return_period,loss";
-      if (ensembletosidx_.size() > 0) fileHeader += ",ensemble_id";
-      fileHeader += "\n";
-    }
-    for (std::vector<int>::const_iterator it = fileIDs.begin();
-	 it != fileIDs.end(); ++it) {
-      if (ordFlag_ == false && fileHeaders_[*it] == true) continue;
-      fprintf(fout_[*it], "%s", fileHeader.c_str());
-      if (ordFlag_ == false) fileHeaders_[*it] = true;
-    }
-  }
-
   if (ordFlag_) {
     WriteOutput = &aggreports::WriteORDOutput;
     if (fileIDs.size() == 0) WriteOutput = &aggreports::WriteNoOutput;
@@ -727,23 +708,6 @@ inline void aggreports::DoSetUpWheatsheaf(int &eptype, int &eptype_tvar,
 
   if (eptype == AEP) eptype_tvar = AEPTVAR;
   else if (eptype == OEP) eptype_tvar = OEPTVAR;
-
-  std::string fileHeader;
-  if (skipheader_ == false) {
-    if (ordFlag_ && pseptHeader_) {
-      fileHeader = "SummaryId,SampleId,EPType,ReturnPeriod,Loss\n";
-      pseptHeader_ = false;
-    } else if (!ordFlag_ && wheatSheaf_[eptype] == false) {
-      fileHeader = "summary_id,sidx,return_period,loss";
-      if (ensembletosidx_.size() > 0) fileHeader += ",ensemble_id";
-      fileHeader += "\n";
-      wheatSheaf_[eptype] = true;
-    }
-    for (std::vector<int>::const_iterator it = fileIDs.begin();
-	 it != fileIDs.end(); ++it) {
-      fprintf(fout_[*it], "%s", fileHeader.c_str());
-    }
-  }
 
   if (ordFlag_) {
     WriteOutput = &aggreports::WriteORDOutput;

@@ -46,6 +46,7 @@ This process will then read all the *.bin files in the subdirectory and then com
 
 */
 
+#include <algorithm>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -246,11 +247,100 @@ namespace leccalc {
 
 	}
 
-	inline void outputaggreports(const int totalperiods, const std::set<int> &summaryids, std::vector<std::map<outkey2, OutLosses>> &out_loss,
-				     FILE **fout, const bool useReturnPeriodFile, const int samplesize, const bool skipheader,
-				     const bool *outputFlags, const bool ordFlag, const std::string *parquetFileNames)
+	inline void setupoutputfiles(FILE **fout, const bool ordFlag,
+				     const bool *outputFlags,
+				     const bool skipheader,
+				     std::vector<int> &fileIDs_occ,
+				     std::vector<int> &fileIDs_agg)
 	{
-		aggreports agg(totalperiods, summaryids, out_loss, fout, useReturnPeriodFile, samplesize, skipheader, outputFlags, ordFlag, parquetFileNames);
+		// Get list of aggregate and occurrence output files for mean
+		// damage ratio
+		const std::vector<int> handles_agg = { AGG_FULL_UNCERTAINTY,
+						       AGG_SAMPLE_MEAN,
+						       AGG_WHEATSHEAF_MEAN };
+		for (auto it = handles_agg.begin(); it != handles_agg.end();
+		     ++it) {
+			if (outputFlags[*it]) fileIDs_agg.push_back(*it);
+		}				
+
+		const std::vector<int> handles_occ = { OCC_FULL_UNCERTAINTY,
+						       OCC_SAMPLE_MEAN,
+						       OCC_WHEATSHEAF_MEAN };
+		for (auto it = handles_occ.begin(); it != handles_occ.end();
+		     ++it) {
+			if (outputFlags[*it]) fileIDs_occ.push_back(*it);
+		}
+
+		if (skipheader) return;   // No header
+
+		// Set file headers
+		std::string fileHeader_ept;
+		std::string fileHeader_psept;
+		if (ordFlag) {
+			fileHeader_ept = "SummaryId,EPCalc,EPType,ReturnPeriod,"
+					 "Loss";
+			fileHeader_psept = "SummaryId,SampleId,EPType,"
+					   "ReturnPeriod,Loss";
+		} else {
+			fileHeader_ept = "summary_id,type,return_period,loss";
+			fileHeader_psept = "summary_id,sidx,return_period,loss";
+			FILE *fin = fopen(ENSEMBLE_FILE, "rb");
+			if (fin != nullptr) {
+				Ensemble e;
+				// If there is at least one entry
+				if (fread(&e, sizeof(Ensemble), 1, fin) != 0) {
+					fileHeader_ept += ",ensemble_id";
+					fileHeader_psept += ",ensemble_id";
+				}
+				fclose(fin);
+			}
+		}
+
+		// Print headers for Exceedance Probability Table
+		// (i.e. full uncertainty, sample mean and Wheatsheaf mean)
+		std::vector<int> fileIDs;
+		std::set_union(fileIDs_agg.begin(), fileIDs_agg.end(),
+			       fileIDs_occ.begin(), fileIDs_occ.end(),
+			       std::back_inserter(fileIDs));
+		if (fileIDs.size() > 0 && ordFlag) {
+			fileIDs.clear();
+			if (fout[EPT] != nullptr) fileIDs.push_back(EPT);
+		}
+
+		for (auto it = fileIDs.begin(); it != fileIDs.end(); ++it) {
+			fprintf(fout[*it], "%s\n", fileHeader_ept.c_str());
+		}
+
+		// Print headers for Per Sample Exceedance Probability Table
+		// (i.e. Wheatsheaf)
+		const std::vector<int> handles_psept = { AGG_WHEATSHEAF,
+							 OCC_WHEATSHEAF };
+		std::vector<int> fileIDs_psept;
+		for (auto it = handles_psept.begin(); it != handles_psept.end();
+		     ++it) {
+			if (outputFlags[*it]) fileIDs_psept.push_back(*it);
+		}
+		if (fileIDs_psept.size() > 0 && ordFlag) {
+			fileIDs_psept.clear();
+			if (fout[PSEPT] != nullptr)
+				fileIDs_psept.push_back(PSEPT);
+		}
+		for (auto it = fileIDs_psept.begin(); it != fileIDs_psept.end();
+		     ++it) {
+			fprintf(fout[*it], "%s\n", fileHeader_psept.c_str());
+		}
+	}
+
+	inline void outputaggreports(const int totalperiods,
+		const std::set<int> &summaryids,
+		std::vector<std::map<outkey2, OutLosses>> &out_loss,
+		FILE **fout, const bool useReturnPeriodFile,
+		const int samplesize, const bool *outputFlags,
+		const bool ordFlag, const std::string *parquetFileNames)
+	{
+		aggreports agg(totalperiods, summaryids, out_loss, fout,
+			       useReturnPeriodFile, samplesize, outputFlags,
+			       ordFlag, parquetFileNames);
 		agg.OutputOccMeanDamageRatio();
 		agg.OutputAggMeanDamageRatio();
 		agg.OutputOccFullUncertainty();
@@ -273,14 +363,23 @@ namespace leccalc {
 		loadoccurrence(event_to_periods, totalperiods);
 		std::vector<std::map<outkey2, OutLosses>> out_loss(2);
 
+		std::vector<int> fileIDs_occ, fileIDs_agg;
+		setupoutputfiles(fout, ordFlag, outputFlags, skipheader,
+				 fileIDs_occ, fileIDs_agg);
+
 		std::vector<std::string> files;
 		std::vector<FILE*> fileHandles;
 		std::vector<std::string> indexFiles;
 		unsigned int samplesize=0;
 		std::set<int> summaryids;
 		if (subfolder.size() == 0) {
-			processinputfile(samplesize, event_to_periods, summaryids, out_loss, useReturnPeriodFile);
-			outputaggreports(totalperiods, summaryids, out_loss, fout, useReturnPeriodFile, samplesize, skipheader, outputFlags, ordFlag, parquetFileNames);
+			processinputfile(samplesize, event_to_periods,
+					 summaryids, out_loss,
+					 useReturnPeriodFile);
+			outputaggreports(totalperiods, summaryids, out_loss,
+					 fout, useReturnPeriodFile, samplesize,
+					 outputFlags, ordFlag,
+					 parquetFileNames);
 			return;
 		} else {
 			// Store order of input files for future reference
@@ -378,7 +477,7 @@ namespace leccalc {
 					if (last_summary_id != -1) {
 						summaryids.clear();
 						summaryids.insert(last_summary_id);
-						outputaggreports(totalperiods, summaryids, out_loss, fout, useReturnPeriodFile, samplesize, skipheader, outputFlags, ordFlag, parquetFileNames);
+						outputaggreports(totalperiods, summaryids, out_loss, fout, useReturnPeriodFile, samplesize, outputFlags, ordFlag, parquetFileNames);
 						out_loss = std::vector<std::map<outkey2, OutLosses>>(2);   // Reset
 						skipheader = true;   // Only print header for first summary ID if requested
 					}
@@ -406,7 +505,7 @@ namespace leccalc {
 			}
 			summaryids.clear();
 			summaryids.insert(last_summary_id);
-			outputaggreports(totalperiods, summaryids, out_loss, fout, useReturnPeriodFile, samplesize, skipheader, outputFlags, ordFlag, parquetFileNames);
+			outputaggreports(totalperiods, summaryids, out_loss, fout, useReturnPeriodFile, samplesize, outputFlags, ordFlag, parquetFileNames);
 		} else {
 			if (indexFiles.size() > 0) {
 				fprintf(stderr, "%d summary index files missing: "
@@ -417,7 +516,7 @@ namespace leccalc {
 				setinputstream(*it);
 				processinputfile(samplesize, event_to_periods, summaryids, out_loss, useReturnPeriodFile);
 			}
-			outputaggreports(totalperiods, summaryids, out_loss, fout, useReturnPeriodFile, samplesize, skipheader, outputFlags, ordFlag, parquetFileNames);
+			outputaggreports(totalperiods, summaryids, out_loss, fout, useReturnPeriodFile, samplesize, outputFlags, ordFlag, parquetFileNames);
 		}
 	}
 

@@ -978,58 +978,16 @@ void aggreports::MeanDamageRatioWithWeighting(const std::vector<int> fileIDs,
 }
 
 
-void aggreports::OutputAggMeanDamageRatio() {
-
-  // Determine which files to write to for legacy stream
-  // Determine whether Mean Damage Ratio should be written for ORD stream
-  std::vector<int> fileIDs;
-  std::vector<int> handles = { AGG_FULL_UNCERTAINTY, AGG_SAMPLE_MEAN,
-			       AGG_WHEATSHEAF_MEAN };
-  for (std::vector<int>::iterator it = handles.begin(); it != handles.end();
-       ++it) {
-    if (outputFlags_[*it] == true) fileIDs.push_back(*it);
-  }
-
-  if (fileIDs.size() == 0) return;   // No suitable files
-
-  if (ordFlag_) {
-    fileIDs.clear();
-    if (fout_[EPT] != nullptr) fileIDs.push_back(EPT);
-  }
+void aggreports::OutputMeanDamageRatio(const int eptype, const int eptype_tvar,
+				       OASIS_FLOAT (OutLosses::*GetOutLoss)(),
+				       std::vector<int> &fileIDs) {
 
   if (periodstoweighting_.size() == 0) {
-    MeanDamageRatio(fileIDs, GetAgg, AEP);
-  } else {
-    MeanDamageRatioWithWeighting(fileIDs, GetAgg, AEP);
+    MeanDamageRatio(fileIDs, GetOutLoss, eptype);
+    return;
   }
 
-}
-
-
-void aggreports::OutputOccMeanDamageRatio() {
-
-  // Determine which files to write to for legacy stream
-  // Determine whether Mean Damage Ratio should be written for ORD stream
-  std::vector<int> fileIDs;
-  std::vector<int> handles = { OCC_FULL_UNCERTAINTY, OCC_SAMPLE_MEAN,
-			       OCC_WHEATSHEAF_MEAN };
-  for (std::vector<int>::iterator it = handles.begin(); it != handles.end();
-       ++it) {
-    if (outputFlags_[*it] == true) fileIDs.push_back(*it);
-  }
-
-  if (fileIDs.size() == 0) return;   // No suitable files
-
-  if (ordFlag_) {
-    fileIDs.clear();
-    if (fout_[EPT] != nullptr) fileIDs.push_back(EPT);
-  }
-
-  if (periodstoweighting_.size() == 0) {
-    MeanDamageRatio(fileIDs, GetMax, OEP);
-  } else {
-    MeanDamageRatioWithWeighting(fileIDs, GetMax, OEP);
-  }
+  MeanDamageRatioWithWeighting(fileIDs, GetOutLoss, eptype);
 
 }
 
@@ -1134,36 +1092,20 @@ void aggreports::FullUncertaintyWithWeighting(const std::vector<int> fileIDs,
 }
 
 
-void aggreports::OutputAggFullUncertainty() {
-
-  const int handle = AGG_FULL_UNCERTAINTY;
-
-  if (outputFlags_[handle] == false) return;
-
-  std::vector<int> fileIDs = GetFileIDs(handle);
-
-  if (periodstoweighting_.size() == 0) {
-    FullUncertainty(fileIDs, GetAgg, AEP);
-  } else {
-    FullUncertaintyWithWeighting(fileIDs, GetAgg, AEP);
-  }
-
-}
-
-
-void aggreports::OutputOccFullUncertainty() {
-
-  const int handle = OCC_FULL_UNCERTAINTY;
+void aggreports::OutputFullUncertainty(const int handle, const int eptype,
+				       const int eptype_tvar,
+				       OASIS_FLOAT (OutLosses::*GetOutLoss)()) {
 
   if (outputFlags_[handle] == false) return;
 
   std::vector<int> fileIDs = GetFileIDs(handle);
 
   if (periodstoweighting_.size() == 0) {
-    FullUncertainty(fileIDs, GetMax, OEP);
-  } else {
-    FullUncertaintyWithWeighting(fileIDs, GetMax, OEP);
+    FullUncertainty(fileIDs, GetOutLoss, eptype);
+    return;
   }
+
+  FullUncertainty(fileIDs, GetOutLoss, eptype);
 
 }
 
@@ -1333,20 +1275,20 @@ void aggreports::WheatsheafAndWheatsheafMeanWithWeighting(
 
 
 // Wheatsheaf Mean = Per Sample Mean
-void aggreports::OutputAggWheatsheafAndWheatsheafMean() {
+void aggreports::OutputWheatsheafAndWheatsheafMean(const std::vector<int> &handles,
+	const int eptype, const int eptype_tvar,
+	OASIS_FLOAT (OutLosses::*GetOutLoss)()) {
 
-  std::vector<int> handles = { AGG_WHEATSHEAF, AGG_WHEATSHEAF_MEAN };
   int falseCount = 0;
-  for (std::vector<int>::iterator it = handles.begin(); it != handles.end();
-       ++it) {
+  for (auto it = handles.begin(); it != handles.end(); ++it) {
     if (outputFlags_[*it] == false) falseCount++;
   }
   if (falseCount == 2) return;
 
   if (periodstoweighting_.size() == 0) {
-    WheatsheafAndWheatsheafMean(handles, GetAgg, AEP);
+    WheatsheafAndWheatsheafMean(handles, GetOutLoss, eptype);
   } else {
-    WheatsheafAndWheatsheafMeanWithWeighting(handles, GetAgg, AEP);
+    WheatsheafAndWheatsheafMeanWithWeighting(handles, GetOutLoss, eptype);
   }
 
   // By ensemble ID
@@ -1354,42 +1296,10 @@ void aggreports::OutputAggWheatsheafAndWheatsheafMean() {
   if (ensembletosidx_.size() > 0) {
     for (auto ensemble : ensembletosidx_) {
       if (periodstoweighting_.size() == 0) {
-	WheatsheafAndWheatsheafMean(handles, GetAgg, AEP, ensemble.first);
+	WheatsheafAndWheatsheafMean(handles, GetOutLoss, eptype,
+				    ensemble.first);
       } else {
-	WheatsheafAndWheatsheafMeanWithWeighting(handles, GetAgg, AEP,
-						 ensemble.first);
-      }
-    }
-  }
-
-}
-
-
-// Wheatsheaf Mean = Per Sample Mean
-void aggreports::OutputOccWheatsheafAndWheatsheafMean() {
-
-  std::vector<int> handles = { OCC_WHEATSHEAF, OCC_WHEATSHEAF_MEAN };
-  int falseCount = 0;
-  for (std::vector<int>::iterator it = handles.begin(); it != handles.end();
-       ++it) {
-    if (outputFlags_[*it] == false) falseCount++;
-  }
-  if (falseCount == 2) return;
-
-  if (periodstoweighting_.size() == 0) {
-    WheatsheafAndWheatsheafMean(handles, GetMax, OEP);
-  } else {
-    WheatsheafAndWheatsheafMeanWithWeighting(handles, GetMax, OEP);
-  }
-
-  // By ensemble ID
-  if (ordFlag_) return;   // Ensemble IDs not supported for ORD output
-  if (ensembletosidx_.size() > 0) {
-    for (auto ensemble : ensembletosidx_) {
-      if (periodstoweighting_.size() == 0) {
-	WheatsheafAndWheatsheafMean(handles, GetMax, OEP, ensemble.first);
-      } else {
-	WheatsheafAndWheatsheafMeanWithWeighting(handles, GetMax, OEP,
+	WheatsheafAndWheatsheafMeanWithWeighting(handles, GetOutLoss, eptype,
 						 ensemble.first);
       }
     }
@@ -1511,35 +1421,19 @@ void aggreports::SampleMeanWithWeighting(const std::vector<int> fileIDs,
 }
 
 
-void aggreports::OutputAggSampleMean() {
-
-  const int handle = AGG_SAMPLE_MEAN;
-
-  if (outputFlags_[handle] == false) return;
-
-  std::vector<int> fileIDs = GetFileIDs(handle);
-
-  if (periodstoweighting_.size() == 0) {
-    SampleMean(fileIDs, GetAgg, AEP);
-  } else {
-    SampleMeanWithWeighting(fileIDs, GetAgg, AEP);
-  }
-
-}
-
-
-void aggreports::OutputOccSampleMean() {
-
-  const int handle = OCC_SAMPLE_MEAN;
+void aggreports::OutputSampleMean(const int handle, const int eptype,
+				  const int eptype_tvar,
+				  OASIS_FLOAT (OutLosses::*GetOutLoss)()) {
 
   if (outputFlags_[handle] == false) return;
 
   std::vector<int> fileIDs = GetFileIDs(handle);
 
   if (periodstoweighting_.size() == 0) {
-    SampleMean(fileIDs, GetMax, OEP);
-  } else {
-    SampleMeanWithWeighting(fileIDs, GetMax, OEP);
+    SampleMean(fileIDs, GetOutLoss, eptype);
+    return;
   }
+
+  SampleMeanWithWeighting(fileIDs, GetOutLoss, eptype);
 
 }

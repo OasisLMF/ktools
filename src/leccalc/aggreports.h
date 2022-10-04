@@ -49,7 +49,6 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #endif
 
 enum { MEANDR = 1, FULL, PERSAMPLEMEAN, MEANSAMPLE };
-enum { OEP = 1, OEPTVAR, AEP, AEPTVAR };
 enum { MEANS = 0, SAMPLES };
 enum { WHEATSHEAF = 0, WHEATSHEAF_MEAN };
 
@@ -236,13 +235,26 @@ private:
 
 public:
 	aggreports(const int totalperiods, const std::set<int> &summaryids, std::vector<std::map<outkey2, OutLosses>> &out_loss, FILE **fout, const bool useReturnPeriodFile, const int samplesize, const bool *outputFlags, const bool ordFlag, const std::string *parquetFileNames);
-	void OutputAggMeanDamageRatio();
-	void OutputOccMeanDamageRatio();
-	void OutputAggFullUncertainty();
-	void OutputOccFullUncertainty();
-	void OutputAggWheatsheafAndWheatsheafMean();
-	void OutputOccWheatsheafAndWheatsheafMean();
-	void OutputAggSampleMean();
-	void OutputOccSampleMean();
+	void OutputMeanDamageRatio(const int eptype, const int eptype_tvar,
+				   OASIS_FLOAT (OutLosses::*GetOutLoss)(),
+				   std::vector<int> &fileIDs);
+	void OutputFullUncertainty(const int handle, const int eptype,
+				   const int eptype_tvar,
+				   OASIS_FLOAT (OutLosses::*GetOutLoss)());
+	void OutputWheatsheafAndWheatsheafMean(const std::vector<int> &handles,
+						const int eptype,
+						const int eptype_tvar,
+						OASIS_FLOAT (OutLosses::*GetOutLoss)());
+	void OutputSampleMean(const int handle, const int eptype,
+			      const int eptype_tvar,
+			      OASIS_FLOAT (OutLosses::*GetOutLoss)());
+//	void OutputAggMeanDamageRatio();
+//	void OutputOccMeanDamageRatio();
+//	void OutputAggFullUncertainty();
+//	void OutputOccFullUncertainty();
+//	void OutputAggWheatsheafAndWheatsheafMean();
+//	void OutputOccWheatsheafAndWheatsheafMean();
+//	void OutputAggSampleMean();
+//	void OutputOccSampleMean();
 };
 #endif // AGGREPORTS_H_

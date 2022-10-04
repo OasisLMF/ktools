@@ -248,13 +248,5 @@ public:
 	void OutputSampleMean(const int handle, const int eptype,
 			      const int eptype_tvar,
 			      OASIS_FLOAT (OutLosses::*GetOutLoss)());
-//	void OutputAggMeanDamageRatio();
-//	void OutputOccMeanDamageRatio();
-//	void OutputAggFullUncertainty();
-//	void OutputOccFullUncertainty();
-//	void OutputAggWheatsheafAndWheatsheafMean();
-//	void OutputOccWheatsheafAndWheatsheafMean();
-//	void OutputAggSampleMean();
-//	void OutputOccSampleMean();
 };
 #endif // AGGREPORTS_H_

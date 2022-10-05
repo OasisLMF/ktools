@@ -64,20 +64,20 @@ private:
 	const int totalperiods_;
 	const std::set<int> summaryids_;
 	std::vector<std::map<outkey2, OutLosses>> &out_loss_;
-	const bool *outputFlags_;
 	FILE **fout_;
+	bool useReturnPeriodFile_;
+	const int samplesize_;
+	const bool *outputFlags_;
+	const bool ordFlag_;
 	const std::string *parquetFileNames_;
 	bool eptHeader_ = true;
 	bool pseptHeader_ = true;
 	std::map<int, bool> wheatSheaf_ = {
 		{ 0, true }, { OEP, false }, { AEP, false }
 	};   // key 0 for fail safe
-	bool useReturnPeriodFile_;
-	const int samplesize_;
 	std::vector<int> returnperiods_;
 	std::map <int, double> periodstoweighting_;
 	std::map<int, std::vector<int>> ensembletosidx_;
-	const bool ordFlag_;
 	std::map<int, bool> fileHeaders_ = {
 		{ AGG_FULL_UNCERTAINTY, false }, { AGG_WHEATSHEAF, false },
 		{ AGG_SAMPLE_MEAN, false }, { AGG_WHEATSHEAF_MEAN, false },

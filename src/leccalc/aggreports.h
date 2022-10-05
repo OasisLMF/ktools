@@ -118,39 +118,39 @@ private:
 		const OASIS_FLOAT current_loss, const int summary_id,
 		const int eptype, const int epcalc, const double max_retperiod,
 		int counter, OASIS_FLOAT tvar, T &tail,
-		void (aggreports::*WriteOutput)(const std::vector<int>,
+		void (aggreports::*WriteOutput)(const std::vector<int>&,
 						const int, const int, const int,
 						const double,
 						const OASIS_FLOAT),
 		parquet::StreamWriter& os);
 #else
 	template<typename T>
-	void WriteReturnPeriodOut(const std::vector<int> fileIDs,
+	void WriteReturnPeriodOut(const std::vector<int> &fileIDs,
 		size_t &nextreturnperiod_index, double &last_return_period,
 		OASIS_FLOAT &last_loss, const double current_return_period,
 		const OASIS_FLOAT current_loss, const int summary_id,
 		const int eptype, const int epcalc, const double max_retperiod,
 		int counter, OASIS_FLOAT tvar, T &tail,
-		void (aggreports::*WriteOutput)(const std::vector<int>,
+		void (aggreports::*WriteOutput)(const std::vector<int>&,
 						const int, const int, const int,
 						const double,
 						const OASIS_FLOAT));
 #endif
-	inline void OutputRows(const std::vector<int> fileIDs,
+	inline void OutputRows(const std::vector<int> &fileIDs,
 			       const char * buffer, int strLen);
-	void WriteLegacyOutput(const std::vector<int> fileIDs,
+	void WriteLegacyOutput(const std::vector<int> &fileIDs,
 			       const int summary_id, const int type,
 			       const int ensemble_id,
 			       const double retperiod,
 			       const OASIS_FLOAT loss);
-	void WriteORDOutput(const std::vector<int> fileIDs,
+	void WriteORDOutput(const std::vector<int> &fileIDs,
 			    const int summary_id, const int epcalc,
 			    const int eptype, const double retperiod,
 			    const OASIS_FLOAT loss);
-	void WriteTVaR(const std::vector<int> fileIDs, const int epcalc,
+	void WriteTVaR(const std::vector<int> &fileIDs, const int epcalc,
 		       const int eptype_tvar,
 		       const std::map<int, std::vector<TVaR>> &tail);
-	void WriteTVaR(const std::vector<int> fileIDs, const int eptype_tvar,
+	void WriteTVaR(const std::vector<int> &fileIDs, const int eptype_tvar,
 		       const std::map<wheatkey, std::vector<TVaR>> &tail);
 #ifdef ORD_OUTPUT
 	inline void WriteParquetOutput(parquet::StreamWriter& os,
@@ -166,7 +166,7 @@ private:
 #endif
 	inline void DoSetUp(int &eptype, int &epcalc, const int ensemble_id,
 		const std::vector<int> fileIDs,
-		void (aggreports::*&WriteOutput)(const std::vector<int>,
+		void (aggreports::*&WriteOutput)(const std::vector<int>&,
 						 const int, const int,
 						 const int, const double,
 						 const OASIS_FLOAT));
@@ -184,7 +184,7 @@ private:
 		int samplesize=1, int ensemble_id=0);
 	inline void DoSetUpWheatsheaf(int &eptype, const int ensemble_id,
 		const std::vector<int> fileIDs,
-		void (aggreports::*&WriteOutput)(const std::vector<int>,
+		void (aggreports::*&WriteOutput)(const std::vector<int>&,
 						 const int, const int,
 						 const int, const double,
 						 const OASIS_FLOAT));

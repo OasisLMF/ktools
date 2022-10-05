@@ -190,26 +190,25 @@ void aggreports::FillTVaR(std::map<wheatkey, std::vector<TVaR>> &tail,
 // epcalc = sidx for Wheatsheaf (Per Sample Exceedance Probability Table)
 // TODO: There is probably a tidier way of doing this.
 #ifdef ORD_OUTPUT
-template<typename T>
-void aggreports::WriteReturnPeriodOut(const std::vector<int> fileIDs,
+void aggreports::WriteReturnPeriodOut(const std::vector<int> &fileIDs,
 	size_t &nextreturnperiod_index, double &last_return_period,
 	OASIS_FLOAT &last_loss, const double current_return_period,
 	const OASIS_FLOAT current_loss, const int summary_id, const int eptype,
 	const int epcalc, const double max_retperiod, int counter,
 	OASIS_FLOAT tvar, T &tail,
-	void (aggreports::*WriteOutput)(const std::vector<int>, const int,
+	void (aggreports::*WriteOutput)(const std::vector<int>&, const int,
 					const int, const int, const double,
 					const OASIS_FLOAT),
 	parquet::StreamWriter& os)
 #else
 template<typename T>
-void aggreports::WriteReturnPeriodOut(const std::vector<int> fileIDs,
+void aggreports::WriteReturnPeriodOut(const std::vector<int> &fileIDs,
 	size_t &nextreturnperiod_index, double &last_return_period,
 	OASIS_FLOAT &last_loss, const double current_return_period,
 	const OASIS_FLOAT current_loss, const int summary_id, const int eptype,
 	const int epcalc, const double max_retperiod, int counter,
 	OASIS_FLOAT tvar, T &tail,
-	void (aggreports::*WriteOutput)(const std::vector<int>, const int,
+	void (aggreports::*WriteOutput)(const std::vector<int>&, const int,
 					const int, const int, const double,
 					const OASIS_FLOAT))
 #endif
@@ -262,7 +261,7 @@ void aggreports::WriteReturnPeriodOut(const std::vector<int> fileIDs,
 }
 
 
-inline void aggreports::OutputRows(const std::vector<int> fileIDs,
+inline void aggreports::OutputRows(const std::vector<int> &fileIDs,
 				   const char * buffer, int strLen) {
 
   for (std::vector<int>::const_iterator it = fileIDs.begin();
@@ -298,7 +297,7 @@ inline void aggreports::OutputRows(const std::vector<int> fileIDs,
 }
 
 
-void aggreports::WriteLegacyOutput(const std::vector<int> fileIDs,
+void aggreports::WriteLegacyOutput(const std::vector<int> &fileIDs,
 				   const int summary_id, const int type,
 				   const int ensemble_id,
 				   const double retperiod,
@@ -318,7 +317,7 @@ void aggreports::WriteLegacyOutput(const std::vector<int> fileIDs,
 }
 
 
-void aggreports::WriteORDOutput(const std::vector<int> fileIDs,
+void aggreports::WriteORDOutput(const std::vector<int> &fileIDs,
 				const int summary_id, const int epcalc,
 				const int eptype, const double retperiod,
 				const OASIS_FLOAT loss) {
@@ -333,7 +332,7 @@ void aggreports::WriteORDOutput(const std::vector<int> fileIDs,
 }
 
 
-void aggreports::WriteTVaR(const std::vector<int> fileIDs, const int epcalc,
+void aggreports::WriteTVaR(const std::vector<int> &fileIDs, const int epcalc,
 			   const int eptype_tvar,
 			   const std::map<int, std::vector<TVaR>> &tail) {
 
@@ -353,7 +352,7 @@ void aggreports::WriteTVaR(const std::vector<int> fileIDs, const int epcalc,
 }
 
 
-void aggreports::WriteTVaR(const std::vector<int> fileIDs,
+void aggreports::WriteTVaR(const std::vector<int> &fileIDs,
 			   const int eptype_tvar,
 			   const std::map<wheatkey, std::vector<TVaR>> &tail) {
 
@@ -443,7 +442,7 @@ inline parquet::StreamWriter aggreports::GetParquetStreamWriter(const int fileSt
 
 inline void aggreports::DoSetUp(int &eptype, int &epcalc, const int ensemble_id,
 	const std::vector<int> fileIDs,
-	void (aggreports::*&WriteOutput)(const std::vector<int>, const int,
+	void (aggreports::*&WriteOutput)(const std::vector<int>&, const int,
 					 const int, const int, const double,
 					 const OASIS_FLOAT))
 {
@@ -476,7 +475,7 @@ void aggreports::WriteExceedanceProbabilityTable(
   if (samplesize == 0) return;
 
 //  int eptype_tvar = 0;
-  void (aggreports::*WriteOutput)(const std::vector<int>, const int, const int,
+  void (aggreports::*WriteOutput)(const std::vector<int>&, const int, const int,
 				  const int, const double, const OASIS_FLOAT);
   WriteOutput = nullptr;
   DoSetUp(eptype, epcalc, ensemble_id, fileIDs, WriteOutput);
@@ -582,7 +581,7 @@ void aggreports::WriteExceedanceProbabilityTable(
   if (samplesize == 0) return;
 
 //  int eptype_tvar = 0;
-  void (aggreports::*WriteOutput)(const std::vector<int>, const int, const int,
+  void (aggreports::*WriteOutput)(const std::vector<int>&, const int, const int,
 				  const int, const double, const OASIS_FLOAT);
   WriteOutput = nullptr;
   DoSetUp(eptype, epcalc, ensemble_id, fileIDs, WriteOutput);
@@ -696,7 +695,7 @@ void aggreports::WriteExceedanceProbabilityTable(
 
 inline void aggreports::DoSetUpWheatsheaf(int &eptype, const int ensemble_id,
 	const std::vector<int> fileIDs,
-	void (aggreports::*&WriteOutput)(const std::vector<int>, const int,
+	void (aggreports::*&WriteOutput)(const std::vector<int>&, const int,
 					 const int, const int, const double,
 					 const OASIS_FLOAT))
 {
@@ -719,7 +718,7 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
   if (items.size() == 0) return;
 
 //  int eptype_tvar = 0;
-  void (aggreports::*WriteOutput)(const std::vector<int>, const int, const int,
+  void (aggreports::*WriteOutput)(const std::vector<int>&, const int, const int,
 				  const int, const double, const OASIS_FLOAT);
   WriteOutput = nullptr;
   DoSetUpWheatsheaf(eptype, ensemble_id, fileIDs, WriteOutput);
@@ -823,7 +822,7 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
   if (items.size() == 0) return;
 
 //  int eptype_tvar = 0;
-  void (aggreports::*WriteOutput)(const std::vector<int>, const int, const int,
+  void (aggreports::*WriteOutput)(const std::vector<int>&, const int, const int,
 				  const int, const double, const OASIS_FLOAT);
   WriteOutput = nullptr;
   DoSetUpWheatsheaf(eptype, ensemble_id, fileIDs, WriteOutput);

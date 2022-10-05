@@ -124,8 +124,8 @@ namespace leccalc {
 		}
 
 		int date_opts = 0;
-		size_t i = fread(&date_opts, sizeof(date_opts), 1, fin);
-		i = fread(&totalperiods, sizeof(totalperiods), 1, fin);
+		fread(&date_opts, sizeof(date_opts), 1, fin);
+		fread(&totalperiods, sizeof(totalperiods), 1, fin);
 		int granular_date = date_opts >> 1;
 		if (granular_date) {
 			occurrence_granular occ;
@@ -263,6 +263,10 @@ namespace leccalc {
 				fileIDs.push_back(EPT);
 		}
 	}
+
+
+	
+
 
 	inline bool setupoutputfiles(FILE **fout, const bool ordFlag,
 				     const bool *outputFlags,

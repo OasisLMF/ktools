@@ -190,6 +190,7 @@ void aggreports::FillTVaR(std::map<wheatkey, std::vector<TVaR>> &tail,
 // epcalc = sidx for Wheatsheaf (Per Sample Exceedance Probability Table)
 // TODO: There is probably a tidier way of doing this.
 #ifdef ORD_OUTPUT
+template<typename T>
 void aggreports::WriteReturnPeriodOut(const std::vector<int> &fileIDs,
 	size_t &nextreturnperiod_index, double &last_return_period,
 	OASIS_FLOAT &last_loss, const double current_return_period,

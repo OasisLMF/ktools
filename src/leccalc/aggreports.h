@@ -147,9 +147,6 @@ private:
 			    const int summary_id, const int epcalc,
 			    const int eptype, const double retperiod,
 			    const OASIS_FLOAT loss);
-	void WriteNoOutput(const std::vector<int> fileIDs, const int summary_id,
-			   const int epcalc, const int eptype,
-			   const double retperiod, const OASIS_FLOAT loss);
 	void WriteTVaR(const std::vector<int> fileIDs, const int epcalc,
 		       const int eptype_tvar,
 		       const std::map<int, std::vector<TVaR>> &tail);

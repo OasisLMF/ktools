@@ -232,8 +232,10 @@ void aggreports::WriteReturnPeriodOut(const std::vector<int> fileIDs,
 
     OASIS_FLOAT loss = GetLoss(nextreturnperiod_value, last_return_period,
 			       last_loss, current_return_period, current_loss);
-    (this->*WriteOutput)(fileIDs, summary_id, epcalc, eptype,
-			 nextreturnperiod_value, loss);
+    if (WriteOutput != nullptr) {
+    	(this->*WriteOutput)(fileIDs, summary_id, epcalc, eptype,
+			     nextreturnperiod_value, loss);
+    }
 #ifdef ORD_OUTPUT
     if (parquetFileNames_[EPT] != "") {
       WriteParquetOutput(os, summary_id, epcalc, eptype,
@@ -328,15 +330,6 @@ void aggreports::WriteORDOutput(const std::vector<int> fileIDs,
 		    eptype, retperiod, loss);
   OutputRows(fileIDs, buffer, strLen);
 
-}
-
-
-void aggreports::WriteNoOutput(const std::vector<int> fileIDs,
-			       const int summary_id, const int epcalc,
-			       const int eptype, const double retperiod,
-			       const OASIS_FLOAT loss)
-{
-  return;
 }
 
 
@@ -457,7 +450,6 @@ inline void aggreports::DoSetUp(int &eptype, int &epcalc, const int ensemble_id,
 
   if (ordFlag_) {
     WriteOutput = &aggreports::WriteORDOutput;
-    if (fileIDs.size() == 0) WriteOutput = &aggreports::WriteNoOutput;
   } else {
     WriteOutput = &aggreports::WriteLegacyOutput;
     // epcalc = type in legacy output
@@ -486,6 +478,7 @@ void aggreports::WriteExceedanceProbabilityTable(
 //  int eptype_tvar = 0;
   void (aggreports::*WriteOutput)(const std::vector<int>, const int, const int,
 				  const int, const double, const OASIS_FLOAT);
+  WriteOutput = nullptr;
   DoSetUp(eptype, epcalc, ensemble_id, fileIDs, WriteOutput);
 
 #ifdef ORD_OUTPUT
@@ -527,8 +520,10 @@ void aggreports::WriteExceedanceProbabilityTable(
       } else {
 	tvar = tvar - ((tvar - (lp / samplesize)) / i);
 	tail[s.first].push_back({retperiod, tvar});
-	(this->*WriteOutput)(fileIDs, s.first, epcalc, eptype, retperiod,
-			     lp / samplesize);
+	if (WriteOutput != nullptr) {
+	  (this->*WriteOutput)(fileIDs, s.first, epcalc, eptype, retperiod,
+			       lp / samplesize);
+	}
 #ifdef ORD_OUTPUT
 	// TODO: Rather than checking for this on every iteration, it may be
 	// more efficient to create a new class that inherits from
@@ -589,6 +584,7 @@ void aggreports::WriteExceedanceProbabilityTable(
 //  int eptype_tvar = 0;
   void (aggreports::*WriteOutput)(const std::vector<int>, const int, const int,
 				  const int, const double, const OASIS_FLOAT);
+  WriteOutput = nullptr;
   DoSetUp(eptype, epcalc, ensemble_id, fileIDs, WriteOutput);
 
 #ifdef ORD_OUTPUT
@@ -642,8 +638,10 @@ void aggreports::WriteExceedanceProbabilityTable(
 	} else {
 	  tvar = tvar - ((tvar - (lp.value / samplesize)) / i);
 	  tail[s.first].push_back({retperiod, tvar});
-	  (this->*WriteOutput)(fileIDs, s.first, epcalc, eptype, retperiod,
-			       lp.value / samplesize);
+	  if (WriteOutput != nullptr) {
+	    (this->*WriteOutput)(fileIDs, s.first, epcalc, eptype, retperiod,
+				 lp.value / samplesize);
+	  }
 #ifdef ORD_OUTPUT
 	// TODO: Rather than checking for this on every iteration, it may be
 	// more efficient to create a new class that inherits from
@@ -705,7 +703,6 @@ inline void aggreports::DoSetUpWheatsheaf(int &eptype, const int ensemble_id,
 
   if (ordFlag_) {
     WriteOutput = &aggreports::WriteORDOutput;
-    if (fileIDs.size() == 0) WriteOutput = &aggreports::WriteNoOutput;
   } else {
     WriteOutput = &aggreports::WriteLegacyOutput;
     eptype = ensemble_id;
@@ -724,6 +721,7 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
 //  int eptype_tvar = 0;
   void (aggreports::*WriteOutput)(const std::vector<int>, const int, const int,
 				  const int, const double, const OASIS_FLOAT);
+  WriteOutput = nullptr;
   DoSetUpWheatsheaf(eptype, ensemble_id, fileIDs, WriteOutput);
 
 #ifdef ORD_OUTPUT
@@ -767,8 +765,10 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
       } else {
 	tvar = tvar - ((tvar - lp) / i);
 	tail[s.first].push_back({retperiod, tvar});
-	(this->*WriteOutput)(fileIDs, s.first.summary_id, s.first.sidx, eptype,
-			     retperiod, lp);
+	if (WriteOutput != nullptr) {
+	  (this->*WriteOutput)(fileIDs, s.first.summary_id, s.first.sidx,
+			       eptype, retperiod, lp);
+	}
 #ifdef ORD_OUTPUT
 	// TODO: Rather than checking for this on every iteration, it may be
 	// more efficient to create a new class that inherits from
@@ -825,6 +825,7 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
 //  int eptype_tvar = 0;
   void (aggreports::*WriteOutput)(const std::vector<int>, const int, const int,
 				  const int, const double, const OASIS_FLOAT);
+  WriteOutput = nullptr;
   DoSetUpWheatsheaf(eptype, ensemble_id, fileIDs, WriteOutput);
 
 #ifdef ORD_OUTPUT
@@ -879,8 +880,10 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
 	} else {
 	  tvar = tvar - ((tvar - lp.value) / i);
 	  tail[s.first].push_back({retperiod, tvar});
-	  (this->*WriteOutput)(fileIDs, s.first.summary_id, s.first.sidx,
-			       eptype, retperiod, lp.value);
+	  if (WriteOutput != nullptr) {
+	    (this->*WriteOutput)(fileIDs, s.first.summary_id, s.first.sidx,
+				 eptype, retperiod, lp.value);
+	  }
 #ifdef ORD_OUTPUT
 	// TODO: Rather than checking for this on every iteration, it may be
 	// more efficient to create a new class that inherits from

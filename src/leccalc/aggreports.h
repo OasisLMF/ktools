@@ -62,11 +62,11 @@ struct line_points{
 class aggreports {
 private:
 	const int totalperiods_;
-	const std::set<int> summaryids_;
-	std::vector<std::map<outkey2, OutLosses>> &out_loss_;
+	std::set<int> summaryids_;
+	std::vector<std::map<outkey2, OutLosses>> *out_loss_;
 	FILE **fout_;
 	bool useReturnPeriodFile_;
-	const int samplesize_;
+	int samplesize_;
 	const bool *outputFlags_;
 	const bool ordFlag_;
 	const std::string *parquetFileNames_;
@@ -234,10 +234,15 @@ private:
 				     const int eptype, const int eptype_tvar);
 
 public:
-	aggreports(const int totalperiods, const std::set<int> &summaryids, std::vector<std::map<outkey2, OutLosses>> &out_loss, FILE **fout, const bool useReturnPeriodFile, const int samplesize, const bool *outputFlags, const bool ordFlag, const std::string *parquetFileNames);
+	aggreports(const int totalperiods, FILE **fout,
+		   const bool useReturnPeriodFile, const bool *outputFlags,
+		   const bool ordFlag, const std::string *parquetFileNames);
+	void SetInputData(const std::set<int> &summaryids,
+			  std::vector<std::map<outkey2, OutLosses>> &out_loss);
+	void SetSampleSize(const int samplesize);
 	void OutputMeanDamageRatio(const int eptype, const int eptype_tvar,
 				   OASIS_FLOAT (OutLosses::*GetOutLoss)(),
-				   std::vector<int> &fileIDs);
+				   const std::vector<int> &fileIDs);
 	void OutputFullUncertainty(const int handle, const int eptype,
 				   const int eptype_tvar,
 				   OASIS_FLOAT (OutLosses::*GetOutLoss)());

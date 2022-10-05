@@ -43,22 +43,33 @@ bool operator<(const wheatkey &lhs, const wheatkey &rhs) {
 }
 
 
-aggreports::aggreports(const int totalperiods, const std::set<int> &summaryids,
-		       std::vector<std::map<outkey2, OutLosses>> &out_loss,
-		       FILE **fout, const bool useReturnPeriodFile,
-		       const int samplesize, const bool *outputFlags,
+aggreports::aggreports(const int totalperiods, FILE **fout,
+		       const bool useReturnPeriodFile, const bool *outputFlags,
 		       const bool ordFlag,
 		       const std::string *parquetFileNames) :
-  totalperiods_(totalperiods), summaryids_(summaryids),
-  out_loss_(out_loss), fout_(fout), useReturnPeriodFile_(useReturnPeriodFile),
-  samplesize_(samplesize), outputFlags_(outputFlags), ordFlag_(ordFlag),
-  parquetFileNames_(parquetFileNames)
+	totalperiods_(totalperiods), fout_(fout),
+	useReturnPeriodFile_(useReturnPeriodFile), outputFlags_(outputFlags),
+	ordFlag_(ordFlag), parquetFileNames_(parquetFileNames)
 {
 
   LoadReturnPeriods();
+
+}
+
+
+void aggreports::SetInputData(const std::set<int> &summaryids,
+	std::vector<std::map<outkey2, OutLosses>> &out_loss)
+{
+  summaryids_ = summaryids;
+  out_loss_ = &out_loss;
+}
+
+
+void aggreports::SetSampleSize(const int samplesize)
+{
+  samplesize_ = samplesize;
   LoadPeriodsToWeighting();
   LoadEnsembleMapping();
-
 }
 
 
@@ -939,7 +950,7 @@ void aggreports::MeanDamageRatio(const std::vector<int> &fileIDs,
 
   std::map<int, lossvec> items;
 
-  for (auto x : out_loss_[MEANS]) {
+  for (auto x : (*out_loss_)[MEANS]) {
     items[x.first.summary_id].push_back((x.second.*GetOutLoss)());
   }
 
@@ -956,7 +967,7 @@ void aggreports::MeanDamageRatioWithWeighting(const std::vector<int> &fileIDs,
   std::map<int, lossvec2> items;
   std::map<int, double> unusedperiodstoweighting = periodstoweighting_;
 
-  for (auto x : out_loss_[MEANS]) {
+  for (auto x : (*out_loss_)[MEANS]) {
     lossval lv;
     lv.value = (x.second.*GetOutLoss)();
     auto iter = periodstoweighting_.find(x.first.period_no);
@@ -976,7 +987,7 @@ void aggreports::MeanDamageRatioWithWeighting(const std::vector<int> &fileIDs,
 
 void aggreports::OutputMeanDamageRatio(const int eptype, const int eptype_tvar,
 				       OASIS_FLOAT (OutLosses::*GetOutLoss)(),
-				       std::vector<int> &fileIDs) {
+				       const std::vector<int> &fileIDs) {
 
   if (periodstoweighting_.size() == 0) {
     MeanDamageRatio(fileIDs, GetOutLoss, eptype, eptype_tvar);
@@ -1009,7 +1020,7 @@ void aggreports::FullUncertainty(const std::vector<int> &fileIDs,
 
   std::map<int, lossvec> items;
 
-  for (auto x : out_loss_[SAMPLES]) {
+  for (auto x : (*out_loss_)[SAMPLES]) {
     items[x.first.summary_id].push_back((x.second.*GetOutLoss)());
   }
 
@@ -1021,7 +1032,7 @@ void aggreports::FullUncertainty(const std::vector<int> &fileIDs,
   if (ensembletosidx_.size() > 0) {
     for (auto ensemble : ensembletosidx_) {
       items.clear();
-      for (auto x : out_loss_[SAMPLES]) {
+      for (auto x : (*out_loss_)[SAMPLES]) {
 	for (auto sidx : ensemble.second) {
 	  if (x.first.sidx == sidx) {
 	    items[x.first.summary_id].push_back((x.second.*GetOutLoss)());
@@ -1045,7 +1056,7 @@ void aggreports::FullUncertaintyWithWeighting(const std::vector<int> &fileIDs,
   std::map<int, lossvec2> items;
   std::map<int, double> unusedperiodstoweighting = periodstoweighting_;
 
-  for (auto x : out_loss_[SAMPLES]) {
+  for (auto x : (*out_loss_)[SAMPLES]) {
     lossval lv;
     lv.value = (x.second.*GetOutLoss)();
     auto iter = periodstoweighting_.find(x.first.period_no);
@@ -1066,7 +1077,7 @@ void aggreports::FullUncertaintyWithWeighting(const std::vector<int> &fileIDs,
     for (auto ensemble : ensembletosidx_) {
       items.clear();
       unusedperiodstoweighting = periodstoweighting_;
-      for (auto x : out_loss_[SAMPLES]) {
+      for (auto x : (*out_loss_)[SAMPLES]) {
 	for (auto sidx : ensemble.second) {
 	  if (x.first.sidx == sidx) {
 	    lossval lv;
@@ -1156,7 +1167,7 @@ void aggreports::WheatsheafAndWheatsheafMean(const std::vector<int> handles,
 
   if (ensemble_id != 0) {
     samplesize = (int)ensembletosidx_[ensemble_id].size();
-    for (auto x : out_loss_[SAMPLES]) {
+    for (auto x : (*out_loss_)[SAMPLES]) {
       for (auto sidx : ensembletosidx_[ensemble_id]) {
 	if (x.first.sidx == sidx) {
 	  FillWheatsheafItems(x.first, items, (x.second.*GetOutLoss)());
@@ -1165,7 +1176,7 @@ void aggreports::WheatsheafAndWheatsheafMean(const std::vector<int> handles,
     }
   } else {
     samplesize = samplesize_;
-    for (auto x : out_loss_[SAMPLES]) {
+    for (auto x : (*out_loss_)[SAMPLES]) {
       FillWheatsheafItems(x.first, items, (x.second.*GetOutLoss)());
     }
   }
@@ -1222,7 +1233,7 @@ void aggreports::WheatsheafAndWheatsheafMeanWithWeighting(
 
   if (ensemble_id != 0) {
     samplesize = (int)ensembletosidx_[ensemble_id].size();
-    for (auto x : out_loss_[SAMPLES]) {
+    for (auto x : (*out_loss_)[SAMPLES]) {
       for (auto sidx : ensembletosidx_[ensemble_id]) {
 	if (x.first.sidx == sidx) {
 	  FillWheatsheafItems(x.first, items, (x.second.*GetOutLoss)(),
@@ -1232,7 +1243,7 @@ void aggreports::WheatsheafAndWheatsheafMeanWithWeighting(
     }
   } else {
     samplesize = samplesize_;
-    for (auto x : out_loss_[SAMPLES]) {
+    for (auto x : (*out_loss_)[SAMPLES]) {
       FillWheatsheafItems(x.first, items, (x.second.*GetOutLoss)(),
 			  maxPeriodNo, unusedperiodstoweighting);
     }
@@ -1316,7 +1327,7 @@ void aggreports::SampleMean(const std::vector<int> &fileIDs,
   if (samplesize_ == 0) return;   // Prevent division by zero error
 
   std::map<summary_id_period_key, OASIS_FLOAT> items;
-  for (auto x : out_loss_[SAMPLES]) {
+  for (auto x : (*out_loss_)[SAMPLES]) {
     summary_id_period_key sk;
     sk.summary_id = x.first.summary_id;
     sk.period_no = x.first.period_no;
@@ -1336,7 +1347,7 @@ void aggreports::SampleMean(const std::vector<int> &fileIDs,
   if (ensembletosidx_.size() > 0) {
     for (auto ensemble : ensembletosidx_) {
       items.clear();
-      for (auto x : out_loss_[SAMPLES]) {
+      for (auto x : (*out_loss_)[SAMPLES]) {
 	for (auto sidx : ensemble.second) {
 	  if (x.first.sidx == sidx) {
 	    summary_id_period_key sk;
@@ -1368,7 +1379,7 @@ void aggreports::SampleMeanWithWeighting(const std::vector<int> &fileIDs,
   std::map<summary_id_period_key, lossval> items;
   std::map<int, double> unusedperiodstoweighting = periodstoweighting_;
 
-  for (auto x : out_loss_[SAMPLES]) {
+  for (auto x : (*out_loss_)[SAMPLES]) {
     summary_id_period_key sk;
     sk.summary_id = x.first.summary_id;
     sk.period_no = x.first.period_no;
@@ -1396,7 +1407,7 @@ void aggreports::SampleMeanWithWeighting(const std::vector<int> &fileIDs,
     for (auto ensemble : ensembletosidx_) {
       items.clear();
       unusedperiodstoweighting = periodstoweighting_;
-      for (auto x : out_loss_[SAMPLES]) {
+      for (auto x : (*out_loss_)[SAMPLES]) {
 	for (auto sidx : ensemble.second) {
 	  if (x.first.sidx == sidx) {
 	    summary_id_period_key sk;

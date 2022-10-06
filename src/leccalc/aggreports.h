@@ -170,29 +170,26 @@ private:
 			      const std::map<wheatkey, std::vector<TVaR>> &tail);
 	inline parquet::StreamWriter GetParquetStreamWriter(const int fileStream);
 #endif
-	inline void DoSetUp(int &eptype, const int ensemble_id);
 	void WriteExceedanceProbabilityTable(const std::vector<int> &fileIDs,
 					     std::map<int, lossvec> &items,
 					     const double max_retperiod,
 					     int epcalc, int eptype,
-					     int eptype_tvar, int samplesize=1,
-					     int ensemble_id=0);
+					     int eptype_tvar, int samplesize=1);
 	void WriteExceedanceProbabilityTable(const std::vector<int> &fileIDs,
 		std::map<int, lossvec2> &items,
 		const OASIS_FLOAT cum_weight_constant, int epcalc, int eptype,
 		int eptype_tvar,
 		std::map<int, double> &unusedperiodstoweighting,
-		int samplesize=1, int ensemble_id=0);
+		int samplesize=1);
 	void WritePerSampleExceedanceProbabilityTable(
 		const std::vector<int> &fileIDs,
-		std::map<wheatkey, lossvec> &items, int eptype, int eptype_tvar,
-		int ensemble_id=0);
+		std::map<wheatkey, lossvec> &items, int eptype,
+		int eptype_tvar);
 	void WritePerSampleExceedanceProbabilityTable(
 		const std::vector<int> &fileIDs,
 		std::map<wheatkey, lossvec2> &items, int eptype,
 		int eptype_tvar,
-		std::map<int, double> &unusedperiodstoweighting,
-		int ensemble_id=0);
+		std::map<int, double> &unusedperiodstoweighting);
 	void MeanDamageRatio(const std::vector<int> &fileIDs,
 			     OASIS_FLOAT (OutLosses::*GetOutLoss)(),
 			     const int epcalc, const int eptype,
@@ -220,12 +217,11 @@ private:
 					 OASIS_FLOAT (OutLosses::*GetOutLoss)(),
 					 const int epcalc, const int eptype,
 					 const int eptype_tvar,
-					 const int ensemble_id=0);
+					 int ensemble_id=0);
 	void WheatsheafAndWheatsheafMeanWithWeighting(
 		const std::vector<int> handles,
 		OASIS_FLOAT (OutLosses::*GetOutLoss)(), const int epcalc,
-		const int eptype, const int eptype_tvar,
-		const int ensemble_id=0);
+		const int eptype, const int eptype_tvar, int ensemble_id=0);
 	void SampleMean(const std::vector<int> &fileIDs,
 			OASIS_FLOAT (OutLosses::*GetOutLoss)(),
 			const int epcalc, const int eptype,
@@ -244,17 +240,16 @@ public:
 	void SetSampleSize(const int samplesize);
 	void SetLegacyOutputFunc(int outputTable);
 	void SetORDOutputFunc(int outputTable);
-	void OutputMeanDamageRatio(const int eptype, const int eptype_tvar,
+	void OutputMeanDamageRatio(int eptype, const int eptype_tvar,
 				   OASIS_FLOAT (OutLosses::*GetOutLoss)(),
 				   const std::vector<int> &fileIDs);
-	void OutputFullUncertainty(const int handle, const int eptype,
+	void OutputFullUncertainty(const int handle, int eptype,
 				   const int eptype_tvar,
 				   OASIS_FLOAT (OutLosses::*GetOutLoss)());
 	void OutputWheatsheafAndWheatsheafMean(const std::vector<int> &handles,
-						const int eptype,
-						const int eptype_tvar,
-						OASIS_FLOAT (OutLosses::*GetOutLoss)());
-	void OutputSampleMean(const int handle, const int eptype,
+		int eptype, const int eptype_tvar,
+		OASIS_FLOAT (OutLosses::*GetOutLoss)());
+	void OutputSampleMean(const int handle, int eptype,
 			      const int eptype_tvar,
 			      OASIS_FLOAT (OutLosses::*GetOutLoss)());
 };

@@ -1,6 +1,12 @@
 Ktools Changelog
 ================
 
+`v3.9.4`_
+ ---------
+* [#323, #278](https://github.com/OasisLMF/ktools/pull/328) - Fix missing header in Wheatsheaf output and refactor aggreports class
+* [#325](https://github.com/OasisLMF/ktools/pull/326) - crossvalidation tool requires damagebin to have (deprecated) interval_type column
+.. _`v3.9.4`:  https://github.com/OasisLMF/ktools/compare/v3.9.3...v3.9.4
+
 .. _`v3.9.4rc3`:  https://github.com/OasisLMF/ktools/compare/v3.9.3...v3.9.4rc3
 
 .. _`v3.9.4rc1`:  https://github.com/OasisLMF/ktools/compare/v3.9.3...v3.9.4rc1

@@ -84,6 +84,12 @@ private:
 		{ OCC_FULL_UNCERTAINTY, false }, { OCC_WHEATSHEAF, false },
 		{ OCC_SAMPLE_MEAN, false }, { OCC_WHEATSHEAF_MEAN, false }
 	};
+	void (aggreports::*WriteEPTOutput)(const std::vector<int>&, const int,
+					   const int, const int, const double,
+					   const OASIS_FLOAT) = nullptr;
+	void (aggreports::*WritePSEPTOutput)(const std::vector<int>&, const int,
+					     const int, const int, const double,
+					     const OASIS_FLOAT) = nullptr;
 #ifdef ORD_OUTPUT
 	bool os_ept_exists_ = false;
 	parquet::StreamWriter os_ept_;
@@ -164,11 +170,7 @@ private:
 			      const std::map<wheatkey, std::vector<TVaR>> &tail);
 	inline parquet::StreamWriter GetParquetStreamWriter(const int fileStream);
 #endif
-	inline void DoSetUp(int &eptype, int &epcalc, const int ensemble_id,
-		void (aggreports::*&WriteOutput)(const std::vector<int>&,
-						 const int, const int,
-						 const int, const double,
-						 const OASIS_FLOAT));
+	inline void DoSetUp(int &eptype, int &epcalc, const int ensemble_id);
 	void WriteExceedanceProbabilityTable(const std::vector<int> &fileIDs,
 					     std::map<int, lossvec> &items,
 					     const double max_retperiod,
@@ -181,11 +183,7 @@ private:
 		int eptype_tvar,
 		std::map<int, double> &unusedperiodstoweighting,
 		int samplesize=1, int ensemble_id=0);
-	inline void DoSetUpWheatsheaf(int &eptype, const int ensemble_id,
-		void (aggreports::*&WriteOutput)(const std::vector<int>&,
-						 const int, const int,
-						 const int, const double,
-						 const OASIS_FLOAT));
+	inline void DoSetUpWheatsheaf(int &eptype, const int ensemble_id);
 	void WritePerSampleExceedanceProbabilityTable(
 		const std::vector<int> &fileIDs,
 		std::map<wheatkey, lossvec> &items, int eptype, int eptype_tvar,
@@ -240,6 +238,8 @@ public:
 	void SetInputData(const std::set<int> &summaryids,
 			  std::vector<std::map<outkey2, OutLosses>> &out_loss);
 	void SetSampleSize(const int samplesize);
+	void SetLegacyOutputFunc(int outputTable);
+	void SetORDOutputFunc(int outputTable);
 	void OutputMeanDamageRatio(const int eptype, const int eptype_tvar,
 				   OASIS_FLOAT (OutLosses::*GetOutLoss)(),
 				   const std::vector<int> &fileIDs);

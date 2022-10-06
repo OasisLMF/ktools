@@ -73,6 +73,21 @@ void aggreports::SetSampleSize(const int samplesize)
 }
 
 
+void aggreports::SetLegacyOutputFunc(int outputTable)
+{
+  if (outputTable == EPT) WriteEPTOutput = &aggreports::WriteLegacyOutput;
+  else if (outputTable == PSEPT)
+    WritePSEPTOutput = &aggreports::WriteLegacyOutput;
+}
+
+
+void aggreports::SetORDOutputFunc(int outputTable)
+{
+  if (outputTable == EPT) WriteEPTOutput = &aggreports::WriteORDOutput;
+  else if (outputTable == PSEPT) WritePSEPTOutput = &aggreports::WriteORDOutput;
+}
+
+
 void aggreports::LoadReturnPeriods() {
 
   if (useReturnPeriodFile_ == false) return;
@@ -452,25 +467,13 @@ inline parquet::StreamWriter aggreports::GetParquetStreamWriter(const int fileSt
 #endif
 
 
-inline void aggreports::DoSetUp(int &eptype, int &epcalc, const int ensemble_id,
-	void (aggreports::*&WriteOutput)(const std::vector<int>&, const int,
-					 const int, const int, const double,
-					 const OASIS_FLOAT))
+inline void aggreports::DoSetUp(int &eptype, int &epcalc, const int ensemble_id)
 {
 
-  if (ordFlag_) {
-    WriteOutput = &aggreports::WriteORDOutput;
-  } else {
-    WriteOutput = &aggreports::WriteLegacyOutput;
-    // epcalc = type in legacy output
-    // eptype = ensemble ID in legacy output
-    if (epcalc == MEANDR) {
-      epcalc = 1;
-    } else {
-      epcalc = 2;
-    }
+  if (!ordFlag_) {
+    if (epcalc == MEANDR) epcalc = 1;
+    else epcalc = 2;
     eptype = ensemble_id;
-
   }
 
 }
@@ -485,11 +488,7 @@ void aggreports::WriteExceedanceProbabilityTable(
   if (items.size() == 0) return;
   if (samplesize == 0) return;
 
-//  int eptype_tvar = 0;
-  void (aggreports::*WriteOutput)(const std::vector<int>&, const int, const int,
-				  const int, const double, const OASIS_FLOAT);
-  WriteOutput = nullptr;
-  DoSetUp(eptype, epcalc, ensemble_id, WriteOutput);
+  DoSetUp(eptype, epcalc, ensemble_id);
 
 #ifdef ORD_OUTPUT
   if (os_ept_exists_ == false) {
@@ -519,20 +518,20 @@ void aggreports::WriteExceedanceProbabilityTable(
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, lp / samplesize,
 			     s.first, eptype, epcalc, max_retperiod, i, tvar,
-			     tail, WriteOutput, os_ept_);
+			     tail, WriteEPTOutput, os_ept_);
 #else
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, lp / samplesize,
 			     s.first, eptype, epcalc, max_retperiod, i, tvar,
-			     tail, WriteOutput);
+			     tail, WriteEPTOutput);
 #endif
 	tvar = tvar - ((tvar - (lp / samplesize)) / i);
       } else {
 	tvar = tvar - ((tvar - (lp / samplesize)) / i);
 	tail[s.first].push_back({retperiod, tvar});
-	if (WriteOutput != nullptr) {
-	  (this->*WriteOutput)(fileIDs, s.first, epcalc, eptype, retperiod,
-			       lp / samplesize);
+	if (WriteEPTOutput != nullptr) {
+	  (this->*WriteEPTOutput)(fileIDs, s.first, epcalc, eptype, retperiod,
+				  lp / samplesize);
 	}
 #ifdef ORD_OUTPUT
 	// TODO: Rather than checking for this on every iteration, it may be
@@ -555,12 +554,12 @@ void aggreports::WriteExceedanceProbabilityTable(
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, 0, s.first, eptype,
 			     epcalc, max_retperiod, i, tvar, tail,
-			     WriteOutput, os_ept_);
+			     WriteEPTOutput, os_ept_);
 #else
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, 0, s.first, eptype,
 			     epcalc, max_retperiod, i, tvar, tail,
-			     WriteOutput);
+			     WriteEPTOutput);
 #endif
 	tvar = tvar - (tvar / i);
 	i++;
@@ -591,11 +590,7 @@ void aggreports::WriteExceedanceProbabilityTable(
   if (items.size() == 0) return;
   if (samplesize == 0) return;
 
-//  int eptype_tvar = 0;
-  void (aggreports::*WriteOutput)(const std::vector<int>&, const int, const int,
-				  const int, const double, const OASIS_FLOAT);
-  WriteOutput = nullptr;
-  DoSetUp(eptype, epcalc, ensemble_id, WriteOutput);
+  DoSetUp(eptype, epcalc, ensemble_id);
 
 #ifdef ORD_OUTPUT
   if (os_ept_exists_ == false) {
@@ -636,21 +631,21 @@ void aggreports::WriteExceedanceProbabilityTable(
 	  WriteReturnPeriodOut(fileIDs, nextreturnperiodindex,
 			       last_computed_rp, last_computed_loss, retperiod,
 			       lp.value / samplesize, s.first, eptype, epcalc,
-			       max_retperiod, i, tvar, tail, WriteOutput,
+			       max_retperiod, i, tvar, tail, WriteEPTOutput,
 			       os_ept_);
 #else
 	  WriteReturnPeriodOut(fileIDs, nextreturnperiodindex,
 			       last_computed_rp, last_computed_loss, retperiod,
 			       lp.value / samplesize, s.first, eptype, epcalc,
-			       max_retperiod, i, tvar, tail, WriteOutput);
+			       max_retperiod, i, tvar, tail, WriteEPTOutput);
 #endif
 	  tvar = tvar - ((tvar - (lp.value / samplesize)) / i);
 	} else {
 	  tvar = tvar - ((tvar - (lp.value / samplesize)) / i);
 	  tail[s.first].push_back({retperiod, tvar});
-	  if (WriteOutput != nullptr) {
-	    (this->*WriteOutput)(fileIDs, s.first, epcalc, eptype, retperiod,
-				 lp.value / samplesize);
+	  if (WriteEPTOutput != nullptr) {
+	    (this->*WriteEPTOutput)(fileIDs, s.first, epcalc, eptype, retperiod,
+				    lp.value / samplesize);
 	  }
 #ifdef ORD_OUTPUT
 	// TODO: Rather than checking for this on every iteration, it may be
@@ -679,12 +674,12 @@ void aggreports::WriteExceedanceProbabilityTable(
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, 0, s.first, eptype,
 			     epcalc, max_retperiod, i, tvar, tail,
-			     WriteOutput, os_ept_);
+			     WriteEPTOutput, os_ept_);
 #else
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, 0, s.first, eptype,
 			     epcalc, max_retperiod, i, tvar, tail,
-			     WriteOutput);
+			     WriteEPTOutput);
 #endif
 	tvar = tvar - (tvar / i);
 	i++;
@@ -704,18 +699,10 @@ void aggreports::WriteExceedanceProbabilityTable(
 }
 
 
-inline void aggreports::DoSetUpWheatsheaf(int &eptype, const int ensemble_id,
-	void (aggreports::*&WriteOutput)(const std::vector<int>&, const int,
-					 const int, const int, const double,
-					 const OASIS_FLOAT))
+inline void aggreports::DoSetUpWheatsheaf(int &eptype, const int ensemble_id)
 {
 
-  if (ordFlag_) {
-    WriteOutput = &aggreports::WriteORDOutput;
-  } else {
-    WriteOutput = &aggreports::WriteLegacyOutput;
-    eptype = ensemble_id;
-  }
+  if (!ordFlag_) eptype = ensemble_id;
 
 }
 
@@ -727,11 +714,7 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
 
   if (items.size() == 0) return;
 
-//  int eptype_tvar = 0;
-  void (aggreports::*WriteOutput)(const std::vector<int>&, const int, const int,
-				  const int, const double, const OASIS_FLOAT);
-  WriteOutput = nullptr;
-  DoSetUpWheatsheaf(eptype, ensemble_id, WriteOutput);
+  DoSetUpWheatsheaf(eptype, ensemble_id);
 
 #ifdef ORD_OUTPUT
   if (os_psept_exists_ == false) {
@@ -762,21 +745,21 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, lp,
 			     s.first.summary_id, eptype, s.first.sidx,
-			     max_retperiod, i, tvar, tail, WriteOutput,
+			     max_retperiod, i, tvar, tail, WritePSEPTOutput,
 			     os_psept_);
 #else
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, lp,
 			     s.first.summary_id, eptype, s.first.sidx,
-			     max_retperiod, i, tvar, tail, WriteOutput);
+			     max_retperiod, i, tvar, tail, WritePSEPTOutput);
 #endif
 	tvar = tvar - ((tvar - lp) / i);
       } else {
 	tvar = tvar - ((tvar - lp) / i);
 	tail[s.first].push_back({retperiod, tvar});
-	if (WriteOutput != nullptr) {
-	  (this->*WriteOutput)(fileIDs, s.first.summary_id, s.first.sidx,
-			       eptype, retperiod, lp);
+	if (WritePSEPTOutput != nullptr) {
+	  (this->*WritePSEPTOutput)(fileIDs, s.first.summary_id, s.first.sidx,
+				    eptype, retperiod, lp);
 	}
 #ifdef ORD_OUTPUT
 	// TODO: Rather than checking for this on every iteration, it may be
@@ -799,13 +782,13 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, 0,
 			     s.first.summary_id, eptype, s.first.sidx,
-			     max_retperiod, i, tvar, tail, WriteOutput,
+			     max_retperiod, i, tvar, tail, WritePSEPTOutput,
 			     os_psept_);
 #else
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, 0,
 			     s.first.summary_id, eptype, s.first.sidx,
-			     max_retperiod, i, tvar, tail, WriteOutput);
+			     max_retperiod, i, tvar, tail, WritePSEPTOutput);
 #endif
 	tvar = tvar - (tvar / i);
 	i++;
@@ -831,11 +814,7 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
 
   if (items.size() == 0) return;
 
-//  int eptype_tvar = 0;
-  void (aggreports::*WriteOutput)(const std::vector<int>&, const int, const int,
-				  const int, const double, const OASIS_FLOAT);
-  WriteOutput = nullptr;
-  DoSetUpWheatsheaf(eptype, ensemble_id, WriteOutput);
+  DoSetUpWheatsheaf(eptype, ensemble_id);
 
 #ifdef ORD_OUTPUT
   if (os_psept_exists_ == false) {
@@ -877,21 +856,21 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
 			       last_computed_rp, last_computed_loss, retperiod,
 			       lp.value, s.first.summary_id, eptype,
 			       s.first.sidx, max_retperiod, i, tvar, tail,
-			       WriteOutput, os_psept_);
+			       WritePSEPTOutput, os_psept_);
 #else
 	  WriteReturnPeriodOut(fileIDs, nextreturnperiodindex,
 			       last_computed_rp, last_computed_loss, retperiod,
 			       lp.value, s.first.summary_id, eptype,
 			       s.first.sidx, max_retperiod, i, tvar, tail,
-			       WriteOutput);
+			       WritePSEPTOutput);
 #endif
 	  tvar = tvar - ((tvar - lp.value) / i);
 	} else {
 	  tvar = tvar - ((tvar - lp.value) / i);
 	  tail[s.first].push_back({retperiod, tvar});
-	  if (WriteOutput != nullptr) {
-	    (this->*WriteOutput)(fileIDs, s.first.summary_id, s.first.sidx,
-				 eptype, retperiod, lp.value);
+	  if (WritePSEPTOutput != nullptr) {
+	    (this->*WritePSEPTOutput)(fileIDs, s.first.summary_id, s.first.sidx,
+				      eptype, retperiod, lp.value);
 	  }
 #ifdef ORD_OUTPUT
 	// TODO: Rather than checking for this on every iteration, it may be
@@ -920,13 +899,13 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, 0,
 			     s.first.summary_id, eptype, s.first.sidx,
-			     max_retperiod, i, tvar, tail, WriteOutput,
+			     max_retperiod, i, tvar, tail, WritePSEPTOutput,
 			     os_psept_);
 #else
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, 0,
 			     s.first.summary_id, eptype, s.first.sidx,
-			     max_retperiod, i, tvar, tail, WriteOutput);
+			     max_retperiod, i, tvar, tail, WritePSEPTOutput);
 #endif
 	tvar = tvar - (tvar / i);
 	i++;

@@ -280,7 +280,8 @@ namespace leccalc {
 				     const bool *outputFlags,
 				     const bool skipheader,
 				     std::vector<int> &fileIDs_occ,
-				     std::vector<int> &fileIDs_agg)
+				     std::vector<int> &fileIDs_agg,
+				     aggreports &agg)
 	{
 		bool hasEPT = false;
 
@@ -296,6 +297,29 @@ namespace leccalc {
 						       OCC_WHEATSHEAF_MEAN };
 		getfileids(fout, handles_occ, ordFlag, outputFlags,
 			   fileIDs_occ, hasEPT);
+
+		const std::vector<int> handles_psept = { AGG_WHEATSHEAF,
+							 OCC_WHEATSHEAF };
+		std::vector<int> fileIDs_psept;
+		for (auto it = handles_psept.begin(); it != handles_psept.end();
+		     ++it) {
+			if (outputFlags[*it]) fileIDs_psept.push_back(*it);
+		}
+		if (fileIDs_psept.size() > 0 && ordFlag) {
+			fileIDs_psept.clear();
+			if (fout[PSEPT] != nullptr)
+				fileIDs_psept.push_back(PSEPT);
+		}
+
+		// Set write csv functions
+		if ((fileIDs_occ.size() + fileIDs_agg.size()) > 0) {
+			if (ordFlag) agg.SetORDOutputFunc(EPT);
+			else agg.SetLegacyOutputFunc(EPT);
+		}
+		if (fileIDs_psept.size() > 0) {
+			if (ordFlag) agg.SetORDOutputFunc(PSEPT);
+			else agg.SetLegacyOutputFunc(PSEPT);
+		}
 
 		if (skipheader) return hasEPT;   // No header
 
@@ -334,18 +358,6 @@ namespace leccalc {
 
 		// Print headers for Per Sample Exceedance Probability Table
 		// (i.e. Wheatsheaf)
-		const std::vector<int> handles_psept = { AGG_WHEATSHEAF,
-							 OCC_WHEATSHEAF };
-		std::vector<int> fileIDs_psept;
-		for (auto it = handles_psept.begin(); it != handles_psept.end();
-		     ++it) {
-			if (outputFlags[*it]) fileIDs_psept.push_back(*it);
-		}
-		if (fileIDs_psept.size() > 0 && ordFlag) {
-			fileIDs_psept.clear();
-			if (fout[PSEPT] != nullptr)
-				fileIDs_psept.push_back(PSEPT);
-		}
 		for (auto it = fileIDs_psept.begin(); it != fileIDs_psept.end();
 		     ++it) {
 			fprintf(fout[*it], "%s\n", fileHeader_psept.c_str());
@@ -405,7 +417,7 @@ namespace leccalc {
 		std::vector<int> fileIDs_occ, fileIDs_agg;
 		bool hasEPT = setupoutputfiles(fout, ordFlag, outputFlags,
 					       skipheader, fileIDs_occ,
-					       fileIDs_agg);
+					       fileIDs_agg, agg);
 
 		std::vector<std::string> files;
 		std::vector<FILE*> fileHandles;

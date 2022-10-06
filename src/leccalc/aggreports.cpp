@@ -43,22 +43,48 @@ bool operator<(const wheatkey &lhs, const wheatkey &rhs) {
 }
 
 
-aggreports::aggreports(const int totalperiods, const std::set<int> &summaryids,
-		       std::vector<std::map<outkey2, OutLosses>> &out_loss,
-		       FILE **fout, const bool useReturnPeriodFile,
-		       const int samplesize, const bool skipheader,
-		       const bool *outputFlags, const bool ordFlag,
+aggreports::aggreports(const int totalperiods, FILE **fout,
+		       const bool useReturnPeriodFile, const bool *outputFlags,
+		       const bool ordFlag,
 		       const std::string *parquetFileNames) :
-  totalperiods_(totalperiods), summaryids_(summaryids),
-  out_loss_(out_loss), fout_(fout), useReturnPeriodFile_(useReturnPeriodFile),
-  samplesize_(samplesize), skipheader_(skipheader), outputFlags_(outputFlags),
-  ordFlag_(ordFlag), parquetFileNames_(parquetFileNames)
+	totalperiods_(totalperiods), fout_(fout),
+	useReturnPeriodFile_(useReturnPeriodFile), outputFlags_(outputFlags),
+	ordFlag_(ordFlag), parquetFileNames_(parquetFileNames)
 {
 
   LoadReturnPeriods();
+
+}
+
+
+void aggreports::SetInputData(const std::set<int> &summaryids,
+	std::vector<std::map<outkey2, OutLosses>> &out_loss)
+{
+  summaryids_ = summaryids;
+  out_loss_ = &out_loss;
+}
+
+
+void aggreports::SetSampleSize(const int samplesize)
+{
+  samplesize_ = samplesize;
   LoadPeriodsToWeighting();
   LoadEnsembleMapping();
+}
 
+
+void aggreports::SetLegacyOutputFunc(int outputTable)
+{
+  if (outputTable == EPT) WriteEPTOutput = &aggreports::WriteLegacyOutput;
+  else if (outputTable == PSEPT)
+    WritePSEPTOutput = &aggreports::WriteLegacyOutput;
+}
+
+
+void aggreports::SetORDOutputFunc(int outputTable)
+{
+  if (outputTable == EPT) WriteEPTOutput = &aggreports::WriteORDOutput;
+  else if (outputTable == PSEPT) WritePSEPTOutput = &aggreports::WriteORDOutput;
 }
 
 
@@ -191,25 +217,25 @@ void aggreports::FillTVaR(std::map<wheatkey, std::vector<TVaR>> &tail,
 // TODO: There is probably a tidier way of doing this.
 #ifdef ORD_OUTPUT
 template<typename T>
-void aggreports::WriteReturnPeriodOut(const std::vector<int> fileIDs,
+void aggreports::WriteReturnPeriodOut(const std::vector<int> &fileIDs,
 	size_t &nextreturnperiod_index, double &last_return_period,
 	OASIS_FLOAT &last_loss, const double current_return_period,
 	const OASIS_FLOAT current_loss, const int summary_id, const int eptype,
 	const int epcalc, const double max_retperiod, int counter,
 	OASIS_FLOAT tvar, T &tail,
-	void (aggreports::*WriteOutput)(const std::vector<int>, const int,
+	void (aggreports::*WriteOutput)(const std::vector<int>&, const int,
 					const int, const int, const double,
 					const OASIS_FLOAT),
 	parquet::StreamWriter& os)
 #else
 template<typename T>
-void aggreports::WriteReturnPeriodOut(const std::vector<int> fileIDs,
+void aggreports::WriteReturnPeriodOut(const std::vector<int> &fileIDs,
 	size_t &nextreturnperiod_index, double &last_return_period,
 	OASIS_FLOAT &last_loss, const double current_return_period,
 	const OASIS_FLOAT current_loss, const int summary_id, const int eptype,
 	const int epcalc, const double max_retperiod, int counter,
 	OASIS_FLOAT tvar, T &tail,
-	void (aggreports::*WriteOutput)(const std::vector<int>, const int,
+	void (aggreports::*WriteOutput)(const std::vector<int>&, const int,
 					const int, const int, const double,
 					const OASIS_FLOAT))
 #endif
@@ -232,8 +258,10 @@ void aggreports::WriteReturnPeriodOut(const std::vector<int> fileIDs,
 
     OASIS_FLOAT loss = GetLoss(nextreturnperiod_value, last_return_period,
 			       last_loss, current_return_period, current_loss);
-    (this->*WriteOutput)(fileIDs, summary_id, epcalc, eptype,
-			 nextreturnperiod_value, loss);
+    if (WriteOutput != nullptr) {
+    	(this->*WriteOutput)(fileIDs, summary_id, epcalc, eptype,
+			     nextreturnperiod_value, loss);
+    }
 #ifdef ORD_OUTPUT
     if (parquetFileNames_[EPT] != "") {
       WriteParquetOutput(os, summary_id, epcalc, eptype,
@@ -260,7 +288,7 @@ void aggreports::WriteReturnPeriodOut(const std::vector<int> fileIDs,
 }
 
 
-inline void aggreports::OutputRows(const std::vector<int> fileIDs,
+inline void aggreports::OutputRows(const std::vector<int> &fileIDs,
 				   const char * buffer, int strLen) {
 
   for (std::vector<int>::const_iterator it = fileIDs.begin();
@@ -296,7 +324,7 @@ inline void aggreports::OutputRows(const std::vector<int> fileIDs,
 }
 
 
-void aggreports::WriteLegacyOutput(const std::vector<int> fileIDs,
+void aggreports::WriteLegacyOutput(const std::vector<int> &fileIDs,
 				   const int summary_id, const int type,
 				   const int ensemble_id,
 				   const double retperiod,
@@ -316,7 +344,7 @@ void aggreports::WriteLegacyOutput(const std::vector<int> fileIDs,
 }
 
 
-void aggreports::WriteORDOutput(const std::vector<int> fileIDs,
+void aggreports::WriteORDOutput(const std::vector<int> &fileIDs,
 				const int summary_id, const int epcalc,
 				const int eptype, const double retperiod,
 				const OASIS_FLOAT loss) {
@@ -331,16 +359,7 @@ void aggreports::WriteORDOutput(const std::vector<int> fileIDs,
 }
 
 
-void aggreports::WriteNoOutput(const std::vector<int> fileIDs,
-			       const int summary_id, const int epcalc,
-			       const int eptype, const double retperiod,
-			       const OASIS_FLOAT loss)
-{
-  return;
-}
-
-
-void aggreports::WriteTVaR(const std::vector<int> fileIDs, const int epcalc,
+void aggreports::WriteTVaR(const std::vector<int> &fileIDs, const int epcalc,
 			   const int eptype_tvar,
 			   const std::map<int, std::vector<TVaR>> &tail) {
 
@@ -360,7 +379,7 @@ void aggreports::WriteTVaR(const std::vector<int> fileIDs, const int epcalc,
 }
 
 
-void aggreports::WriteTVaR(const std::vector<int> fileIDs,
+void aggreports::WriteTVaR(const std::vector<int> &fileIDs,
 			   const int eptype_tvar,
 			   const std::map<wheatkey, std::vector<TVaR>> &tail) {
 
@@ -448,66 +467,14 @@ inline parquet::StreamWriter aggreports::GetParquetStreamWriter(const int fileSt
 #endif
 
 
-inline void aggreports::DoSetUp(int &eptype, int &eptype_tvar, int &epcalc,
-	const int ensemble_id, const std::vector<int> fileIDs,
-	void (aggreports::*&WriteOutput)(const std::vector<int>, const int,
-					 const int, const int, const double,
-					 const OASIS_FLOAT))
-{
-
-  if (eptype == AEP) eptype_tvar = AEPTVAR;
-  else if (eptype == OEP) eptype_tvar = OEPTVAR;
-
-  if (eptHeader_ == true && skipheader_ == false) {
-    std::string fileHeader;
-    if (ordFlag_) {
-      fileHeader = "SummaryId,EPCalc,EPType,ReturnPeriod,Loss\n";
-      eptHeader_ = false;
-    } else {
-      fileHeader = "summary_id,type,return_period,loss";
-      if (ensembletosidx_.size() > 0) fileHeader += ",ensemble_id";
-      fileHeader += "\n";
-    }
-    for (std::vector<int>::const_iterator it = fileIDs.begin();
-	 it != fileIDs.end(); ++it) {
-      if (ordFlag_ == false && fileHeaders_[*it] == true) continue;
-      fprintf(fout_[*it], "%s", fileHeader.c_str());
-      if (ordFlag_ == false) fileHeaders_[*it] = true;
-    }
-  }
-
-  if (ordFlag_) {
-    WriteOutput = &aggreports::WriteORDOutput;
-    if (fileIDs.size() == 0) WriteOutput = &aggreports::WriteNoOutput;
-  } else {
-    WriteOutput = &aggreports::WriteLegacyOutput;
-    // epcalc = type in legacy output
-    // eptype = ensemble ID in legacy output
-    if (epcalc == MEANDR) {
-      epcalc = 1;
-    } else {
-      epcalc = 2;
-    }
-    eptype = ensemble_id;
-
-  }
-
-}
-
-
 // No weighting
 void aggreports::WriteExceedanceProbabilityTable(
-	const std::vector<int> fileIDs, std::map<int, lossvec> &items,
-	const double max_retperiod, int epcalc, int eptype, int samplesize,
-	int ensemble_id) {
+	const std::vector<int> &fileIDs, std::map<int, lossvec> &items,
+	const double max_retperiod, int epcalc, int eptype, int eptype_tvar,
+	int samplesize) {
 
   if (items.size() == 0) return;
   if (samplesize == 0) return;
-
-  int eptype_tvar = 0;
-  void (aggreports::*WriteOutput)(const std::vector<int>, const int, const int,
-				  const int, const double, const OASIS_FLOAT);
-  DoSetUp(eptype, eptype_tvar, epcalc, ensemble_id, fileIDs, WriteOutput);
 
 #ifdef ORD_OUTPUT
   if (os_ept_exists_ == false) {
@@ -537,19 +504,21 @@ void aggreports::WriteExceedanceProbabilityTable(
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, lp / samplesize,
 			     s.first, eptype, epcalc, max_retperiod, i, tvar,
-			     tail, WriteOutput, os_ept_);
+			     tail, WriteEPTOutput, os_ept_);
 #else
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, lp / samplesize,
 			     s.first, eptype, epcalc, max_retperiod, i, tvar,
-			     tail, WriteOutput);
+			     tail, WriteEPTOutput);
 #endif
 	tvar = tvar - ((tvar - (lp / samplesize)) / i);
       } else {
 	tvar = tvar - ((tvar - (lp / samplesize)) / i);
 	tail[s.first].push_back({retperiod, tvar});
-	(this->*WriteOutput)(fileIDs, s.first, epcalc, eptype, retperiod,
-			     lp / samplesize);
+	if (WriteEPTOutput != nullptr) {
+	  (this->*WriteEPTOutput)(fileIDs, s.first, epcalc, eptype, retperiod,
+				  lp / samplesize);
+	}
 #ifdef ORD_OUTPUT
 	// TODO: Rather than checking for this on every iteration, it may be
 	// more efficient to create a new class that inherits from
@@ -571,12 +540,12 @@ void aggreports::WriteExceedanceProbabilityTable(
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, 0, s.first, eptype,
 			     epcalc, max_retperiod, i, tvar, tail,
-			     WriteOutput, os_ept_);
+			     WriteEPTOutput, os_ept_);
 #else
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, 0, s.first, eptype,
 			     epcalc, max_retperiod, i, tvar, tail,
-			     WriteOutput);
+			     WriteEPTOutput);
 #endif
 	tvar = tvar - (tvar / i);
 	i++;
@@ -598,19 +567,13 @@ void aggreports::WriteExceedanceProbabilityTable(
 
 // With weighting
 void aggreports::WriteExceedanceProbabilityTable(
-	const std::vector<int> fileIDs, std::map<int, lossvec2> &items,
+	const std::vector<int> &fileIDs, std::map<int, lossvec2> &items,
 	const OASIS_FLOAT cum_weight_constant,
-	int epcalc, int eptype,
-	std::map<int, double> &unusedperiodstoweighting, int samplesize,
-	int ensemble_id) {
+	int epcalc, int eptype, int eptype_tvar,
+	std::map<int, double> &unusedperiodstoweighting, int samplesize) {
 
   if (items.size() == 0) return;
   if (samplesize == 0) return;
-
-  int eptype_tvar = 0;
-  void (aggreports::*WriteOutput)(const std::vector<int>, const int, const int,
-				  const int, const double, const OASIS_FLOAT);
-  DoSetUp(eptype, eptype_tvar, epcalc, ensemble_id, fileIDs, WriteOutput);
 
 #ifdef ORD_OUTPUT
   if (os_ept_exists_ == false) {
@@ -651,20 +614,22 @@ void aggreports::WriteExceedanceProbabilityTable(
 	  WriteReturnPeriodOut(fileIDs, nextreturnperiodindex,
 			       last_computed_rp, last_computed_loss, retperiod,
 			       lp.value / samplesize, s.first, eptype, epcalc,
-			       max_retperiod, i, tvar, tail, WriteOutput,
+			       max_retperiod, i, tvar, tail, WriteEPTOutput,
 			       os_ept_);
 #else
 	  WriteReturnPeriodOut(fileIDs, nextreturnperiodindex,
 			       last_computed_rp, last_computed_loss, retperiod,
 			       lp.value / samplesize, s.first, eptype, epcalc,
-			       max_retperiod, i, tvar, tail, WriteOutput);
+			       max_retperiod, i, tvar, tail, WriteEPTOutput);
 #endif
 	  tvar = tvar - ((tvar - (lp.value / samplesize)) / i);
 	} else {
 	  tvar = tvar - ((tvar - (lp.value / samplesize)) / i);
 	  tail[s.first].push_back({retperiod, tvar});
-	  (this->*WriteOutput)(fileIDs, s.first, epcalc, eptype, retperiod,
-			       lp.value / samplesize);
+	  if (WriteEPTOutput != nullptr) {
+	    (this->*WriteEPTOutput)(fileIDs, s.first, epcalc, eptype, retperiod,
+				    lp.value / samplesize);
+	  }
 #ifdef ORD_OUTPUT
 	// TODO: Rather than checking for this on every iteration, it may be
 	// more efficient to create a new class that inherits from
@@ -692,12 +657,12 @@ void aggreports::WriteExceedanceProbabilityTable(
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, 0, s.first, eptype,
 			     epcalc, max_retperiod, i, tvar, tail,
-			     WriteOutput, os_ept_);
+			     WriteEPTOutput, os_ept_);
 #else
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, 0, s.first, eptype,
 			     epcalc, max_retperiod, i, tvar, tail,
-			     WriteOutput);
+			     WriteEPTOutput);
 #endif
 	tvar = tvar - (tvar / i);
 	i++;
@@ -717,55 +682,12 @@ void aggreports::WriteExceedanceProbabilityTable(
 }
 
 
-inline void aggreports::DoSetUpWheatsheaf(int &eptype, int &eptype_tvar,
-	const int ensemble_id, const std::vector<int> fileIDs,
-	void (aggreports::*&WriteOutput)(const std::vector<int>, const int,
-					 const int, const int, const double,
-					 const OASIS_FLOAT))
-{
-
-  if (eptype == AEP) eptype_tvar = AEPTVAR;
-  else if (eptype == OEP) eptype_tvar = OEPTVAR;
-
-  std::string fileHeader;
-  if (skipheader_ == false) {
-    if (ordFlag_ && pseptHeader_) {
-      fileHeader = "SummaryId,SampleId,EPType,ReturnPeriod,Loss\n";
-      pseptHeader_ = false;
-    } else if (!ordFlag_ && wheatSheaf_[eptype] == false) {
-      fileHeader = "summary_id,sidx,return_period,loss";
-      if (ensembletosidx_.size() > 0) fileHeader += ",ensemble_id";
-      fileHeader += "\n";
-      wheatSheaf_[eptype] = true;
-    }
-    for (std::vector<int>::const_iterator it = fileIDs.begin();
-	 it != fileIDs.end(); ++it) {
-      fprintf(fout_[*it], "%s", fileHeader.c_str());
-    }
-  }
-
-  if (ordFlag_) {
-    WriteOutput = &aggreports::WriteORDOutput;
-    if (fileIDs.size() == 0) WriteOutput = &aggreports::WriteNoOutput;
-  } else {
-    WriteOutput = &aggreports::WriteLegacyOutput;
-    eptype = ensemble_id;
-  }
-
-}
-
-
 // No weighting
 void aggreports::WritePerSampleExceedanceProbabilityTable(
-	const std::vector<int> fileIDs, std::map<wheatkey, lossvec> &items,
-	int eptype, int ensemble_id) {
+	const std::vector<int> &fileIDs, std::map<wheatkey, lossvec> &items,
+	int eptype, int eptype_tvar) {
 
   if (items.size() == 0) return;
-
-  int eptype_tvar = 0;
-  void (aggreports::*WriteOutput)(const std::vector<int>, const int, const int,
-				  const int, const double, const OASIS_FLOAT);
-  DoSetUpWheatsheaf(eptype, eptype_tvar, ensemble_id, fileIDs, WriteOutput);
 
 #ifdef ORD_OUTPUT
   if (os_psept_exists_ == false) {
@@ -796,20 +718,22 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, lp,
 			     s.first.summary_id, eptype, s.first.sidx,
-			     max_retperiod, i, tvar, tail, WriteOutput,
+			     max_retperiod, i, tvar, tail, WritePSEPTOutput,
 			     os_psept_);
 #else
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, lp,
 			     s.first.summary_id, eptype, s.first.sidx,
-			     max_retperiod, i, tvar, tail, WriteOutput);
+			     max_retperiod, i, tvar, tail, WritePSEPTOutput);
 #endif
 	tvar = tvar - ((tvar - lp) / i);
       } else {
 	tvar = tvar - ((tvar - lp) / i);
 	tail[s.first].push_back({retperiod, tvar});
-	(this->*WriteOutput)(fileIDs, s.first.summary_id, s.first.sidx, eptype,
-			     retperiod, lp);
+	if (WritePSEPTOutput != nullptr) {
+	  (this->*WritePSEPTOutput)(fileIDs, s.first.summary_id, s.first.sidx,
+				    eptype, retperiod, lp);
+	}
 #ifdef ORD_OUTPUT
 	// TODO: Rather than checking for this on every iteration, it may be
 	// more efficient to create a new class that inherits from
@@ -831,13 +755,13 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, 0,
 			     s.first.summary_id, eptype, s.first.sidx,
-			     max_retperiod, i, tvar, tail, WriteOutput,
+			     max_retperiod, i, tvar, tail, WritePSEPTOutput,
 			     os_psept_);
 #else
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, 0,
 			     s.first.summary_id, eptype, s.first.sidx,
-			     max_retperiod, i, tvar, tail, WriteOutput);
+			     max_retperiod, i, tvar, tail, WritePSEPTOutput);
 #endif
 	tvar = tvar - (tvar / i);
 	i++;
@@ -857,16 +781,11 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
 
 // With weighting
 void aggreports::WritePerSampleExceedanceProbabilityTable(
-	const std::vector<int> fileIDs, std::map<wheatkey, lossvec2> &items,
-	int eptype, std::map<int, double> &unusedperiodstoweighting,
-	int ensemble_id) {
+	const std::vector<int> &fileIDs, std::map<wheatkey, lossvec2> &items,
+	int eptype, int eptype_tvar,
+	std::map<int, double> &unusedperiodstoweighting) {
 
   if (items.size() == 0) return;
-
-  int eptype_tvar = 0;
-  void (aggreports::*WriteOutput)(const std::vector<int>, const int, const int,
-				  const int, const double, const OASIS_FLOAT);
-  DoSetUpWheatsheaf(eptype, eptype_tvar, ensemble_id, fileIDs, WriteOutput);
 
 #ifdef ORD_OUTPUT
   if (os_psept_exists_ == false) {
@@ -908,20 +827,22 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
 			       last_computed_rp, last_computed_loss, retperiod,
 			       lp.value, s.first.summary_id, eptype,
 			       s.first.sidx, max_retperiod, i, tvar, tail,
-			       WriteOutput, os_psept_);
+			       WritePSEPTOutput, os_psept_);
 #else
 	  WriteReturnPeriodOut(fileIDs, nextreturnperiodindex,
 			       last_computed_rp, last_computed_loss, retperiod,
 			       lp.value, s.first.summary_id, eptype,
 			       s.first.sidx, max_retperiod, i, tvar, tail,
-			       WriteOutput);
+			       WritePSEPTOutput);
 #endif
 	  tvar = tvar - ((tvar - lp.value) / i);
 	} else {
 	  tvar = tvar - ((tvar - lp.value) / i);
 	  tail[s.first].push_back({retperiod, tvar});
-	  (this->*WriteOutput)(fileIDs, s.first.summary_id, s.first.sidx,
-			       eptype, retperiod, lp.value);
+	  if (WritePSEPTOutput != nullptr) {
+	    (this->*WritePSEPTOutput)(fileIDs, s.first.summary_id, s.first.sidx,
+				      eptype, retperiod, lp.value);
+	  }
 #ifdef ORD_OUTPUT
 	// TODO: Rather than checking for this on every iteration, it may be
 	// more efficient to create a new class that inherits from
@@ -949,13 +870,13 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, 0,
 			     s.first.summary_id, eptype, s.first.sidx,
-			     max_retperiod, i, tvar, tail, WriteOutput,
+			     max_retperiod, i, tvar, tail, WritePSEPTOutput,
 			     os_psept_);
 #else
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, 0,
 			     s.first.summary_id, eptype, s.first.sidx,
-			     max_retperiod, i, tvar, tail, WriteOutput);
+			     max_retperiod, i, tvar, tail, WritePSEPTOutput);
 #endif
 	tvar = tvar - (tvar / i);
 	i++;
@@ -973,29 +894,31 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
 }
 
 
-void aggreports::MeanDamageRatio(const std::vector<int> fileIDs,
+void aggreports::MeanDamageRatio(const std::vector<int> &fileIDs,
 				 OASIS_FLOAT (OutLosses::*GetOutLoss)(),
-				 const int eptype) {
+				 const int epcalc, const int eptype,
+				 const int eptype_tvar) {
 
   std::map<int, lossvec> items;
 
-  for (auto x : out_loss_[MEANS]) {
+  for (auto x : (*out_loss_)[MEANS]) {
     items[x.first.summary_id].push_back((x.second.*GetOutLoss)());
   }
 
-  WriteExceedanceProbabilityTable(fileIDs, items, totalperiods_, MEANDR,
-				  eptype);
+  WriteExceedanceProbabilityTable(fileIDs, items, totalperiods_, epcalc,
+				  eptype, eptype_tvar);
 
 }
 
 
-void aggreports::MeanDamageRatioWithWeighting(const std::vector<int> fileIDs,
-	OASIS_FLOAT (OutLosses::*GetOutLoss)(), const int eptype) {
+void aggreports::MeanDamageRatioWithWeighting(const std::vector<int> &fileIDs,
+	OASIS_FLOAT (OutLosses::*GetOutLoss)(), const int epcalc,
+	const int eptype, const int eptype_tvar) {
 
   std::map<int, lossvec2> items;
   std::map<int, double> unusedperiodstoweighting = periodstoweighting_;
 
-  for (auto x : out_loss_[MEANS]) {
+  for (auto x : (*out_loss_)[MEANS]) {
     lossval lv;
     lv.value = (x.second.*GetOutLoss)();
     auto iter = periodstoweighting_.find(x.first.period_no);
@@ -1007,64 +930,29 @@ void aggreports::MeanDamageRatioWithWeighting(const std::vector<int> fileIDs,
     unusedperiodstoweighting.erase(x.first.period_no);
   }
 
-  WriteExceedanceProbabilityTable(fileIDs, items, samplesize_, MEANDR, eptype,
-				  unusedperiodstoweighting);
+  WriteExceedanceProbabilityTable(fileIDs, items, samplesize_, epcalc, eptype,
+				  eptype_tvar, unusedperiodstoweighting);
 
 }
 
 
-void aggreports::OutputAggMeanDamageRatio() {
+void aggreports::OutputMeanDamageRatio(int eptype, const int eptype_tvar,
+				       OASIS_FLOAT (OutLosses::*GetOutLoss)(),
+				       const std::vector<int> &fileIDs) {
 
-  // Determine which files to write to for legacy stream
-  // Determine whether Mean Damage Ratio should be written for ORD stream
-  std::vector<int> fileIDs;
-  std::vector<int> handles = { AGG_FULL_UNCERTAINTY, AGG_SAMPLE_MEAN,
-			       AGG_WHEATSHEAF_MEAN };
-  for (std::vector<int>::iterator it = handles.begin(); it != handles.end();
-       ++it) {
-    if (outputFlags_[*it] == true) fileIDs.push_back(*it);
-  }
-
-  if (fileIDs.size() == 0) return;   // No suitable files
-
-  if (ordFlag_) {
-    fileIDs.clear();
-    if (fout_[EPT] != nullptr) fileIDs.push_back(EPT);
-  }
+  // EPCalc = MEANDR for ORD output
+  // EPCalc = 1 for legacy output
+  int epcalc = ordFlag_ * MEANDR + !ordFlag_;
+  // EPType doubles as ensemble ID for legacy output
+  eptype *= ordFlag_;   // Set to default value 0 in legacy output
 
   if (periodstoweighting_.size() == 0) {
-    MeanDamageRatio(fileIDs, GetAgg, AEP);
-  } else {
-    MeanDamageRatioWithWeighting(fileIDs, GetAgg, AEP);
+    MeanDamageRatio(fileIDs, GetOutLoss, epcalc, eptype, eptype_tvar);
+    return;
   }
 
-}
-
-
-void aggreports::OutputOccMeanDamageRatio() {
-
-  // Determine which files to write to for legacy stream
-  // Determine whether Mean Damage Ratio should be written for ORD stream
-  std::vector<int> fileIDs;
-  std::vector<int> handles = { OCC_FULL_UNCERTAINTY, OCC_SAMPLE_MEAN,
-			       OCC_WHEATSHEAF_MEAN };
-  for (std::vector<int>::iterator it = handles.begin(); it != handles.end();
-       ++it) {
-    if (outputFlags_[*it] == true) fileIDs.push_back(*it);
-  }
-
-  if (fileIDs.size() == 0) return;   // No suitable files
-
-  if (ordFlag_) {
-    fileIDs.clear();
-    if (fout_[EPT] != nullptr) fileIDs.push_back(EPT);
-  }
-
-  if (periodstoweighting_.size() == 0) {
-    MeanDamageRatio(fileIDs, GetMax, OEP);
-  } else {
-    MeanDamageRatioWithWeighting(fileIDs, GetMax, OEP);
-  }
+  MeanDamageRatioWithWeighting(fileIDs, GetOutLoss, epcalc, eptype,
+			       eptype_tvar);
 
 }
 
@@ -1084,25 +972,26 @@ inline std::vector<int> aggreports::GetFileIDs(const int handle, int table) {
 }
 
 
-void aggreports::FullUncertainty(const std::vector<int> fileIDs,
+void aggreports::FullUncertainty(const std::vector<int> &fileIDs,
 				 OASIS_FLOAT (OutLosses::*GetOutLoss)(),
-				 const int eptype) {
+				 const int epcalc, const int eptype,
+				 const int eptype_tvar) {
 
   std::map<int, lossvec> items;
 
-  for (auto x : out_loss_[SAMPLES]) {
+  for (auto x : (*out_loss_)[SAMPLES]) {
     items[x.first.summary_id].push_back((x.second.*GetOutLoss)());
   }
 
   WriteExceedanceProbabilityTable(fileIDs, items, totalperiods_ * samplesize_,
-				  FULL, eptype);
+				  epcalc, eptype, eptype_tvar);
 
   // By ensemble ID
   if (ordFlag_) return;   // Ensemble IDs not supported for ORD output
   if (ensembletosidx_.size() > 0) {
     for (auto ensemble : ensembletosidx_) {
       items.clear();
-      for (auto x : out_loss_[SAMPLES]) {
+      for (auto x : (*out_loss_)[SAMPLES]) {
 	for (auto sidx : ensemble.second) {
 	  if (x.first.sidx == sidx) {
 	    items[x.first.summary_id].push_back((x.second.*GetOutLoss)());
@@ -1111,20 +1000,21 @@ void aggreports::FullUncertainty(const std::vector<int> fileIDs,
       }
       WriteExceedanceProbabilityTable(fileIDs, items,
 				      totalperiods_ * ensemble.second.size(),
-				      FULL, eptype, 1, ensemble.first);
+				      epcalc, ensemble.first, eptype_tvar, 1);
     }
   }
 
 }
 
 
-void aggreports::FullUncertaintyWithWeighting(const std::vector<int> fileIDs,
-	OASIS_FLOAT (OutLosses::*GetOutLoss)(), const int eptype) {
+void aggreports::FullUncertaintyWithWeighting(const std::vector<int> &fileIDs,
+	OASIS_FLOAT (OutLosses::*GetOutLoss)(), const int epcalc,
+	const int eptype, const int eptype_tvar) {
 
   std::map<int, lossvec2> items;
   std::map<int, double> unusedperiodstoweighting = periodstoweighting_;
 
-  for (auto x : out_loss_[SAMPLES]) {
+  for (auto x : (*out_loss_)[SAMPLES]) {
     lossval lv;
     lv.value = (x.second.*GetOutLoss)();
     auto iter = periodstoweighting_.find(x.first.period_no);
@@ -1136,8 +1026,8 @@ void aggreports::FullUncertaintyWithWeighting(const std::vector<int> fileIDs,
     unusedperiodstoweighting.erase(x.first.period_no);
   }
 
-  WriteExceedanceProbabilityTable(fileIDs, items, 1, FULL, eptype,
-				  unusedperiodstoweighting);
+  WriteExceedanceProbabilityTable(fileIDs, items, 1, epcalc, eptype,
+				  eptype_tvar, unusedperiodstoweighting);
 
   // By ensemble ID
   if (ordFlag_) return;   // Ensemble IDs not supported for ORD output
@@ -1145,7 +1035,7 @@ void aggreports::FullUncertaintyWithWeighting(const std::vector<int> fileIDs,
     for (auto ensemble : ensembletosidx_) {
       items.clear();
       unusedperiodstoweighting = periodstoweighting_;
-      for (auto x : out_loss_[SAMPLES]) {
+      for (auto x : (*out_loss_)[SAMPLES]) {
 	for (auto sidx : ensemble.second) {
 	  if (x.first.sidx == sidx) {
 	    lossval lv;
@@ -1160,45 +1050,35 @@ void aggreports::FullUncertaintyWithWeighting(const std::vector<int> fileIDs,
 	  }
 	}
       }
-      WriteExceedanceProbabilityTable(fileIDs, items, 1, FULL, eptype,
-				      unusedperiodstoweighting, 1,
-				      ensemble.first);
+      // EPType doubles as ensemble ID for legacy output
+      WriteExceedanceProbabilityTable(fileIDs, items, 1, epcalc, ensemble.first,
+				      eptype_tvar, unusedperiodstoweighting, 1);
     }
   }
 
 }
 
 
-void aggreports::OutputAggFullUncertainty() {
-
-  const int handle = AGG_FULL_UNCERTAINTY;
-
-  if (outputFlags_[handle] == false) return;
-
-  std::vector<int> fileIDs = GetFileIDs(handle);
-
-  if (periodstoweighting_.size() == 0) {
-    FullUncertainty(fileIDs, GetAgg, AEP);
-  } else {
-    FullUncertaintyWithWeighting(fileIDs, GetAgg, AEP);
-  }
-
-}
-
-
-void aggreports::OutputOccFullUncertainty() {
-
-  const int handle = OCC_FULL_UNCERTAINTY;
+void aggreports::OutputFullUncertainty(const int handle, int eptype,
+				       const int eptype_tvar,
+				       OASIS_FLOAT (OutLosses::*GetOutLoss)()) {
 
   if (outputFlags_[handle] == false) return;
 
   std::vector<int> fileIDs = GetFileIDs(handle);
 
+  // EPCalc = FULL for ORD output
+  // EPCalc = 2 for legacy output
+  int epcalc = ordFlag_ * FULL + !ordFlag_ * 2;
+  // EPType doubles as ensemble ID for legacy output
+  eptype *= ordFlag_;   // Set to default value 0 in legacy output
+
   if (periodstoweighting_.size() == 0) {
-    FullUncertainty(fileIDs, GetMax, OEP);
-  } else {
-    FullUncertaintyWithWeighting(fileIDs, GetMax, OEP);
+    FullUncertainty(fileIDs, GetOutLoss, epcalc, eptype, eptype_tvar);
+    return;
   }
+
+  FullUncertainty(fileIDs, GetOutLoss, epcalc, eptype, eptype_tvar);
 
 }
 
@@ -1243,14 +1123,15 @@ inline void aggreports::FillWheatsheafItems(const outkey2 key,
 // Wheatsheaf Mean = Per Sample Mean (Exceedance Probability Table)
 void aggreports::WheatsheafAndWheatsheafMean(const std::vector<int> handles,
 				OASIS_FLOAT (OutLosses::*GetOutLoss)(),
-				const int eptype, const int ensemble_id) {
+				const int epcalc, const int eptype,
+				const int eptype_tvar, int ensemble_id) {
 
   std::map<wheatkey, lossvec> items;
   int samplesize;
 
   if (ensemble_id != 0) {
     samplesize = (int)ensembletosidx_[ensemble_id].size();
-    for (auto x : out_loss_[SAMPLES]) {
+    for (auto x : (*out_loss_)[SAMPLES]) {
       for (auto sidx : ensembletosidx_[ensemble_id]) {
 	if (x.first.sidx == sidx) {
 	  FillWheatsheafItems(x.first, items, (x.second.*GetOutLoss)());
@@ -1259,7 +1140,7 @@ void aggreports::WheatsheafAndWheatsheafMean(const std::vector<int> handles,
     }
   } else {
     samplesize = samplesize_;
-    for (auto x : out_loss_[SAMPLES]) {
+    for (auto x : (*out_loss_)[SAMPLES]) {
       FillWheatsheafItems(x.first, items, (x.second.*GetOutLoss)());
     }
   }
@@ -1267,7 +1148,7 @@ void aggreports::WheatsheafAndWheatsheafMean(const std::vector<int> handles,
   if (outputFlags_[handles[WHEATSHEAF]] == true) {
     std::vector<int> fileIDs = GetFileIDs(handles[WHEATSHEAF], PSEPT);
     WritePerSampleExceedanceProbabilityTable(fileIDs, items, eptype,
-					     ensemble_id);
+					     eptype_tvar);
   }
 
   if (outputFlags_[handles[WHEATSHEAF_MEAN]] == false) return;
@@ -1296,9 +1177,8 @@ void aggreports::WheatsheafAndWheatsheafMean(const std::vector<int> handles,
   }
 
   std::vector<int> fileIDs = GetFileIDs(handles[WHEATSHEAF_MEAN]);
-  WriteExceedanceProbabilityTable(fileIDs, mean_map, totalperiods_,
-				  PERSAMPLEMEAN, eptype, samplesize,
-				  ensemble_id);
+  WriteExceedanceProbabilityTable(fileIDs, mean_map, totalperiods_, epcalc,
+				  eptype, eptype_tvar, samplesize);
 
 }
 
@@ -1307,7 +1187,8 @@ void aggreports::WheatsheafAndWheatsheafMean(const std::vector<int> handles,
 // Wheatsheaf Mean = Per Sample Mean (Exceedance Probability Table)
 void aggreports::WheatsheafAndWheatsheafMeanWithWeighting(
 	const std::vector<int> handles, OASIS_FLOAT (OutLosses::*GetOutLoss)(),
-	const int eptype, const int ensemble_id) {
+	const int epcalc, const int eptype, const int eptype_tvar,
+	int ensemble_id) {
 
   std::map<wheatkey, lossvec2> items;
   int samplesize;
@@ -1316,7 +1197,7 @@ void aggreports::WheatsheafAndWheatsheafMeanWithWeighting(
 
   if (ensemble_id != 0) {
     samplesize = (int)ensembletosidx_[ensemble_id].size();
-    for (auto x : out_loss_[SAMPLES]) {
+    for (auto x : (*out_loss_)[SAMPLES]) {
       for (auto sidx : ensembletosidx_[ensemble_id]) {
 	if (x.first.sidx == sidx) {
 	  FillWheatsheafItems(x.first, items, (x.second.*GetOutLoss)(),
@@ -1326,7 +1207,7 @@ void aggreports::WheatsheafAndWheatsheafMeanWithWeighting(
     }
   } else {
     samplesize = samplesize_;
-    for (auto x : out_loss_[SAMPLES]) {
+    for (auto x : (*out_loss_)[SAMPLES]) {
       FillWheatsheafItems(x.first, items, (x.second.*GetOutLoss)(),
 			  maxPeriodNo, unusedperiodstoweighting);
     }
@@ -1335,8 +1216,8 @@ void aggreports::WheatsheafAndWheatsheafMeanWithWeighting(
   if (outputFlags_[handles[WHEATSHEAF]] == true) {
     std::vector<int> fileIDs = GetFileIDs(handles[WHEATSHEAF], PSEPT);
     WritePerSampleExceedanceProbabilityTable(fileIDs, items, eptype,
-					     unusedperiodstoweighting,
-					     ensemble_id);
+					     eptype_tvar,
+					     unusedperiodstoweighting);
   }
 
   if (outputFlags_[handles[WHEATSHEAF_MEAN]] == false) return;
@@ -1359,29 +1240,36 @@ void aggreports::WheatsheafAndWheatsheafMeanWithWeighting(
   }
 
   std::vector<int> fileIDs = GetFileIDs(handles[WHEATSHEAF_MEAN]);
-  WriteExceedanceProbabilityTable(fileIDs, mean_map, samplesize,
-				  PERSAMPLEMEAN, eptype,
-				  unusedperiodstoweighting, samplesize,
-				  ensemble_id);
+  WriteExceedanceProbabilityTable(fileIDs, mean_map, samplesize, epcalc, eptype,
+				  eptype_tvar, unusedperiodstoweighting,
+				  samplesize);
 
 }
 
 
 // Wheatsheaf Mean = Per Sample Mean
-void aggreports::OutputAggWheatsheafAndWheatsheafMean() {
+void aggreports::OutputWheatsheafAndWheatsheafMean(const std::vector<int> &handles,
+	int eptype, const int eptype_tvar,
+	OASIS_FLOAT (OutLosses::*GetOutLoss)()) {
 
-  std::vector<int> handles = { AGG_WHEATSHEAF, AGG_WHEATSHEAF_MEAN };
   int falseCount = 0;
-  for (std::vector<int>::iterator it = handles.begin(); it != handles.end();
-       ++it) {
+  for (auto it = handles.begin(); it != handles.end(); ++it) {
     if (outputFlags_[*it] == false) falseCount++;
   }
   if (falseCount == 2) return;
 
+  // EPCalc = PERSAMPLEMEAN for ORD output
+  // EPCalc = 2 for legacy output
+  int epcalc = ordFlag_ * PERSAMPLEMEAN + !ordFlag_ * 2;
+  // EPType doubles as ensemble ID for legacy output
+  eptype *= ordFlag_;   // Set to default value 0 in legacy output
+
   if (periodstoweighting_.size() == 0) {
-    WheatsheafAndWheatsheafMean(handles, GetAgg, AEP);
+    WheatsheafAndWheatsheafMean(handles, GetOutLoss, epcalc, eptype,
+				eptype_tvar);
   } else {
-    WheatsheafAndWheatsheafMeanWithWeighting(handles, GetAgg, AEP);
+    WheatsheafAndWheatsheafMeanWithWeighting(handles, GetOutLoss, epcalc,
+					     eptype, eptype_tvar);
   }
 
   // By ensemble ID
@@ -1389,9 +1277,11 @@ void aggreports::OutputAggWheatsheafAndWheatsheafMean() {
   if (ensembletosidx_.size() > 0) {
     for (auto ensemble : ensembletosidx_) {
       if (periodstoweighting_.size() == 0) {
-	WheatsheafAndWheatsheafMean(handles, GetAgg, AEP, ensemble.first);
+	WheatsheafAndWheatsheafMean(handles, GetOutLoss, epcalc, ensemble.first,
+				    eptype_tvar, ensemble.first);
       } else {
-	WheatsheafAndWheatsheafMeanWithWeighting(handles, GetAgg, AEP,
+	WheatsheafAndWheatsheafMeanWithWeighting(handles, GetOutLoss, epcalc,
+						 ensemble.first, eptype_tvar,
 						 ensemble.first);
       }
     }
@@ -1400,47 +1290,15 @@ void aggreports::OutputAggWheatsheafAndWheatsheafMean() {
 }
 
 
-// Wheatsheaf Mean = Per Sample Mean
-void aggreports::OutputOccWheatsheafAndWheatsheafMean() {
-
-  std::vector<int> handles = { OCC_WHEATSHEAF, OCC_WHEATSHEAF_MEAN };
-  int falseCount = 0;
-  for (std::vector<int>::iterator it = handles.begin(); it != handles.end();
-       ++it) {
-    if (outputFlags_[*it] == false) falseCount++;
-  }
-  if (falseCount == 2) return;
-
-  if (periodstoweighting_.size() == 0) {
-    WheatsheafAndWheatsheafMean(handles, GetMax, OEP);
-  } else {
-    WheatsheafAndWheatsheafMeanWithWeighting(handles, GetMax, OEP);
-  }
-
-  // By ensemble ID
-  if (ordFlag_) return;   // Ensemble IDs not supported for ORD output
-  if (ensembletosidx_.size() > 0) {
-    for (auto ensemble : ensembletosidx_) {
-      if (periodstoweighting_.size() == 0) {
-	WheatsheafAndWheatsheafMean(handles, GetMax, OEP, ensemble.first);
-      } else {
-	WheatsheafAndWheatsheafMeanWithWeighting(handles, GetMax, OEP,
-						 ensemble.first);
-      }
-    }
-  }
-
-}
-
-
-void aggreports::SampleMean(const std::vector<int> fileIDs,
+void aggreports::SampleMean(const std::vector<int> &fileIDs,
 			    OASIS_FLOAT (OutLosses::*GetOutLoss)(),
-			    const int eptype) {
+			    const int epcalc, const int eptype,
+			    const int eptype_tvar) {
 
   if (samplesize_ == 0) return;   // Prevent division by zero error
 
   std::map<summary_id_period_key, OASIS_FLOAT> items;
-  for (auto x : out_loss_[SAMPLES]) {
+  for (auto x : (*out_loss_)[SAMPLES]) {
     summary_id_period_key sk;
     sk.summary_id = x.first.summary_id;
     sk.period_no = x.first.period_no;
@@ -1452,15 +1310,15 @@ void aggreports::SampleMean(const std::vector<int> fileIDs,
     mean_map[s.first.summary_id].push_back(s.second);
   }
 
-  WriteExceedanceProbabilityTable(fileIDs, mean_map, totalperiods_, MEANSAMPLE,
-				  eptype);
+  WriteExceedanceProbabilityTable(fileIDs, mean_map, totalperiods_, epcalc,
+				  eptype, eptype_tvar);
 
   // By ensemble ID
   if (ordFlag_) return;   // Ensemble IDs not supported for ORD output
   if (ensembletosidx_.size() > 0) {
     for (auto ensemble : ensembletosidx_) {
       items.clear();
-      for (auto x : out_loss_[SAMPLES]) {
+      for (auto x : (*out_loss_)[SAMPLES]) {
 	for (auto sidx : ensemble.second) {
 	  if (x.first.sidx == sidx) {
 	    summary_id_period_key sk;
@@ -1474,23 +1332,24 @@ void aggreports::SampleMean(const std::vector<int> fileIDs,
       for (auto s : items) {
 	mean_map[s.first.summary_id].push_back(s.second);
       }
-      WriteExceedanceProbabilityTable(fileIDs, mean_map, totalperiods_,
-				      MEANSAMPLE, eptype, 1, ensemble.first);
+      WriteExceedanceProbabilityTable(fileIDs, mean_map, totalperiods_, epcalc,
+				      ensemble.first, eptype_tvar, 1);
     }
   }
 
 }
 
 
-void aggreports::SampleMeanWithWeighting(const std::vector<int> fileIDs,
-	OASIS_FLOAT (OutLosses::*GetOutLoss)(), const int eptype) {
+void aggreports::SampleMeanWithWeighting(const std::vector<int> &fileIDs,
+	OASIS_FLOAT (OutLosses::*GetOutLoss)(), const int epcalc,
+	const int eptype, const int eptype_tvar) {
 
   if (samplesize_ == 0) return;   // Prevent division by zero error
 
   std::map<summary_id_period_key, lossval> items;
   std::map<int, double> unusedperiodstoweighting = periodstoweighting_;
 
-  for (auto x : out_loss_[SAMPLES]) {
+  for (auto x : (*out_loss_)[SAMPLES]) {
     summary_id_period_key sk;
     sk.summary_id = x.first.summary_id;
     sk.period_no = x.first.period_no;
@@ -1508,8 +1367,9 @@ void aggreports::SampleMeanWithWeighting(const std::vector<int> fileIDs,
     mean_map[s.first.summary_id].push_back(s.second);
   }
 
-  WriteExceedanceProbabilityTable(fileIDs, mean_map, samplesize_, MEANSAMPLE,
-				  eptype, unusedperiodstoweighting);
+  WriteExceedanceProbabilityTable(fileIDs, mean_map, samplesize_, epcalc,
+				  eptype, eptype_tvar,
+				  unusedperiodstoweighting);
 
   // By ensemble ID
   if (ordFlag_) return;   // Ensemble IDs not supported for ORD output
@@ -1517,7 +1377,7 @@ void aggreports::SampleMeanWithWeighting(const std::vector<int> fileIDs,
     for (auto ensemble : ensembletosidx_) {
       items.clear();
       unusedperiodstoweighting = periodstoweighting_;
-      for (auto x : out_loss_[SAMPLES]) {
+      for (auto x : (*out_loss_)[SAMPLES]) {
 	for (auto sidx : ensemble.second) {
 	  if (x.first.sidx == sidx) {
 	    summary_id_period_key sk;
@@ -1538,43 +1398,32 @@ void aggreports::SampleMeanWithWeighting(const std::vector<int> fileIDs,
 	mean_map[s.first.summary_id].push_back(s.second);
       }
       WriteExceedanceProbabilityTable(fileIDs, mean_map, samplesize_,
-				      MEANSAMPLE, eptype,
-				      unusedperiodstoweighting, 1,
-				      ensemble.first);
+				      epcalc, ensemble.first, eptype_tvar,
+				      unusedperiodstoweighting, 1);
     }
   }
 }
 
 
-void aggreports::OutputAggSampleMean() {
-
-  const int handle = AGG_SAMPLE_MEAN;
-
-  if (outputFlags_[handle] == false) return;
-
-  std::vector<int> fileIDs = GetFileIDs(handle);
-
-  if (periodstoweighting_.size() == 0) {
-    SampleMean(fileIDs, GetAgg, AEP);
-  } else {
-    SampleMeanWithWeighting(fileIDs, GetAgg, AEP);
-  }
-
-}
-
-
-void aggreports::OutputOccSampleMean() {
-
-  const int handle = OCC_SAMPLE_MEAN;
+void aggreports::OutputSampleMean(const int handle, int eptype,
+				  const int eptype_tvar,
+				  OASIS_FLOAT (OutLosses::*GetOutLoss)()) {
 
   if (outputFlags_[handle] == false) return;
 
   std::vector<int> fileIDs = GetFileIDs(handle);
 
+  // EPCalc = MEANSAMPLE for ORD output
+  // EPCalc = 2 for legacy output
+  int epcalc = ordFlag_ * MEANSAMPLE + !ordFlag_ * 2;
+  // EPType doubles as ensemble ID for legacy output
+  eptype *= ordFlag_;   // Set to default value 0 in legacy output
+
   if (periodstoweighting_.size() == 0) {
-    SampleMean(fileIDs, GetMax, OEP);
-  } else {
-    SampleMeanWithWeighting(fileIDs, GetMax, OEP);
+    SampleMean(fileIDs, GetOutLoss, epcalc, eptype, eptype_tvar);
+    return;
   }
+
+  SampleMeanWithWeighting(fileIDs, GetOutLoss, epcalc, eptype, eptype_tvar);
 
 }

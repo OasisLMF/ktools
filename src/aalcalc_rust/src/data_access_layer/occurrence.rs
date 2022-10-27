@@ -4,7 +4,7 @@ use std::cmp::PartialEq;
 use std::collections::HashMap;
 
 
-#[derive(Clone, Debug, PartialOrd, PartialEq, Eq, Ord)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum DateFormat {
     NewFormat,
     IncludesHoursAndMinutes,
@@ -153,16 +153,6 @@ mod occurrence_data_tests {
 
         let mut occ_data = OccurrenceData::new(String::from("./input/occurrence.bin")).await;
         occ_data.get_data().await;
-        // let mut file = File::open("./input/occurrence.bin").await.unwrap();
-        // let mut buf: Vec<u8> = Vec::new();
-        // let mut bytes = file.read(&mut buf).await.unwrap();
-
-        // for chunk in buf.into_iter() {
-        //     // Check that the sum of each chunk is 4.
-        //     println!("{:?}", chunk);
-        // }
-        // println!("{:?}", buf);
-        // println!("the test has finished");
     }
 
 }

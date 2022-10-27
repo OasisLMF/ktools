@@ -29,7 +29,6 @@ impl Occurrence {
             occ_date_id: LittleEndian::read_i32(occ_date_id),
         }
     }
-
 }
 
 
@@ -147,12 +146,13 @@ mod occurrence_data_tests {
         assert_eq!(DateFormat::NewFormat, occ_data.date_format);
     }
 
-
     #[tokio::test]
     async fn test_get_data() {
-
         let mut occ_data = OccurrenceData::new(String::from("./input/occurrence.bin")).await;
-        occ_data.get_data().await;
+        let data = occ_data.get_data().await;
+
+        assert_eq!(2, data.get(&1).unwrap().len());
+        assert_eq!(2, data.get(&2).unwrap().len());
     }
 
 }

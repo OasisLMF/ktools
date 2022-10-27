@@ -1,0 +1,164 @@
+use tokio::{fs::File, io::AsyncReadExt};
+use byteorder::{ByteOrder, LittleEndian};
+
+
+#[derive(Debug, Clone)]
+pub struct Event {
+    pub event_id: i32,
+    pub losses: Vec<(i32, f32)>
+}
+
+impl Event {
+
+    pub fn add_loss(&mut self, sidx: &[u8], loss: &[u8]) -> bool {
+        let sidx_int = LittleEndian::read_i32(sidx);
+        let loss_float = LittleEndian::read_f32(loss);
+
+        if sidx_int == 0 && loss_float == 0.0 {
+            return false
+        }
+        self.losses.push((sidx_int, loss_float));
+        return true
+    }
+
+}
+
+
+#[derive(Debug, Clone)]
+pub struct Summary {
+    pub event_id: i32,
+    pub summary_id: i32,
+    pub exposure_value: i32,
+    pub events: Vec<Event>
+}
+
+impl Summary {
+
+    pub fn from_bytes(event_id: &[u8], summary_id: &[u8], exposure_value: &[u8]) -> Self {
+        let events: Vec<Event> = vec![];
+        return Summary { 
+            event_id: LittleEndian::read_i32(event_id), 
+            summary_id: LittleEndian::read_i32(summary_id), 
+            exposure_value: LittleEndian::read_i32(exposure_value), 
+            events: events 
+        }
+    }
+}
+
+
+#[derive(Debug)]
+pub struct SummaryData {
+    pub handler: File,
+    pub stream_id: i32,
+    pub no_of_samples: i32,
+    pub summary_set: i32
+}
+
+impl SummaryData {
+
+    pub async fn new(path: String) -> Self {
+        let mut file = File::open(path).await.unwrap();
+        let mut num_buffer = [0; 4];
+
+        file.read_exact(&mut num_buffer).await.unwrap();
+        let stream_id = LittleEndian::read_i32(&num_buffer);
+        file.read_exact(&mut num_buffer).await.unwrap();
+        let no_of_samples = LittleEndian::read_i32(&num_buffer);
+        file.read_exact(&mut num_buffer).await.unwrap();
+        let summary_set = LittleEndian::read_i32(&num_buffer);
+
+        return SummaryData {
+            stream_id,
+            no_of_samples,
+            summary_set,
+            handler: file
+        }
+    }
+
+    pub async fn get_data(&mut self) -> Vec<Summary> {
+        let mut meta_read_frame = [0; 12];
+        let mut event_read_frame = [0; 8];
+        let mut buffer = vec![];
+
+        loop {
+            // gets new summary
+            match self.handler.read_exact(&mut meta_read_frame).await {
+                Ok(_) => {
+                    let mut chunked_meta_frame = meta_read_frame.chunks(4).into_iter();
+
+                    let mut summary = Summary::from_bytes(
+                        chunked_meta_frame.next().unwrap(), 
+                        chunked_meta_frame.next().unwrap(), 
+                        chunked_meta_frame.next().unwrap()
+                    );
+
+                    let mut event = Event{event_id: summary.event_id.clone(), losses: vec![]};
+
+                    // loop through adding the losses to the event
+                    loop {
+                        match self.handler.read_exact(&mut event_read_frame).await {
+                            Ok(_) => {
+                                let mut chunked_event_read_frame = event_read_frame.chunks(4).into_iter();
+                                let sidx = chunked_event_read_frame.next().unwrap();
+                                let loss = chunked_event_read_frame.next().unwrap();
+                                let pushed = event.add_loss(sidx, loss);
+                                if pushed == false {
+                                    summary.events.push(event);
+                                    break
+                                }
+                            },
+                            Err(error) => {
+                                if error.to_string().as_str() != "early eof" {
+                                    panic!("{}", error);
+                                }
+                                break
+                            }
+                        }
+                    }
+                    buffer.push(summary);
+                },
+                Err(error) => {
+                    if error.to_string().as_str() != "early eof" {
+                        panic!("{}", error);
+                    }
+                    break
+                }
+            };
+            
+        };
+        return buffer
+    }
+}
+
+
+#[cfg(test)]
+mod summary_data_tests {
+
+    use super::{SummaryData};
+    use tokio;
+
+    #[tokio::test]
+    async fn test_new() {
+        let sum_data = SummaryData::new(String::from("./work/summary_aal/summary_1.bin")).await;
+        assert_eq!(50331649, sum_data.stream_id);
+        assert_eq!(10, sum_data.no_of_samples);
+        assert_eq!(1, sum_data.summary_set);
+    }
+
+    #[tokio::test]
+    async fn test_get_data() {
+        let mut sum_data = SummaryData::new(String::from("./work/summary_aal/summary_1.bin")).await;
+        let summaries = sum_data.get_data().await;
+
+        let first_summary = summaries[0].clone();
+
+        assert_eq!(1, first_summary.event_id);
+        assert_eq!(1, first_summary.summary_id);
+        assert_eq!(1240736768, first_summary.exposure_value);
+
+        let events = first_summary.events[0].clone();
+
+        assert_eq!(12, events.losses.len());
+    }
+
+}

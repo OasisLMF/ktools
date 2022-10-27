@@ -1,6 +1,7 @@
 use tokio::{fs::File, io::AsyncReadExt};
 use byteorder::{ByteOrder, LittleEndian};
 use std::cmp::PartialEq;
+use std::collections::HashMap;
 
 
 #[derive(Clone, Debug, PartialOrd, PartialEq, Eq, Ord)]
@@ -11,23 +12,28 @@ pub enum DateFormat {
 }
 
 
-pub struct Occurence {
+#[derive(Debug)]
+pub struct Occurrence {
     pub event_id: i32,
     pub period_num: i32,
     pub occ_date_id: i32
 }
 
 
-// impl Occurence {
+impl Occurrence {
 
-//     pub async fn new(buffer: [u8; 12]) -> Self {
+    pub fn from_bytes(event_id: &[u8], period_num: &[u8], occ_date_id: &[u8]) -> Self {
+        return Occurrence {
+            event_id: LittleEndian::read_i32(event_id),
+            period_num: LittleEndian::read_i32(period_num),
+            occ_date_id: LittleEndian::read_i32(occ_date_id),
+        }
+    }
 
-//     }
-
-// }
+}
 
 
-pub struct OccurenceData {
+pub struct OccurrenceData {
     pub date_format: DateFormat,
     pub period_number: i32,
     pub handler: File,
@@ -35,7 +41,7 @@ pub struct OccurenceData {
 }
 
 
-impl OccurenceData {
+impl OccurrenceData {
 
     pub async fn new(path: String) -> Self {
         let mut file = File::open(path).await.unwrap();
@@ -58,7 +64,7 @@ impl OccurenceData {
                 date_format = DateFormat::Depreciated;
             },
             _ => {
-                panic!("occurence bin file only supports 0, 1, and 3 in header for date option type");
+                panic!("occurrence bin file only supports 0, 1, and 3 in header for date option type");
             }
         }
 
@@ -74,7 +80,7 @@ impl OccurenceData {
             }
         }
 
-        return OccurenceData{
+        return OccurrenceData{
             date_format,
             period_number,
             handler: file,
@@ -82,20 +88,45 @@ impl OccurenceData {
         }
     }
 
-    pub async fn get_data(&mut self) {
-        let mut buf: Vec<u8> = Vec::new();
-        let mut buffer = [0; 4];
-        self.handler.read_exact(&mut buffer);
+    pub async fn get_data(&mut self) -> HashMap<i32, Vec<Occurrence>> {
+        let mut read_frame = [0; 12];
+        let mut data = HashMap::new();
 
-        // for chunk in buf.into_iter() {
-        //     // Check that the sum of each chunk is 4.
-        //     println!("{:?}", chunk);
-        // }
-        println!("{:?}", buffer);
-        self.handler.read_exact(&mut buffer);
-        println!("{:?}", buffer);
-        println!("the test has finished");
-        // return buffer
+        loop {
+            match self.handler.read_exact(&mut read_frame).await {
+                Ok(_) => {
+                    let mut chunked_frame = read_frame.chunks(4).into_iter();
+                    let occurrence = Occurrence::from_bytes(
+                        chunked_frame.next().unwrap(), 
+                        chunked_frame.next().unwrap(), 
+                        chunked_frame.next().unwrap()
+                    );
+                    OccurrenceData::insert_occurrence(&mut data, occurrence);
+
+                },
+                Err(error) => {
+                    if error.to_string().as_str() != "early eof" {
+                        panic!("{}", error);
+                    }
+                    break
+                }
+            }
+        }
+        return data
+    }
+
+    fn insert_occurrence(map: &mut HashMap<i32, Vec<Occurrence>>, occurrence: Occurrence) {
+        match map.get_mut(&occurrence.event_id) {
+            Some(data) => {
+                data.push(occurrence);
+            }, 
+            None => {
+                let mut data = vec![];
+                let key = occurrence.event_id.clone();
+                data.push(occurrence);
+                map.insert(key, data);
+            }
+        }
     }
 
 }
@@ -104,17 +135,13 @@ impl OccurenceData {
 #[cfg(test)]
 mod occurrence_data_tests {
 
-    use super::{OccurenceData, DateFormat};
+    use super::{OccurrenceData, DateFormat};
     use tokio;
-
-    use tokio::{fs::File, io::AsyncReadExt};
-    use byteorder::{ByteOrder, LittleEndian};
-    use std::cmp::PartialEq;
 
     #[tokio::test]
     async fn test_new() {
 
-        let occ_data = OccurenceData::new(String::from("./input/occurrence.bin")).await;
+        let occ_data = OccurrenceData::new(String::from("./input/occurrence.bin")).await;
         assert_eq!(10, occ_data.period_number);
         assert_eq!(12, occ_data.chunk_size);
         assert_eq!(DateFormat::NewFormat, occ_data.date_format);
@@ -124,7 +151,7 @@ mod occurrence_data_tests {
     #[tokio::test]
     async fn test_get_data() {
 
-        let mut occ_data = OccurenceData::new(String::from("./input/occurrence.bin")).await;
+        let mut occ_data = OccurrenceData::new(String::from("./input/occurrence.bin")).await;
         occ_data.get_data().await;
         // let mut file = File::open("./input/occurrence.bin").await.unwrap();
         // let mut buf: Vec<u8> = Vec::new();

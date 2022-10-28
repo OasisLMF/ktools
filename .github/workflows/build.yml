@@ -61,6 +61,9 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-buildx-
 
+
+#(LOCAL)
+
     - name: Create ktools-builder
       uses: docker/build-push-action@v3
       with:
@@ -79,3 +82,19 @@ jobs:
       run: |
         rm -rf /tmp/.buildx-cache
         mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+
+    - name: Build with Autotools
+      uses: addnab/docker-run-action@v3
+      with:
+        image: ktools-builder:latest
+        shell: bash
+        run: ./build-autotools.sh
+        #options: -v ${{ github.workspace }}:/var/ktools
+
+    - name: Build with Cmake
+      uses: addnab/docker-run-action@v3
+      with:
+        image: ktools-builder:latest
+        shell: bash
+        options: -v ${{ github.workspace }}:/var/ktools
+        run: ./build-cmake.sh

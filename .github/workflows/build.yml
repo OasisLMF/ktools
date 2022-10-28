@@ -52,9 +52,9 @@ jobs:
 
     - name: Create ktools-builder
       uses: docker/build-push-action@v3
-        with:
-          push: false
-          context: .
-          tags: ktools-builder:latest
-          file: jenkins/Dockerfile.clang-build
-          #outputs: type=docker,dest=/tmp/myimage.tar
+      with:
+        push: false
+        context: .
+        tags: ktools-builder:latest
+        file: jenkins/Dockerfile.clang-build
+        #outputs: type=docker,dest=/tmp/myimage.tar

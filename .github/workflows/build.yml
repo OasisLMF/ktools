@@ -10,8 +10,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-        with:
-          fetch-depth: 1
+      with:
+        fetch-depth: 1
 
     - name: (MacOS) Install dependencies
       run: |
@@ -44,8 +44,8 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-        with:
-          fetch-depth: 1
+      with:
+        fetch-depth: 1
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2

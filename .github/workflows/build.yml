@@ -10,6 +10,8 @@ on:
 
 env:
   CREATE_KTOOLS_BUILDER: "${{ github.event_name == 'workflow_dispatch' && github.event.inputs.create_ktools_builder || 'false' }}"
+  IMAGE_KTOOLS_BUILDER: "coreoasis/ktools-builder" 
+  TAG_KTOOLS_BUILDER: "latest"
 
 jobs:
   build-osx:
@@ -65,13 +67,13 @@ jobs:
     - name: pull latest ktools builder
       if: env.CREATE_KTOOLS_BUILDER == 'false'
       run: |
-        docker pull coreoasis/ktools-builder:latest
+        docker pull ${{ env.IMAGE_KTOOLS_BUILDER }}:${{ env.TAG_KTOOLS_BUILDER }}
 
     - name: (Optional - create new build image)
       if: env.CREATE_KTOOLS_BUILDER == 'true'
       run: |
-        docker build -f jenkins/Dockerfile.clang-build -t coreoasis/ktools-builder:latest .
-        docker push coreoasis/ktools-builder:latest
+        docker build -f jenkins/Dockerfile.clang-build -t ${{ env.IMAGE_KTOOLS_BUILDER }}:${{ env.TAG_KTOOLS_BUILDER }} .
+        docker push ${{ env.IMAGE_KTOOLS_BUILDER }}:${{ env.TAG_KTOOLS_BUILDER }}
 
     - name: Show images (DEBUG)
       run: |
@@ -80,7 +82,7 @@ jobs:
     - name: Build with Autotools
       working-directory: ${{ github.workspace }}
       run: |
-        docker run --entrypoint build-autotools.sh -v $(pwd):/var/ktools ktools-builder
+        docker run --entrypoint build-autotools.sh -v $(pwd):/var/ktools ${{ env.IMAGE_KTOOLS_BUILDER }}:${{ env.TAG_KTOOLS_BUILDER }}
         ls -la ./tar
     - name: 'Store autotools build'
       uses: actions/upload-artifact@v2
@@ -92,7 +94,7 @@ jobs:
     - name: Build with Cmake
       working-directory: ${{ github.workspace }}
       run: |
-        docker run --entrypoint build-cmake.sh -v $(pwd):/var/ktools ktools-builder
+        docker run --entrypoint build-cmake.sh -v $(pwd):/var/ktools ${{ env.IMAGE_KTOOLS_BUILDER }}:${{ env.TAG_KTOOLS_BUILDER }}
         ls -la ./tar
     - name: 'Store cmake build'
       uses: actions/upload-artifact@v2

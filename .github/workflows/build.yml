@@ -43,7 +43,7 @@ jobs:
         make install
 
     - name: 'Upload Ktool binaries - x86'
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: Darwin_x86_64
         path: x86/bin
@@ -79,24 +79,20 @@ jobs:
       run: |
         docker run --entrypoint build-autotools.sh -v $(pwd):/var/ktools ${{ env.IMAGE_KTOOLS_BUILDER }}:${{ env.TAG_KTOOLS_BUILDER }}
         ls -la ./tar
-    - name: 'Store autotools build'
-      uses: actions/upload-artifact@v2
-      with:
-        name: Linux_x86_64-autotools
-        path: ./tar/Linux_x86_64.tar.gz
-        retention-days: 5
 
     - name: Build with Cmake
       working-directory: ${{ github.workspace }}
       run: |
         docker run --entrypoint build-cmake.sh -v $(pwd):/var/ktools ${{ env.IMAGE_KTOOLS_BUILDER }}:${{ env.TAG_KTOOLS_BUILDER }}
         ls -la ./tar
-    - name: 'Store cmake build'
-      uses: actions/upload-artifact@v2
+
+    - name: 'Store Linux build'
+      uses: actions/upload-artifact@v3
       with:
-        name: Linux_x86_64-cmake
+        name: Linux_x86_64
         path: ./tar/Linux_x86_64.tar.gz
         retention-days: 5
+
 
 
 

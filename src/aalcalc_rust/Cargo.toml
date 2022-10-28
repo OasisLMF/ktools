@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 tokio = { version = "1.21.2", features = ["full"] }
 byteorder = "1.4.3"
+rayon = "1.5"

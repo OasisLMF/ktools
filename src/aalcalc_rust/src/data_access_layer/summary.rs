@@ -1,7 +1,12 @@
-use tokio::{fs::File, io::AsyncReadExt};
 use byteorder::{ByteOrder, LittleEndian};
+use std::{fs::File, io::Read};
 
 
+/// Holds ```sidx``` and losses for an event.
+/// 
+/// # Fields
+/// * event_id: the ID of the event
+/// * losses: vector of tuples (sidx, loss)
 #[derive(Debug, Clone)]
 pub struct Event {
     pub event_id: i32,
@@ -10,6 +15,15 @@ pub struct Event {
 
 impl Event {
 
+    /// Adds a loss to the ```self.losses```.
+    /// 
+    /// # Arguments
+    /// * sidx: the sample ID of the loss
+    /// * loss: the total amount of the loss
+    /// 
+    /// # Returns
+    /// ```true```: loss added and should continue to add losses
+    /// ```false```: the end of event stream has been reached
     pub fn add_loss(&mut self, sidx: &[u8], loss: &[u8]) -> bool {
         let sidx_int = LittleEndian::read_i32(sidx);
         let loss_float = LittleEndian::read_f32(loss);
@@ -56,15 +70,15 @@ pub struct SummaryData {
 
 impl SummaryData {
 
-    pub async fn new(path: String) -> Self {
-        let mut file = File::open(path).await.unwrap();
+    pub fn new(path: String) -> Self {
+        let mut file = File::open(path).unwrap();
         let mut num_buffer = [0; 4];
 
-        file.read_exact(&mut num_buffer).await.unwrap();
+        file.read_exact(&mut num_buffer).unwrap();
         let stream_id = LittleEndian::read_i32(&num_buffer);
-        file.read_exact(&mut num_buffer).await.unwrap();
+        file.read_exact(&mut num_buffer).unwrap();
         let no_of_samples = LittleEndian::read_i32(&num_buffer);
-        file.read_exact(&mut num_buffer).await.unwrap();
+        file.read_exact(&mut num_buffer).unwrap();
         let summary_set = LittleEndian::read_i32(&num_buffer);
 
         return SummaryData {
@@ -75,14 +89,14 @@ impl SummaryData {
         }
     }
 
-    pub async fn get_data(&mut self) -> Vec<Summary> {
+    pub fn get_data(&mut self) -> Vec<Summary> {
         let mut meta_read_frame = [0; 12];
         let mut event_read_frame = [0; 8];
         let mut buffer = vec![];
 
         loop {
             // gets new summary
-            match self.handler.read_exact(&mut meta_read_frame).await {
+            match self.handler.read_exact(&mut meta_read_frame) {
                 Ok(_) => {
                     let mut chunked_meta_frame = meta_read_frame.chunks(4).into_iter();
 
@@ -96,7 +110,7 @@ impl SummaryData {
 
                     // loop through adding the losses to the event
                     loop {
-                        match self.handler.read_exact(&mut event_read_frame).await {
+                        match self.handler.read_exact(&mut event_read_frame) {
                             Ok(_) => {
                                 let mut chunked_event_read_frame = event_read_frame.chunks(4).into_iter();
                                 let sidx = chunked_event_read_frame.next().unwrap();
@@ -108,18 +122,15 @@ impl SummaryData {
                                 }
                             },
                             Err(error) => {
-                                if error.to_string().as_str() != "early eof" {
-                                    panic!("{}", error);
-                                }
-                                break
+                                panic!("{}", error);
                             }
                         }
                     }
                     buffer.push(summary);
                 },
                 Err(error) => {
-                    if error.to_string().as_str() != "early eof" {
-                        panic!("{}", error);
+                    if error.to_string().as_str() != "failed to fill whole buffer" {
+                        println!("{}", error);
                     }
                     break
                 }
@@ -139,7 +150,7 @@ mod summary_data_tests {
 
     #[tokio::test]
     async fn test_new() {
-        let sum_data = SummaryData::new(String::from("./work/summary_aal/summary_1.bin")).await;
+        let sum_data = SummaryData::new(String::from("./work/summary_aal/summary_1.bin"));
         assert_eq!(50331649, sum_data.stream_id);
         assert_eq!(10, sum_data.no_of_samples);
         assert_eq!(1, sum_data.summary_set);
@@ -147,8 +158,8 @@ mod summary_data_tests {
 
     #[tokio::test]
     async fn test_get_data() {
-        let mut sum_data = SummaryData::new(String::from("./work/summary_aal/summary_1.bin")).await;
-        let summaries = sum_data.get_data().await;
+        let mut sum_data = SummaryData::new(String::from("./work/summary_aal/summary_1.bin"));
+        let summaries = sum_data.get_data();
 
         let first_summary = summaries[0].clone();
 

@@ -76,20 +76,34 @@ jobs:
         cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
 
     - name: Build with Autotools
-      uses: addnab/docker-run-action@v3
-      with:
-        image: ktools-builder:latest
-        #shell: bash
-        run: ./build-autotools.sh
-        #options: -v ${{ github.workspace }}:/var/ktools
+      working-directory: ${{ github.workspace }}
+      run: |
+        docker run --entrypoint build-autotools.sh -v $(pwd):/var/ktools ktools-builder
+        ls ./tar
 
     - name: Build with Cmake
-      uses: addnab/docker-run-action@v3
-      with:
-        image: ktools-builder:latest
-        #shell: bash
-        options: -v ${{ github.workspace }}:/var/ktools
-        run: ./build-cmake.sh
+      working-directory: ${{ github.workspace }}
+      run: |
+        docker run --entrypoint build-cmake.sh -v $(pwd):/var/ktools ktools-builder
+        ls ./tar
+
+
+
+#    - name: Build with Autotools
+#      uses: addnab/docker-run-action@v3
+#      with:
+#        image: ktools-builder:latest
+#        #shell: bash
+#        run: ./build-autotools.sh
+#        #options: -v ${{ github.workspace }}:/var/ktools
+#
+#    - name: Build with Cmake
+#      uses: addnab/docker-run-action@v3
+#      with:
+#        image: ktools-builder:latest
+#        #shell: bash
+#        options: -v ${{ github.workspace }}:/var/ktools
+#        run: ./build-cmake.sh
 
     # Temp fix
     # https://github.com/docker/build-push-action/issues/252

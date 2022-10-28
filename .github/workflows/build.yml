@@ -67,7 +67,8 @@ jobs:
     - name: Create ktools-builder
       uses: docker/build-push-action@v3
       with:
-        push: false
+        push: false  # push image to remote reg
+        load: true   # load docker image as local image
         context: .
         tags: ktools-builder:latest
         file: jenkins/Dockerfile.clang-build

@@ -10,7 +10,7 @@ on:
 
 env:
   CREATE_KTOOLS_BUILDER: "${{ github.event_name == 'workflow_dispatch' && github.event.inputs.create_ktools_builder || 'false' }}"
-  IMAGE_KTOOLS_BUILDER: "coreoasis/ktools-builder" 
+  IMAGE_KTOOLS_BUILDER: "coreoasis/ktools-builder"
   TAG_KTOOLS_BUILDER: "latest"
 
 jobs:
@@ -49,7 +49,6 @@ jobs:
         path: x86/bin
         retention-days: 5
 
-
   build-linux:
     runs-on: ubuntu-latest
     steps:
@@ -69,15 +68,11 @@ jobs:
       run: |
         docker pull ${{ env.IMAGE_KTOOLS_BUILDER }}:${{ env.TAG_KTOOLS_BUILDER }}
 
-    - name: (Optional - create new build image)
+    - name: Create new build image (optional)
       if: env.CREATE_KTOOLS_BUILDER == 'true'
       run: |
         docker build -f jenkins/Dockerfile.clang-build -t ${{ env.IMAGE_KTOOLS_BUILDER }}:${{ env.TAG_KTOOLS_BUILDER }} .
         docker push ${{ env.IMAGE_KTOOLS_BUILDER }}:${{ env.TAG_KTOOLS_BUILDER }}
-
-    - name: Show images (DEBUG)
-      run: |
-        docker images
 
     - name: Build with Autotools
       working-directory: ${{ github.workspace }}

@@ -75,6 +75,10 @@ jobs:
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
 
+    - name: Show images (DEBUG)
+      run: |
+        docker images
+
     - name: Build with Autotools
       working-directory: ${{ github.workspace }}
       run: |

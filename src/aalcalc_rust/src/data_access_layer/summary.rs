@@ -38,6 +38,30 @@ impl Event {
 }
 
 
+/// Houses the data around a summary. 
+/// 
+/// # Fields
+/// * event_id: the ID of the event that the summary belongs to
+/// * summary_id: the ID of the summary
+/// * exposure_value: don't know will need to be filled in
+/// * events: the events belonging to the summary
+/// 
+/// # Constructing from bytes 
+/// The summary can be instructed from bytes by using the following code:
+/// 
+/// ```rust
+/// let mut file = File::open("path/to/bin/file.bin").unwrap();
+/// let mut meta_read_frame = [0; 12];
+/// 
+/// file.read_exact(&mut meta_read_frame)
+/// let mut chunked_meta_frame = meta_read_frame.chunks(4).into_iter();
+/// 
+/// let mut summary = Summary::from_bytes(
+///                         chunked_meta_frame.next().unwrap(), 
+///                         chunked_meta_frame.next().unwrap(), 
+///                         chunked_meta_frame.next().unwrap());
+///                
+/// ```
 #[derive(Debug, Clone)]
 pub struct Summary {
     pub event_id: i32,
@@ -48,6 +72,12 @@ pub struct Summary {
 
 impl Summary {
 
+    /// Constructs the ```Summary``` struct using bytes
+    /// 
+    /// # Arguments
+    /// * event_id: the ID of the event that the summary belongs to
+    /// * summary_id: the ID of the summary
+    /// * exposure_value: don't know will need to be filled in
     pub fn from_bytes(event_id: &[u8], summary_id: &[u8], exposure_value: &[u8]) -> Self {
         let events: Vec<Event> = vec![];
         return Summary { 
@@ -60,6 +90,13 @@ impl Summary {
 }
 
 
+/// Houses meta data around the loading and handling of summary data. 
+/// 
+/// # Fields 
+/// * handler: handles the reading and writing of a binary file
+/// * stream_id: the ID of the stream for the summary 
+/// * no_of_samples: The number of samples in the summary
+/// * summary_set: don't know will need to be filled in
 #[derive(Debug)]
 pub struct SummaryData {
     pub handler: File,
@@ -70,6 +107,13 @@ pub struct SummaryData {
 
 impl SummaryData {
 
+    /// The constructor for the SummaryData struct.
+    /// 
+    /// # Fields
+    /// * path: the path to the binary file that is going to read
+    /// 
+    /// # Returns 
+    /// The constructed ```SummaryData``` struct
     pub fn new(path: String) -> Self {
         let mut file = File::open(path).unwrap();
         let mut num_buffer = [0; 4];
@@ -89,6 +133,10 @@ impl SummaryData {
         }
     }
 
+    /// Gets all the summaries and events belonging to the summary in the binary file attached to the ```SummaryData``` struct.
+    /// 
+    /// # Returns
+    /// all the summaries in the binary file attached to the ```SummaryData``` struct
     pub fn get_data(&mut self) -> Vec<Summary> {
         let mut meta_read_frame = [0; 12];
         let mut event_read_frame = [0; 8];

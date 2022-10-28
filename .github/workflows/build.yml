@@ -71,7 +71,7 @@ jobs:
     - name: Create new build image (optional)
       if: env.CREATE_KTOOLS_BUILDER == 'true'
       run: |
-        docker build -f jenkins/Dockerfile.clang-build -t ${{ env.IMAGE_KTOOLS_BUILDER }}:${{ env.TAG_KTOOLS_BUILDER }} .
+        docker build -f build/Dockerfile.clang-build -t ${{ env.IMAGE_KTOOLS_BUILDER }}:${{ env.TAG_KTOOLS_BUILDER }} .
         docker push ${{ env.IMAGE_KTOOLS_BUILDER }}:${{ env.TAG_KTOOLS_BUILDER }}
 
     - name: Build with Autotools
@@ -124,7 +124,7 @@ jobs:
 #        load: true   # load docker image as local image
 #        context: .
 #        tags: ktools-builder:latest
-#        file: jenkins/Dockerfile.clang-build
+#        file: build/Dockerfile.clang-build
 #        #outputs: type=docker,dest=/tmp/myimage.tar
 #        cache-from: type=local,src=/tmp/.buildx-cache
 #        cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max

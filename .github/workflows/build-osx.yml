@@ -32,19 +32,3 @@ jobs:
         name: Darwin_x86_64
         path: x86/bin
         retention-days: 5
-
-#    - name: (MacOS) Build ktools arm64
-#      run: |
-#        BIN_TARGET=$(pwd)/arm64
-#        #make clean
-#        ./autogen.sh
-#        ./configure --enable-osx --enable-osx-arm --enable-o3 --prefix=$BIN_TARGET
-#        make check
-#        make install
-#
-#    - name: 'Upload Ktool binaries - arm64'
-#      uses: actions/upload-artifact@v2
-#      with:
-#        name: Darwin_arm64
-#        path: arm64/bin
-#        retention-days: 5

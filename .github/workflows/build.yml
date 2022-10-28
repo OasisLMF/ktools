@@ -2,14 +2,18 @@ name: compile-ktools
 on: [push]
 
 jobs:
-  build-macos:
+  build-osx:
     runs-on: macos-latest
     defaults:
       run:
         shell: bash
     steps:
-    - uses: actions/checkout@v2
-    - name: (MacOS) Install dependencies         
+    - name: Checkout
+      uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+
+    - name: (MacOS) Install dependencies
       run: |
         ln -s /usr/bin/shasum5.18 /usr/local/bin/sha1sum
         brew install \
@@ -32,3 +36,25 @@ jobs:
         name: Darwin_x86_64
         path: x86/bin
         retention-days: 5
+
+
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+
+    - name: Create ktools-builder
+      uses: docker/build-push-action@v3
+        with:
+          push: false
+          context: .
+          tags: ktools-builder:latest
+          file: jenkins/Dockerfile.clang-build
+          #outputs: type=docker,dest=/tmp/myimage.tar

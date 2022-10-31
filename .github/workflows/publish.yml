@@ -33,15 +33,27 @@ env:
 
 
 jobs:
-  linux_build:
+  build:
     uses: ./.github/workflows/build.yml
     secrets: inherit
     with:
       create_ktools_builder: 'false'
 
 
-#  osx_build:
-#    uses:
-#    secrets: inherit
+# https://github.com/marketplace/actions/download-workflow-artifact
+  create_release:
+    runs-on: ubuntu-latest
+    steps:
 
-#  create_release:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Download Linux binaies 
+      uses: actions/download-artifact@v3
+      with:
+        name: Linux_x86_64
+
+    - name: Download Darwin binaies 
+      uses: actions/download-artifact@v3
+      with:
+        name: Darwin_x86_64

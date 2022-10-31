@@ -1,7 +1,7 @@
-#name: Ktools Release 
+#name: Ktools Release
 #
 on:
-  # ONLY USE PUSH FOR TESTING --- delete this 
+  # ONLY USE PUSH FOR TESTING --- delete this
   push:
   workflow_dispatch:
     inputs:
@@ -36,6 +36,8 @@ jobs:
   linux_build:
     uses: ./.github/workflows/build.yml
     secrets: inherit
+    with:
+      create_ktools_builder: 'false'
 
 
 #  osx_build:

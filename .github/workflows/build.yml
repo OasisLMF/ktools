@@ -17,6 +17,7 @@ on:
         description: 'Rebuild the "coreoasis/ktools-builder:latest" image and push to docker hub, Options: [true, false]'
         required: true
         default: false
+        type: string
       
 
 env:

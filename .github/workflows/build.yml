@@ -2,7 +2,7 @@ name: compile-ktools
 on:
   push:
 
-  # For manual trigged builds  
+  # For manual trigged builds
   workflow_dispatch:
     inputs:
       create_ktools_builder:
@@ -10,7 +10,7 @@ on:
         required: true
         default: false
 
-  # For reusable workflows      
+  # For reusable workflows
   workflow_call:
     inputs:
       create_ktools_builder:
@@ -18,7 +18,7 @@ on:
         required: true
         default: false
         type: string
-      
+
 
 env:
   CREATE_KTOOLS_BUILDER: "${{ github.event_name == 'workflow_dispatch' && github.event.inputs.create_ktools_builder || 'false' }}"
@@ -54,11 +54,16 @@ jobs:
         make check
         make install
 
+    - name: Tarball bin files
+      run: |
+        cd ./x86/bin
+        tar -zcvf ${{ github.workspace }}/Darwin_x86_64.tar.gz ./
+
     - name: 'Upload Ktool binaries - x86'
       uses: actions/upload-artifact@v3
       with:
         name: Darwin_x86_64
-        path: x86/bin
+        path: Darwin_x86_64.tar.gz
         retention-days: 5
 
   build-linux:

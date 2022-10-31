@@ -1,12 +1,23 @@
 name: compile-ktools
 on:
   push:
+
+  # For manual trigged builds  
   workflow_dispatch:
     inputs:
       create_ktools_builder:
         description: 'Rebuild the "coreoasis/ktools-builder:latest" image and push to docker hub, Options: [true, false]'
         required: true
         default: false
+
+  # For reusable workflows      
+  workflow_call:
+    inputs:
+      create_ktools_builder:
+        description: 'Rebuild the "coreoasis/ktools-builder:latest" image and push to docker hub, Options: [true, false]'
+        required: true
+        default: false
+      
 
 env:
   CREATE_KTOOLS_BUILDER: "${{ github.event_name == 'workflow_dispatch' && github.event.inputs.create_ktools_builder || 'false' }}"

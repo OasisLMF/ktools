@@ -1,35 +1,45 @@
 #name: Ktools Release 
 #
-#on:
-#  workflow_dispatch:
-#    inputs:
-#      build_branch:
-#        description: 'Branch of build script repo - https://github.com/OasisLMF/build'
-#        required: true
-#        default: master
-#      RELEASE_TAG:
-#        description: 'Release tag to publish ktools as'
-#        required: true
-#        default: ''
-#      PREV_RELEASE_TAG:
-#        description: 'The last release, used for generating the changelog'
-#        required: true
-#        default: ''
-#      PRE_RELEASE:
-#        description: 'Mark release as pre-release'
-#        required: true
-#        default: false
-#      AUTO_MERGE:
-#        description: 'Run Git flow, git_merge(source_branch -> master) and then git_merge(master -> develop)'
-#        required: true
-#        default: false
-#
-#
-#env:
-#
-#jobs:
-#  linux_build:
-#
+on:
+  # ONLY USE PUSH FOR TESTING --- delete this 
+  push:
+  workflow_dispatch:
+    inputs:
+      build_branch:
+        description: 'Branch of build script repo - https://github.com/OasisLMF/build'
+        required: true
+        default: master
+      RELEASE_TAG:
+        description: 'Release tag to publish ktools as'
+        required: true
+        default: ''
+      PREV_RELEASE_TAG:
+        description: 'The last release, used for generating the changelog'
+        required: true
+        default: ''
+      PRE_RELEASE:
+        description: 'Mark release as pre-release'
+        required: true
+        default: false
+      AUTO_MERGE:
+        description: 'Run Git flow, git_merge(source_branch -> master) and then git_merge(master -> develop)'
+        required: true
+        default: false
+
+
+env:
+  MAIN_BRANCH: "test-master"
+  DEVELOP_BRANCH: "test-develop"
+
+
+jobs:
+  linux_build:
+    uses: ./.github/workflows/build.yml
+    secrets: inherit
+
+
 #  osx_build:
-#
+#    uses:
+#    secrets: inherit
+
 #  create_release:

@@ -102,25 +102,34 @@ jobs:
         git checkout ${{ github.ref_name }}
         git tag ${{ env.RELEASE_TAG }}
 
-    # --- Create release logs/notes ----- #
-    - name: clone build repository
-      uses: actions/checkout@v3
-      with:
-        repository: OasisLMF/build
-        fetch-depth: 1
-        ref: ${{ env.BUILD_BRANCH }}
-        path: ${{ env.BUILD_WORKSPACE }}
+    ## --- Create release logs/notes ----- #
+    #- name: clone build repository
+    #  uses: actions/checkout@v3
+    #  with:
+    #    repository: OasisLMF/build
+    #    fetch-depth: 1
+    #    ref: ${{ env.BUILD_BRANCH }}
+    #    path: ${{ env.BUILD_WORKSPACE }}
 
-    - name: Changelog create image
-      working-directory: ${{ env.BUILD_WORKSPACE }}
+    - name: Setup python 
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+        cache: 'pip' # caching pip dependencies
+
+    - name: Setup Changelog builder    
       run: |
-        docker build -f docker/Dockerfile.release-notes -t release-builder .
+        pip install click beautifulsoup4 PyGithub PyDriller
+        wget https://raw.githubusercontent.com/OasisLMF/${{ env.BUILD_BRANCH }}/master/buildscript/auto_changelog.py
+        chmod +x auto_changelog.py
+
+
 
     - name: Create changelog
       env:
         GITHUB_TOKEN: ${{ secrets.AWSBUILD_GIT_TOKEN }}
       run: |
-        docker run -v ${{ env.KTOOLS_WORKSPACE }}:/tmp release-builder build-changelog \
+        ./auto_changelog.py build-changelog \
           --repo ktools \
           --from-tag ${{ env.PREV_RELEASE_TAG }} \
           --to-tag ${{ env.RELEASE_TAG }} \
@@ -135,13 +144,46 @@ jobs:
 
     - name: Create Release notes
       run: |
-        docker run -v ${{ env.KTOOLS_WORKSPACE }}:/tmp release-builder build-release \
+        ./auto_changelog.py build-release \
           --repo ktools \
           --from-tag ${{ env.PREV_RELEASE_TAG }} \
           --to-tag ${{ env.RELEASE_TAG }} \
           --github-token ${{ secrets.AWSBUILD_GIT_TOKEN }} \
           --local-repo-path ./ \
           --output-path ./RELEASE.md
+
+
+#    - name: Changelog create image
+#      working-directory: ${{ env.BUILD_WORKSPACE }}
+#      run: |
+#        docker build -f docker/Dockerfile.release-notes -t release-builder .
+#
+#    - name: Create changelog
+#      env:
+#        GITHUB_TOKEN: ${{ secrets.AWSBUILD_GIT_TOKEN }}
+#      run: |
+#        docker run -v ${{ env.KTOOLS_WORKSPACE }}:/tmp release-builder build-changelog \
+#          --repo ktools \
+#          --from-tag ${{ env.PREV_RELEASE_TAG }} \
+#          --to-tag ${{ env.RELEASE_TAG }} \
+#          --github-token ${{ secrets.AWSBUILD_GIT_TOKEN }} \
+#          --local-repo-path ./ \
+#          --output-path ./CHANGELOG.rst
+#         #--apply-milestone
+#
+#        git add ./CHANGELOG.rst
+#        git commit -m 'Update changelog'
+#
+#
+#    - name: Create Release notes
+#      run: |
+#        docker run -v ${{ env.KTOOLS_WORKSPACE }}:/tmp release-builder build-release \
+#          --repo ktools \
+#          --from-tag ${{ env.PREV_RELEASE_TAG }} \
+#          --to-tag ${{ env.RELEASE_TAG }} \
+#          --github-token ${{ secrets.AWSBUILD_GIT_TOKEN }} \
+#          --local-repo-path ./ \
+#          --output-path ./RELEASE.md
 
 #    # --- Create release and attach bins ----- #
 #

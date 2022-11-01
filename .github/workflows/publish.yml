@@ -95,7 +95,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.AWSBUILD_GIT_TOKEN }}
       #if: ${{ env.AUTO_MERGE == 'true'}}
       run: |
-        git pull origin ${{ env.MAIN_BRANCH }} --allow-unrelated-histories
+        #git pull origin ${{ env.MAIN_BRANCH }} --allow-unrelated-histories
+        git fetch
         git checkout ${{ env.MAIN_BRANCH }}
         git merge ${{ github.ref_name }} --no-ff --no-commit
         git merge --abort 

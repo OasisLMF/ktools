@@ -87,6 +87,7 @@ jobs:
       run: | 
         git config --global user.email ${{ env.GIT_EMAIL }}
         git config --global user.name ${{ env.GIT_USERNAME }}
+        git config --global pull.ff only
 
     - name: Check for merge conflicts and tag
       working-directory: env.KTOOLS_WORKSPACE

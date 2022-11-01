@@ -166,6 +166,7 @@ jobs:
           --output-path ./RELEASE.md
 
     - name: Push changes
+      working-directory: ${{ env.KTOOLS_WORKSPACE }}
       run: |
         git push origin ${{ env.RELEASE_TAG  }}
         git push

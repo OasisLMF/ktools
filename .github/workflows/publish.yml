@@ -64,12 +64,12 @@ jobs:
 
     # -- test version tags ----- #
     - name: Check tag is valid for release
-      if: ${{ env.PRE_RELEASE }} == 'false'
+      if: ${{ env.PRE_RELEASE == 'false'}}
       run: |
         echo ${{ env.RELEASE_TAG }} | grep -Eq  "^v(0|[1-9]*)\.(0|[1-9]*)\.(0|[1-9]*)$" && echo 'Passed' || exit 1
 
     - name: Check tag is valid for pre-release
-      if: ${{ env.PRE_RELEASE }} == 'true'
+      if: ${{ env.PRE_RELEASE == 'true'}}
       run: |
         echo ${{ env.RELEASE_TAG }} | grep -Eq  "^v(0|[1-9]*)\.(0|[1-9]*)\.(0|[1-9]*)rc([1-9]*)$" && echo 'Passed' || exit 1
 

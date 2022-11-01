@@ -118,6 +118,7 @@ jobs:
         docker build -f docker/Dockerfile.release-notes -t release-builder .
 
     - name: Create changelog
+      working-directory: env.KTOOLS_WORKSPACE
       env:
         GITHUB_TOKEN: ${{ secrets.AWSBUILD_GIT_TOKEN }}
       run: |
@@ -126,7 +127,7 @@ jobs:
           --from-tag ${{ env.PREV_RELEASE_TAG }} \
           --to-tag ${{ env.RELEASE_TAG }} \
           --github-token ${{ secrets.AWSBUILD_GIT_TOKEN }} \
-          --local-repo-path ${{ env.BUILD_WORKSPACE }} \
+          --local-repo-path ./ \
          #--apply-milestone
           --output-path ./CHANGELOG.rst
         
@@ -136,12 +137,12 @@ jobs:
 
     - name: Create Release notes
       run: |
-        docker run -v ${{ env.BUILD_WORKSPACE }}:/tmp release-builder build-release \
+        docker run -v ${{ env.KTOOLS_WORKSPACE }}:/tmp release-builder build-release \
           --repo ktools \
           --from-tag ${{ env.PREV_RELEASE_TAG }} \
           --to-tag ${{ env.RELEASE_TAG }} \
           --github-token ${{ secrets.AWSBUILD_GIT_TOKEN }} \
-          --local-repo-path ${{ env.BUILD_WORKSPACE }} \
+          --local-repo-path ./ \
           --output-path ./RELEASE.md
 
 #    # --- Create release and attach bins ----- #

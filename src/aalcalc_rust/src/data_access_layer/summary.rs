@@ -10,6 +10,11 @@ use std::{fs::File, io::Read};
 #[derive(Debug, Clone)]
 pub struct Event {
     pub event_id: i32,
+    pub maximum_loss: Option<f32>,
+    pub numerical_mean: f32,
+    pub standard_deviation: Option<f32>,
+    pub sum: f32,
+    pub count: i32,
     pub losses: Vec<(i32, f32)>
 }
 
@@ -31,9 +36,28 @@ impl Event {
         if sidx_int == 0 && loss_float == 0.0 {
             return false
         }
-        self.losses.push((sidx_int, loss_float));
+
+        match sidx_int {
+            // -1 => {
+            //     println!("{}", loss_float);
+            //     self.numerical_mean += loss_float;
+            // },
+            -2 => {
+                self.standard_deviation = Some(loss_float);
+            },
+            -5 => {
+                self.maximum_loss = Some(loss_float);
+            },
+            _ => {
+                self.count += 1;
+                self.sum += loss_float;
+                self.losses.push((sidx_int, loss_float));
+            }
+        }
         return true
     }
+
+    // pub fn 
 
 }
 
@@ -154,7 +178,15 @@ impl SummaryData {
                         chunked_meta_frame.next().unwrap()
                     );
 
-                    let mut event = Event{event_id: summary.event_id.clone(), losses: vec![]};
+                    let mut event = Event{
+                        event_id: summary.event_id.clone(), 
+                        losses: vec![], 
+                        numerical_mean: 0.0, 
+                        standard_deviation: None,
+                        maximum_loss: None,
+                        sum: 0.0,
+                        count: 0
+                    };
 
                     // loop through adding the losses to the event
                     loop {

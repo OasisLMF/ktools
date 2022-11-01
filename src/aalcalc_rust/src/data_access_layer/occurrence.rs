@@ -148,6 +148,14 @@ impl OccurrenceData {
         return data
     }
 
+    /// Inserts an occurrence into the map. 
+    /// 
+    /// # Fields
+    /// map: the map in which the occurrence is going to be inserted into
+    /// occurrence: the occurrence that is going to be inserted into the map
+    /// 
+    /// # Returns 
+    /// the map with the inserted occurrence
     fn insert_occurrence(map: &mut HashMap<i32, Vec<Occurrence>>, occurrence: Occurrence) {
         match map.get_mut(&occurrence.event_id) {
             Some(data) => {

@@ -66,7 +66,7 @@ jobs:
 
     # -- test version tags ----- #
     - name: Check tag is valid for release
-      if: ${{ env.PRE_RELEASE == 'false'}}
+      if: env.PRE_RELEASE == 'false'
       run: |
         echo ${{ env.RELEASE_TAG }} | grep -Eq  "^v(0|[1-9]*)\.(0|[1-9]*)\.(0|[1-9]*)$" && ERROR_CODE=0 || ERROR_CODE=1
         if [[ "$ERROR_CODE" == 1 ]]; then 
@@ -74,7 +74,7 @@ jobs:
         fi     
 
     - name: Check tag is valid for pre-release
-      if: ${{ env.PRE_RELEASE == 'true'}}
+      if: env.PRE_RELEASE == 'true'
       run: |
         echo ${{ env.RELEASE_TAG }} | grep -Eq  "^v(0|[1-9]*)\.(0|[1-9]*)\.(0|[1-9]*)rc([1-9]*)$" && ERROR_CODE=0 || ERROR_CODE=1
         if [[ "$ERROR_CODE" == 1 ]]; then 
@@ -220,10 +220,10 @@ jobs:
         asset_content_type: application/octet-stream
 
     - name: Run Gitflow (Production)
+      if: env.AUTO_MERGE == 'true' && env.PRE_RELEASE == 'false'
       working-directory: ${{ env.KTOOLS_WORKSPACE }}
       env:
         GITHUB_TOKEN: ${{ secrets.AWSBUILD_GIT_TOKEN }}
-      if: ${{ env.AUTO_MERGE == 'true'}} && ${{ env.PRE_RELEASE == 'false'}}
       run: |
         git checkout ${{ env.MAIN_BRANCH }} && git pull
         git merge ${{ github.ref_name }} && git push
@@ -231,10 +231,10 @@ jobs:
         git merge ${{env.MAIN_BRANCH }} && git push
 
     - name: Run Gitflow (Release Candidate)
+      if: env.AUTO_MERGE == 'true' && env.PRE_RELEASE == 'true'
       working-directory: ${{ env.KTOOLS_WORKSPACE }}
       env:
         GITHUB_TOKEN: ${{ secrets.AWSBUILD_GIT_TOKEN }}
-      if: ${{ env.AUTO_MERGE == 'true'}} && ${{ env.PRE_RELEASE == 'true'}}
       run: |
         git checkout ${{ env.DEVELOP_BRANCH }} && git pull
         git merge ${{ github.ref_name }} && git push

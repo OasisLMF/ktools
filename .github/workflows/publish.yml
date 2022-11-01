@@ -5,23 +5,30 @@ on:
   push:
   workflow_dispatch:
     inputs:
+
       build_branch:
         description: 'Branch of build script repo - https://github.com/OasisLMF/build'
         required: true
         default: master
-      RELEASE_TAG:
+
+      release_tag:
         description: 'Release tag to publish ktools as'
         required: true
-        default: ''
-      PREV_RELEASE_TAG:
+        #default: ''
+        default: 'v3.9.5rc1'
+
+      prev_release_tag:
         description: 'The last release, used for generating the changelog'
         required: true
-        default: ''
-      PRE_RELEASE:
+        default: 'v3.9.4'
+
+      pre_release:
         description: 'Mark release as pre-release'
         required: true
-        default: false
-      AUTO_MERGE:
+        #default: false
+        default: true
+
+      auto_merge:
         description: 'Run Git flow, git_merge(source_branch -> master) and then git_merge(master -> develop)'
         required: true
         default: false
@@ -30,6 +37,11 @@ on:
 env:
   MAIN_BRANCH: "test-master"
   DEVELOP_BRANCH: "test-develop"
+  BUILD_WORKSPACE: oasis_build
+
+  NEW_RELEASE: ${{ inputs.release_tag  }}
+  PREV_RELEASE: ${{ inputs.prev_release_tag }}
+
 
 
 jobs:
@@ -40,14 +52,47 @@ jobs:
       create_ktools_builder: 'false'
 
 
-# https://github.com/marketplace/actions/download-workflow-artifact
+# https://github.com/marketplace/actions/check-version-format-in-tag
   create_release:
     runs-on: ubuntu-latest
     needs: build
     steps:
 
-    - name: Checkout
+    # -- test version tags ----- #
+    - name: Check tag is valid for release
+      if: inputs.pre_release == 'false'
+      run: |
+        echo env.NEW_RELEASE | grep -Eq  "^v(0|[1-9]*)\.(0|[1-9]*)\.(0|[1-9]*)$" && echo 'Passed' || exit 1
+
+    - name: Check tag is valid for pre-release
+      if: inputs.pre_release == 'true'
+      run: |
+        echo env.NEW_RELEASE | grep -Eq  "^v(0|[1-9]*)\.(0|[1-9]*)\.(0|[1-9]*)rc([1-9]*)$" && echo 'Passed' || exit 1
+
+#    # -- test can merge ----- #
+#    - name: Checkout
+#      uses: actions/checkout@v3
+#
+#    - name: Check for merge conflict
+#      run: |
+
+    # --- Create release logs/notes ----- #
+    - name: clone build repository
       uses: actions/checkout@v3
+      with:
+        repository: OasisLMF/build
+        fetch-depth: 1
+        ref: ${{ inputs.build_branch }}
+        path: ${{ env.BUILD_WORKSPACE }}
+
+#    - name: Create changelog and release notes
+#      run:
+#
+#    - name: commit changelogs
+#
+#
+#    # --- Create release and attach bins ----- #
+#
 
     - name: Download Linux binaies
       uses: actions/download-artifact@v3

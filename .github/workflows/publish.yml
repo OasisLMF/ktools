@@ -30,8 +30,6 @@ on:
 env:
   MAIN_BRANCH: "test-master"
   DEVELOP_BRANCH: "test-develop"
-
-  BUILD_WORKSPACE: ${{ github.workspace }}/oasis_build
   KTOOLS_WORKSPACE: ${{ github.workspace }}/ktools
 
   #BUILD_BRANCH: ${{ inputs.build_branch }}
@@ -53,11 +51,11 @@ env:
   GIT_EMAIL: 'awsbuild@oasislmf.org'
 
 jobs:
- # build:
- #   uses: ./.github/workflows/build.yml
- #   secrets: inherit
- #   with:
- #     create_ktools_builder: 'false'
+  build:
+    uses: ./.github/workflows/build.yml
+    secrets: inherit
+    with:
+      create_ktools_builder: 'false'
 
 
 # https://github.com/marketplace/actions/check-version-format-in-tag
@@ -84,6 +82,18 @@ jobs:
         fetch-depth: 0
         path: ${{ env.KTOOLS_WORKSPACE }}
 
+    - name: Check tag matches built version
+      working-directory: ${{ env.KTOOLS_WORKSPACE }}
+      run: |
+        BUILD_VER=$(cat VERSION.in)
+        RELEASE_VER=$(echo ${{ env.RELEASE_TAG }} | cut -c2-)
+        [[ "$RELEASE_VER" = "$BUILD_VER" ]] && echo 'Release tag matches version' || exit 1
+
+    - name: Check if tag exisits
+      working-directory: ${{ env.KTOOLS_WORKSPACE }}
+      run: |
+        git rev-parse -q --verify "refs/tags/v3.9.4" && echo "Tag exisits"; exit 1 || echo "Pass"
+
     - name: Setup github user
       run: |
         git config --global user.email ${{ env.GIT_EMAIL }}
@@ -102,21 +112,12 @@ jobs:
         git checkout ${{ github.ref_name }}
         git tag ${{ env.RELEASE_TAG }}
 
-    ## --- Create release logs/notes ----- #
-    #- name: clone build repository
-    #  uses: actions/checkout@v3
-    #  with:
-    #    repository: OasisLMF/build
-    #    fetch-depth: 1
-    #    ref: ${{ env.BUILD_BRANCH }}
-    #    path: ${{ env.BUILD_WORKSPACE }}
-
-    - name: Setup python 
+    - name: Setup python
       uses: actions/setup-python@v4
       with:
         python-version: '3.9'
 
-    - name: Setup Changelog builder    
+    - name: Setup Changelog builder
       working-directory: ${{ github.workspace }}
       run: |
         BASE_URL="https://raw.githubusercontent.com/OasisLMF/build/${{ env.BUILD_BRANCH }}/buildscript"
@@ -141,7 +142,6 @@ jobs:
         git add ./CHANGELOG.rst
         git commit -m 'Update changelog'
 
-
     - name: Create Release notes
       working-directory: ${{ env.KTOOLS_WORKSPACE }}
       run: |
@@ -153,48 +153,75 @@ jobs:
           --local-repo-path ./ \
           --output-path ./RELEASE.md
 
+    - name: Push changes
+      run: |
+        git push origin ${{ env.RELEASE_TAG  }}
+        git push
 
-#    - name: Changelog create image
-#      working-directory: ${{ env.BUILD_WORKSPACE }}
-#      run: |
-#        docker build -f docker/Dockerfile.release-notes -t release-builder .
-#
-#    - name: Create changelog
-#      env:
-#        GITHUB_TOKEN: ${{ secrets.AWSBUILD_GIT_TOKEN }}
-#      run: |
-#        docker run -v ${{ env.KTOOLS_WORKSPACE }}:/tmp release-builder build-changelog \
-#          --repo ktools \
-#          --from-tag ${{ env.PREV_RELEASE_TAG }} \
-#          --to-tag ${{ env.RELEASE_TAG }} \
-#          --github-token ${{ secrets.AWSBUILD_GIT_TOKEN }} \
-#          --local-repo-path ./ \
-#          --output-path ./CHANGELOG.rst
-#         #--apply-milestone
-#
-#        git add ./CHANGELOG.rst
-#        git commit -m 'Update changelog'
-#
-#
-#    - name: Create Release notes
-#      run: |
-#        docker run -v ${{ env.KTOOLS_WORKSPACE }}:/tmp release-builder build-release \
-#          --repo ktools \
-#          --from-tag ${{ env.PREV_RELEASE_TAG }} \
-#          --to-tag ${{ env.RELEASE_TAG }} \
-#          --github-token ${{ secrets.AWSBUILD_GIT_TOKEN }} \
-#          --local-repo-path ./ \
-#          --output-path ./RELEASE.md
-
-#    # --- Create release and attach bins ----- #
-#
+    # https://github.com/actions/create-release
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.AWSBUILD_GIT_TOKEN }}
+      with:
+        tag_name: ${{ env.RELEASE_TAG }}
+        release_name: Release ${{ env.RELEASE_TAG }}
+        body_path: ${{ env.KTOOLS_WORKSPACE }}/RELEASE.md
+        draft: false
+        prerelease: ${{ env.PRE_RELEASE }}
 
     - name: Download Linux binaies
       uses: actions/download-artifact@v3
       with:
         name: Linux_x86_64
+        path: Linux_x86_64.tar.gz
+
+    # https://github.com/actions/upload-release-asset
+    - name: Upload Linux binaies
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.AWSBUILD_GIT_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+        asset_path: ./Linux_x86_64.tar.gz
+        asset_name: Linux_x86_64.tar.gz
+        asset_content_type: application/octet-stream
 
     - name: Download Darwin binaies
       uses: actions/download-artifact@v3
       with:
         name: Darwin_x86_64
+        path: Darwin_x86_64.tar.gz
+
+    - name: Upload Darwin binaies
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.AWSBUILD_GIT_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+        asset_path: ./Darwin_x86_64.tar.gz
+        asset_name: Darwin_x86_64.tar.gz
+        asset_content_type: application/octet-stream
+
+    - name: Run Gitflow (Production)
+      working-directory: ${{ env.KTOOLS_WORKSPACE }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.AWSBUILD_GIT_TOKEN }}
+      if: ${{ env.AUTO_MERGE == 'true'}} && ${{ env.PRE_RELEASE == 'false'}}
+      run: |
+        git checkout ${{ env.MAIN_BRANCH }} && git pull
+        git merge ${{ github.ref_name }} && git push
+        git checkout ${{ env.DEVELOP_BRANCH }} && git pull
+        git merge ${{env.MAIN_BRANCH }} && git push
+
+    - name: Run Gitflow (Release Candidate)
+      working-directory: ${{ env.KTOOLS_WORKSPACE }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.AWSBUILD_GIT_TOKEN }}
+      if: ${{ env.AUTO_MERGE == 'true'}} && ${{ env.PRE_RELEASE == 'true'}}
+      run: |
+        git checkout ${{ env.DEVELOP_BRANCH }} && git pull
+        git merge ${{ github.ref_name }} && git push

@@ -9,29 +9,22 @@ on:
       build_branch:
         description: 'Branch of build script repo - https://github.com/OasisLMF/build'
         required: true
-        default: master
 
       release_tag:
         description: 'Release tag to publish ktools as'
         required: true
-        #default: ''
-        default: 'v3.9.5rc1'
 
       prev_release_tag:
         description: 'The last release, used for generating the changelog'
         required: true
-        default: 'v3.9.4'
 
       pre_release:
         description: 'Mark release as pre-release'
         required: true
-        #default: false
-        default: true
 
       auto_merge:
         description: 'Run Git flow, git_merge(source_branch -> master) and then git_merge(master -> develop)'
         required: true
-        default: false
 
 
 env:
@@ -40,15 +33,20 @@ env:
   BUILD_WORKSPACE: oasis_build
 
 
-  
+  #BUILD_BRANCH: ${{ inputs.build_branch }}
+  #RELEASE_TAG: ${{ inputs.release_tag }}
+  #PREV_RELEASE_TAG: ${{ inputs.prev_release_tag }}
+  #PRE_RELEASE: ${{ inputs.pre_release }}
+  #AUTO_MERGE: ${{ inputs.auto_merge }}
 
-  #NEW_RELEASE: ${{ inputs.release_tag  }}
-  #PREV_RELEASE: ${{ inputs.prev_release_tag }}
+# -- TESTING ONLY ---- 
 
-  PRE_RELEASE: ${{ github.event_name == 'push' && github.event.inputs.pre_release.default || inputs.pre_release }}
-  RELEASE_TAG: ${{ github.event_name == 'push' && github.event.inputs.release_tag.default || inputs.release_tag }}
-  PREV_RELEASE_TAG: ${{ github.event_name == 'push' && github.event.inputs.prev_release_tag.default || inputs.prev_release_tag }}
-  
+  BUILD_BRANCH: 'master' 
+  RELEASE_TAG: 'v3.9.5rc1'
+  PREV_RELEASE_TAG: 'v3.9.4' 
+  PRE_RELEASE: 'true' 
+  AUTO_MERGE: 'false' 
+
 
 jobs:
  # build:

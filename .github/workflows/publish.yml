@@ -61,7 +61,7 @@ jobs:
 # https://github.com/marketplace/actions/check-version-format-in-tag
   create_release:
     runs-on: ubuntu-latest
-    #needs: build
+    needs: build
     steps:
 
     # -- test version tags ----- #
@@ -179,7 +179,7 @@ jobs:
 
     # https://github.com/actions/upload-release-asset
     - name: Upload Linux binaies
-      id: upload-release-asset
+      id: upload-linux-release-asset
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.AWSBUILD_GIT_TOKEN }}
@@ -196,7 +196,7 @@ jobs:
         path: Darwin_x86_64.tar.gz
 
     - name: Upload Darwin binaies
-      id: upload-release-asset
+      id: upload-osx-release-asset
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.AWSBUILD_GIT_TOKEN }}

@@ -84,7 +84,7 @@ jobs:
       working-directory: env.KTOOLS_WORKSPACE
       #if: ${{ env.AUTO_MERGE == 'true'}}
       run: |
-        git fetch
+        git pull origin ${{ env.MAIN_BRANCH }} --allow-unrelated-histories
         git checkout ${{ env.MAIN_BRANCH }}
         git merge ${{ github.ref_name }} --no-ff --no-commit
         git merge --abort 

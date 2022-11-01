@@ -62,12 +62,12 @@ jobs:
     - name: Check tag is valid for release
       if: ${{ inputs.pre_release }} == 'false'
       run: |
-        echo ${{ env.NEW_RELEASE }} | grep -Eq  "^v(0|[1-9]*)\.(0|[1-9]*)\.(0|[1-9]*)$" && echo 'Passed' || exit 1
+        echo ${{ inputs.release_tag }} | grep -Eq  "^v(0|[1-9]*)\.(0|[1-9]*)\.(0|[1-9]*)$" && echo 'Passed' || exit 1
 
     - name: Check tag is valid for pre-release
       if: ${{ inputs.pre_release }} == 'true'
       run: |
-        echo ${{ env.NEW_RELEASE }} | grep -Eq  "^v(0|[1-9]*)\.(0|[1-9]*)\.(0|[1-9]*)rc([1-9]*)$" && echo 'Passed' || exit 1
+        echo ${{ inputs.release_tag }} | grep -Eq  "^v(0|[1-9]*)\.(0|[1-9]*)\.(0|[1-9]*)rc([1-9]*)$" && echo 'Passed' || exit 1
 
 #    # -- test can merge ----- #
 #    - name: Checkout

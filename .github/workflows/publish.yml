@@ -49,6 +49,9 @@ env:
   AUTO_MERGE: 'false' 
 
 
+  GIT_USERNAME: 'awsbuild'
+  GIT_EMAIL: 'awsbuild@oasislmf.org'
+
 jobs:
  # build:
  #   uses: ./.github/workflows/build.yml
@@ -80,8 +83,15 @@ jobs:
       with:
         path: env.KTOOLS_WORKSPACE
 
+    - name: Setup github user
+      run: | 
+        git config --global user.email ${{ env.GIT_EMAIL }}
+        git config --global user.name ${{ env.GIT_USERNAME }}
+
     - name: Check for merge conflicts and tag
       working-directory: env.KTOOLS_WORKSPACE
+      env:
+        GITHUB_TOKEN: ${{ secrets.AWSBUILD_GIT_TOKEN }}
       #if: ${{ env.AUTO_MERGE == 'true'}}
       run: |
         git pull origin ${{ env.MAIN_BRANCH }} --allow-unrelated-histories
@@ -106,6 +116,8 @@ jobs:
         docker build -f docker/Dockerfile.release-notes -t release-builder .
 
     - name: Create changelog
+      env:
+        GITHUB_TOKEN: ${{ secrets.AWSBUILD_GIT_TOKEN }}
       run: |
         docker run -v ${{ env.BUILD_WORKSPACE }}:/tmp release-builder build-changelog \
           --repo ktools \

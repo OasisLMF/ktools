@@ -119,7 +119,7 @@ jobs:
     - name: Setup Changelog builder    
       run: |
         pip install click beautifulsoup4 PyGithub PyDriller
-        wget https://raw.githubusercontent.com/OasisLMF/${{ env.BUILD_BRANCH }}/master/buildscript/auto_changelog.py
+        wget https://raw.githubusercontent.com/OasisLMF/${{ env.BUILD_BRANCH }}/buildscript/auto_changelog.py
         chmod +x auto_changelog.py
 
 

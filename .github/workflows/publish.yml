@@ -68,12 +68,20 @@ jobs:
     - name: Check tag is valid for release
       if: ${{ env.PRE_RELEASE == 'false'}}
       run: |
-        echo ${{ env.RELEASE_TAG }} | grep -Eq  "^v(0|[1-9]*)\.(0|[1-9]*)\.(0|[1-9]*)$" && echo 'Passed' || exit 1
+        echo ${{ env.RELEASE_TAG }} | grep -Eq  "^v(0|[1-9]*)\.(0|[1-9]*)\.(0|[1-9]*)$" && ERROR_CODE=0 || ERROR_CODE=1
+        if [[ "$ERROR_CODE" == 1 ]]; then 
+            echo "Release Tag ${{ env.RELEASE_TAG }} is not valid"
+            exit $ERROR_CODE
+        fi     
 
     - name: Check tag is valid for pre-release
       if: ${{ env.PRE_RELEASE == 'true'}}
       run: |
-        echo ${{ env.RELEASE_TAG }} | grep -Eq  "^v(0|[1-9]*)\.(0|[1-9]*)\.(0|[1-9]*)rc([1-9]*)$" && echo 'Passed' || exit 1
+        echo ${{ env.RELEASE_TAG }} | grep -Eq  "^v(0|[1-9]*)\.(0|[1-9]*)\.(0|[1-9]*)rc([1-9]*)$" && ERROR_CODE=0 || ERROR_CODE=1
+        if [[ "$ERROR_CODE" == 1 ]]; then 
+            echo "Release Tag ${{ env.RELEASE_TAG }} is not valid"
+            exit $ERROR_CODE
+        fi     
 
     # -- test can merge ----- #
     - name: Checkout
@@ -87,12 +95,18 @@ jobs:
       run: |
         BUILD_VER=$(cat VERSION.in)
         RELEASE_VER=$(echo ${{ env.RELEASE_TAG }} | cut -c2-)
-        [[ "$RELEASE_VER" = "$BUILD_VER" ]] && echo 'Release tag matches version' || exit 1
+        [[ "$RELEASE_VER" = "$BUILD_VER" ]] && ERROR_CODE=0 || ERROR_CODE=1
+        if [[ "$ERROR_CODE" == 1 ]]; then 
+            echo "BUILD_VER: $BUILD_VER stored in 'VERSION.in' dosn't match RELEASE_TAG: $RELEASE_VER"
+        fi     
 
     - name: Check if tag exisits
       working-directory: ${{ env.KTOOLS_WORKSPACE }}
       run: |
-        git rev-parse -q --verify "refs/tags/v3.9.4" && echo "Tag exisits"; exit 1 || echo "Pass"
+        git rev-parse -q --verify "refs/tags/${{ env.RELEASE_TAG }}" && ERROR_CODE=1 || ERROR_CODE=0
+        if [[ "$ERROR_CODE" == 1 ]]; then 
+            echo "TAG ${{ env.RELEASE_TAG }} exists in repository, can't create release with this tag"
+        fi     
 
     - name: Setup github user
       run: |

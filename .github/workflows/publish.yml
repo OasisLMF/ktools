@@ -39,10 +39,16 @@ env:
   DEVELOP_BRANCH: "test-develop"
   BUILD_WORKSPACE: oasis_build
 
-  NEW_RELEASE: ${{ inputs.release_tag  }}
-  PREV_RELEASE: ${{ inputs.prev_release_tag }}
 
+  
 
+  #NEW_RELEASE: ${{ inputs.release_tag  }}
+  #PREV_RELEASE: ${{ inputs.prev_release_tag }}
+
+  PRE_RELEASE: ${{ github.event_name == 'push' && github.event.inputs.pre_release.default || inputs.pre_release }}
+  RELEASE_TAG: ${{ github.event_name == 'push' && github.event.inputs.release_tag.default || inputs.release_tag }}
+  PREV_RELEASE_TAG: ${{ github.event_name == 'push' && github.event.inputs.prev_release_tag.default || inputs.prev_release_tag }}
+  
 
 jobs:
  # build:
@@ -60,14 +66,14 @@ jobs:
 
     # -- test version tags ----- #
     - name: Check tag is valid for release
-      if: ${{ inputs.pre_release }} == 'false'
+      if: ${{ env.PRE_RELEASE }} == 'false'
       run: |
-        echo ${{ inputs.release_tag }} | grep -Eq  "^v(0|[1-9]*)\.(0|[1-9]*)\.(0|[1-9]*)$" && echo 'Passed' || exit 1
+        echo ${{ env.RELEASE_TAG }} | grep -Eq  "^v(0|[1-9]*)\.(0|[1-9]*)\.(0|[1-9]*)$" && echo 'Passed' || exit 1
 
     - name: Check tag is valid for pre-release
-      if: ${{ inputs.pre_release }} == 'true'
+      if: ${{ env.PRE_RELEASE }} == 'true'
       run: |
-        echo ${{ inputs.release_tag }} | grep -Eq  "^v(0|[1-9]*)\.(0|[1-9]*)\.(0|[1-9]*)rc([1-9]*)$" && echo 'Passed' || exit 1
+        echo ${{ env.RELEASE_TAG }} | grep -Eq  "^v(0|[1-9]*)\.(0|[1-9]*)\.(0|[1-9]*)rc([1-9]*)$" && echo 'Passed' || exit 1
 
 #    # -- test can merge ----- #
 #    - name: Checkout

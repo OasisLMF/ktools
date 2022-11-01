@@ -70,8 +70,7 @@ jobs:
       run: |
         echo ${{ env.RELEASE_TAG }} | grep -Eq  "^v(0|[1-9]*)\.(0|[1-9]*)\.(0|[1-9]*)$" && ERROR_CODE=0 || ERROR_CODE=1
         if [[ "$ERROR_CODE" == 1 ]]; then 
-            echo "Release Tag ${{ env.RELEASE_TAG }} is not valid"
-            exit $ERROR_CODE
+            echo "Release Tag ${{ env.RELEASE_TAG }} is not valid" && exit $ERROR_CODE
         fi     
 
     - name: Check tag is valid for pre-release
@@ -79,8 +78,7 @@ jobs:
       run: |
         echo ${{ env.RELEASE_TAG }} | grep -Eq  "^v(0|[1-9]*)\.(0|[1-9]*)\.(0|[1-9]*)rc([1-9]*)$" && ERROR_CODE=0 || ERROR_CODE=1
         if [[ "$ERROR_CODE" == 1 ]]; then 
-            echo "Release Tag ${{ env.RELEASE_TAG }} is not valid"
-            exit $ERROR_CODE
+            echo "Release Tag ${{ env.RELEASE_TAG }} is not valid" && exit $ERROR_CODE
         fi     
 
     # -- test can merge ----- #
@@ -97,7 +95,7 @@ jobs:
         RELEASE_VER=$(echo ${{ env.RELEASE_TAG }} | cut -c2-)
         [[ "$RELEASE_VER" = "$BUILD_VER" ]] && ERROR_CODE=0 || ERROR_CODE=1
         if [[ "$ERROR_CODE" == 1 ]]; then 
-            echo "BUILD_VER: $BUILD_VER stored in 'VERSION.in' dosn't match RELEASE_TAG: $RELEASE_VER"
+            echo "BUILD_VER: $BUILD_VER stored in 'VERSION.in' dosn't match RELEASE_TAG: $RELEASE_VER" && exit $ERROR_CODE
         fi     
 
     - name: Check if tag exisits
@@ -105,7 +103,7 @@ jobs:
       run: |
         git rev-parse -q --verify "refs/tags/${{ env.RELEASE_TAG }}" && ERROR_CODE=1 || ERROR_CODE=0
         if [[ "$ERROR_CODE" == 1 ]]; then 
-            echo "TAG ${{ env.RELEASE_TAG }} exists in repository, can't create release with this tag"
+            echo "TAG ${{ env.RELEASE_TAG }} exists in repository, can't create release with this tag" && exit $ERROR_CODE
         fi     
 
     - name: Setup github user

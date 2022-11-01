@@ -126,8 +126,8 @@ jobs:
           --to-tag ${{ env.RELEASE_TAG }} \
           --github-token ${{ secrets.AWSBUILD_GIT_TOKEN }} \
           --local-repo-path ./ \
-         #--apply-milestone
           --output-path ./CHANGELOG.rst
+         #--apply-milestone
 
         git add ./CHANGELOG.rst
         git commit -m 'Update changelog'

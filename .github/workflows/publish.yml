@@ -105,14 +105,12 @@ jobs:
         docker build -f docker/Dockerfile.release-notes -t release-builder .
 
     - name: Create changelog
-      with:
-        gh_token: ${{ secrets.AWSBUILD_GIT_TOKEN }}
       run: |
         docker run -v ${{ env.BUILD_WORKSPACE }}:/tmp release-builder build-changelog \
           --repo ktools \
           --from-tag ${{ env.PREV_RELEASE_TAG }} \
           --to-tag ${{ env.RELEASE_TAG }} \
-          --github-token ${gh_token} \
+          --github-token ${{ secrets.AWSBUILD_GIT_TOKEN }} \
           --local-repo-path ${{ env.BUILD_WORKSPACE }} \
          #--apply-milestone
           --output-path ./CHANGELOG.rst
@@ -127,7 +125,7 @@ jobs:
           --repo ktools \
           --from-tag ${{ env.PREV_RELEASE_TAG }} \
           --to-tag ${{ env.RELEASE_TAG }} \
-          --github-token ${gh_token} \
+          --github-token ${{ secrets.AWSBUILD_GIT_TOKEN }} \
           --local-repo-path ${{ env.BUILD_WORKSPACE }} \
           --output-path ./RELEASE.md
 

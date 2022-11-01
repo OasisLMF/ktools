@@ -1,4 +1,4 @@
-name: compile-ktools
+name: Build Ktools
 on:
   push:
 
@@ -68,9 +68,6 @@ jobs:
 
   build-linux:
     runs-on: ubuntu-latest
-    #outputs:
-    #  output1: ${{ steps.step1.outputs.firstword }}
-    #  output2: ${{ steps.step2.outputs.secondword }}
     steps:
     - name: Checkout
       uses: actions/checkout@v3

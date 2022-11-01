@@ -1,54 +1,54 @@
-name: Ktools Release
+name: Release Ktools
 
 on:
-  # ONLY USE PUSH FOR TESTING --- delete this
-  push:
+  # ONLY USE PUSH FOR TESTING
+  #push:
   workflow_dispatch:
     inputs:
-
       build_branch:
-        description: 'Branch of build script repo - https://github.com/OasisLMF/build'
+        description: 'Branch of build script repo, used for running create changelog script'
         required: true
+        default: 'master'
 
       release_tag:
-        description: 'Release tag to publish ktools as'
+        description: 'Release tag to publish ktools, example: "v{n}.{n}.{n}" where n = int, e.g. v3.0.0,  if "pre_release=true" then valid formats are "v{n}.{n}.{n}rc{n}"'
         required: true
 
       prev_release_tag:
-        description: 'The last release, used for generating the changelog'
+        description: 'The last release, used for generating the changelog and release notes'
         required: true
 
       pre_release:
         description: 'Mark release as pre-release'
         required: true
+        default: 'false'
 
       auto_merge:
         description: 'Run Git flow, git_merge(source_branch -> master) and then git_merge(master -> develop)'
         required: true
-
+        default: 'true'
 
 env:
   MAIN_BRANCH: "test-master"
   DEVELOP_BRANCH: "test-develop"
   KTOOLS_WORKSPACE: ${{ github.workspace }}/ktools
 
-  #BUILD_BRANCH: ${{ inputs.build_branch }}
-  #RELEASE_TAG: ${{ inputs.release_tag }}
-  #PREV_RELEASE_TAG: ${{ inputs.prev_release_tag }}
-  #PRE_RELEASE: ${{ inputs.pre_release }}
-  #AUTO_MERGE: ${{ inputs.auto_merge }}
-
-# -- TESTING ONLY ----
-
-  BUILD_BRANCH: 'master'
-  RELEASE_TAG: 'v3.9.5rc1'
-  PREV_RELEASE_TAG: 'v3.9.4'
-  PRE_RELEASE: 'true'
-  AUTO_MERGE: 'false'
-
-
   GIT_USERNAME: 'awsbuild'
   GIT_EMAIL: 'awsbuild@oasislmf.org'
+
+  BUILD_BRANCH: ${{ inputs.build_branch }}
+  RELEASE_TAG: ${{ inputs.release_tag }}
+  PREV_RELEASE_TAG: ${{ inputs.prev_release_tag }}
+  PRE_RELEASE: ${{ inputs.pre_release }}
+  AUTO_MERGE: ${{ inputs.auto_merge }}
+
+## -- TESTING ONLY ----
+#
+#  BUILD_BRANCH: 'master'
+#  RELEASE_TAG: 'v3.9.5rc1'
+#  PREV_RELEASE_TAG: 'v3.9.4'
+#  PRE_RELEASE: 'true'
+#  AUTO_MERGE: 'false'
 
 jobs:
   build:
@@ -57,31 +57,28 @@ jobs:
     with:
       create_ktools_builder: 'false'
 
-
-# https://github.com/marketplace/actions/check-version-format-in-tag
   create_release:
     runs-on: ubuntu-latest
     needs: build
     steps:
 
-    # -- test version tags ----- #
+    # --_ test version tags and checkout --- #
     - name: Check tag is valid for release
       if: env.PRE_RELEASE == 'false'
       run: |
         echo ${{ env.RELEASE_TAG }} | grep -Eq  "^v(0|[1-9]*)\.(0|[1-9]*)\.(0|[1-9]*)$" && ERROR_CODE=0 || ERROR_CODE=1
-        if [[ "$ERROR_CODE" == 1 ]]; then 
+        if [[ "$ERROR_CODE" == 1 ]]; then
             echo "Release Tag ${{ env.RELEASE_TAG }} is not valid" && exit $ERROR_CODE
-        fi     
+        fi
 
     - name: Check tag is valid for pre-release
       if: env.PRE_RELEASE == 'true'
       run: |
         echo ${{ env.RELEASE_TAG }} | grep -Eq  "^v(0|[1-9]*)\.(0|[1-9]*)\.(0|[1-9]*)rc([1-9]*)$" && ERROR_CODE=0 || ERROR_CODE=1
-        if [[ "$ERROR_CODE" == 1 ]]; then 
+        if [[ "$ERROR_CODE" == 1 ]]; then
             echo "Release Tag ${{ env.RELEASE_TAG }} is not valid" && exit $ERROR_CODE
-        fi     
+        fi
 
-    # -- test can merge ----- #
     - name: Checkout
       uses: actions/checkout@v3
       with:
@@ -94,18 +91,19 @@ jobs:
         BUILD_VER=$(cat VERSION.in)
         RELEASE_VER=$(echo ${{ env.RELEASE_TAG }} | cut -c2-)
         [[ "$RELEASE_VER" = "$BUILD_VER" ]] && ERROR_CODE=0 || ERROR_CODE=1
-        if [[ "$ERROR_CODE" == 1 ]]; then 
+        if [[ "$ERROR_CODE" == 1 ]]; then
             echo "BUILD_VER: $BUILD_VER stored in 'VERSION.in' dosn't match RELEASE_TAG: $RELEASE_VER" && exit $ERROR_CODE
-        fi     
+        fi
 
     - name: Check if tag exisits
       working-directory: ${{ env.KTOOLS_WORKSPACE }}
       run: |
         git rev-parse -q --verify "refs/tags/${{ env.RELEASE_TAG }}" && ERROR_CODE=1 || ERROR_CODE=0
-        if [[ "$ERROR_CODE" == 1 ]]; then 
+        if [[ "$ERROR_CODE" == 1 ]]; then
             echo "TAG ${{ env.RELEASE_TAG }} exists in repository, can't create release with this tag" && exit $ERROR_CODE
-        fi     
+        fi
 
+    # --- Setup Changelog builder script --- #
     - name: Setup github user
       run: |
         git config --global user.email ${{ env.GIT_EMAIL }}
@@ -116,7 +114,6 @@ jobs:
       working-directory: ${{ env.KTOOLS_WORKSPACE }}
       env:
         GITHUB_TOKEN: ${{ secrets.AWSBUILD_GIT_TOKEN }}
-      #if: ${{ env.AUTO_MERGE == 'true'}}
       run: |
         git checkout ${{ env.MAIN_BRANCH }}
         git merge ${{ github.ref_name }} --no-ff --no-commit
@@ -171,7 +168,7 @@ jobs:
         git push origin ${{ env.RELEASE_TAG  }}
         git push
 
-    # https://github.com/actions/create-release
+    # --- Create Release --- #
     - name: Create Release
       id: create_release
       uses: actions/create-release@v1
@@ -190,14 +187,14 @@ jobs:
         name: Linux_x86_64
         path: ${{ github.workspace }}/
 
-    # https://github.com/actions/upload-release-asset
+    # --- Attach build assest --- #
     - name: Upload Linux binaies
       id: upload-linux-release-asset
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.AWSBUILD_GIT_TOKEN }}
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ${{ github.workspace }}/Linux_x86_64.tar.gz
         asset_name: Linux_x86_64.tar.gz
         asset_content_type: application/octet-stream
@@ -214,7 +211,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.AWSBUILD_GIT_TOKEN }}
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ${{ github.workspace }}/Darwin_x86_64.tar.gz
         asset_name: Darwin_x86_64.tar.gz
         asset_content_type: application/octet-stream

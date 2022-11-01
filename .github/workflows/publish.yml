@@ -81,6 +81,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
       with:
+        fetch-depth: 0
         path: env.KTOOLS_WORKSPACE
 
     - name: Setup github user
@@ -96,7 +97,6 @@ jobs:
       #if: ${{ env.AUTO_MERGE == 'true'}}
       run: |
         #git pull origin ${{ env.MAIN_BRANCH }} --allow-unrelated-histories
-        git fetch
         git checkout ${{ env.MAIN_BRANCH }}
         git merge ${{ github.ref_name }} --no-ff --no-commit
         git merge --abort 

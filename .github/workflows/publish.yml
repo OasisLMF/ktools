@@ -29,8 +29,8 @@ on:
         default: 'true'
 
 env:
-  MAIN_BRANCH: "test-master"
-  DEVELOP_BRANCH: "test-develop"
+  MAIN_BRANCH: "master"
+  DEVELOP_BRANCH: "develop"
   KTOOLS_WORKSPACE: ${{ github.workspace }}/ktools
 
   GIT_USERNAME: 'awsbuild'

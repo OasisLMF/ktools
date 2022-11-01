@@ -30,8 +30,9 @@ on:
 env:
   MAIN_BRANCH: "test-master"
   DEVELOP_BRANCH: "test-develop"
-  BUILD_WORKSPACE: oasis_build
 
+  BUILD_WORKSPACE: ${{ github.workspace }}/oasis_build
+  KTOOLS_WORKSPACE: ${{ github.workspace }}/ktools
 
   #BUILD_BRANCH: ${{ inputs.build_branch }}
   #RELEASE_TAG: ${{ inputs.release_tag }}
@@ -73,38 +74,63 @@ jobs:
       run: |
         echo ${{ env.RELEASE_TAG }} | grep -Eq  "^v(0|[1-9]*)\.(0|[1-9]*)\.(0|[1-9]*)rc([1-9]*)$" && echo 'Passed' || exit 1
 
-#    # -- test can merge ----- #
-#    - name: Checkout
-#      uses: actions/checkout@v3
-#
-#    - name: Check for merge conflict
-#      run: |
+    # -- test can merge ----- #
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        path: env.KTOOLS_WORKSPACE
 
-#    # --- Create release logs/notes ----- #
-#    - name: clone build repository
-#      uses: actions/checkout@v3
-#      with:
-#        repository: OasisLMF/build
-#        fetch-depth: 1
-#        ref: ${{ inputs.build_branch }}
-#        path: ${{ env.BUILD_WORKSPACE }}
-#
-#    - name: Changelog create image
-#      working-directory: env.BUILD_WORKSPACE
-#      run: |
-#        docker build -f docker/Dockerfile.release-notes -t release-builder .
-#
-#    - name: Create changelog
-#      run: |
-#        docker run -v ${{ env.BUILD_WORKSPACE }}:/tmp release-builder build-changelog --repo ktools --from-tag ${{ }} --to-tag ${{ }} --github-token ${gh_token} --local-repo-path ./ --output-path ./CHANGELOG.rst --apply-milestone
-#
-#    - name: Create Release notes
-#      run: |
+    - name: Check for merge conflicts and tag
+      working-directory: env.KTOOLS_WORKSPACE
+      #if: ${{ env.AUTO_MERGE == 'true'}}
+      run: |
+        git checkout ${{ env.MAIN_BRANCH }}
+        git merge ${{ github.ref_name }} --no-ff --no-commit
+        git merge --abort 
+        git checkout ${{ github.ref_name }}
+        git tag ${{ env.RELEASE_TAG }}
 
-#
-#    - name: commit changelogs
-#
-#
+    # --- Create release logs/notes ----- #
+    - name: clone build repository
+      uses: actions/checkout@v3
+      with:
+        repository: OasisLMF/build
+        fetch-depth: 1
+        ref: ${{ env.BUILD_BRANCH }}
+        path: ${{ env.BUILD_WORKSPACE }}
+
+    - name: Changelog create image
+      working-directory: env.BUILD_WORKSPACE
+      run: |
+        docker build -f docker/Dockerfile.release-notes -t release-builder .
+
+    - name: Create changelog
+      with:
+        gh_token: ${{ secrets.AWSBUILD_GIT_TOKEN }}
+      run: |
+        docker run -v ${{ env.BUILD_WORKSPACE }}:/tmp release-builder build-changelog \
+          --repo ktools \
+          --from-tag ${{ env.PREV_RELEASE_TAG }} \
+          --to-tag ${{ env.RELEASE_TAG }} \
+          --github-token ${gh_token} \
+          --local-repo-path ${{ env.BUILD_WORKSPACE }} \
+         #--apply-milestone
+          --output-path ./CHANGELOG.rst
+        
+        git add ./CHANGELOG.rst
+        git commit -m 'Update changelog'
+
+
+    - name: Create Release notes
+      run: |
+        docker run -v ${{ env.BUILD_WORKSPACE }}:/tmp release-builder build-release \
+          --repo ktools \
+          --from-tag ${{ env.PREV_RELEASE_TAG }} \
+          --to-tag ${{ env.RELEASE_TAG }} \
+          --github-token ${gh_token} \
+          --local-repo-path ${{ env.BUILD_WORKSPACE }} \
+          --output-path ./RELEASE.md
+
 #    # --- Create release and attach bins ----- #
 #
 

@@ -28,7 +28,6 @@ env:
   CREATE_KTOOLS_BUILDER: "${{ github.event_name == 'workflow_dispatch' && github.event.inputs.create_ktools_builder || 'false' }}"
   IMAGE_KTOOLS_BUILDER: "coreoasis/ktools-builder"
   TAG_KTOOLS_BUILDER: "latest"
-  #KTOOLS_BRANCH: "${{ inputs.ktools_branch == "" && github.ref_name || inputs.ktools_branch  }}"
   KTOOLS_BRANCH: ${{ github.ref_name }}
 
 jobs:
@@ -38,6 +37,10 @@ jobs:
       run:
         shell: bash
     steps:
+    - name: Set input - ktools_branch
+    if: inputs.ktools_branch != ''
+    run: echo "KTOOLS_BRANCH=${{ inputs.ktools_branch }}" >> $GITHUB_ENV
+
     - name: Checkout
       uses: actions/checkout@v3
       with:
@@ -75,6 +78,10 @@ jobs:
   build-linux:
     runs-on: ubuntu-latest
     steps:
+    - name: Set input - ktools_branch
+    if: inputs.ktools_branch != ''
+    run: echo "KTOOLS_BRANCH=${{ inputs.ktools_branch }}" >> $GITHUB_ENV
+
     - name: Checkout
       uses: actions/checkout@v3
       with:

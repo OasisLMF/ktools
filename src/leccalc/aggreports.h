@@ -70,6 +70,7 @@ private:
 	const bool *outputFlags_;
 	const bool ordFlag_;
 	const std::string *parquetFileNames_;
+	const char *progname_;
 	bool eptHeader_ = true;
 	bool pseptHeader_ = true;
 	std::map<int, bool> wheatSheaf_ = {
@@ -234,7 +235,8 @@ private:
 public:
 	aggreports(const int totalperiods, FILE **fout,
 		   const bool useReturnPeriodFile, const bool *outputFlags,
-		   const bool ordFlag, const std::string *parquetFileNames);
+		   const bool ordFlag, const std::string *parquetFileNames,
+		   const char *progname);
 	void SetInputData(const std::set<int> &summaryids,
 			  std::vector<std::map<outkey2, OutLosses>> &out_loss);
 	void SetSampleSize(const int samplesize);

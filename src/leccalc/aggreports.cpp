@@ -46,13 +46,16 @@ bool operator<(const wheatkey &lhs, const wheatkey &rhs) {
 aggreports::aggreports(const int totalperiods, FILE **fout,
 		       const bool useReturnPeriodFile, const bool *outputFlags,
 		       const bool ordFlag,
-		       const std::string *parquetFileNames) :
+		       const std::string *parquetFileNames,
+		       const char *progname) :
 	totalperiods_(totalperiods), fout_(fout),
 	useReturnPeriodFile_(useReturnPeriodFile), outputFlags_(outputFlags),
-	ordFlag_(ordFlag), parquetFileNames_(parquetFileNames)
+	ordFlag_(ordFlag), parquetFileNames_(parquetFileNames),
+	progname_(progname)
 {
 
   LoadReturnPeriods();
+  logprintf(progname_, "INFO", "loss,next_rp_val,last_rp,last_loss,current_rp,current_loss\n");
 
 }
 
@@ -258,6 +261,9 @@ void aggreports::WriteReturnPeriodOut(const std::vector<int> &fileIDs,
 
     OASIS_FLOAT loss = GetLoss(nextreturnperiod_value, last_return_period,
 			       last_loss, current_return_period, current_loss);
+    logprintf(progname_, "INFO", "%f,%f,%f,%f,%f,%f\n", loss,
+	      nextreturnperiod_value, last_return_period, last_loss,
+	      current_return_period, current_loss);
     if (WriteOutput != nullptr) {
     	(this->*WriteOutput)(fileIDs, summary_id, epcalc, eptype,
 			     nextreturnperiod_value, loss);

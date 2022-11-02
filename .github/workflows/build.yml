@@ -18,17 +18,18 @@ on:
         required: true
         default: false
         type: string
-#      ktools_branch:
-#        description: 'For Remote calls, override the ktools branch with value'
-#        required: false
-#        type: string
+      ktools_branch:
+        description: 'For Remote calls, override the ktools branch with value'
+        required: false
+        type: string
 
 
 env:
   CREATE_KTOOLS_BUILDER: "${{ github.event_name == 'workflow_dispatch' && github.event.inputs.create_ktools_builder || 'false' }}"
   IMAGE_KTOOLS_BUILDER: "coreoasis/ktools-builder"
   TAG_KTOOLS_BUILDER: "latest"
-  KTOOLS_BRANCH: "${{ inputs.ktools_branch == "" && github.ref_name || inputs.ktools_branch  }}"
+  #KTOOLS_BRANCH: "${{ inputs.ktools_branch == "" && github.ref_name || inputs.ktools_branch  }}"
+  KTOOLS_BRANCH: ${{ github.ref_name }}
 
 jobs:
   build-osx:

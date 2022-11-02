@@ -64,7 +64,7 @@ namespace leccalc {
 	void doit(const std::string &subfolder, FILE **fout,
 		  const bool useReturnPeriodFile, const bool skipheader,
 		  bool *outputFlags, bool ordFlag,
-		  const std::string *parquetFileNames);
+		  const std::string *parquetFileNames, const char *progname);
 }
 
 
@@ -242,7 +242,7 @@ int main(int argc, char* argv[])
 		initstreams();
         	logprintf(progname, "INFO", "starting process..\n");
 		leccalc::doit(subfolder, fout, useReturnPeriodFile, skipheader,
-			      outputFlags, ordFlag, parquetOutFiles);
+			      outputFlags, ordFlag, parquetOutFiles, progname);
         	logprintf(progname, "INFO", "finishing process..\n");
 		return EXIT_SUCCESS;
 	} catch (std::bad_alloc&) {

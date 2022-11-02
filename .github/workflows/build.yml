@@ -44,6 +44,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
       with:
+        repository: OasisLMF/ktools
         ref: ${{ env.KTOOLS_BRANCH }}
 
     - name: (MacOS) Install dependencies
@@ -85,6 +86,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
       with:
+        repository: OasisLMF/ktools
         ref: ${{ env.KTOOLS_BRANCH }}
 
     - name: Login to Docker Hub

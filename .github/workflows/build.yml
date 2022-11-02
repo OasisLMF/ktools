@@ -18,11 +18,10 @@ on:
         required: true
         default: false
         type: string
-      ktools_branch:
-        description: 'For Remote calls, override the ktools branch with value'
-        required: false
-        default: ''
-        type: string
+#      ktools_branch:
+#        description: 'For Remote calls, override the ktools branch with value'
+#        required: false
+#        type: string
 
 
 env:

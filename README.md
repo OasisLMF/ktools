@@ -1,8 +1,7 @@
 <img src="https://oasislmf.org/packages/oasis_theme_package/themes/oasis_theme/assets/src/oasis-lmf-colour.png" alt="Oasis LMF logo" width="250"/>
 
  [![ktools version](https://img.shields.io/github/tag/Oasislmf/ktools?label=ktools)](https://github.com/OasisLMF/ktools/releases)
- [![Travis (.com) branch](https://img.shields.io/travis/com/OasisLMF/ktools/master?label=Build%20OSX%20)](https://travis-ci.com/OasisLMF/ktools)
-[![Build Status](https://ci.oasislmfdev.org/buildStatus/icon?job=oasis_ktools/master)](https://ci.oasislmfdev.org/job/oasis_ktools/job/master/)
+[![Build Status](https://github.com/OasisLMF/ktools/actions/workflows/build.yml/badge.svg)](https://github.com/OasisLMF/ktools/actions/workflows/build.yml)
 
 # ktools
 
@@ -10,13 +9,13 @@ This is the POSIX-compliant Oasis LMF In-Memory Kernel toolkit.
 
 ### Release
 
-Please click [here](https://github.com/OasisLMF/ktools/releases) to download the latest release. 
+Please click [here](https://github.com/OasisLMF/ktools/releases) to download the latest release.
 
 The source code will change on a regular basis but only the releases are supported. Support enquiries should be sent to support@oasislmf.org.
 
-There are build instructions for Windows 64-bit executables. 
+There are build instructions for Windows 64-bit executables.
 
-Note that the dynamic random number option in the Windows build uses a deterministic seed due to a bug in the mingw compiler. We recommend the random number file option (gulcalc -r) should be used in Windows. 
+Note that the dynamic random number option in the Windows build uses a deterministic seed due to a bug in the mingw compiler. We recommend the random number file option (gulcalc -r) should be used in Windows.
 
 This issue will be handled in future releases by implementing the rdrand random number generator in all environments.
 
@@ -26,7 +25,7 @@ This issue will be handled in future releases by implementing the rdrand random 
 
 The g++ compiler build-essential, libtool, zlib1g-dev, autoconf, pkg-config on debian distros or 'Development Tools' and zlib-devel on red hat  needs to be installed in Linux.
 
-To enable Parquet format outputs (optional), version 7.0.0 of the Arrow Apache library is required. The recommended method is to build the library from source as follows; 
+To enable Parquet format outputs (optional), version 7.0.0 of the Arrow Apache library is required. The recommended method is to build the library from source as follows;
 
 ```
 $ mkdir build
@@ -83,7 +82,7 @@ Finally, install the executables using the following command;
 $ [sudo] make install
 ```
 
-The installation is complete. The executables are located in /usr/local/bin. 
+The installation is complete. The executables are located in /usr/local/bin.
 
 If installing the latest code from the git repository, clone the ktools repository onto your machine.
 
@@ -97,7 +96,7 @@ $ ./autogen.sh
 Follow the rest of the process as described above.
 
 
-### Cmake build - Experimental 
+### Cmake build - Experimental
 
 Install Cmake from either system packages or [cmake.org](https://cmake.org/download/).
 
@@ -121,7 +120,7 @@ $ make install
 MSYS2 64-bit is required for the Windows native build.  MSYS2 is a Unix/Linux like development environment for building and distributing windows applications.
 https://www.msys2.org/
 
-Download and run the set-up program for MSYS2 64-bit. 
+Download and run the set-up program for MSYS2 64-bit.
 
 Open a MSYS2 terminal and perform the updates before continuing.
 
@@ -175,17 +174,17 @@ Finally, install the executables using the following command;
 $ make install
 ```
 
-The installation is complete. The executables are located in /usr/local/bin. 
+The installation is complete. The executables are located in /usr/local/bin.
 
 ## Usage
 
-There is sample data and six example scripts which demonstrate how to invoke ktools in the /examples folder. These are written in python v2. 
+There is sample data and six example scripts which demonstrate how to invoke ktools in the /examples folder. These are written in python v2.
 
 For example, to run the eltcalc_example script, go into the examples folder and run the following command (you must have python installed):
 
 ``` sh
 $ cd examples
-$ python eltcalc_example.py 
+$ python eltcalc_example.py
 ```
 
 To build linux docker image do following command

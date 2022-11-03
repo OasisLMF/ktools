@@ -55,6 +55,7 @@ impl Occurrence {
 /// * period_number: the period bin that the occurrence belongs to
 /// * handler: handles the reading and writing of the binary file
 /// * chunk_size: the number of bytes each occurrence takes (subject to change based on date format)
+#[derive(Debug)]
 pub struct OccurrenceData {
     pub date_format: DateFormat,
     pub period_number: i32,

@@ -38,10 +38,9 @@ impl Event {
         }
 
         match sidx_int {
-            // -1 => {
-            //     println!("{}", loss_float);
-            //     self.numerical_mean += loss_float;
-            // },
+            -1 => {
+                self.numerical_mean += loss_float;
+            },
             -2 => {
                 self.standard_deviation = Some(loss_float);
             },
@@ -56,8 +55,6 @@ impl Event {
         }
         return true
     }
-
-    // pub fn 
 
 }
 

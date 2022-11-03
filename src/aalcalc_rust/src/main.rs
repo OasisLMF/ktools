@@ -3,7 +3,7 @@
 mod data_access_layer;
 use data_access_layer::occurrence::OccurrenceData;
 use data_access_layer::summary::{SummaryData};
-use std::sync::{Arc, Mutex};
+use std::sync::Arc;
 use std::collections::HashMap;
 
 
@@ -22,6 +22,7 @@ async fn main() {
     // let sidx_totals: Arc<Mutex<HashMap<i32, f32>>> = Arc::new(Mutex::new(HashMap::new()));
     let mut sidx_totals: HashMap<i32, f32> = HashMap::new();
     let mut ni_loss = 0.0;
+    let mut ni_loss_squared = 0.0;
 
     let mut sample_size = 0;
     let mut total_loss = 0.0;
@@ -47,11 +48,11 @@ async fn main() {
                             let raw_loss = loss.1;
                             let loss = loss.1 * occ_num as f32;
 
-                            total_loss += loss;
                             sample_size += occ_num;
 
                             for _ in 0..occ_num {
                                 squared_total_loss += raw_loss * raw_loss;
+                                total_loss += raw_loss;
                             }
 
                             match sidx_totals.get_mut(&sidx) {
@@ -64,8 +65,12 @@ async fn main() {
                             }
  
                         }
-                        // need to work out why this isn't working
-                        ni_loss += event.numerical_mean;
+
+                        for _ in 0..occ_num {
+                            ni_loss += event.numerical_mean;
+                            ni_loss_squared += event.numerical_mean * event.numerical_mean;
+                        }
+                        // ni_loss += event.numerical_mean * occ_num as f32;
                     }
 
                     // drop(internal_sidx_totals);
@@ -91,14 +96,18 @@ async fn main() {
         }
     }
 
+    let number_of_years = sidx_totals.keys().len() as i32;
+
+    // standard deviation run experimental
+    let alpha = (ni_loss * ni_loss) / number_of_years as f32;
+    let beta = (ni_loss_squared - alpha) / (number_of_years as f32 - 1.0);
+    let std_dev = f32::sqrt(beta);
+
+    println!("The test standard deviation is: {}", std_dev);
 
 
-    println!("{:?}", sidx_totals);
+    println!("{:?}", occurrences);
 
-    // need to sort this out and work out why the numerical_mean reference isn't working
-    let ni_loss = sidx_totals.get(&-1).unwrap().clone();
-
-    let number_of_years = sidx_totals.keys().len() as i32 - 1;
     let type_one_ni = ni_loss / number_of_years as f32;
     let type_two_sample = total_sample_losses / (number_of_years * number_of_years) as f32;
 

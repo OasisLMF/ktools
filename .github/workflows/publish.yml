@@ -146,7 +146,7 @@ jobs:
           --github-token ${{ secrets.AWSBUILD_GIT_TOKEN }} \
           --local-repo-path ./ \
           --output-path ./CHANGELOG.rst
-         #--apply-milestone
+          --apply-milestone
 
         git add ./CHANGELOG.rst
         git commit -m 'Update changelog'

@@ -31,7 +31,7 @@ env:
   KTOOLS_BRANCH: ${{ github.ref_name }}
 
 jobs:
-  build-osx:
+  osx:
     runs-on: macos-latest
     defaults:
       run:
@@ -76,7 +76,7 @@ jobs:
         path: Darwin_x86_64.tar.gz
         retention-days: 5
 
-  build-linux:
+  linux:
     runs-on: ubuntu-latest
     steps:
     - name: Set input - ktools_branch

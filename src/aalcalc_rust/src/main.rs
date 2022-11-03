@@ -115,7 +115,6 @@ async fn main() {
     let sd_dev = f64::sqrt(s2 as f64);
 
 
-
     // drop(totals);
     println!("standard deviation: {}", sd_dev);
     println!("total sample losses: {:?}", total_sample_losses);

@@ -1,13 +1,16 @@
 name: Ktools Build
 on:
   #push:
-  # For manual trigged builds
   workflow_dispatch:
     inputs:
       create_ktools_builder:
         description: 'Rebuild the "coreoasis/ktools-builder:latest" image and push to docker hub, Options: [true, false]'
         required: true
         default: false
+      skip_cmake:
+        description: 'Skip the optional build with CMake step [true, false]'
+        required: false
+        type: string
 
   # For reusable workflows
   workflow_call:
@@ -21,6 +24,10 @@ on:
         description: 'For Remote calls, override the ktools branch with value'
         required: false
         type: string
+      skip_cmake:
+        description: 'Skip the optional build with CMake step [true, false]'
+        required: false
+        type: string
 
 
 env:
@@ -28,6 +35,7 @@ env:
   IMAGE_KTOOLS_BUILDER: "coreoasis/ktools-builder"
   TAG_KTOOLS_BUILDER: "latest"
   KTOOLS_BRANCH: ${{ github.ref_name }}
+  SKIP_CMAKE: 'false'
 
 jobs:
   osx:
@@ -45,6 +53,10 @@ jobs:
     - name: Set input - ktools_branch
       if: inputs.ktools_branch != ''
       run: echo "KTOOLS_BRANCH=${{ inputs.ktools_branch }}" >> $GITHUB_ENV
+
+    - name: Set input - skip_cmake
+      if: inputs.skip_cmake == 'true'
+      run: echo "SKIP_CMAKE=true" >> $GITHUB_ENV
 
     - name: Checkout
       uses: actions/checkout@v3
@@ -117,16 +129,17 @@ jobs:
         docker build -f build/Dockerfile.clang-build -t ${{ env.IMAGE_KTOOLS_BUILDER }}:${{ env.TAG_KTOOLS_BUILDER }} .
         docker push ${{ env.IMAGE_KTOOLS_BUILDER }}:${{ env.TAG_KTOOLS_BUILDER }}
 
+    - name: Build with Cmake
+      if: env.SKIP_CMAKE == 'false'
+      working-directory: ${{ github.workspace }}
+      run: |
+        docker run --entrypoint build-cmake.sh -v $(pwd):/var/ktools ${{ env.IMAGE_KTOOLS_BUILDER }}:${{ env.TAG_KTOOLS_BUILDER }}
+        ls -la ./tar
+
     - name: Build with Autotools
       working-directory: ${{ github.workspace }}
       run: |
         docker run --entrypoint build-autotools.sh -v $(pwd):/var/ktools ${{ env.IMAGE_KTOOLS_BUILDER }}:${{ env.TAG_KTOOLS_BUILDER }}
-        ls -la ./tar
-
-    - name: Build with Cmake
-      working-directory: ${{ github.workspace }}
-      run: |
-        docker run --entrypoint build-cmake.sh -v $(pwd):/var/ktools ${{ env.IMAGE_KTOOLS_BUILDER }}:${{ env.TAG_KTOOLS_BUILDER }}
         ls -la ./tar
 
     - name: 'Store Linux build'

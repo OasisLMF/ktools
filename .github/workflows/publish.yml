@@ -2,7 +2,7 @@ name: Ktools Release
 
 on:
   # ONLY USE PUSH FOR TESTING
-  push:
+  #push:
   workflow_dispatch:
     inputs:
       release_tag:
@@ -24,28 +24,28 @@ on:
         default: 'true'
 
 env:
-#  MAIN_BRANCH: "master"     # Gitflow - Production branch for ktools repo
-#  DEVELOP_BRANCH: "develop" # Gitflow - Develop branch for ktools repo
+  MAIN_BRANCH: "master"     # Gitflow - Production branch for ktools repo
+  DEVELOP_BRANCH: "develop" # Gitflow - Develop branch for ktools repo
   BUILD_SCRIPTS: "master"    # build scripts branch
   KTOOLS_WORKSPACE: ${{ github.workspace }}/ktools
   KTOOLS_TEST_DIR: ${{ github.workspace }}/bin_check
 
 
-#  KTOOLS_VER: ${{ inputs.release_tag }}
-#  RELEASE_TAG: "v${{ inputs.release_tag }}"
-#  PREV_RELEASE_TAG: "v${{ inputs.prev_release_tag }}"
-#  PRE_RELEASE: ${{ inputs.pre_release }}
-#  AUTO_MERGE: ${{ inputs.auto_merge }}
+  KTOOLS_VER: ${{ inputs.release_tag }}
+  RELEASE_TAG: "v${{ inputs.release_tag }}"
+  PREV_RELEASE_TAG: "v${{ inputs.prev_release_tag }}"
+  PRE_RELEASE: ${{ inputs.pre_release }}
+  AUTO_MERGE: ${{ inputs.auto_merge }}
 
 ## -- TESTING ONLY ----
 #
-  MAIN_BRANCH: "test-master"     # Gitflow - Production branch for ktools repo
-  DEVELOP_BRANCH: "test-develop" # Gitflow - Develop branch for ktools repo
-  KTOOLS_VER: '3.9.5rc1'
-  RELEASE_TAG: 'v3.9.5rc1'
-  PREV_RELEASE_TAG: 'v3.9.3'
-  PRE_RELEASE: 'true'
-  AUTO_MERGE: 'true'
+#  MAIN_BRANCH: "test-master"     # Gitflow - Production branch for ktools repo
+#  DEVELOP_BRANCH: "test-develop" # Gitflow - Develop branch for ktools repo
+#  KTOOLS_VER: '3.9.5rc1'
+#  RELEASE_TAG: 'v3.9.5rc1'
+#  PREV_RELEASE_TAG: 'v3.9.3'
+#  PRE_RELEASE: 'true'
+#  AUTO_MERGE: 'true'
 
 jobs:
   update:
@@ -55,14 +55,13 @@ jobs:
       #ktools_version: ${{ inputs.release_tag }}
       ktools_version: '3.9.5rc1'
 
-
   build:
     uses: ./.github/workflows/build.yml
     needs: update
     secrets: inherit
     with:
       create_ktools_builder: 'false'
-
+      skip_cmake: 'true'
 
   release:
     runs-on: ubuntu-latest

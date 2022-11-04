@@ -1,6 +1,6 @@
 name: Ktools Build
 on:
-  push:
+  #push:
   # For manual trigged builds
   workflow_dispatch:
     inputs:

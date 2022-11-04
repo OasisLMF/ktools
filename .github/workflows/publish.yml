@@ -28,6 +28,8 @@ env:
 #  DEVELOP_BRANCH: "develop" # Gitflow - Develop branch for ktools repo
   BUILD_SCRIPTS: "master"    # build scripts branch 
   KTOOLS_WORKSPACE: ${{ github.workspace }}/ktools
+  KTOOLS_TEST_DIR: ${{ github.workspace }}/bin_check
+
 
 #  RELEASE_TAG: "v${{ inputs.release_tag }}"
 #  PREV_RELEASE_TAG: "v${{ inputs.prev_release_tag }}"
@@ -115,6 +117,41 @@ jobs:
             echo "TAG ${{ env.RELEASE_TAG }} exists in repository, can't create release with this tag" && exit $ERROR_CODE
         fi
 
+    # --- Download and test build --- #
+
+    - name: Download Linux binaies
+      uses: actions/download-artifact@v3
+      with:
+        name: Linux_x86_64
+        path: ${{ github.workspace }}/
+
+    - name: Download Darwin binaies
+      uses: actions/download-artifact@v3
+      with:
+        name: Darwin_x86_64
+        path: ${{ github.workspace }}/
+
+    - name: Extract linux build 
+      run: |
+        mkdir -p ${{ env.KTOOLS_TEST_DIR }}
+        tar -xvzf  Linux_x86_64.tar.gz -C ${{ github.KTOOLS_TEST_DIR }}
+
+    - name: Test binaries report the correct version 
+      working-directory: ${{ env.KTOOLS_TEST_DIR }}
+      run: |  
+        ./eve -v  2>&1 | > eve_version
+        cat eve_version
+        VALID=$(cat eve_version | grep ": version: ${{ env.RELEASE_TAG }} -" -c)
+        [[ $VALID = 1 ]] || exit 1
+
+    - name: Test binaries support parquet output   
+      working-directory: ${{ env.KTOOLS_TEST_DIR }}
+      run: | 
+        ./ordleccalc -v 2>&1 | > ordleccalc_version
+        cat ordleccalc_version
+        VALID=$(cat ordleccalc_version | grep -i "Parquet output enabled" -c)
+        [[ $VALID = 1 ]] || exit 1
+
     # --- Setup Changelog builder script --- #
     - name: Setup github user
       run: |
@@ -196,12 +233,6 @@ jobs:
         draft: false
         prerelease: ${{ env.PRE_RELEASE }}
 
-    - name: Download Linux binaies
-      uses: actions/download-artifact@v3
-      with:
-        name: Linux_x86_64
-        path: ${{ github.workspace }}/
-
     # --- Attach build assest --- #
     - name: Upload Linux binaies
       id: upload-linux-release-asset
@@ -213,12 +244,6 @@ jobs:
         asset_path: ${{ github.workspace }}/Linux_x86_64.tar.gz
         asset_name: Linux_x86_64.tar.gz
         asset_content_type: application/octet-stream
-
-    - name: Download Darwin binaies
-      uses: actions/download-artifact@v3
-      with:
-        name: Darwin_x86_64
-        path: ${{ github.workspace }}/
 
     - name: Upload Darwin binaies
       id: upload-osx-release-asset

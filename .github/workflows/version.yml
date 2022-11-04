@@ -18,7 +18,6 @@ on:
 
 env:
   ktools_file: 'VERSION.in'
-  ktools_regex: '^KTOOLS_VERSION'
 
 
 jobs:
@@ -51,8 +50,8 @@ jobs:
     - name: Write ktools version
       if: inputs.ktools_version != ''
       run: |
-        echo '${{ inputs.ktools_version }}' > ${{ inputs.ktools_file }}
-        git add ${{ inputs.ktools_file }}
+        echo '${{ inputs.ktools_version }}' > ${{ env.ktools_file }}
+        git add ${{ env.ktools_file }}
         [[ -z $(git status -s) ]] || git commit -m "Set Ktools to version ${{ inputs.ktools_version }}"
 
     - name: Push

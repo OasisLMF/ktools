@@ -24,8 +24,8 @@ on:
         default: 'true'
 
 env:
-  MAIN_BRANCH: "master"     # Gitflow - Production branch for ktools repo
-  DEVELOP_BRANCH: "develop" # Gitflow - Develop branch for ktools repo
+#  MAIN_BRANCH: "master"     # Gitflow - Production branch for ktools repo
+#  DEVELOP_BRANCH: "develop" # Gitflow - Develop branch for ktools repo
   BUILD_SCRIPTS: "master"    # build scripts branch 
   KTOOLS_WORKSPACE: ${{ github.workspace }}/ktools
 

@@ -1,6 +1,6 @@
 name: Ktools Build
 on:
-  #push:
+  push:
   workflow_dispatch:
     inputs:
       create_ktools_builder:

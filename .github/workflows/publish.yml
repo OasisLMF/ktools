@@ -134,7 +134,7 @@ jobs:
     - name: Extract linux build 
       run: |
         mkdir -p ${{ env.KTOOLS_TEST_DIR }}
-        tar -xvzf  Linux_x86_64.tar.gz -C ${{ github.KTOOLS_TEST_DIR }}
+        tar -xvzf  Linux_x86_64.tar.gz -C ${{ env.KTOOLS_TEST_DIR }}
 
     - name: Test binaries report the correct version 
       working-directory: ${{ env.KTOOLS_TEST_DIR }}

@@ -2,7 +2,7 @@ name: Ktools Release
 
 on:
   # ONLY USE PUSH FOR TESTING
-  #push:
+  push:
   workflow_dispatch:
     inputs:
       release_tag:
@@ -36,11 +36,12 @@ env:
 
 ## -- TESTING ONLY ----
 #
-#  BUILD_SCRIPTS: 'master'
-#  RELEASE_TAG: 'v3.9.5rc1'
-#  PREV_RELEASE_TAG: 'v3.9.4'
-#  PRE_RELEASE: 'true'
-#  AUTO_MERGE: 'false'
+  MAIN_BRANCH: "test-master"     # Gitflow - Production branch for ktools repo
+  DEVELOP_BRANCH: "test-develop" # Gitflow - Develop branch for ktools repo
+  RELEASE_TAG: 'v3.9.5rc1'
+  PREV_RELEASE_TAG: 'v3.9.3'
+  PRE_RELEASE: 'true'
+  AUTO_MERGE: 'true'
 
 jobs:
   version:
@@ -158,7 +159,7 @@ jobs:
           --github-token ${{ secrets.BUILD_GIT_TOKEN }} \
           --local-repo-path ./ \
           --output-path ./CHANGELOG.rst
-          --apply-milestone
+          #--apply-milestone
 
         git add ./CHANGELOG.rst
         git commit -m 'Update changelog'
@@ -253,7 +254,7 @@ jobs:
       run: |
         HEAD=$(echo "*${{ github.event.repository.name}} Release* (${{ env.RELEASE_TAG }})")
         DATE=$(date)
-        TITLE=$(echo "• <https://github.com/${{ github.repository }}/releases/tag/${{ env.RELEASE_TAG }}|${{ github.event.repository.name }} ${{ env.RELEASE_TAG }} - Release Notes>")
+        TITLE=$(echo "• TESTING ONLY <https://github.com/${{ github.repository }}/releases/tag/${{ env.RELEASE_TAG }}|${{ github.event.repository.name }} ${{ env.RELEASE_TAG }} - Release Notes>")
         JOB_URL=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         echo "heading=$HEAD" >> $GITHUB_OUTPUT
         echo "run_date=$DATE" >> $GITHUB_OUTPUT

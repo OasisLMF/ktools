@@ -54,10 +54,6 @@ jobs:
       if: inputs.ktools_branch != ''
       run: echo "KTOOLS_BRANCH=${{ inputs.ktools_branch }}" >> $GITHUB_ENV
 
-    - name: Set input - skip_cmake
-      if: inputs.skip_cmake == 'true'
-      run: echo "SKIP_CMAKE=true" >> $GITHUB_ENV
-
     - name: Checkout
       uses: actions/checkout@v3
       with:
@@ -105,6 +101,10 @@ jobs:
     - name: Set input - ktools_branch
       if: inputs.ktools_branch != ''
       run: echo "KTOOLS_BRANCH=${{ inputs.ktools_branch }}" >> $GITHUB_ENV
+
+    - name: Set input - skip_cmake
+      if: inputs.skip_cmake == 'true'
+      run: echo "SKIP_CMAKE=true" >> $GITHUB_ENV
 
     - name: Checkout
       uses: actions/checkout@v3

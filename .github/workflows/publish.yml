@@ -136,27 +136,25 @@ jobs:
         mkdir -p ${{ env.KTOOLS_TEST_DIR }}
         tar -xvzf  Linux_x86_64.tar.gz -C ${{ env.KTOOLS_TEST_DIR }}
 
-    # calling ktools bins with '-v' triggers exit 1
     - name: log binaries version outputs
       working-directory: ${{ env.KTOOLS_TEST_DIR }}
-      continue-on-error: true
       run: | 
         ./eve -v  2>&1 | > eve_version
+        cat eve_version
         ./ordleccalc -v 2>&1 | > ordleccalc_version
+        cat ordleccalc_version
 
     - name: Test binaries report the correct version 
       working-directory: ${{ env.KTOOLS_TEST_DIR }}
       run: |  
-        cat eve_version
         VALID=$(cat eve_version | grep ": version: ${{ env.RELEASE_TAG }} -" -c)
-        [[ $VALID = 1 ]] || exit 1
+        [[ "$VALID" -eq "1" ]] || exit 1
 
     - name: Test binaries support parquet output   
       working-directory: ${{ env.KTOOLS_TEST_DIR }}
       run: | 
-        cat ordleccalc_version
         VALID=$(cat ordleccalc_version | grep -i "Parquet output enabled" -c)
-        [[ $VALID = 1 ]] || exit 1
+        [[ "$VALID" -eq "1" ]] || exit 1
 
     # --- Setup Changelog builder script --- #
     - name: Setup github user

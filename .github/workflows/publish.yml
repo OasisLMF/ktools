@@ -138,28 +138,31 @@ jobs:
         mkdir -p ${{ env.KTOOLS_TEST_DIR }}
         tar -xvzf  Linux_x86_64.tar.gz -C ${{ env.KTOOLS_TEST_DIR }}
 
-    - name: log binaries version outputs
+    - name: log eve version output
       working-directory: ${{ env.KTOOLS_TEST_DIR }}
       continue-on-error: true
       run: |
         ./eve -v 2> eve_version
+
+    - name: log ordleccalc version output
+      working-directory: ${{ env.KTOOLS_TEST_DIR }}
+      continue-on-error: true
+      run: |
         ./ordleccalc -v 2> ordleccalc_version
 
-    ## DEBUG ------------------------- ##
-    - name: 'eve version'
+    - name: 'store eve version'
       uses: actions/upload-artifact@v3
       with:
         name: eve_version
         path: ${{ env.KTOOLS_TEST_DIR }}/eve_version
         retention-days: 5
 
-    - name: 'ordleccalc version'
+    - name: 'store ordleccalc version'
       uses: actions/upload-artifact@v3
       with:
         name: ordleccalc_version
         path: ${{ env.KTOOLS_TEST_DIR }}/ordleccalc_version
         retention-days: 5
-    # -------------------------------- #
 
     - name: Test binaries report the correct version
       working-directory: ${{ env.KTOOLS_TEST_DIR }}

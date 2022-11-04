@@ -1,8 +1,6 @@
 name: Ktools Release
 
 on:
-  # ONLY USE PUSH FOR TESTING
-  #push:
   workflow_dispatch:
     inputs:
       release_tag:
@@ -52,8 +50,7 @@ jobs:
     uses: ./.github/workflows/version.yml
     secrets: inherit
     with:
-      #ktools_version: ${{ inputs.release_tag }}
-      ktools_version: '3.9.5rc1'
+      ktools_version: ${{ inputs.release_tag }}
 
   build:
     uses: ./.github/workflows/build.yml
@@ -304,7 +301,7 @@ jobs:
       run: |
         HEAD=$(echo "*${{ github.event.repository.name}} Release* (${{ env.RELEASE_TAG }})")
         DATE=$(date)
-        TITLE=$(echo "• TESTING ONLY <https://github.com/${{ github.repository }}/releases/tag/${{ env.RELEASE_TAG }}|${{ github.event.repository.name }} ${{ env.RELEASE_TAG }} - Release Notes>")
+        TITLE=$(echo "• <https://github.com/${{ github.repository }}/releases/tag/${{ env.RELEASE_TAG }}|${{ github.event.repository.name }} ${{ env.RELEASE_TAG }} - Release Notes>")
         JOB_URL=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         echo "heading=$HEAD" >> $GITHUB_OUTPUT
         echo "run_date=$DATE" >> $GITHUB_OUTPUT
@@ -316,8 +313,8 @@ jobs:
 
   # --- Notify Slack --- #
   slack:
-    #uses: OasisLMF/OasisLMF/.github/workflows/notify.yml@master
-    uses: OasisLMF/OasisLMF/.github/workflows/notify.yml@hotfix/github-actions
+    uses: OasisLMF/OasisLMF/.github/workflows/notify.yml@master
+    #uses: OasisLMF/OasisLMF/.github/workflows/notify.yml@hotfix/github-actions
     secrets: inherit
     needs: release
     with:

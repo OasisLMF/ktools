@@ -53,7 +53,7 @@ jobs:
 
   build:
     uses: ./.github/workflows/build.yml
-    needs: version
+    needs: update
     secrets: inherit
     with:
       create_ktools_builder: 'false'

@@ -49,7 +49,7 @@ jobs:
     secrets: inherit
     with:
       #ktools_version: ${{ inputs.release_tag }}
-      ktools_version: 'v3.9.5rc1'
+      ktools_version: '3.9.5rc1'
 
 
   build:

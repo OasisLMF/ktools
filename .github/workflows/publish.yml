@@ -77,17 +77,19 @@ jobs:
     - name: Check tag is valid for release
       if: env.PRE_RELEASE == 'false'
       run: |
-        echo ${{ env.RELEASE_TAG }} | grep -Eq  "^v(0|[1-9]*)\.(0|[1-9]*)\.(0|[1-9]*)$" && ERROR_CODE=0 || ERROR_CODE=1
-        if [[ "$ERROR_CODE" == 1 ]]; then
-            echo "Release Tag ${{ env.RELEASE_TAG }} is not valid" && exit $ERROR_CODE
+        VALID=$(echo ${{ env.RELEASE_TAG }} | grep -oPc "^v(\d+)\.(\d+)\.(\d+)$")
+        if [[ ! "$VALID" == 1 ]]; then
+            echo "Release Tag ${{ env.RELEASE_TAG }} is not valid"
+            exit 1
         fi
 
     - name: Check tag is valid for pre-release
       if: env.PRE_RELEASE == 'true'
       run: |
-        echo ${{ env.RELEASE_TAG }} | grep -Eq  "^v(0|[1-9]*)\.(0|[1-9]*)\.(0|[1-9]*)rc([1-9]*)$" && ERROR_CODE=0 || ERROR_CODE=1
-        if [[ "$ERROR_CODE" == 1 ]]; then
-            echo "Release Tag ${{ env.RELEASE_TAG }} is not valid" && exit $ERROR_CODE
+        VALID=$(echo ${{ env.RELEASE_TAG }} | grep -oPc "^v(\d+)\.(\d+)\.(\d+)rc(\d+)$")
+        if [[ ! "$VALID" == 1 ]]; then
+            echo "Release Tag ${{ env.RELEASE_TAG }} is not valid"
+            exit 1
         fi
 
     - name: Checkout
@@ -218,7 +220,6 @@ jobs:
           --github-token ${{ secrets.BUILD_GIT_TOKEN }} \
           --local-repo-path ./ \
           --output-path ./CHANGELOG.rst
-          #--apply-milestone
 
         git add ./CHANGELOG.rst
         git commit -m 'Update changelog'
@@ -232,6 +233,7 @@ jobs:
           --to-tag ${{ env.RELEASE_TAG }} \
           --github-token ${{ secrets.BUILD_GIT_TOKEN }} \
           --local-repo-path ./ \
+          --apply-milestone
           --output-path ./RELEASE.md
 
     - name: Push changes
@@ -314,7 +316,6 @@ jobs:
   # --- Notify Slack --- #
   slack:
     uses: OasisLMF/OasisLMF/.github/workflows/notify.yml@master
-    #uses: OasisLMF/OasisLMF/.github/workflows/notify.yml@hotfix/github-actions
     secrets: inherit
     needs: release
     with:

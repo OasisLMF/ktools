@@ -26,11 +26,12 @@ on:
 env:
 #  MAIN_BRANCH: "master"     # Gitflow - Production branch for ktools repo
 #  DEVELOP_BRANCH: "develop" # Gitflow - Develop branch for ktools repo
-  BUILD_SCRIPTS: "master"    # build scripts branch 
+  BUILD_SCRIPTS: "master"    # build scripts branch
   KTOOLS_WORKSPACE: ${{ github.workspace }}/ktools
   KTOOLS_TEST_DIR: ${{ github.workspace }}/bin_check
 
 
+#  KTOOLS_VER: ${{ inputs.release_tag }}
 #  RELEASE_TAG: "v${{ inputs.release_tag }}"
 #  PREV_RELEASE_TAG: "v${{ inputs.prev_release_tag }}"
 #  PRE_RELEASE: ${{ inputs.pre_release }}
@@ -40,6 +41,7 @@ env:
 #
   MAIN_BRANCH: "test-master"     # Gitflow - Production branch for ktools repo
   DEVELOP_BRANCH: "test-develop" # Gitflow - Develop branch for ktools repo
+  KTOOLS_VER: '3.9.5rc1'
   RELEASE_TAG: 'v3.9.5rc1'
   PREV_RELEASE_TAG: 'v3.9.3'
   PRE_RELEASE: 'true'
@@ -131,28 +133,28 @@ jobs:
         name: Darwin_x86_64
         path: ${{ github.workspace }}/
 
-    - name: Extract linux build 
+    - name: Extract linux build
       run: |
         mkdir -p ${{ env.KTOOLS_TEST_DIR }}
         tar -xvzf  Linux_x86_64.tar.gz -C ${{ env.KTOOLS_TEST_DIR }}
 
     - name: log binaries version outputs
       working-directory: ${{ env.KTOOLS_TEST_DIR }}
-      run: | 
+      run: |
         ./eve -v  2>&1 | > eve_version
         cat eve_version
         ./ordleccalc -v 2>&1 | > ordleccalc_version
         cat ordleccalc_version
 
-    - name: Test binaries report the correct version 
+    - name: Test binaries report the correct version
       working-directory: ${{ env.KTOOLS_TEST_DIR }}
-      run: |  
-        VALID=$(cat eve_version | grep ": version: ${{ env.RELEASE_TAG }} -" -c)
+      run: |
+        VALID=$(cat eve_version | grep "version: ${{ env.KTOOLS_VER }} " -c)
         [[ "$VALID" -eq "1" ]] || exit 1
 
-    - name: Test binaries support parquet output   
+    - name: Test binaries support parquet output
       working-directory: ${{ env.KTOOLS_TEST_DIR }}
-      run: | 
+      run: |
         VALID=$(cat ordleccalc_version | grep -i "Parquet output enabled" -c)
         [[ "$VALID" -eq "1" ]] || exit 1
 

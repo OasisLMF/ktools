@@ -1,17 +1,12 @@
-name: Release Ktools
+name: Ktools Release
 
 on:
   # ONLY USE PUSH FOR TESTING
   #push:
   workflow_dispatch:
     inputs:
-      build_branch:
-        description: 'Branch of build script repo, used for running create changelog script'
-        required: true
-        default: 'master'
-
       release_tag:
-        description: 'Release tag to publish ktools, example: "v{n}.{n}.{n}" where n = int, e.g. v3.0.0,  if "pre_release=true" then valid formats are "v{n}.{n}.{n}rc{n}"'
+        description: 'Release tag to publish ktools, example: "{n}.{n}.{n}" where n = int, e.g. 3.0.0,  if "pre_release=true" then valid formats are "{n}.{n}.{n}rc{n}"'
         required: true
 
       prev_release_tag:
@@ -29,36 +24,53 @@ on:
         default: 'true'
 
 env:
-  MAIN_BRANCH: "master"
-  DEVELOP_BRANCH: "develop"
+  MAIN_BRANCH: "master"     # Gitflow - Production branch for ktools repo
+  DEVELOP_BRANCH: "develop" # Gitflow - Develop branch for ktools repo
+  BUILD_SCRIPTS: "master"    # build scripts branch 
   KTOOLS_WORKSPACE: ${{ github.workspace }}/ktools
 
-  BUILD_BRANCH: ${{ inputs.build_branch }}
-  RELEASE_TAG: ${{ inputs.release_tag }}
-  PREV_RELEASE_TAG: ${{ inputs.prev_release_tag }}
+  RELEASE_TAG: "v${{ inputs.release_tag }}"
+  PREV_RELEASE_TAG: "v${{ inputs.prev_release_tag }}"
   PRE_RELEASE: ${{ inputs.pre_release }}
   AUTO_MERGE: ${{ inputs.auto_merge }}
 
 ## -- TESTING ONLY ----
 #
-#  BUILD_BRANCH: 'master'
+#  BUILD_SCRIPTS: 'master'
 #  RELEASE_TAG: 'v3.9.5rc1'
 #  PREV_RELEASE_TAG: 'v3.9.4'
 #  PRE_RELEASE: 'true'
 #  AUTO_MERGE: 'false'
 
 jobs:
+  version:
+    uses: ./.github/workflows/version.yml
+    secrets: inherit
+    with:
+      ktools_version: ${{ inputs.release_tag }}
+
+
   build:
     uses: ./.github/workflows/build.yml
+    needs: version
     secrets: inherit
     with:
       create_ktools_builder: 'false'
 
-  create_release:
+
+  release:
     runs-on: ubuntu-latest
     needs: build
-    steps:
+    outputs:
+      heading: ${{ steps.slack_vars.outputs.heading }}
+      title: ${{ steps.slack_vars.outputs.title }}
+      build_branch: ${{ steps.slack_vars.outputs.branch }}
+      run_url: ${{ steps.slack_vars.outputs.run_url }}
+      run_id: ${{ steps.slack_vars.outputs.run_id }}
+      run_status: ${{ steps.slack_vars.outputs.run_status }}
+      run_date: ${{ steps.slack_vars.outputs.run_date }}
 
+    steps:
     # --_ test version tags and checkout --- #
     - name: Check tag is valid for release
       if: env.PRE_RELEASE == 'false'
@@ -129,7 +141,7 @@ jobs:
     - name: Setup Changelog builder
       working-directory: ${{ github.workspace }}
       run: |
-        BASE_URL="https://raw.githubusercontent.com/OasisLMF/build/${{ env.BUILD_BRANCH }}/buildscript"
+        BASE_URL="https://raw.githubusercontent.com/OasisLMF/build/${{ env.BUILD_SCRIPTS }}/buildscript"
         pip install -r $BASE_URL/requirments_changelog.txt
         wget $BASE_URL/auto_changelog.py
         chmod +x auto_changelog.py
@@ -235,3 +247,33 @@ jobs:
       run: |
         git checkout ${{ env.DEVELOP_BRANCH }} && git pull
         git merge ${{ github.ref_name }} && git push
+
+    - name: slack message vars
+      id: slack_vars
+      run: |
+        HEAD=$(echo "*${{ github.event.repository.name}} Release* (${{ env.RELEASE_TAG }})")
+        DATE=$(date)
+        TITLE=$(echo "• <https://github.com/${{ github.repository }}/releases/tag/${{ env.RELEASE_TAG }}|${{ github.event.repository.name }} ${{ env.RELEASE_TAG }} - Release Notes>")
+        JOB_URL=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        echo "heading=$HEAD" >> $GITHUB_OUTPUT
+        echo "run_date=$DATE" >> $GITHUB_OUTPUT
+        echo "title=$TITLE" >> $GITHUB_OUTPUT
+        echo "run_url=$JOB_URL" >> $GITHUB_OUTPUT
+        echo "run_id=${{ github.run_id }}"  >> $GITHUB_OUTPUT
+        echo "branch=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+        echo "run_status=${{ job.status }}" >> $GITHUB_OUTPUT
+
+  # --- Notify Slack --- #
+  slack:
+    #uses: OasisLMF/OasisLMF/.github/workflows/notify.yml@master
+    uses: OasisLMF/OasisLMF/.github/workflows/notify.yml@hotfix/github-actions
+    secrets: inherit
+    needs: release
+    with:
+      heading: ${{ needs.release.outputs.heading }}
+      title: ${{ needs.release.outputs.title }}
+      build_branch: ${{ needs.release.outputs.build_branch }}
+      run_url: ${{ needs.release.outputs.run_url }}
+      run_id: ${{ needs.release.outputs.run_id }}
+      run_status: ${{ needs.release.outputs.run_status }}
+      run_date: ${{ needs.release.outputs.run_date }}

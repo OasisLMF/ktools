@@ -1,4 +1,4 @@
-name: Oasislmf Version
+name: Ktools Version
 
 on:
   workflow_dispatch:

@@ -48,7 +48,7 @@ jobs:
     uses: ./.github/workflows/version.yml
     secrets: inherit
     with:
-      ktools_version: ${{ inputs.release_tag }}
+      ktools_version: ${{ env.RELEASE_TAG }}
 
 
   build:

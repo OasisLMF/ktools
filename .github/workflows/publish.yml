@@ -29,10 +29,10 @@ env:
   BUILD_SCRIPTS: "master"    # build scripts branch 
   KTOOLS_WORKSPACE: ${{ github.workspace }}/ktools
 
-  RELEASE_TAG: "v${{ inputs.release_tag }}"
-  PREV_RELEASE_TAG: "v${{ inputs.prev_release_tag }}"
-  PRE_RELEASE: ${{ inputs.pre_release }}
-  AUTO_MERGE: ${{ inputs.auto_merge }}
+#  RELEASE_TAG: "v${{ inputs.release_tag }}"
+#  PREV_RELEASE_TAG: "v${{ inputs.prev_release_tag }}"
+#  PRE_RELEASE: ${{ inputs.pre_release }}
+#  AUTO_MERGE: ${{ inputs.auto_merge }}
 
 ## -- TESTING ONLY ----
 #
@@ -44,7 +44,7 @@ env:
   AUTO_MERGE: 'true'
 
 jobs:
-  version:
+  update:
     uses: ./.github/workflows/version.yml
     secrets: inherit
     with:

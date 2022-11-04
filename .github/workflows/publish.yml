@@ -95,6 +95,7 @@ jobs:
       with:
         fetch-depth: 0
         path: ${{ env.KTOOLS_WORKSPACE }}
+        ref: ${{ github.ref_name }}
 
     - name: Check tag matches built version
       working-directory: ${{ env.KTOOLS_WORKSPACE }}

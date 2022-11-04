@@ -141,10 +141,9 @@ jobs:
     - name: log binaries version outputs
       working-directory: ${{ env.KTOOLS_TEST_DIR }}
       run: |
-        ./eve -v  2>&1 | > eve_version
-        cat eve_version
-        ./ordleccalc -v 2>&1 | > ordleccalc_version
-        cat ordleccalc_version
+        ls -la
+        ./eve -v 2> eve_version
+        ./ordleccalc -v 2> ordleccalc_version
 
     ## DEBUG ------------------------- ##
     - name: 'eve version'

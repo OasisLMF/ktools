@@ -146,6 +146,22 @@ jobs:
         ./ordleccalc -v 2>&1 | > ordleccalc_version
         cat ordleccalc_version
 
+    ## DEBUG ------------------------- ##
+    - name: 'eve version'
+      uses: actions/upload-artifact@v3
+      with:
+        name: eve_version
+        path: ${{ env.KTOOLS_TEST_DIR }}/eve_version
+        retention-days: 5
+
+    - name: 'ordleccalc version'
+      uses: actions/upload-artifact@v3
+      with:
+        name: ordleccalc_version
+        path: ${{ env.KTOOLS_TEST_DIR }}/ordleccalc_version
+        retention-days: 5
+    # -------------------------------- #
+
     - name: Test binaries report the correct version
       working-directory: ${{ env.KTOOLS_TEST_DIR }}
       run: |

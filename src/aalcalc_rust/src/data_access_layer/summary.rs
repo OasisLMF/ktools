@@ -246,7 +246,7 @@ mod summary_data_tests {
 
         let events = first_summary.events[0].clone();
 
-        assert_eq!(12, events.losses.len());
+        assert_eq!(10, events.losses.len());
     }
 
 }

@@ -158,6 +158,7 @@ impl OccurrenceData {
     /// # Returns 
     /// the map with the inserted occurrence
     fn insert_occurrence(map: &mut HashMap<i32, Vec<Occurrence>>, occurrence: Occurrence) {
+        // get reference to occurence based on and have a hashmap with the key of the period.
         match map.get_mut(&occurrence.event_id) {
             Some(data) => {
                 data.push(occurrence);
@@ -193,7 +194,7 @@ mod occurrence_data_tests {
     async fn test_get_data() {
         let mut occ_data = OccurrenceData::new(String::from("./input/occurrence.bin")).await;
         let data = occ_data.get_data().await;
-
+        println!("{:?}", data);
         assert_eq!(2, data.get(&1).unwrap().len());
         assert_eq!(2, data.get(&2).unwrap().len());
     }

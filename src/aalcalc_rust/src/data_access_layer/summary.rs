@@ -1,5 +1,8 @@
 use byteorder::{ByteOrder, LittleEndian};
 use std::{fs::File, io::Read};
+use std::collections::HashMap;
+
+use super::occurrence::Occurrence;
 
 
 /// Holds ```sidx``` and losses for an event.
@@ -13,9 +16,10 @@ pub struct Event {
     pub maximum_loss: Option<f32>,
     pub numerical_mean: f32,
     pub standard_deviation: Option<f32>,
-    pub sum: f32,
-    pub count: i32,
-    pub losses: Vec<(i32, f32)>
+    pub sample_size: i32,
+    pub period_categories: HashMap<i32, Vec<f32>>,
+    pub squared_total_loss: f32,
+    pub total_loss: f32
 }
 
 impl Event {
@@ -29,9 +33,12 @@ impl Event {
     /// # Returns
     /// ```true```: loss added and should continue to add losses
     /// ```false```: the end of event stream has been reached
-    pub fn add_loss(&mut self, sidx: &[u8], loss: &[u8]) -> bool {
+    pub fn add_loss(&mut self, sidx: &[u8], loss: &[u8], occurrence_vec: &Vec<Occurrence>, vec_capacity: i32) -> bool {
+        
+        // read the raw data 
         let sidx_int = LittleEndian::read_i32(sidx);
         let loss_float = LittleEndian::read_f32(loss);
+
 
         if sidx_int == 0 && loss_float == 0.0 {
             return false
@@ -48,9 +55,28 @@ impl Event {
                 self.maximum_loss = Some(loss_float);
             },
             _ => {
-                self.count += 1;
-                self.sum += loss_float;
-                self.losses.push((sidx_int, loss_float));
+                let occ_num = occurrence_vec.len() as i32;
+                self.sample_size += occ_num;
+
+                for occ in occurrence_vec {
+                    let index = sidx_int - 1;
+
+                    match self.period_categories.get_mut(&occ.period_num) {
+                        Some(total_array) => {
+                            total_array[index as usize] += loss_float;
+                        },
+                        None => {
+                            let mut buffer = vec![0.0; vec_capacity as usize];
+                            buffer[index as usize] += loss_float;
+                            self.period_categories.insert(occ.period_num, buffer);
+                        }
+                    }
+                    // add squared_total_loss field for event
+                    self.squared_total_loss += loss_float * loss_float;
+
+                    // add total_loss field for event
+                    self.total_loss += loss_float;
+                }
             }
         }
         return true
@@ -116,7 +142,7 @@ impl Summary {
 /// # Fields 
 /// * handler: handles the reading and writing of a binary file
 /// * stream_id: the ID of the stream for the summary 
-/// * no_of_samples: The number of samples in the summary
+/// * no_of_samples: The number of samples per summary (consistent for each summary)
 /// * summary_set: don't know will need to be filled in
 #[derive(Debug)]
 pub struct SummaryData {
@@ -158,7 +184,7 @@ impl SummaryData {
     /// 
     /// # Returns
     /// all the summaries in the binary file attached to the ```SummaryData``` struct
-    pub fn get_data(&mut self) -> Vec<Summary> {
+    pub fn get_data(&mut self, reference_data: &HashMap<i32, Vec<Occurrence>>, vec_capacity: i32) -> Vec<Summary> {
         let mut meta_read_frame = [0; 12];
         let mut event_read_frame = [0; 8];
         let mut buffer = vec![];
@@ -175,14 +201,18 @@ impl SummaryData {
                         chunked_meta_frame.next().unwrap()
                     );
 
+                    let occurrences_vec = reference_data.get(&summary.event_id).unwrap();
+                    let period_categories = HashMap::new();
+
                     let mut event = Event{
                         event_id: summary.event_id.clone(), 
-                        losses: vec![], 
-                        numerical_mean: 0.0, 
-                        standard_deviation: None,
                         maximum_loss: None,
-                        sum: 0.0,
-                        count: 0
+                        numerical_mean: 0.0,
+                        standard_deviation: None,
+                        sample_size: 0,
+                        period_categories,
+                        squared_total_loss: 0.0,
+                        total_loss: 0.0
                     };
 
                     // loop through adding the losses to the event
@@ -192,7 +222,7 @@ impl SummaryData {
                                 let mut chunked_event_read_frame = event_read_frame.chunks(4).into_iter();
                                 let sidx = chunked_event_read_frame.next().unwrap();
                                 let loss = chunked_event_read_frame.next().unwrap();
-                                let pushed = event.add_loss(sidx, loss);
+                                let pushed = event.add_loss(sidx, loss, occurrences_vec, vec_capacity);
                                 if pushed == false {
                                     summary.events.push(event);
                                     break

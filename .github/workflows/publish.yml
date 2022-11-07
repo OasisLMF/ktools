@@ -74,6 +74,12 @@ jobs:
 
     steps:
     # --_ test version tags and checkout --- #
+    - name: check branchname is valid for release
+      if: ${{ !startsWith(github.ref_name , 'release/') && inputs.pre_release == 'false' }}
+      run: |
+        echo "Releases must be trigged on branchs 'release/x.x.x'"
+        exit 1
+
     - name: Check tag is valid for release
       if: env.PRE_RELEASE == 'false'
       run: |

@@ -19,7 +19,9 @@ pub struct Event {
     pub sample_size: i32,
     pub period_categories: HashMap<i32, Vec<f32>>,
     pub squared_total_loss: f32,
-    pub total_loss: f32
+    pub total_loss: f32,
+    pub ni_loss: f32,
+    pub ni_loss_squared: f32
 }
 
 impl Event {
@@ -47,6 +49,15 @@ impl Event {
         match sidx_int {
             -1 => {
                 self.numerical_mean += loss_float;
+                let occ_num = occurrence_vec.len() as i32;
+                
+                let mut cache = 0.0;
+                for _ in 0..occ_num {
+                    self.ni_loss += loss_float;
+                    cache += loss_float;
+                }
+                self.ni_loss_squared += cache * cache;
+
             },
             -2 => {
                 self.standard_deviation = Some(loss_float);
@@ -212,7 +223,9 @@ impl SummaryData {
                         sample_size: 0,
                         period_categories,
                         squared_total_loss: 0.0,
-                        total_loss: 0.0
+                        total_loss: 0.0,
+                        ni_loss: 0.0,
+                        ni_loss_squared: 0.0
                     };
 
                     // loop through adding the losses to the event

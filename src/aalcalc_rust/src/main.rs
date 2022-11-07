@@ -17,6 +17,7 @@ fn add_two_vectors(one: &mut Vec<f32>, two: &Vec<f32>) {
 
 #[tokio::main]
 async fn main() {
+    // get data around the occurrences
     let mut occ_data = OccurrenceData::new(String::from("./input/occurrence.bin")).await;
     let raw_data = occ_data.get_data().await;
     let occurrences = raw_data;
@@ -27,12 +28,13 @@ async fn main() {
         String::from("./work/summary_aal/summary_2.bin")
         ];
 
+    // define the collections for statistics on the events and losses for each summary
     let mut ni_loss_map: HashMap<i32, f32> = HashMap::new();
     let mut period_categories: HashMap<i32, Vec<f32>> = HashMap::new();
 
+    // define the statistics that we are counting for the entire run for a single summary
     let mut ni_loss = 0.0;
     let mut ni_loss_squared = 0.0;
-
     let mut sample_size = 0;
     let mut total_loss = 0.0;
     let mut squared_total_loss = 0.0;
@@ -46,17 +48,14 @@ async fn main() {
         for summary in summaries {
             let occurrences_vec = &occurrences.get(&summary.event_id).unwrap();
 
-            // obtaining the number of times an event occurs
-            let occ_num = occurrences_vec.len() as i32;
-
-            // this is the add_loss function with occ_num argument
             for event in summary.events {
 
-                // this loops through the losses. look into calculating the total losses
-                // as the events are read from the file
+
                 sample_size += event.sample_size;
                 squared_total_loss += event.squared_total_loss;
                 total_loss += event.total_loss;
+                ni_loss_squared += event.ni_loss_squared;
+                ni_loss += event.ni_loss;
 
                 for (key, value) in event.period_categories {
                     match period_categories.get_mut(&key) {
@@ -68,16 +67,6 @@ async fn main() {
                         }
                     }
                 }
-
-                // add occ_num argument to the add_loss function
-                let mut cache = 0.0;
-                for _ in 0..occ_num {
-                    // add ni_loss field to event
-                    ni_loss += event.numerical_mean;
-                    cache += event.numerical_mean;
-                }
-                // add ni_loss_squared to for event
-                ni_loss_squared += cache * cache;
 
                 for occurrence in *occurrences_vec {
                     let occ_period = occurrence.period_num;
@@ -97,11 +86,13 @@ async fn main() {
     }).collect::<Vec<i32>>();
     // .collect_into_vec(&mut buffer);
 
+    // calculate the standard deviation and mean for the summary ID
     let type_one_ni = ni_loss / number_of_periods as f32;
     let type_two_sample = total_loss / (number_of_periods * number_of_periods) as f32;
     let standard_deviation = calculate_standard_deviation(&ni_loss_map, number_of_periods);
     let standard_deviation_two = calculate_st_deviation_two(&period_categories, number_of_periods * 10);
 
+    // printout the statistics
     println!("standard deviation: {:?}", standard_deviation);
     println!("standard deviation two: {:?}", standard_deviation_two);
     println!("total loss: {:?}", total_loss);

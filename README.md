@@ -1,8 +1,7 @@
 <img src="https://oasislmf.org/packages/oasis_theme_package/themes/oasis_theme/assets/src/oasis-lmf-colour.png" alt="Oasis LMF logo" width="250"/>
 
 [![ktools version](https://img.shields.io/github/tag/Oasislmf/ktools?label=ktools)](https://github.com/OasisLMF/ktools/releases)
-[![Build Status](https://github.com/OasisLMF/ktools/actions/workflows/build.yml/badge.svg)](https://github.com/OasisLMF/ktools/actions/workflows/build.yml)
-[![Release](https://github.com/OasisLMF/ktools/actions/workflows/publish.yml/badge.svg)](https://github.com/OasisLMF/ktools/actions/workflows/publish.yml)
+[![Ktools Build](https://github.com/OasisLMF/ktools/actions/workflows/build.yml/badge.svg?branch=master&event=push)](https://github.com/OasisLMF/ktools/actions/workflows/build.yml)
 
 # ktools
 

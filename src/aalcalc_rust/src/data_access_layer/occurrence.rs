@@ -13,7 +13,7 @@ pub enum DateFormat {
 }
 
 
-/// An occurrence of an event. 
+/// An occurrence of an event.
 /// 
 /// # Fields
 /// * event_id: the ID of the event that the occurrence belongs to

@@ -8,7 +8,8 @@
 #include "../include/oasis.h"
 
 
-inline OASIS_FLOAT linear_interpolate(line_points lp, OASIS_FLOAT xpos) {
+//inline OASIS_FLOAT linear_interpolate(line_points lp, OASIS_FLOAT xpos) {
+inline double linear_interpolate(const line_points lp, const double xpos) {
   return ((xpos - lp.to_x) * (lp.from_y - lp.to_y) / (lp.from_x - lp.to_x)) + lp.to_y;
 }
 
@@ -190,7 +191,8 @@ OASIS_FLOAT aggreports::GetLoss(const double next_return_period,
     lpt.from_y = last_loss;
     lpt.to_x = current_return_period;
     lpt.to_y = current_loss;
-    OASIS_FLOAT zz = linear_interpolate(lpt, next_return_period);
+//    OASIS_FLOAT zz = linear_interpolate(lpt, next_return_period);
+    double zz = linear_interpolate(lpt, next_return_period);
     return zz;
   }
 
@@ -506,7 +508,8 @@ void aggreports::WriteExceedanceProbabilityTable(
     double last_computed_rp = 0;
     OASIS_FLOAT last_computed_loss = 0;
     OASIS_FLOAT tvar = 0;
-    int i = 1;
+//    int i = 1;
+    long i = 1;
 
     for (auto lp : lpv) {
       double retperiod = max_retperiod / i;
@@ -999,8 +1002,9 @@ void aggreports::FullUncertainty(const std::vector<int> &fileIDs,
     items[x.first.summary_id].push_back((x.second.*GetOutLoss)());
   }
 
-  WriteExceedanceProbabilityTable(fileIDs, items, totalperiods_ * samplesize_,
-				  epcalc, eptype, eptype_tvar);
+  WriteExceedanceProbabilityTable(fileIDs, items,
+				  (long)totalperiods_ * samplesize_, epcalc,
+				  eptype, eptype_tvar);
 
   // By ensemble ID
   if (ordFlag_) return;   // Ensemble IDs not supported for ORD output
@@ -1015,8 +1019,8 @@ void aggreports::FullUncertainty(const std::vector<int> &fileIDs,
 	}
       }
       WriteExceedanceProbabilityTable(fileIDs, items,
-				      totalperiods_ * ensemble.second.size(),
-				      epcalc, ensemble.first, eptype_tvar, 1);
+	(long)totalperiods_ * ensemble.second.size(), epcalc, ensemble.first,
+	eptype_tvar, 1);
     }
   }
 

@@ -77,6 +77,15 @@ jobs:
         make check
         make install
 
+
+    - name: Store ktest output (DEBUG)
+      if: always()
+      run: | 
+        echo $PWD 
+        ls -la ./
+        ls -la ./ktools/ktest/
+        ls -la ./ktools/ktest/testout
+
     - name: Store ktest output
       if: always()
       uses: actions/upload-artifact@v3

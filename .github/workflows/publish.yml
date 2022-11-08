@@ -1,0 +1,334 @@
+name: Ktools Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: 'Release tag to publish ktools, example: "{n}.{n}.{n}" where n = int, e.g. 3.0.0,  if "pre_release=true" then valid formats are "{n}.{n}.{n}rc{n}"'
+        required: true
+
+      prev_release_tag:
+        description: 'The last release, used for generating the changelog and release notes'
+        required: true
+
+      pre_release:
+        description: 'Mark release as pre-release'
+        required: true
+        default: 'false'
+
+      auto_merge:
+        description: 'Run Git flow, git_merge(source_branch -> master) and then git_merge(master -> develop)'
+        required: true
+        default: 'true'
+
+env:
+  MAIN_BRANCH: "master"     # Gitflow - Production branch for ktools repo
+  DEVELOP_BRANCH: "develop" # Gitflow - Develop branch for ktools repo
+  BUILD_SCRIPTS: "master"    # build scripts branch
+  KTOOLS_WORKSPACE: ${{ github.workspace }}/ktools
+  KTOOLS_TEST_DIR: ${{ github.workspace }}/bin_check
+
+
+  KTOOLS_VER: ${{ inputs.release_tag }}
+  RELEASE_TAG: "v${{ inputs.release_tag }}"
+  PREV_RELEASE_TAG: "v${{ inputs.prev_release_tag }}"
+  PRE_RELEASE: ${{ inputs.pre_release }}
+  AUTO_MERGE: ${{ inputs.auto_merge }}
+
+## -- TESTING ONLY ----
+#
+#  MAIN_BRANCH: "test-master"     # Gitflow - Production branch for ktools repo
+#  DEVELOP_BRANCH: "test-develop" # Gitflow - Develop branch for ktools repo
+#  KTOOLS_VER: '3.9.5rc1'
+#  RELEASE_TAG: 'v3.9.5rc1'
+#  PREV_RELEASE_TAG: 'v3.9.3'
+#  PRE_RELEASE: 'true'
+#  AUTO_MERGE: 'true'
+
+jobs:
+  update:
+    uses: ./.github/workflows/version.yml
+    secrets: inherit
+    with:
+      ktools_version: ${{ inputs.release_tag }}
+
+  build:
+    uses: ./.github/workflows/build.yml
+    needs: update
+    secrets: inherit
+    with:
+      create_ktools_builder: 'false'
+      skip_cmake: 'true'
+
+  release:
+    runs-on: ubuntu-latest
+    needs: build
+    outputs:
+      heading: ${{ steps.slack_vars.outputs.heading }}
+      title: ${{ steps.slack_vars.outputs.title }}
+      build_branch: ${{ steps.slack_vars.outputs.branch }}
+      run_url: ${{ steps.slack_vars.outputs.run_url }}
+      run_id: ${{ steps.slack_vars.outputs.run_id }}
+      run_status: ${{ steps.slack_vars.outputs.run_status }}
+      run_date: ${{ steps.slack_vars.outputs.run_date }}
+
+    steps:
+    # --_ test version tags and checkout --- #
+    - name: check branchname is valid for release
+      if: ${{ !startsWith(github.ref_name , 'release/') && inputs.pre_release == 'false' }}
+      run: |
+        echo "Releases must be trigged on branchs 'release/x.x.x'"
+        exit 1
+
+    - name: Check tag is valid for release
+      if: env.PRE_RELEASE == 'false'
+      run: |
+        VALID=$(echo ${{ env.RELEASE_TAG }} | grep -oPc "^v(\d+)\.(\d+)\.(\d+)$")
+        if [[ ! "$VALID" == 1 ]]; then
+            echo "Release Tag ${{ env.RELEASE_TAG }} is not valid"
+            exit 1
+        fi
+
+    - name: Check tag is valid for pre-release
+      if: env.PRE_RELEASE == 'true'
+      run: |
+        VALID=$(echo ${{ env.RELEASE_TAG }} | grep -oPc "^v(\d+)\.(\d+)\.(\d+)rc(\d+)$")
+        if [[ ! "$VALID" == 1 ]]; then
+            echo "Release Tag ${{ env.RELEASE_TAG }} is not valid"
+            exit 1
+        fi
+
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+        path: ${{ env.KTOOLS_WORKSPACE }}
+        ref: ${{ github.ref_name }}
+
+    - name: Check tag matches built version
+      working-directory: ${{ env.KTOOLS_WORKSPACE }}
+      run: |
+        BUILD_VER=$(cat VERSION.in)
+        RELEASE_VER=$(echo ${{ env.RELEASE_TAG }} | cut -c2-)
+        [[ "$RELEASE_VER" = "$BUILD_VER" ]] && ERROR_CODE=0 || ERROR_CODE=1
+        if [[ "$ERROR_CODE" == 1 ]]; then
+            echo "BUILD_VER: $BUILD_VER stored in 'VERSION.in' dosn't match RELEASE_TAG: $RELEASE_VER" && exit $ERROR_CODE
+        fi
+
+    - name: Check if tag exisits
+      working-directory: ${{ env.KTOOLS_WORKSPACE }}
+      run: |
+        git rev-parse -q --verify "refs/tags/${{ env.RELEASE_TAG }}" && ERROR_CODE=1 || ERROR_CODE=0
+        if [[ "$ERROR_CODE" == 1 ]]; then
+            echo "TAG ${{ env.RELEASE_TAG }} exists in repository, can't create release with this tag" && exit $ERROR_CODE
+        fi
+
+    # --- Download and test build --- #
+
+    - name: Download Linux binaies
+      uses: actions/download-artifact@v3
+      with:
+        name: Linux_x86_64
+        path: ${{ github.workspace }}/
+
+    - name: Download Darwin binaies
+      uses: actions/download-artifact@v3
+      with:
+        name: Darwin_x86_64
+        path: ${{ github.workspace }}/
+
+    - name: Extract linux build
+      run: |
+        mkdir -p ${{ env.KTOOLS_TEST_DIR }}
+        tar -xvzf  Linux_x86_64.tar.gz -C ${{ env.KTOOLS_TEST_DIR }}
+
+    - name: log eve version output
+      working-directory: ${{ env.KTOOLS_TEST_DIR }}
+      continue-on-error: true
+      run: |
+        ./eve -v 2> eve_version
+
+    - name: log ordleccalc version output
+      working-directory: ${{ env.KTOOLS_TEST_DIR }}
+      continue-on-error: true
+      run: |
+        ./ordleccalc -v 2> ordleccalc_version
+
+    - name: 'store eve version'
+      uses: actions/upload-artifact@v3
+      with:
+        name: eve_version
+        path: ${{ env.KTOOLS_TEST_DIR }}/eve_version
+        retention-days: 5
+
+    - name: 'store ordleccalc version'
+      uses: actions/upload-artifact@v3
+      with:
+        name: ordleccalc_version
+        path: ${{ env.KTOOLS_TEST_DIR }}/ordleccalc_version
+        retention-days: 5
+
+    - name: Test binaries report the correct version
+      working-directory: ${{ env.KTOOLS_TEST_DIR }}
+      run: |
+        VALID=$(cat eve_version | grep "version: ${{ env.KTOOLS_VER }} " -c)
+        [[ "$VALID" -eq "1" ]] || exit 1
+
+    - name: Test binaries support parquet output
+      working-directory: ${{ env.KTOOLS_TEST_DIR }}
+      run: |
+        VALID=$(cat ordleccalc_version | grep -i "Parquet output enabled" -c)
+        [[ "$VALID" -eq "1" ]] || exit 1
+
+    # --- Setup Changelog builder script --- #
+    - name: Setup github user
+      run: |
+        git config --global user.email ${{ env.GIT_EMAIL }}
+        git config --global user.name ${{ env.GIT_USERNAME }}
+        git config --global pull.ff only
+      env:
+        GIT_EMAIL: ${{ secrets.BUILD_GIT_EMAIL }}
+        GIT_USERNAME: ${{ secrets.BUILD_GIT_USERNAME }}
+
+    - name: Check for merge conflicts and tag
+      working-directory: ${{ env.KTOOLS_WORKSPACE }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.BUILD_GIT_TOKEN }}
+      run: |
+        git checkout ${{ env.MAIN_BRANCH }}
+        git merge ${{ github.ref_name }} --no-ff --no-commit
+        git merge --abort
+        git checkout ${{ github.ref_name }}
+        git tag ${{ env.RELEASE_TAG }}
+
+    - name: Setup python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Setup Changelog builder
+      working-directory: ${{ github.workspace }}
+      run: |
+        BASE_URL="https://raw.githubusercontent.com/OasisLMF/build/${{ env.BUILD_SCRIPTS }}/buildscript"
+        pip install -r $BASE_URL/requirments_changelog.txt
+        wget $BASE_URL/auto_changelog.py
+        chmod +x auto_changelog.py
+
+    - name: Create changelog
+      working-directory: ${{ env.KTOOLS_WORKSPACE }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.BUILD_GIT_TOKEN }}
+      run: |
+        ${{ github.workspace }}/auto_changelog.py build-changelog \
+          --repo ktools \
+          --from-tag ${{ env.PREV_RELEASE_TAG }} \
+          --to-tag ${{ env.RELEASE_TAG }} \
+          --github-token ${{ secrets.BUILD_GIT_TOKEN }} \
+          --local-repo-path ./ \
+          --output-path ./CHANGELOG.rst
+
+        git add ./CHANGELOG.rst
+        git commit -m 'Update changelog'
+
+    - name: Create Release notes
+      working-directory: ${{ env.KTOOLS_WORKSPACE }}
+      run: |
+        ${{ github.workspace }}/auto_changelog.py build-release \
+          --repo ktools \
+          --from-tag ${{ env.PREV_RELEASE_TAG }} \
+          --to-tag ${{ env.RELEASE_TAG }} \
+          --github-token ${{ secrets.BUILD_GIT_TOKEN }} \
+          --local-repo-path ./ \
+          --apply-milestone
+          --output-path ./RELEASE.md
+
+    - name: Push changes
+      working-directory: ${{ env.KTOOLS_WORKSPACE }}
+      run: |
+        git push origin ${{ env.RELEASE_TAG  }}
+        git push
+
+    # --- Create Release --- #
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.BUILD_GIT_TOKEN }}
+      with:
+        tag_name: ${{ env.RELEASE_TAG }}
+        release_name: Release ${{ env.RELEASE_TAG }}
+        body_path: ${{ env.KTOOLS_WORKSPACE }}/RELEASE.md
+        draft: false
+        prerelease: ${{ env.PRE_RELEASE }}
+
+    # --- Attach build assest --- #
+    - name: Upload Linux binaies
+      id: upload-linux-release-asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.BUILD_GIT_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ${{ github.workspace }}/Linux_x86_64.tar.gz
+        asset_name: Linux_x86_64.tar.gz
+        asset_content_type: application/octet-stream
+
+    - name: Upload Darwin binaies
+      id: upload-osx-release-asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.BUILD_GIT_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ${{ github.workspace }}/Darwin_x86_64.tar.gz
+        asset_name: Darwin_x86_64.tar.gz
+        asset_content_type: application/octet-stream
+
+    - name: Run Gitflow (Production)
+      if: env.AUTO_MERGE == 'true' && env.PRE_RELEASE == 'false'
+      working-directory: ${{ env.KTOOLS_WORKSPACE }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.BUILD_GIT_TOKEN }}
+      run: |
+        git checkout ${{ env.MAIN_BRANCH }} && git pull
+        git merge ${{ github.ref_name }} && git push
+        git checkout ${{ env.DEVELOP_BRANCH }} && git pull
+        git merge ${{env.MAIN_BRANCH }} && git push
+
+    - name: Run Gitflow (Release Candidate)
+      if: env.AUTO_MERGE == 'true' && env.PRE_RELEASE == 'true'
+      working-directory: ${{ env.KTOOLS_WORKSPACE }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.BUILD_GIT_TOKEN }}
+      run: |
+        git checkout ${{ env.DEVELOP_BRANCH }} && git pull
+        git merge ${{ github.ref_name }} && git push
+
+    - name: slack message vars
+      id: slack_vars
+      run: |
+        HEAD=$(echo "*${{ github.event.repository.name}} Release* (${{ env.RELEASE_TAG }})")
+        DATE=$(date)
+        TITLE=$(echo "• <https://github.com/${{ github.repository }}/releases/tag/${{ env.RELEASE_TAG }}|${{ github.event.repository.name }} ${{ env.RELEASE_TAG }} - Release Notes>")
+        JOB_URL=${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        echo "heading=$HEAD" >> $GITHUB_OUTPUT
+        echo "run_date=$DATE" >> $GITHUB_OUTPUT
+        echo "title=$TITLE" >> $GITHUB_OUTPUT
+        echo "run_url=$JOB_URL" >> $GITHUB_OUTPUT
+        echo "run_id=${{ github.run_id }}"  >> $GITHUB_OUTPUT
+        echo "branch=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+        echo "run_status=${{ job.status }}" >> $GITHUB_OUTPUT
+
+  # --- Notify Slack --- #
+  slack:
+    uses: OasisLMF/OasisLMF/.github/workflows/notify.yml@master
+    secrets: inherit
+    needs: release
+    with:
+      heading: ${{ needs.release.outputs.heading }}
+      title: ${{ needs.release.outputs.title }}
+      build_branch: ${{ needs.release.outputs.build_branch }}
+      run_url: ${{ needs.release.outputs.run_url }}
+      run_id: ${{ needs.release.outputs.run_id }}
+      run_status: ${{ needs.release.outputs.run_status }}
+      run_date: ${{ needs.release.outputs.run_date }}

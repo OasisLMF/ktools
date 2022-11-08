@@ -1,4 +1,4 @@
-FROM ubuntu:focal 
+FROM ubuntu:focal
 
  # Create variable to hold timezone for configuring tzdata
  ENV TZ=Europe/London
@@ -31,14 +31,14 @@ RUN apt-get update && apt-get install -y \
     cmake \
     cmake \
     dirmngr \
-    dpkg-dev \ 
+    dpkg-dev \
     file \
     git \
     gnupg2 \
     lbzip2 \
-    libc++-dev \ 
-    libc-dev \ 
-    libgcc-10-dev \ 
+    libc++-dev \
+    libc-dev \
+    libgcc-10-dev \
     libstdc++-10-dev  \
     libtinfo5 \
     libtool \
@@ -47,7 +47,7 @@ RUN apt-get update && apt-get install -y \
     patch \
     pkg-config \
     wget \
-    xz-utils \ 
+    xz-utils \
     zlib1g-dev \
     && rm -rf /var/lib/apt/lists/*
 
@@ -58,11 +58,11 @@ ENV LLVM_RELEASE 9
 ENV LLVM_VERSION 9.0.0
 
 RUN gpg --batch --keyserver keyserver.ubuntu.com --recv-keys $GPG_KEYS
-COPY ./jenkins/install-clang.sh .
+COPY ./build/install-clang.sh .
 RUN ./install-clang.sh
 
-COPY ./jenkins/entrypoint_clang-autotools.sh /usr/local/bin/build-autotools.sh
-COPY ./jenkins/entrypoint_clang-cmake.sh /usr/local/bin/build-cmake.sh
+COPY ./build/entrypoint_clang-autotools.sh /usr/local/bin/build-autotools.sh
+COPY ./build/entrypoint_clang-cmake.sh /usr/local/bin/build-cmake.sh
 
 WORKDIR /var/ktools
 ENTRYPOINT build-autotools.sh

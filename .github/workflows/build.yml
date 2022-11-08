@@ -91,7 +91,7 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: darwin_testout
-        path: ./ktools/ktest/testout
+        path: ${{ github.workspace }}/ktest/testout
         retention-days: 5
 
     - name: Tarball bin files

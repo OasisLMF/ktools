@@ -77,22 +77,13 @@ jobs:
         make check
         make install
 
-
-    - name: Store ktest output (DEBUG)
-      if: always()
-      run: | 
-        echo $PWD 
-        ls -la ./
-        ls -la ./ktools/ktest/
-        ls -la ./ktools/ktest/testout
-
     - name: Store ktest output
       if: always()
       uses: actions/upload-artifact@v3
       with:
         name: darwin_testout
         path: ${{ github.workspace }}/ktest/testout
-        retention-days: 5
+        retention-days: 3
 
     - name: Tarball bin files
       run: |
@@ -164,8 +155,8 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: linux_testout
-        path: ./ktools/ktest/testout
-        retention-days: 5
+        path: ${{ github.workspace }}/ktest/testout
+        retention-days: 3
 
     - name: 'Store Linux build'
       uses: actions/upload-artifact@v3

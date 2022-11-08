@@ -55,7 +55,8 @@ aggreports::aggreports(const int totalperiods, FILE **fout,
 {
 
   LoadReturnPeriods();
-  logprintf(progname_, "INFO", "loss,next_rp_val,last_rp,last_loss,current_rp,current_loss\n");
+//  logprintf(progname_, "INFO", "loss,next_rp_val,last_rp,last_loss,current_rp,current_loss\n");
+  logprintf(progname_, "INFO", "useReturnPeriodFile = %d\n", useReturnPeriodFile);
 
 }
 
@@ -120,7 +121,12 @@ void aggreports::LoadReturnPeriods() {
 void aggreports::LoadPeriodsToWeighting() {
 
   FILE *fin = fopen(PERIODS_FILE, "rb");
-  if (fin == nullptr) return;
+  if (fin == nullptr) {
+    logprintf(progname_, "INFO", "retperiod,i\n");
+    return;
+  }
+  logprintf(progname_, "INFO",
+	    "retperiod,cumulative_weighting,lp.period_weighting\n");
 
   Periods p;
   OASIS_FLOAT total_weighting = 0;
@@ -261,9 +267,9 @@ void aggreports::WriteReturnPeriodOut(const std::vector<int> &fileIDs,
 
     OASIS_FLOAT loss = GetLoss(nextreturnperiod_value, last_return_period,
 			       last_loss, current_return_period, current_loss);
-    logprintf(progname_, "INFO", "%f,%f,%f,%f,%f,%f\n", loss,
+/*    logprintf(progname_, "INFO", "%f,%f,%f,%f,%f,%f\n", loss,
 	      nextreturnperiod_value, last_return_period, last_loss,
-	      current_return_period, current_loss);
+	      current_return_period, current_loss);*/
     if (WriteOutput != nullptr) {
     	(this->*WriteOutput)(fileIDs, summary_id, epcalc, eptype,
 			     nextreturnperiod_value, loss);
@@ -504,6 +510,7 @@ void aggreports::WriteExceedanceProbabilityTable(
 
     for (auto lp : lpv) {
       double retperiod = max_retperiod / i;
+      if (retperiod < 1) logprintf(progname_, "INFO", "%f,%d\n", retperiod, i);
 
       if (useReturnPeriodFile_) {
 #ifdef ORD_OUTPUT
@@ -609,6 +616,9 @@ void aggreports::WriteExceedanceProbabilityTable(
 
       if (lp.period_weighting) {
 	double retperiod = 1 / cumulative_weighting;
+	if (retperiod < 1)
+	  logprintf(progname_, "INFO", "%f,%f,%f\n", retperiod,
+		    cumulative_weighting, lp.period_weighting);
 
 	if (!largest_loss) {
 	  max_retperiod = retperiod + 0.0001;   // Add for floating point errors

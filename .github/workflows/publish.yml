@@ -16,11 +16,6 @@ on:
         required: true
         default: 'false'
 
-      auto_merge:
-        description: 'Run Git flow, git_merge(source_branch -> master) and then git_merge(master -> develop)'
-        required: true
-        default: 'true'
-
 env:
   MAIN_BRANCH: "master"     # Gitflow - Production branch for ktools repo
   DEVELOP_BRANCH: "develop" # Gitflow - Develop branch for ktools repo
@@ -33,7 +28,6 @@ env:
   RELEASE_TAG: "v${{ inputs.release_tag }}"
   PREV_RELEASE_TAG: "v${{ inputs.prev_release_tag }}"
   PRE_RELEASE: ${{ inputs.pre_release }}
-  AUTO_MERGE: ${{ inputs.auto_merge }}
 
 ## -- TESTING ONLY ----
 #
@@ -43,7 +37,6 @@ env:
 #  RELEASE_TAG: 'v3.9.5rc1'
 #  PREV_RELEASE_TAG: 'v3.9.3'
 #  PRE_RELEASE: 'true'
-#  AUTO_MERGE: 'true'
 
 jobs:
   update:
@@ -113,14 +106,6 @@ jobs:
         [[ "$RELEASE_VER" = "$BUILD_VER" ]] && ERROR_CODE=0 || ERROR_CODE=1
         if [[ "$ERROR_CODE" == 1 ]]; then
             echo "BUILD_VER: $BUILD_VER stored in 'VERSION.in' dosn't match RELEASE_TAG: $RELEASE_VER" && exit $ERROR_CODE
-        fi
-
-    - name: Check if tag exisits
-      working-directory: ${{ env.KTOOLS_WORKSPACE }}
-      run: |
-        git rev-parse -q --verify "refs/tags/${{ env.RELEASE_TAG }}" && ERROR_CODE=1 || ERROR_CODE=0
-        if [[ "$ERROR_CODE" == 1 ]]; then
-            echo "TAG ${{ env.RELEASE_TAG }} exists in repository, can't create release with this tag" && exit $ERROR_CODE
         fi
 
     # --- Download and test build --- #
@@ -283,26 +268,6 @@ jobs:
         asset_path: ${{ github.workspace }}/Darwin_x86_64.tar.gz
         asset_name: Darwin_x86_64.tar.gz
         asset_content_type: application/octet-stream
-
-    - name: Run Gitflow (Production)
-      if: env.AUTO_MERGE == 'true' && env.PRE_RELEASE == 'false'
-      working-directory: ${{ env.KTOOLS_WORKSPACE }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.BUILD_GIT_TOKEN }}
-      run: |
-        git checkout ${{ env.MAIN_BRANCH }} && git pull
-        git merge ${{ github.ref_name }} && git push
-        git checkout ${{ env.DEVELOP_BRANCH }} && git pull
-        git merge ${{env.MAIN_BRANCH }} && git push
-
-    - name: Run Gitflow (Release Candidate)
-      if: env.AUTO_MERGE == 'true' && env.PRE_RELEASE == 'true'
-      working-directory: ${{ env.KTOOLS_WORKSPACE }}
-      env:
-        GITHUB_TOKEN: ${{ secrets.BUILD_GIT_TOKEN }}
-      run: |
-        git checkout ${{ env.DEVELOP_BRANCH }} && git pull
-        git merge ${{ github.ref_name }} && git push
 
     - name: slack message vars
       id: slack_vars

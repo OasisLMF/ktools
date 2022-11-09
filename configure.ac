@@ -191,7 +191,6 @@ AC_CONFIG_FILES([
 		 src/katparquet/Makefile
 		 src/footprintconv/Makefile
 		 src/fmprofilebinconv/Makefile
-		 src/validateitems/Makefile
 		 src/validatedamagebin/Makefile
 		 src/validatefootprint/Makefile
 		 src/validateoasisfiles/Makefile

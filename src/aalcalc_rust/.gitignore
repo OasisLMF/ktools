@@ -3,3 +3,6 @@
 ./target/
 target/
 .idea
+
+venv/
+work/summary_three/

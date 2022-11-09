@@ -3,12 +3,15 @@ name = "aalcalc_rust"
 version = "0.1.0"
 edition = "2021"
 
-[output.html]
-mathjax-support = true
-
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-tokio = { version = "1.21.2", features = ["full"] }
 byteorder = "1.4.3"
-rayon = "1.5"
+glob = "0.3.0"
+profiling = "1.0.7"
+
+
+[profile.release]
+incremental = true
+debug = true
+lto = "fat"

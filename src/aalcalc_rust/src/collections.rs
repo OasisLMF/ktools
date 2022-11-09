@@ -1,6 +1,9 @@
 use std::collections::HashMap;
 
+use super::processes::{calculate_standard_deviation, calculate_st_deviation_two};
 
+
+#[derive(Debug)]
 pub struct SummaryStatistics {
     pub summary_id: i32,
     pub ni_loss: f32,
@@ -27,6 +30,18 @@ impl SummaryStatistics {
             ni_loss_map,
             period_categories
         }
+    }
+
+    pub fn print_type_one_stats(&self, number_of_periods: i32) {
+        let type_one_ni = self.ni_loss / number_of_periods as f32;
+        let standard_deviation = calculate_standard_deviation(&self.ni_loss_map, number_of_periods);
+        println!("{},1,{},{}", self.summary_id, type_one_ni, standard_deviation);
+    }
+
+    pub fn print_type_two_stats(&self, number_of_periods: i32) {
+        let type_two_sample = self.total_loss / (number_of_periods * number_of_periods) as f32;
+        let standard_deviation_two = calculate_st_deviation_two(&self.period_categories, number_of_periods * 10);
+        println!("{},2,{},{}", self.summary_id, type_two_sample, standard_deviation_two);
     }
 
 }

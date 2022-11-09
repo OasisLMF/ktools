@@ -125,7 +125,13 @@ pub struct Summary {
     pub event_id: i32,
     pub summary_id: i32,
     pub exposure_value: i32,
-    pub events: Vec<Event>
+    pub events: Vec<Event>,
+    // below are statistics needed for the event
+    pub sample_size: i32,
+    pub total_loss: f32,
+    pub squared_total_loss: f32,
+    pub ni_loss_map: HashMap<i32, f32>,
+    pub period_categories: HashMap<i32, Vec<f32>>
 }
 
 impl Summary {
@@ -138,12 +144,24 @@ impl Summary {
     /// * exposure_value: don't know will need to be filled in
     pub fn from_bytes(event_id: &[u8], summary_id: &[u8], exposure_value: &[u8]) -> Self {
         let events: Vec<Event> = vec![];
+        let ni_loss_map: HashMap<i32, f32> = HashMap::new();
+        let period_categories: HashMap<i32, Vec<f32>> = HashMap::new();
+
         return Summary { 
             event_id: LittleEndian::read_i32(event_id), 
             summary_id: LittleEndian::read_i32(summary_id), 
             exposure_value: LittleEndian::read_i32(exposure_value), 
-            events: events 
+            events: events,
+            sample_size: 0,
+            total_loss: 0.0,
+            squared_total_loss: 0.0,
+            ni_loss_map,
+            period_categories
         }
+    }
+
+    pub fn add_event(&self, event: Event) {
+
     }
 }
 
@@ -216,7 +234,7 @@ impl SummaryData {
                     let period_categories = HashMap::new();
 
                     let mut event = Event{
-                        event_id: summary.event_id.clone(), 
+                        event_id: summary.event_id.clone(),
                         maximum_loss: None,
                         numerical_mean: 0.0,
                         standard_deviation: None,
@@ -262,34 +280,34 @@ impl SummaryData {
 }
 
 
-#[cfg(test)]
-mod summary_data_tests {
-
-    use super::{SummaryData};
-    use tokio;
-
-    #[tokio::test]
-    async fn test_new() {
-        let sum_data = SummaryData::new(String::from("./work/summary_aal/summary_1.bin"));
-        assert_eq!(50331649, sum_data.stream_id);
-        assert_eq!(10, sum_data.no_of_samples);
-        assert_eq!(1, sum_data.summary_set);
-    }
-
-    #[tokio::test]
-    async fn test_get_data() {
-        let mut sum_data = SummaryData::new(String::from("./work/summary_aal/summary_1.bin"));
-        let summaries = sum_data.get_data();
-
-        let first_summary = summaries[0].clone();
-
-        assert_eq!(1, first_summary.event_id);
-        assert_eq!(1, first_summary.summary_id);
-        assert_eq!(1240736768, first_summary.exposure_value);
-
-        let events = first_summary.events[0].clone();
-
-        assert_eq!(10, events.losses.len());
-    }
-
-}
+// #[cfg(test)]
+// mod summary_data_tests {
+//
+//     use super::{SummaryData};
+//     use tokio;
+//
+//     #[tokio::test]
+//     async fn test_new() {
+//         let sum_data = SummaryData::new(String::from("./work/summary_aal/summary_1.bin"));
+//         assert_eq!(50331649, sum_data.stream_id);
+//         assert_eq!(10, sum_data.no_of_samples);
+//         assert_eq!(1, sum_data.summary_set);
+//     }
+//
+//     #[tokio::test]
+//     async fn test_get_data() {
+//         let mut sum_data = SummaryData::new(String::from("./work/summary_aal/summary_1.bin"));
+//         let summaries = sum_data.get_data();
+//
+//         let first_summary = summaries[0].clone();
+//
+//         assert_eq!(1, first_summary.event_id);
+//         assert_eq!(1, first_summary.summary_id);
+//         assert_eq!(1240736768, first_summary.exposure_value);
+//
+//         let events = first_summary.events[0].clone();
+//
+//         assert_eq!(10, events.losses.len());
+//     }
+//
+// }

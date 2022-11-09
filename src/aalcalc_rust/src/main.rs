@@ -1,40 +1,40 @@
+//! This tool is responsible for calculating the average annual losses.
+//!
+//! # Running
+//! You can run the program with the following command:
+//! ```bash
+//! aalcalc -K summary_aal
+//! ```
+//!
 mod data_access_layer;
 mod processes;
 mod collections;
 
 use data_access_layer::occurrence::OccurrenceData;
 use data_access_layer::summary::{SummaryData};
-use processes::{calculate_standard_deviation, calculate_st_deviation_two};
 use collections::SummaryStatistics;
+use processes::{add_two_vectors, get_all_binary_file_paths};
 
 use std::collections::HashMap;
 
 
-fn add_two_vectors(one: &mut Vec<f32>, two: &Vec<f32>) {
-    for i in 0..one.len() {
-        one[i as usize] += two[i as usize];
-    }
-}
-
-
-#[tokio::main]
-async fn main() {
+fn main() {
     // get data around the occurrences
-    let mut occ_data = OccurrenceData::new(String::from("./input/occurrence.bin")).await;
-    let raw_data = occ_data.get_data().await;
+    let mut occ_data = OccurrenceData::new(String::from("./input/occurrence.bin"));
+    let raw_data = occ_data.get_data();
     let occurrences = raw_data;
     let number_of_periods = occ_data.period_number;
 
     // define map for summary statistics
     let mut summary_map: HashMap<i32, SummaryStatistics> = HashMap::new();
 
-    let files = [
-        String::from("./work/summary_aal/summary_1.bin"), 
-        String::from("./work/summary_aal/summary_2.bin")
-        ];
+    // get all files in directory
+    let file_pattern = String::from("./work/summary_three/*.bin");
+    let files = get_all_binary_file_paths(file_pattern);
 
     // run the processes in parallel
     let _ = files.iter().map(|i| {
+
         let mut sum_data = SummaryData::new(i.clone());
         let vec_capacity = sum_data.no_of_samples;
         let summaries = sum_data.get_data(&occurrences, vec_capacity);
@@ -88,20 +88,23 @@ async fn main() {
         }
         return 1
     }).collect::<Vec<i32>>();
-    // .collect_into_vec(&mut buffer);
 
-    let summary_statistics = summary_map.get_mut(&1).unwrap();
+    let mut summary_ids: Vec<&i32> = summary_map.keys().collect();
+    summary_ids.sort();
 
-    // calculate the standard deviation and mean for the summary ID
-    let type_one_ni = summary_statistics.ni_loss / number_of_periods as f32;
-    let type_two_sample = summary_statistics.total_loss / (number_of_periods * number_of_periods) as f32;
-    let standard_deviation = calculate_standard_deviation(&summary_statistics.ni_loss_map, number_of_periods);
-    let standard_deviation_two = calculate_st_deviation_two(&summary_statistics.period_categories, number_of_periods * 10);
+    println!("\n\nsummary_id,type,mean,standard_deviation");
 
-    // printout the statistics
-    println!("standard deviation: {:?}", standard_deviation);
-    println!("standard deviation two: {:?}", standard_deviation_two);
-    println!("total loss: {:?}", summary_statistics.total_loss);
-    println!("type 1 ni: {:?}", type_one_ni);
-    println!("type 2 sample: {:?}", type_two_sample);
+    // for i in &summary_ids {
+    //     let sum_stats = &summary_map.get(i).unwrap();
+    //     sum_stats.print_type_one_stats(number_of_periods);
+    // }
+    // for i in &summary_ids {
+    //     let sum_stats = &summary_map.get(i).unwrap();
+    //     sum_stats.print_type_two_stats(number_of_periods);
+    // }
+    // summary_id,type,mean,standard_deviation
+    // 1,1,361999.987500,643234.861354
+    // 2,1,12750.000000,40319.040167
+    // 1,2,355150.791250,681288.772663
+    // 2,2,12683.683545,48889.295168
 }

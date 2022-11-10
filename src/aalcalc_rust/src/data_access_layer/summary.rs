@@ -280,29 +280,28 @@ impl SummaryData {
                     summary.ni_loss_squared += event.ni_loss_squared;
                     summary.ni_loss += event.ni_loss;
 
+                    for (key, value) in &event.period_categories {
+                        match summary.period_categories.get_mut(&key) {
+                            Some(data) => {
+                                add_two_vectors(data, &value);
+                            },
+                            None => {
+                                summary.period_categories.insert(key.clone(), value.clone());
+                            }
+                        }
+                    }
+                    for occurrence in occurrences_vec {
+                        let occ_period = occurrence.period_num;
 
-                    // for (key, value) in &event.period_categories {
-                    //     match summary.period_categories.get_mut(&key) {
-                    //         Some(data) => {
-                    //             add_two_vectors(data, &value);
-                    //         },
-                    //         None => {
-                    //             summary.period_categories.insert(key.clone(), value.clone());
-                    //         }
-                    //     }
-                    // }
-                    // for occurrence in occurrences_vec {
-                    //     let occ_period = occurrence.period_num;
-                    //
-                    //     match summary.ni_loss_map.get_mut(&occ_period) {
-                    //         Some(data) => {
-                    //             *data += &event.numerical_mean;
-                    //         },
-                    //         None => {
-                    //             summary.ni_loss_map.insert(occ_period, event.numerical_mean.clone());
-                    //         }
-                    //     }
-                    // }
+                        match summary.ni_loss_map.get_mut(&occ_period) {
+                            Some(data) => {
+                                *data += &event.numerical_mean;
+                            },
+                            None => {
+                                summary.ni_loss_map.insert(occ_period, event.numerical_mean.clone());
+                            }
+                        }
+                    }
                     summary.events.push(event);
                     break
                 }

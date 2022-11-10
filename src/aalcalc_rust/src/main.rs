@@ -60,43 +60,16 @@ fn main() {
             summary_statistics.ni_loss += summary.ni_loss;
             summary_statistics.period_categories = summary.period_categories;
 
-            // for (key, value) in summary.ni_loss_map {
-            //     match summary_statistics.ni_loss_map.get_mut(&key) {
-            //         Some(data) => {
-            //             *data += value;
-            //         },
-            //         None => {
-            //             summary_statistics.ni_loss_map.insert(key, value);
-            //         }
-            //     }
-            // }
-
-            for event in summary.events {
-                for (key, value) in event.period_categories {
-                    match summary_statistics.period_categories.get_mut(&key) {
-                        Some(data) => {
-                            add_two_vectors(data, &value);
-                        },
-                        None => {
-                            summary_statistics.period_categories.insert(key, value);
-                        }
-                    }
-                }
-
-                for occurrence in *occurrences_vec {
-                    let occ_period = occurrence.period_num;
-
-                    match summary_statistics.ni_loss_map.get_mut(&occ_period) {
-                        Some(data) => {
-                            *data += event.numerical_mean
-                        },
-                        None => {
-                            summary_statistics.ni_loss_map.insert(occ_period, event.numerical_mean);
-                        }
+            for (key, value) in summary.ni_loss_map {
+                match summary_statistics.ni_loss_map.get_mut(&key) {
+                    Some(data) => {
+                        *data += value;
+                    },
+                    None => {
+                        summary_statistics.ni_loss_map.insert(key, value);
                     }
                 }
             }
-            println!("{:?}", summary_statistics.ni_loss_map);
         }
         return 1
     }).collect::<Vec<i32>>();

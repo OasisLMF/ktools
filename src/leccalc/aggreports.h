@@ -53,10 +53,10 @@ enum { MEANS = 0, SAMPLES };
 enum { WHEATSHEAF = 0, WHEATSHEAF_MEAN };
 
 struct line_points{
-	OASIS_FLOAT from_x;
-	OASIS_FLOAT from_y;
-	OASIS_FLOAT to_x;
-	OASIS_FLOAT to_y;
+	double from_x;
+	double from_y;
+	double to_x;
+	double to_y;
 };
 
 class aggreports {

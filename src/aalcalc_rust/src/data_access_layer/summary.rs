@@ -3,6 +3,7 @@ use std::{fs::File, io::Read};
 use std::collections::HashMap;
 
 use super::occurrence::Occurrence;
+use crate::processes::add_two_vectors;
 
 
 /// Holds ```sidx``` and losses for an event.
@@ -131,7 +132,10 @@ pub struct Summary {
     pub total_loss: f32,
     pub squared_total_loss: f32,
     pub ni_loss_map: HashMap<i32, f32>,
-    pub period_categories: HashMap<i32, Vec<f32>>
+    pub period_categories: HashMap<i32, Vec<f32>>,
+    pub ni_loss_squared: f32,
+    pub ni_loss: f32,
+    pub numerical_mean: f32
 }
 
 impl Summary {
@@ -156,12 +160,11 @@ impl Summary {
             total_loss: 0.0,
             squared_total_loss: 0.0,
             ni_loss_map,
-            period_categories
+            period_categories,
+            ni_loss_squared: 0.0,
+            ni_loss: 0.0,
+            numerical_mean: 0.0
         }
-    }
-
-    pub fn add_event(&self, event: Event) {
-
     }
 }
 
@@ -178,7 +181,8 @@ pub struct SummaryData {
     pub handler: File,
     pub stream_id: i32,
     pub no_of_samples: i32,
-    pub summary_set: i32
+    pub summary_set: i32,
+    pub data: Vec<u8>
 }
 
 impl SummaryData {
@@ -201,11 +205,15 @@ impl SummaryData {
         file.read_exact(&mut num_buffer).unwrap();
         let summary_set = LittleEndian::read_i32(&num_buffer);
 
+        let mut data: Vec<u8> = Vec::new();
+        file.read_to_end(&mut data).unwrap();
+
         return SummaryData {
             stream_id,
             no_of_samples,
             summary_set,
-            handler: file
+            handler: file,
+            data
         }
     }
 
@@ -214,67 +222,93 @@ impl SummaryData {
     /// # Returns
     /// all the summaries in the binary file attached to the ```SummaryData``` struct
     pub fn get_data(&mut self, reference_data: &HashMap<i32, Vec<Occurrence>>, vec_capacity: i32) -> Vec<Summary> {
-        let mut meta_read_frame = [0; 12];
-        let mut event_read_frame = [0; 8];
         let mut buffer = vec![];
 
-        loop {
-            // gets new summary
-            match self.handler.read_exact(&mut meta_read_frame) {
-                Ok(_) => {
-                    let mut chunked_meta_frame = meta_read_frame.chunks(4).into_iter();
+        let end = self.data.len();
+        let mut start = 0;
+        let mut finish = 4;
 
-                    let mut summary = Summary::from_bytes(
-                        chunked_meta_frame.next().unwrap(), 
-                        chunked_meta_frame.next().unwrap(), 
-                        chunked_meta_frame.next().unwrap()
-                    );
+        while finish <= end {
 
-                    let occurrences_vec = reference_data.get(&summary.event_id).unwrap();
-                    let period_categories = HashMap::new();
+            // extract the header data
+            let event_id = &self.data[start..finish];
+            start += 4;
+            finish += 4;
+            let summary_id = &self.data[start..finish];
+            start += 4;
+            finish += 4;
+            let exposure_value = &self.data[start..finish];
+            start += 4;
+            finish += 4;
 
-                    let mut event = Event{
-                        event_id: summary.event_id.clone(),
-                        maximum_loss: None,
-                        numerical_mean: 0.0,
-                        standard_deviation: None,
-                        sample_size: 0,
-                        period_categories,
-                        squared_total_loss: 0.0,
-                        total_loss: 0.0,
-                        ni_loss: 0.0,
-                        ni_loss_squared: 0.0
-                    };
+            let mut summary = Summary::from_bytes(
+                event_id,
+                summary_id,
+                exposure_value
+            );
+            let occurrences_vec = reference_data.get(&summary.event_id).unwrap();
+            let period_categories = HashMap::new();
 
-                    // loop through adding the losses to the event
-                    loop {
-                        match self.handler.read_exact(&mut event_read_frame) {
-                            Ok(_) => {
-                                let mut chunked_event_read_frame = event_read_frame.chunks(4).into_iter();
-                                let sidx = chunked_event_read_frame.next().unwrap();
-                                let loss = chunked_event_read_frame.next().unwrap();
-                                let pushed = event.add_loss(sidx, loss, occurrences_vec, vec_capacity);
-                                if pushed == false {
-                                    summary.events.push(event);
-                                    break
-                                }
-                            },
-                            Err(error) => {
-                                panic!("{}", error);
-                            }
-                        }
-                    }
-                    buffer.push(summary);
-                },
-                Err(error) => {
-                    if error.to_string().as_str() != "failed to fill whole buffer" {
-                        println!("{}", error);
-                    }
+            let mut event = Event{
+                event_id: summary.event_id.clone(),
+                maximum_loss: None,
+                numerical_mean: 0.0,
+                standard_deviation: None,
+                sample_size: 0,
+                period_categories,
+                squared_total_loss: 0.0,
+                total_loss: 0.0,
+                ni_loss: 0.0,
+                ni_loss_squared: 0.0
+            };
+
+            // extract the losses for the event
+            while finish <= end {
+                let sidx = &self.data[start..finish];
+                start += 4;
+                finish += 4;
+                let loss = &self.data[start..finish];
+                start += 4;
+                finish += 4;
+                let pushed = event.add_loss(sidx, loss, occurrences_vec, vec_capacity);
+
+                // if false this is the end of the event stream for the summary.
+                if pushed == false {
+                    summary.sample_size += event.sample_size;
+                    summary.squared_total_loss += event.squared_total_loss;
+                    summary.total_loss += event.total_loss;
+                    summary.ni_loss_squared += event.ni_loss_squared;
+                    summary.ni_loss += event.ni_loss;
+
+
+                    // for (key, value) in &event.period_categories {
+                    //     match summary.period_categories.get_mut(&key) {
+                    //         Some(data) => {
+                    //             add_two_vectors(data, &value);
+                    //         },
+                    //         None => {
+                    //             summary.period_categories.insert(key.clone(), value.clone());
+                    //         }
+                    //     }
+                    // }
+                    // for occurrence in occurrences_vec {
+                    //     let occ_period = occurrence.period_num;
+                    //
+                    //     match summary.ni_loss_map.get_mut(&occ_period) {
+                    //         Some(data) => {
+                    //             *data += &event.numerical_mean;
+                    //         },
+                    //         None => {
+                    //             summary.ni_loss_map.insert(occ_period, event.numerical_mean.clone());
+                    //         }
+                    //     }
+                    // }
+                    summary.events.push(event);
                     break
                 }
-            };
-            
-        };
+            }
+            buffer.push(summary);
+        }
         return buffer
     }
 }

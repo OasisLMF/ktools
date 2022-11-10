@@ -8,7 +8,6 @@
 #include "../include/oasis.h"
 
 
-//inline OASIS_FLOAT linear_interpolate(line_points lp, OASIS_FLOAT xpos) {
 inline double linear_interpolate(const line_points lp, const double xpos) {
   return ((xpos - lp.to_x) * (lp.from_y - lp.to_y) / (lp.from_x - lp.to_x)) + lp.to_y;
 }
@@ -47,17 +46,13 @@ bool operator<(const wheatkey &lhs, const wheatkey &rhs) {
 aggreports::aggreports(const int totalperiods, FILE **fout,
 		       const bool useReturnPeriodFile, const bool *outputFlags,
 		       const bool ordFlag,
-		       const std::string *parquetFileNames,
-		       const char *progname) :
+		       const std::string *parquetFileNames) :
 	totalperiods_(totalperiods), fout_(fout),
 	useReturnPeriodFile_(useReturnPeriodFile), outputFlags_(outputFlags),
-	ordFlag_(ordFlag), parquetFileNames_(parquetFileNames),
-	progname_(progname)
+	ordFlag_(ordFlag), parquetFileNames_(parquetFileNames)
 {
 
   LoadReturnPeriods();
-//  logprintf(progname_, "INFO", "loss,next_rp_val,last_rp,last_loss,current_rp,current_loss\n");
-  logprintf(progname_, "INFO", "useReturnPeriodFile = %d\n", useReturnPeriodFile);
 
 }
 
@@ -122,12 +117,7 @@ void aggreports::LoadReturnPeriods() {
 void aggreports::LoadPeriodsToWeighting() {
 
   FILE *fin = fopen(PERIODS_FILE, "rb");
-  if (fin == nullptr) {
-    logprintf(progname_, "INFO", "retperiod,i\n");
-    return;
-  }
-  logprintf(progname_, "INFO",
-	    "retperiod,cumulative_weighting,lp.period_weighting\n");
+  if (fin == nullptr) return;
 
   Periods p;
   OASIS_FLOAT total_weighting = 0;
@@ -191,7 +181,6 @@ OASIS_FLOAT aggreports::GetLoss(const double next_return_period,
     lpt.from_y = last_loss;
     lpt.to_x = current_return_period;
     lpt.to_y = current_loss;
-//    OASIS_FLOAT zz = linear_interpolate(lpt, next_return_period);
     double zz = linear_interpolate(lpt, next_return_period);
     return zz;
   }
@@ -269,9 +258,6 @@ void aggreports::WriteReturnPeriodOut(const std::vector<int> &fileIDs,
 
     OASIS_FLOAT loss = GetLoss(nextreturnperiod_value, last_return_period,
 			       last_loss, current_return_period, current_loss);
-/*    logprintf(progname_, "INFO", "%f,%f,%f,%f,%f,%f\n", loss,
-	      nextreturnperiod_value, last_return_period, last_loss,
-	      current_return_period, current_loss);*/
     if (WriteOutput != nullptr) {
     	(this->*WriteOutput)(fileIDs, summary_id, epcalc, eptype,
 			     nextreturnperiod_value, loss);
@@ -508,12 +494,10 @@ void aggreports::WriteExceedanceProbabilityTable(
     double last_computed_rp = 0;
     OASIS_FLOAT last_computed_loss = 0;
     OASIS_FLOAT tvar = 0;
-//    int i = 1;
     long i = 1;
 
     for (auto lp : lpv) {
       double retperiod = max_retperiod / i;
-      if (retperiod < 1) logprintf(progname_, "INFO", "%f,%d\n", retperiod, i);
 
       if (useReturnPeriodFile_) {
 #ifdef ORD_OUTPUT
@@ -620,8 +604,6 @@ void aggreports::WriteExceedanceProbabilityTable(
       if (lp.period_weighting) {
 	double retperiod = 1 / cumulative_weighting;
 	if (retperiod < 1)
-	  logprintf(progname_, "INFO", "%f,%f,%f\n", retperiod,
-		    cumulative_weighting, lp.period_weighting);
 
 	if (!largest_loss) {
 	  max_retperiod = retperiod + 0.0001;   // Add for floating point errors

@@ -1080,7 +1080,8 @@ void aggreports::OutputFullUncertainty(const int handle, int eptype,
     return;
   }
 
-  FullUncertainty(fileIDs, GetOutLoss, epcalc, eptype, eptype_tvar);
+  FullUncertaintyWithWeighting(fileIDs, GetOutLoss, epcalc, eptype,
+			       eptype_tvar);
 
 }
 

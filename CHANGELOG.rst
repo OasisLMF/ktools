@@ -1,6 +1,15 @@
 Ktools Changelog
 ================
 
+`v3.9.5`_
+ ---------
+* [#330](https://github.com/OasisLMF/ktools/pull/330) - Hotfix/GitHub actions
+* [#331](https://github.com/OasisLMF/ktools/pull/331) - Hotfix/GitHub actions update
+* [#166](https://github.com/OasisLMF/ktools/pull/332) - Finish developing validateitems
+* [#333](https://github.com/OasisLMF/ktools/pull/333) - Remove auto-merge feature
+* [#329, #334](https://github.com/OasisLMF/ktools/pull/335) - Increase precision of return periods + use period weights in full uncertainty output in leccalc/ordleccalc
+.. _`v3.9.5`:  https://github.com/OasisLMF/ktools/compare/v3.9.4...v3.9.5
+
 `v3.9.4`_
  ---------
 * [#323, #278](https://github.com/OasisLMF/ktools/pull/328) - Fix missing header in Wheatsheaf output and refactor aggreports class

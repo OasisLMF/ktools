@@ -29,14 +29,6 @@ env:
   PREV_RELEASE_TAG: "v${{ inputs.prev_release_tag }}"
   PRE_RELEASE: ${{ inputs.pre_release }}
 
-## -- TESTING ONLY ----
-#
-#  MAIN_BRANCH: "test-master"     # Gitflow - Production branch for ktools repo
-#  DEVELOP_BRANCH: "test-develop" # Gitflow - Develop branch for ktools repo
-#  KTOOLS_VER: '3.9.5rc1'
-#  RELEASE_TAG: 'v3.9.5rc1'
-#  PREV_RELEASE_TAG: 'v3.9.3'
-#  PRE_RELEASE: 'true'
 
 jobs:
   update:
@@ -210,7 +202,8 @@ jobs:
           --to-tag ${{ env.RELEASE_TAG }} \
           --github-token ${{ secrets.BUILD_GIT_TOKEN }} \
           --local-repo-path ./ \
-          --output-path ./CHANGELOG.rst
+          --output-path ./CHANGELOG.rst \
+          --apply-milestone
 
         git add ./CHANGELOG.rst
         git commit -m 'Update changelog'
@@ -224,7 +217,6 @@ jobs:
           --to-tag ${{ env.RELEASE_TAG }} \
           --github-token ${{ secrets.BUILD_GIT_TOKEN }} \
           --local-repo-path ./ \
-          --apply-milestone
           --output-path ./RELEASE.md
 
     - name: Push changes

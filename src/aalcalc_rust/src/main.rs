@@ -20,7 +20,7 @@ use std::collections::HashMap;
 
 fn main() {
     // get data around the occurrences
-    let mut occ_data = OccurrenceData::new(String::from("./input/occ_small.bin"));
+    let mut occ_data = OccurrenceData::new(String::from("./input/occurrence.bin"));
     let raw_data = occ_data.get_data();
     let occurrences = raw_data;
     let number_of_periods = occ_data.period_number;
@@ -40,7 +40,7 @@ fn main() {
         let summaries = sum_data.get_data(&occurrences, vec_capacity);
 
         for summary in summaries {
-            let occurrences_vec = &occurrences.get(&summary.event_id).unwrap();
+            // let occurrences_vec = &occurrences.get(&summary.event_id).unwrap();
 
             let mut summary_statistics: &mut SummaryStatistics;
             match summary_map.get_mut(&summary.summary_id) {

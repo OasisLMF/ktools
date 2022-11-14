@@ -83,6 +83,7 @@ fn main() {
         let sum_stats = &summary_map.get(i).unwrap();
         sum_stats.print_type_one_stats(number_of_periods);
     }
+
     for i in &summary_ids {
         let sum_stats = &summary_map.get(i).unwrap();
         sum_stats.print_type_two_stats(number_of_periods);

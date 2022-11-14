@@ -70,6 +70,7 @@ impl Event {
                 let occ_num = occurrence_vec.len() as i32;
                 self.sample_size += occ_num;
 
+                println!("occurrence vector: {:?}", occurrence_vec);
                 for occ in occurrence_vec {
                     let index = sidx_int - 1;
 
@@ -273,12 +274,13 @@ impl SummaryData {
                 let pushed = event.add_loss(sidx, loss, occurrences_vec, vec_capacity);
 
                 // if false this is the end of the event stream for the summary.
-                if pushed == false {
+                if (pushed == false) | (end - finish < 8) {
                     summary.sample_size += event.sample_size;
                     summary.squared_total_loss += event.squared_total_loss;
                     summary.total_loss += event.total_loss;
                     summary.ni_loss_squared += event.ni_loss_squared;
                     summary.ni_loss += event.ni_loss;
+                    println!("event categories: {:?}\n", event.period_categories);
 
                     for (key, value) in &event.period_categories {
                         match summary.period_categories.get_mut(&key) {
@@ -290,6 +292,8 @@ impl SummaryData {
                             }
                         }
                     }
+                    println!("summary period categories: {:?}", summary.period_categories);
+                    println!("{:?}\n", occurrences_vec);
                     for occurrence in occurrences_vec {
                         let occ_period = occurrence.period_num;
 

@@ -35,6 +35,7 @@ fn main() {
     // run the processes in parallel
     let _ = files.iter().map(|i| {
 
+        // load all the data from the
         let mut sum_data = SummaryData::new(i.clone());
         let vec_capacity = sum_data.no_of_samples;
         let summaries = sum_data.get_data(&occurrences, vec_capacity);
@@ -53,7 +54,7 @@ fn main() {
                     summary_statistics = summary_map.get_mut(&summary.summary_id).unwrap();
                 }
             }
-            summary_statistics.sample_size += summary.sample_size;
+            summary_statistics.sample_size = summary.sample_size;
             summary_statistics.squared_total_loss += summary.squared_total_loss;
             summary_statistics.total_loss += summary.total_loss;
             summary_statistics.ni_loss_squared += summary.ni_loss_squared;

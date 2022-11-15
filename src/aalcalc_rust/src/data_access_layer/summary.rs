@@ -67,12 +67,11 @@ impl Event {
                 self.maximum_loss = Some(loss_float);
             },
             _ => {
-                let occ_num = occurrence_vec.len() as i32;
-                self.sample_size += occ_num;
+                self.sample_size += 1;
 
                 for occ in occurrence_vec {
                     let index = sidx_int - 1;
-                    // println!("{} {} {}", occ.event_id, sidx_int, occ.period_num);
+
                     match self.period_categories.get_mut(&occ.period_num) {
                         Some(total_array) => {
                             total_array[index as usize] += loss_float;
@@ -274,7 +273,8 @@ impl SummaryData {
 
                 // if false this is the end of the event stream for the summary.
                 if pushed == false {
-                    summary.sample_size += event.sample_size;
+                    // println!("event id: {}", event.event_id);
+                    summary.sample_size = event.sample_size;
                     summary.squared_total_loss += event.squared_total_loss;
                     summary.total_loss += event.total_loss;
                     summary.ni_loss_squared += event.ni_loss_squared;

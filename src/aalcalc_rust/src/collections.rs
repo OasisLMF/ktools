@@ -41,7 +41,9 @@ impl SummaryStatistics {
     pub fn print_type_two_stats(&self, number_of_periods: i32) {
         // println!("number of total loss: {}", self.total_loss);
         let type_two_sample = self.total_loss / (number_of_periods * number_of_periods) as f32;
+        // println!("{} {}", number_of_periods, self.sample_size);
         let standard_deviation_two = calculate_st_deviation_two(&self.period_categories, number_of_periods * self.sample_size);
+        // let standard_deviation_two = calculate_st_deviation_two(&self.period_categories, 100);
         println!("{},2,{},{}", self.summary_id, type_two_sample, standard_deviation_two);
     }
 

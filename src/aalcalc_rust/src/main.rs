@@ -13,7 +13,7 @@ mod collections;
 use data_access_layer::occurrence::OccurrenceData;
 use data_access_layer::summary::{SummaryData};
 use collections::SummaryStatistics;
-use processes::{add_two_vectors, get_all_binary_file_paths};
+use processes::{get_all_binary_file_paths, add_two_vectors};
 
 use std::collections::HashMap;
 
@@ -58,7 +58,17 @@ fn main() {
             summary_statistics.total_loss += summary.total_loss;
             summary_statistics.ni_loss_squared += summary.ni_loss_squared;
             summary_statistics.ni_loss += summary.ni_loss;
-            summary_statistics.period_categories = summary.period_categories;
+
+            for (key, value) in summary.period_categories {
+                match summary_statistics.period_categories.get_mut(&key) {
+                    Some(data) => {
+                        add_two_vectors(data, &value);
+                    },
+                    None => {
+                        summary_statistics.period_categories.insert(key, value);
+                    }
+                }
+            }
 
             for (key, value) in summary.ni_loss_map {
                 match summary_statistics.ni_loss_map.get_mut(&key) {

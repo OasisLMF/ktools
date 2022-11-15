@@ -38,7 +38,6 @@ pub fn calculate_st_deviation_two(periods: &HashMap<i32, Vec<f32>>, n: i32) -> f
 
     let alpha = sum_squared - (sum / n as f32);
     let beta = alpha / (n - 1) as f32;
-    println!("{} {} {} {:?}", sum_squared, sum, n, periods);
     return f32::sqrt(beta)
 }
 

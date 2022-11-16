@@ -18,10 +18,25 @@ use processes::{get_all_binary_file_paths, add_two_vectors};
 use std::collections::HashMap;
 use std::mem::drop;
 
+use clap::Parser;
+
+
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about = None)]
+struct Args {
+    #[arg(short, long)]
+    K: String,
+}
+
 
 fn main() {
+    let args = Args::parse();
+
+    let pwd = std::env::current_dir().unwrap().into_os_string().into_string().unwrap();
+    let occurrence_path = format!("{}/input/occurrence.bin", pwd);
+
     // get data around the occurrences
-    let mut occ_data = OccurrenceData::new(String::from("./input/occurrence.bin"));
+    let mut occ_data = OccurrenceData::new(occurrence_path);
     let raw_data = occ_data.get_data();
     let occurrences = raw_data;
     let number_of_periods = occ_data.period_number;
@@ -30,7 +45,7 @@ fn main() {
     let mut summary_map: HashMap<i32, SummaryStatistics> = HashMap::new();
 
     // get all files in directory
-    let file_pattern = String::from("./work/summary_aal_two/*.bin");
+    let file_pattern = format!("{}/work/{}/*.bin", pwd, args.K);
     let files = get_all_binary_file_paths(file_pattern);
 
     // run the processes in parallel

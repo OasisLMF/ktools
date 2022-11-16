@@ -7,11 +7,5 @@ edition = "2021"
 
 [dependencies]
 byteorder = "1.4.3"
+clap = { version = "4.0.26", features = ["derive"] }
 glob = "0.3.0"
-profiling = "1.0.7"
-
-
-[profile.release]
-incremental = true
-debug = true
-lto = "fat"

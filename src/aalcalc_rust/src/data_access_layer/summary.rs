@@ -1,3 +1,27 @@
+//!Summary data is a general summary of the events belonging to the summary and losses belonging to
+//! the events.
+//! # Loading
+//! Summary data is generally houses in a series of ```bin``` files, therefore it is advised to
+//!collect all ```bin``` files in the directory using ```glob```:
+//!```rust
+//!use processes::get_all_binary_file_paths;
+//!
+//!let file_pattern = String::from("./work/summary_aal_two/*.bin");
+//!let files = get_all_binary_file_paths(file_pattern);
+//!```
+//!We can then loop through the file paths denoting each file path as ```i``` loading the summaries
+//!with the following code:
+//!```rust
+//!let mut sum_data: SummaryData = SummaryData::new(i.clone());
+//!let vec_capacity: i32 = sum_data.no_of_samples;
+//!let summaries: Vec<Summary> = sum_data.get_data(&occurrences, vec_capacity);
+//!```
+//! # Notes
+//! It should be noted that individual losses and events are not housed in the summary data but.
+//! Instead events and losses are merely processed when loaded from the file and then dropped. This
+//! is because AAL is summary data such as totals and means etc. There is no need at this current
+//! time to keep all the events and losses in memory once the data of that loss and event has been
+//! added to the tally.
 use byteorder::{ByteOrder, LittleEndian};
 use std::{fs::File, io::Read};
 use std::collections::HashMap;
@@ -6,11 +30,22 @@ use super::occurrence::Occurrence;
 use crate::processes::add_two_vectors;
 
 
-/// Holds ```sidx``` and losses for an event.
-/// 
+/// Holds the summary statistics for a collection of losses under an event.
+///
 /// # Fields
 /// * event_id: the ID of the event
-/// * losses: vector of tuples (sidx, loss)
+/// * maximum_loss: the maximum loss that the event has endured
+/// * numerical_mean: the mean of all the losses belonging to the event
+/// * standard_deviation: The standard deviation for the losses belonging to the event
+/// * sample_size: the number of samples that houses, it must be noted that the sample size
+/// across the entire AAL calculation will be uniform
+/// * period_categories: a vector of total losses which is the length of the sample size which can
+/// be accessed using the period number as the key.
+/// * squared_total_loss: The sum of squares of each loss belonging to the event
+/// * total_loss: the total loss of all the losses belonging to the event
+/// * ni_loss: The total losses for the event where each loss is multiplied by the amount of times
+/// the loss occurs in the occurrence data.
+/// * ni_loss_squared: the sum of each loss multiplied by the occurrence squared
 #[derive(Debug, Clone)]
 pub struct Event {
     pub event_id: i32,
@@ -32,6 +67,9 @@ impl Event {
     /// # Arguments
     /// * sidx: the sample ID of the loss
     /// * loss: the total amount of the loss
+    /// * occurrence_vec: the occurrences of the event
+    /// * vec_capacity: The vec capacity needed for a ```self.period_categories``` insert which is
+    /// usually the number of samples
     /// 
     /// # Returns
     /// ```true```: loss added and should continue to add losses
@@ -101,31 +139,22 @@ impl Event {
 /// # Fields
 /// * event_id: the ID of the event that the summary belongs to
 /// * summary_id: the ID of the summary
-/// * exposure_value: don't know will need to be filled in
-/// * events: the events belonging to the summary
-/// 
-/// # Constructing from bytes 
-/// The summary can be instructed from bytes by using the following code:
-/// 
-/// ```rust
-/// let mut file = File::open("path/to/bin/file.bin").unwrap();
-/// let mut meta_read_frame = [0; 12];
-/// 
-/// file.read_exact(&mut meta_read_frame)
-/// let mut chunked_meta_frame = meta_read_frame.chunks(4).into_iter();
-/// 
-/// let mut summary = Summary::from_bytes(
-///                         chunked_meta_frame.next().unwrap(), 
-///                         chunked_meta_frame.next().unwrap(), 
-///                         chunked_meta_frame.next().unwrap());
-///                
-/// ```
+/// * exposure_value: the total insured value of the summary
+/// * sample_size: the number of samples taken (will be consistent throughout whole of AAL)
+/// * total_loss: the total loss of all events under the summary
+/// * squared_total_loss: the total loss of all squared losses under all events under the summary
+/// * ni_loss_map: total losses multiplied by occurrence of events mapped by period number
+/// * period_categories: a vector of total losses which is the length of the sample size which can
+/// be accessed using the period number as the key.
+/// * ni_loss: The total losses for the event where each loss is multiplied by the amount of times
+/// the loss occurs in the occurrence data.
+/// * ni_loss_squared: the sum of each loss multiplied by the occurrence squared
+/// * numerical_mean: the mean of all the events belonging to the summary
 #[derive(Debug, Clone)]
 pub struct Summary {
     pub event_id: i32,
     pub summary_id: i32,
     pub exposure_value: i32,
-    pub events: Vec<Event>,
     // below are statistics needed for the event
     pub sample_size: i32,
     pub total_loss: f32,
@@ -146,7 +175,7 @@ impl Summary {
     /// * summary_id: the ID of the summary
     /// * exposure_value: don't know will need to be filled in
     pub fn from_bytes(event_id: &[u8], summary_id: &[u8], exposure_value: &[u8]) -> Self {
-        let events: Vec<Event> = vec![];
+        // let events: Vec<Event> = vec![];
         let ni_loss_map: HashMap<i32, f32> = HashMap::new();
         let period_categories: HashMap<i32, Vec<f32>> = HashMap::new();
 
@@ -154,7 +183,7 @@ impl Summary {
             event_id: LittleEndian::read_i32(event_id), 
             summary_id: LittleEndian::read_i32(summary_id), 
             exposure_value: LittleEndian::read_i32(exposure_value), 
-            events: events,
+            // events: events,
             sample_size: 0,
             total_loss: 0.0,
             squared_total_loss: 0.0,
@@ -175,6 +204,7 @@ impl Summary {
 /// * stream_id: the ID of the stream for the summary 
 /// * no_of_samples: The number of samples per summary (consistent for each summary)
 /// * summary_set: don't know will need to be filled in
+/// * data: raw bytes loaded from the binary file to be processed
 #[derive(Debug)]
 pub struct SummaryData {
     pub handler: File,
@@ -216,7 +246,14 @@ impl SummaryData {
         }
     }
 
-    /// Gets all the summaries and events belonging to the summary in the binary file attached to the ```SummaryData``` struct.
+    /// Gets all the summaries and events belonging to the summary in the binary file attached
+    /// to the ```SummaryData``` struct. Whilst the data is being loaded from the file, summary
+    /// statistics are calculated on the fly and added to each summary in-turn dropping all events
+    /// and losses from memory as soon as the data is added to the summary statistics.
+    ///
+    /// # Arugments
+    /// * reference_data: vector of occurrences mapped by event_id
+    /// * vec_capacity: number of samples that need to be stored
     /// 
     /// # Returns
     /// all the summaries in the binary file attached to the ```SummaryData``` struct
@@ -302,7 +339,7 @@ impl SummaryData {
                             }
                         }
                     }
-                    summary.events.push(event);
+                    // summary.events.push(event);
                     break
                 }
             }
@@ -313,34 +350,16 @@ impl SummaryData {
 }
 
 
-// #[cfg(test)]
-// mod summary_data_tests {
-//
-//     use super::{SummaryData};
-//     use tokio;
-//
-//     #[tokio::test]
-//     async fn test_new() {
-//         let sum_data = SummaryData::new(String::from("./work/summary_aal/summary_1.bin"));
-//         assert_eq!(50331649, sum_data.stream_id);
-//         assert_eq!(10, sum_data.no_of_samples);
-//         assert_eq!(1, sum_data.summary_set);
-//     }
-//
-//     #[tokio::test]
-//     async fn test_get_data() {
-//         let mut sum_data = SummaryData::new(String::from("./work/summary_aal/summary_1.bin"));
-//         let summaries = sum_data.get_data();
-//
-//         let first_summary = summaries[0].clone();
-//
-//         assert_eq!(1, first_summary.event_id);
-//         assert_eq!(1, first_summary.summary_id);
-//         assert_eq!(1240736768, first_summary.exposure_value);
-//
-//         let events = first_summary.events[0].clone();
-//
-//         assert_eq!(10, events.losses.len());
-//     }
-//
-// }
+#[cfg(test)]
+mod summary_data_tests {
+
+    use super::{SummaryData};
+
+    #[test]
+    fn test_new() {
+        let sum_data = SummaryData::new(String::from("./work/summary_aal/summary_1.bin"));
+        assert_eq!(50331649, sum_data.stream_id);
+        assert_eq!(10, sum_data.no_of_samples);
+        assert_eq!(1, sum_data.summary_set);
+    }
+}

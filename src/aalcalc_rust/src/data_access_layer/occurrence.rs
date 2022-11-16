@@ -1,3 +1,15 @@
+//!Occurrence data denotes the number of times an event will occur. We can then reference these
+//!occurrences against the losses of each event that we are loading.
+//!
+//!# Loading occurrence data
+//!We can load the occurrence data from a ```bin``` with the following code:
+//!```rust
+//!let mut occ_data: OccurrenceData = OccurrenceData::new(String::from("./input/occurrence.bin"));
+//!let raw_data: HashMap<i32, Vec<Occurrence>> = occ_data.get_data();
+//!let occurrences_vec = reference_data.get(event_id).unwrap();
+//!```
+//!We can see that we can get a vector of occurrences belonging to an event as the keys for the
+//!```raw_data``` are events IDs.
 use std::{fs::File, io::Read};
 use byteorder::{ByteOrder, LittleEndian};
 use std::cmp::PartialEq;
@@ -175,28 +187,26 @@ impl OccurrenceData {
 }
 
 
-// #[cfg(test)]
-// mod occurrence_data_tests {
-//
-//     use super::{OccurrenceData, DateFormat};
-//     use tokio;
-//
-//     #[tokio::test]
-//     async fn test_new() {
-//
-//         let occ_data = OccurrenceData::new(String::from("./input/occurrence.bin")).await;
-//         assert_eq!(10, occ_data.period_number);
-//         assert_eq!(12, occ_data.chunk_size);
-//         assert_eq!(DateFormat::NewFormat, occ_data.date_format);
-//     }
-//
-//     #[tokio::test]
-//     async fn test_get_data() {
-//         let mut occ_data = OccurrenceData::new(String::from("./input/occurrence.bin")).await;
-//         let data = occ_data.get_data().await;
-//         println!("{:?}", data);
-//         assert_eq!(2, data.get(&1).unwrap().len());
-//         assert_eq!(2, data.get(&2).unwrap().len());
-//     }
-//
-// }
+#[cfg(test)]
+mod occurrence_data_tests {
+
+    use super::{OccurrenceData, DateFormat, Occurrence};
+
+    #[test]
+    fn test_new() {
+        let occ_data = OccurrenceData::new(String::from("./input/occurrence.bin"));
+        assert_eq!(10, occ_data.period_number);
+        assert_eq!(12, occ_data.chunk_size);
+        assert_eq!(DateFormat::NewFormat, occ_data.date_format);
+    }
+
+    #[test]
+    fn test_get_data() {
+        let mut occ_data = OccurrenceData::new(String::from("./input/occurrence.bin"));
+        let data = occ_data.get_data();
+        println!("{:?}", data);
+        assert_eq!(2, data.get(&1).unwrap().len());
+        assert_eq!(2, data.get(&2).unwrap().len());
+    }
+
+}

@@ -16,6 +16,7 @@ use collections::SummaryStatistics;
 use processes::{get_all_binary_file_paths, add_two_vectors};
 
 use std::collections::HashMap;
+use std::mem::drop;
 
 
 fn main() {
@@ -39,10 +40,11 @@ fn main() {
         let mut sum_data = SummaryData::new(i.clone());
         let vec_capacity = sum_data.no_of_samples;
         let summaries = sum_data.get_data(&occurrences, vec_capacity);
+        drop(sum_data);
 
         for summary in summaries {
-            // let occurrences_vec = &occurrences.get(&summary.event_id).unwrap();
 
+            // extract the summary statistics if it exists, crease one if not
             let mut summary_statistics: &mut SummaryStatistics;
             match summary_map.get_mut(&summary.summary_id) {
                 Some(statistics) => {
@@ -54,6 +56,7 @@ fn main() {
                     summary_statistics = summary_map.get_mut(&summary.summary_id).unwrap();
                 }
             }
+            // update the summary statistics with the data from the summary
             summary_statistics.sample_size = summary.sample_size;
             summary_statistics.squared_total_loss += summary.squared_total_loss;
             summary_statistics.total_loss += summary.total_loss;
@@ -85,11 +88,13 @@ fn main() {
         return 1
     }).collect::<Vec<i32>>();
 
+    // order the summary IDs for printing out
     let mut summary_ids: Vec<&i32> = summary_map.keys().collect();
     summary_ids.sort();
 
     println!("\n\nsummary_id,type,mean,standard_deviation");
 
+    // print out summary statistics
     for i in &summary_ids {
         let sum_stats = &summary_map.get(i).unwrap();
         sum_stats.print_type_one_stats(number_of_periods);

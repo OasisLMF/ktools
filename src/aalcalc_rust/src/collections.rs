@@ -116,7 +116,7 @@ impl SummaryStatistics {
     /// # Arguments
     /// * number_of_periods: the ```period_number``` of the constructed ```OccurrenceData```
     pub fn print_type_two_stats(&self, number_of_periods: i32) {
-        let type_two_sample = self.total_loss / (number_of_periods * number_of_periods) as f32;
+        let type_two_sample = self.total_loss / (self.sample_size * number_of_periods) as f32;
         let standard_deviation_two = calculate_st_deviation_two(&self.period_categories, number_of_periods * self.sample_size);
         println!("{},2,{},{}", self.summary_id, type_two_sample, standard_deviation_two);
     }

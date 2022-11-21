@@ -107,7 +107,7 @@ fn main() {
     let mut summary_ids: Vec<&i32> = summary_map.keys().collect();
     summary_ids.sort();
 
-    println!("\n\nsummary_id,type,mean,standard_deviation");
+    println!("summary_id,type,mean,standard_deviation");
 
     // print out summary statistics
     for i in &summary_ids {

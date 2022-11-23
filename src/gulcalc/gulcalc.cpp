@@ -362,7 +362,11 @@ void gulcalc::writemode1output(const int event_id, const OASIS_FLOAT tiv,
 	// If so, split TIV in proportion to losses
 	for (size_t i = 0; i < gilv.size(); i++) {
 
-		split_tiv(gilv[i], tiv);
+		if ((i != num_idx_ + std_dev_idx) ||
+		    (i != num_idx_ + chance_of_loss_idx)) {
+			split_tiv(gilv[i], tiv);
+		}
+
 		auto iter = gilv[i].begin();
 		while (iter != gilv[i].end()) {
 

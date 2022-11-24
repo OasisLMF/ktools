@@ -99,6 +99,15 @@ AX_CXX_COMPILE_STDCXX_11
 AX_CHECK_ZLIB()
 # Checks for libraries.
 
+# Check for pkg-config
+AC_MSG_CHECKING([for pkg-config])
+PKGCONFIG=no
+pkg-config --version > /dev/null 2>&1 && PKGCONFIG=yes
+AC_MSG_RESULT([$PKGCONFIG])
+AS_IF([test "x$PKGCONFIG" = "xno"],
+      [AC_MSG_ERROR([cannot find pkg-config. Please install pkg-config and run ./configure again.])
+])
+
 # Check for arrow and parquet libraries
 # Provide option to disable search for parquet libraries for debugging
 AC_ARG_ENABLE([parquet],

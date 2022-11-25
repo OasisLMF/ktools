@@ -282,7 +282,19 @@ impl SummaryData {
                 summary_id,
                 exposure_value
             );
-            let occurrences_vec = reference_data.get(&summary.event_id).unwrap();
+            // println!("{:?}", reference_data);
+            // println!("{}", &summary.event_id);
+            let occurrences_vec: &Vec<Occurrence>;
+            let placeholder: Vec<Occurrence> = Vec::new();
+            match reference_data.get(&summary.event_id) {
+                Some(data) => {
+                    occurrences_vec = data;
+                },
+                None => {
+                    occurrences_vec = &placeholder;
+                }
+            }
+            // let occurrences_vec = reference_data.get(&summary.event_id).unwrap();
             let period_categories = HashMap::new();
 
             let mut event = Event{
@@ -310,7 +322,6 @@ impl SummaryData {
 
                 // if false this is the end of the event stream for the summary.
                 if pushed == false {
-                    // println!("event id: {}", event.event_id);
                     summary.sample_size = event.sample_size;
                     summary.squared_total_loss += event.squared_total_loss;
                     summary.total_loss += event.total_loss;

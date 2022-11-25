@@ -72,7 +72,7 @@ fn main() {
                 }
             }
             // update the summary statistics with the data from the summary
-            summary_statistics.sample_size = summary.sample_size;
+            summary_statistics.sample_size = vec_capacity;
             summary_statistics.squared_total_loss += summary.squared_total_loss;
             summary_statistics.total_loss += summary.total_loss;
             summary_statistics.ni_loss_squared += summary.ni_loss_squared;

@@ -111,13 +111,10 @@ void aalcalc::loadoccurrence(T &occ, FILE * fin)
 {
 
 	size_t i = fread(&no_of_periods_, sizeof(no_of_periods_), 1, fin);
-	std::set<int> periods;
 	i = fread(&occ, sizeof(occ), 1, fin);
 	while (i != 0) {
-		event_count_[occ.event_id] = event_count_[occ.event_id] + 1;
 		event_to_period_[occ.event_id].push_back(occ.period_no);
 		if (max_period_no_ < occ.period_no) max_period_no_ = occ.period_no;
-		periods.insert(occ.period_no);
 		i = fread(&occ, sizeof(occ), 1, fin);
 	}
 	
@@ -139,7 +136,6 @@ void aalcalc::loadoccurrence()
 		fprintf(stderr, "FATAL: %s: cannot open %s\n", __func__, OCCURRENCE_FILE);
 		exit(-1);
 	}
-	std::set<int> periods;
 	fread(&date_opts, sizeof(date_opts), 1, fin);
 	granular_date = date_opts >> 1;
 	if (granular_date) {
@@ -167,154 +163,6 @@ void aalcalc::getsamplesizes()
 		}
 	}
 	vec_sample_aal_[samplesize_].resize(max_summary_id_ + 1);
-}
-
-void aalcalc::indexevents(const std::string& fullfilename, std::string& filename) {
-	FILE* fin = fopen(fullfilename.c_str(), "rb");
-	if (fin == NULL) {
-		fprintf(stderr, "FATAL: %s: cannot open %s\n", __func__, fullfilename.c_str());
-		exit(EXIT_FAILURE);
-	}
-	std::string ss = filename.substr(1, filename.length() - 5);
-	int fileindex = atoi(ss.c_str());
-	long long offset = 0;
-	int summarycalcstream_type = 0;
-	size_t i = fread(&summarycalcstream_type, sizeof(summarycalcstream_type), 1, fin);
-	if (i != 0) offset += sizeof(summarycalcstream_type);
-	int stream_type = summarycalcstream_type & summarycalc_id;
-
-	if (stream_type != summarycalc_id) {
-		fprintf(stderr, "FATAL: %s: Not a summarycalc stream type %d\n", __func__, stream_type);
-		exit(-1);
-	}
-
-	stream_type = streamno_mask & summarycalcstream_type;
-	int samplesize;
-	i = fread(&samplesize, sizeof(samplesize), 1, fin);
-	if (i != 0) offset += sizeof(samplesize);
-	int summary_set = 0;
-	if (i != 0) i = fread(&summary_set, sizeof(summary_set), 1, fin);
-	if (i != 0) offset += sizeof(summary_set);
-	summarySampleslevelHeader sh;
-	int last_event_id = -1;
-	int last_summary_id = -1;
-	long long last_offset = -1;
-	bool skiprecord = false;
-	while (i != 0) {
-		i = fread(&sh, sizeof(sh), 1, fin);
-		if (i != 0) {
-			if (last_event_id != sh.event_id || last_summary_id != sh.summary_id) {				
-				if (skiprecord == false && last_event_id > 0) {
-					event_offset_rec s;
-					s.offset = last_offset;
-					s.event_id = last_event_id;
-					s.fileindex = fileindex;
-					summary_id_to_event_offset_[last_summary_id].push_back(s);
-				}
-				else {
-					skiprecord = false;
-				}
-				last_event_id = sh.event_id;
-				last_summary_id = sh.summary_id;
-				last_offset = offset;
-			}
-			offset += sizeof(sh);
-		}
-
-		while (i != 0) {
-			sampleslevelRec sr;
-			i = fread(&sr, sizeof(sr), 1, fin);
-			if (i != 0) offset += sizeof(sr);
-			if (i == 0) break;
-			if (sr.sidx == 0) break;
-			if (sr.sidx == -1 && sr.loss == 0.0) skiprecord = true;
-		}
-	}
-
-	fclose(fin);
-
-}
-struct ind_rec {
-	int summary_id;
-	int event_id;
-	int fileindex;
-	long long offset;
-};
-void savesummaryIndex(const std::string& subfolder,const std::map<int, std::vector<event_offset_rec>> &summary_id_to_event_offset)
-{
-	std::string path = "work/" + subfolder;
-	if (path.substr(path.length() - 1, 1) != "/") {
-		path = path + "/";
-	}
-
-	path = path + "index.idx";
-	FILE* fout = fopen(path.c_str(), "wb");
-	auto iter = summary_id_to_event_offset.begin();
-	while (iter != summary_id_to_event_offset.end()) {
-		auto iter2 = iter->second.begin();
-		while (iter2 != iter->second.end()) {
-			ind_rec xx;
-			xx.summary_id = iter->first;
-			xx.event_id = iter2->event_id;
-			xx.fileindex = iter2->fileindex;
-			xx.offset = iter2->offset;
-			fwrite(&xx, sizeof(xx),1, fout);
-			iter2++;
-		}
-		iter++;
-	}
-	fclose(fout);
-}
-void loadsummaryindex(const std::string& subfolder, std::map<int, std::vector<event_offset_rec>>& summary_id_to_event_offset)
-{
-	std::string path = "work/" + subfolder;
-	if (path.substr(path.length() - 1, 1) != "/") {
-		path = path + "/";
-	}
-	path = path + "index.idx";
-	FILE* fin = fopen(path.c_str(), "rb");
-	if (fin == nullptr) {
-		fprintf(stderr, "FATAL: File %s not  found\n", path.c_str());
-		exit(-1);
-	}
-	ind_rec idx;
-	size_t i = fread(&idx, sizeof(idx), 1, fin);
-	while (i > 0) {
-		event_offset_rec r;
-		r.event_id = idx.event_id;
-		r.fileindex = idx.fileindex;
-		r.offset = idx.offset;
-		summary_id_to_event_offset[idx.summary_id].push_back(r);
-		i = fread(&idx, sizeof(idx), 1, fin);
-	}
-	fclose(fin);
-}
-void aalcalc::load_event_to_summary_index(const std::string& subfolder)
-{
-	
-	std::string path = "work/" + subfolder;
-	if (path.substr(path.length() - 1, 1) != "/") {
-		path = path + "/";
-	}
-
-	DIR* dir;
-	struct dirent* ent;
-	if ((dir = opendir(path.c_str())) != NULL) {
-		while ((ent = readdir(dir)) != NULL) {
-			std::string s = ent->d_name;
-			if (s.length() > 4 && s.substr(s.length() - 4, 4) == ".bin") {
-				std::string s2 = path + ent->d_name;				
-				indexevents(s2, s);
-			}
-		}
-	}
-	else {
-		fprintf(stderr, "FATAL: Unable to open directory %s\n", path.c_str());
-		exit(-1);
-	}
-	// Save summaryIndex
-	savesummaryIndex(subfolder,summary_id_to_event_offset_);	
-	exit(-1);
 }
 
 inline void aalcalc::fillensemblerec(const int sidx, const double mean,
@@ -466,7 +314,6 @@ inline void aalcalc::outputrows(const char * buffer, int strLen, FILE * fout) {
 	int counter = 0;
 	do {
 
-	//	num = printf("%s", bufPtr);
 		num = fprintf(fout, "%s", bufPtr);
 		if (num < 0) {   // Write error
 			fprintf(stderr, "FATAL: Error writing %s: %s\n",

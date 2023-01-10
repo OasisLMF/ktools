@@ -107,7 +107,7 @@ private:
 	void loadoccurrence(T &occ, FILE * fin);
 	void loadoccurrence();
 	void initsameplsize(const std::string &path);
-	void loadperiodtoweigthing();
+	void loadperiodtoweighting();
 	void loadensemblemapping();
 	void getsamplesizes();
 	void process_summaryfilew(const std::string &filename);

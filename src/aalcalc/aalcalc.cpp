@@ -86,20 +86,15 @@ void aalcalc::loadensemblemapping()
 }
 
 
-// Load and normalize weighting table 
-// we must have entry for every return period!!!
-// otherwise no way to pad missing ones
-// Weightings should be between zero and 1 and should sum to one 
-void aalcalc::loadperiodtoweigthing()
+// Load weighting table
+void aalcalc::loadperiodtoweighting()
 {
 	FILE *fin = fopen(PERIODS_FILE, "rb");
 	if (fin == NULL) return;
 
 	Periods p;
-	double total_weighting = 0;
 	size_t i = fread(&p, sizeof(Periods), 1, fin);
 	while (i != 0) {
-		total_weighting += p.weighting;
 		periodstoweighting_[p.period_no] = (OASIS_FLOAT)p.weighting;		
 		i = fread(&p, sizeof(Periods), 1, fin);
 	}
@@ -672,7 +667,7 @@ void aalcalc::doit(const std::string& subfolder)
 	initsameplsize(path);
 	getmaxsummaryid(path);
 	getsamplesizes();
-	loadperiodtoweigthing();	// move this to after the samplesize_ variable has been set i.e.  after reading the first 8 bytes of the first summary file
+	loadperiodtoweighting();
 	loadensemblemapping();
 	char line[4096];
 	vec_sample_sum_loss_.resize(samplesize_+1, 0.0);

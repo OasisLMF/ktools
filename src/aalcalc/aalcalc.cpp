@@ -15,7 +15,7 @@
 
 
 namespace summaryindex {
-	void doit(const std::string& subfolder, const std::map<int, std::vector<int>> &eventtoperiods);
+	void doit(const std::string& path, const std::map<int, std::vector<int>> &eventtoperiods);
 }
 
 bool operator<(const period_sidx_map_key& lhs, const period_sidx_map_key& rhs)
@@ -668,7 +668,7 @@ void aalcalc::doit(const std::string& subfolder)
 		path = path + "/";
 	}
 	loadoccurrence();
-	summaryindex::doit(subfolder, event_to_period_);
+	summaryindex::doit(path, event_to_period_);
 	initsameplsize(path);
 	getmaxsummaryid(path);
 	getsamplesizes();

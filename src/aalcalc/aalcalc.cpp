@@ -610,7 +610,7 @@ void aalcalc::outputresultscsv_new()
 
 }
 
-void aalcalc::initsameplsize(const std::string &path)
+void aalcalc::initsamplesize(const std::string &path)
 {
 	DIR *dir;
 	struct dirent *ent;
@@ -664,7 +664,7 @@ void aalcalc::doit(const std::string& subfolder)
 	}
 	loadoccurrence();
 	summaryindex::doit(path, event_to_period_);
-	initsameplsize(path);
+	initsamplesize(path);
 	getmaxsummaryid(path);
 	getsamplesizes();
 	loadperiodtoweighting();

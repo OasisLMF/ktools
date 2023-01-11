@@ -106,7 +106,7 @@ private:
 	template<typename T>
 	void loadoccurrence(T &occ, FILE * fin);
 	void loadoccurrence();
-	void initsameplsize(const std::string &path);
+	void initsamplesize(const std::string &path);
 	void loadperiodtoweighting();
 	void loadensemblemapping();
 	void getsamplesizes();

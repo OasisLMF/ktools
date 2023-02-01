@@ -49,15 +49,15 @@ use crate::processes::add_two_vectors;
 #[derive(Debug, Clone)]
 pub struct Event {
     pub event_id: i32,
-    pub maximum_loss: Option<f32>,
-    pub numerical_mean: f32,
-    pub standard_deviation: Option<f32>,
+    pub maximum_loss: Option<f64>,
+    pub numerical_mean: f64,
+    pub standard_deviation: Option<f64>,
     pub sample_size: i32,
-    pub period_categories: HashMap<i32, Vec<f32>>,
-    pub squared_total_loss: f32,
-    pub total_loss: f32,
-    pub ni_loss: f32,
-    pub ni_loss_squared: f32
+    pub period_categories: HashMap<i32, Vec<f64>>,
+    pub squared_total_loss: f64,
+    pub total_loss: f64,
+    pub ni_loss: f64,
+    pub ni_loss_squared: f64
 }
 
 impl Event {
@@ -78,7 +78,7 @@ impl Event {
         
         // read the raw data 
         let sidx_int = LittleEndian::read_i32(sidx);
-        let loss_float = LittleEndian::read_f32(loss);
+        let loss_float = LittleEndian::read_f32(loss) as f64;
 
 
         if sidx_int == 0 && loss_float == 0.0 {
@@ -157,13 +157,13 @@ pub struct Summary {
     pub exposure_value: i32,
     // below are statistics needed for the event
     pub sample_size: i32,
-    pub total_loss: f32,
-    pub squared_total_loss: f32,
-    pub ni_loss_map: HashMap<i32, f32>,
-    pub period_categories: HashMap<i32, Vec<f32>>,
-    pub ni_loss_squared: f32,
-    pub ni_loss: f32,
-    pub numerical_mean: f32
+    pub total_loss: f64,
+    pub squared_total_loss: f64,
+    pub ni_loss_map: HashMap<i32, f64>,
+    pub period_categories: HashMap<i32, Vec<f64>>,
+    pub ni_loss_squared: f64,
+    pub ni_loss: f64,
+    pub numerical_mean: f64
 }
 
 impl Summary {
@@ -176,8 +176,8 @@ impl Summary {
     /// * exposure_value: don't know will need to be filled in
     pub fn from_bytes(event_id: &[u8], summary_id: &[u8], exposure_value: &[u8]) -> Self {
         // let events: Vec<Event> = vec![];
-        let ni_loss_map: HashMap<i32, f32> = HashMap::new();
-        let period_categories: HashMap<i32, Vec<f32>> = HashMap::new();
+        let ni_loss_map: HashMap<i32, f64> = HashMap::new();
+        let period_categories: HashMap<i32, Vec<f64>> = HashMap::new();
 
         return Summary { 
             event_id: LittleEndian::read_i32(event_id), 

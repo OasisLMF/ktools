@@ -2,7 +2,7 @@
 use std::collections::HashMap;
 use glob::glob;
 
-type TotalMap = HashMap<i32, f32>;
+type TotalMap = HashMap<i32, f64>;
 
 
 /// Calculates the standard deviation for type one statistics.
@@ -13,7 +13,7 @@ type TotalMap = HashMap<i32, f32>;
 ///
 /// # Returns
 /// the calculated standard deviation
-pub fn calculate_standard_deviation(ni_loss_map: &TotalMap, n: i32) -> f32 {
+pub fn calculate_standard_deviation(ni_loss_map: &TotalMap, n: i32) -> f64 {
     let mut sum_squared = 0.0;
     let mut sum = 0.0;
 
@@ -25,10 +25,10 @@ pub fn calculate_standard_deviation(ni_loss_map: &TotalMap, n: i32) -> f32 {
     }
     sum = sum * sum;
 
-    let alpha = sum_squared - (sum / n as f32);
-    let beta = alpha / (n - 1) as f32;
+    let alpha = sum_squared - (sum / n as f64);
+    let beta = alpha / (n - 1) as f64;
 
-    return f32::sqrt(beta)
+    return f64::sqrt(beta)
 }
 
 
@@ -41,7 +41,7 @@ pub fn calculate_standard_deviation(ni_loss_map: &TotalMap, n: i32) -> f32 {
 ///
 /// # Returns
 /// the calculated standard deviation
-pub fn calculate_st_deviation_two(periods: &HashMap<i32, Vec<f32>>, n: i32) -> f32 {
+pub fn calculate_st_deviation_two(periods: &HashMap<i32, Vec<f64>>, n: i32) -> f64 {
     let mut sum_squared = 0.0;
     let mut sum = 0.0;
 
@@ -53,9 +53,9 @@ pub fn calculate_st_deviation_two(periods: &HashMap<i32, Vec<f32>>, n: i32) -> f
     }
     sum = sum * sum;
 
-    let alpha = sum_squared - (sum / n as f32);
-    let beta = alpha / (n - 1) as f32;
-    return f32::sqrt(beta)
+    let alpha = sum_squared - (sum / n as f64);
+    let beta = alpha / (n - 1) as f64;
+    return f64::sqrt(beta)
 }
 
 
@@ -64,7 +64,7 @@ pub fn calculate_st_deviation_two(periods: &HashMap<i32, Vec<f32>>, n: i32) -> f
 /// # Arguments
 /// * one: the vector that will have the elements added to it
 /// * two: the vector to supply the elements to be added to ```one```
-pub fn add_two_vectors(one: &mut Vec<f32>, two: &Vec<f32>) {
+pub fn add_two_vectors(one: &mut Vec<f64>, two: &Vec<f64>) {
     for i in 0..one.len() {
         one[i as usize] += two[i as usize];
     }

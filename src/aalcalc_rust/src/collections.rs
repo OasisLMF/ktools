@@ -49,15 +49,15 @@ use super::processes::{calculate_standard_deviation, calculate_st_deviation_two}
 /// Houses the summary statistics for a summary from all files.
 ///
 /// # Fields
-/// * summary_id: the ID of the summary the statistics belong to
-/// * ni_loss: The total losses for the event where each loss is multiplied by the amount of times
+/// * **summary_id:** the ID of the summary the statistics belong to
+/// * **ni_loss:** The total losses for the event where each loss is multiplied by the amount of times
 /// the loss occurs in the occurrence data.
-/// * ni_loss_squared: the sum of each loss multiplied by the occurrence squared
-/// * sample_size: the number of samples taken (will be consistent throughout whole of AAL)
-/// * total_loss: the total loss of all events under the summary
-/// * squared_total_loss: the total loss of all squared losses under all events under the summary
-/// * ni_loss_map: total losses multiplied by occurrence of events mapped by period number
-/// * period_categories: a vector of total losses which is the length of the sample size which can
+/// * **ni_loss_squared:** the sum of each loss multiplied by the occurrence squared
+/// * **sample_size:** the number of samples taken (will be consistent throughout whole of AAL)
+/// * **total_loss:** the total loss of all events under the summary
+/// * **squared_total_loss:** the total loss of all squared losses under all events under the summary
+/// * **ni_loss_map:** total losses multiplied by occurrence of events mapped by period number
+/// * **period_categories:** a vector of total losses which is the length of the sample size which can
 /// be accessed using the period number as the key.
 #[derive(Debug)]
 pub struct SummaryStatistics {
@@ -76,7 +76,7 @@ impl SummaryStatistics {
     /// The constructor for the ```SummaryStatistics``` struct.
     ///
     /// # Arguments
-    /// * summary_id: the ID of the summaries that statistics are going to be collected on
+    /// * **summary_id:** the ID of the summaries that statistics are going to be collected on
     pub fn new(summary_id: i32) -> Self {
         let ni_loss_map: HashMap<i32, f64> = HashMap::new();
         let period_categories: HashMap<i32, Vec<f64>> = HashMap::new();
@@ -99,7 +99,7 @@ impl SummaryStatistics {
     /// 2,1,12750,40319.043
     /// ```
     /// # Arguments
-    /// * number_of_periods: the ```period_number``` of the constructed ```OccurrenceData```
+    /// * **number_of_periods:** the ```period_number``` of the constructed ```OccurrenceData```
     pub fn print_type_one_stats(&self, number_of_periods: i32) {
         let type_one_ni = self.ni_loss / number_of_periods as f64;
         let standard_deviation = calculate_standard_deviation(&self.ni_loss_map, number_of_periods);
@@ -114,7 +114,7 @@ impl SummaryStatistics {
     /// ```
     ///
     /// # Arguments
-    /// * number_of_periods: the ```period_number``` of the constructed ```OccurrenceData```
+    /// * **number_of_periods:** the ```period_number``` of the constructed ```OccurrenceData```
     pub fn print_type_two_stats(&self, number_of_periods: i32) {
         let denominator  = self.sample_size * number_of_periods;
         let type_two_sample = self.total_loss / denominator as f64;

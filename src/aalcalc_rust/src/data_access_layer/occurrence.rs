@@ -28,9 +28,9 @@ pub enum DateFormat {
 /// An occurrence of an event.
 /// 
 /// # Fields
-/// * event_id: the ID of the event that the occurrence belongs to
-/// * period_num: the period bin that the occurrence belongs to
-/// * occ_date_id: the ID of the occurrence date
+/// * **event_id:** the ID of the event that the occurrence belongs to
+/// * **period_num:** the period bin that the occurrence belongs to
+/// * **occ_date_id:** the ID of the occurrence date
 #[derive(Debug)]
 pub struct Occurrence {
     pub event_id: i32,
@@ -44,9 +44,9 @@ impl Occurrence {
     /// Constructs the ```Occurrence``` struct from bytes. 
     /// 
     /// # Fields
-    /// * event_id: the ID of the event that the occurrence belongs to
-    /// * period_num: the period bin that the occurrence belongs to
-    /// * occ_date_id: the ID of the occurrence date
+    /// * **event_id:** the ID of the event that the occurrence belongs to
+    /// * **period_num:** the period bin that the occurrence belongs to
+    /// * **occ_date_id:** the ID of the occurrence date
     /// 
     /// # Returns
     /// the constructed ```Occurrence``` struct
@@ -63,10 +63,10 @@ impl Occurrence {
 /// Holds the meta data around an occurrence binary file. 
 /// 
 /// # Fields 
-/// * date_format: the format of the dates in the file
-/// * period_number: the period bin that the occurrence belongs to
-/// * handler: handles the reading and writing of the binary file
-/// * chunk_size: the number of bytes each occurrence takes (subject to change based on date format)
+/// * **date_format:** the format of the dates in the file
+/// * **period_number:** the period bin that the occurrence belongs to
+/// * **handler:** handles the reading and writing of the binary file
+/// * **chunk_size:** the number of bytes each occurrence takes (subject to change based on date format)
 #[derive(Debug)]
 pub struct OccurrenceData {
     pub date_format: DateFormat,
@@ -81,7 +81,7 @@ impl OccurrenceData {
     /// The constructor for the ```OccurrenceData``` struct. 
     /// 
     /// # Arguments
-    /// * path: the path to the binary file that is going to read
+    /// * **path:** the path to the binary file that is going to read
     /// 
     /// # Returns 
     /// The constructed ```OccurrenceData``` struct
@@ -164,8 +164,8 @@ impl OccurrenceData {
     /// Inserts an occurrence into the map. 
     /// 
     /// # Fields
-    /// map: the map in which the occurrence is going to be inserted into
-    /// occurrence: the occurrence that is going to be inserted into the map
+    /// **map:** the map in which the occurrence is going to be inserted into
+    /// **occurrence:** the occurrence that is going to be inserted into the map
     /// 
     /// # Returns 
     /// the map with the inserted occurrence
@@ -190,7 +190,7 @@ impl OccurrenceData {
 #[cfg(test)]
 mod occurrence_data_tests {
 
-    use super::{OccurrenceData, DateFormat, Occurrence};
+    use super::{OccurrenceData, DateFormat};
 
     #[test]
     fn test_new() {

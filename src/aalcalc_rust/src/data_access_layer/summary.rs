@@ -33,19 +33,19 @@ use crate::processes::add_two_vectors;
 /// Holds the summary statistics for a collection of losses under an event.
 ///
 /// # Fields
-/// * event_id: the ID of the event
-/// * maximum_loss: the maximum loss that the event has endured
-/// * numerical_mean: the mean of all the losses belonging to the event
-/// * standard_deviation: The standard deviation for the losses belonging to the event
-/// * sample_size: the number of samples that houses, it must be noted that the sample size
+/// * **event_id:** the ID of the event
+/// * **maximum_loss:** the maximum loss that the event has endured
+/// * **numerical_mean:** the mean of all the losses belonging to the event
+/// * **standard_deviation:** The standard deviation for the losses belonging to the event
+/// * **sample_size:** the number of samples that houses, it must be noted that the sample size
 /// across the entire AAL calculation will be uniform
-/// * period_categories: a vector of total losses which is the length of the sample size which can
+/// * **period_categories:** a vector of total losses which is the length of the sample size which can
 /// be accessed using the period number as the key.
-/// * squared_total_loss: The sum of squares of each loss belonging to the event
-/// * total_loss: the total loss of all the losses belonging to the event
-/// * ni_loss: The total losses for the event where each loss is multiplied by the amount of times
+/// * **squared_total_loss:** The sum of squares of each loss belonging to the event
+/// * **total_loss:** the total loss of all the losses belonging to the event
+/// * **ni_loss:** The total losses for the event where each loss is multiplied by the amount of times
 /// the loss occurs in the occurrence data.
-/// * ni_loss_squared: the sum of each loss multiplied by the occurrence squared
+/// * **ni_loss_squared:** the sum of each loss multiplied by the occurrence squared
 #[derive(Debug, Clone)]
 pub struct Event {
     pub event_id: i32,
@@ -65,10 +65,10 @@ impl Event {
     /// Adds a loss to the ```self.losses```.
     /// 
     /// # Arguments
-    /// * sidx: the sample ID of the loss
-    /// * loss: the total amount of the loss
-    /// * occurrence_vec: the occurrences of the event
-    /// * vec_capacity: The vec capacity needed for a ```self.period_categories``` insert which is
+    /// * **sidx:** the sample ID of the loss
+    /// * **loss:** the total amount of the loss
+    /// * **occurrence_vec:** the occurrences of the event
+    /// * **vec_capacity:** The vec capacity needed for a ```self.period_categories``` insert which is
     /// usually the number of samples
     /// 
     /// # Returns
@@ -137,19 +137,19 @@ impl Event {
 /// Houses the data around a summary. 
 /// 
 /// # Fields
-/// * event_id: the ID of the event that the summary belongs to
-/// * summary_id: the ID of the summary
-/// * exposure_value: the total insured value of the summary
-/// * sample_size: the number of samples taken (will be consistent throughout whole of AAL)
-/// * total_loss: the total loss of all events under the summary
-/// * squared_total_loss: the total loss of all squared losses under all events under the summary
-/// * ni_loss_map: total losses multiplied by occurrence of events mapped by period number
-/// * period_categories: a vector of total losses which is the length of the sample size which can
+/// * **event_id:** the ID of the event that the summary belongs to
+/// * **summary_id:** the ID of the summary
+/// * **exposure_value:** the total insured value of the summary
+/// * **sample_size:** the number of samples taken (will be consistent throughout whole of AAL)
+/// * **total_loss:** the total loss of all events under the summary
+/// * **squared_total_loss:** the total loss of all squared losses under all events under the summary
+/// * **ni_loss_map:** total losses multiplied by occurrence of events mapped by period number
+/// * **period_categories:** a vector of total losses which is the length of the sample size which can
 /// be accessed using the period number as the key.
-/// * ni_loss: The total losses for the event where each loss is multiplied by the amount of times
+/// * **ni_loss:** The total losses for the event where each loss is multiplied by the amount of times
 /// the loss occurs in the occurrence data.
-/// * ni_loss_squared: the sum of each loss multiplied by the occurrence squared
-/// * numerical_mean: the mean of all the events belonging to the summary
+/// * **ni_loss_squared:** the sum of each loss multiplied by the occurrence squared
+/// * **numerical_mean:** the mean of all the events belonging to the summary
 #[derive(Debug, Clone)]
 pub struct Summary {
     pub event_id: i32,
@@ -171,9 +171,9 @@ impl Summary {
     /// Constructs the ```Summary``` struct using bytes
     /// 
     /// # Arguments
-    /// * event_id: the ID of the event that the summary belongs to
-    /// * summary_id: the ID of the summary
-    /// * exposure_value: don't know will need to be filled in
+    /// * **event_id:** the ID of the event that the summary belongs to
+    /// * **summary_id:** the ID of the summary
+    /// * **exposure_value:** don't know will need to be filled in
     pub fn from_bytes(event_id: &[u8], summary_id: &[u8], exposure_value: &[u8]) -> Self {
         // let events: Vec<Event> = vec![];
         let ni_loss_map: HashMap<i32, f64> = HashMap::new();
@@ -200,11 +200,11 @@ impl Summary {
 /// Houses meta data around the loading and handling of summary data. 
 /// 
 /// # Fields 
-/// * handler: handles the reading and writing of a binary file
-/// * stream_id: the ID of the stream for the summary 
-/// * no_of_samples: The number of samples per summary (consistent for each summary)
-/// * summary_set: don't know will need to be filled in
-/// * data: raw bytes loaded from the binary file to be processed
+/// * **handler:** handles the reading and writing of a binary file
+/// * **stream_id:** the ID of the stream for the summary 
+/// * **no_of_samples:** The number of samples per summary (consistent for each summary)
+/// * **summary_set:** don't know will need to be filled in
+/// * **data:** raw bytes loaded from the binary file to be processed
 #[derive(Debug)]
 pub struct SummaryData {
     pub handler: File,
@@ -219,7 +219,7 @@ impl SummaryData {
     /// The constructor for the SummaryData struct.
     /// 
     /// # Fields
-    /// * path: the path to the binary file that is going to read
+    /// * **path:** the path to the binary file that is going to read
     /// 
     /// # Returns 
     /// The constructed ```SummaryData``` struct
@@ -252,8 +252,8 @@ impl SummaryData {
     /// and losses from memory as soon as the data is added to the summary statistics.
     ///
     /// # Arugments
-    /// * reference_data: vector of occurrences mapped by event_id
-    /// * vec_capacity: number of samples that need to be stored
+    /// * **reference_data:** vector of occurrences mapped by event_id
+    /// * **vec_capacity:** number of samples that need to be stored
     /// 
     /// # Returns
     /// all the summaries in the binary file attached to the ```SummaryData``` struct
@@ -282,8 +282,6 @@ impl SummaryData {
                 summary_id,
                 exposure_value
             );
-            // println!("{:?}", reference_data);
-            // println!("{}", &summary.event_id);
             let occurrences_vec: &Vec<Occurrence>;
             let placeholder: Vec<Occurrence> = Vec::new();
             match reference_data.get(&summary.event_id) {
@@ -294,7 +292,6 @@ impl SummaryData {
                     occurrences_vec = &placeholder;
                 }
             }
-            // let occurrences_vec = reference_data.get(&summary.event_id).unwrap();
             let period_categories = HashMap::new();
 
             let mut event = Event{
@@ -350,7 +347,6 @@ impl SummaryData {
                             }
                         }
                     }
-                    // summary.events.push(event);
                     break
                 }
             }

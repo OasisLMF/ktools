@@ -15,7 +15,7 @@ $ sum^2 = \sum_{i=1}^{n} s_i^2 $
 
 We calculate the mean with the following:
 
-$ mean = \displaystyle\frac{sum}{\displaystyle{N_{perils} * N_{samples}} } $
+$$ mean = \displaystyle\frac{sum}{\displaystyle{N_{perils} * N_{samples}} } $$
 
 We can then calculate the standard deviation with the following:
 

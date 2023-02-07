@@ -20,8 +20,36 @@ pub fn calculate_standard_deviation(ni_loss_map: &TotalMap, n: i32) -> f64 {
     // square and sum period losses to the ni
     for key in ni_loss_map.keys() {
         let loss = ni_loss_map.get(&key).unwrap();
-        sum += loss.clone();
+        sum += loss;
         sum_squared += loss * loss;
+    }
+    sum = sum * sum;
+
+    let alpha = sum_squared - (sum / n as f64);
+    let beta = alpha / (n - 1) as f64;
+
+    return f64::sqrt(beta)
+}
+
+
+/// Calculates the weighted standard deviation for type one statistics.
+///
+/// # Arguments
+/// * **ni_loss_map:** total losses multiplied by occurrence of events mapped by period number
+/// * **n:** number of periods which is the ```period_number``` of the constructed ```OccurrenceData```
+/// * **weights:** a vector of f64 values containing the period weights where the index of the vector is the period number.
+///
+/// # Returns
+/// the calculated standard deviation
+pub fn calculate_weighted_standard_deviation(ni_loss_map: &TotalMap, n: i32, weights: &Vec<f64>) -> f64 {
+    let mut sum_squared = 0.0;
+    let mut sum = 0.0;
+
+    // square and sum period losses to the ni
+    for key in ni_loss_map.keys() {
+        let loss = ni_loss_map.get(&key).unwrap();
+        sum += loss * weights[(key - 1) as usize];
+        sum_squared += loss * loss * weights[(key - 1) as usize];
     }
     sum = sum * sum;
 
@@ -47,8 +75,35 @@ pub fn calculate_st_deviation_two(periods: &HashMap<i32, Vec<f64>>, n: i32) -> f
 
     for (_, data) in periods {
         for loss in data {
-            sum += loss.clone();
+            sum += loss;
             sum_squared += loss * loss;
+        }
+    }
+    sum = sum * sum;
+
+    let alpha = sum_squared - (sum / n as f64);
+    let beta = alpha / (n - 1) as f64;
+    return f64::sqrt(beta)
+}
+
+
+/// Calculates the weighted standard deviation for type two statistics.
+///
+/// # Arguments
+/// * **periods:** a vector of total losses which is the length of the sample size which can be accessed using the period number as the key.
+/// * **n:** number of periods which is the ```period_number``` of the constructed ```OccurrenceData```
+/// * **weights:** a vector of f64 values containing the period weights where the index of the vector is the period number.
+///
+/// # Returns
+/// the calculated standard deviation
+pub fn calculate_weighted_st_deviation_two(periods: &HashMap<i32, Vec<f64>>, n: i32, weights: &Vec<f64>) -> f64 {
+    let mut sum_squared = 0.0;
+    let mut sum = 0.0;
+
+    for (period_number, data) in periods {
+        for loss in data {
+            sum += loss * weights[(period_number - 1) as usize];
+            sum_squared += loss * loss * weights[(period_number - 1) as usize];
         }
     }
     sum = sum * sum;

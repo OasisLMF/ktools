@@ -1,1 +1,1 @@
-aalcalc -K summary_aal
+aalcalc -K summary_aal_two

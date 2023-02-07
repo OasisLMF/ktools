@@ -51,7 +51,7 @@ fn main() {
     // run the processes in parallel
     let _ = files.iter().map(|i| {
 
-        // load all the data from the
+        // load all the data from the file
         let mut sum_data = SummaryData::new(i.clone());
         let vec_capacity = sum_data.no_of_samples;
         let summaries = sum_data.get_data(&occurrences, vec_capacity);
@@ -119,9 +119,4 @@ fn main() {
         let sum_stats = &summary_map.get(i).unwrap();
         sum_stats.print_type_two_stats(number_of_periods);
     }
-    // summary_id,type,mean,standard_deviation
-    // 1,1,361999.987500,643234.861354
-    // 2,1,12750.000000,40319.040167
-    // 1,2,355150.791250,681288.772663
-    // 2,2,12683.683545,48889.295168
 }

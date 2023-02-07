@@ -8,8 +8,8 @@ type TotalMap = HashMap<i32, f64>;
 /// Calculates the standard deviation for type one statistics.
 ///
 /// # Arguments
-/// * ni_loss_map: ni_loss_map: total losses multiplied by occurrence of events mapped by period number
-/// * n: number of periods which is the ```period_number``` of the constructed ```OccurrenceData```
+/// * **ni_loss_map: ni_loss_map:** total losses multiplied by occurrence of events mapped by period number
+/// * **n:** number of periods which is the ```period_number``` of the constructed ```OccurrenceData```
 ///
 /// # Returns
 /// the calculated standard deviation
@@ -35,9 +35,9 @@ pub fn calculate_standard_deviation(ni_loss_map: &TotalMap, n: i32) -> f64 {
 /// Calculates the standard deviation for type two statistics.
 ///
 /// # Arguments
-/// * periods: a vector of total losses which is the length of the sample size which can
+/// * **periods:** a vector of total losses which is the length of the sample size which can
 /// be accessed using the period number as the key.
-/// * n: number of periods which is the ```period_number``` of the constructed ```OccurrenceData```
+/// * **n:** number of periods which is the ```period_number``` of the constructed ```OccurrenceData```
 ///
 /// # Returns
 /// the calculated standard deviation
@@ -62,8 +62,8 @@ pub fn calculate_st_deviation_two(periods: &HashMap<i32, Vec<f64>>, n: i32) -> f
 /// Adds two vectors together elementwise.
 ///
 /// # Arguments
-/// * one: the vector that will have the elements added to it
-/// * two: the vector to supply the elements to be added to ```one```
+/// * **one:** the vector that will have the elements added to it
+/// * **two:** the vector to supply the elements to be added to ```one```
 pub fn add_two_vectors(one: &mut Vec<f64>, two: &Vec<f64>) {
     for i in 0..one.len() {
         one[i as usize] += two[i as usize];

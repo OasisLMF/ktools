@@ -1,0 +1,1 @@
+./aalcalc_rust -k summary_aal_two

@@ -603,7 +603,6 @@ void aggreports::WriteExceedanceProbabilityTable(
 
       if (lp.period_weighting) {
 	double retperiod = 1 / cumulative_weighting;
-	if (retperiod < 1)
 
 	if (!largest_loss) {
 	  max_retperiod = retperiod + 0.0001;   // Add for floating point errors

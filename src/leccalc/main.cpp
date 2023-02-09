@@ -158,7 +158,7 @@ int main(int argc, char* argv[])
 			useReturnPeriodFile = true;
 			break;
 		case 'v':
-			fprintf(stderr, "%s : version: %s-IF2\n", argv[0], VERSION);
+			fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
 			exit(EXIT_FAILURE);
 			break;
 		case 'h':

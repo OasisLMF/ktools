@@ -1,6 +1,13 @@
 Ktools Changelog
 ================
 
+`v3.9.6`_
+ ---------
+* [#337, #279](https://github.com/OasisLMF/ktools/pull/338) - Bring split TIV calculation in line with gulpy
+* [#315](https://github.com/OasisLMF/ktools/pull/339) - Find robust way to test for pre-requisites
+* [#341](https://github.com/OasisLMF/ktools/pull/341) - Project workflows
+.. _`v3.9.6`:  https://github.com/OasisLMF/ktools/compare/v3.9.5...v3.9.6
+
 `v3.9.5`_
  ---------
 * [#330](https://github.com/OasisLMF/ktools/pull/330) - Hotfix/GitHub actions

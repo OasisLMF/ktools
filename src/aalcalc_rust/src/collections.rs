@@ -43,7 +43,12 @@
 //! ```
 use std::collections::HashMap;
 
-use super::processes::{calculate_standard_deviation, calculate_st_deviation_two};
+use super::processes::{
+    calculate_standard_deviation, 
+    calculate_st_deviation_two,
+    calculate_weighted_st_deviation_two,
+    calculate_weighted_standard_deviation
+};
 
 
 /// Houses the summary statistics for a summary from all files.
@@ -100,9 +105,20 @@ impl SummaryStatistics {
     /// ```
     /// # Arguments
     /// * **number_of_periods:** the ```period_number``` of the constructed ```OccurrenceData```
-    pub fn print_type_one_stats(&self, number_of_periods: i32) {
+    pub fn print_type_one_stats(&self, number_of_periods: i32, weights: Option<&Vec<f64>>) {
         let type_one_ni = self.ni_loss / number_of_periods as f64;
-        let standard_deviation = calculate_standard_deviation(&self.ni_loss_map, number_of_periods);
+
+        let standard_deviation: f64;
+
+        match weights {
+            Some(weights_vec) => {
+                standard_deviation = calculate_weighted_standard_deviation(&self.ni_loss_map, number_of_periods, weights_vec);
+            },
+            None => {
+                standard_deviation = calculate_standard_deviation(&self.ni_loss_map, number_of_periods);
+            }
+        }
+        // let standard_deviation = calculate_standard_deviation(&self.ni_loss_map, number_of_periods);
         println!("{},1,{:.6},{:.6}", self.summary_id, type_one_ni, standard_deviation);
     }
 
@@ -115,10 +131,19 @@ impl SummaryStatistics {
     ///
     /// # Arguments
     /// * **number_of_periods:** the ```period_number``` of the constructed ```OccurrenceData```
-    pub fn print_type_two_stats(&self, number_of_periods: i32) {
+    pub fn print_type_two_stats(&self, number_of_periods: i32, weights: Option<&Vec<f64>>) {
         let denominator  = self.sample_size * number_of_periods;
         let type_two_sample = self.total_loss / denominator as f64;
-        let standard_deviation_two = calculate_st_deviation_two(&self.period_categories, denominator);
+
+        let standard_deviation_two: f64;
+        match weights {
+            Some(weights_vec) => {
+                standard_deviation_two = calculate_weighted_st_deviation_two(&self.period_categories, denominator, weights_vec);
+            },
+            None => {
+                standard_deviation_two = calculate_st_deviation_two(&self.period_categories, denominator);
+            }
+        }
         println!("{},2,{:.6},{:.6}", self.summary_id, type_two_sample, standard_deviation_two);
     }
 

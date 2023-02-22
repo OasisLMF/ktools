@@ -87,10 +87,10 @@ jobs:
 
     - name: Tarball bin files
       run: |
-        cd ./x86/bin
-        tar -zcvf ${{ github.workspace }}/Darwin_x86_64.tar.gz ./
+        cd ./ARM/bin
+        tar -zcvf ${{ github.workspace }}/Darwin_ARM.tar.gz ./
 
-    - name: 'Upload Ktool binaries - x86'
+    - name: 'Upload Ktool binaries - ARM'
       uses: actions/upload-artifact@v3
       with:
         name: Darwin_arm64

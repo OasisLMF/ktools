@@ -38,6 +38,65 @@ env:
   SKIP_CMAKE: 'false'
 
 jobs:
+  osx-arm:
+    runs-on: macos-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+    - name: Dump github context
+      run:   echo "$GITHUB_CONTEXT"
+      shell: bash
+      env:
+       GITHUB_CONTEXT: ${{ toJson(github) }}
+
+    - name: Set input - ktools_branch
+      if: inputs.ktools_branch != ''
+      run: echo "KTOOLS_BRANCH=${{ inputs.ktools_branch }}" >> $GITHUB_ENV
+
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        repository: OasisLMF/ktools
+        ref: ${{ env.KTOOLS_BRANCH }}
+
+    - name: (MacOS) Install dependencies
+      run: |
+        ln -s /usr/bin/shasum5.18 /usr/local/bin/sha1sum
+        brew install \
+            autoconf \
+            automake \
+            libtool \
+            zlib-ng
+
+    - name: (MacOS) Build ktools x86
+      run: |
+        BIN_TARGET=$(pwd)/x86
+        ./autogen.sh
+        ./configure --enable-osx --target arm-unknown-linux-gnueabi --disable-parquet --prefix=$BIN_TARGET
+        make check
+        make install
+
+    - name: Store ktest output
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: darwin_testout
+        path: ${{ github.workspace }}/ktest/testout
+        retention-days: 3
+
+    - name: Tarball bin files
+      run: |
+        cd ./x86/bin
+        tar -zcvf ${{ github.workspace }}/Darwin_x86_64.tar.gz ./
+
+    - name: 'Upload Ktool binaries - x86'
+      uses: actions/upload-artifact@v3
+      with:
+        name: Darwin_arm64
+        path: Darwin_arm64.tar.gz
+        retention-days: 5
+
   osx:
     runs-on: macos-latest
     defaults:

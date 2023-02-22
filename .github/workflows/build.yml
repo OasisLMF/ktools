@@ -89,7 +89,7 @@ jobs:
     - name: Tarball bin files
       run: |
         cd ./ARM/bin
-        tar -zcvf ${{ github.workspace }}/Darwin_ARM.tar.gz ./
+        tar -zcvf ${{ github.workspace }}/Darwin_arm64.tar.gz ./
 
     - name: 'Upload Ktool binaries - ARM'
       uses: actions/upload-artifact@v3

@@ -115,7 +115,7 @@ fn main() {
 
     if Path::new(&period_weights_path).exists() == true {
         println!("period weights are firing");
-        period_weights_loader = Some(PeriodWeights::new(period_weights_path).as_dummy());
+        period_weights_loader = Some(PeriodWeights::new(period_weights_path));
     }
     else {
         period_weights_loader = None;

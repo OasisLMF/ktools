@@ -28,7 +28,6 @@ use std::collections::HashMap;
 
 use super::occurrence::Occurrence;
 use crate::processes::add_two_vectors;
-use crate::collections::period_samples::PeriodSamples;
 
 
 /// Holds the summary statistics for a collection of losses under an event.
@@ -110,8 +109,7 @@ impl Event {
                 self.sample_size += 1;
 
                 for occ in occurrence_vec {
-                    let 
-                     = sidx_int - 1;
+                    let index = sidx_int - 1;
 
                     match self.period_categories.get_mut(&occ.period_num) {
                         Some(total_array) => {

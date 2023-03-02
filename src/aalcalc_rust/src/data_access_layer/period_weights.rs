@@ -32,6 +32,7 @@ impl PeriodWeights {
         // define the meta data for looping through the data file
         let end = data.len();
         let total_chunks = (end / 12) as i32;
+        let total_number_weight = total_chunks as f64;
         let mut start = 0;
         let mut finish = 4;
         let mut buffer = vec![0.0; total_chunks as usize];
@@ -44,7 +45,7 @@ impl PeriodWeights {
             let period_weight = LittleEndian::read_f64(&data[start..finish]);
             start += 8;
             finish += 4;
-            buffer[(period_number - 1) as usize] = period_weight;
+            buffer[(period_number - 1) as usize] = period_weight * total_number_weight;
         }
         PeriodWeights {
             weights: buffer

@@ -50,6 +50,11 @@ impl PeriodWeights {
             weights: buffer
         }
     }
+
+    pub fn as_dummy(self) -> Self {
+        let ones = vec![1.0; self.weights.len()];
+        return Self {weights: ones}
+    }
 }
 
 
@@ -61,8 +66,9 @@ mod period_weights_test {
 
     #[test]
     fn test_new() {
-        let path = "./periods.bin".to_string();
+        let path = "./input/periods.bin".to_string();
         let test = PeriodWeights::new(path);
         assert_eq!(0.0006261203011901157, test.weights[3]);
+
     }
 }

@@ -13,7 +13,7 @@ mod collections;
 use data_access_layer::occurrence::OccurrenceData;
 use data_access_layer::period_weights::PeriodWeights;
 use data_access_layer::summary::{SummaryData};
-use collections::SummaryStatistics;
+use collections::summary_statistics::SummaryStatistics;
 use processes::{get_all_binary_file_paths, add_two_vectors};
 
 use std::collections::HashMap;
@@ -114,7 +114,8 @@ fn main() {
     let period_weights_loader: Option<PeriodWeights>;
 
     if Path::new(&period_weights_path).exists() == true {
-        period_weights_loader = Some(PeriodWeights::new(period_weights_path));
+        println!("period weights are firing");
+        period_weights_loader = Some(PeriodWeights::new(period_weights_path).as_dummy());
     }
     else {
         period_weights_loader = None;

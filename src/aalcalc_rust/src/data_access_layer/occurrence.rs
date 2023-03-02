@@ -92,7 +92,7 @@ impl OccurrenceData {
         let mut period_number_buffer = [0; 4];
 
         file.read_exact(&mut date_option_buffer).unwrap();
-        file.read_exact(&mut period_number_buffer).unwrap();
+        file.read_exact(&mut period_number_buffer).unwrap(); // gives us the maximum number of periods
 
         let date_format: DateFormat;
         match LittleEndian::read_i32(&date_option_buffer) {
@@ -204,7 +204,6 @@ mod occurrence_data_tests {
     fn test_get_data() {
         let mut occ_data = OccurrenceData::new(String::from("./input/occurrence.bin"));
         let data = occ_data.get_data();
-        println!("{:?}", data);
         assert_eq!(2, data.get(&1).unwrap().len());
         assert_eq!(2, data.get(&2).unwrap().len());
     }

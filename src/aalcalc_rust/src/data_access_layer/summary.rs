@@ -28,6 +28,7 @@ use std::collections::HashMap;
 
 use super::occurrence::Occurrence;
 use crate::processes::add_two_vectors;
+use crate::collections::period_samples::PeriodSamples;
 
 
 /// Holds the summary statistics for a collection of losses under an event.
@@ -80,11 +81,11 @@ impl Event {
         let sidx_int = LittleEndian::read_i32(sidx);
         let loss_float = LittleEndian::read_f32(loss) as f64;
 
-
+        // double zeros indicate the end of the stream
         if sidx_int == 0 && loss_float == 0.0 {
             return false
         }
-
+        // minus values indicate meta data around the loss
         match sidx_int {
             -1 => {
                 self.numerical_mean += loss_float;
@@ -104,11 +105,13 @@ impl Event {
             -5 => {
                 self.maximum_loss = Some(loss_float);
             },
+            // positive values are losses
             _ => {
                 self.sample_size += 1;
 
                 for occ in occurrence_vec {
-                    let index = sidx_int - 1;
+                    let 
+                     = sidx_int - 1;
 
                     match self.period_categories.get_mut(&occ.period_num) {
                         Some(total_array) => {

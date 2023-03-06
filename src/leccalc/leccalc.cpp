@@ -402,7 +402,8 @@ namespace leccalc {
 	void doit(const std::string &subfolder, FILE **fout,
 		  const bool useReturnPeriodFile, bool skipheader,
 		  bool *outputFlags, bool ordFlag,
-		  const std::string *parquetFileNames)
+		  const std::string *parquetFileNames,
+		  const char *progname)
 	{
 		std::string path = "work/" + subfolder;
 		if (path.substr(path.length() - 1, 1) != "/") {
@@ -414,7 +415,9 @@ namespace leccalc {
 		std::vector<std::map<outkey2, OutLosses>> out_loss(2);
 
 		aggreports agg(totalperiods, fout, useReturnPeriodFile,
-			       outputFlags, ordFlag, parquetFileNames);
+			       outputFlags, ordFlag, parquetFileNames,
+			       progname);
+		outputFlags = agg.GetOutputFlags();
 
 		std::vector<int> fileIDs_occ, fileIDs_agg;
 		bool hasEPT = setupoutputfiles(fout, ordFlag, outputFlags,

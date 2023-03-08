@@ -449,6 +449,7 @@ inline  void logprintf(const std::string &program_name,const std::string &msgtyp
 #define PERIODS_FILE "input/periods.bin"		// period to weighting mapping
 #define ENSEMBLE_FILE "input/ensemble.bin"
 #define QUANTILE_FILE "input/quantile.bin"
+#define ITEMAMPLITUDE_FILE "input/itemsamplitudes.bin"
 
 #define DAMAGE_BIN_DICT_FILE "static/damage_bin_dict.bin"
 #define DAMAGE_CDF_BIN_FILE "static/damage_cdf.bin"
@@ -464,6 +465,7 @@ inline  void logprintf(const std::string &program_name,const std::string &msgtyp
 // compressed variant of footprint
 #define ZFOOTPRINT_FILE  "static/footprint.bin.z"	
 #define ZFOOTPRINT_IDX_FILE  "static/footprint.idx.z"
+#define PLAFACTORS_FILE "static/lossfactors.bin"
 
 #define SEMA_DIR_PREFIX "work/sema"
 #endif  // OASIS_H_

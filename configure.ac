@@ -178,6 +178,7 @@ AC_CONFIG_FILES([
                  src/fmxreftobin/Makefile
                  src/summarycalctocsv/Makefile
                  src/eltcalc/Makefile
+		 src/placalc/Makefile
                  src/pltcalc/Makefile
                  src/gulsummaryxreftobin/Makefile
                  src/gulsummaryxreftocsv/Makefile

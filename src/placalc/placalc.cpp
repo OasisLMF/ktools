@@ -141,7 +141,7 @@ namespace placalc {
       fwrite(&gh, sizeof(gh), 1, stdout);
       ea.event_id = gh.event_id;
       ea.amplitude_id = item_to_amplitude_[gh.item_id];
-      float factor = 0.0;   // Assume factor = 0.0 if not present
+      float factor = 1.0;   // Assume factor = 1.0 if not present
       auto iter = factors_.find(ea);
       if (iter != factors_.end()) factor = iter->second;
 

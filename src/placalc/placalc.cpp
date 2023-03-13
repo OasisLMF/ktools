@@ -27,8 +27,8 @@ namespace placalc {
   };
 
   struct hash_event_amplitude {
-    long operator()(const event_amplitude &ea) const {
-      return ea.event_id + ((long)ea.amplitude_id << 32);
+    size_t operator()(const event_amplitude &ea) const {
+      return ea.event_id * std::numeric_limits<int>::max() + ea.amplitude_id;
     }
   };
 

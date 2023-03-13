@@ -449,7 +449,7 @@ inline  void logprintf(const std::string &program_name,const std::string &msgtyp
 #define PERIODS_FILE "input/periods.bin"		// period to weighting mapping
 #define ENSEMBLE_FILE "input/ensemble.bin"
 #define QUANTILE_FILE "input/quantile.bin"
-#define ITEMAMPLITUDE_FILE "input/itemsamplitudes.bin"
+#define ITEMAMPLIFICATION_FILE "input/itemsamplitudes.bin"
 
 #define DAMAGE_BIN_DICT_FILE "static/damage_bin_dict.bin"
 #define DAMAGE_CDF_BIN_FILE "static/damage_cdf.bin"

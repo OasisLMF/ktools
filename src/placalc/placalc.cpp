@@ -12,23 +12,23 @@
 
 namespace placalc {
 
-  struct item_amplitude {
+  struct item_amplification {
     int item_id;
-    int amplitude_id;
+    int amplification_id;
   };
 
-  struct event_amplitude {
+  struct event_amplification {
     int event_id;
-    int amplitude_id;
+    int amplification_id;
 
-    bool operator==(const event_amplitude &rhs) const {
-      return event_id == rhs.event_id && amplitude_id == rhs.amplitude_id;
+    bool operator==(const event_amplification &rhs) const {
+      return event_id == rhs.event_id && amplification_id == rhs.amplification_id;
     }
   };
 
-  struct hash_event_amplitude {
-    size_t operator()(const event_amplitude &ea) const {
-      return ea.event_id * std::numeric_limits<int>::max() + ea.amplitude_id;
+  struct hash_event_amplification {
+    size_t operator()(const event_amplification &ea) const {
+      return ea.event_id * std::numeric_limits<int>::max() + ea.amplification_id;
     }
   };
 
@@ -37,32 +37,32 @@ namespace placalc {
     int count;
   };
 
-  struct amplitude_factor {
-    int amplitude_id;
+  struct amplification_factor {
+    int amplification_id;
     float factor;
   };
 
   // Zeroth item ID factor = 0.0
-  std::vector<int> item_to_amplitude_(1, 0.0);
-  std::unordered_map<event_amplitude, float, hash_event_amplitude> factors_;
+  std::vector<int> item_to_amplification_(1, 0.0);
+  std::unordered_map<event_amplification, float, hash_event_amplification> factors_;
 
 
-  void LoadItemToAmplitude() {
+  void LoadItemToAmplification() {
 
-    FILE * fin = fopen(ITEMAMPLITUDE_FILE, "rb");
+    FILE * fin = fopen(ITEMAMPLIFICATION_FILE, "rb");
     if (fin == nullptr) {
       fprintf(stderr, "FATAL: %s: Error opening file %s\n", __func__,
-	      ITEMAMPLITUDE_FILE);
+	      ITEMAMPLIFICATION_FILE);
       exit(EXIT_FAILURE);
     }
 
     int opts;
     size_t i = fread(&opts, sizeof(opts), 1, fin);
 
-    item_amplitude ia;
+    item_amplification ia;
     i = fread(&ia, sizeof(ia), 1, fin);
     while (i != 0) {
-      item_to_amplitude_.push_back(ia.amplitude_id);
+      item_to_amplification_.push_back(ia.amplification_id);
       i = fread(&ia, sizeof(ia), 1, fin);
     }
 
@@ -84,16 +84,16 @@ namespace placalc {
     size_t i = fread(&opts, sizeof(opts), 1, fin);
 
     event_count ec;
-    amplitude_factor af;
+    amplification_factor af;
     while (i != 0) {
       i = fread(&ec, sizeof(ec), 1, fin);
       if (i == 0) break;
-      event_amplitude ea;
+      event_amplification ea;
       ea.event_id = ec.event_id;
-      for (int amplitude = 0; amplitude != ec.count; ++amplitude) {
+      for (int amplification = 0; amplification != ec.count; ++amplification) {
 	i = fread(&af, sizeof(af), 1, fin);
 	if (i == 0) break;
-	ea.amplitude_id = af.amplitude_id;
+	ea.amplification_id = af.amplification_id;
 	factors_[ea] = af.factor;
       }
     }
@@ -103,7 +103,7 @@ namespace placalc {
 
   void doit() {
 
-    LoadItemToAmplitude();
+    LoadItemToAmplification();
     LoadPostLossAmplificationFactors();
 
     // Check input stream type is GUL item stream or loss stream and write type
@@ -133,14 +133,14 @@ namespace placalc {
     // Read in data from GUL stream, apply Post Loss Amplification (PLA) factors
     // and write out to standard output
     while (i != 0) {
-      event_amplitude ea;
+      event_amplification ea;
       gulSampleslevelHeader gh;
       i = fread(&gh, sizeof(gh), 1, stdin);
       if (i == 0) break;
 
       fwrite(&gh, sizeof(gh), 1, stdout);
       ea.event_id = gh.event_id;
-      ea.amplitude_id = item_to_amplitude_[gh.item_id];
+      ea.amplification_id = item_to_amplification_[gh.item_id];
       float factor = 1.0;   // Assume factor = 1.0 if not present
       auto iter = factors_.find(ea);
       if (iter != factors_.end()) factor = iter->second;

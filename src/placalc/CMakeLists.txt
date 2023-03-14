@@ -8,4 +8,4 @@ if (WIN32)
 	target_link_libraries(placlac wingetopt)
 endif()
 
-install(TARGETS gulcalc RUNTIME DESTINATION bin)
+install(TARGETS placalc RUNTIME DESTINATION bin)

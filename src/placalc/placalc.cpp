@@ -23,11 +23,6 @@ namespace placalc {
     }
   };
 
-  struct event_count {
-    int event_id;
-    int count;
-  };
-
   // Zeroth item ID factor = 0.0
   std::vector<int> item_to_amplification_(1, 0.0);
   std::unordered_map<event_amplification, float, hash_event_amplification> factors_;

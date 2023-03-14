@@ -375,6 +375,12 @@ struct amplification_factor {
 	float factor;
 };
 
+struct event_count {
+	int event_id;
+	int count;
+};
+
+
 
 
 #pragma pack(pop)

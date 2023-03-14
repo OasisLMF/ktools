@@ -17,15 +17,6 @@ namespace placalc {
     int amplification_id;
   };
 
-  struct event_amplification {
-    int event_id;
-    int amplification_id;
-
-    bool operator==(const event_amplification &rhs) const {
-      return event_id == rhs.event_id && amplification_id == rhs.amplification_id;
-    }
-  };
-
   struct hash_event_amplification {
     size_t operator()(const event_amplification &ea) const {
       return ea.event_id * std::numeric_limits<int>::max() + ea.amplification_id;
@@ -35,11 +26,6 @@ namespace placalc {
   struct event_count {
     int event_id;
     int count;
-  };
-
-  struct amplification_factor {
-    int amplification_id;
-    float factor;
   };
 
   // Zeroth item ID factor = 0.0

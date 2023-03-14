@@ -361,6 +361,22 @@ struct EventRates {
 	double event_rate;
 };
 
+struct event_amplification {
+	int event_id;
+	int amplification_id;
+	
+	bool operator==(const event_amplification &rhs) const {
+		return event_id == rhs.event_id && amplification_id == rhs.amplification_id;
+	}
+};
+
+struct amplification_factor {
+	int amplification_id;
+	float factor;
+};
+
+
+
 #pragma pack(pop)
 
 

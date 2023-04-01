@@ -10,7 +10,7 @@ mod data_access_layer;
 mod processes;
 mod collections;
 
-use data_access_layer::occurrence::{OccurrenceData, OccurrenceFileHandle};
+use data_access_layer::occurrence::OccurrenceFileHandle;
 use data_access_layer::period_weights::{PeriodWeights, PeriodWeightsHandle};
 use data_access_layer::traits::load_period_weights::ReadPeriodWeights;
 use data_access_layer::summary::get_summaries_from_data;
@@ -43,7 +43,7 @@ fn main() {
     // get data around the occurrences
     let mut occ_data_handle = OccurrenceFileHandle::new(occurrence_path).unwrap();
     let number_of_periods = &occ_data_handle.get_meta_data().period_number;
-    let mut occ_data = occ_data_handle.get_data();
+    let occ_data = occ_data_handle.get_data();
     // let number_of_periods = occ_data_handle.get_meta_data().period_number;
 
     // define map for summary statistics
@@ -63,7 +63,7 @@ fn main() {
         for summary in summaries {
 
             // extract the summary statistics if it exists, crease one if not
-            let mut summary_statistics: &mut SummaryStatistics;
+            let summary_statistics: &mut SummaryStatistics;
             match summary_map.get_mut(&summary.summary_id) {
                 Some(statistics) => {
                     summary_statistics = statistics;
@@ -89,7 +89,7 @@ fn main() {
 
     if Path::new(&period_weights_path).exists() == true {
         println!("period weights are firing");
-        let mut period_handle = PeriodWeightsHandle::new(period_weights_path).unwrap();
+        let period_handle = PeriodWeightsHandle::new(period_weights_path).unwrap();
         period_weights_loader = Some(PeriodWeights{weights: period_handle.get_data()});
     }
     else {

@@ -27,10 +27,7 @@ use std::collections::HashMap;
 use super::occurrence::Occurrence;
 use crate::processes::add_two_vectors;
 use crate::collections::event::Event;
-use crate::data_access_layer::summary_loader::{
-    SummaryLoader,
-    SummaryLoaderHandle
-};
+use crate::data_access_layer::summary_loader::SummaryLoader;
 use crate::data_access_layer::traits::load_summary_data::{
     ReadSummaryData,
     ExtractSummaryData

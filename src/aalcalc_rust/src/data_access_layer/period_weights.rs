@@ -9,6 +9,12 @@ use crate::data_access_layer::traits::load_period_weights::{
 };
 
 
+
+pub struct PeriodWeights {
+    pub weights: Vec<f64>,
+}
+
+
 /// A struct to hold the period weights
 ///
 /// # Fields
@@ -38,7 +44,7 @@ impl ReadPeriodWeights<f64> for PeriodWeightsHandle {
     ///
     /// # Returns
     /// * A PeriodWeights struct
-    fn get_data(mut self) -> Vec<f64> {
+    fn get_data(self) -> Vec<f64> {
         // read the data from the file
         let mut file = self.file;
         let mut data: Vec<u8> = Vec::new();

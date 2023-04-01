@@ -10,12 +10,14 @@ mod data_access_layer;
 mod processes;
 mod collections;
 
-use data_access_layer::occurrence::OccurrenceData;
-// use data_access_layer::period_weights::PeriodWeights;
+use data_access_layer::occurrence::{OccurrenceData, OccurrenceFileHandle};
+use data_access_layer::period_weights::{PeriodWeights, PeriodWeightsHandle};
+use data_access_layer::traits::load_period_weights::ReadPeriodWeights;
 use data_access_layer::summary::get_summaries_from_data;
 use collections::summary_statistics::SummaryStatistics;
 use processes::get_all_binary_file_paths;
 use crate::data_access_layer::summary_loader::SummaryLoaderHandle;
+use crate::data_access_layer::traits::load_occurrence::ReadOccurrences;
 
 use std::collections::HashMap;
 use std::path::Path;
@@ -39,10 +41,10 @@ fn main() {
     let period_weights_path = format!("{}/input/periods.bin", pwd);
 
     // get data around the occurrences
-    let mut occ_data = OccurrenceData::new(occurrence_path);
-    let raw_data = occ_data.get_data();
-    let occurrences = raw_data;
-    let number_of_periods = occ_data.period_number;
+    let mut occ_data_handle = OccurrenceFileHandle::new(occurrence_path).unwrap();
+    let number_of_periods = &occ_data_handle.get_meta_data().period_number;
+    let mut occ_data = occ_data_handle.get_data();
+    // let number_of_periods = occ_data_handle.get_meta_data().period_number;
 
     // define map for summary statistics
     let mut summary_map: HashMap<i32, SummaryStatistics> = HashMap::new();
@@ -56,7 +58,7 @@ fn main() {
 
         // load all the data from the file
         let mut handle = SummaryLoaderHandle{};
-        let summaries = get_summaries_from_data(i.clone(), &mut handle, &occurrences).unwrap();
+        let summaries = get_summaries_from_data(i.clone(), &mut handle, &occ_data).unwrap();
 
         for summary in summaries {
 
@@ -87,7 +89,8 @@ fn main() {
 
     if Path::new(&period_weights_path).exists() == true {
         println!("period weights are firing");
-        period_weights_loader = Some(PeriodWeights::new(period_weights_path));
+        let mut period_handle = PeriodWeightsHandle::new(period_weights_path).unwrap();
+        period_weights_loader = Some(PeriodWeights{weights: period_handle.get_data()});
     }
     else {
         period_weights_loader = None;
@@ -106,11 +109,11 @@ fn main() {
     // print out summary statistics
     for i in &summary_ids {
         let sum_stats = &summary_map.get(i).unwrap();
-        sum_stats.print_type_one_stats(number_of_periods, period_weights);
+        sum_stats.print_type_one_stats(*number_of_periods, period_weights);
     }
 
     for i in &summary_ids {
         let sum_stats = &summary_map.get(i).unwrap();
-        sum_stats.print_type_two_stats(number_of_periods, period_weights);
+        sum_stats.print_type_two_stats(*number_of_periods, period_weights);
     }
 }

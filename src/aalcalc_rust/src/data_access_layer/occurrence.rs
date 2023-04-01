@@ -118,7 +118,7 @@ pub struct OccurrenceFileHandle {
 
 impl OccurrenceFileHandle {
 
-    fn new(path: String) -> Result<Self, String> {
+    pub fn new(path: String) -> Result<Self, String> {
         match File::open(path) {
             Ok(handle) => {
                 return Ok(OccurrenceFileHandle{handle})

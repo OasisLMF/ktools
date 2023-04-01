@@ -209,25 +209,45 @@ impl ReadOccurrences<i32, Occurrence, File, OccurrenceData> for OccurrenceFileHa
 }
 
 
-// #[cfg(test)]
-// mod occurrence_data_tests {
+#[cfg(test)]
+mod occurrence_data_tests {
 
-//     use super::{OccurrenceData, DateFormat};
+    use mockall::predicate::*;
+    use mockall::mock;
+    use super::{
+        OccurrenceData,
+        DateFormat,
+        OccurrenceFileHandle,
+        IngestOccurrence,
+        ReadOccurrences,
+        Occurrence,
+        File
+    };
+    use std::collections::HashMap;
 
-//     #[test]
-//     fn test_new() {
-//         let occ_data = OccurrenceData::new(String::from("./input/occurrence.bin"));
-//         assert_eq!(10, occ_data.period_number);
-//         assert_eq!(12, occ_data.chunk_size);
-//         assert_eq!(DateFormat::NewFormat, occ_data.date_format);
-//     }
+    #[test]
+    fn test_get_meta_data() {
 
-//     #[test]
-//     fn test_get_data() {
-//         let mut occ_data = OccurrenceData::new(String::from("./input/occurrence.bin"));
-//         let data = occ_data.get_data();
-//         assert_eq!(2, data.get(&1).unwrap().len());
-//         assert_eq!(2, data.get(&2).unwrap().len());
-//     }
+        mock! {
+            OccurrenceFileHandle {}
 
-// }
+            impl ReadOccurrences<i32, Occurrence, File, OccurrenceData> for OccurrenceFileHandle {
+                fn get_data(mut self) -> HashMap<i32, Vec<Occurrence>>;
+                fn get_meta_data(&mut self) -> OccurrenceData;
+            }
+        }
+
+        let mut mock_handle = MockOccurrenceFileHandle::new();
+        mock_handle.expect_get_meta_data().returning(|| {
+            OccurrenceData{
+                date_format: DateFormat::NewFormat,
+                period_number: 10,
+                chunk_size: 12
+            }
+        });
+        let occ_data = mock_handle.get_meta_data();
+        assert_eq!(10, occ_data.period_number);
+        assert_eq!(12, occ_data.chunk_size);
+        assert_eq!(DateFormat::NewFormat, occ_data.date_format);
+    }
+}

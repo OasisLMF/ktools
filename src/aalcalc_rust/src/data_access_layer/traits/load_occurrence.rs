@@ -5,6 +5,7 @@ use std::collections::HashMap;
 pub trait IngestOccurrence<T, Y> {
 
     fn insert_occurrence(map: &mut HashMap<T, Vec<Y>>, occurrence: Y);
+
 }
 
 

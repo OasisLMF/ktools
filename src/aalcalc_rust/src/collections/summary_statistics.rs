@@ -47,8 +47,10 @@ use super::super::processes::{
     calculate_standard_deviation, 
     calculate_st_deviation_two,
     calculate_weighted_st_deviation_two,
-    calculate_weighted_standard_deviation
+    calculate_weighted_standard_deviation,
+    add_two_vectors
 };
+use crate::data_access_layer::summary::Summary;
 
 
 /// Houses the summary statistics for a summary from all files.
@@ -94,6 +96,36 @@ impl SummaryStatistics {
             squared_total_loss: 0.0,
             ni_loss_map,
             period_categories
+        }
+    }
+
+    pub fn ingest_summary(&mut self, summary: Summary) {
+        self.sample_size = summary.sample_size;
+        self.squared_total_loss += summary.squared_total_loss;
+        self.total_loss += summary.total_loss;
+        self.ni_loss_squared += summary.ni_loss_squared;
+        self.ni_loss += summary.ni_loss;
+
+        for (key, value) in summary.period_categories {
+            match self.period_categories.get_mut(&key) {
+                Some(data) => {
+                    add_two_vectors(data, &value);
+                },
+                None => {
+                    self.period_categories.insert(key, value);
+                }
+            }
+        }
+
+        for (key, value) in summary.ni_loss_map {
+            match self.ni_loss_map.get_mut(&key) {
+                Some(data) => {
+                    *data += value;
+                },
+                None => {
+                    self.ni_loss_map.insert(key, value);
+                }
+            }
         }
     }
 

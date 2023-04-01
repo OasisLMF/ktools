@@ -9,3 +9,7 @@ edition = "2021"
 byteorder = "1.4.3"
 clap = { version = "4.0.26", features = ["derive"] }
 glob = "0.3.0"
+
+
+[dev-dependencies]
+mockall = "0.11.3"

@@ -95,6 +95,11 @@ impl Summary {
         }
     }
 
+    /// Updates the statistics by consuming an event and adding this to the statistics. 
+    /// 
+    /// # Arguments
+    /// * **event:** the event to be added to the statistics
+    /// * **occurrences_vec:** the vector of occurrences for the event
     pub fn ingest_event(&mut self, event: Event, occurrences_vec: &Vec<Occurrence>) {
         self.sample_size = event.sample_size;
         self.squared_total_loss += event.squared_total_loss;
@@ -142,6 +147,15 @@ pub struct SummaryData {
 }
 
 
+/// Loads the summary data from the file and returns a vector of summaries.
+/// 
+/// # Arguments
+/// * **path:** the path to the summary file
+/// * **handle:** the handle to the summary file which implements the ```ReadSummaryData``` trait
+/// * **reference_data:** the reference data which is a map of event IDs to a vector of occurrences
+/// 
+/// # Returns
+/// * **Result<Vec<Summary>, std::io::Error>** a vector of summaries or an error
 pub fn get_summaries_from_data(path: String, handle: &mut dyn ReadSummaryData, reference_data: &HashMap<i32, Vec<Occurrence>>) -> Result<Vec<Summary>, std::io::Error>
 {
     let mut buffer = vec![];

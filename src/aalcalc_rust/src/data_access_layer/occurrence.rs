@@ -217,8 +217,6 @@ mod occurrence_data_tests {
     use super::{
         OccurrenceData,
         DateFormat,
-        OccurrenceFileHandle,
-        IngestOccurrence,
         ReadOccurrences,
         Occurrence,
         File

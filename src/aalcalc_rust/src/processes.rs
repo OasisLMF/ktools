@@ -41,9 +41,13 @@ pub fn calculate_standard_deviation(ni_loss_map: &TotalMap, n: i32) -> f64 {
 ///
 /// # Returns
 /// the calculated standard deviation
-pub fn calculate_weighted_standard_deviation(ni_loss_map: &TotalMap, n: i32, weights: &Vec<f64>) -> f64 {
+pub fn calculate_weighted_standard_deviation(ni_loss_map: &TotalMap, n: i32, weights: &Vec<f64>) -> (f64, f64) {
     let mut sum_squared = 0.0;
     let mut sum = 0.0;
+
+    // Type	Mean	Standard deviation
+    // 1	917.805	351.6125866
+    // 2	917.8006	426.9855306
 
     // square and sum period losses to the ni
     for key in ni_loss_map.keys() {
@@ -51,12 +55,14 @@ pub fn calculate_weighted_standard_deviation(ni_loss_map: &TotalMap, n: i32, wei
         sum += loss * weights[(key - 1) as usize];
         sum_squared += loss * loss * weights[(key - 1) as usize];
     }
+
+    let mean = sum / n as f64;
     sum = sum * sum;
 
     let alpha = sum_squared - (sum / n as f64);
     let beta = alpha / (n - 1) as f64;
 
-    return f64::sqrt(beta)
+    return (f64::sqrt(beta), mean)
 }
 
 
@@ -79,6 +85,7 @@ pub fn calculate_st_deviation_two(periods: &HashMap<i32, Vec<f64>>, n: i32) -> f
             sum_squared += loss * loss;
         }
     }
+
     sum = sum * sum;
 
     let alpha = sum_squared - (sum / n as f64);
@@ -96,7 +103,7 @@ pub fn calculate_st_deviation_two(periods: &HashMap<i32, Vec<f64>>, n: i32) -> f
 ///
 /// # Returns
 /// the calculated standard deviation
-pub fn calculate_weighted_st_deviation_two(periods: &HashMap<i32, Vec<f64>>, n: i32, weights: &Vec<f64>) -> f64 {
+pub fn calculate_weighted_st_deviation_two(periods: &HashMap<i32, Vec<f64>>, n: i32, weights: &Vec<f64>) -> (f64, f64) {
     let mut sum_squared = 0.0;
     let mut sum = 0.0;
 
@@ -106,11 +113,13 @@ pub fn calculate_weighted_st_deviation_two(periods: &HashMap<i32, Vec<f64>>, n: 
             sum_squared += loss * loss * weights[(period_number - 1) as usize];
         }
     }
+
+    let mean = sum / n as f64;
     sum = sum * sum;
 
     let alpha = sum_squared - (sum / n as f64);
     let beta = alpha / (n - 1) as f64;
-    return f64::sqrt(beta)
+    return (f64::sqrt(beta), mean)
 }
 
 

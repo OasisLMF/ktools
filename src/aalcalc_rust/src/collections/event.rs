@@ -1,3 +1,4 @@
+//! Here we define the ```Event``` struct which handles the losses and summary statistics around an event.
 use std::collections::HashMap;
 
 use crate::data_access_layer::occurrence::Occurrence;

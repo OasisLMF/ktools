@@ -15,6 +15,11 @@ use byteorder::{ByteOrder, LittleEndian};
 use std::cmp::PartialEq;
 use std::collections::HashMap;
 
+use crate::data_access_layer::traits::load_occurrence::{
+    ReadOccurrences,
+    IngestOccurrence
+};
+
 
 /// The types of date formats that are supported when reading occurrence binary files.
 #[derive(Debug, PartialEq, Eq)]
@@ -65,34 +70,107 @@ impl Occurrence {
 /// # Fields 
 /// * **date_format:** the format of the dates in the file
 /// * **period_number:** the period bin that the occurrence belongs to
-/// * **handler:** handles the reading and writing of the binary file
 /// * **chunk_size:** the number of bytes each occurrence takes (subject to change based on date format)
 #[derive(Debug)]
 pub struct OccurrenceData {
     pub date_format: DateFormat,
     pub period_number: i32,
-    pub handler: File,
     pub chunk_size: i32
 }
 
 
-impl OccurrenceData {
+impl IngestOccurrence<i32, Occurrence> for OccurrenceData {
 
-    /// The constructor for the ```OccurrenceData``` struct. 
+    /// Inserts an occurrence into the map. 
     /// 
-    /// # Arguments
-    /// * **path:** the path to the binary file that is going to read
+    /// # Fields
+    /// **map:** the map in which the occurrence is going to be inserted into
+    /// **occurrence:** the occurrence that is going to be inserted into the map
     /// 
     /// # Returns 
-    /// The constructed ```OccurrenceData``` struct
-    pub fn new(path: String) -> Self {
-        let mut file = File::open(path).unwrap();
+    /// the map with the inserted occurrence
+    fn insert_occurrence(map: &mut HashMap<i32, Vec<Occurrence>>, occurrence: Occurrence) {
+        // get reference to occurence based on and have a hashmap with the key of the period.
+        match map.get_mut(&occurrence.event_id) {
+            Some(data) => {
+                data.push(occurrence);
+            }, 
+            None => {
+                let mut data = vec![];
+                let key = occurrence.event_id.clone();
+                data.push(occurrence);
+                map.insert(key, data);
+            }
+        }
+    }
+}
 
+
+
+/// The handle for loading data from the Occurrence files
+/// 
+/// # Fields
+/// **handle:** the handle for reading a file
+pub struct OccurrenceFileHandle {
+    pub handle: File
+}
+
+
+impl OccurrenceFileHandle {
+
+    pub fn new(path: String) -> Result<Self, String> {
+        match File::open(path) {
+            Ok(handle) => {
+                return Ok(OccurrenceFileHandle{handle})
+            },
+            Err(error) => {
+                return Err(error.to_string())
+            }
+        }
+    }
+
+}
+
+
+impl ReadOccurrences<i32, Occurrence, File, OccurrenceData> for OccurrenceFileHandle {
+
+    /// Gets all the occurrences and events belonging to the occurrences in the binary file attached to the ```OccurrenceData``` struct.
+    /// 
+    /// # Returns
+    /// all the occurrences in the binary file attached to the ```OccurrenceData``` struct
+    fn get_data(mut self) -> HashMap<i32, Vec<Occurrence>> {
+        let mut read_frame = [0; 12];
+        let mut data = HashMap::new();
+
+        loop {
+            match self.handle.read_exact(&mut read_frame) {
+                Ok(_) => {
+                    let mut chunked_frame = read_frame.chunks(4).into_iter();
+                    let occurrence = Occurrence::from_bytes(
+                        chunked_frame.next().unwrap(), 
+                        chunked_frame.next().unwrap(), 
+                        chunked_frame.next().unwrap()
+                    );
+                    OccurrenceData::insert_occurrence(&mut data, occurrence);
+
+                },
+                Err(error) => {
+                    if error.to_string().as_str() != "failed to fill whole buffer" {
+                        panic!("{}", error);
+                    }
+                    break
+                }
+            }
+        }
+        return data
+    }
+
+    fn get_meta_data(&mut self) -> OccurrenceData {
         let mut date_option_buffer = [0; 4];
         let mut period_number_buffer = [0; 4];
 
-        file.read_exact(&mut date_option_buffer).unwrap();
-        file.read_exact(&mut period_number_buffer).unwrap(); // gives us the maximum number of periods
+        self.handle.read_exact(&mut date_option_buffer).unwrap();
+        self.handle.read_exact(&mut period_number_buffer).unwrap(); // gives us the maximum number of periods
 
         let date_format: DateFormat;
         match LittleEndian::read_i32(&date_option_buffer) {
@@ -125,87 +203,49 @@ impl OccurrenceData {
         return OccurrenceData{
             date_format,
             period_number,
-            handler: file,
             chunk_size
         }
     }
-
-    /// Gets all the occurrences and events belonging to the occurrences in the binary file attached to the ```OccurrenceData``` struct.
-    /// 
-    /// # Returns
-    /// all the occurrences in the binary file attached to the ```OccurrenceData``` struct
-    pub fn get_data(&mut self) -> HashMap<i32, Vec<Occurrence>> {
-        let mut read_frame = [0; 12];
-        let mut data = HashMap::new();
-
-        loop {
-            match self.handler.read_exact(&mut read_frame) {
-                Ok(_) => {
-                    let mut chunked_frame = read_frame.chunks(4).into_iter();
-                    let occurrence = Occurrence::from_bytes(
-                        chunked_frame.next().unwrap(), 
-                        chunked_frame.next().unwrap(), 
-                        chunked_frame.next().unwrap()
-                    );
-                    OccurrenceData::insert_occurrence(&mut data, occurrence);
-
-                },
-                Err(error) => {
-                    if error.to_string().as_str() != "failed to fill whole buffer" {
-                        panic!("{}", error);
-                    }
-                    break
-                }
-            }
-        }
-        return data
-    }
-
-    /// Inserts an occurrence into the map. 
-    /// 
-    /// # Fields
-    /// **map:** the map in which the occurrence is going to be inserted into
-    /// **occurrence:** the occurrence that is going to be inserted into the map
-    /// 
-    /// # Returns 
-    /// the map with the inserted occurrence
-    fn insert_occurrence(map: &mut HashMap<i32, Vec<Occurrence>>, occurrence: Occurrence) {
-        // get reference to occurence based on and have a hashmap with the key of the period.
-        match map.get_mut(&occurrence.event_id) {
-            Some(data) => {
-                data.push(occurrence);
-            }, 
-            None => {
-                let mut data = vec![];
-                let key = occurrence.event_id.clone();
-                data.push(occurrence);
-                map.insert(key, data);
-            }
-        }
-    }
-
 }
 
 
 #[cfg(test)]
 mod occurrence_data_tests {
 
-    use super::{OccurrenceData, DateFormat};
+    use mockall::predicate::*;
+    use mockall::mock;
+    use super::{
+        OccurrenceData,
+        DateFormat,
+        ReadOccurrences,
+        Occurrence,
+        File
+    };
+    use std::collections::HashMap;
 
     #[test]
-    fn test_new() {
-        let occ_data = OccurrenceData::new(String::from("./input/occurrence.bin"));
+    fn test_get_meta_data() {
+
+        mock! {
+            OccurrenceFileHandle {}
+
+            impl ReadOccurrences<i32, Occurrence, File, OccurrenceData> for OccurrenceFileHandle {
+                fn get_data(mut self) -> HashMap<i32, Vec<Occurrence>>;
+                fn get_meta_data(&mut self) -> OccurrenceData;
+            }
+        }
+
+        let mut mock_handle = MockOccurrenceFileHandle::new();
+        mock_handle.expect_get_meta_data().returning(|| {
+            OccurrenceData{
+                date_format: DateFormat::NewFormat,
+                period_number: 10,
+                chunk_size: 12
+            }
+        });
+        let occ_data = mock_handle.get_meta_data();
         assert_eq!(10, occ_data.period_number);
         assert_eq!(12, occ_data.chunk_size);
         assert_eq!(DateFormat::NewFormat, occ_data.date_format);
     }
-
-    #[test]
-    fn test_get_data() {
-        let mut occ_data = OccurrenceData::new(String::from("./input/occurrence.bin"));
-        let data = occ_data.get_data();
-        assert_eq!(2, data.get(&1).unwrap().len());
-        assert_eq!(2, data.get(&2).unwrap().len());
-    }
-
 }

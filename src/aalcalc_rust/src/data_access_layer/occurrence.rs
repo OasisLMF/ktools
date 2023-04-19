@@ -22,6 +22,11 @@ use crate::data_access_layer::traits::load_occurrence::{
 
 
 /// The types of date formats that are supported when reading occurrence binary files.
+/// 
+/// # Variants
+/// * **NewFormat:** the new format of dates that are in the format of YYYYMMDD
+/// * **IncludesHoursAndMinutes:** the old format of dates that are in the format of YYYYMMDDHHMM
+/// * **Depreciated:** the old format of dates that are in the format of YYYYMMDDHHMMSS
 #[derive(Debug, PartialEq, Eq)]
 pub enum DateFormat {
     NewFormat,
@@ -118,6 +123,13 @@ pub struct OccurrenceFileHandle {
 
 impl OccurrenceFileHandle {
 
+    /// Constructs the ```OccurrenceFileHandle``` struct from a path to a binary file.
+    /// 
+    /// # Fields
+    /// * **path:** the path to the binary file
+    /// 
+    /// # Returns
+    /// the constructed ```OccurrenceFileHandle``` struct
     pub fn new(path: String) -> Result<Self, String> {
         match File::open(path) {
             Ok(handle) => {
@@ -165,6 +177,10 @@ impl ReadOccurrences<i32, Occurrence, File, OccurrenceData> for OccurrenceFileHa
         return data
     }
 
+    /// Gets the meta data of the binary file attached to the ```OccurrenceData``` struct.
+    /// 
+    /// # Returns
+    /// the meta data of the binary file attached to the ```OccurrenceData``` struct
     fn get_meta_data(&mut self) -> OccurrenceData {
         let mut date_option_buffer = [0; 4];
         let mut period_number_buffer = [0; 4];

@@ -144,6 +144,9 @@ void aggreports::LoadPeriodsToWeighting() {
 				   "will not be produced.\n");
       outputFlags_[AGG_WHEATSHEAF_MEAN] = false;
       outputFlags_[OCC_WHEATSHEAF_MEAN] = false;
+    } else if (periodstoweighting_.size() > 0 && ordFlag_ == true) {
+      logprintf(progname_, "INFO", "Tail Value at Risk for Wheatsheaf mean/per "
+				   "sample mean is not supported.\n");
     }
   }
 
@@ -944,16 +947,11 @@ void aggreports::WriteWheatsheafMean(const std::vector<int> &fileIDs,
   }
 #endif
 
-  std::map<int, std::vector<TVaR>> tail;
-
   for (auto s : *mean_map) {
     std::vector<mean_count> &rmc = s.second;
-    OASIS_FLOAT tvar = 0;
     int i = 1;
 
     for (auto mc : rmc) {
-      tvar = tvar - ((tvar - (mc.mean / std::max(mc.count, 1))) / i);
-      tail[s.first].push_back({mc.retperiod, tvar});
 
       if (WriteEPTOutput != nullptr) {
 	(this->*WriteEPTOutput)(fileIDs, s.first, epcalc, eptype, mc.retperiod,
@@ -972,15 +970,6 @@ void aggreports::WriteWheatsheafMean(const std::vector<int> &fileIDs,
     }
 
   }
-
-  // Only write Tail Value at Risk (TVaR) for ORD output
-  if (!ordFlag_) return;
-  if (fout_[EPT] != nullptr) WriteTVaR(fileIDs, epcalc, eptype_tvar, tail);
-#ifdef ORD_OUTPUT
-  if (parquetFileNames_[EPT] != "") {
-    WriteTVaR(os_ept_, epcalc, eptype_tvar, tail);
-  }
-#endif
 
 }
 

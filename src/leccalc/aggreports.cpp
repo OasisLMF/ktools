@@ -146,7 +146,8 @@ void aggreports::LoadPeriodsToWeighting() {
       outputFlags_[OCC_WHEATSHEAF_MEAN] = false;
     } else if (periodstoweighting_.size() > 0 && ordFlag_ == true) {
       logprintf(progname_, "INFO", "Tail Value at Risk for Wheatsheaf mean/per "
-				   "sample mean is not supported.\n");
+				   "sample mean is not supported if you wish "
+				   "to use non-uniform period weights..\n");
     }
   }
 

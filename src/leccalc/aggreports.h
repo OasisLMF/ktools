@@ -52,11 +52,17 @@ enum { MEANDR = 1, FULL, PERSAMPLEMEAN, MEANSAMPLE };
 enum { MEANS = 0, SAMPLES };
 enum { WHEATSHEAF = 0, WHEATSHEAF_MEAN };
 
-struct line_points{
+struct line_points {
 	double from_x;
 	double from_y;
 	double to_x;
 	double to_y;
+};
+
+struct mean_count {
+	double retperiod;
+	double mean;
+	int count;
 };
 
 class aggreports {
@@ -67,9 +73,10 @@ private:
 	FILE **fout_;
 	bool useReturnPeriodFile_;
 	int samplesize_;
-	const bool *outputFlags_;
+	bool *outputFlags_;
 	const bool ordFlag_;
 	const std::string *parquetFileNames_;
+	const char *progname_;
 	bool eptHeader_ = true;
 	bool pseptHeader_ = true;
 	std::map<int, bool> wheatSheaf_ = {
@@ -102,6 +109,7 @@ private:
 
 	void LoadReturnPeriods();
 	void LoadPeriodsToWeighting();
+	void NormalisePeriodWeights();
 	void LoadEnsembleMapping();
 	OASIS_FLOAT GetLoss(const double next_return_period,
 			    const double last_return_period,
@@ -128,7 +136,8 @@ private:
 						const int, const int, const int,
 						const double,
 						const OASIS_FLOAT),
-		parquet::StreamWriter& os);
+		parquet::StreamWriter& os,
+		std::map<int, std::vector<mean_count>> *mean_map=nullptr);
 #else
 	template<typename T>
 	void WriteReturnPeriodOut(const std::vector<int> &fileIDs,
@@ -140,7 +149,8 @@ private:
 		void (aggreports::*WriteOutput)(const std::vector<int>&,
 						const int, const int, const int,
 						const double,
-						const OASIS_FLOAT));
+						const OASIS_FLOAT),
+		std::map<int, std::vector<mean_count>> *mean_map=nullptr);
 #endif
 	inline void OutputRows(const std::vector<int> &fileIDs,
 			       const char * buffer, int strLen);
@@ -189,7 +199,11 @@ private:
 		const std::vector<int> &fileIDs,
 		std::map<wheatkey, lossvec2> &items, int eptype,
 		int eptype_tvar,
-		std::map<int, double> &unusedperiodstoweighting);
+		std::map<int, double> &unusedperiodstoweighting,
+		std::map<int, std::vector<mean_count>> *mean_map);
+	void WriteWheatsheafMean(const std::vector<int> &fileIDs, int epcalc,
+		int eptype, int eptype_tvar,
+		std::map<int, std::vector<mean_count>> *mean_map);
 	void MeanDamageRatio(const std::vector<int> &fileIDs,
 			     OASIS_FLOAT (OutLosses::*GetOutLoss)(),
 			     const int epcalc, const int eptype,
@@ -233,8 +247,10 @@ private:
 
 public:
 	aggreports(const int totalperiods, FILE **fout,
-		   const bool useReturnPeriodFile, const bool *outputFlags,
-		   const bool ordFlag, const std::string *parquetFileNames);
+		   const bool useReturnPeriodFile, bool *outputFlags,
+		   const bool ordFlag, const std::string *parquetFileNames,
+		   const char *progname);
+	bool * GetOutputFlags();
 	void SetInputData(const std::set<int> &summaryids,
 			  std::vector<std::map<outkey2, OutLosses>> &out_loss);
 	void SetSampleSize(const int samplesize);

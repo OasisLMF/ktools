@@ -42,9 +42,17 @@ namespace placalc {
     size_t i = fread(&opts, sizeof(opts), 1, fin);
 
     item_amplification ia;
+    int expectedItemID = 1;
     i = fread(&ia, sizeof(ia), 1, fin);
     while (i != 0) {
       item_to_amplification_.push_back(ia.amplification_id);
+      if (ia.item_id != expectedItemID) {
+	fprintf(stderr, "FATAL: %s: Item IDs are not contiguous. "
+			"Expected item ID %d but read item ID %d\n",
+		__func__, expectedItemID, ia.item_id);
+	exit(EXIT_FAILURE);
+      }
+      ++expectedItemID;
       i = fread(&ia, sizeof(ia), 1, fin);
     }
 

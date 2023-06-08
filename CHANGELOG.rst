@@ -1,6 +1,12 @@
 Ktools Changelog
 ================
 
+`v3.9.8`_
+ ---------
+* [#346](https://github.com/OasisLMF/ktools/pull/346) - Release/3.9.7
+* [#344](https://github.com/OasisLMF/ktools/pull/349) - Incorrect Values from Wheatsheaf/Per Sample Mean with Period Weights in leccalc/ordleccalc
+.. _`v3.9.8`:  https://github.com/OasisLMF/ktools/compare/v3.9.7...v3.9.8
+
 * [#343](https://github.com/OasisLMF/ktools/pull/345) - Empty leccalc output files when using period weights and return periods file
 .. _`v3.9.7`:  https://github.com/OasisLMF/ktools/compare/v3.9.6...v3.9.7
 

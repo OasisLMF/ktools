@@ -44,16 +44,23 @@ bool operator<(const wheatkey &lhs, const wheatkey &rhs) {
 
 
 aggreports::aggreports(const int totalperiods, FILE **fout,
-		       const bool useReturnPeriodFile, const bool *outputFlags,
-		       const bool ordFlag,
-		       const std::string *parquetFileNames) :
+		       const bool useReturnPeriodFile, bool *outputFlags,
+		       const bool ordFlag, const std::string *parquetFileNames,
+		       const char *progname) :
 	totalperiods_(totalperiods), fout_(fout),
 	useReturnPeriodFile_(useReturnPeriodFile), outputFlags_(outputFlags),
-	ordFlag_(ordFlag), parquetFileNames_(parquetFileNames)
+	ordFlag_(ordFlag), parquetFileNames_(parquetFileNames),
+	progname_(progname)
 {
 
   LoadReturnPeriods();
+  LoadPeriodsToWeighting();
 
+}
+
+bool * aggreports::GetOutputFlags()
+{
+  return outputFlags_;
 }
 
 
@@ -68,7 +75,7 @@ void aggreports::SetInputData(const std::set<int> &summaryids,
 void aggreports::SetSampleSize(const int samplesize)
 {
   samplesize_ = samplesize;
-  LoadPeriodsToWeighting();
+  NormalisePeriodWeights();
   LoadEnsembleMapping();
 }
 
@@ -120,16 +127,38 @@ void aggreports::LoadPeriodsToWeighting() {
   if (fin == nullptr) return;
 
   Periods p;
-  OASIS_FLOAT total_weighting = 0;
   while (fread(&p, sizeof(Periods), 1, fin) != 0) {
-    total_weighting += (OASIS_FLOAT)p.weighting;
     periodstoweighting_[p.period_no] = p.weighting;
   }
 
-  // Normalise weighting
+  // User must define return periods if he/she wishes to use non-uniform period
+  // weights for Wheatsheaf/per sample mean output
+  if (outputFlags_[AGG_WHEATSHEAF_MEAN] == true ||
+      outputFlags_[OCC_WHEATSHEAF_MEAN] == true) {
+    if (periodstoweighting_.size() > 0 && useReturnPeriodFile_ == false) {
+      logprintf(progname_, "WARNING", "Return periods file must be present if "
+				      "you wish to use non-uniform period "
+				      "weights for Wheatsheaf mean/per sample "
+				      "mean output.\n");
+      logprintf(progname_, "INFO", "Wheatsheaf mean/per sample mean output "
+				   "will not be produced.\n");
+      outputFlags_[AGG_WHEATSHEAF_MEAN] = false;
+      outputFlags_[OCC_WHEATSHEAF_MEAN] = false;
+    } else if (periodstoweighting_.size() > 0 && ordFlag_ == true) {
+      logprintf(progname_, "INFO", "Tail Value at Risk for Wheatsheaf mean/per "
+				   "sample mean is not supported if you wish "
+				   "to use non-uniform period weights..\n");
+    }
+  }
+
+}
+
+
+void aggreports::NormalisePeriodWeights() {
+
   if (samplesize_) {
     for (auto iter = periodstoweighting_.begin();
-	 iter != periodstoweighting_.end(); iter++) {
+	 iter != periodstoweighting_.end(); ++iter) {
       iter->second /= samplesize_;
     }
   }
@@ -226,7 +255,8 @@ void aggreports::WriteReturnPeriodOut(const std::vector<int> &fileIDs,
 	void (aggreports::*WriteOutput)(const std::vector<int>&, const int,
 					const int, const int, const double,
 					const OASIS_FLOAT),
-	parquet::StreamWriter& os)
+	parquet::StreamWriter& os,
+	std::map<int, std::vector<mean_count>> *mean_map)
 #else
 template<typename T>
 void aggreports::WriteReturnPeriodOut(const std::vector<int> &fileIDs,
@@ -237,7 +267,8 @@ void aggreports::WriteReturnPeriodOut(const std::vector<int> &fileIDs,
 	OASIS_FLOAT tvar, T &tail,
 	void (aggreports::*WriteOutput)(const std::vector<int>&, const int,
 					const int, const int, const double,
-					const OASIS_FLOAT))
+					const OASIS_FLOAT),
+	std::map<int, std::vector<mean_count>> *mean_map)
 #endif
 {
 
@@ -261,6 +292,11 @@ void aggreports::WriteReturnPeriodOut(const std::vector<int> &fileIDs,
     if (WriteOutput != nullptr) {
     	(this->*WriteOutput)(fileIDs, summary_id, epcalc, eptype,
 			     nextreturnperiod_value, loss);
+    }
+    if (mean_map != nullptr) {   // Wheatsheaf Mean with period weights
+      (*mean_map)[summary_id][nextreturnperiod_index].retperiod = nextreturnperiod_value;
+      (*mean_map)[summary_id][nextreturnperiod_index].mean += loss;
+      (*mean_map)[summary_id][nextreturnperiod_index].count++;
     }
 #ifdef ORD_OUTPUT
     if (parquetFileNames_[EPT] != "") {
@@ -783,7 +819,8 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
 void aggreports::WritePerSampleExceedanceProbabilityTable(
 	const std::vector<int> &fileIDs, std::map<wheatkey, lossvec2> &items,
 	int eptype, int eptype_tvar,
-	std::map<int, double> &unusedperiodstoweighting) {
+	std::map<int, double> &unusedperiodstoweighting,
+	std::map<int, std::vector<mean_count>> *mean_map) {
 
   if (items.size() == 0) return;
 
@@ -827,13 +864,13 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
 			       last_computed_rp, last_computed_loss, retperiod,
 			       lp.value, s.first.summary_id, eptype,
 			       s.first.sidx, max_retperiod, i, tvar, tail,
-			       WritePSEPTOutput, os_psept_);
+			       WritePSEPTOutput, os_psept_, mean_map);
 #else
 	  WriteReturnPeriodOut(fileIDs, nextreturnperiodindex,
 			       last_computed_rp, last_computed_loss, retperiod,
 			       lp.value, s.first.summary_id, eptype,
 			       s.first.sidx, max_retperiod, i, tvar, tail,
-			       WritePSEPTOutput);
+			       WritePSEPTOutput, mean_map);
 #endif
 	  tvar = tvar - ((tvar - lp.value) / i);
 	} else {
@@ -871,12 +908,13 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
 			     last_computed_loss, retperiod, 0,
 			     s.first.summary_id, eptype, s.first.sidx,
 			     max_retperiod, i, tvar, tail, WritePSEPTOutput,
-			     os_psept_);
+			     os_psept_, mean_map);
 #else
 	WriteReturnPeriodOut(fileIDs, nextreturnperiodindex, last_computed_rp,
 			     last_computed_loss, retperiod, 0,
 			     s.first.summary_id, eptype, s.first.sidx,
-			     max_retperiod, i, tvar, tail, WritePSEPTOutput);
+			     max_retperiod, i, tvar, tail, WritePSEPTOutput,
+			     mean_map);
 #endif
 	tvar = tvar - (tvar / i);
 	i++;
@@ -890,6 +928,49 @@ void aggreports::WritePerSampleExceedanceProbabilityTable(
 #ifdef ORD_OUTPUT
   if (parquetFileNames_[PSEPT] != "") WriteTVaR(os_psept_, eptype_tvar, tail);
 #endif
+
+}
+
+
+// Wheatsheaf mean output when period weights and return periods defined
+void aggreports::WriteWheatsheafMean(const std::vector<int> &fileIDs,
+	int epcalc, int eptype, int eptype_tvar,
+	std::map<int, std::vector<mean_count>> *mean_map) {
+
+  if (mean_map->size() == 0) return;
+
+#ifdef ORD_OUTPUT
+  if (os_ept_exists_ == false) {
+    if (parquetFileNames_[EPT] != "") {
+      os_ept_ = GetParquetStreamWriter(EPT);
+      os_ept_exists_ = true;
+    }
+  }
+#endif
+
+  for (auto s : *mean_map) {
+    std::vector<mean_count> &rmc = s.second;
+    int i = 1;
+
+    for (auto mc : rmc) {
+
+      if (WriteEPTOutput != nullptr) {
+	(this->*WriteEPTOutput)(fileIDs, s.first, epcalc, eptype, mc.retperiod,
+				mc.mean / std::max(mc.count, 1));
+      }
+
+#ifdef ORD_OUTPUT
+      if (parquetFileNames_[EPT] != "") {
+	WriteParquetOutput(os_ept_, s.first, epcalc, eptype, mc.retperiod,
+			   mc.mean / std::max(mc.count, 1));
+      }
+#endif
+
+      i++;
+
+    }
+
+  }
 
 }
 
@@ -1215,36 +1296,33 @@ void aggreports::WheatsheafAndWheatsheafMeanWithWeighting(
     }
   }
 
-  if (outputFlags_[handles[WHEATSHEAF]] == true) {
-    std::vector<int> fileIDs = GetFileIDs(handles[WHEATSHEAF], PSEPT);
-    WritePerSampleExceedanceProbabilityTable(fileIDs, items, eptype,
-					     eptype_tvar,
-					     unusedperiodstoweighting);
-  }
-
-  if (outputFlags_[handles[WHEATSHEAF_MEAN]] == false) return;
-
-  std::map<int, lossvec2> mean_map;
-  for (std::set<int>::iterator it = summaryids_.begin();
-       it != summaryids_.end(); ++it) {
-    mean_map[*it] = lossvec2(maxPeriodNo[*it], lossval());
-  }
-
-  for (auto s : items) {
-    lossvec2 &lpv = s.second;
-    std::sort(lpv.rbegin(), lpv.rend());
-    for (auto lp : lpv) {
-      lossval &l = mean_map[s.first.summary_id][lp.period_no-1];
-      l.period_no = lp.period_no;
-      l.period_weighting = lp.period_weighting;
-      l.value += lp.value;
+  // Map for Wheatsheaf mean - calculate Wheatsheaf mean at same time as
+  // Wheatsheaf. There is no need to check for a return period file, as
+  // this is checked earlier in aggreports::LoadPeriodsToWeighting().
+  std::map<int, std::vector<mean_count>> *temp_map = nullptr;
+  if (outputFlags_[handles[WHEATSHEAF_MEAN]]) {
+    temp_map = new std::map<int, std::vector<mean_count>>();
+    for (auto it = summaryids_.begin(); it != summaryids_.end(); ++it) {
+      (*temp_map)[*it] = std::vector<mean_count>(returnperiods_.size(),
+						 mean_count());
     }
   }
 
-  std::vector<int> fileIDs = GetFileIDs(handles[WHEATSHEAF_MEAN]);
-  WriteExceedanceProbabilityTable(fileIDs, mean_map, samplesize, epcalc, eptype,
-				  eptype_tvar, unusedperiodstoweighting,
-				  samplesize);
+
+  std::vector<int> fileIDs;
+  if (outputFlags_[handles[WHEATSHEAF]] == true) {
+    std::vector<int> fileIDs = GetFileIDs(handles[WHEATSHEAF], PSEPT);
+  }
+  WritePerSampleExceedanceProbabilityTable(fileIDs, items, eptype, eptype_tvar,
+					   unusedperiodstoweighting, temp_map);
+
+  if (outputFlags_[handles[WHEATSHEAF_MEAN]] == false) return;
+
+  fileIDs = GetFileIDs(handles[WHEATSHEAF_MEAN]);
+  WriteWheatsheafMean(fileIDs, epcalc, eptype, eptype_tvar, temp_map);
+
+  delete temp_map;   // tidy up
+  temp_map = nullptr;
 
 }
 

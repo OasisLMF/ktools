@@ -31,10 +31,10 @@ namespace placalc {
 
   void LoadItemToAmplification() {
 
-    FILE * fin = fopen(ITEMAMPLIFICATION_FILE, "rb");
+    FILE * fin = fopen(AMPLIFICATION_FILE, "rb");
     if (fin == nullptr) {
       fprintf(stderr, "FATAL: %s: Error opening file %s\n", __func__,
-	      ITEMAMPLIFICATION_FILE);
+	      AMPLIFICATION_FILE);
       exit(EXIT_FAILURE);
     }
 

@@ -11,7 +11,7 @@
 #endif
 
 
-namespace lossfactorstobin {
+namespace lossfactorstocsv {
 
 
   // First 4 bytes reserved for optional flags

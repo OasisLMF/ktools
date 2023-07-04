@@ -11,7 +11,7 @@
 #endif
 
 
-namespace lossfactorstobin {
+namespace lossfactorstocsv {
   void DoIt();
 }
 char *progname;
@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
 
   try {
     initstreams();
-    lossfactorstobin::DoIt();
+    lossfactorstocsv::DoIt();
   } catch (std::bad_alloc&) {
     fprintf(stderr, "FATAL: %s: Memory allocation failed.\n", progname);
     exit(EXIT_FAILURE);

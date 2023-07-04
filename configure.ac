@@ -191,6 +191,8 @@ AC_CONFIG_FILES([
 		 src/lossfactorstocsv/Makefile
 		 src/ordleccalc/Makefile
                  src/aalcalc/Makefile
+		 src/amplificationstobin/Makefile
+		 src/amplificationstocsv/Makefile
                  src/vulnerabilitytobin/Makefile
                  src/vulnerabilitytocsv/Makefile
                  src/footprinttobin/Makefile

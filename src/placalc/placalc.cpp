@@ -13,11 +13,6 @@
 
 namespace placalc {
 
-  struct item_amplification {
-    int item_id;
-    int amplification_id;
-  };
-
   struct hash_event_amplification {
     size_t operator()(const event_amplification &ea) const {
       return ea.event_id * std::numeric_limits<int>::max() + ea.amplification_id;

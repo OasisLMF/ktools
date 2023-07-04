@@ -381,6 +381,10 @@ struct event_count {
 };
 
 
+struct item_amplification {
+	int item_id;
+	int amplification_id;
+};
 
 
 #pragma pack(pop)

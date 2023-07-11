@@ -131,7 +131,7 @@ namespace placalc {
       if (iter != factors_.end()) factor = iter->second;
 
       gulSampleslevelRec gr;
-      while (i = fread(&gr, sizeof(gr), 1, stdin) != 0) {
+      while ((i = fread(&gr, sizeof(gr), 1, stdin)) != 0) {
 	gr.loss *= factor;
 	fwrite(&gr, sizeof(gr), 1, stdout);
 	if (gr.sidx == 0) break;

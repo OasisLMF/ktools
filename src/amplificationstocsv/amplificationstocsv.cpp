@@ -29,7 +29,7 @@ namespace amplificationstocsv {
 
     fprintf(stdout, "item_id,amplification_id\n");   // header
 
-    while (i = fread(&ia, sizeof(ia), 1, stdin) != 0) {
+    while ((i = fread(&ia, sizeof(ia), 1, stdin)) != 0) {
 
       fprintf(stdout, "%d,%d\n", ia.item_id, ia.amplification_id);
 

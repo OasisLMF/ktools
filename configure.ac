@@ -178,6 +178,7 @@ AC_CONFIG_FILES([
                  src/fmxreftobin/Makefile
                  src/summarycalctocsv/Makefile
                  src/eltcalc/Makefile
+		 src/placalc/Makefile
                  src/pltcalc/Makefile
                  src/gulsummaryxreftobin/Makefile
                  src/gulsummaryxreftocsv/Makefile
@@ -186,8 +187,12 @@ AC_CONFIG_FILES([
                  src/occurrencetobin/Makefile
                  src/occurrencetocsv/Makefile
                  src/leccalc/Makefile
+		 src/lossfactorstobin/Makefile
+		 src/lossfactorstocsv/Makefile
 		 src/ordleccalc/Makefile
                  src/aalcalc/Makefile
+		 src/amplificationstobin/Makefile
+		 src/amplificationstocsv/Makefile
                  src/vulnerabilitytobin/Makefile
                  src/vulnerabilitytocsv/Makefile
                  src/footprinttobin/Makefile

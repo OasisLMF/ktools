@@ -1,6 +1,9 @@
 Ktools Changelog
 ================
 
+* [#351](https://github.com/OasisLMF/ktools/pull/351) - Introduce components for Post Loss Amplification
+.. _`v3.10.0`:  https://github.com/OasisLMF/ktools/compare/v3.9.8...v3.10.0
+
 `v3.9.8`_
  ---------
 * [#346](https://github.com/OasisLMF/ktools/pull/346) - Release/3.9.7

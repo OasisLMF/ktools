@@ -56,7 +56,7 @@ namespace placalc {
   }
 
 
-  void LoadPostLossAmplificationFactors() {
+  void LoadPostLossAmplificationFactors(const float secondaryFactor) {
 
     FILE *fin = fopen(PLAFACTORS_FILE, "rb");
     if (fin == nullptr) {
@@ -79,17 +79,17 @@ namespace placalc {
 	i = fread(&af, sizeof(af), 1, fin);
 	if (i == 0) break;
 	ea.amplification_id = af.amplification_id;
-	factors_[ea] = af.factor;
+	factors_[ea] = 1. + (af.factor - 1.) * secondaryFactor;
       }
     }
 
   }
       
 
-  void doit() {
+  void doit(const float secondaryFactor) {
 
     LoadItemToAmplification();
-    LoadPostLossAmplificationFactors();
+    LoadPostLossAmplificationFactors(secondaryFactor);
 
     // Check input stream type is GUL item stream or loss stream and write type
     // to output

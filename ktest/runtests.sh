@@ -217,6 +217,8 @@ installertest()
 	../src/cdftocsv/cdftocsv  < ../ktest/testout/getmodelout.bin > ../ktest/testout/getmodelout.csv
 	../src/gultocsv/gultocsv -f < ../ktest/testout/gulcalci.bin > ../ktest/testout/gulcalci.csv
 	../src/gultocsv/gultocsv -f < ../ktest/testout/gulcalcc.bin > ../ktest/testout/gulcalcc.csv
+	../src/gultocsv/gultocsv -f < ../ktest/testout/placalci.bin > ../ktest/testout/placalci.csv
+	../src/gultocsv/gultocsv -f < ../ktest/testout/placalci_f.bin > ../ktest/testout/placalci_f.csv
 	../src/fmtocsv/fmtocsv -f < ../ktest/testout/fmcalc.bin > ../ktest/testout/fmcalc.csv
 
 	../src/summarycalctocsv/summarycalctocsv -f < ../ktest/testout/gulsummarycalc2.bin > ../ktest/testout/gulsummarycalc2.csv

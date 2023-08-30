@@ -57,6 +57,7 @@ installertest()
 	# test placalc
 	../src/placalc/placalc < ../ktest/testout/gulcalci.bin > ../ktest/testout/placalci.bin
 	../src/placalc/placalc -f 0.75 < ../ktest/testout/gulcalci.bin > ../ktest/testout/placalci_f.bin
+	../src/placalc/placalc -F 0.75 < ../ktest/testout/gulcalci.bin > ../ktest/testout/placalci_F.bin
 
 	# test fmcalc
 	 ../src/fmcalc/fmcalc > ../ktest/testout/fmcalc.bin < ../ktest/testout/gulcalci.bin
@@ -179,6 +180,7 @@ installertest()
 	../src/gultocsv/gultocsv -f < ../ktest/testout/gulcalcc.bin > ../ktest/testout/gulcalcc.csv
 	../src/gultocsv/gultocsv -f < ../ktest/testout/placalci.bin > ../ktest/testout/placalci.csv
 	../src/gultocsv/gultocsv -f < ../ktest/testout/placalci_f.bin > ../ktest/testout/placalci_f.csv
+	../src/gultocsv/gultocsv -f < ../ktest/testout/placalci_F.bin > ../ktest/testout/placalci_F.csv
 	../src/fmtocsv/fmtocsv -f < ../ktest/testout/fmcalc.bin > ../ktest/testout/fmcalc.csv
 
 	../src/summarycalctocsv/summarycalctocsv -f < ../ktest/testout/gulsummarycalc2.bin > ../ktest/testout/gulsummarycalc2.csv

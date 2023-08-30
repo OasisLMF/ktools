@@ -86,10 +86,14 @@ namespace placalc {
   }
       
 
-  void doit(const float secondaryFactor) {
+  void doit(const float relativeSecondaryFactor,
+	    const float absoluteFactor) {
 
     LoadItemToAmplification();
-    LoadPostLossAmplificationFactors(secondaryFactor);
+    // Ignore loss factors file if absolute factor is specified
+    if (absoluteFactor == 0.0) {
+      LoadPostLossAmplificationFactors(relativeSecondaryFactor);
+    }
 
     // Check input stream type is GUL item stream or loss stream and write type
     // to output
@@ -115,6 +119,9 @@ namespace placalc {
     }
     fwrite(&sampleSize, sizeof(sampleSize), 1, stdout);
 
+    // Default factor is 1.0 or absolute factor given by user
+    const float defaultFactor = (absoluteFactor == 0.0) ? 1.0 : absoluteFactor;
+
     // Read in data from GUL stream, apply Post Loss Amplification (PLA) factors
     // and write out to standard output
     while (i != 0) {
@@ -126,7 +133,8 @@ namespace placalc {
       fwrite(&gh, sizeof(gh), 1, stdout);
       ea.event_id = gh.event_id;
       ea.amplification_id = item_to_amplification_[gh.item_id];
-      float factor = 1.0;   // Assume factor = 1.0 if not present
+      // Default factor is used if post loss amplification factor is not present
+      float factor = defaultFactor;
       auto iter = factors_.find(ea);
       if (iter != factors_.end()) factor = iter->second;
 

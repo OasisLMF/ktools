@@ -12,7 +12,8 @@
 
 
 namespace placalc {
-  void doit(const float secondaryFactor);
+  void doit(const float relativeSecondaryFactor,
+	    const float absoluteFactor);
 }
 char *progname;
 
@@ -27,7 +28,8 @@ void segfault_sigaction(int, siginfo_t *si, void *) {
 
 void help() {
   fprintf(stderr,
-	  "-f optional secondary factor within range [0, 1]\n"
+	  "-f optional relative secondary factor within range [0, 1]\n"
+	  "-F optional absolute post loss amplification factor\n"
 	  "-v version\n"
 	  "-h help\n");
 }
@@ -36,12 +38,16 @@ void help() {
 int main(int argc, char *argv[]) {
 
   int opt;
-  float secondaryFactor = 1.;
+  float relativeSecondaryFactor = 1.;
+  float absoluteFactor = 0.0;
   progname = argv[0];
-  while ((opt = getopt(argc, argv, "f:vh")) != -1) {
+  while ((opt = getopt(argc, argv, "f:F:vh")) != -1) {
     switch (opt) {
       case 'f':
-	secondaryFactor = atof(optarg);
+	relativeSecondaryFactor = atof(optarg);
+	break;
+      case 'F':
+	absoluteFactor = atof(optarg);
 	break;
       case 'v':
 	fprintf(stderr, "%s : version: %s\n", argv[0], VERSION);
@@ -54,11 +60,22 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  if (secondaryFactor < 0.0 || secondaryFactor > 1.0) {
+  if (relativeSecondaryFactor < 0.0 || relativeSecondaryFactor > 1.0) {
     fprintf(stderr,
-	    "FATAL: Secondary factor %f must lie within range [0, 1]\n",
-	    secondaryFactor);
+	    "FATAL: Relative secondary factor %f must lie within range [0, 1]\n",
+	    relativeSecondaryFactor);
     exit(EXIT_FAILURE);
+  }
+  if (absoluteFactor < 0.0) {
+    fprintf(stderr, "FATAL: Absolute factor %f must be positive value\n",
+	    absoluteFactor);
+    exit(EXIT_FAILURE);
+  }
+  if (relativeSecondaryFactor < 1.0 && absoluteFactor > 0.0) {
+    fprintf(stderr,
+	    "WARNING: Relative secondary and absolute factors are incompatible\n"
+	    "INFO: Ignoring relative secondary factor\n");
+    relativeSecondaryFactor = 1.;
   }
 
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
@@ -75,7 +92,7 @@ int main(int argc, char *argv[]) {
   try {
     initstreams();
     logprintf(progname, "INFO", "starting process...\n");
-    placalc::doit(secondaryFactor);
+    placalc::doit(relativeSecondaryFactor, absoluteFactor);
     logprintf(progname, "INFO", "finishing process...\n");
   } catch (std::bad_alloc&) {
     fprintf(stderr, "FATAL: %s: Memory allocation failed.\n", progname);

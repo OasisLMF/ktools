@@ -361,6 +361,32 @@ struct EventRates {
 	double event_rate;
 };
 
+struct event_amplification {
+	int event_id;
+	int amplification_id;
+	
+	bool operator==(const event_amplification &rhs) const {
+		return event_id == rhs.event_id && amplification_id == rhs.amplification_id;
+	}
+};
+
+struct amplification_factor {
+	int amplification_id;
+	float factor;
+};
+
+struct event_count {
+	int event_id;
+	int count;
+};
+
+
+struct item_amplification {
+	int item_id;
+	int amplification_id;
+};
+
+
 #pragma pack(pop)
 
 
@@ -449,6 +475,7 @@ inline  void logprintf(const std::string &program_name,const std::string &msgtyp
 #define PERIODS_FILE "input/periods.bin"		// period to weighting mapping
 #define ENSEMBLE_FILE "input/ensemble.bin"
 #define QUANTILE_FILE "input/quantile.bin"
+#define AMPLIFICATION_FILE "input/amplifications.bin"
 
 #define DAMAGE_BIN_DICT_FILE "static/damage_bin_dict.bin"
 #define DAMAGE_CDF_BIN_FILE "static/damage_cdf.bin"
@@ -464,6 +491,7 @@ inline  void logprintf(const std::string &program_name,const std::string &msgtyp
 // compressed variant of footprint
 #define ZFOOTPRINT_FILE  "static/footprint.bin.z"	
 #define ZFOOTPRINT_IDX_FILE  "static/footprint.idx.z"
+#define PLAFACTORS_FILE "static/lossfactors.bin"
 
 #define SEMA_DIR_PREFIX "work/sema"
 #endif  // OASIS_H_

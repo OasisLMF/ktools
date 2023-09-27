@@ -1,6 +1,25 @@
 Ktools Changelog
 ================
 
+* [#351](https://github.com/OasisLMF/ktools/pull/351) - Introduce components for Post Loss Amplification
+.. _`v3.10.0`:  https://github.com/OasisLMF/ktools/compare/v3.9.8...v3.10.0
+
+`v3.9.8`_
+ ---------
+* [#346](https://github.com/OasisLMF/ktools/pull/346) - Release/3.9.7
+* [#344](https://github.com/OasisLMF/ktools/pull/349) - Incorrect Values from Wheatsheaf/Per Sample Mean with Period Weights in leccalc/ordleccalc
+.. _`v3.9.8`:  https://github.com/OasisLMF/ktools/compare/v3.9.7...v3.9.8
+
+* [#343](https://github.com/OasisLMF/ktools/pull/345) - Empty leccalc output files when using period weights and return periods file
+.. _`v3.9.7`:  https://github.com/OasisLMF/ktools/compare/v3.9.6...v3.9.7
+
+`v3.9.6`_
+ ---------
+* [#337, #279](https://github.com/OasisLMF/ktools/pull/338) - Bring split TIV calculation in line with gulpy
+* [#315](https://github.com/OasisLMF/ktools/pull/339) - Find robust way to test for pre-requisites
+* [#341](https://github.com/OasisLMF/ktools/pull/341) - Project workflows
+.. _`v3.9.6`:  https://github.com/OasisLMF/ktools/compare/v3.9.5...v3.9.6
+
 `v3.9.5`_
  ---------
 * [#330](https://github.com/OasisLMF/ktools/pull/330) - Hotfix/GitHub actions

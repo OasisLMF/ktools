@@ -156,6 +156,12 @@ installertest()
 	../src/aalcalc/aalcalc -Kfm1/summary > ../ktest/testout/fmaalcalc1.csv
 	../src/aalcalc/aalcalc -Kfm2/summary > ../ktest/testout/fmaalcalc2.csv
 
+	# test aalcalcsimple
+	../src/aalcalcsimple/aalcalcsimple -Kgul1/summary > ../ktest/testout/gulaalcalcsimple1.csv
+	../src/aalcalcsimple/aalcalcsimple -Kgul2/summary > ../ktest/testout/gulaalcalcsimple2.csv
+	../src/aalcalcsimple/aalcalcsimple -Kfm1/summary > ../ktest/testout/fmaalcalcsimple1.csv
+	../src/aalcalcsimple/aalcalcsimple -Kfm2/summary > ../ktest/testout/fmaalcalcsimple2.csv
+
 	# test alt	
 	../src/aalcalc/aalcalc -o -Kgul1/summary > ../ktest/testout/gulalt1.csv
 	../src/aalcalc/aalcalc -o -Kgul2/summary > ../ktest/testout/gulalt2.csv

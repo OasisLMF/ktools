@@ -1,10 +1,10 @@
-add_executable(aalcalcsimple)
-target_sources(aalcalcsimple
+add_executable(aalcalcmeanonly)
+target_sources(aalcalcmeanonly
 	PRIVATE
-		aalcalcsimple.cpp main.cpp
+		aalcalcmeanonly.cpp main.cpp
 )
 if (WIN32)
-	target_link_libraries(aalcalcsimple wingetopt)
+	target_link_libraries(aalcalcmeanonly wingetopt)
 endif()
 
-install(TARGETS aalcalcsimple RUNTIME DESTINATION bin)
+install(TARGETS aalcalcmeanonly RUNTIME DESTINATION bin)

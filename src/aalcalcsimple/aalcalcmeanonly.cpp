@@ -11,7 +11,7 @@
 
 #include "../include/oasis.h"
 
-namespace aalcalcsimple {
+namespace aalcalcmeanonly {
 
   int nPeriods_ = 0;
   int maxPeriodNo_ = 0;

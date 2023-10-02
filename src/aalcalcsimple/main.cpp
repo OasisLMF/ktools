@@ -10,7 +10,7 @@
 
 char *progname = nullptr;
 
-namespace aalcalcsimple {
+namespace aalcalcmeanonly {
 
   void DoIt(const std::string& subFolder, const bool skipHeader,
 	    const bool ordOutput);
@@ -83,7 +83,7 @@ int main(int argc, char* argv[]) {
 
   try {
     logprintf(progname, "INFO", "starting process...\n");
-    aalcalcsimple::DoIt(subFolder, skipHeader, ordOutput);
+    aalcalcmeanonly::DoIt(subFolder, skipHeader, ordOutput);
     logprintf(progname, "INFO", "ending procecss...\n");
   } catch (std::bad_alloc&) {
     fprintf(stderr, "FATAL: %s: Memory allocation failed\n", progname);

@@ -54,6 +54,11 @@ installertest()
 	../src/eve/eve -n 1 1 | ../src/getmodel/getmodel | ../src/gulcalc/gulcalc -S100 -L0.1 -r -a0 -i - > ../ktest/testout/gulcalci.bin
 	../src/eve/eve -n 1 1 | ../src/getmodel/getmodel | ../src/gulcalc/gulcalc -S100 -L0.1 -r -c - > ../ktest/testout/gulcalcc.bin
 
+	# test placalc
+	../src/placalc/placalc < ../ktest/testout/gulcalci.bin > ../ktest/testout/placalci.bin
+	../src/placalc/placalc -f 0.75 < ../ktest/testout/gulcalci.bin > ../ktest/testout/placalci_relf.bin
+	../src/placalc/placalc -F 0.75 < ../ktest/testout/gulcalci.bin > ../ktest/testout/placalci_absf.bin
+
 	# test fmcalc
 	 ../src/fmcalc/fmcalc > ../ktest/testout/fmcalc.bin < ../ktest/testout/gulcalci.bin
 	
@@ -173,6 +178,9 @@ installertest()
 	../src/cdftocsv/cdftocsv  < ../ktest/testout/getmodelout.bin > ../ktest/testout/getmodelout.csv
 	../src/gultocsv/gultocsv -f < ../ktest/testout/gulcalci.bin > ../ktest/testout/gulcalci.csv
 	../src/gultocsv/gultocsv -f < ../ktest/testout/gulcalcc.bin > ../ktest/testout/gulcalcc.csv
+	../src/gultocsv/gultocsv -f < ../ktest/testout/placalci.bin > ../ktest/testout/placalci.csv
+	../src/gultocsv/gultocsv -f < ../ktest/testout/placalci_relf.bin > ../ktest/testout/placalci_relf.csv
+	../src/gultocsv/gultocsv -f < ../ktest/testout/placalci_absf.bin > ../ktest/testout/placalci_absf.csv
 	../src/fmtocsv/fmtocsv -f < ../ktest/testout/fmcalc.bin > ../ktest/testout/fmcalc.csv
 
 	../src/summarycalctocsv/summarycalctocsv -f < ../ktest/testout/gulsummarycalc2.bin > ../ktest/testout/gulsummarycalc2.csv
@@ -210,6 +218,10 @@ installertest()
 	../src/vulnerabilitytocsv/vulnerabilitytocsv < ../examples/static/vulnerability.bin | ../src/vulnerabilitytobin/vulnerabilitytobin -d 102 > ../ktest/testout/vulnerability.bin
 	
 	../src/quantiletocsv/quantiletocsv < ../examples/input/quantile.bin | ../src/quantiletobin/quantiletobin  > ../ktest/testout/quantile.bin
+
+	../src/amplificationstocsv/amplificationstocsv < ../examples/input/amplifications.bin | ../src/amplificationstobin/amplificationstobin > ../ktest/testout/amplifications.bin
+
+	../src/lossfactorstocsv/lossfactorstocsv < ../examples/static/lossfactors.bin | ../src/lossfactorstobin/lossfactorstobin > ../ktest/testout/lossfactors.bin
 	
 	cp static/footprint.bin ../ktest/testout/footprint.bin
     cp static/footprint.idx ../ktest/testout/footprint.idx

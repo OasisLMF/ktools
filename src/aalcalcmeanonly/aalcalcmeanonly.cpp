@@ -222,6 +222,8 @@ namespace aalcalcmeanonly {
 #ifdef HAVE_PARQUET
     if (!parquetOutFile.empty()) WriteParquetOutputFile(parquetOutFile);
 #endif
+
+  }
 	
   void DoIt(const std::string& subFolder, const bool skipHeader,
 	    const bool ordOutput, const std::string& parquetOutFile) {

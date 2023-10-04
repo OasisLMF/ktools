@@ -149,7 +149,7 @@ namespace aalcalcmeanonly {
 
   }
 
-  void OutputRows(const bool skipHeader, const bool ordOutput) {
+  inline void WriteCsvOutputFile(const bool skipHeader, const bool ordOutput) {
 
     if (!skipHeader) {
       if (ordOutput) {
@@ -160,18 +160,68 @@ namespace aalcalcmeanonly {
     }
 
     for (auto sumIter = means_.begin(); sumIter != means_.end(); ++sumIter) {
-      for (auto typeIter = sumIter->second.begin(); typeIter != sumIter->second.end(); ++typeIter) {
+      for (auto typeIter = sumIter->second.begin();
+	   typeIter != sumIter->second.end(); ++typeIter) {
+
         printf("%d,%ld,%f\n",
 	       sumIter->first,
 	       typeIter - sumIter->second.begin() + 1,
 	       (*typeIter) / nPeriods_);
+
       }
     }
 
   }
+
+#ifdef HAVE_PARQUET
+  inline void WriteParquetFile(const std::string& parquetOutFile) {
+
+    std::vector<OasisParquet::ParquetFields> parquetFields;
+    parquetFields.push_back({"SummaryId", parquet::Type::INT32,
+                            parquet::ConvertedType::INT_32});
+    parquetFields.push_back({"SampleType", parquet::Type::INT32,
+                            parquet::ConvertedType::INT_32});
+    parquetFields.push_back({"MeanLoss", parquet::Type::FLOAT,
+                            parquet::ConvertedType::NONE});
+
+    parquet::StreamWriter os =
+      OasisParquet::SetupParquetOutputStream(parquetOutFile, parquetFields);
+
+    for (auto sumIter = means_.begin(); sumIter != means_.end(); ++sumIter) {
+      for (auto typeIter = sumIter->second.begin();
+           typeIter != sumIter->second.end(); ++typeIter) {
+
+        os << sumIter->first << typeIter - sumIter->second.begin() + 1
+           << (*typeIter) / nPeriods_ << parquet::EndRow();
+
+      }
+    }
+
+  }
+#endif
+
+  void OutputRows(const bool skipHeader, const bool ordOutput,
+		  const std::string& parquetOutFile) {
+  /* !parquetOutfile.empty() | ordOutput | output files
+  * ---------------------------------------------------
+  *            1             |     1     | ORD parquet and csv
+  *            1             |     0     | ORD parquet
+  *            0             |     1     | ORD csv
+  *            0             |     0     | legacy csv
+  */
+
+    if (!(!parquetOutFile.empty() && !ordOutput)) {
+      WriteCsvOutputFile(skipHeader, ordOutput);
+    }
+
+#ifdef HAVE_PARQUET
+    if (!parquetOutFile.empty()) WriteParquetOutputFile(parquetOutFile);
+
+  }
+#endif
 	
   void DoIt(const std::string& subFolder, const bool skipHeader,
-	    const bool ordOutput) {
+	    const bool ordOutput, const std::string& parquetOutFile) {
 
     LoadPeriodToWeighting();
     LoadOccurrence();
@@ -181,7 +231,7 @@ namespace aalcalcmeanonly {
       path = path + "/";
     }
     ReadFilesInDirectory(path);
-    OutputRows(skipHeader, ordOutput);
+    OutputRows(skipHeader, ordOutput, parquetOutFile);
 
   }
 

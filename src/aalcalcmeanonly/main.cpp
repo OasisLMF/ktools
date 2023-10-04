@@ -13,7 +13,7 @@ char *progname = nullptr;
 namespace aalcalcmeanonly {
 
   void DoIt(const std::string& subFolder, const bool skipHeader,
-	    const bool ordOutput);
+	    const bool ordOutput, const std::string& parquetOutFile);
 
 }
 
@@ -30,6 +30,7 @@ void help() {
 
   fprintf(stderr, "-K [folder] workspace sub folder\n");
   fprintf(stderr, "-o Open Results Data (ORD) output\n");
+  fprintf(stderr, "-p [filename] ORD output in parquet format\n");
   fprintf(stderr, "-s skip header\n");
   fprintf(stderr, "-v version\n");
   fprintf(stderr, "-h help\n");
@@ -43,11 +44,17 @@ int main(int argc, char* argv[]) {
   int opt;
   bool skipHeader = false;
   bool ordOutput = false;
+  std::string parquetOutFile;
 
-  while ((opt = getopt(argc, argv, (char *)"osvhK:")) != -1) {
+  while ((opt = getopt(argc, argv, (char *)"osvhK:p:")) != -1) {
     switch (opt) {
       case 'v':
+#ifdef HAVE_PARQUET
+        fprintf(stderr, "%s : version: %s : Parquet output enabled\n",
+                argv[0], VERSION);
+#else
         fprintf(stderr, "%s: version: %s\n", argv[0], VERSION);
+#endif
 	exit(EXIT_FAILURE);
       case 's':
         skipHeader = true;
@@ -58,6 +65,9 @@ int main(int argc, char* argv[]) {
       case 'K':
         subFolder = optarg;
         break;
+      case 'p':
+        parquetOutFile = optarg;
+	break;
       case 'h':
       default:
 	help();
@@ -69,6 +79,14 @@ int main(int argc, char* argv[]) {
     fprintf(stderr, "FATAL: No folder supplied for summarycalc files\n");
     exit(EXIT_FAILURE);
   }
+
+#ifndef HAVE_PARQUET
+  if (!parquetOutFile.empty()) {
+    fprintf(stderr, "FATAL: Apache arrow libraries for parquet output are missing.\n"
+                    "Please install libraries and recompile to use this option.\n");
+    exit(EXIT_FAILURE);
+  }
+#endif
 
 #if !defined(_MSC_VER) && !defined(__MINGW32__)
   struct sigaction sa;
@@ -83,7 +101,7 @@ int main(int argc, char* argv[]) {
 
   try {
     logprintf(progname, "INFO", "starting process...\n");
-    aalcalcmeanonly::DoIt(subFolder, skipHeader, ordOutput);
+    aalcalcmeanonly::DoIt(subFolder, skipHeader, ordOutput, parquetOutFile);
     logprintf(progname, "INFO", "ending procecss...\n");
   } catch (std::bad_alloc&) {
     fprintf(stderr, "FATAL: %s: Memory allocation failed\n", progname);

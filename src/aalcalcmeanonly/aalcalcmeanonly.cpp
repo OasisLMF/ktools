@@ -8,8 +8,13 @@
 #include <map>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "../include/oasis.h"
+
+#ifdef HAVE_PARQUET
+#include "../include/oasisparquet.h"
+#endif
 
 namespace aalcalcmeanonly {
 
@@ -174,7 +179,7 @@ namespace aalcalcmeanonly {
   }
 
 #ifdef HAVE_PARQUET
-  inline void WriteParquetFile(const std::string& parquetOutFile) {
+  inline void WriteParquetOutputFile(const std::string& parquetOutFile) {
 
     std::vector<OasisParquet::ParquetFields> parquetFields;
     parquetFields.push_back({"SummaryId", parquet::Type::INT32,
@@ -216,8 +221,6 @@ namespace aalcalcmeanonly {
 
 #ifdef HAVE_PARQUET
     if (!parquetOutFile.empty()) WriteParquetOutputFile(parquetOutFile);
-
-  }
 #endif
 	
   void DoIt(const std::string& subFolder, const bool skipHeader,

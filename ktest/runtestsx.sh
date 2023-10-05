@@ -161,12 +161,6 @@ installertest()
 	../src/aalcalc/aalcalc -Kfm1/summary > ../ktest/testout/fmaalcalc1.csv
 	../src/aalcalc/aalcalc -Kfm2/summary > ../ktest/testout/fmaalcalc2.csv
 
-	# test aalcalcmeanonly
-	../src/aalcalcmeanonly/aalcalcmeanonly -Kgul1/summary > ../ktest/testout/gulaalcalcmeanonly1.csv
-	../src/aalcalcmeanonly/aalcalcmeanonly -Kgul2/summary > ../ktest/testout/gulaalcalcmeanonly2.csv
-	../src/aalcalcmeanonly/aalcalcmeanonly -Kfm1/summary > ../ktest/testout/fmaalcalcmeanonly1.csv
-	../src/aalcalcmeanonly/aalcalcmeanonly -Kfm2/summary > ../ktest/testout/fmaalcalcmeanonly2.csv
-
 	# test alt	
 	../src/aalcalc/aalcalc -o -Kgul1/summary > ../ktest/testout/gulalt1.csv
 	../src/aalcalc/aalcalc -o -Kgul2/summary > ../ktest/testout/gulalt2.csv
@@ -178,7 +172,23 @@ installertest()
 		../src/aalcalc/aalcalc -p ../ktest/testout/fmalt1.parquet -Kfm1/summary
 		../src/aalcalc/aalcalc -p ../ktest/testout/fmalt2.parquet -Kfm2/summary
 	fi
-	
+
+	# test aalcalcmeanonly
+	../src/aalcalcmeanonly/aalcalcmeanonly -Kgul1/summary > ../ktest/testout/gulaalcalcmeanonly1.csv
+	../src/aalcalcmeanonly/aalcalcmeanonly -Kgul2/summary > ../ktest/testout/gulaalcalcmeanonly2.csv
+	../src/aalcalcmeanonly/aalcalcmeanonly -Kfm1/summary > ../ktest/testout/fmaalcalcmeanonly1.csv
+	../src/aalcalcmeanonly/aalcalcmeanonly -Kfm2/summary > ../ktest/testout/fmaalcalcmeanonly2.csv
+	../src/aalcalcmeanonly/aalcalcmeanonly -o -Kgul1/summary > ../ktest/testout/gulaltmeanonly1.csv
+	../src/aalcalcmeanonly/aalcalcmeanonly -o -Kgul2/summary > ../ktest/testout/gulaltmeanonly2.csv
+	../src/aalcalcmeanonly/aalcalcmeanonly -o -Kfm1/summary > ../ktest/testout/fmaltmeanonly1.csv
+	../src/aalcalcmeanonly/aalcalcmeanonly -o -Kfm2/summary > ../ktest/testout/fmaltmeanonly2.csv
+	if [ ${PARQUET_OUTPUT} -eq 1 ]; then
+		../src/aalcalcmeanonly/aalcalcmeanonly -p ../ktest/testout/gulaltmeanonly1.parquet -Kgul1/summary
+		../src/aalcalcmeanonly/aalcalcmeanonly -p ../ktest/testout/gulaltmeanonly2.parquet -Kgul2/summary
+		../src/aalcalcmeanonly/aalcalcmeanonly -p ../ktest/testout/fmaaltmeanonly1.parquet -Kfm1/summary
+		../src/aalcalcmeanonly/aalcalcmeanonly -p ../ktest/testout/fmaaltmeanonly2.parquet -Kfm2/summary
+	fi
+
 	# test stream conversion components
 	# stdout to csv
 	../src/cdftocsv/cdftocsv  < ../ktest/testout/getmodelout.bin > ../ktest/testout/getmodelout.csv

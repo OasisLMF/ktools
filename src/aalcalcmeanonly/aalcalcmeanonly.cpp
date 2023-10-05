@@ -196,7 +196,8 @@ namespace aalcalcmeanonly {
       for (auto typeIter = sumIter->second.begin();
            typeIter != sumIter->second.end(); ++typeIter) {
 
-        os << sumIter->first << typeIter - sumIter->second.begin() + 1
+        os << sumIter->first#
+           << (int)typeIter - (int)(sumIter->second.begin()) + 1
            << (float)((*typeIter) / nPeriods_) << parquet::EndRow;
 
       }

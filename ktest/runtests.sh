@@ -225,8 +225,8 @@ installertest()
 	if [ ${PARQUET_OUTPUT} -eq 1 ]; then
 		../src/aalcalcmeanonly/aalcalcmeanonly -p ../ktest/testout/gulaltmeanonly1.parquet -Kgul1/summary
 		../src/aalcalcmeanonly/aalcalcmeanonly -p ../ktest/testout/gulaltmeanonly2.parquet -Kgul2/summary
-		../src/aalcalcmeanonly/aalcalcmeanonly -p ../ktest/testout/fmaaltmeanonly1.parquet -Kfm1/summary
-		../src/aalcalcmeanonly/aalcalcmeanonly -p ../ktest/testout/fmaaltmeanonly2.parquet -Kfm2/summary
+		../src/aalcalcmeanonly/aalcalcmeanonly -p ../ktest/testout/fmaltmeanonly1.parquet -Kfm1/summary
+		../src/aalcalcmeanonly/aalcalcmeanonly -p ../ktest/testout/fmaltmeanonly2.parquet -Kfm2/summary
 	fi
 
 	# test stream conversion components

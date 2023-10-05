@@ -100,9 +100,9 @@ int main(int argc, char* argv[]) {
 #endif
 
   try {
-    logprintf(progname, "INFO", "starting process...\n");
+    logprintf(progname, "INFO", "starting process..\n");
     aalcalcmeanonly::DoIt(subFolder, skipHeader, ordOutput, parquetOutFile);
-    logprintf(progname, "INFO", "ending procecss...\n");
+    logprintf(progname, "INFO", "finishing process..\n");
   } catch (std::bad_alloc&) {
     fprintf(stderr, "FATAL: %s: Memory allocation failed\n", progname);
     exit(EXIT_FAILURE);

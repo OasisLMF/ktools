@@ -1,4 +1,5 @@
 add_subdirectory(aalcalc)
+add_subdirectory(aalcalcmeanonly)
 add_subdirectory(amplificationstobin)
 add_subdirectory(amplificationstocsv)
 add_subdirectory(cdftocsv)

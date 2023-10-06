@@ -156,13 +156,8 @@ namespace summaryindex {
 
 	}
 
-void doit(const std::string& subfolder, const std::map<int, std::vector<int>> &eventtoperiods)
+void doit(const std::string& path, const std::map<int, std::vector<int>> &eventtoperiods)
 {	
-	std::string path = "work/" + subfolder;
-	if (path.substr(path.length() - 1, 1) != "/") {
-		path = path + "/";
-	}
-
 	std::vector<std::string> files;
 	std::map<summary_period, std::vector<long long>> summaryfileperiod_to_offset;
 	DIR* dir;

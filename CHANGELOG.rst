@@ -1,6 +1,12 @@
 Ktools Changelog
 ================
 
+`v3.10.1`_
+ ---------
+* [#353](https://github.com/OasisLMF/ktools/pull/354) - Add runtime user supplied secondary factor option to placalc
+* [#342](https://github.com/OasisLMF/ktools/pull/357) - aalcalc Performance Improvements
+.. _`v3.10.1`:  https://github.com/OasisLMF/ktools/compare/v3.10.0...v3.10.1
+
 * [#351](https://github.com/OasisLMF/ktools/pull/351) - Introduce components for Post Loss Amplification
 .. _`v3.10.0`:  https://github.com/OasisLMF/ktools/compare/v3.9.8...v3.10.0
 

@@ -278,7 +278,7 @@ jobs:
 
   # --- Notify Slack --- #
   slack:
-    uses: OasisLMF/OasisLMF/.github/workflows/notify.yml@master
+    uses: OasisLMF/OasisLMF/.github/workflows/notify.yml@main
     secrets: inherit
     needs: release
     with:

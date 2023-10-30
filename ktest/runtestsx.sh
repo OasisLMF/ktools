@@ -162,15 +162,15 @@ installertest()
 	../src/aalcalc/aalcalc -Kfm2/summary > ../ktest/testout/fmaalcalc2.csv
 
 	# test alt	
-	../src/aalcalc/aalcalc -o -Kgul1/summary -l 0.9375 -c ../ktest/testout/gulcalt1.csv > ../ktest/testout/gulalt1.csv
-	../src/aalcalc/aalcalc -o -Kgul2/summary -l 0.9375 -c ../ktest/testout/gulcalt2.csv > ../ktest/testout/gulalt2.csv
-	../src/aalcalc/aalcalc -o -Kfm1/summary -l 0.9375 -c ../ktest/testout/fmcalt1.csv > ../ktest/testout/fmalt1.csv
-	../src/aalcalc/aalcalc -o -Kfm2/summary -l 0.9375 -c ../ktest/testout/fmcalt2.csv > ../ktest/testout/fmalt2.csv
+	../src/aalcalc/aalcalc -o -Kgul1/summary -l 0.9 -c ../ktest/testout/gulcalt1.csv > ../ktest/testout/gulalt1.csv
+	../src/aalcalc/aalcalc -o -Kgul2/summary -l 0.9 -c ../ktest/testout/gulcalt2.csv > ../ktest/testout/gulalt2.csv
+	../src/aalcalc/aalcalc -o -Kfm1/summary -l 0.9 -c ../ktest/testout/fmcalt1.csv > ../ktest/testout/fmalt1.csv
+	../src/aalcalc/aalcalc -o -Kfm2/summary -l 0.9 -c ../ktest/testout/fmcalt2.csv > ../ktest/testout/fmalt2.csv
 	if [ ${PARQUET_OUTPUT} -eq 1 ]; then
-		../src/aalcalc/aalcalc -p ../ktest/testout/gulalt1.parquet -Kgul1/summary -l 0.9375 -c ../ktest/testout/gulcalt1.parquet
-		../src/aalcalc/aalcalc -p ../ktest/testout/gulalt2.parquet -Kgul2/summary -l 0.9375 -c ../ktest/testout/gulcalt2.parquet
-		../src/aalcalc/aalcalc -p ../ktest/testout/fmalt1.parquet -Kfm1/summary -l 0.9375 -c ../ktest/testout/fmcalt1.parquet
-		../src/aalcalc/aalcalc -p ../ktest/testout/fmalt2.parquet -Kfm2/summary -l 0.9375 -c ../ktest/testout/fmcalt2.parquet
+		../src/aalcalc/aalcalc -p ../ktest/testout/gulalt1.parquet -Kgul1/summary -l 0.9 -c ../ktest/testout/gulcalt1.parquet
+		../src/aalcalc/aalcalc -p ../ktest/testout/gulalt2.parquet -Kgul2/summary -l 0.9 -c ../ktest/testout/gulcalt2.parquet
+		../src/aalcalc/aalcalc -p ../ktest/testout/fmalt1.parquet -Kfm1/summary -l 0.9 -c ../ktest/testout/fmcalt1.parquet
+		../src/aalcalc/aalcalc -p ../ktest/testout/fmalt2.parquet -Kfm2/summary -l 0.9 -c ../ktest/testout/fmcalt2.parquet
 	fi
 
 	# test aalcalcmeanonly

@@ -196,6 +196,10 @@ AC_CONFIG_FILES([
 		 src/amplificationstocsv/Makefile
                  src/vulnerabilitytobin/Makefile
                  src/vulnerabilitytocsv/Makefile
+		 src/aggregatevulnerabilitytobin/Makefile
+		 src/aggregatevulnerabilitytocsv/Makefile
+		 src/weightstobin/Makefile
+		 src/weightstocsv/Makefile
                  src/footprinttobin/Makefile
                  src/footprinttocsv/Makefile
                  src/periodstobin/Makefile

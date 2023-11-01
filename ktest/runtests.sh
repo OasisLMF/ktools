@@ -279,6 +279,10 @@ installertest()
 
 	../src/lossfactorstocsv/lossfactorstocsv < ../examples/static/lossfactors.bin | ../src/lossfactorstobin/lossfactorstobin > ../ktest/testout/lossfactors.bin
 
+	../src/aggregatevulnerabilitytocsv/aggregatevulnerabilitytocsv < ../examples/static/aggregate_vulnerability.bin | ../src/aggregatevulnerabilitytobin/aggregatevulnerabilitytobin > ../ktest/testout/aggregate_vulnerability.bin
+
+	../src/weightstocsv/weightstocsv < ../examples/static/weights.bin | ../src/weightstobin/weightstobin > ../ktest/testout/weights.bin
+
 	cp static/footprint.bin ../ktest/testout/footprint.bin
     cp static/footprint.idx ../ktest/testout/footprint.idx
 	

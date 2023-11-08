@@ -1,3 +1,4 @@
+9e3397070a7594b4a129bb5b2aa4393e9a6df078  aggregate_vulnerability.bin
 a9f8989cb56f23d0fafccf3d90f952605c8ddc60  amplifications.bin
 3e6ab5ba99a0e752ddab274e4096bf5053bfa4dc  coverages.bin
 be097766c88d879a69cee2c5315e3a8db25912db  damage_bin_dict.bin
@@ -156,3 +157,4 @@ e88b44c57eb810dbf03f4cdc4c7799e196aa623f  quantile.bin
 ed069eb7fd4e8a58a40553ede7d50fba0b20efee  random.bin
 34744aa708c7cb804f7831e48d13677086da69de  returnperiods.bin
 dd1efa81ffc7ea3027c3bcc59dd442e2cfa5d25f  vulnerability.bin
+ad46defe885e0d501bdd862a04c3966eaa280ef3  weights.bin

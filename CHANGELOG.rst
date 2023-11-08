@@ -1,6 +1,16 @@
 Ktools Changelog
 ================
 
+`v3.11.0`_
+ ---------
+* [#353](https://github.com/OasisLMF/ktools/pull/354) - Add runtime user supplied secondary factor option to placalc
+* [#342](https://github.com/OasisLMF/ktools/pull/357) - aalcalc Performance Improvements
+* [#358](https://github.com/OasisLMF/ktools/pull/358) - Release/3.10.1
+* [#304](https://github.com/OasisLMF/ktools/pull/360) - CALT estimated standard error in AAL overstates observed sampling error
+* [#359](https://github.com/OasisLMF/ktools/pull/362) - CSV to BIN conversion tool for aggregate weights and vulnerability definitions.
+* [#361](https://github.com/OasisLMF/ktools/pull/363) - The `vulnerability.bin` file can be written with the wrong data types
+.. _`v3.11.0`:  https://github.com/OasisLMF/ktools/compare/v3.10.1...v3.11.0
+
 `v3.10.1`_
  ---------
 * [#353](https://github.com/OasisLMF/ktools/pull/354) - Add runtime user supplied secondary factor option to placalc
@@ -176,7 +186,7 @@ Ktools Changelog
 `v3.6.2`_
  ---------
 * [#217](https://github.com/OasisLMF/ktools/pull/218) - Construct Period Average Loss Table (PALT) without SourceNumLocs field
-* [#222](https://github.com/OasisLMF/ktools/pull/223) - Bash exit handler not triggering on OOM kill  
+* [#222](https://github.com/OasisLMF/ktools/pull/223) - Bash exit handler not triggering on OOM kill
 * [#215](https://github.com/OasisLMF/ktools/pull/216) - OASIS_FLOAT in kat
 .. _`v3.6.2`:  https://github.com/OasisLMF/ktools/compare/v3.6.1...v3.6.2
 
@@ -199,7 +209,7 @@ Ktools Changelog
 * [#211, #212](https://github.com/OasisLMF/ktools/pull/213) - Change ensemble.bin directory and drop sample_id column
 .. _`v3.6.1rc1`:  https://github.com/OasisLMF/ktools/compare/v3.6.0...v3.6.1rc1
 
-.. * [#_](https://github.com/OasisLMF/OasisLMF/issues/_) -  
+.. * [#_](https://github.com/OasisLMF/OasisLMF/issues/_) -
 
 `v3.6.0`_
 -------------
@@ -289,7 +299,7 @@ Ktools Changelog
 
 `v3.3.0`_
 ---------
-* [#124](https://github.com/OasisLMF/ktools/issues/124) - Update CMake build files   
+* [#124](https://github.com/OasisLMF/ktools/issues/124) - Update CMake build files
 * [#103](https://github.com/OasisLMF/ktools/issues/103) - Fixed issue with leccalc and the periods file
 * [#120](https://github.com/OasisLMF/ktools/issues/120) - Add calcrule for ded % loss and normal limit
 
@@ -316,15 +326,15 @@ Ktools Changelog
 ---------
 * Added support for ded and min ded only https://github.com/OasisLMF/OasisPlatform/issues/296 https://github.com/OasisLMF/OasisLMF/issues/480
 * #23 - Weighted periods documentation
-* #99 - Occurrence file format 
-* #101 - Remove exposure value from aalcalc output 
+* #99 - Occurrence file format
+* #101 - Remove exposure value from aalcalc output
 
 `v3.2.2`_
 ---------
 * Fixed potential limit_surplus bug
 * Fixed bug in alloc rule 3 and make it a bit faster
 * Fixed issue #55 - fmcalc max deductible not being applied for certain samples
-* Fixed Cmake build issue + gcc warning messages cleanup 
+* Fixed Cmake build issue + gcc warning messages cleanup
 * Added calcrules 30 and 31 for step policies
 * Added calcrule 32 for franchise policies and updated 28
 * update for Step policies

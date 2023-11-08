@@ -326,6 +326,19 @@ struct VulnerabilityIndex
 	long long original_size;
 };
 
+struct AggregateVulnerability
+{
+	int aggregatevulnerability_id;
+	int vulnerability_id;
+};
+
+struct VulnerabilityWeight
+{
+	int areaperil_id;
+	int vulnerability_id;
+	OASIS_FLOAT weight;
+};
+
 struct Periods
 {
 	int period_no;

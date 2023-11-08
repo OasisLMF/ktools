@@ -162,15 +162,15 @@ installertest()
 	../src/aalcalc/aalcalc -Kfm2/summary > ../ktest/testout/fmaalcalc2.csv
 
 	# test alt	
-	../src/aalcalc/aalcalc -o -Kgul1/summary > ../ktest/testout/gulalt1.csv
-	../src/aalcalc/aalcalc -o -Kgul2/summary > ../ktest/testout/gulalt2.csv
-	../src/aalcalc/aalcalc -o -Kfm1/summary > ../ktest/testout/fmalt1.csv
-	../src/aalcalc/aalcalc -o -Kfm2/summary > ../ktest/testout/fmalt2.csv
+	../src/aalcalc/aalcalc -o -Kgul1/summary -l 0.9 -c ../ktest/testout/gulcalt1.csv > ../ktest/testout/gulalt1.csv
+	../src/aalcalc/aalcalc -o -Kgul2/summary -l 0.9 -c ../ktest/testout/gulcalt2.csv > ../ktest/testout/gulalt2.csv
+	../src/aalcalc/aalcalc -o -Kfm1/summary -l 0.9 -c ../ktest/testout/fmcalt1.csv > ../ktest/testout/fmalt1.csv
+	../src/aalcalc/aalcalc -o -Kfm2/summary -l 0.9 -c ../ktest/testout/fmcalt2.csv > ../ktest/testout/fmalt2.csv
 	if [ ${PARQUET_OUTPUT} -eq 1 ]; then
-		../src/aalcalc/aalcalc -p ../ktest/testout/gulalt1.parquet -Kgul1/summary
-		../src/aalcalc/aalcalc -p ../ktest/testout/gulalt2.parquet -Kgul2/summary
-		../src/aalcalc/aalcalc -p ../ktest/testout/fmalt1.parquet -Kfm1/summary
-		../src/aalcalc/aalcalc -p ../ktest/testout/fmalt2.parquet -Kfm2/summary
+		../src/aalcalc/aalcalc -p ../ktest/testout/gulalt1.parquet -Kgul1/summary -l 0.9 -c ../ktest/testout/gulcalt1.parquet
+		../src/aalcalc/aalcalc -p ../ktest/testout/gulalt2.parquet -Kgul2/summary -l 0.9 -c ../ktest/testout/gulcalt2.parquet
+		../src/aalcalc/aalcalc -p ../ktest/testout/fmalt1.parquet -Kfm1/summary -l 0.9 -c ../ktest/testout/fmcalt1.parquet
+		../src/aalcalc/aalcalc -p ../ktest/testout/fmalt2.parquet -Kfm2/summary -l 0.9 -c ../ktest/testout/fmcalt2.parquet
 	fi
 
 	# test aalcalcmeanonly
@@ -238,7 +238,11 @@ installertest()
 	../src/amplificationstocsv/amplificationstocsv < ../examples/input/amplifications.bin | ../src/amplificationstobin/amplificationstobin > ../ktest/testout/amplifications.bin
 
 	../src/lossfactorstocsv/lossfactorstocsv < ../examples/static/lossfactors.bin | ../src/lossfactorstobin/lossfactorstobin > ../ktest/testout/lossfactors.bin
-	
+
+        ../src/aggregatevulnerabilitytocsv/aggregatevulnerabilitytocsv < ../examples/static/aggregate_vulnerability.bin | ../src/aggregatevulnerabilitytobin/aggregatevulnerabilitytobin > ../ktest/testout/aggregate_vulnerability.bin
+
+        ../src/weightstocsv/weightstocsv < ../examples/static/weights.bin | ../src/weightstobin/weightstobin > ../ktest/testout/weights.bin
+
 	cp static/footprint.bin ../ktest/testout/footprint.bin
     cp static/footprint.idx ../ktest/testout/footprint.idx
 	

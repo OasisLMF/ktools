@@ -495,7 +495,7 @@ namespace pltcalc {
 		o.mean = mean_val;
 		o.standard_deviation = 0;
 		for (auto p : vp) {
-			if (o.mean > 0 || o.standard_deviation > 0) {
+			if (o.mean > 0) {
 				o.period_no = p.period_no;
 				o.occ_date_id = p.occ_date_id;
 				OutputData(o, 1, outFile);
@@ -544,10 +544,14 @@ namespace pltcalc {
 			}
 			if (hasrec) {
 				o.mean = loss_sum / samplesize_;
-				OASIS_FLOAT sd = (squared_loss_sum - ((loss_sum * loss_sum) / samplesize_)) / (samplesize_ - 1);
-				OASIS_FLOAT x = sd / squared_loss_sum;
-				if (x < 0.0000001) sd = 0;   // fix OASIS_FLOATing point precision problems caused by using large numbers
-				o.standard_deviation = sqrt(sd);
+				if (samplesize_ != 1) {
+					OASIS_FLOAT sd = (squared_loss_sum - ((loss_sum * loss_sum) / samplesize_)) / (samplesize_ - 1);
+					OASIS_FLOAT x = sd / squared_loss_sum;
+					if (x < 0.0000001) sd = 0;   // fix OASIS_FLOATing point precision problems caused by using large numbers
+					o.standard_deviation = sqrt(sd);
+				} else {
+					o.standard_deviation = 0;
+				}
 				if (o.mean > 0 || o.standard_deviation > 0) {
 					OutputData(o, 2, outFile);
 				}

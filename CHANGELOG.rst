@@ -1,6 +1,8 @@
 Ktools Changelog
 ================
 
+.. _`v3.11.1`:  https://github.com/OasisLMF/ktools/compare/v3.11.0...v3.11.1
+
 `v3.11.0`_
  ---------
 * [#353](https://github.com/OasisLMF/ktools/pull/354) - Add runtime user supplied secondary factor option to placalc

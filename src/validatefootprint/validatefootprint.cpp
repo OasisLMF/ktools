@@ -1,194 +1,237 @@
-#include <cmath>
+#include <algorithm>
+#include <cstdio>
 #include <cstring>
-#include <iostream>
-#include <set>
-#include <stdio.h>
-#include <stdlib.h>
 
-#include "../include/oasis.h"
+#include "validatefootprint.h"
 
-#if defined(_MSC_VER)
-#include "../wingetopt/wingetopt.h"
-#else
-#include <unistd.h>
-#endif
 
-struct FootprintRow : EventRow {
+int ValidateFootprint::ScanLine() {
+/* The areaperil_id field is defined according to the data type assigned to
+ * AREAPERIL_INT in include/oasis.h
+ * The probability field is defined according to the data type assigned to
+ * OASIS_FLOAT in include/oasis.h */
 
-  int event_id;
-
-};
-
-namespace validatefootprint {
-
-  inline bool ProbabilityCheck(float prob) {
-
-    return roundf(prob * 10000) / 10000 != 1.0;
-
-  }
-
-  inline bool ProbabilityError(FootprintRow r, float prob) {
-  
-    fprintf(stderr, "Probabilities for event ID %d", r.event_id);
-#ifdef AREAPERIL_TYPE_UNSIGNED_LONG_LONG
-    fprintf(stderr, " and areaperil ID %llu", r.areaperil_id);
-#else
-    fprintf(stderr, " and areaperil ID %u", r.areaperil_id);
-#endif
-    fprintf(stderr, " do not sum to 1.\n");
-    fprintf(stderr, "Probability = %f\n", prob);
-    
-    return false;
-
-  }
-
-  inline bool OutOfOrderError(char const * name, int lineno, char * prevLine,
-		  	      char * line) {
-
-    fprintf(stderr, "%s IDs in lines %d and %d", name, lineno-1, lineno);
-    fprintf(stderr, " not in ascending order:\n");
-    fprintf(stderr, "%s\n%s\n", prevLine, line);
-
-    return false;
-
-  }
-
-  void doit() {
-
-    FootprintRow p = {}, q;
-    bool dataValid = true;
-    std::set<int> intensityBins;
-    int maxIntensityBin = 0;
-    char const * sEvent = "Event";
-    char const * sAreaperil = "Areaperil";
-    float prob = 0.0;
-    char prevLine[4096], line[4096];
-
-#ifdef AREAPERIL_TYPE_UNSIGNED_LONG_LONG
-    sprintf(prevLine, "%d, %llu, %d, %f", p.event_id, p.areaperil_id,
-	    p.intensity_bin_id, p.probability);
-#else
-    sprintf(prevLine, "%d, %u, %d, %f", p.event_id, p.areaperil_id,
-	    p.intensity_bin_id, p.probability);
-#endif
-    int lineno = 0;
-    fgets(line, sizeof(line), stdin);   // Skip header line
-    lineno++;
-
-    while(fgets(line, sizeof(line), stdin) != 0) {
-
-      // Check for invalid data
 #ifdef AREAPERIL_TYPE_UNSIGNED_LONG_LONG
   #ifdef OASIS_FLOAT_TYPE_DOUBLE
-      if(sscanf(line, "%d,%llu,%d,%lf", &q.event_id, &q.areaperil_id,
-		&q.intensity_bin_id, &q.probability) != 4) {
+  return sscanf(line_, "%d,%llu,%d,%lf", &fr_.event_id, &fr_.areaperil_id,
+				      &fr_.intensity_bin_id, &fr_.probability);
   #else
-      if(sscanf(line, "%d,%llu,%d,%f", &q.event_id, &q.areaperil_id,
-		&q.intensity_bin_id, &q.probability) != 4) {
+  return sscanf(line_, "%d,%llu,%d,%f", &fr_.event_id, &fr_.areaperil_id,
+				      &fr_.intensity_bin_id, &fr_.probability);
   #endif
 #else
   #ifdef OASIS_FLOAT_TYPE_DOUBLE
-      if(sscanf(line, "%d,%u,%d,%lf", &q.event_id, &q.areaperil_id,
-		&q.intensity_bin_id, &q.probability) != 4) {
+  return sscanf(line_, "%d,%u,%d,%lf", &fr_.event_id, &fr_.areaperil_id,
+				      &fr_.intensity_bin_id, &fr_.probability);
   #else
-      if(sscanf(line, "%d,%u,%d,%f", &q.event_id, &q.areaperil_id,
-		&q.intensity_bin_id, &q.probability) != 4) {
+  return sscanf(line_, "%d,%u,%d,%f", &fr_.event_id, &fr_.areaperil_id,
+				      &fr_.intensity_bin_id, &fr_.probability);
   #endif
 #endif
 
-	fprintf(stderr, "Invalid data in line %d:\n%s\n", lineno, line);
-	dataValid = false;
+}
+
+
+inline void ValidateFootprint::StoreLine() {
+/* Store current line before going to the next one. Used in some error message
+ * output. */
+
+    ++lineno_;
+    prevEventID_ = fr_.event_id;
+    prevAreaPerilID_ = fr_.areaperil_id;
+
+    memcpy(prevLine_, line_, strlen(line_) + 1);
+    prevLine_[strlen(line_) - 1] = '\0';
+
+}
+
+
+inline void ValidateFootprint::SetMaximumIntensityBinIndex() {
+/* The maximum intensity bin index is a required input argument to convert
+ * footprint csv files to binary format with footprinttobin. */
+
+  if (maxIntensityBin_ < fr_.intensity_bin_id) {
+
+    maxIntensityBin_ = fr_.intensity_bin_id;
+
+  }
+
+}
+
+
+void ValidateFootprint::ReadFirstFootprintLine(OASIS_FLOAT &totalProbability) {
+/* After skipping header, first line of footprint csv file is read primarily to
+ * establish initial event ID. */
+
+  if (fgets(line_, sizeof(line_), stdin) != 0) {
+
+    if (ScanLine() == 4) {
+
+      // In the case when there are no validation checks to perform, the
+      // initial previous event ID must still be set and line number
+      // incremented. In this case, total probability is not used.
+      if (!validationCheck_) {
+
+        SetPreviousEventID();
+
+	return;
 
       }
 
-      // New event ID
-      if(q.event_id != p.event_id) {
+      StoreLine();
+      intensityBinIDs_.push_back(fr_.intensity_bin_id);
+      totalProbability = fr_.probability;
 
-	// Check total probability for event-areaperil combination is 1.0
-	if(ProbabilityCheck(prob) && p.event_id != 0) {
-	
-	  dataValid = ProbabilityError(p, prob);
+      SetMaximumIntensityBinIndex();
 
-	}
+      return;
 
-	intensityBins.clear();
-	prob = 0.0;
+    }
 
-        // Check event IDs listed in ascending order
-        if(q.event_id < p.event_id) {
+    fprintf(stderr, "ERROR: Invalid data in line %d:\n%s\n", lineno_, line_);
+    PrintErrorMessage();
 
-	  dataValid = OutOfOrderError(sEvent, lineno, prevLine, line);
+  }
 
-        }
+  fprintf(stderr, "ERROR: Empty file\n");
+  PrintErrorMessage();
 
-      } else if(q.areaperil_id != p.areaperil_id) {
+}
 
-	// Check total probability for event-areaperil combination is 1.0
-	if(ProbabilityCheck(prob)) {
 
-	  dataValid = ProbabilityError(p, prob);
+inline void ValidateFootprint::CheckProbability(const OASIS_FLOAT totalProbability) {
+/* Check probabilities for each event ID-areaperil ID pair sum to 1.0. */
 
-	}
+  // Define precision to avoid floating point errors
+  int probCheck = (int)(totalProbability * 10000 + 0.5);
+  if (probCheck != 10000) {
 
-	intensityBins.clear();
-	prob = 0.0;
+    fprintf(stderr, "ERROR: Probabilities for event ID %d and areaperil ID %u"
+		    " do not sum to 1.0 (total probability = %f).\n",
+	    prevEventID_, prevAreaPerilID_, totalProbability);
+    PrintErrorMessage();
 
-	// Check areaperil IDs listed in ascending order
-	if(q.areaperil_id < p.areaperil_id) {
+  }
 
-	  dataValid = OutOfOrderError(sAreaperil, lineno, prevLine, line);
+}
 
-	}
 
-      }
+inline void ValidateFootprint::CheckOrder() {
+/* Check event IDs and areaperil IDs are in ascending order. */
 
-      // Check no duplicate intensity bins for each event-areaperil combination
-      if(intensityBins.find(q.intensity_bin_id) == intensityBins.end()) {
+  char idName[10];
 
-	intensityBins.insert(q.intensity_bin_id);
-	prob += q.probability;
+  if (fr_.event_id < prevEventID_) {
 
-	// Get maximum value of intensity_bin_index
-	if(q.intensity_bin_id > maxIntensityBin) {
+    strcpy(idName, "Event");
 
-	  maxIntensityBin = q.intensity_bin_id;
+  } else if ((fr_.areaperil_id < prevAreaPerilID_) &&
+	     (fr_.event_id == prevEventID_)) {
 
-	}
+    strcpy(idName, "Areaperil");
+
+  } else return;
+
+  fprintf(stderr, "%s IDs in lines %d and %d are not in ascending"
+		  " order:\n%s\n%s\n",
+	  idName, lineno_ - 1, lineno_, prevLine_, line_);
+  PrintErrorMessage();
+
+}
+
+
+inline void ValidateFootprint::CheckIntensityBins() {
+
+  if (find(intensityBinIDs_.begin(), intensityBinIDs_.end(),
+           fr_.intensity_bin_id) == intensityBinIDs_.end()) {
+
+    intensityBinIDs_.push_back(fr_.intensity_bin_id);
+
+    return;
+
+  }
+
+  fprintf(stderr, "ERROR: Duplicate intensity bin %d on line %d"
+		  " for event ID %d areaperil ID %u:\n%s\n",
+	  fr_.intensity_bin_id, lineno_, fr_.event_id, fr_.areaperil_id, line_);
+  PrintErrorMessage();
+
+}
+
+
+void ValidateFootprint::ReadFootprintFile() {
+/* After reading in a line from the csv file and checking for data integrity,
+ * this method calls other methods to check:
+ * 
+ * - Total probability for each event ID-areaperil ID pair sums to 1.0.
+ * - Event and areaperil IDs are in ascending order.
+ * - Unique intensity bin IDs for each event ID-areaperil ID pair. */
+
+  OASIS_FLOAT totalProbability = 0.0;
+  ReadFirstFootprintLine(totalProbability);
+  if (convertToBin_) WriteBinFootprintFile();   // Write first footprint line
+
+  while (fgets(line_, sizeof(line_), stdin) != 0) {
+
+    if (ScanLine() == 4) {
+
+      // New event and/or areaperil IDs.
+      // Check probabilities sum to 1.0 for each event ID-areaperil ID
+      // combination and event IDs and areaperil IDs are in ascending order.
+      if ((fr_.event_id != prevEventID_) || 
+	  (fr_.areaperil_id != prevAreaPerilID_)) {
+
+        CheckProbability(totalProbability);
+	CheckOrder();
+
+	// Reset for next event
+	intensityBinIDs_.clear();
+	intensityBinIDs_.push_back(fr_.intensity_bin_id);
+	totalProbability = fr_.probability;
 
       } else {
 
-	fprintf(stderr, "Duplicate intensity bin for event-areaperil");
-	fprintf(stderr, " combination:\n");
-	fprintf(stderr, "%s\n", line);
-	dataValid = false;
+        CheckIntensityBins();
+	totalProbability += fr_.probability;
 
       }
 
-      lineno++;
-      p = q;
-      memcpy(prevLine, line, strlen(line)+1);
-      prevLine[strlen(line)-1] = '\0';
+      if (convertToBin_) {
+
+	if (fr_.event_id != prevEventID_) WriteIdxFootprintFile();
+        WriteBinFootprintFile();
+
+      } else {
+
+        // Maximum intensity bin index value is required for binary conversion
+	// in the future.
+        SetMaximumIntensityBinIndex();
+
+      }
+
+      StoreLine();
+      continue;
 
     }
 
-    // Check total probability for last event-areaperil combination is 1.0
-    if(ProbabilityCheck(prob)) {
-
-      dataValid = ProbabilityError(q, prob);
-
-    }
-
-    if(dataValid == true) {
-
-      fprintf(stderr, "All checks pass.\n");
-      fprintf(stderr, "Maximum value of intensity_bin_index = %d\n", maxIntensityBin);
-
-    } else {
-
-      fprintf(stderr, "Some checks have failed. Please edit input file.\n");
-
-    }
+    fprintf(stderr, "ERROR: Invalid data in line %d:\n%s\n", lineno_, line_);
+    PrintErrorMessage();
 
   }
+
+  // Check probabilities sum to 1.0 for last event ID-areaperil ID combination
+  // and event IDs and areaperil IDs are in ascending order for last row
+  CheckProbability(totalProbability);
+  CheckOrder();
+  // Write index row for last event ID-areaperil ID combination
+  if (convertToBin_) WriteIdxFootprintFile();
+
+}
+
+
+void ValidateFootprint::PrintMaximumIntensityBinIndex() {
+
+  fprintf(stderr, "INFO: Maximum value of intensity bin index = %d\n",
+	  maxIntensityBin_);
 
 }

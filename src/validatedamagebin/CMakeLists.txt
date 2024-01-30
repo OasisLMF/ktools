@@ -1,7 +1,7 @@
 add_executable(validatedamagebin)
 target_sources(validatedamagebin
 	PRIVATE
-		validatedamagebin.cpp main.cpp
+		../include/validate.h ../include/validate.cpp validatedamagebin.h validatedamagebin.cpp main.cpp
 )
 
 if (WIN32)

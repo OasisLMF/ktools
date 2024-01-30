@@ -1,7 +1,7 @@
 add_executable(footprinttobin)
 target_sources(footprinttobin
 	PRIVATE
-		footprinttobin.cpp main.cpp
+		../include/validate.h ../include/validate.cpp ../validatefootprint/validatefootprint.h ../validatefootprint/validatefootprint.cpp footprinttobin.h footprinttobin.cpp main.cpp
 )
 
 target_link_libraries(footprinttobin ${ZLIB_LIBRARIES})

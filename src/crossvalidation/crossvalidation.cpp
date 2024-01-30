@@ -13,11 +13,6 @@
 #include <unistd.h>
 #endif
 
-struct FootprintRow : EventRow {
-
-  int event_id;
-
-};
 
 namespace crossvalidation {
 

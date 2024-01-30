@@ -7,7 +7,7 @@ add_subdirectory(amplificationstocsv)
 add_subdirectory(cdftocsv)
 add_subdirectory(coveragetobin)
 add_subdirectory(coveragetocsv)
-add_subdirectory{crossvalidation}
+add_subdirectory(crossvalidation)
 add_subdirectory(damagebintobin)
 add_subdirectory(damagebintocsv)
 add_subdirectory(eltcalc)
@@ -62,9 +62,9 @@ add_subdirectory(summarycalc)
 add_subdirectory(summarycalctobin)
 add_subdirectory(summarycalctocsv)
 add_subdirectory(summaryindex)
-add_subdirectory{validatedamagebin}
-add_subdirectory{validatefootprint}
-add_subdirectory{validatevulnerability}
+add_subdirectory(validatedamagebin)
+add_subdirectory(validatefootprint)
+add_subdirectory(validatevulnerability)
 add_subdirectory(vulnerabilitytobin)
 add_subdirectory(vulnerabilitytocsv)
 add_subdirectory(weightstobin)

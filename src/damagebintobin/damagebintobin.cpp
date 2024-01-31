@@ -1,44 +1,9 @@
-/*
-* Copyright (c)2015 - 2016 Oasis LMF Limited 
-* All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions
-* are met:
-*
-*   * Redistributions of source code must retain the above copyright
-*     notice, this list of conditions and the following disclaimer.
-*
-*   * Redistributions in binary form must reproduce the above copyright
-*     notice, this list of conditions and the following disclaimer in
-*     the documentation and/or other materials provided with the
-*     distribution.
-*
-*   * Neither the original author of this software nor the names of its
-*     contributors may be used to endorse or promote products derived
-*     from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-* "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-* LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-* FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-* COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-* INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-* BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
-* OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
-* AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-* OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
-* THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
-* DAMAGE.
-*/
-/*
-Author: Ben Matharu  email: ben.matharu@oasislmf.org
-*/
+#include <cstdio>
+#include <cstdlib>
 #include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
 
 #include "../include/oasis.h"
+#include "../validatedamagebin/validatedamagebin.h"
 
 #if defined(_MSC_VER)
 #include "../wingetopt/wingetopt.h"
@@ -46,35 +11,94 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 #include <unistd.h>
 #endif
 
-namespace damagebintobin {
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+#include <csignal>
+#include <cstring>
+#endif
 
-	int doscan(char* line, int& bin_index, float& bin_from, float& bin_to, float& interpolation) {
-		return sscanf(line, "%d,%f,%f,%f", &bin_index, &bin_from, &bin_to, &interpolation);
-	}
+char *progname;
 
-	int doscan(char* line, int& bin_index, double& bin_from, double& bin_to, double& interpolation) {
-		return sscanf(line, "%d,%lf,%lf,%lf", &bin_index, &bin_from, &bin_to, &interpolation);
-	}
-	
-	void doit()
-	{
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+void SegFaultSigAction(int, siginfo_t *si, void *) {
+  fprintf(stderr, "ERROR: %s: Segment fault at address: %p\n",
+	  progname, si->si_addr);
+  exit(EXIT_FAILURE);
+}
+#endif
 
-		damagebindictionary q = {};
-		char line[4096];
-		int lineno=0;
-		fgets(line, sizeof(line), stdin);
-		lineno++;
-		while (fgets(line, sizeof(line), stdin) != 0)
-		{
-			int ret = doscan(line, q.bin_index, q.bin_from, q.bin_to, q.interpolation);
-			if (ret != 4) {
-				fprintf(stderr, "FATAL: Invalid data in line %d:\n%s", lineno, line);
-				return;
-			} else {
-				fwrite(&q, sizeof(q), 1, stdout);
-			}
-			lineno++;
-		}
 
-	}
-}	
+void Help() {
+  fprintf(stderr, "-N no validation checks\n"
+		  "-h help\n"
+		  "-v version\n");
+}
+
+
+void DoIt(const bool validationCheck) {
+
+  ValidateDamageBin vDBD;
+  vDBD.SkipHeaderRow();
+
+  if (validationCheck) {
+
+    vDBD.CheckFormat();
+    vDBD.CheckFirstBin(true);   // true = convert to binary
+    vDBD.ReadDamageBinDictFile(true);   // true = convert to binary
+    vDBD.CheckLastBin();
+    vDBD.PrintSuccessMessage();
+
+    return;
+
+  }
+
+  vDBD.ReadDamageBinDictFileNoChecks();
+
+}
+
+
+int main(int argc, char *argv[]) {
+
+  progname = argv[0];
+  bool validationCheck = true;
+  int opt;
+  while ((opt = getopt(argc, argv, "Nvh")) != -1) {
+    switch (opt) {
+      case 'N':
+        validationCheck = false;
+	break;
+      case 'v':
+        fprintf(stderr, "%s : version : %s\n", argv[0], VERSION);
+	exit(EXIT_FAILURE);
+	break;
+      case 'h':
+      default:
+	Help();
+	exit(EXIT_FAILURE);
+    }
+  }
+
+#if !defined(_MSC_VER) && !defined(__MINGW32__)
+  struct sigaction sa;
+
+  memset(&sa, 0, sizeof(struct sigaction));
+  sigemptyset(&sa.sa_mask);
+  sa.sa_sigaction = SegFaultSigAction;
+  sa.sa_flags = SA_SIGINFO;
+
+  sigaction(SIGSEGV, &sa, NULL);
+#endif
+
+  try {
+
+    initstreams();
+    DoIt(validationCheck);
+    return 0;
+
+  } catch (std::bad_alloc&) {
+
+    fprintf(stderr, "ERROR: %s: Memory allocation failed.\n", progname);
+    exit(EXIT_FAILURE);
+
+  }
+
+}

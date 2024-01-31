@@ -253,7 +253,9 @@ installertest()
 
 	 ../src/coveragetocsv/coveragetocsv < ../examples/input/coverages.bin | ../src/coveragetobin/coveragetobin > ../ktest/testout/coverages.bin
 
-	../src/damagebintocsv/damagebintocsv < ../examples/static/damage_bin_dict.bin | ../src/damagebintobin/damagebintobin > ../ktest/testout/damage_bin_dict.bin
+	 # damage bin dictionary, -N argument skips validation checks
+	../src/damagebintocsv/damagebintocsv < ../examples/static/damage_bin_dict.bin | ../src/damagebintobin/damagebintobin -N > ../ktest/testout/damage_bin_dict.bin
+	../src/damagebintocsv/damagebintocsv < ../examples/static/damage_bin_dict.bin | ../src/damagebintobin/damagebintobin > ../ktest/testout/damage_bin_dict_ctrl.bin 2> ../ktest/testout/damagebintobin_ctrl_stderr.out
 	
 	../src/fmprogrammetocsv/fmprogrammetocsv < ../examples/input/fm_programme.bin | ../src/fmprogrammetobin/fmprogrammetobin > ../ktest/testout/fm_programme.bin
 	
@@ -270,8 +272,6 @@ installertest()
     ../src/returnperiodtocsv/returnperiodtocsv < ../examples/input/returnperiods.bin | ../src/returnperiodtobin/returnperiodtobin > ../ktest/testout/returnperiods.bin
 
 	../src/occurrencetocsv/occurrencetocsv < ../examples/input/occurrence.bin | ../src/occurrencetobin/occurrencetobin -P10000 > ../ktest/testout/occurrence.bin
-
-	../src/vulnerabilitytocsv/vulnerabilitytocsv < ../examples/static/vulnerability.bin | ../src/vulnerabilitytobin/vulnerabilitytobin -d 102 > ../ktest/testout/vulnerability.bin
 	
 	../src/quantiletocsv/quantiletocsv < ../examples/input/quantile.bin | ../src/quantiletobin/quantiletobin  > ../ktest/testout/quantile.bin
 
@@ -283,14 +283,76 @@ installertest()
 
 	../src/weightstocsv/weightstocsv < ../examples/static/weights.bin | ../src/weightstobin/weightstobin > ../ktest/testout/weights.bin
 
+	# footprint to csv and bin
 	cp static/footprint.bin ../ktest/testout/footprint.bin
-    cp static/footprint.idx ../ktest/testout/footprint.idx
-	
+	cp static/footprint.idx ../ktest/testout/footprint.idx
 	cd ../ktest/testout
 	../../src/footprinttocsv/footprinttocsv > footprint.csv
 	mv footprint.bin footprintin.bin
-    mv footprint.idx footprintin.idx 
-	../../src/footprinttobin/footprinttobin -i 121 < footprint.csv
+	mv footprint.idx footprintin.idx
+	../../src/footprinttobin/footprinttobin -i 121 -N < footprint.csv
+	../../src/footprinttobin/footprinttobin -i 121 -N -z < footprint.csv
+	../../src/footprinttobin/footprinttobin -i 121 -N -z -u -b footprint_usize.bin.z -x footprint_usize.idx.z < footprint.csv
+	../../src/footprinttobin/footprinttobin -i 121 -b footprint_ctrl.bin -x footprint_ctrl.idx < footprint.csv 2> footprinttobin_ctrl_stderr.out
+
+	# vulnerability to csv and bin
+	../../src/vulnerabilitytocsv/vulnerabilitytocsv < ../../examples/static/vulnerability.bin > vulnerability.csv
+	../../src/vulnerabilitytobin/vulnerabilitytobin -d 102 -N < vulnerability.csv > vulnerabilityin.bin
+	../../src/vulnerabilitytobin/vulnerabilitytobin -d 102 -N -i < vulnerability.csv
+	../../src/vulnerabilitytobin/vulnerabilitytobin -d 102 -N -z < vulnerability.csv
+	../../src/vulnerabilitytobin/vulnerabilitytobin -d 102 < vulnerability.csv > vulnerability_ctrl.bin 2> vulnerabilitytobin_ctrl_stderr.out
+
+	# Validation checks
+	# Damage bin dictionary
+	../../src/damagebintocsv/damagebintocsv < ../../examples/static/damage_bin_dict.bin | ../../src/validatedamagebin/validatedamagebin 2> validatedamagebin_ctrl_stderr.out
+	echo "See ../../examples/validation/damage_bin_dict_testlist.txt for test details" > validatedamagebin_stderr.out
+	for i in `seq -f "%02g" 1 9`; do
+		echo Test $i >> validatedamagebin_stderr.out
+		../../src/validatedamagebin/validatedamagebin < ../../examples/static/validation/damage_bin_dict_$i.csv 2>> validatedamagebin_stderr.out
+		echo Exit code $? >> validatedamagebin_stderr.out
+		echo >> validatedamagebin_stderr.out
+	done
+	echo "See ../../examples/validation/damage_bin_dict_testlist.txt for test details" > damagebintobin_stderr.out
+	for i in `seq -f "%02g" 1 9`; do
+		echo Test $i >> damagebintobin_stderr.out
+		../../src/damagebintobin/damagebintobin < ../../examples/static/validation/damage_bin_dict_$i.csv > /dev/null 2>> damagebintobin_stderr.out
+		echo Exit code $? >> damagebintobin_stderr.out
+		echo >> damagebintobin_stderr.out
+	done
+	# Footprint
+	../../src/validatefootprint/validatefootprint < footprint.csv 2> validatefootprint_ctrl_stderr.out
+	echo "See ../../examples/validation/footprint_testlist.txt for test details" > validatefootprint_stderr.out
+	for i in `seq -f "%02g" 1 7`; do
+		echo Test $i >> validatefootprint_stderr.out
+		../../src/validatefootprint/validatefootprint < ../../examples/static/validation/footprint_$i.csv 2>> validatefootprint_stderr.out
+		echo Exit code $? >> validatefootprint_stderr.out
+		echo >> validatefootprint_stderr.out
+	done
+	echo "See ../../examples/validation/footprint_testlist.txt for test details" > footprinttobin_stderr.out
+	for i in `seq -f "%02g" 1 8`; do
+		echo Test $i >> footprinttobin_stderr.out
+		../../src/footprinttobin/footprinttobin -i 4 -b footprint_test_$i.bin -x footprint_test_$i.idx < ../../examples/static/validation/footprint_$i.csv 2>> footprinttobin_stderr.out
+		echo Exit code $? >> footprinttobin_stderr.out
+		echo >> footprinttobin_stderr.out
+		rm footprint_test_$i.bin
+		rm footprint_test_$i.idx
+	done
+	# Vulnerability
+	../../src/validatevulnerability/validatevulnerability < vulnerability.csv 2> validatevulnerability_ctrl_stderr.out
+	echo "See ../../examples/validation/vulnerability_testlist.txt for test details" > validatevulnerability_stderr.out
+	for i in `seq -f "%02g" 1 9`; do
+		echo Test $i >> validatevulnerability_stderr.out
+		../../src/validatevulnerability/validatevulnerability < ../../examples/static/validation/vulnerability_$i.csv 2>> validatevulnerability_stderr.out
+		echo Exit code $? >> validatevulnerability_stderr.out
+		echo >> validatevulnerability_stderr.out
+	done
+	echo "See ../../examples/validation/vulnerability_testlist.txt for test details" > vulnerabilitytobin_stderr.out
+	for i in `seq -f "%02g" 1 10`; do
+		echo Test $i >> vulnerabilitytobin_stderr.out
+		../../src/vulnerabilitytobin/vulnerabilitytobin -d 4 < ../../examples/static/validation/vulnerability_$i.csv > /dev/null 2>> vulnerabilitytobin_stderr.out
+		echo Exit code $? >> vulnerabilitytobin_stderr.out
+		echo >> vulnerabilitytobin_stderr.out
+	done
 
      # checksums
  	SHA_SUM_EXE='sha1sum'

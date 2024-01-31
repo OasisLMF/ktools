@@ -1,258 +1,158 @@
-/*
-* Copyright (c)2015 - 2016 Oasis LMF Limited
-* All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions
-* are met:
-*
-*   * Redistributions of source code must retain the above copyright
-*     notice, this list of conditions and the following disclaimer.
-*
-*   * Redistributions in binary form must reproduce the above copyright
-*     notice, this list of conditions and the following disclaimer in
-*     the documentation and/or other materials provided with the
-*     distribution.
-*
-*   * Neither the original author of this software nor the names of its
-*     contributors may be used to endorse or promote products derived
-*     from this software without specific prior written permission.
-*
-* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-* "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-* LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-* FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-* COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-* INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-* BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
-* OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
-* AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-* OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
-* THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
-* DAMAGE.
-*/
-/*
-Convert footprint csv to binary
-Author: Ben Matharu  email: ben.matharu@oasislmf.org
-*/
-
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <set>
+#include <cstdio>
 #include <vector>
+
 #include <zlib.h>
 
-
-
 #include "../include/oasis.h"
-
-namespace footprinttobin {
-
-	int doscan (char *line, int &event_id, unsigned long long &areaperil_id, int &intensity_bin_id, double &probability) {
-		return sscanf(line, "%d,%llu,%d,%lf", &event_id, &areaperil_id, &intensity_bin_id, &probability);
-	}
-
-	int doscan(char* line, int& event_id, unsigned long long& areaperil_id, int& intensity_bin_id, float &probability) {
-		return sscanf(line, "%d,%llu,%d,%f", &event_id, &areaperil_id, &intensity_bin_id, &probability);
-	}
+#include "footprinttobin.h"
 
 
-	int doscan(char* line, int& event_id, unsigned int& areaperil_id, int& intensity_bin_id, double &probability) {
-		return sscanf(line, "%d,%u,%d,%lf", &event_id, &areaperil_id, &intensity_bin_id, &probability);
-	}
+FootprintToBin::FootprintToBin(const int maxIntensityBinIdx,
+			       const bool hasIntensityUncertainty,
+			       const char* binFileName,
+			       const char* idxFileName,
+			       const bool uncompressedSize, const bool zip,
+			       const bool validationCheck) :
+  maxIntensityBinIdx_(maxIntensityBinIdx),
+  hasIntensityUncertainty_(hasIntensityUncertainty),
+  uncompressedSize_(uncompressedSize), zip_(zip) {
 
-	int doscan(char* line, int& event_id, unsigned int& areaperil_id, int& intensity_bin_id, float &probability) {
-		return sscanf(line, "%d,%u,%d,%f", &event_id, &areaperil_id, &intensity_bin_id, &probability);
-	}
+  strcpy(fileDescription_, "Footprint");
+  convertToBin_ = true;
+  validationCheck_ = validationCheck;
+  fileOutBin_ = fopen(binFileName, "wb");
+  fileOutIdx_ = fopen(idxFileName, "wb");
 
-	void doitz(int intensity_bins, int hasIntensityUncertainty,
-		   int uncompressedSize, const char * binFileName,
-		   const char * idxFileName) {
-
-		FILE *foutx = fopen(binFileName, "wb");
-		FILE *fouty = fopen(idxFileName, "wb");
-
-		char line[4096];
-		int lineno = 0;
-		fgets(line, sizeof(line), stdin); // skip header line
-		lineno++;
-		int last_event_id = 0;
-		AREAPERIL_INT last_areaperil_id = 0;
-		EventRow r;
-		EventIndex idx;
-		idx.event_id = 0;
-		idx.offset = 0;
-		idx.size = 0;
-		long long originalSize = 0;
-		int event_id = 0;
-		std::set<int> events;
-		std::set<AREAPERIL_INT> areaperils;
-		fwrite(&intensity_bins, sizeof(intensity_bins), 1, foutx);
-		idx.offset += sizeof(intensity_bins);
-		int zipOpts = uncompressedSize << 1 | hasIntensityUncertainty;
-		fwrite(&zipOpts, sizeof(zipOpts), 1, foutx);
-		idx.offset += sizeof(zipOpts);
-		std::vector<EventRow> rv;
-		std::vector<unsigned char> rvz;
-
-		while (fgets(line, sizeof(line), stdin) != 0) {
-			lineno++;
-			
-			int ret = doscan(line, event_id, r.areaperil_id, r.intensity_bin_id, r.probability);
-	
-			if (ret != 4) {
-				fprintf(stderr, "FATAL: Invalid data in line %d:\n%s", lineno, line);
-				return;
-			}
-			if (r.intensity_bin_id > intensity_bins) {
-				fprintf(stderr, "FATAL: Intensity bin id %d is greater than the max supplied (%d) in line %d:\n%s", r.intensity_bin_id, intensity_bins, lineno, line);
-				return;
-			}
-			if (event_id != last_event_id) {
-				if (events.find(event_id) == events.end()) {
-					events.insert(event_id);
-					areaperils.clear();
-					last_areaperil_id = r.areaperil_id;
-					areaperils.insert(r.areaperil_id);
-				}
-				else {
-					fprintf(stderr, "FATAL: Error (%d):Event_id %d has already been converted - "
-						"all event data should be contiguous \n",
-						lineno, event_id);
-					exit(-1);
-				}
-				if (last_event_id) {
-					rvz.clear();
-					rvz.resize(rv.size() * sizeof(r) + 1024);
-					unsigned long len = rvz.size();
-					compress(&rvz[0], &len, (unsigned char *)&rv[0], rv.size() * sizeof(r));
-					fwrite((unsigned char *)&rvz[0], len, 1, foutx);
-					rvz.clear();
-					idx.event_id = last_event_id;
-					idx.size = len;
-					fwrite(&idx, sizeof(idx), 1, fouty);
-					if (uncompressedSize) {
-						originalSize = rv.size() * sizeof(r);
-						fwrite(&originalSize, sizeof(originalSize), 1, fouty);
-					}
-					idx.offset += idx.size; // offset incremented for the next one
-					rv.clear();
-				}
-				last_event_id = event_id;
-			}
-			if (last_areaperil_id != r.areaperil_id) {
-				last_areaperil_id = r.areaperil_id;
-				if (areaperils.find(r.areaperil_id) == areaperils.end()) {
-					areaperils.insert(r.areaperil_id);
-				}
-				else {
-#ifdef AREAPERIL_TYPE_UNSIGNED_LONG_LONG
-					fprintf(stderr, "FATAL: Error (%d): areaperil_id %llu data is not contiguous for event_id %d \n", lineno, r.areaperil_id, event_id);
-#else
-					::fprintf(stderr, "FATAL: Error (%d): areaperil_id %u data is not contiguous for event_id %d \n", lineno, r.areaperil_id, event_id);
-#endif
-					::exit(-1);
-				}
-			}
-			rv.push_back(r);
-
-		}
-		rvz.clear();
-		rvz.resize(rv.size() * sizeof(r) + 1024);
-		unsigned long len = rvz.size();
-		compress(&rvz[0], &len, (unsigned char *)&rv[0], rv.size() * sizeof(r));
-		fwrite((unsigned char *)&rvz[0], len, 1, foutx);
-		//int len = sizeof(r) * rv.size();
-		//fwrite((unsigned char *)&rv[0], sizeof(r) * rv.size(), 1, foutx);
-		idx.event_id = last_event_id;
-		idx.size = len;
-		fwrite(&idx, sizeof(idx), 1, fouty);
-		if (uncompressedSize) {
-			originalSize = rv.size() * sizeof(r);
-			fwrite(&originalSize, sizeof(originalSize), 1, fouty);
-		}
-		fclose(foutx);
-		fclose(fouty);
-	}
-
-	void doit(int intensity_bins, int hasIntensityUncertainty, const char * binFileName, const char * idxFileName){
-		FILE *foutx = fopen(binFileName, "wb");
-		FILE *fouty = fopen(idxFileName, "wb");
-
-		char line[4096];
-		int lineno = 0;
-		fgets(line, sizeof(line), stdin); // skip header line
-		lineno++;
-		int last_event_id = 0;
-		AREAPERIL_INT last_areaperil_id = 0;
-		EventRow r;
-		EventIndex idx;
-		idx.event_id = 0;
-		idx.offset = 0;
-		idx.size = 0;
-		int event_id = 0;
-		int count = 0; // 11616 / 968*12
-		std::set<int> events;
-		std::set<AREAPERIL_INT> areaperils;
-		fwrite(&intensity_bins, sizeof(intensity_bins), 1, foutx);
-		idx.offset += sizeof(intensity_bins);
-		fwrite(&hasIntensityUncertainty, sizeof(hasIntensityUncertainty), 1, foutx);
-		idx.offset += sizeof(hasIntensityUncertainty);
-		while (fgets(line, sizeof(line), stdin) != 0) {
-			lineno++;
-			int ret = doscan(line, event_id, r.areaperil_id, r.intensity_bin_id, r.probability);
-			if (ret != 4) {
-				fprintf(stderr, "FATAL: Invalid data in line %d:\n%s", lineno, line);
-				return;
-			}
-			if (r.intensity_bin_id > intensity_bins) {
-				fprintf(stderr, "FATAL: Intensity bin id %d is greater than the max supplied (%d) in line %d:\n%s", r.intensity_bin_id, intensity_bins, lineno, line);
-				return;
-			}
-			if (event_id != last_event_id) {
-				if (events.find(event_id) == events.end()) {
-					events.insert(event_id);
-					areaperils.clear();
-					last_areaperil_id = r.areaperil_id;
-					areaperils.insert(r.areaperil_id);
-				}
-				else {
-					fprintf(stderr, "FATAL: Error (%d):Event_id %d has already been converted - "
-						"all event data should be contiguous \n",
-						lineno, event_id);
-					exit(-1);
-				}
-				if (last_event_id) {
-					idx.event_id = last_event_id;
-					idx.size = count * sizeof(EventRow);
-					fwrite(&idx, sizeof(idx), 1, fouty);
-					idx.offset += idx.size;
-				}
-				last_event_id = event_id;
-				count = 0;
-			}
-			if (last_areaperil_id != r.areaperil_id) {
-				last_areaperil_id = r.areaperil_id;
-				if (areaperils.find(r.areaperil_id) == areaperils.end()) {
-					areaperils.insert(r.areaperil_id);
-				}
-				else {
-#ifdef AREAPERIL_TYPE_UNSIGNED_LONG_LONG
-					fprintf(stderr, "FATAL: Error (%d): areaperil_id %llu data is not contiguous for event_id %d \n", lineno, r.areaperil_id, event_id);
-#else
-					fprintf(stderr, "FATAL: Error (%d): areaperil_id %u data is not contiguous for event_id %d \n", lineno, r.areaperil_id, event_id);
-#endif
-					exit(-1);
-				}
-			}
-			fwrite(&r, sizeof(r), 1, foutx);
-			count++;
-		}
-		idx.event_id = last_event_id;
-		idx.size = count * sizeof(EventRow);
-		fwrite(&idx, sizeof(idx), 1, fouty);
-		fclose(foutx);
-		fclose(fouty);
 }
+
+
+FootprintToBin::~FootprintToBin() {
+
+    fclose(fileOutBin_);
+    fclose(fileOutIdx_);
+
+}
+
+
+void FootprintToBin::SetPreviousEventID() {
+
+  ++lineno_;
+  prevEventID_ = fr_.event_id;
+
+}
+
+
+void FootprintToBin::ReadFootprintFileNoChecks() {
+/* If user is satisfied that the footprint csv file is sound and therefore does
+ * not require any validation checks, this method can be executed instead of
+ * ValidateFootprint::ReadFootprintFile(). This method assumes that the methods
+ * Validate:SkipHeaderRow() and WriteHeader() have been executed beforehand. */
+
+  ReadFirstFootprintLine();
+  WriteBinFootprintFile();
+
+  while (fgets(line_, sizeof(line_), stdin) != 0) {
+
+    if (ScanLine() == 4) {
+
+      if (fr_.event_id != prevEventID_) {
+
+        WriteIdxFootprintFile();
+	SetPreviousEventID();
+
+      }
+
+      WriteBinFootprintFile();
+      continue;
+
+    }
+
+    fprintf(stderr, "ERROR: Invalid data in line %d:\n%s\n", lineno_, line_);
+    PrintErrorMessage();
+
+  }
+
+  WriteIdxFootprintFile();
+
+}
+
+
+void FootprintToBin::WriteHeader() {
+/* Binary file header consists of an integer giving the value of the maximum
+ * intensity bin index. */
+
+  fwrite(&maxIntensityBinIdx_, sizeof(maxIntensityBinIdx_), 1, fileOutBin_);
+
+  int zipOpts = uncompressedSize_ << 1 | hasIntensityUncertainty_;
+  fwrite(&zipOpts, sizeof(zipOpts), 1, fileOutBin_);
+
+  // Set initial offset
+  idx_.offset = sizeof(maxIntensityBinIdx_) + sizeof(zipOpts);
+
+}
+
+
+void FootprintToBin::WriteBinFootprintFile() {
+
+  // Check that intensity bin ID from file does not exceed maximum in header
+  if (fr_.intensity_bin_id > maxIntensityBinIdx_) {
+    fprintf(stderr, "ERROR: Maximum intensity bin index of %d in header is"
+		    " less than that of %d in line %d:\n%s\n",
+	    maxIntensityBinIdx_, fr_.intensity_bin_id, lineno_, line_);
+    exit(EXIT_FAILURE);
+  }
+	
+
+  EventRow er = { fr_.areaperil_id, fr_.intensity_bin_id, fr_.probability };
+  ++rowCount_;   // Increment row counter
+
+  // Write binary footprint file if no zipped output requested
+  if (!zip_) {
+
+    fwrite(&er, sizeof(er), 1, fileOutBin_);
+    return;
+
+  }
+
+  // Otherwise, store in vector
+  eventRows_.push_back(er);
+
+}
+
+
+void FootprintToBin::WriteIdxFootprintFile() {
+
+  idx_.event_id = prevEventID_;
+  idx_.size = rowCount_ * sizeof(EventRow);
+
+  // Write zipped output to binary file
+  if (zip_) {
+
+    std::vector<unsigned char> zer;
+    zer.resize(eventRows_.size() * sizeof(EventRow) + 1024);
+    unsigned long zippedEventRowsLength = zer.size();
+    compress(&zer[0], &zippedEventRowsLength, (unsigned char*)&eventRows_[0],
+	     eventRows_.size() * sizeof(EventRow));
+    fwrite((unsigned char*)&zer[0], zippedEventRowsLength, 1, fileOutBin_);
+
+    // Overwrite with actual size of compressed buffer
+    idx_.size = zippedEventRowsLength;
+
+    eventRows_.clear();   // Reset
+
+  }
+
+  fwrite(&idx_, sizeof(idx_), 1, fileOutIdx_);
+
+  // Write uncompressed size to index file if requested (only relevant for
+  // zipped footprint files)
+  if (uncompressedSize_) {
+    long long originalSize = rowCount_ * sizeof(EventRow);
+    fwrite(&originalSize, sizeof(originalSize), 1, fileOutIdx_);
+  }
+
+  // Set new offset and reset row counter
+  idx_.offset += idx_.size;
+  rowCount_ = 0;
+
 }

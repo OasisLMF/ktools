@@ -351,6 +351,11 @@ struct EventRow
 	OASIS_FLOAT probability;
 };
 
+struct FootprintRow : EventRow
+{
+	int event_id;
+};
+
 struct EventIndex
 {
 	int event_id;

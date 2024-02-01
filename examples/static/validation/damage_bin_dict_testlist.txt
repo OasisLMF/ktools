@@ -1,0 +1,30 @@
+DAMAGE BIN DICTIONARY CONVERSION TOOLS TEST LIST
+
+Test 01: damage_bin_dict_01.csv
+WARNING: Deprecated format (interval type given).
+WARNING: Lower limit of first bin not 0.0.
+WARNING: Upper limit of last bin not 1.0.
+
+Test 02: damage_bin_dict_02.csv
+ERROR: Invalid data in line 2.
+
+Test 03: damage_bin_dict_03.csv
+ERROR: Empty file, only header present.
+
+Test 04: damage_bin_dict_04.csv
+ERROR: First bin index is not 1.
+
+Test 05: damage_bin_dict_05.csv
+ERROR: Deprecated format used after new format was detected when reading line 2.
+
+Test 06: damage_bin_dict_06.csv
+ERROR: New format used after deprecated format was detected when reading line 2.
+
+Test 07: damage_bin_dict_07.csv
+ERROR: Invalid data after line 2.
+
+Test 08: damage_bin_dict_08.csv
+ERROR: Non-contiguous bin indices.
+
+Test 09: damage_bin_dict_09.csv
+ERROR: Interpolation lies outside range.

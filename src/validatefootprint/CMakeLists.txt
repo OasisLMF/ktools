@@ -1,7 +1,7 @@
 add_executable(validatefootprint)
 target_sources(validatefootprint
 	PRIVATE
-		validatefootprint.cpp main.cpp
+		../include/validate.h ../include/validate.cpp validatefootprint.h validatefootprint.cpp main.cpp
 )
 
 if (WIN32)

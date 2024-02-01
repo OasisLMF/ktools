@@ -1,0 +1,26 @@
+FOOTPRINT CONVERSION TOOLS TEST LIST
+
+Test 01: footprint_01.csv
+ERROR: Invalid data in line 2.
+
+Test 02: footprint_02.csv
+ERROR: Empty file, only header present.
+
+Test 03: footprint_03.csv
+ERROR: Invalid data after line 2.
+
+Test 04: footprint_04.csv
+ERROR: Probabilities for event ID 1 and areaperil ID 4 combination do not sum to 1.0
+
+Test 05: footprint_05.csv
+ERROR: Event IDs not in ascending order.
+
+Test 06: footprint_06.csv
+ERROR: Areaperil IDs not in ascending order.
+
+Test 07: footprint_07.csv
+ERROR: Duplicate intensity bin IDs.
+
+Test 08: footprint_08.csv
+ERROR: Maximum intensity bin index exceeds that in header.
+(This test is only relevant for footprinttobin conversion tool.)

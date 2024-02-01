@@ -1,6 +1,12 @@
 Ktools Changelog
 ================
 
+`v3.12.0`_
+ ---------
+* [#369](https://github.com/OasisLMF/ktools/pull/369) - Release 3.11.1
+* [#356](https://github.com/OasisLMF/ktools/pull/370) - Incorporate model file validation checks when running csv to binary conversion tools
+.. _`v3.12.0`:  https://github.com/OasisLMF/ktools/compare/v3.11.1...v3.12.0
+
 .. _`v3.11.1`:  https://github.com/OasisLMF/ktools/compare/v3.11.0...v3.11.1
 
 `v3.11.0`_

@@ -306,14 +306,14 @@ installertest()
 	# Damage bin dictionary
 	../../src/damagebintocsv/damagebintocsv < ../../examples/static/damage_bin_dict.bin | ../../src/validatedamagebin/validatedamagebin 2> validatedamagebin_ctrl_stderr.out
 	echo "See ../../examples/validation/damage_bin_dict_testlist.txt for test details" > validatedamagebin_stderr.out
-	for i in `seq -f "%02g" 1 9`; do
+	for i in `seq -f "%02g" 1 10`; do
 		echo Test $i >> validatedamagebin_stderr.out
 		../../src/validatedamagebin/validatedamagebin < ../../examples/static/validation/damage_bin_dict_$i.csv 2>> validatedamagebin_stderr.out
 		echo Exit code $? >> validatedamagebin_stderr.out
 		echo >> validatedamagebin_stderr.out
 	done
 	echo "See ../../examples/validation/damage_bin_dict_testlist.txt for test details" > damagebintobin_stderr.out
-	for i in `seq -f "%02g" 1 9`; do
+	for i in `seq -f "%02g" 1 10`; do
 		echo Test $i >> damagebintobin_stderr.out
 		../../src/damagebintobin/damagebintobin < ../../examples/static/validation/damage_bin_dict_$i.csv > /dev/null 2>> damagebintobin_stderr.out
 		echo Exit code $? >> damagebintobin_stderr.out

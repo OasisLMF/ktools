@@ -340,14 +340,14 @@ installertest()
 	# Vulnerability
 	../../src/validatevulnerability/validatevulnerability < vulnerability.csv 2> validatevulnerability_ctrl_stderr.out
 	echo "See ../../examples/validation/vulnerability_testlist.txt for test details" > validatevulnerability_stderr.out
-	for i in `seq -f "%02g" 1 9`; do
+	for i in `seq -f "%02g" 1 10`; do
 		echo Test $i >> validatevulnerability_stderr.out
 		../../src/validatevulnerability/validatevulnerability < ../../examples/static/validation/vulnerability_$i.csv 2>> validatevulnerability_stderr.out
 		echo Exit code $? >> validatevulnerability_stderr.out
 		echo >> validatevulnerability_stderr.out
 	done
 	echo "See ../../examples/validation/vulnerability_testlist.txt for test details" > vulnerabilitytobin_stderr.out
-	for i in `seq -f "%02g" 1 10`; do
+	for i in `seq -f "%02g" 1 11`; do
 		echo Test $i >> vulnerabilitytobin_stderr.out
 		../../src/vulnerabilitytobin/vulnerabilitytobin -d 4 < ../../examples/static/validation/vulnerability_$i.csv > /dev/null 2>> vulnerabilitytobin_stderr.out
 		echo Exit code $? >> vulnerabilitytobin_stderr.out

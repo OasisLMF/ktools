@@ -1,6 +1,9 @@
 Ktools Changelog
 ================
 
+* [#372](https://github.com/OasisLMF/ktools/pull/373) - Additional model file validation checks
+.. _`v3.12.1`:  https://github.com/OasisLMF/ktools/compare/v3.12.0...v3.12.1
+
 `v3.12.0`_
  ---------
 * [#369](https://github.com/OasisLMF/ktools/pull/369) - Release 3.11.1

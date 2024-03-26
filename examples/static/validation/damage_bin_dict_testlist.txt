@@ -28,3 +28,6 @@ ERROR: Non-contiguous bin indices.
 
 Test 09: damage_bin_dict_09.csv
 ERROR: Interpolation lies outside range.
+
+Test 10: damage_bin_dict_10.csv
+WARNING: Interpolation not at bin centre.

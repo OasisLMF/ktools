@@ -146,6 +146,18 @@ inline void ValidateDamageBin::CheckInterpolationDamageValuesWithinRange() {
 
   }
 
+  OASIS_FLOAT midPoint = (dbd_.bin_to - dbd_.bin_from) / 2.0 + dbd_.bin_from;
+  int binCentre = (int)(midPoint * 10000 + 0.5);
+  if ((int)(dbd_.interpolation * 10000 + 0.5) != binCentre) {
+
+    fprintf(stderr, "WARNING: Interpolation damage value %f does not lie at"
+		    " centre %f of bin %d on line %d. Are you sure this is"
+		    " what you want?\n%s\n",
+	    dbd_.interpolation, midPoint, dbd_.bin_index, lineno_, line_);
+    warnings_ = true;
+
+  }
+
 }
 
 

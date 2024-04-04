@@ -84,6 +84,10 @@ The data should be ordered by bin_index ascending and not contain nulls. The bin
 ```
 $ damagebintobin < damage_bin_dict.csv > damage_bin_dict.bin
 ```
+Validation checks on the damage bin dictionary csv file are conducted by default during conversion to binary format. These can be suppressed with the -N argument:
+```
+$ damagebintobin -N < damage_bin_dict.csv > damage_bin_dict.bin
+```
 
 ##### damagebintocsv
 ```
@@ -140,7 +144,12 @@ The data should be ordered by event_id, areaperil_id and not contain nulls.
 ```
 $ footprinttobin -i {number of intensity bins} < footprint.csv
 ```
-This command will create a binary file footprint.bin and an index file footprint.idx in the working directory. The number of intensity bins is the maximum value of intensity_bin_index. 
+This command will create a binary file footprint.bin and an index file footprint.idx in the working directory. The number of intensity bins is the maximum value of intensity_bin_index.
+
+Validation checks on the footprint csv file are conducted by default during conversion to binary format. These can be suppressed with the -N argument:
+```
+$ footprinttobin -i {number of intensity bins} -N < footprint.csv > footprint.bin
+```
 
 There is an additional parameter -n, which should be used when there is only one record per event_id and areaperil_id, with a single intensity_bin_index value and prob = 1. This is the special case 'no hazard intensity uncertainty'. In this case, the usage is as follows.
 
@@ -254,6 +263,11 @@ The data should be ordered by vulnerability_id, intensity_bin_index and not cont
 $ vulnerabilitytobin -d {number of damage bins} < vulnerability.csv > vulnerability.bin
 ```
 The parameter -d number of damage bins is the maximum value of damage_bin_index. This is held in the header of vulnerability.bin and used by getmodel.
+
+Validation checks on the vulnerability csv file are conducted by default during conversion to binary format. These can be suppressed with the -N argument:
+```
+$ vulnerabilitytobin -d {number of damage bins} -N < vulnerability.csv > vulnerability.bin
+```
 
 In the case of very large vulnerability files, it may be preferrable to create an index file to improve performance. Issuing the -i flag creates vulnerability.bin and vulnerability.idx in the current working directory:
 

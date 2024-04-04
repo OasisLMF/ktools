@@ -492,6 +492,9 @@ code {
 <h5 id="damagebintobin">damagebintobin</h5>
 <pre class="hljs"><code><div>$ damagebintobin &lt; damage_bin_dict.csv &gt; damage_bin_dict.bin
 </div></code></pre>
+<p>Validation checks on the damage bin dictionary csv file are conducted by default during conversion to binary format. These can be suppressed with the -N argument:</p>
+<pre class="hljs"><code><div>$ damagebintobin -N &lt; damage_bin_dict.csv &gt; damage_bin_dict.bin
+</div></code></pre>
 <h5 id="damagebintocsv">damagebintocsv</h5>
 <pre class="hljs"><code><div>$ damagebintocsv &lt; damage_bin_dict.bin &gt; damage_bin_dict.csv
 </div></code></pre>
@@ -610,6 +613,9 @@ code {
 <pre class="hljs"><code><div>$ footprinttobin -i {number of intensity bins} &lt; footprint.csv
 </div></code></pre>
 <p>This command will create a binary file footprint.bin and an index file footprint.idx in the working directory. The number of intensity bins is the maximum value of intensity_bin_index.</p>
+<p>Validation checks on the footprint csv file are conducted by default during conversion to binary format. These can be suppressed with the -N argument.</p>
+<pre class="hljs"><code><div>$ footprinttobin -i {number of intensity bins} -N &lt; footprint.csv
+</div></code></pre>
 <p>There is an additional parameter -n, which should be used when there is only one record per event_id and areaperil_id, with a single intensity_bin_index value and prob = 1. This is the special case 'no hazard intensity uncertainty'. In this case, the usage is as follows.</p>
 <pre class="hljs"><code><div>$ footprinttobin -i {number of intensity bins} -n &lt; footprint.csv
 </div></code></pre>
@@ -738,6 +744,9 @@ $ randtocsv -g 1000000 -S 1234 &gt; random.csv
 <pre class="hljs"><code><div>$ vulnerabilitytobin -d {number of damage bins} &lt; vulnerability.csv &gt; vulnerability.bin
 </div></code></pre>
 <p>The parameter -d number of damage bins is the maximum value of damage_bin_index. This is held in the header of vulnerability.bin and used by getmodel.</p>
+<p>Validation checks on the vulnerability csv file are conducted by default during conversion to binary format. These can be suppressed with the -N argument:</p>
+<pre class="hljs"><code><div>$ vulnerabilitytobin -d {number of damage bins} -N &lt; vulnerability.csv &gt; vulnerability.bin
+</div></code></pre>
 <p>In the case of very large vulnerability files, it may be preferrable to create an index file to improve performance. Issuing the -i flag creates vulnerability.bin and vulnerability.idx in the current working directory:</p>
 <pre class="hljs"><code><div>$ vulnerabilitytobin -d {number of damage bins} -i &lt; vulnerability.csv
 </div></code></pre>

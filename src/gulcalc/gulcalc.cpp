@@ -363,7 +363,7 @@ void gulcalc::writemode1output(const int event_id, const OASIS_FLOAT tiv,
 	for (size_t i = 0; i < gilv.size(); i++) {
 
 		if ((i != num_idx_ + std_dev_idx) ||
-		    (i != num_idx_ + chance_of_loss_idx)) {
+		    (i != num_idx_ + number_of_affected_risk_idx)) {
 			split_tiv(gilv[i], tiv);
 		}
 

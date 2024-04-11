@@ -311,7 +311,7 @@ void summarycalc::outputsummaryset(int sample_size, int summary_set, int event_i
 			fwrite(&sh, sizeof(sh), 1, fout[summary_set]);
 			offset_[summary_set] += sizeof(sh);
 			for (int j = first_idx_; j < sample_size + num_idx_ + 1; j++) {
-				if (j != num_idx_ && j != chance_of_loss_idx + num_idx_) {   // sidx = 0 AND sidx = chance_of_loss_idx
+				if (j != num_idx_ && j != number_of_affected_risk_idx + num_idx_) {   // sidx = 0 AND sidx = number_of_affected_risk_idx
 					sampleslevelRec s;
 					s.sidx = j - num_idx_;
 					if (s.sidx == tiv_idx || s.sidx == std_dev_idx) {
@@ -610,7 +610,7 @@ void summarycalc::dosummaryprocessing(int samplesize)
 			i = (int)fread(&sr, sizeof(sr), 1, stdin);
 			if (i == 0) break;
 			if (sr.sidx == 0) break;
-			if (sr.sidx == chance_of_loss_idx) continue;   // Ignore chance of loss
+			if (sr.sidx == number_of_affected_risk_idx) continue;
 			if (sr.sidx == tiv_idx) {
 				expure_val = sr.loss;
 			} else if (sr.sidx == max_loss_idx) {

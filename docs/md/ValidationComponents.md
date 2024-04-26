@@ -28,11 +28,21 @@ In addition, warnings are issued in the following cases:
 * Lower limit of first bin is not 0.
 * Upper limit of last bin is not 1.
 * Deprecated `interval_type` column included.
+* Interpolation lies within range but not in the bin centre.
 
 The checks can be performed on `damage_bin_dict.csv` from the command line:
 
 ```
 $ validatedamagebin < damage_bin_dict.csv
+```
+
+The checks are also performed by default when converting damage bin dictionary files from csv to binary format:
+
+```
+$ damagebintobin < damage_bin_dict.csv > damage_bin_dict.bin
+
+# Suppress vaidation checks with -N argument
+$ damagebintobin -N < damage_bin_dict.csv > damage_bin_dict.bin
 ```
 
 <a id="validatefootprint"></a>
@@ -53,6 +63,15 @@ The checks can be performed on `footprint.csv` from the command line:
 $ validatefootprint < footprint.csv
 ```
 
+The checks are also performed by default when converting footprint files from csv to binary format:
+
+```
+$ footprinttobin -i {number of intensity bins} < footprint.csv
+
+# Suppress validation checks with -N argument
+$ footprinttobin -i {number of intensity bins} -N < footprint.csv
+```
+
 <a id="validatevulnerability"></a>
 ### validatevulnerability
 The following checks are performed on the vulnerability data:
@@ -61,7 +80,7 @@ The following checks are performed on the vulnerability data:
 * Total probability for each vulnerability-intensity bin combination is 1.
 * Vulnerability IDs listed in ascending order.
 * For each vulnerability ID, all intensity bin IDs are present and listed in ascending order.
-* No duplicate damage bin IDs for each vulnerability-intensity bin combination.
+* For each vulnerability-intensity bin combination, damage bin IDs are contiguous and start at bin index 1.
 
 Should all checks pass, the maximum value of `damage_bin_id` is given, which is a required input for `vulnerabilitytobin`.
 
@@ -69,6 +88,15 @@ The checks can be performed on `vulnerability.csv` from the command line:
 
 ```
 $ validatevulnerability < vulnerability.csv
+```
+
+The checks are also performed by default when converting vulnerability files from csv to binary format:
+
+```
+$ vulnerabilitytobin -d {number of damage bins} < vulnerability.csv > vulnerability.bin
+
+# Suppress validation checks with -N argument
+$ vulnerabilitytobin -d {number of damage bins} -N < vulnerability.csv > vulnerability.bin
 ```
 
 <a id="crossvalidation"></a>

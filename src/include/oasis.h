@@ -85,7 +85,7 @@ typedef unsigned int AREAPERIL_INT;
 const int mean_idx = -1;
 const int std_dev_idx = -2;
 const int tiv_idx = -3;
-const int chance_of_loss_idx = -4;   // Reserved
+const int number_of_affected_risk_idx = -4;
 const int max_loss_idx = -5;
 
 // Stream types

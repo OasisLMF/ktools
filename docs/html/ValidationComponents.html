@@ -394,9 +394,16 @@ code {
 <li>Lower limit of first bin is not 0.</li>
 <li>Upper limit of last bin is not 1.</li>
 <li>Deprecated <code>interval_type</code> column included.</li>
+<li>Interpolation lies within range but not in the bin centre.</li>
 </ul>
 <p>The checks can be performed on <code>damage_bin_dict.csv</code> from the command line:</p>
 <pre class="hljs"><code><div>$ validatedamagebin &lt; damage_bin_dict.csv
+</div></code></pre>
+<p>The checks are also performed by default when converting damage bin dictionary files from csv to binary format:</p>
+<pre class="hljs"><code><div>$ damagebintobin &lt; damage_bin_dict.csv &gt; damage_bin_dict.bin
+
+# Suppress validation checks with -N argument
+$ damagebintobin -N &lt; damage_bin_dict.csv &gt; damage_bin_dict.bin
 </div></code></pre>
 <p><a id="validatefootprint"></a></p>
 <h3 id="validatefootprint">validatefootprint</h3>
@@ -412,6 +419,12 @@ code {
 <p>The checks can be performed on <code>footprint.csv</code> from the command line:</p>
 <pre class="hljs"><code><div>$ validatefootprint &lt; footprint.csv
 </div></code></pre>
+<p>The checks are also performed by default when converting footprint files from csv to binary format:</p>
+<pre class="hljs"><code><div>$ footprinttobin -i {number of intensity bins} &lt; footprint.csv
+
+# Suppress validation checks with -N argument
+$ footprinttobin -i {number of intensity bins} -N &lt; footprint.csv
+</div></code></pre>
 <p><a id="validatevulnerability"></a></p>
 <h3 id="validatevulnerability">validatevulnerability</h3>
 <p>The following checks are performed on the vulnerability data:</p>
@@ -420,11 +433,17 @@ code {
 <li>Total probability for each vulnerability-intensity bin combination is 1.</li>
 <li>Vulnerability IDs listed in ascending order.</li>
 <li>For each vulnerability ID, all intensity bin IDs are present and listed in ascending order.</li>
-<li>No duplicate damage bin IDs for each vulnerability-intensity bin combination.</li>
+<li>For each vulnerability-intensity bin combination, damage bin IDs are contiguous and start at bin index 1.</li>
 </ul>
 <p>Should all checks pass, the maximum value of <code>damage_bin_id</code> is given, which is a required input for <code>vulnerabilitytobin</code>.</p>
 <p>The checks can be performed on <code>vulnerability.csv</code> from the command line:</p>
 <pre class="hljs"><code><div>$ validatevulnerability &lt; vulnerability.csv
+</div></code></pre>
+<p>The checks are also performed by default when converting vulnerability files from csv to binary format:</p>
+<pre class="hljs"><code><div>$ vulnerabilitytobin -d {number of damage bins} &lt; vulnerability.csv &gt; vulnerability.bin
+
+# Suppress validation checks with -N argument
+$ vulnerabilitytobin -d {number of damage bins} -N &lt; vulnerability.csv &gt; vulnerability.bin
 </div></code></pre>
 <p><a id="crossvalidation"></a></p>
 <h3 id="crossvalidation">crossvalidation</h3>

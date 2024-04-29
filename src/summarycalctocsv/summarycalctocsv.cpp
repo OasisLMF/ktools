@@ -103,7 +103,6 @@ void doitz(bool skipheader, bool fullprecision, bool show_exposure_value,
 				i = fread(&sr, sizeof(sr), 1, stdin);
 				if (i == 0) break;
 				if (sr.sidx == 0) break;
-				if (sr.sidx == chance_of_loss_idx) continue;   // Ignore chance of loss
 				if (!all_idx && sr.sidx == max_loss_idx) {   // Only output MaxLoss if flag set
 					continue;
 				}
@@ -205,7 +204,6 @@ void doit(bool skipheader, bool fullprecision,bool show_exposure_value,
 				i = fread(&sr, sizeof(sr), 1, stdin);
 				if (i == 0) break;	
 				if (sr.sidx == 0) break;
-				if (sr.sidx == chance_of_loss_idx) continue;   // Ignore chance of loss
 				if (!all_idx && sr.sidx == max_loss_idx) {   // Only output MaxLoss if flag set
 					continue;
 				}

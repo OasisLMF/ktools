@@ -578,7 +578,7 @@ namespace pltcalc {
 				OASIS_FLOAT impacted_exposure = 0;
 				sampleslevelRec sr;
 				i = fread(&sr, sizeof(sr), 1, stdin);
-				if (sr.sidx == chance_of_loss_idx) continue;   // Ignore chance of loss
+				if (sr.sidx == number_of_affected_risk_idx) continue;
 				if (i == 0 || sr.sidx == 0) {
 					dopltcalc(sh, vrec, OutputData, outFile,
 						  m_occ, vp,

@@ -104,7 +104,7 @@ namespace aalcalcmeanonly {
         sampleslevelRec sr;
         i = fread(&sr, sizeof(sr), 1, fin);
 
-        if (sr.sidx == chance_of_loss_idx || sr.sidx == max_loss_idx) continue;
+        if (sr.sidx == number_of_affected_risk_idx || sr.sidx == max_loss_idx) continue;
         if (i == 0 || sr.sidx == 0) break;
 
         means_[sh.summary_id][sr.sidx != -1] += (sr.loss * weight / (1 + (sampleSize_ - 1) * (sr.sidx != -1)));

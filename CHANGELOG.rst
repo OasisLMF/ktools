@@ -1,6 +1,14 @@
 Ktools Changelog
 ================
 
+`v3.12.2`_
+ ---------
+* [#375](https://github.com/OasisLMF/ktools/pull/376) - Update documentation for recent changes in validation tools
+* [#377](https://github.com/OasisLMF/ktools/pull/378) - Allow number of affected risks (sample index = -4) to be processed by summarycalctocsv
+* [#380](https://github.com/OasisLMF/ktools/pull/380) - Pin OSX builds to v13
+* [#374](https://github.com/OasisLMF/ktools/pull/374) - Release 3.12.1
+.. _`v3.12.2`:  https://github.com/OasisLMF/ktools/compare/v3.12.1...v3.12.2
+
 * [#372](https://github.com/OasisLMF/ktools/pull/373) - Additional model file validation checks
 .. _`v3.12.1`:  https://github.com/OasisLMF/ktools/compare/v3.12.0...v3.12.1
 

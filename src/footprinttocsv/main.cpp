@@ -86,8 +86,8 @@ int main(int argc, char* argv[])
 	int opt;
 	bool skipheader = false;
 	bool zip = false;
-	int from_event = 1;
-	int to_event = 999999999;
+	int from_event = 0;   // No minimum event ID by default
+	int to_event = 0;   // No maximum event ID by default
 	char *binFileName = 0;
 	bool binFileGiven = false;
 	char *idxFileName = 0;
@@ -113,6 +113,7 @@ int main(int argc, char* argv[])
 					from_event = atoi(result[0].c_str());
 					to_event = atoi(result[1].c_str());
 				}
+				// Must set finite limits if setting range from command line
 				if (from_event == 0) {
 					fprintf(stderr, "FATAL: Invalid from event_id\n");
 					exit(EXIT_FAILURE);

@@ -282,14 +282,14 @@ installertest()
 	# Footprint
 	../../src/validatefootprint/validatefootprint < footprint.csv 2> validatefootprint_ctrl_stderr.out
 	echo "See ../../examples/validation/footprint_testlist.txt for test details" > validatefootprint_stderr.out
-	for i in `seq -f "%02g" 1 7`; do
+	for i in `seq -f "%02g" 1 8`; do
 		echo Test $i >> validatefootprint_stderr.out
 		../../src/validatefootprint/validatefootprint < ../../examples/static/validation/footprint_$i.csv 2>> validatefootprint_stderr.out
 		echo Exit code $? >> validatefootprint_stderr.out
 		echo >> validatefootprint_stderr.out
 	done
 	echo "See ../../examples/validation/footprint_testlist.txt for test details" > footprinttobin_stderr.out
-	for i in `seq -f "%02g" 1 8`; do
+	for i in `seq -f "%02g" 1 9`; do
 		echo Test $i >> footprinttobin_stderr.out
 		../../src/footprinttobin/footprinttobin -i 4 -b footprint_test_$i.bin -x footprint_test_$i.idx < ../../examples/static/validation/footprint_$i.csv 2>> footprinttobin_stderr.out
 		echo Exit code $? >> footprinttobin_stderr.out

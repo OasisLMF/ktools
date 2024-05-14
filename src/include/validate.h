@@ -17,8 +17,10 @@ protected:
   int lineno_ = 1;
   char fileDescription_[4096];
   bool warnings_ = false;
+  long long initialID_;
 
   void PrintErrorMessage();
+  int CheckIDDoesNotExceedMaxLimit(char *idName, long long initialID);
 };
 
 #endif   // VALIDATE_H_

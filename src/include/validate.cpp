@@ -1,3 +1,4 @@
+#include <climits>
 #include <cstdio>
 #include <cstdlib>
 
@@ -31,5 +32,23 @@ void Validate::PrintErrorMessage() {
   fprintf(stderr, "INFO: Some checks have failed. Please edit %s file.\n",
 		  fileDescription_);
   exit(EXIT_FAILURE);
+
+}
+
+
+int Validate::CheckIDDoesNotExceedMaxLimit(char *idName, long long initialID) {
+/* Check ID does not exceed maximum value for integers. */
+
+  if (initialID > INT_MAX) {
+
+    fprintf(stderr, "ERROR: %s ID %lld on line %d exceeds maximum permissible"
+		    " value %d. Please reassign %s IDs to lie under this"
+		    " maximum.\n",
+		    idName, initialID, lineno_, INT_MAX, idName);
+    PrintErrorMessage();
+
+  }
+
+  return int(initialID);
 
 }

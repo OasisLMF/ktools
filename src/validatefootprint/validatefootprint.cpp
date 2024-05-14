@@ -13,18 +13,18 @@ int ValidateFootprint::ScanLine() {
 
 #ifdef AREAPERIL_TYPE_UNSIGNED_LONG_LONG
   #ifdef OASIS_FLOAT_TYPE_DOUBLE
-  return sscanf(line_, "%d,%llu,%d,%lf", &fr_.event_id, &fr_.areaperil_id,
+  return sscanf(line_, "%lld,%llu,%d,%lf", &initialEveID_, &fr_.areaperil_id,
 				      &fr_.intensity_bin_id, &fr_.probability);
   #else
-  return sscanf(line_, "%d,%llu,%d,%f", &fr_.event_id, &fr_.areaperil_id,
+  return sscanf(line_, "%lld,%llu,%d,%f", &initialEveID_, &fr_.areaperil_id,
 				      &fr_.intensity_bin_id, &fr_.probability);
   #endif
 #else
   #ifdef OASIS_FLOAT_TYPE_DOUBLE
-  return sscanf(line_, "%d,%u,%d,%lf", &fr_.event_id, &fr_.areaperil_id,
+  return sscanf(line_, "%lld,%u,%d,%lf", &initialEveID_, &fr_.areaperil_id,
 				      &fr_.intensity_bin_id, &fr_.probability);
   #else
-  return sscanf(line_, "%d,%u,%d,%f", &fr_.event_id, &fr_.areaperil_id,
+  return sscanf(line_, "%lld,%u,%d,%f", &initialEveID_, &fr_.areaperil_id,
 				      &fr_.intensity_bin_id, &fr_.probability);
   #endif
 #endif
@@ -66,6 +66,8 @@ void ValidateFootprint::ReadFirstFootprintLine(OASIS_FLOAT &totalProbability) {
   if (fgets(line_, sizeof(line_), stdin) != 0) {
 
     if (ScanLine() == 4) {
+
+      fr_.event_id = CheckIDDoesNotExceedMaxLimit(eveIDName_, initialEveID_);
 
       // In the case when there are no validation checks to perform, the
       // initial previous event ID must still be set and line number
@@ -174,6 +176,8 @@ void ValidateFootprint::ReadFootprintFile() {
   while (fgets(line_, sizeof(line_), stdin) != 0) {
 
     if (ScanLine() == 4) {
+
+      fr_.event_id = CheckIDDoesNotExceedMaxLimit(eveIDName_, initialEveID_);
 
       // New event and/or areaperil IDs.
       // Check probabilities sum to 1.0 for each event ID-areaperil ID

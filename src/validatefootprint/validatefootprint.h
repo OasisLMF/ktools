@@ -23,6 +23,8 @@ protected:
   bool validationCheck_ = true;
   FootprintRow fr_;
   int prevEventID_;
+  long long initialEveID_;
+  char eveIDName_[6] = "Event";
 
   int ScanLine();
   void ReadFirstFootprintLine(OASIS_FLOAT &totalProbability);

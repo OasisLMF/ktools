@@ -55,6 +55,8 @@ void FootprintToBin::ReadFootprintFileNoChecks() {
 
     if (ScanLine() == 4) {
 
+      fr_.event_id = int(initialEveID_);
+
       if (fr_.event_id != prevEventID_) {
 
         WriteIdxFootprintFile();

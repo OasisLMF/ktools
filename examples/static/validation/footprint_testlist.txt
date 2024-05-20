@@ -25,5 +25,11 @@ Test 08: footprint_08.csv
 ERROR: Event ID exceeds maximum signed 32-bit integer value.
 
 Test 09: footprint_09.csv
+ERROR: Event ID is 0.
+
+Test 10: footprint_10.csv
+ERROR: Event ID is negative.
+
+Test 11: footprint_11.csv
 ERROR: Maximum intensity bin index exceeds that in header.
 (This test is only relevant for footprinttobin conversion tool.)

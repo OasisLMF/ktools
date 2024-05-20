@@ -282,14 +282,14 @@ installertest()
 	# Footprint
 	../../src/validatefootprint/validatefootprint < footprint.csv 2> validatefootprint_ctrl_stderr.out
 	echo "See ../../examples/validation/footprint_testlist.txt for test details" > validatefootprint_stderr.out
-	for i in `seq -f "%02g" 1 8`; do
+	for i in `seq -f "%02g" 1 10`; do
 		echo Test $i >> validatefootprint_stderr.out
 		../../src/validatefootprint/validatefootprint < ../../examples/static/validation/footprint_$i.csv 2>> validatefootprint_stderr.out
 		echo Exit code $? >> validatefootprint_stderr.out
 		echo >> validatefootprint_stderr.out
 	done
 	echo "See ../../examples/validation/footprint_testlist.txt for test details" > footprinttobin_stderr.out
-	for i in `seq -f "%02g" 1 9`; do
+	for i in `seq -f "%02g" 1 11`; do
 		echo Test $i >> footprinttobin_stderr.out
 		../../src/footprinttobin/footprinttobin -i 4 -b footprint_test_$i.bin -x footprint_test_$i.idx < ../../examples/static/validation/footprint_$i.csv 2>> footprinttobin_stderr.out
 		echo Exit code $? >> footprinttobin_stderr.out
@@ -300,14 +300,14 @@ installertest()
 	# Vulnerability
 	../../src/validatevulnerability/validatevulnerability < vulnerability.csv 2> validatevulnerability_ctrl_stderr.out
 	echo "See ../../examples/validation/vulnerability_testlist.txt for test details" > validatevulnerability_stderr.out
-	for i in `seq -f "%02g" 1 10`; do
+	for i in `seq -f "%02g" 1 12`; do
 		echo Test $i >> validatevulnerability_stderr.out
 		../../src/validatevulnerability/validatevulnerability < ../../examples/static/validation/vulnerability_$i.csv 2>> validatevulnerability_stderr.out
 		echo Exit code $? >> validatevulnerability_stderr.out
 		echo >> validatevulnerability_stderr.out
 	done
 	echo "See ../../examples/validation/vulnerability_testlist.txt for test details" > vulnerabilitytobin_stderr.out
-	for i in `seq -f "%02g" 1 11`; do
+	for i in `seq -f "%02g" 1 13`; do
 		echo Test $i >> vulnerabilitytobin_stderr.out
 		../../src/vulnerabilitytobin/vulnerabilitytobin -d 4 < ../../examples/static/validation/vulnerability_$i.csv > /dev/null 2>> vulnerabilitytobin_stderr.out
 		echo Exit code $? >> vulnerabilitytobin_stderr.out

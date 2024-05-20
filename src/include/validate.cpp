@@ -39,12 +39,12 @@ void Validate::PrintErrorMessage() {
 int Validate::CheckIDDoesNotExceedMaxLimit(char *idName, long long initialID) {
 /* Check ID does not exceed maximum value for integers. */
 
-  if (initialID > INT_MAX) {
+  if (initialID < MIN_ID_ || initialID > INT_MAX) {
 
-    fprintf(stderr, "ERROR: %s ID %lld on line %d exceeds maximum permissible"
-		    " value %d. Please reassign %s IDs to lie under this"
-		    " maximum.\n",
-		    idName, initialID, lineno_, INT_MAX, idName);
+    fprintf(stderr, "ERROR: %s ID %lld on line %d does not lie within"
+		    " permitted range [%d, %d]. Please reassign %s IDs to lie"
+		    " within this range.\n",
+		    idName, initialID, lineno_, MIN_ID_, INT_MAX, idName);
     PrintErrorMessage();
 
   }

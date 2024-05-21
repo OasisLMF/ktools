@@ -47,11 +47,36 @@ INFO: Some checks have failed. Please edit Footprint file.
 Exit code 1
 
 Test 08
-ERROR: Event ID 2147483648 on line 18 exceeds maximum permissible value 2147483647. Please reassign Event IDs to lie under this maximum.
+ERROR: Event ID 2147483648 on line 18 does not lie within permitted range [1, 2147483647]. Please reassign Event IDs to lie within this range.
 INFO: Some checks have failed. Please edit Footprint file.
 Exit code 1
 
 Test 09
+ERROR: Event ID 0 on line 2 does not lie within permitted range [1, 2147483647]. Please reassign Event IDs to lie within this range.
+INFO: Some checks have failed. Please edit Footprint file.
+Exit code 1
+
+Test 10
+ERROR: Event ID -1 on line 2 does not lie within permitted range [1, 2147483647]. Please reassign Event IDs to lie within this range.
+INFO: Some checks have failed. Please edit Footprint file.
+Exit code 1
+
+Test 11
+ERROR: Areaperil ID 4294967296 on line 18 does not lie within permitted range [1, 4294967295]. Please reassign Areaperil IDs to lie within this range.
+INFO: Some checks have failed. Please edit Footprint file.
+Exit code 1
+
+Test 12
+ERROR: Areaperil ID 0 on line 18 does not lie within permitted range [1, 4294967295]. Please reassign Areaperil IDs to lie within this range.
+INFO: Some checks have failed. Please edit Footprint file.
+Exit code 1
+
+Test 13
+ERROR: Areaperil ID -1 on line 2 does not lie within permitted range [1, 4294967295]. Please reassign Areaperil IDs to lie within this range.
+INFO: Some checks have failed. Please edit Footprint file.
+Exit code 1
+
+Test 14
 ERROR: Maximum intensity bin index of 4 in header is less than that of 5 in line 6:
 1,1,5,0.0
 

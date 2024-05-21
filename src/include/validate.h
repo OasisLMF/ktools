@@ -21,6 +21,8 @@ protected:
 
   void PrintErrorMessage();
   int CheckIDDoesNotExceedMaxLimit(char *idName, long long initialID);
+  unsigned int CheckIDDoesNotExceedMaxLimit(char *idName,
+					    unsigned long long initialID);
 };
 
 #endif   // VALIDATE_H_

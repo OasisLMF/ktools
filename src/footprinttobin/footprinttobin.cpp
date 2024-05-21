@@ -55,7 +55,12 @@ void FootprintToBin::ReadFootprintFileNoChecks() {
 
     if (ScanLine() == 4) {
 
-      fr_.event_id = int(initialEveID_);
+      fr_.event_id = (int)initialEveID_;
+#ifdef AREAPERIL_TYPE_UNSIGNED_LONG_LONG
+      fr_.areaperil_id = initialAreaperilID_;
+#else
+      fr_.areaperil_id = (unsigned int)initialAreaperilID_;
+#endif
 
       if (fr_.event_id != prevEventID_) {
 

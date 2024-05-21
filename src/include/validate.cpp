@@ -49,6 +49,29 @@ int Validate::CheckIDDoesNotExceedMaxLimit(char *idName, long long initialID) {
 
   }
 
-  return int(initialID);
+  return (int)initialID;
+
+}
+
+
+unsigned int Validate::CheckIDDoesNotExceedMaxLimit(char *idName,
+	unsigned long long initialID) {
+/* Check ID does not exceed maximum value for unsigned integers. */
+
+  // No need to check for negative numbers as ID is of unsigned long long data
+  // type and therefore negative numbers should exceed the maximum value for an
+  // unsigned integer (i.e. UINT_MAX).
+  if (initialID == 0 || initialID > UINT_MAX) {
+
+    fprintf(stderr, "ERROR: %s ID %lld on line %d does not lie within"
+		    " permitted range [%d, %u]. Please reassign %s IDs to lie"
+		    " within this range.\n",
+		    idName, (long long)initialID, lineno_, MIN_ID_, UINT_MAX,
+		    idName);
+    PrintErrorMessage();
+
+  }
+
+  return (unsigned int)initialID;
 
 }

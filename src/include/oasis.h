@@ -67,14 +67,14 @@ Author: Ben Matharu  email: ben.matharu@oasislmf.org
 // OASIS_INT and OASIS_FLOAT so its easy to change the size of the streams 
 typedef int32_t OASIS_INT ;
 
-// #define OASIS_FLOAT_TYPE_DOUBLE
+//#define OASIS_FLOAT_TYPE_DOUBLE
 #ifdef OASIS_FLOAT_TYPE_DOUBLE
 typedef double OASIS_FLOAT;
 #else
 typedef float OASIS_FLOAT;
 #endif
 
-// #define AREAPERIL_TYPE_UNSIGNED_LONG_LONG
+//#define AREAPERIL_TYPE_UNSIGNED_LONG_LONG
 #ifdef AREAPERIL_TYPE_UNSIGNED_LONG_LONG
 typedef unsigned long long AREAPERIL_INT;
 #else

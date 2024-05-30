@@ -101,7 +101,13 @@ int main(int argc, char *argv[]) {
 	validationCheck = false;
 	break;
       case 'v':
+#ifdef AREAPERIL_TYPE_UNSIGNED_LONG_LONG
+        fprintf(stderr, "%s : version : %s :"
+			" Areaperil ID data type unsigned long long\n",
+		argv[0], VERSION);
+#else
 	fprintf(stderr, "%s : version : %s\n", argv[0], VERSION);
+#endif
         exit(EXIT_FAILURE);
       case 'h':
       default:

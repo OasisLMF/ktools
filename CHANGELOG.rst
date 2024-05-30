@@ -1,6 +1,13 @@
 Ktools Changelog
 ================
 
+`v3.12.3`_
+ ---------
+* [#382](https://github.com/OasisLMF/ktools/pull/384) - footprinttocsv produces no output for large event IDs
+* [#383](https://github.com/OasisLMF/ktools/pull/385) - Event ID should not exceed MAX_INT when converting footprint file from csv to binary
+* [#379](https://github.com/OasisLMF/ktools/pull/379) - Release 3.12.2
+.. _`v3.12.3`:  https://github.com/OasisLMF/ktools/compare/v3.12.2...v3.12.3
+
 `v3.12.2`_
  ---------
 * [#375](https://github.com/OasisLMF/ktools/pull/376) - Update documentation for recent changes in validation tools

@@ -22,5 +22,23 @@ Test 07: footprint_07.csv
 ERROR: Duplicate intensity bin IDs.
 
 Test 08: footprint_08.csv
+ERROR: Event ID exceeds maximum signed 32-bit integer value.
+
+Test 09: footprint_09.csv
+ERROR: Event ID is 0.
+
+Test 10: footprint_10.csv
+ERROR: Event ID is negative.
+
+Test 11: footprint_11.csv
+ERROR: Areaperil ID exceeds maximum unsigned 32-bit integer value.
+
+Test 12: footprint_12.csv
+ERROR: Areaperil ID is 0.
+
+Test 13: footprint_13.csv
+ERROR: Areaperil ID is negative.
+
+Test 14: footprint_14.csv
 ERROR: Maximum intensity bin index exceeds that in header.
 (This test is only relevant for footprinttobin conversion tool.)

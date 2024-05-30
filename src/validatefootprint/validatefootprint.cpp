@@ -6,27 +6,15 @@
 
 
 int ValidateFootprint::ScanLine() {
-/* The areaperil_id field is defined according to the data type assigned to
- * AREAPERIL_INT in include/oasis.h
- * The probability field is defined according to the data type assigned to
+/* The probability field is defined according to the data type assigned to
  * OASIS_FLOAT in include/oasis.h */
 
-#ifdef AREAPERIL_TYPE_UNSIGNED_LONG_LONG
-  #ifdef OASIS_FLOAT_TYPE_DOUBLE
-  return sscanf(line_, "%d,%llu,%d,%lf", &fr_.event_id, &fr_.areaperil_id,
+#ifdef OASIS_FLOAT_TYPE_DOUBLE
+  return sscanf(line_, "%lld,%llu,%d,%lf", &initialEveID_, &initialAreaperilID_,
 				      &fr_.intensity_bin_id, &fr_.probability);
-  #else
-  return sscanf(line_, "%d,%llu,%d,%f", &fr_.event_id, &fr_.areaperil_id,
-				      &fr_.intensity_bin_id, &fr_.probability);
-  #endif
 #else
-  #ifdef OASIS_FLOAT_TYPE_DOUBLE
-  return sscanf(line_, "%d,%u,%d,%lf", &fr_.event_id, &fr_.areaperil_id,
+  return sscanf(line_, "%lld,%llu,%d,%f", &initialEveID_, &initialAreaperilID_,
 				      &fr_.intensity_bin_id, &fr_.probability);
-  #else
-  return sscanf(line_, "%d,%u,%d,%f", &fr_.event_id, &fr_.areaperil_id,
-				      &fr_.intensity_bin_id, &fr_.probability);
-  #endif
 #endif
 
 }
@@ -66,6 +54,16 @@ void ValidateFootprint::ReadFirstFootprintLine(OASIS_FLOAT &totalProbability) {
   if (fgets(line_, sizeof(line_), stdin) != 0) {
 
     if (ScanLine() == 4) {
+
+      fr_.event_id = CheckIDDoesNotExceedMaxLimit(eveIDName_, initialEveID_);
+#ifdef AREAPERIL_TYPE_UNSIGNED_LONG_LONG
+      // If areaperil ID is of data type unsigned long long, it is not possible
+      // to check for overflow
+      fr_.areaperil_id = initialAreaperilID_;
+#else
+      fr_.areaperil_id = CheckIDDoesNotExceedMaxLimit(areaperilIDName_,
+						      initialAreaperilID_);
+#endif
 
       // In the case when there are no validation checks to perform, the
       // initial previous event ID must still be set and line number
@@ -174,6 +172,16 @@ void ValidateFootprint::ReadFootprintFile() {
   while (fgets(line_, sizeof(line_), stdin) != 0) {
 
     if (ScanLine() == 4) {
+
+      fr_.event_id = CheckIDDoesNotExceedMaxLimit(eveIDName_, initialEveID_);
+#ifdef AREAPERIL_TYPE_UNSIGNED_LONG_LONG
+      // If areaperil ID is of data type unsigned long long, it is not possible
+      // to check for overflow
+      fr_.areaperil_id = initialAreaperilID_;
+#else
+      fr_.areaperil_id = CheckIDDoesNotExceedMaxLimit(areaperilIDName_,
+						      initialAreaperilID_);
+#endif
 
       // New event and/or areaperil IDs.
       // Check probabilities sum to 1.0 for each event ID-areaperil ID

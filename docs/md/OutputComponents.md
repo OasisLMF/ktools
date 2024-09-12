@@ -272,7 +272,7 @@ $ aalcalc [parameters] > aal.csv
 First generate summarycalc binaries by running the core workflow, for the required summary set
 $ eve 1 2 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - > work/summary1/summarycalc1.bin
 $ eve 2 2 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - > work/summary1/summarycalc2.bin
-'Then run aalcalc, pointing to the specified sub-directory of work containing summarycalc binaries.
+Then run aalcalc, pointing to the specified sub-directory of work containing summarycalc binaries.
 $ aalcalc -Ksummary1 > aal.csv  
 Add alct output at 95% confidence level
 $ aalcalc -Ksummary1 -o -l 0.95 -c alct.csv > aal.csv  
@@ -326,7 +326,7 @@ For type 2 the mean and standard deviation of the annual loss samples are calcul
 
 In ALCT, MeanLoss and SDLoss are the same as the type 2 mean and standard deviation from the AAL report. StandardError indicates how much the average annual loss estimate might vary if the simulation were rerun with different random numbers, reflecting the simulation error in the estimate. RelativeError, the StandardError as a percentage of the mean, is convenient for assessing simulation error and acceptable levels are typically expressed in percentage terms. StandardError is derived from the ANOVA metrics described below. 
 
-LowerCI and UpperCI represent the absolute lower and upper thresholds for the confident interval for the AAL estimate, indicating the range of losses within a specified confidence level. A higher confidence level results in a wider confidence interval.
+LowerCI and UpperCI represent the absolute lower and upper thresholds for the confidence interval for the AAL estimate, indicating the range of losses within a specified confidence level. A higher confidence level results in a wider confidence interval.
 
 **Variance components:**
 

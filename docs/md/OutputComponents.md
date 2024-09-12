@@ -233,6 +233,8 @@ aalcalc computes the overall average annual loss and standard deviation of annua
 
 Two types of aal and standard deviation of loss are calculated; analytical (type 1) and sample (type 2).  If the analysis is run with zero samples, then only type 1 statistics are returned by aalcalc.
 
+The Average Loss Converence Table 'ALCT' is a second optional output which can be generated from aalcalc. This provides extra statistical output which can be used to estimate the amount of simulation error in the average annual loss estimate from samples (type 2).
+
 ##### Internal data
 
 aalcalc requires the occurrence.bin file 
@@ -256,6 +258,7 @@ The reason for aalcalc not having an input stream is that the calculation is not
 ##### Parameters
 
 * -K{sub-directory}. The sub-directory of /work containing the input aalcalc binary files.
+* -o -l {confidence_level} -c {file path} - Generates the alct report in addition to the aalcalc report (optional)
 
 ##### Usage
 
@@ -266,31 +269,97 @@ $ aalcalc [parameters] > aal.csv
 ##### Examples
 
 ```
-'First generate summarycalc binaries by running the core workflow, for the required summary set
+First generate summarycalc binaries by running the core workflow, for the required summary set
 $ eve 1 2 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - > work/summary1/summarycalc1.bin
 $ eve 2 2 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - > work/summary1/summarycalc2.bin
 'Then run aalcalc, pointing to the specified sub-directory of work containing summarycalc binaries.
 $ aalcalc -Ksummary1 > aal.csv  
+Add alct output at 95% confidence level
+$ aalcalc -Ksummary1 -o -l 0.95 -c alct.csv > aal.csv  
 ```
 
 ##### Output
+
+**AAL:**
 
 csv file containing the following fields;
 
 | Name                | Type   |  Bytes | Description                                                         | Example     |
 |:--------------------|--------|--------| :-------------------------------------------------------------------|------------:|
-| summary_id          | int    |    4   | summary_id representing a grouping of losses                        |   10        |
-| type                | int    |    4   | 1 for analytical statistics, 2 for sample statistics                |    1        |
-| mean                | float  |    8   | average annual loss                                                 |    6785.9   |
-| standard_deviation  | float  |    8   | standard deviation of loss                                          |    54657.8  |
+| summary_id          | int    |    4   | summary_id representing a grouping of losses                        |   1         |
+| type                | int    |    4   | 1 for analytical statistics, 2 for sample statistics                |    2        |
+| mean                | float  |    8   | average annual loss                                                 |    1014.23  |
+| standard_deviation  | float  |    8   | standard deviation of annual loss                                   |    11039.78 |
 
+**ALCT:**
+
+csv file containing the following fields;
+
+| Name                | Type   |  Bytes | Description                                                         | Example     |
+|:--------------------|--------|--------| :-------------------------------------------------------------------|------------:|
+| SummaryId           | int    |    4   | summary_id representing a grouping of losses                        |   1         |
+| MeanLoss            | float  |    4   | the average annual loss estimate from samples                       |    1014.23  |
+| SDLoss              | float  |    8   | the standard deviation of annual loss from samples                  |    11039.78 |
+| SampleSize          | int    |    8   | the number of samples used to produce the statistics                |    100      |
+| LowerCI             | float  |    8   | the lower threshold of the confidence interval for the mean estimate|    1004.52  |
+| UpperCI             | float  |    8   | the upper threshold of the confidence interval for the mean estimate|    1023.94  |
+| StandardError       | float  |    8   | the total standard error of the mean estimate                       |    5.90     |
+| RelativeError       | float  |    8   | the StandardError divided by the mean estimate                      |    0.005    |
+| VarElementHaz       | float  |    8   | the contribution to variance of the estimate from the hazard        |    8707.40  |
+| StandardErrorHaz    | float  |    8   | the square root of VarElementHaz                                    |    93.31    |
+| RelativeErrorHaz    | float  |    8   | the StandardErrorHaz divided by the mean estimate                   |    0.092    |
+| VarElementVuln      | float  |    8   | the contribution to variance of the estimate from the vulnerability |    34.81    |
+| StandardErrorVuln   | float  |    8   | the square root of VarElementVuln                                   |    5.90     |
+| RelativeErrorVuln   | float  |    8   | the StandardErrorVuln divided by the mean estimate                  |    0.005    |
 
 ##### Calculation
 
-The occurrence file and summarycalc files from the specified subdirectory are read into memory. Event losses are assigned to period according to which period the events occur in and summed by period and by sample.
+The occurrence file and summarycalc files from the specified subdirectory are read into memory. Event losses are assigned to periods based on when the events occur and summed by period and by sample. These are referred to as 'annual loss samples'.
 
-For type 1, the mean and standard deviation of numerically integrated mean period losses are calculated across the periods. For type 2 the mean and standard deviation of the sampled period losses are calculated across all samples (sidx > 1) and periods. 
+**AAL calculation:**
 
+For type 1, calculations are performed on the type 1 (numerically integrated)  mean annual losses by period. The AAL is the mean annual losses summed across the periods and divided by the number of periods.  The standard deviation is the square root of the sum of squared errors between each annual mean loss and the AAL mean divided by the degrees of freedom (periods - 1). 
+
+For type 2 the mean and standard deviation of the annual loss samples are calculated across all samples and periods. The mean estimates the average annual loss, calculated as the sum of all annual loss samples divided by the total number of periods times the number of samples. The standard deviation is the square root of the sum of squared errors between each annual loss sample and the type 2 mean, divided by the degrees of freedom (periods × samples - 1).
+
+**ALCT calculation:**
+
+In ALCT, MeanLoss and SDLoss are the same as the type 2 mean and standard deviation from the AAL report. StandardError indicates how much the average annual loss estimate might vary if the simulation were rerun with different random numbers, reflecting the simulation error in the estimate. RelativeError, the StandardError as a percentage of the mean, is convenient for assessing simulation error and acceptable levels are typically expressed in percentage terms. StandardError is derived from the ANOVA metrics described below. 
+
+LowerCI and UpperCI represent the absolute lower and upper thresholds for the confident interval for the AAL estimate, indicating the range of losses within a specified confidence level. A higher confidence level results in a wider confidence interval.
+
+**Variance components:**
+
+VarElementHaz and VarElementVuln arise from attributing variance in the annual loss to hazard effects (variation due to event intensity across years) and vulnerability effects (variation due to sampling from exposure's damage uncertainty distributions). This is done using a one-factor effects model and standard analysis of variance 'ANOVA' on the annual loss samples.
+
+In the one-factor model, annual loss in year i and sample m, denoted L(i,m), is expressed as:
+
+L(i,m) = AAL + h(i) + v(i,m)
+
+where;
+
+* i = 1,2,.. to I years (periods)
+* m = 1,2,.. to M samples
+* h(i) = mean loss for year i - AAL
+* v(i,m) = L(i,m) - mean loss for year i
+* I is the total number of years (periods) in the model
+* M is the number of samples specified at runtime by the user
+
+Total variance in annual loss is partitioned into independent hazard and vulnerability effects:
+
+Var(L) = Var(h) + Var(v)
+
+ANOVA is used to estimate the variance components Var(h) and Var(v). For standard Oasis models, since the events are fixed across years, the simulation error in the AAL estimate arises only from the vulnerability component.
+
+The StandardError of the AAL estimate in ALCT follows from the calculation of the Variance of the AAL estimate as follows;
+
+Var(AAL estimate) = VarElementVuln = Var(v) / (I * M)
+
+StandardErrorVuln = sqrt(VarElementVuln)
+
+StandardError = StandardErrorVuln
+
+Finally, ALCT provides statistics for multiple increasing sample subsets, showing the convergence of the AAL estimate with increasing sample sizes. These subsets are non-overlapping and fixed, starting with SampleSize=1 (m=1), SampleSize=2 (m=2 to 3), SampleSize=4 (m=4 to 7), up to the maximum subset size. The final row gives statistics for the total samples M, using all available samples.
 
 ##### Period weightings
 
@@ -301,6 +370,12 @@ All period_nos must appear in the file from 1 to P (no gaps). There is no constr
 This feature will be invoked automatically if the periods.bin file is present in the input directory.
 
 [Return to top](#outputcomponents)
+
+#### Parameters
+
+Optional parameter for aalcalc;
+
+* -c {file path} - Generate the alct report
 
 ### kat <a id="kat"></a>
 ***

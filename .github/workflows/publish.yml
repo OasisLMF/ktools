@@ -103,13 +103,13 @@ jobs:
     # --- Download and test build --- #
 
     - name: Download Linux binaies
-      uses: actions/download-artifact@v4.1.7
+      uses: actions/download-artifact@v4
       with:
         name: Linux_x86_64
         path: ${{ github.workspace }}/
 
     - name: Download Darwin binaies
-      uses: actions/download-artifact@v4.1.7
+      uses: actions/download-artifact@v4
       with:
         name: Darwin_x86_64
         path: ${{ github.workspace }}/
@@ -132,14 +132,14 @@ jobs:
         ./ordleccalc -v 2> ordleccalc_version
 
     - name: 'store eve version'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: eve_version
         path: ${{ env.KTOOLS_TEST_DIR }}/eve_version
         retention-days: 5
 
     - name: 'store ordleccalc version'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ordleccalc_version
         path: ${{ env.KTOOLS_TEST_DIR }}/ordleccalc_version

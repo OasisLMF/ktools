@@ -262,6 +262,27 @@ inline void aalcalc::calculatemeansddev(const aal_rec_T &record,
 
 }
 
+inline void aalcalc::calculatemeansddev(const aal_rec_period &record,
+					const int sample_size, const int p1,
+					const int p2, const int periods,
+					double &mean, double &sd_dev,
+					double &var_vuln, double &var_haz) {
+
+	calculatemeansddev(record, sample_size, p1, p2, periods, mean, sd_dev);
+	double mean_period = record.mean_period / (sample_size * sample_size);
+
+	// Vulnerability contribution
+	double v1 = record.mean_squared - sample_size * mean_period;
+	double v2 = v1 / (sample_size * periods - sample_size);
+	var_vuln = v2 / (sample_size * periods);
+
+	// Hazard contribution
+	double h1 = mean_period - periods * mean * mean;
+	double h2 = sample_size * h1 / (periods - 1);
+	var_haz = h2 / (sample_size * periods);
+
+}
+
 double aalcalc::calculateconfidenceinterval(const double std_err) {
 
 	// Find p-value above 0.5
@@ -400,35 +421,43 @@ void aalcalc::output_alct(std::map<int, std::vector<aal_rec_period>>& vec_aal)
 		alct_outFile_ += ".csv";
 	}
 	FILE * fout = fopen(alct_outFile_.c_str(), "wb");
-	fprintf(fout, "SummaryId,MeanLoss,SDLoss,SampleSize,LowerCI,UpperCI,"
-		      "StandardError,RelativeError\n");
 /*	fprintf(fout, "SummaryId,MeanLoss,SDLoss,SampleSize,LowerCI,UpperCI,"
+		      "StandardError,RelativeError\n");*/
+	fprintf(fout, "SummaryId,MeanLoss,SDLoss,SampleSize,LowerCI,UpperCI,"
 		      "StandardError,RelativeError,VarElementHaz,"
 		      "StandardErrorHaz,RelativeErrorHaz,VarElementVuln,"
-		      "StandardErrorVuln,RelativeErrorVuln\n");*/
+		      "StandardErrorVuln,RelativeErrorVuln\n");
 
 	if (!samplesize_) return;
 
 	for (int summary_id = 1; summary_id < max_summary_id_ + 1; summary_id++) {
 		for (auto iter = vec_aal.begin(); iter != vec_aal.end(); ++iter)
 		{
-			double mean, sd_dev;
+			double mean, sd_dev, var_vuln, var_haz;
 			int p1 = no_of_periods_ * iter->first;
 			int p2 = p1 - 1;
 			calculatemeansddev(iter->second[summary_id],
 					   iter->first, p1, p2, no_of_periods_,
-					   mean, sd_dev);
-			double std_err = sd_dev / sqrt(p1);
+					   mean, sd_dev, var_vuln, var_haz);
+			double std_err = sqrt(var_vuln);
 			double ci = calculateconfidenceinterval(std_err);
+			double std_err_haz = sqrt(var_haz);
+			double std_err_vuln = sqrt(var_vuln);
+			double lower_ci = 0;
+			double upper_ci = 0;
+			if (ci>0) lower_ci= mean - ci;
+			if (ci>0) upper_ci= mean + ci;
 
 			const int bufferSize = 4096;
 			char buffer[bufferSize];
 			int strLen;
 			strLen = snprintf(buffer, bufferSize,
-					  "%d,%f,%f,%d,%f,%f,%f,%f\n",
+					  "%d,%f,%f,%d,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f\n",
 					  summary_id, mean, sd_dev, iter->first,
-					  mean - ci, mean + ci, std_err,
-					  std_err / mean);
+					  lower_ci, upper_ci, std_err,
+					  std_err/mean, var_haz, std_err_haz,
+					  std_err_haz/mean, var_vuln,
+					  std_err_vuln, std_err_vuln/mean);
 			outputrows(buffer, strLen, fout);
 		}
 	}
@@ -444,19 +473,27 @@ void aalcalc::output_alct_parquet(std::map<int, std::vector<aal_rec_period>>& ve
 	for (int summary_id = 1; summary_id < max_summary_id_ + 1; summary_id++) {
 		for (auto iter = vec_aal.begin(); iter != vec_aal.end(); ++iter)
 		{
-			double mean, sd_dev;
+			double mean, sd_dev, var_vuln, var_haz;
 			int p1 = no_of_periods_ * iter->first;
 			int p2 = p1 - 1;
 			calculatemeansddev(iter->second[summary_id],
 					   iter->first, p1, p2, no_of_periods_,
-					   mean, sd_dev);
-			double std_err = sd_dev / sqrt(p1);
+					   mean, sd_dev, var_vuln, var_haz);
+			double std_err = sqrt(var_vuln);
 			double ci = calculateconfidenceinterval(std_err);
-
+			double std_err_haz = sqrt(var_haz);
+			double std_err_vuln = sqrt(var_vuln);
+			double lower_ci = 0;
+			double upper_ci = 0;
+			if (ci>0) lower_ci= mean - ci;
+			if (ci>0) upper_ci= mean + ci;
 			os << summary_id << (float)mean << (float)sd_dev
-			   << iter->first << (float)(mean - ci)
-			   << (float)(mean + ci) << (float)std_err
-			   << (float)(std_err/mean) << parquet::EndRow;
+			   << iter->first << (float)lower_ci
+			   << (float)upper_ci << (float)std_err
+			   << (float)(std_err/mean) << (float)var_haz
+			   << (float)std_err_haz << (float)(std_err_haz/mean)
+			   << (float)var_vuln << (float)std_err_vuln
+			   << (float)(std_err_vuln/mean) << parquet::EndRow;
 		}
 	}
 }
@@ -532,7 +569,24 @@ void aalcalc::outputresultscsv_new()
 			parquetFields_alct.push_back(
 				{"RelativeError", parquet::Type::FLOAT,
 				parquet::ConvertedType::NONE});
-
+			parquetFields_alct.push_back(
+				{"VarElementHaz", parquet::Type::FLOAT,
+				parquet::ConvertedType::NONE});
+			parquetFields_alct.push_back(
+				{"StandardErrorHaz", parquet::Type::FLOAT,
+				parquet::ConvertedType::NONE});
+			parquetFields_alct.push_back(
+				{"RelativeErrorHaz", parquet::Type::FLOAT,
+				parquet::ConvertedType::NONE});
+			parquetFields_alct.push_back(
+				{"VarElementVuln", parquet::Type::FLOAT,
+				parquet::ConvertedType::NONE});
+			parquetFields_alct.push_back(
+				{"StandardErrorVuln", parquet::Type::FLOAT,
+				parquet::ConvertedType::NONE});
+			parquetFields_alct.push_back(
+				{"RelativeErrorVuln", parquet::Type::FLOAT,
+				parquet::ConvertedType::NONE});
 			// Ensure file has parquet extension to prevent conflict
 			// with potential csv format output file
 			std::string parquet_alct_outFile = alct_outFile_;

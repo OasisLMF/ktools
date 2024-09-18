@@ -79,7 +79,7 @@ jobs:
 
     - name: Store ktest output
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: darwin_testout
         path: ${{ github.workspace }}/ktest/testout
@@ -91,7 +91,7 @@ jobs:
         tar -zcvf ${{ github.workspace }}/Darwin_x86_64.tar.gz ./
 
     - name: 'Upload Ktool binaries - x86'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Darwin_x86_64
         path: Darwin_x86_64.tar.gz
@@ -152,14 +152,14 @@ jobs:
 
     - name: Store ktest output
       if: always()
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: linux_testout
         path: ${{ github.workspace }}/ktest/testout
         retention-days: 3
 
     - name: 'Store Linux build'
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Linux_x86_64
         path: ./tar/Linux_x86_64.tar.gz

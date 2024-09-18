@@ -1,6 +1,14 @@
 Ktools Changelog
 ================
 
+`v3.12.4`_
+ ---------
+* [#386](https://github.com/OasisLMF/ktools/pull/386) - Release 3.12.3
+* [#387](https://github.com/OasisLMF/ktools/pull/387) - Bump actions/download-artifact from 3 to 4.1.7 in /.github/workflows
+* [#390](https://github.com/OasisLMF/ktools/pull/390) - Average Loss Convergence Table (ALCT) fix
+* [#391](https://github.com/OasisLMF/ktools/pull/391) - Fix GH actions artifact
+.. _`v3.12.4`:  https://github.com/OasisLMF/ktools/compare/v3.12.3...v3.12.4
+
 `v3.12.3`_
  ---------
 * [#382](https://github.com/OasisLMF/ktools/pull/384) - footprinttocsv produces no output for large event IDs

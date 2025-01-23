@@ -10,13 +10,13 @@ AC_CONFIG_MACRO_DIR([m4])
 AC_LANG([C])
 AC_LANG([C++])
 
-AC_MSG_CHECKING([Check for /usr/bin/md5sum ])
-if [[ -f /usr/bin/md5sum ]];
+AC_MSG_CHECKING([Check for /usr/bin/md5sum or /usr/local/bin/md5sum ])
+if [[ -f /usr/bin/md5sum ]] || [[ -f /usr/local/bin/md5sum ]];
 then
 	AC_MSG_RESULT([yes])
 else
 	AC_MSG_RESULT([no])
-	AC_MSG_NOTICE([ /usr/bin/md5sum not found - cannot do make check])
+	AC_MSG_NOTICE([ /usr/bin/md5sum and /usr/local/bin/md5sum not found - cannot do make check])
 fi
 
 AC_ARG_ENABLE(debug,

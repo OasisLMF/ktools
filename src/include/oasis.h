@@ -334,7 +334,7 @@ struct AggregateVulnerability
 
 struct VulnerabilityWeight
 {
-	int areaperil_id;
+	AREAPERIL_INT areaperil_id;
 	int vulnerability_id;
 	OASIS_FLOAT weight;
 };

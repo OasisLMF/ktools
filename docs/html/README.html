@@ -1,447 +1,335 @@
 <!DOCTYPE html>
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
 <head>
-<title>README.md</title>
-<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
-
-<style>
-/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) Microsoft Corporation. All rights reserved.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
-
-body {
-	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
-	font-size: var(--vscode-markdown-font-size, 14px);
-	padding: 0 26px;
-	line-height: var(--vscode-markdown-line-height, 22px);
-	word-wrap: break-word;
-}
-
-#code-csp-warning {
-	position: fixed;
-	top: 0;
-	right: 0;
-	color: white;
-	margin: 16px;
-	text-align: center;
-	font-size: 12px;
-	font-family: sans-serif;
-	background-color:#444444;
-	cursor: pointer;
-	padding: 6px;
-	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
-}
-
-#code-csp-warning:hover {
-	text-decoration: none;
-	background-color:#007acc;
-	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
-}
-
-body.scrollBeyondLastLine {
-	margin-bottom: calc(100vh - 22px);
-}
-
-body.showEditorSelection .code-line {
-	position: relative;
-}
-
-body.showEditorSelection .code-active-line:before,
-body.showEditorSelection .code-line:hover:before {
-	content: "";
-	display: block;
-	position: absolute;
-	top: 0;
-	left: -12px;
-	height: 100%;
-}
-
-body.showEditorSelection li.code-active-line:before,
-body.showEditorSelection li.code-line:hover:before {
-	left: -30px;
-}
-
-.vscode-light.showEditorSelection .code-active-line:before {
-	border-left: 3px solid rgba(0, 0, 0, 0.15);
-}
-
-.vscode-light.showEditorSelection .code-line:hover:before {
-	border-left: 3px solid rgba(0, 0, 0, 0.40);
-}
-
-.vscode-light.showEditorSelection .code-line .code-line:hover:before {
-	border-left: none;
-}
-
-.vscode-dark.showEditorSelection .code-active-line:before {
-	border-left: 3px solid rgba(255, 255, 255, 0.4);
-}
-
-.vscode-dark.showEditorSelection .code-line:hover:before {
-	border-left: 3px solid rgba(255, 255, 255, 0.60);
-}
-
-.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
-	border-left: none;
-}
-
-.vscode-high-contrast.showEditorSelection .code-active-line:before {
-	border-left: 3px solid rgba(255, 160, 0, 0.7);
-}
-
-.vscode-high-contrast.showEditorSelection .code-line:hover:before {
-	border-left: 3px solid rgba(255, 160, 0, 1);
-}
-
-.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
-	border-left: none;
-}
-
-img {
-	max-width: 100%;
-	max-height: 100%;
-}
-
-a {
-	text-decoration: none;
-}
-
-a:hover {
-	text-decoration: underline;
-}
-
-a:focus,
-input:focus,
-select:focus,
-textarea:focus {
-	outline: 1px solid -webkit-focus-ring-color;
-	outline-offset: -1px;
-}
-
-hr {
-	border: 0;
-	height: 2px;
-	border-bottom: 2px solid;
-}
-
-h1 {
-	padding-bottom: 0.3em;
-	line-height: 1.2;
-	border-bottom-width: 1px;
-	border-bottom-style: solid;
-}
-
-h1, h2, h3 {
-	font-weight: normal;
-}
-
-table {
-	border-collapse: collapse;
-}
-
-table > thead > tr > th {
-	text-align: left;
-	border-bottom: 1px solid;
-}
-
-table > thead > tr > th,
-table > thead > tr > td,
-table > tbody > tr > th,
-table > tbody > tr > td {
-	padding: 5px 10px;
-}
-
-table > tbody > tr + tr > td {
-	border-top: 1px solid;
-}
-
-blockquote {
-	margin: 0 7px 0 5px;
-	padding: 0 16px 0 10px;
-	border-left-width: 5px;
-	border-left-style: solid;
-}
-
-code {
-	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
-	font-size: 1em;
-	line-height: 1.357em;
-}
-
-body.wordWrap pre {
-	white-space: pre-wrap;
-}
-
-pre:not(.hljs),
-pre.hljs code > div {
-	padding: 16px;
-	border-radius: 3px;
-	overflow: auto;
-}
-
-pre code {
-	color: var(--vscode-editor-foreground);
-	tab-size: 4;
-}
-
-/** Theming */
-
-.vscode-light pre {
-	background-color: rgba(220, 220, 220, 0.4);
-}
-
-.vscode-dark pre {
-	background-color: rgba(10, 10, 10, 0.4);
-}
-
-.vscode-high-contrast pre {
-	background-color: rgb(0, 0, 0);
-}
-
-.vscode-high-contrast h1 {
-	border-color: rgb(0, 0, 0);
-}
-
-.vscode-light table > thead > tr > th {
-	border-color: rgba(0, 0, 0, 0.69);
-}
-
-.vscode-dark table > thead > tr > th {
-	border-color: rgba(255, 255, 255, 0.69);
-}
-
-.vscode-light h1,
-.vscode-light hr,
-.vscode-light table > tbody > tr + tr > td {
-	border-color: rgba(0, 0, 0, 0.18);
-}
-
-.vscode-dark h1,
-.vscode-dark hr,
-.vscode-dark table > tbody > tr + tr > td {
-	border-color: rgba(255, 255, 255, 0.18);
-}
-
-</style>
-
-<style>
-/* Tomorrow Theme */
-/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
-/* Original theme - https://github.com/chriskempson/tomorrow-theme */
-
-/* Tomorrow Comment */
-.hljs-comment,
-.hljs-quote {
-	color: #8e908c;
-}
-
-/* Tomorrow Red */
-.hljs-variable,
-.hljs-template-variable,
-.hljs-tag,
-.hljs-name,
-.hljs-selector-id,
-.hljs-selector-class,
-.hljs-regexp,
-.hljs-deletion {
-	color: #c82829;
-}
-
-/* Tomorrow Orange */
-.hljs-number,
-.hljs-built_in,
-.hljs-builtin-name,
-.hljs-literal,
-.hljs-type,
-.hljs-params,
-.hljs-meta,
-.hljs-link {
-	color: #f5871f;
-}
-
-/* Tomorrow Yellow */
-.hljs-attribute {
-	color: #eab700;
-}
-
-/* Tomorrow Green */
-.hljs-string,
-.hljs-symbol,
-.hljs-bullet,
-.hljs-addition {
-	color: #718c00;
-}
-
-/* Tomorrow Blue */
-.hljs-title,
-.hljs-section {
-	color: #4271ae;
-}
-
-/* Tomorrow Purple */
-.hljs-keyword,
-.hljs-selector-tag {
-	color: #8959a8;
-}
-
-.hljs {
-	display: block;
-	overflow-x: auto;
-	color: #4d4d4c;
-	padding: 0.5em;
-}
-
-.hljs-emphasis {
-	font-style: italic;
-}
-
-.hljs-strong {
-	font-weight: bold;
-}
-</style>
-
-<style>
-/*
- * Markdown PDF CSS
- */
-
- body {
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
-	padding: 0 12px;
-}
-
-pre {
-	background-color: #f8f8f8;
-	border: 1px solid #cccccc;
-	border-radius: 3px;
-	overflow-x: auto;
-	white-space: pre-wrap;
-	overflow-wrap: break-word;
-}
-
-pre:not(.hljs) {
-	padding: 23px;
-	line-height: 19px;
-}
-
-blockquote {
-	background: rgba(127, 127, 127, 0.1);
-	border-color: rgba(0, 122, 204, 0.5);
-}
-
-.emoji {
-	height: 1.4em;
-}
-
-code {
-	font-size: 14px;
-	line-height: 19px;
-}
-
-/* for inline code */
-:not(pre):not(.hljs) > code {
-	color: #C9AE75; /* Change the old color so it seems less like an error */
-	font-size: inherit;
-}
-
-/* Page Break : use <div class="page"/> to insert page break
--------------------------------------------------------- */
-.page {
-	page-break-after: always;
-}
-
-</style>
-
-<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>README</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
 </head>
 <body>
-  <script>
-    mermaid.initialize({
-      startOnLoad: true,
-      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
-          ? 'dark'
-          : 'default'
-    });
-  </script>
-<img src="https://oasislmf.org/packages/oasis_theme_package/themes/oasis_theme/assets/src/oasis-lmf-colour.png" alt="Oasis LMF logo" width="250"/>
-<p><a href="https://github.com/OasisLMF/ktools/releases"><img src="https://img.shields.io/github/tag/Oasislmf/ktools?label=ktools" alt="ktools version"></a>
-<a href="https://travis-ci.com/OasisLMF/ktools"><img src="https://img.shields.io/travis/com/OasisLMF/ktools/master?label=Build OSX " alt="Travis (.com) branch"></a>
-<a href="https://ci.oasislmfdev.org/job/oasis_ktools/job/master/"><img src="https://ci.oasislmfdev.org/buildStatus/icon?job=oasis_ktools/master" alt="Build Status"></a></p>
+<p><img src="https://oasislmf.org/packages/oasis_theme_package/themes/oasis_theme/assets/src/oasis-lmf-colour.png" alt="Oasis LMF logo" width="250"/></p>
+<p><a href="https://github.com/OasisLMF/ktools/releases"><img
+src="https://img.shields.io/github/tag/Oasislmf/ktools?label=ktools"
+alt="ktools version" /></a> <a
+href="https://github.com/OasisLMF/ktools/actions/workflows/build.yml"><img
+src="https://github.com/OasisLMF/ktools/actions/workflows/build.yml/badge.svg?branch=master&amp;event=push"
+alt="Ktools Build" /></a></p>
 <h1 id="ktools">ktools</h1>
 <p>This is the POSIX-compliant Oasis LMF In-Memory Kernel toolkit.</p>
 <h3 id="release">Release</h3>
-<p>Please click <a href="https://github.com/OasisLMF/ktools/releases">here</a> to download the latest release.</p>
-<p>The source code will change on a regular basis but only the releases are supported. Support enquiries should be sent to support@oasislmf.org.</p>
+<p>Please click <a
+href="https://github.com/OasisLMF/ktools/releases">here</a> to download
+the latest release.</p>
+<p>The source code will change on a regular basis but only the releases
+are supported. Support enquiries should be sent to <a
+href="mailto:support@oasislmf.org"
+class="email">support@oasislmf.org</a>.</p>
 <p>There are build instructions for Windows 64-bit executables.</p>
-<p>Note that the dynamic random number option in the Windows build uses a deterministic seed due to a bug in the mingw compiler. We recommend the random number file option (gulcalc -r) should be used in Windows.</p>
-<p>This issue will be handled in future releases by implementing the rdrand random number generator in all environments.</p>
+<p>Note that the dynamic random number option in the Windows build uses
+a deterministic seed due to a bug in the mingw compiler. We recommend
+the random number file option (gulcalc -r) should be used in
+Windows.</p>
+<p>This issue will be handled in future releases by implementing the
+rdrand random number generator in all environments.</p>
 <h2 id="linux-installation">Linux Installation</h2>
 <h3 id="pre-requisites">Pre-requisites</h3>
-<p>The g++ compiler build-essential, libtool, zlib1g-dev, autoconf, pkg-config on debian distros or 'Development Tools' and zlib-devel on red hat  needs to be installed in Linux.</p>
-<p>To enable Parquet format outputs (optional), version 7.0.0 of the Arrow Apache library is required. The recommended method is to build the library from source as follows;</p>
-<pre class="hljs"><code><div>$ mkdir build
+<p>The g++ compiler build-essential, libtool, zlib1g-dev, autoconf,
+pkg-config on debian distros or 'Development Tools' and zlib-devel on
+red hat needs to be installed in Linux.</p>
+<p>To enable Parquet format outputs (optional), version 7.0.0 of the
+Arrow Apache library is required. The recommended method is to build the
+library from source as follows;</p>
+<pre><code>$ mkdir build
 $ cd build
 $ git clone https://github.com/apache/arrow.git -b release-7.0.0
 $ mkdir -p arrow/cpp/build-release
 $ cd build/arrow/cpp/build-release
 $ cmake -DARROW_PARQUET=ON -DARROW_BUILD_STATIC=ON -DARROW_OPTIONAL_INSTALL=ON ..
 $ make -j$(nproc)
-$ make install
-</div></code></pre>
-<p><a href="https://arrow.apache.org/docs/developers/cpp/building.html">More information on Arrow Apache</a>.</p>
+$ make install</code></pre>
+<p><a
+href="https://arrow.apache.org/docs/developers/cpp/building.html">More
+information on Arrow Apache</a>.</p>
 <h3 id="instructions">Instructions</h3>
 <p>Copy ktools-[version].tar.gz onto your machine and untar.</p>
-<pre class="hljs"><code><div>$ tar -xvf ktools-[version].tar.gz
-</div></code></pre>
-<p>Go into the ktools folder and  autogen using the following command;</p>
-<pre class="hljs"><code><div>$ <span class="hljs-built_in">cd</span> ktools-[version]
-$ ./autogen.sh
-</div></code></pre>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> tar <span class="at">-xvf</span> ktools-<span class="pp">[</span><span class="ss">version</span><span class="pp">]</span>.tar.gz</span></code></pre></div>
+<p>Go into the ktools folder and autogen using the following
+command;</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> cd ktools-<span class="pp">[</span><span class="ss">version</span><span class="pp">]</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> ./autogen.sh</span></code></pre></div>
 <p>Configure using the following command;</p>
-<pre class="hljs"><code><div>$ ./configure
-</div></code></pre>
-<p>The configure script will attempt to find and link the appropriate Apache libraries to enable Parquet format output.  This search for these libraries can be disabled manually with an extra flag:</p>
-<pre class="hljs"><code><div>$ ./configure --disable-parquet
-</div></code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> ./configure</span></code></pre></div>
+<p>The configure script will attempt to find and link the appropriate
+Apache libraries to enable Parquet format output. This search for these
+libraries can be disabled manually with an extra flag:</p>
+<pre><code>$ ./configure --disable-parquet</code></pre>
 <p>On OS X add an extra flag:</p>
-<pre class="hljs"><code><div>$ ./configure --<span class="hljs-built_in">enable</span>-osx
-</div></code></pre>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> ./configure <span class="at">--enable-osx</span></span></code></pre></div>
 <p>Make using the following command;</p>
-<pre class="hljs"><code><div>$ make
-</div></code></pre>
-<p>Next run the automated test to check the build and numerical results;</p>
-<pre class="hljs"><code><div>$ make check
-</div></code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> make</span></code></pre></div>
+<p>Next run the automated test to check the build and numerical
+results;</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> make check</span></code></pre></div>
 <p>Finally, install the executables using the following command;</p>
-<pre class="hljs"><code><div>$ [sudo] make install
-</div></code></pre>
-<p>The installation is complete. The executables are located in /usr/local/bin.</p>
-<p>If installing the latest code from the git repository, clone the ktools repository onto your machine.</p>
-<p>Go into the ktools folder and  autogen using the following command;</p>
-<pre class="hljs"><code><div>$ <span class="hljs-built_in">cd</span> ktools
-$ ./autogen.sh
-</div></code></pre>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> <span class="pp">[</span><span class="ss">sudo</span><span class="pp">]</span> make install</span></code></pre></div>
+<p>The installation is complete. The executables are located in
+/usr/local/bin.</p>
+<p>If installing the latest code from the git repository, clone the
+ktools repository onto your machine.</p>
+<p>Go into the ktools folder and autogen using the following
+command;</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> cd ktools</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> ./autogen.sh</span></code></pre></div>
 <p>Follow the rest of the process as described above.</p>
 <h3 id="cmake-build---experimental">Cmake build - Experimental</h3>
-<p>Install Cmake from either system packages or <a href="https://cmake.org/download/">cmake.org</a>.</p>
-<pre class="hljs"><code><div><span class="hljs-comment"># create the build directory within ktools directory</span>
-$ mkdir build &amp;&amp; <span class="hljs-built_in">cd</span> build
-$ ktools_source_dir=~/ktools
-<span class="hljs-comment"># Generate files and specify destination (here is in ./local/bin)</span>
-$ cmake -G <span class="hljs-string">"Unix Makefiles"</span> -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=~/.<span class="hljs-built_in">local</span> <span class="hljs-variable">$ktools_source_dir</span>
-
-<span class="hljs-comment"># Build</span>
-$ make all <span class="hljs-built_in">test</span>
-
-<span class="hljs-comment"># If all is OK, install to bin subdir of the specified install prefix</span>
-$ make install
-</div></code></pre>
+<p>Install Cmake from either system packages or <a
+href="https://cmake.org/download/">cmake.org</a>.</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># create the build directory within ktools directory</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> mkdir build <span class="kw">&amp;&amp;</span> <span class="bu">cd</span> build</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> ktools_source_dir=~/ktools</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate files and specify destination (here is in ./local/bin)</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> cmake <span class="at">-G</span> <span class="st">&quot;Unix Makefiles&quot;</span> <span class="at">-DCMAKE_BUILD_TYPE</span><span class="op">=</span>Release <span class="at">-DCMAKE_INSTALL_PREFIX</span><span class="op">=</span>~/.local <span class="va">$ktools_source_dir</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Build</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> make all test</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="co"># If all is OK, install to bin subdir of the specified install prefix</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> make install</span></code></pre></div>
 <h2 id="windows-installation">Windows Installation</h2>
-<h3 id="pre-requisites">Pre-requisites</h3>
-<p>MSYS2 64-bit is required for the Windows native build.  MSYS2 is a Unix/Linux like development environment for building and distributing windows applications.
-https://www.msys2.org/</p>
+<h3 id="pre-requisites-1">Pre-requisites</h3>
+<p>MSYS2 64-bit is required for the Windows native build. MSYS2 is a
+Unix/Linux like development environment for building and distributing
+windows applications. <a href="https://www.msys2.org/"
+class="uri">https://www.msys2.org/</a></p>
 <p>Download and run the set-up program for MSYS2 64-bit.</p>
 <p>Open a MSYS2 terminal and perform the updates before continuing.</p>
 <p>The following add-in packages are required;</p>
@@ -454,44 +342,52 @@ https://www.msys2.org/</p>
 <li>mingw-w64-x86_64-toolchain</li>
 <li>python</li>
 </ul>
-<p>These packages can be installed at the MSYS2 terminal command line.</p>
-<pre class="hljs"><code><div>$ pacman -S autoconf automake git libtool make mingw-w64-x86_64-toolchain python
-</div></code></pre>
-<p><img src="docs/img/msys2packages.jpg" alt="alt text" title="Install add-in packages"></p>
-<h3 id="instructions">Instructions</h3>
+<p>These packages can be installed at the MSYS2 terminal command
+line.</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> pacman <span class="at">-S</span> autoconf automake git libtool make mingw-w64-x86_64-toolchain python</span></code></pre></div>
+<p><img src="docs/img/msys2packages.jpg" title="Install add-in packages"
+alt="alt text" /></p>
+<h3 id="instructions-1">Instructions</h3>
 <p>Clone the github repository at the MSYS2 terminal command line</p>
-<pre class="hljs"><code><div>$ git <span class="hljs-built_in">clone</span> https://github.com/OasisLMF/ktools.git
-</div></code></pre>
-<p>Go into the ktools folder and run autogen using the following command;</p>
-<pre class="hljs"><code><div>$ <span class="hljs-built_in">cd</span> ktools
-$ ./autogen.sh
-</div></code></pre>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> git clone https://github.com/OasisLMF/ktools.git</span></code></pre></div>
+<p>Go into the ktools folder and run autogen using the following
+command;</p>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> cd ktools</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> ./autogen.sh</span></code></pre></div>
 <p>Configure using the following command;</p>
-<pre class="hljs"><code><div>$ ./configure
-</div></code></pre>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> ./configure</span></code></pre></div>
 <p>Make using the following command;</p>
-<pre class="hljs"><code><div>$ make
-</div></code></pre>
-<p>Next run the automated test to check the build and numerical results;</p>
-<pre class="hljs"><code><div>$ make check
-</div></code></pre>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> make</span></code></pre></div>
+<p>Next run the automated test to check the build and numerical
+results;</p>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> make check</span></code></pre></div>
 <p>Finally, install the executables using the following command;</p>
-<pre class="hljs"><code><div>$ make install
-</div></code></pre>
-<p>The installation is complete. The executables are located in /usr/local/bin.</p>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> make install</span></code></pre></div>
+<p>The installation is complete. The executables are located in
+/usr/local/bin.</p>
 <h2 id="usage">Usage</h2>
-<p>There is sample data and six example scripts which demonstrate how to invoke ktools in the /examples folder. These are written in python v2.</p>
-<p>For example, to run the eltcalc_example script, go into the examples folder and run the following command (you must have python installed):</p>
-<pre class="hljs"><code><div>$ <span class="hljs-built_in">cd</span> examples
-$ python eltcalc_example.py 
-</div></code></pre>
+<p>There is sample data and six example scripts which demonstrate how to
+invoke ktools in the /examples folder. These are written in python
+v2.</p>
+<p>For example, to run the eltcalc_example script, go into the examples
+folder and run the following command (you must have python
+installed):</p>
+<div class="sourceCode" id="cb19"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> cd examples</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="ex">$</span> python eltcalc_example.py</span></code></pre></div>
 <p>To build linux docker image do following command</p>
-<pre class="hljs"><code><div>docker build --file Dockerfile.ktools.alpine -t alpine-ktools .
-</div></code></pre>
+<pre><code>docker build --file Dockerfile.ktools.alpine -t alpine-ktools .</code></pre>
 <h2 id="questionsproblems">Questions/problems?</h2>
-<p>Email support@oasislmf.org</p>
+<p>Email <a href="mailto:support@oasislmf.org"
+class="email">support@oasislmf.org</a></p>
 <h2 id="license">License</h2>
 <p>The code in this project is licensed under BSD 3-clause license.</p>
-
 </body>
 </html>

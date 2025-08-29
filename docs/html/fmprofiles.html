@@ -1,535 +1,435 @@
 <!DOCTYPE html>
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
 <head>
-<title>fmprofiles.md</title>
-<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
-
-<style>
-/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) Microsoft Corporation. All rights reserved.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
-
-body {
-	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
-	font-size: var(--vscode-markdown-font-size, 14px);
-	padding: 0 26px;
-	line-height: var(--vscode-markdown-line-height, 22px);
-	word-wrap: break-word;
-}
-
-#code-csp-warning {
-	position: fixed;
-	top: 0;
-	right: 0;
-	color: white;
-	margin: 16px;
-	text-align: center;
-	font-size: 12px;
-	font-family: sans-serif;
-	background-color:#444444;
-	cursor: pointer;
-	padding: 6px;
-	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
-}
-
-#code-csp-warning:hover {
-	text-decoration: none;
-	background-color:#007acc;
-	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
-}
-
-body.scrollBeyondLastLine {
-	margin-bottom: calc(100vh - 22px);
-}
-
-body.showEditorSelection .code-line {
-	position: relative;
-}
-
-body.showEditorSelection .code-active-line:before,
-body.showEditorSelection .code-line:hover:before {
-	content: "";
-	display: block;
-	position: absolute;
-	top: 0;
-	left: -12px;
-	height: 100%;
-}
-
-body.showEditorSelection li.code-active-line:before,
-body.showEditorSelection li.code-line:hover:before {
-	left: -30px;
-}
-
-.vscode-light.showEditorSelection .code-active-line:before {
-	border-left: 3px solid rgba(0, 0, 0, 0.15);
-}
-
-.vscode-light.showEditorSelection .code-line:hover:before {
-	border-left: 3px solid rgba(0, 0, 0, 0.40);
-}
-
-.vscode-light.showEditorSelection .code-line .code-line:hover:before {
-	border-left: none;
-}
-
-.vscode-dark.showEditorSelection .code-active-line:before {
-	border-left: 3px solid rgba(255, 255, 255, 0.4);
-}
-
-.vscode-dark.showEditorSelection .code-line:hover:before {
-	border-left: 3px solid rgba(255, 255, 255, 0.60);
-}
-
-.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
-	border-left: none;
-}
-
-.vscode-high-contrast.showEditorSelection .code-active-line:before {
-	border-left: 3px solid rgba(255, 160, 0, 0.7);
-}
-
-.vscode-high-contrast.showEditorSelection .code-line:hover:before {
-	border-left: 3px solid rgba(255, 160, 0, 1);
-}
-
-.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
-	border-left: none;
-}
-
-img {
-	max-width: 100%;
-	max-height: 100%;
-}
-
-a {
-	text-decoration: none;
-}
-
-a:hover {
-	text-decoration: underline;
-}
-
-a:focus,
-input:focus,
-select:focus,
-textarea:focus {
-	outline: 1px solid -webkit-focus-ring-color;
-	outline-offset: -1px;
-}
-
-hr {
-	border: 0;
-	height: 2px;
-	border-bottom: 2px solid;
-}
-
-h1 {
-	padding-bottom: 0.3em;
-	line-height: 1.2;
-	border-bottom-width: 1px;
-	border-bottom-style: solid;
-}
-
-h1, h2, h3 {
-	font-weight: normal;
-}
-
-table {
-	border-collapse: collapse;
-}
-
-table > thead > tr > th {
-	text-align: left;
-	border-bottom: 1px solid;
-}
-
-table > thead > tr > th,
-table > thead > tr > td,
-table > tbody > tr > th,
-table > tbody > tr > td {
-	padding: 5px 10px;
-}
-
-table > tbody > tr + tr > td {
-	border-top: 1px solid;
-}
-
-blockquote {
-	margin: 0 7px 0 5px;
-	padding: 0 16px 0 10px;
-	border-left-width: 5px;
-	border-left-style: solid;
-}
-
-code {
-	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
-	font-size: 1em;
-	line-height: 1.357em;
-}
-
-body.wordWrap pre {
-	white-space: pre-wrap;
-}
-
-pre:not(.hljs),
-pre.hljs code > div {
-	padding: 16px;
-	border-radius: 3px;
-	overflow: auto;
-}
-
-pre code {
-	color: var(--vscode-editor-foreground);
-	tab-size: 4;
-}
-
-/** Theming */
-
-.vscode-light pre {
-	background-color: rgba(220, 220, 220, 0.4);
-}
-
-.vscode-dark pre {
-	background-color: rgba(10, 10, 10, 0.4);
-}
-
-.vscode-high-contrast pre {
-	background-color: rgb(0, 0, 0);
-}
-
-.vscode-high-contrast h1 {
-	border-color: rgb(0, 0, 0);
-}
-
-.vscode-light table > thead > tr > th {
-	border-color: rgba(0, 0, 0, 0.69);
-}
-
-.vscode-dark table > thead > tr > th {
-	border-color: rgba(255, 255, 255, 0.69);
-}
-
-.vscode-light h1,
-.vscode-light hr,
-.vscode-light table > tbody > tr + tr > td {
-	border-color: rgba(0, 0, 0, 0.18);
-}
-
-.vscode-dark h1,
-.vscode-dark hr,
-.vscode-dark table > tbody > tr + tr > td {
-	border-color: rgba(255, 255, 255, 0.18);
-}
-
-</style>
-
-<style>
-/* Tomorrow Theme */
-/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
-/* Original theme - https://github.com/chriskempson/tomorrow-theme */
-
-/* Tomorrow Comment */
-.hljs-comment,
-.hljs-quote {
-	color: #8e908c;
-}
-
-/* Tomorrow Red */
-.hljs-variable,
-.hljs-template-variable,
-.hljs-tag,
-.hljs-name,
-.hljs-selector-id,
-.hljs-selector-class,
-.hljs-regexp,
-.hljs-deletion {
-	color: #c82829;
-}
-
-/* Tomorrow Orange */
-.hljs-number,
-.hljs-built_in,
-.hljs-builtin-name,
-.hljs-literal,
-.hljs-type,
-.hljs-params,
-.hljs-meta,
-.hljs-link {
-	color: #f5871f;
-}
-
-/* Tomorrow Yellow */
-.hljs-attribute {
-	color: #eab700;
-}
-
-/* Tomorrow Green */
-.hljs-string,
-.hljs-symbol,
-.hljs-bullet,
-.hljs-addition {
-	color: #718c00;
-}
-
-/* Tomorrow Blue */
-.hljs-title,
-.hljs-section {
-	color: #4271ae;
-}
-
-/* Tomorrow Purple */
-.hljs-keyword,
-.hljs-selector-tag {
-	color: #8959a8;
-}
-
-.hljs {
-	display: block;
-	overflow-x: auto;
-	color: #4d4d4c;
-	padding: 0.5em;
-}
-
-.hljs-emphasis {
-	font-style: italic;
-}
-
-.hljs-strong {
-	font-weight: bold;
-}
-</style>
-
-<style>
-/*
- * Markdown PDF CSS
- */
-
- body {
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
-	padding: 0 12px;
-}
-
-pre {
-	background-color: #f8f8f8;
-	border: 1px solid #cccccc;
-	border-radius: 3px;
-	overflow-x: auto;
-	white-space: pre-wrap;
-	overflow-wrap: break-word;
-}
-
-pre:not(.hljs) {
-	padding: 23px;
-	line-height: 19px;
-}
-
-blockquote {
-	background: rgba(127, 127, 127, 0.1);
-	border-color: rgba(0, 122, 204, 0.5);
-}
-
-.emoji {
-	height: 1.4em;
-}
-
-code {
-	font-size: 14px;
-	line-height: 19px;
-}
-
-/* for inline code */
-:not(pre):not(.hljs) > code {
-	color: #C9AE75; /* Change the old color so it seems less like an error */
-	font-size: inherit;
-}
-
-/* Page Break : use <div class="page"/> to insert page break
--------------------------------------------------------- */
-.page {
-	page-break-after: always;
-}
-
-</style>
-
-<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>fmprofiles</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
 </head>
 <body>
-  <script>
-    mermaid.initialize({
-      startOnLoad: true,
-      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
-          ? 'dark'
-          : 'default'
-    });
-  </script>
-<p><img src="../img/banner.jpg" alt="alt text" title="banner"></p>
-<h1 id="appendix-b-fm-profiles-a-id%22fmprofiles%22a">Appendix B: FM Profiles <a id="fmprofiles"></a></h1>
-<p>This section specifies the attributes and rules for the following list of Financial module profiles.</p>
+<p><img src="../img/banner.jpg" title="banner" alt="alt text" /></p>
+<h1 id="appendix-b-fm-profiles-">Appendix B: FM Profiles
+<a id="fmprofiles"></a></h1>
+<p>This section specifies the attributes and rules for the following
+list of Financial module profiles.</p>
 <table>
+<colgroup>
+<col style="width: 85%" />
+<col style="width: 15%" />
+</colgroup>
 <thead>
 <tr>
-<th style="text-align:left">Profile description</th>
-<th style="text-align:right">calcrule_id</th>
+<th style="text-align: left;">Profile description</th>
+<th style="text-align: right;">calcrule_id</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">Do nothing (pass losses through)</td>
-<td style="text-align:right">100</td>
+<td style="text-align: left;">Do nothing (pass losses through)</td>
+<td style="text-align: right;">100</td>
 </tr>
 <tr>
-<td style="text-align:left">deductible and limit</td>
-<td style="text-align:right">1</td>
+<td style="text-align: left;">deductible and limit</td>
+<td style="text-align: right;">1</td>
 </tr>
 <tr>
-<td style="text-align:left">deductible with attachment, limit and share</td>
-<td style="text-align:right">2</td>
+<td style="text-align: left;">deductible with attachment, limit and
+share</td>
+<td style="text-align: right;">2</td>
 </tr>
 <tr>
-<td style="text-align:left">franchise deductible and limit</td>
-<td style="text-align:right">3</td>
+<td style="text-align: left;">franchise deductible and limit</td>
+<td style="text-align: right;">3</td>
 </tr>
 <tr>
-<td style="text-align:left">deductible % TIV and limit</td>
-<td style="text-align:right">4</td>
+<td style="text-align: left;">deductible % TIV and limit</td>
+<td style="text-align: right;">4</td>
 </tr>
 <tr>
-<td style="text-align:left">deductible and limit % loss</td>
-<td style="text-align:right">5</td>
+<td style="text-align: left;">deductible and limit % loss</td>
+<td style="text-align: right;">5</td>
 </tr>
 <tr>
-<td style="text-align:left">deductible % TIV</td>
-<td style="text-align:right">6</td>
+<td style="text-align: left;">deductible % TIV</td>
+<td style="text-align: right;">6</td>
 </tr>
 <tr>
-<td style="text-align:left">deductible, minimum and maximum deductible, with limit</td>
-<td style="text-align:right">7</td>
+<td style="text-align: left;">deductible, minimum and maximum
+deductible, with limit</td>
+<td style="text-align: right;">7</td>
 </tr>
 <tr>
-<td style="text-align:left">deductible and minimum deductible, with limit</td>
-<td style="text-align:right">8</td>
+<td style="text-align: left;">deductible and minimum deductible, with
+limit</td>
+<td style="text-align: right;">8</td>
 </tr>
 <tr>
-<td style="text-align:left">limit with deductible % limit</td>
-<td style="text-align:right">9</td>
+<td style="text-align: left;">limit with deductible % limit</td>
+<td style="text-align: right;">9</td>
 </tr>
 <tr>
-<td style="text-align:left">deductible and maximum deductible</td>
-<td style="text-align:right">10</td>
+<td style="text-align: left;">deductible and maximum deductible</td>
+<td style="text-align: right;">10</td>
 </tr>
 <tr>
-<td style="text-align:left">deductible and minimum deductible</td>
-<td style="text-align:right">11</td>
+<td style="text-align: left;">deductible and minimum deductible</td>
+<td style="text-align: right;">11</td>
 </tr>
 <tr>
-<td style="text-align:left">deductible</td>
-<td style="text-align:right">12</td>
+<td style="text-align: left;">deductible</td>
+<td style="text-align: right;">12</td>
 </tr>
 <tr>
-<td style="text-align:left">deductible, minimum and maximum deductible</td>
-<td style="text-align:right">13</td>
+<td style="text-align: left;">deductible, minimum and maximum
+deductible</td>
+<td style="text-align: right;">13</td>
 </tr>
 <tr>
-<td style="text-align:left">limit only</td>
-<td style="text-align:right">14</td>
+<td style="text-align: left;">limit only</td>
+<td style="text-align: right;">14</td>
 </tr>
 <tr>
-<td style="text-align:left">deductible and limit % loss</td>
-<td style="text-align:right">15</td>
+<td style="text-align: left;">deductible and limit % loss</td>
+<td style="text-align: right;">15</td>
 </tr>
 <tr>
-<td style="text-align:left">deductible % loss</td>
-<td style="text-align:right">16</td>
+<td style="text-align: left;">deductible % loss</td>
+<td style="text-align: right;">16</td>
 </tr>
 <tr>
-<td style="text-align:left">deductible % loss with attachment, limit and share</td>
-<td style="text-align:right">17</td>
+<td style="text-align: left;">deductible % loss with attachment, limit
+and share</td>
+<td style="text-align: right;">17</td>
 </tr>
 <tr>
-<td style="text-align:left">deductible % tiv with attachment, limit and share</td>
-<td style="text-align:right">18</td>
+<td style="text-align: left;">deductible % tiv with attachment, limit
+and share</td>
+<td style="text-align: right;">18</td>
 </tr>
 <tr>
-<td style="text-align:left">deductible % loss with min and/or max deductible</td>
-<td style="text-align:right">19</td>
+<td style="text-align: left;">deductible % loss with min and/or max
+deductible</td>
+<td style="text-align: right;">19</td>
 </tr>
 <tr>
-<td style="text-align:left">reverse franchise deductible</td>
-<td style="text-align:right">20</td>
+<td style="text-align: left;">reverse franchise deductible</td>
+<td style="text-align: right;">20</td>
 </tr>
 <tr>
-<td style="text-align:left">deductible % tiv with min and max deductible</td>
-<td style="text-align:right">21</td>
+<td style="text-align: left;">deductible % tiv with min and max
+deductible</td>
+<td style="text-align: right;">21</td>
 </tr>
 <tr>
-<td style="text-align:left">reinsurance % ceded, limit and % placed</td>
-<td style="text-align:right">22</td>
+<td style="text-align: left;">reinsurance % ceded, limit and %
+placed</td>
+<td style="text-align: right;">22</td>
 </tr>
 <tr>
-<td style="text-align:left">reinsurance limit and % placed</td>
-<td style="text-align:right">23</td>
+<td style="text-align: left;">reinsurance limit and % placed</td>
+<td style="text-align: right;">23</td>
 </tr>
 <tr>
-<td style="text-align:left">reinsurance excess terms</td>
-<td style="text-align:right">24</td>
+<td style="text-align: left;">reinsurance excess terms</td>
+<td style="text-align: right;">24</td>
 </tr>
 <tr>
-<td style="text-align:left">reinsurance proportional terms</td>
-<td style="text-align:right">25</td>
+<td style="text-align: left;">reinsurance proportional terms</td>
+<td style="text-align: right;">25</td>
 </tr>
 <tr>
-<td style="text-align:left">deductible % loss with min and/or max deductible and limit</td>
-<td style="text-align:right">26</td>
+<td style="text-align: left;">deductible % loss with min and/or max
+deductible and limit</td>
+<td style="text-align: right;">26</td>
 </tr>
 <tr>
-<td style="text-align:left">% tiv trigger and % tiv step payout with limit</td>
-<td style="text-align:right">27</td>
+<td style="text-align: left;">% tiv trigger and % tiv step payout with
+limit</td>
+<td style="text-align: right;">27</td>
 </tr>
 <tr>
-<td style="text-align:left">% tiv trigger and % loss step payout</td>
-<td style="text-align:right">28</td>
+<td style="text-align: left;">% tiv trigger and % loss step payout</td>
+<td style="text-align: right;">28</td>
 </tr>
 <tr>
-<td style="text-align:left">% tiv trigger and % tiv step payout</td>
-<td style="text-align:right">29</td>
+<td style="text-align: left;">% tiv trigger and % tiv step payout</td>
+<td style="text-align: right;">29</td>
 </tr>
 <tr>
-<td style="text-align:left">% tiv trigger and % limit step payout</td>
-<td style="text-align:right">30</td>
+<td style="text-align: left;">% tiv trigger and % limit step payout</td>
+<td style="text-align: right;">30</td>
 </tr>
 <tr>
-<td style="text-align:left">% tiv trigger and monetary amount step payout</td>
-<td style="text-align:right">31</td>
+<td style="text-align: left;">% tiv trigger and monetary amount step
+payout</td>
+<td style="text-align: right;">31</td>
 </tr>
 <tr>
-<td style="text-align:left">monetary amount trigger and % loss step payout with limit</td>
-<td style="text-align:right">32</td>
+<td style="text-align: left;">monetary amount trigger and % loss step
+payout with limit</td>
+<td style="text-align: right;">32</td>
 </tr>
 <tr>
-<td style="text-align:left">deductible % loss with limit</td>
-<td style="text-align:right">33</td>
+<td style="text-align: left;">deductible % loss with limit</td>
+<td style="text-align: right;">33</td>
 </tr>
 <tr>
-<td style="text-align:left">deductible with attachment and share</td>
-<td style="text-align:right">34</td>
+<td style="text-align: left;">deductible with attachment and share</td>
+<td style="text-align: right;">34</td>
 </tr>
 <tr>
-<td style="text-align:left">deductible % loss with min and/or max deductible and limit % loss</td>
-<td style="text-align:right">35</td>
+<td style="text-align: left;">deductible % loss with min and/or max
+deductible and limit % loss</td>
+<td style="text-align: right;">35</td>
 </tr>
 <tr>
-<td style="text-align:left">deductible with min and/or max deductible and limit % loss</td>
-<td style="text-align:right">36</td>
+<td style="text-align: left;">deductible with min and/or max deductible
+and limit % loss</td>
+<td style="text-align: right;">36</td>
+</tr>
+<tr>
+<td style="text-align: left;">% tiv trigger and % loss step payout with
+limit</td>
+<td style="text-align: right;">37</td>
+</tr>
+<tr>
+<td style="text-align: left;">conditional coverage payouts based on
+prior step payouts</td>
+<td style="text-align: right;">38</td>
 </tr>
 </tbody>
 </table>
 <table>
 <thead>
 <tr>
-<th style="text-align:left">calcrule_id</th>
+<th style="text-align: left;">calcrule_id</th>
 <th>d1</th>
 <th>d2</th>
 <th>d3</th>
@@ -545,12 +445,12 @@ code {
 <th>pe</th>
 <th>l2</th>
 <th>sc1</th>
-<th style="text-align:right">sc2</th>
+<th style="text-align: right;">sc2</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">100</td>
+<td style="text-align: left;">100</td>
 <td></td>
 <td></td>
 <td></td>
@@ -566,10 +466,10 @@ code {
 <td></td>
 <td></td>
 <td></td>
-<td style="text-align:right"></td>
+<td style="text-align: right;"></td>
 </tr>
 <tr>
-<td style="text-align:left">1</td>
+<td style="text-align: left;">1</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -585,10 +485,10 @@ code {
 <td></td>
 <td></td>
 <td></td>
-<td style="text-align:right"></td>
+<td style="text-align: right;"></td>
 </tr>
 <tr>
-<td style="text-align:left">2</td>
+<td style="text-align: left;">2</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -604,10 +504,10 @@ code {
 <td></td>
 <td></td>
 <td></td>
-<td style="text-align:right"></td>
+<td style="text-align: right;"></td>
 </tr>
 <tr>
-<td style="text-align:left">3</td>
+<td style="text-align: left;">3</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -623,10 +523,10 @@ code {
 <td></td>
 <td></td>
 <td></td>
-<td style="text-align:right"></td>
+<td style="text-align: right;"></td>
 </tr>
 <tr>
-<td style="text-align:left">4</td>
+<td style="text-align: left;">4</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -642,10 +542,10 @@ code {
 <td></td>
 <td></td>
 <td></td>
-<td style="text-align:right"></td>
+<td style="text-align: right;"></td>
 </tr>
 <tr>
-<td style="text-align:left">5</td>
+<td style="text-align: left;">5</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -661,10 +561,10 @@ code {
 <td></td>
 <td></td>
 <td></td>
-<td style="text-align:right"></td>
+<td style="text-align: right;"></td>
 </tr>
 <tr>
-<td style="text-align:left">6</td>
+<td style="text-align: left;">6</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -680,10 +580,10 @@ code {
 <td></td>
 <td></td>
 <td></td>
-<td style="text-align:right"></td>
+<td style="text-align: right;"></td>
 </tr>
 <tr>
-<td style="text-align:left">7</td>
+<td style="text-align: left;">7</td>
 <td>x</td>
 <td>x</td>
 <td>x</td>
@@ -699,10 +599,10 @@ code {
 <td></td>
 <td></td>
 <td></td>
-<td style="text-align:right"></td>
+<td style="text-align: right;"></td>
 </tr>
 <tr>
-<td style="text-align:left">8</td>
+<td style="text-align: left;">8</td>
 <td>x</td>
 <td>x</td>
 <td></td>
@@ -718,10 +618,10 @@ code {
 <td></td>
 <td></td>
 <td></td>
-<td style="text-align:right"></td>
+<td style="text-align: right;"></td>
 </tr>
 <tr>
-<td style="text-align:left">9</td>
+<td style="text-align: left;">9</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -737,10 +637,10 @@ code {
 <td></td>
 <td></td>
 <td></td>
-<td style="text-align:right"></td>
+<td style="text-align: right;"></td>
 </tr>
 <tr>
-<td style="text-align:left">10</td>
+<td style="text-align: left;">10</td>
 <td>x</td>
 <td></td>
 <td>x</td>
@@ -756,10 +656,10 @@ code {
 <td></td>
 <td></td>
 <td></td>
-<td style="text-align:right"></td>
+<td style="text-align: right;"></td>
 </tr>
 <tr>
-<td style="text-align:left">11</td>
+<td style="text-align: left;">11</td>
 <td>x</td>
 <td>x</td>
 <td></td>
@@ -775,10 +675,10 @@ code {
 <td></td>
 <td></td>
 <td></td>
-<td style="text-align:right"></td>
+<td style="text-align: right;"></td>
 </tr>
 <tr>
-<td style="text-align:left">12</td>
+<td style="text-align: left;">12</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -794,10 +694,10 @@ code {
 <td></td>
 <td></td>
 <td></td>
-<td style="text-align:right"></td>
+<td style="text-align: right;"></td>
 </tr>
 <tr>
-<td style="text-align:left">13</td>
+<td style="text-align: left;">13</td>
 <td>x</td>
 <td>x</td>
 <td>x</td>
@@ -813,10 +713,10 @@ code {
 <td></td>
 <td></td>
 <td></td>
-<td style="text-align:right"></td>
+<td style="text-align: right;"></td>
 </tr>
 <tr>
-<td style="text-align:left">14</td>
+<td style="text-align: left;">14</td>
 <td></td>
 <td></td>
 <td></td>
@@ -832,10 +732,10 @@ code {
 <td></td>
 <td></td>
 <td></td>
-<td style="text-align:right"></td>
+<td style="text-align: right;"></td>
 </tr>
 <tr>
-<td style="text-align:left">15</td>
+<td style="text-align: left;">15</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -851,10 +751,10 @@ code {
 <td></td>
 <td></td>
 <td></td>
-<td style="text-align:right"></td>
+<td style="text-align: right;"></td>
 </tr>
 <tr>
-<td style="text-align:left">16</td>
+<td style="text-align: left;">16</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -870,10 +770,10 @@ code {
 <td></td>
 <td></td>
 <td></td>
-<td style="text-align:right"></td>
+<td style="text-align: right;"></td>
 </tr>
 <tr>
-<td style="text-align:left">17</td>
+<td style="text-align: left;">17</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -889,10 +789,10 @@ code {
 <td></td>
 <td></td>
 <td></td>
-<td style="text-align:right"></td>
+<td style="text-align: right;"></td>
 </tr>
 <tr>
-<td style="text-align:left">18</td>
+<td style="text-align: left;">18</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -908,10 +808,10 @@ code {
 <td></td>
 <td></td>
 <td></td>
-<td style="text-align:right"></td>
+<td style="text-align: right;"></td>
 </tr>
 <tr>
-<td style="text-align:left">19</td>
+<td style="text-align: left;">19</td>
 <td>x</td>
 <td>x</td>
 <td>x</td>
@@ -927,10 +827,10 @@ code {
 <td></td>
 <td></td>
 <td></td>
-<td style="text-align:right"></td>
+<td style="text-align: right;"></td>
 </tr>
 <tr>
-<td style="text-align:left">20</td>
+<td style="text-align: left;">20</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -946,10 +846,10 @@ code {
 <td></td>
 <td></td>
 <td></td>
-<td style="text-align:right"></td>
+<td style="text-align: right;"></td>
 </tr>
 <tr>
-<td style="text-align:left">21</td>
+<td style="text-align: left;">21</td>
 <td>x</td>
 <td>x</td>
 <td>x</td>
@@ -965,10 +865,10 @@ code {
 <td></td>
 <td></td>
 <td></td>
-<td style="text-align:right"></td>
+<td style="text-align: right;"></td>
 </tr>
 <tr>
-<td style="text-align:left">22</td>
+<td style="text-align: left;">22</td>
 <td></td>
 <td></td>
 <td></td>
@@ -984,10 +884,10 @@ code {
 <td></td>
 <td></td>
 <td></td>
-<td style="text-align:right"></td>
+<td style="text-align: right;"></td>
 </tr>
 <tr>
-<td style="text-align:left">23</td>
+<td style="text-align: left;">23</td>
 <td></td>
 <td></td>
 <td></td>
@@ -1003,10 +903,10 @@ code {
 <td></td>
 <td></td>
 <td></td>
-<td style="text-align:right"></td>
+<td style="text-align: right;"></td>
 </tr>
 <tr>
-<td style="text-align:left">24</td>
+<td style="text-align: left;">24</td>
 <td></td>
 <td></td>
 <td></td>
@@ -1022,10 +922,10 @@ code {
 <td></td>
 <td></td>
 <td></td>
-<td style="text-align:right"></td>
+<td style="text-align: right;"></td>
 </tr>
 <tr>
-<td style="text-align:left">25</td>
+<td style="text-align: left;">25</td>
 <td></td>
 <td></td>
 <td></td>
@@ -1041,10 +941,10 @@ code {
 <td></td>
 <td></td>
 <td></td>
-<td style="text-align:right"></td>
+<td style="text-align: right;"></td>
 </tr>
 <tr>
-<td style="text-align:left">26</td>
+<td style="text-align: left;">26</td>
 <td>x</td>
 <td>x</td>
 <td>x</td>
@@ -1060,10 +960,10 @@ code {
 <td></td>
 <td></td>
 <td></td>
-<td style="text-align:right"></td>
+<td style="text-align: right;"></td>
 </tr>
 <tr>
-<td style="text-align:left">27</td>
+<td style="text-align: left;">27</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -1079,10 +979,10 @@ code {
 <td></td>
 <td>x</td>
 <td>x</td>
-<td style="text-align:right">x</td>
+<td style="text-align: right;">x</td>
 </tr>
 <tr>
-<td style="text-align:left">28</td>
+<td style="text-align: left;">28</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -1098,10 +998,10 @@ code {
 <td></td>
 <td>x</td>
 <td>x</td>
-<td style="text-align:right">x</td>
+<td style="text-align: right;">x</td>
 </tr>
 <tr>
-<td style="text-align:left">29</td>
+<td style="text-align: left;">29</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -1117,10 +1017,10 @@ code {
 <td></td>
 <td>x</td>
 <td>x</td>
-<td style="text-align:right">x</td>
+<td style="text-align: right;">x</td>
 </tr>
 <tr>
-<td style="text-align:left">30</td>
+<td style="text-align: left;">30</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -1136,10 +1036,10 @@ code {
 <td></td>
 <td>x</td>
 <td>x</td>
-<td style="text-align:right">x</td>
+<td style="text-align: right;">x</td>
 </tr>
 <tr>
-<td style="text-align:left">31</td>
+<td style="text-align: left;">31</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -1155,10 +1055,10 @@ code {
 <td></td>
 <td>x</td>
 <td>x</td>
-<td style="text-align:right">x</td>
+<td style="text-align: right;">x</td>
 </tr>
 <tr>
-<td style="text-align:left">32</td>
+<td style="text-align: left;">32</td>
 <td></td>
 <td></td>
 <td></td>
@@ -1174,10 +1074,10 @@ code {
 <td></td>
 <td>x</td>
 <td>x</td>
-<td style="text-align:right">x</td>
+<td style="text-align: right;">x</td>
 </tr>
 <tr>
-<td style="text-align:left">33</td>
+<td style="text-align: left;">33</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -1193,10 +1093,10 @@ code {
 <td></td>
 <td></td>
 <td></td>
-<td style="text-align:right"></td>
+<td style="text-align: right;"></td>
 </tr>
 <tr>
-<td style="text-align:left">34</td>
+<td style="text-align: left;">34</td>
 <td>x</td>
 <td></td>
 <td></td>
@@ -1212,10 +1112,10 @@ code {
 <td></td>
 <td></td>
 <td></td>
-<td style="text-align:right"></td>
+<td style="text-align: right;"></td>
 </tr>
 <tr>
-<td style="text-align:left">35</td>
+<td style="text-align: left;">35</td>
 <td>x</td>
 <td>x</td>
 <td>x</td>
@@ -1231,10 +1131,10 @@ code {
 <td></td>
 <td></td>
 <td></td>
-<td style="text-align:right"></td>
+<td style="text-align: right;"></td>
 </tr>
 <tr>
-<td style="text-align:left">36</td>
+<td style="text-align: left;">36</td>
 <td>x</td>
 <td>x</td>
 <td>x</td>
@@ -1250,529 +1150,639 @@ code {
 <td></td>
 <td></td>
 <td></td>
-<td style="text-align:right"></td>
+<td style="text-align: right;"></td>
+</tr>
+<tr>
+<td style="text-align: left;">37</td>
+<td>x</td>
+<td></td>
+<td></td>
+<td></td>
+<td>x</td>
+<td></td>
+<td></td>
+<td></td>
+<td>x</td>
+<td>x</td>
+<td>x</td>
+<td>x</td>
+<td></td>
+<td>x</td>
+<td>x</td>
+<td style="text-align: right;">x</td>
+</tr>
+<tr>
+<td style="text-align: left;">38</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>x</td>
+<td>x</td>
+<td>x</td>
+<td></td>
+<td></td>
+<td>x</td>
+<td>x</td>
+<td style="text-align: right;">x</td>
 </tr>
 </tbody>
 </table>
-<p>The fields with an x are those which are required by the profile. The full names of the fields are as follows;</p>
+<p>The fields with an x are those which are required by the profile. The
+full names of the fields are as follows;</p>
 <table>
 <thead>
 <tr>
-<th style="text-align:left">Short name</th>
-<th style="text-align:right">Profile field name</th>
+<th style="text-align: left;">Short name</th>
+<th style="text-align: right;">Profile field name</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">d1</td>
-<td style="text-align:right">deductible_1</td>
+<td style="text-align: left;">d1</td>
+<td style="text-align: right;">deductible_1</td>
 </tr>
 <tr>
-<td style="text-align:left">d2</td>
-<td style="text-align:right">deductible_2</td>
+<td style="text-align: left;">d2</td>
+<td style="text-align: right;">deductible_2</td>
 </tr>
 <tr>
-<td style="text-align:left">d3</td>
-<td style="text-align:right">deductible_3</td>
+<td style="text-align: left;">d3</td>
+<td style="text-align: right;">deductible_3</td>
 </tr>
 <tr>
-<td style="text-align:left">a1</td>
-<td style="text-align:right">attachment_1</td>
+<td style="text-align: left;">a1</td>
+<td style="text-align: right;">attachment_1</td>
 </tr>
 <tr>
-<td style="text-align:left">l1</td>
-<td style="text-align:right">limit_1</td>
+<td style="text-align: left;">l1</td>
+<td style="text-align: right;">limit_1</td>
 </tr>
 <tr>
-<td style="text-align:left">sh1</td>
-<td style="text-align:right">share_1</td>
+<td style="text-align: left;">sh1</td>
+<td style="text-align: right;">share_1</td>
 </tr>
 <tr>
-<td style="text-align:left">sh2</td>
-<td style="text-align:right">share_2</td>
+<td style="text-align: left;">sh2</td>
+<td style="text-align: right;">share_2</td>
 </tr>
 <tr>
-<td style="text-align:left">sh3</td>
-<td style="text-align:right">share_3</td>
+<td style="text-align: left;">sh3</td>
+<td style="text-align: right;">share_3</td>
 </tr>
 <tr>
-<td style="text-align:left">st</td>
-<td style="text-align:right">step_id</td>
+<td style="text-align: left;">st</td>
+<td style="text-align: right;">step_id</td>
 </tr>
 <tr>
-<td style="text-align:left">ts</td>
-<td style="text-align:right">trigger_start</td>
+<td style="text-align: left;">ts</td>
+<td style="text-align: right;">trigger_start</td>
 </tr>
 <tr>
-<td style="text-align:left">te</td>
-<td style="text-align:right">trigger_end</td>
+<td style="text-align: left;">te</td>
+<td style="text-align: right;">trigger_end</td>
 </tr>
 <tr>
-<td style="text-align:left">ps</td>
-<td style="text-align:right">payout_start</td>
+<td style="text-align: left;">ps</td>
+<td style="text-align: right;">payout_start</td>
 </tr>
 <tr>
-<td style="text-align:left">pe</td>
-<td style="text-align:right">payout_end</td>
+<td style="text-align: left;">pe</td>
+<td style="text-align: right;">payout_end</td>
 </tr>
 <tr>
-<td style="text-align:left">l2</td>
-<td style="text-align:right">limit_2</td>
+<td style="text-align: left;">l2</td>
+<td style="text-align: right;">limit_2</td>
 </tr>
 <tr>
-<td style="text-align:left">sc1</td>
-<td style="text-align:right">scale_1</td>
+<td style="text-align: left;">sc1</td>
+<td style="text-align: right;">scale_1</td>
 </tr>
 <tr>
-<td style="text-align:left">sc2</td>
-<td style="text-align:right">scale_2</td>
+<td style="text-align: left;">sc2</td>
+<td style="text-align: right;">scale_2</td>
 </tr>
 </tbody>
 </table>
-<p>An allocation rule can be assigned to each call of fmcalc, which determines whether calculated losses should be back-allocated to the contributing items, and if so how. This is specified via the command line parameter -a.</p>
+<p>An allocation rule can be assigned to each call of fmcalc, which
+determines whether calculated losses should be back-allocated to the
+contributing items, and if so how. This is specified via the command
+line parameter -a.</p>
 <p>The choices are as follows;</p>
 <table>
+<colgroup>
+<col style="width: 85%" />
+<col style="width: 14%" />
+</colgroup>
 <thead>
 <tr>
-<th style="text-align:left">Allocrule description</th>
-<th style="text-align:right">allocrule_id</th>
+<th style="text-align: left;">Allocrule description</th>
+<th style="text-align: right;">allocrule_id</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">Don't back-allocate losses (default if no parameter supplied)</td>
-<td style="text-align:right">0</td>
+<td style="text-align: left;">Don't back-allocate losses (default if no
+parameter supplied)</td>
+<td style="text-align: right;">0</td>
 </tr>
 <tr>
-<td style="text-align:left">Back allocate losses to items in proportion to input loss</td>
-<td style="text-align:right">1</td>
+<td style="text-align: left;">Back allocate losses to items in
+proportion to input loss</td>
+<td style="text-align: right;">1</td>
 </tr>
 <tr>
-<td style="text-align:left">Back-allocate losses to items in proportion to prior level loss</td>
-<td style="text-align:right">2</td>
+<td style="text-align: left;">Back-allocate losses to items in
+proportion to prior level loss</td>
+<td style="text-align: right;">2</td>
 </tr>
 <tr>
-<td style="text-align:left">Back-allocate losses to items in proportion to prior level loss (reinsurance)</td>
-<td style="text-align:right">3</td>
+<td style="text-align: left;">Back-allocate losses to items in
+proportion to prior level loss (reinsurance)</td>
+<td style="text-align: right;">3</td>
 </tr>
 </tbody>
 </table>
 <h2 id="effective-deductibles">Effective deductibles</h2>
-<p>Often there are more than one hierarchal levels with deductibles, and there is a choice of methods of accumulation of deductibles through the hierarchy. Whenever a rule with a deductible is used in the loss calculation then it is accumulated through the calculation in an <strong>effective_deductible</strong> variable. The effective deductible is the smaller of the deductible amount and the loss.</p>
-<p>All deductibles amounts calculated from the deductible_1 field are simply additive through the hierarchy.</p>
-<p>Ay any level, the user can specify a calcrule using a minimum and/or maximum deductible which changes the way that effective deductibles are accumulated.</p>
-<p>For a minimum deductible specified in calcrules using the deductible_2 field, the calculation increases the effective_deductible carried forward from the previous levels up to the minimum deductible if it is smaller.</p>
-<p>For a maximum deductible specified in calcrules using the deductible_3 field, the calculation decreases the effective_deductible carried forward from the previous levels down to the maximum deductible if it is larger.</p>
-<h2 id="adjustment-of-loss-for-prior-level-limits">Adjustment of loss for prior level limits</h2>
-<p>Loss adjustments due to minimum and maximum deductibles may lead to breaching or falling short of prior level limits. For instance, an increase in loss due a policy maximum deductible being applied can lead to a breach of site limit that applied at the prior calculation level. Conversely, a decrease in loss due to policy minimum deductible can leave the loss falling short of a site limit applied at the prior calculation level. In these situations the prior level limits are carried through and reapplied in all calcrules that have minimum and/or maximum deductibles.</p>
+<p>Often there are more than one hierarchal levels with deductibles, and
+there is a choice of methods of accumulation of deductibles through the
+hierarchy. Whenever a rule with a deductible is used in the loss
+calculation then it is accumulated through the calculation in an
+<strong>effective_deductible</strong> variable. The effective deductible
+is the smaller of the deductible amount and the loss.</p>
+<p>All deductibles amounts calculated from the deductible_1 field are
+simply additive through the hierarchy.</p>
+<p>Ay any level, the user can specify a calcrule using a minimum and/or
+maximum deductible which changes the way that effective deductibles are
+accumulated.</p>
+<p>For a minimum deductible specified in calcrules using the
+deductible_2 field, the calculation increases the effective_deductible
+carried forward from the previous levels up to the minimum deductible if
+it is smaller.</p>
+<p>For a maximum deductible specified in calcrules using the
+deductible_3 field, the calculation decreases the effective_deductible
+carried forward from the previous levels down to the maximum deductible
+if it is larger.</p>
+<h2 id="adjustment-of-loss-for-prior-level-limits">Adjustment of loss
+for prior level limits</h2>
+<p>Loss adjustments due to minimum and maximum deductibles may lead to
+breaching or falling short of prior level limits. For instance, an
+increase in loss due a policy maximum deductible being applied can lead
+to a breach of site limit that applied at the prior calculation level.
+Conversely, a decrease in loss due to policy minimum deductible can
+leave the loss falling short of a site limit applied at the prior
+calculation level. In these situations the prior level limits are
+carried through and reapplied in all calcrules that have minimum and/or
+maximum deductibles.</p>
 <p>We introduce the following variables;</p>
 <ul>
-<li><strong>over limit</strong> is the sum of the amount by which limits are exceeded at the prior level calculation (positive measure)</li>
-<li><strong>under limit</strong> is the sum of the amount by which losses fall short of limits at the prior level calculation (positive measure)</li>
-<li><strong>loss delta</strong> is the amount by which the loss would change due to the enforcement of a minimum or maximum ignoring prior level limits (positive for loss increase and negative for loss decrease). The loss is adjusted by an amount up to the loss delta depending on the values carried in the under and over limit variables</li>
+<li><strong>over limit</strong> is the sum of the amount by which limits
+are exceeded at the prior level calculation (positive measure)</li>
+<li><strong>under limit</strong> is the smaller of the effective
+deductible and sum of the amount by which losses fall short of limits at
+the prior level calculation (positive measure). It represents the amount
+by which the loss can be adjusted upwards due to the enforcement of a
+maximum deductible at the current level.</li>
+<li><strong>loss delta</strong> is the amount by which the loss would
+change due to the enforcement of a minimum or maximum ignoring prior
+level limits (positive for loss increase and negative for loss
+decrease). The loss is adjusted by an amount up to the loss delta
+depending on the values carried in the under and over limit
+variables</li>
 </ul>
-<h3 id="scenarios-for-under-and-over-limit">Scenarios for under and over limit</h3>
-<p>The over and under limit variables are initialised when there exist prior level limits. The possible cases are;</p>
+<h3 id="scenarios-for-under-and-over-limit">Scenarios for under and over
+limit</h3>
+<p>The over and under limit variables are initialised when there exist
+prior level limits. The possible cases are;</p>
 <table>
+<colgroup>
+<col style="width: 6%" />
+<col style="width: 13%" />
+<col style="width: 13%" />
+<col style="width: 67%" />
+</colgroup>
 <thead>
 <tr>
-<th style="text-align:left">Case</th>
+<th style="text-align: left;">Case</th>
 <th>Under limit</th>
 <th>Over limit</th>
-<th style="text-align:left">Meaning</th>
+<th style="text-align: left;">Meaning</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">1</td>
+<td style="text-align: left;">1</td>
 <td>0</td>
 <td>0</td>
-<td style="text-align:left">All prior level losses are exactly at their limits</td>
+<td style="text-align: left;">All prior level losses are exactly at
+their limits</td>
 </tr>
 <tr>
-<td style="text-align:left">2</td>
+<td style="text-align: left;">2</td>
 <td>0</td>
 <td>&gt;0</td>
-<td style="text-align:left">Some prior level losses are over limit and none are under limit</td>
+<td style="text-align: left;">Some prior level losses are over limit and
+none are under limit</td>
 </tr>
 <tr>
-<td style="text-align:left">3</td>
+<td style="text-align: left;">3</td>
 <td>&gt;0</td>
 <td>0</td>
-<td style="text-align:left">Some prior level losses are under limit and none are over limit</td>
+<td style="text-align: left;">Some prior level losses are under limit
+and none are over limit</td>
 </tr>
 <tr>
-<td style="text-align:left">4</td>
+<td style="text-align: left;">4</td>
 <td>&gt;0</td>
 <td>&gt;0</td>
-<td style="text-align:left">Some prior level losses are over limit and some are under limit</td>
+<td style="text-align: left;">Some prior level losses are over limit and
+some are under limit</td>
 </tr>
 </tbody>
 </table>
 <p>When the loss delta is positive;</p>
 <ul>
-<li>in cases 1 and 2 the loss is not adjusted upwards because the prior level losses are already at their limits. The loss delta is added to the carried over limit.</li>
-<li>in cases 3 and 4 the loss is adjusted upwards to a maximum of the under limit. Losses are therefore adjusted up to the prior level limits and any excess loss delta is added to the over limit variable. The loss increase is subtracted from the carried under limit.</li>
+<li>in cases 1 and 2 the loss is not adjusted upwards because the prior
+level losses are already at their limits. The loss delta is added to the
+carried over limit.</li>
+<li>in cases 3 and 4 the loss is adjusted upwards to a maximum of the
+under limit. Losses are therefore adjusted up to the prior level limits
+and any excess loss delta is added to the over limit variable. The loss
+increase is subtracted from the carried under limit.</li>
 </ul>
 <p>When the loss delta is negative;</p>
 <ul>
-<li>in cases 1 and 2 the loss delta is added to the over limit until the over limit is zero and any excess loss delta is used to adjust the loss downwards. Losses that are over limit by more than the loss delta remain at their limits, and decrease only if the over limit is fully eroded by the loss delta.</li>
-<li>in cases 3 and 4 losses are adjusted down fully by the loss delta, or to zero if the loss delta is greater than the initial loss. The loss adjustment is added to the carried under limit.</li>
+<li>in cases 1 and 2 the loss delta is added to the over limit until the
+over limit is zero and any excess loss delta is used to adjust the loss
+downwards. Losses that are over limit by more than the loss delta remain
+at their limits, and decrease only if the over limit is fully eroded by
+the loss delta.</li>
+<li>in cases 3 and 4 losses are adjusted down fully by the loss delta,
+or to zero if the loss delta is greater than the initial loss. The loss
+adjustment is added to the carried under limit.</li>
 </ul>
-<p>Current calculation level limits may also apply and these are used to update the over limit and under limit measures to carry through to the next level.</p>
+<p>Current calculation level limits may also apply and these are used to
+update the over limit and under limit measures to carry through to the
+next level.</p>
 <h2 id="calcrules">Calcrules</h2>
 <p>In the following notation;</p>
 <ul>
 <li>x.loss is the input loss to the calculation</li>
-<li>x.effective_deductible is the input effective deductible to the calculation (where required)</li>
+<li>x.effective_deductible is the input effective deductible to the
+calculation (where required)</li>
 <li>loss is the calculated loss</li>
 </ul>
 <h3 id="1-deductible-and-limit">1. Deductible and limit</h3>
 <table>
 <thead>
 <tr>
-<th style="text-align:left">Attributes</th>
-<th style="text-align:right">Example</th>
+<th style="text-align: left;">Attributes</th>
+<th style="text-align: right;">Example</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">policytc_id</td>
-<td style="text-align:right">1</td>
+<td style="text-align: left;">policytc_id</td>
+<td style="text-align: right;">1</td>
 </tr>
 <tr>
-<td style="text-align:left">calcrule_id</td>
-<td style="text-align:right">1</td>
+<td style="text-align: left;">calcrule_id</td>
+<td style="text-align: right;">1</td>
 </tr>
 <tr>
-<td style="text-align:left">deductible_1</td>
-<td style="text-align:right">50000</td>
+<td style="text-align: left;">deductible_1</td>
+<td style="text-align: right;">50000</td>
 </tr>
 <tr>
-<td style="text-align:left">limit_1</td>
-<td style="text-align:right">900000</td>
+<td style="text-align: left;">limit_1</td>
+<td style="text-align: right;">900000</td>
 </tr>
 </tbody>
 </table>
 <h5 id="calculation-logic">Calculation logic</h5>
-<pre class="hljs"><code><div>loss = x.loss - deductible_1;
-<span class="hljs-keyword">if</span> (loss &lt; 0) loss = 0;
-<span class="hljs-keyword">if</span> (loss &gt; limit_1) loss = limit_1;
-</div></code></pre>
-<h3 id="2-deductible-attachment-limit-and-share">2. Deductible, attachment, limit and share</h3>
+<div class="sourceCode" id="cb1"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">loss</span> = x.loss <span class="at">-</span> deductible_1<span class="kw">;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&lt;</span> 0<span class="kw">)</span> <span class="ex">loss</span> = 0<span class="kw">;</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&gt;</span> limit_1<span class="kw">)</span> <span class="ex">loss</span> = limit_1<span class="kw">;</span></span></code></pre></div>
+<h3 id="2-deductible-attachment-limit-and-share">2. Deductible,
+attachment, limit and share</h3>
 <table>
 <thead>
 <tr>
-<th style="text-align:left">Attributes</th>
-<th style="text-align:right">Example</th>
+<th style="text-align: left;">Attributes</th>
+<th style="text-align: right;">Example</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">policytc_id</td>
-<td style="text-align:right">1</td>
+<td style="text-align: left;">policytc_id</td>
+<td style="text-align: right;">1</td>
 </tr>
 <tr>
-<td style="text-align:left">calcrule_id</td>
-<td style="text-align:right">2</td>
+<td style="text-align: left;">calcrule_id</td>
+<td style="text-align: right;">2</td>
 </tr>
 <tr>
-<td style="text-align:left">deductible_1</td>
-<td style="text-align:right">70000</td>
+<td style="text-align: left;">deductible_1</td>
+<td style="text-align: right;">70000</td>
 </tr>
 <tr>
-<td style="text-align:left">attachment_1</td>
-<td style="text-align:right">0</td>
+<td style="text-align: left;">attachment_1</td>
+<td style="text-align: right;">0</td>
 </tr>
 <tr>
-<td style="text-align:left">limit_1</td>
-<td style="text-align:right">1000000</td>
+<td style="text-align: left;">limit_1</td>
+<td style="text-align: right;">1000000</td>
 </tr>
 <tr>
-<td style="text-align:left">share_1</td>
-<td style="text-align:right">0.1</td>
+<td style="text-align: left;">share_1</td>
+<td style="text-align: right;">0.1</td>
 </tr>
 </tbody>
 </table>
-<h5 id="calculation-logic">Calculation logic</h5>
-<pre class="hljs"><code><div>loss = x.loss - deductible_1
-<span class="hljs-keyword">if</span> (loss &lt; 0) loss = 0;
-<span class="hljs-keyword">if</span> (loss &gt; (attachment_1 + limit_1)) loss = limit_1;
-	<span class="hljs-keyword">else</span> loss = loss - attachment_1;
-<span class="hljs-keyword">if</span> (loss &lt; 0) loss = 0;
-loss = loss * share_1;
-</div></code></pre>
-<h3 id="3-franchise-deductible-and-limit">3. Franchise deductible and limit</h3>
+<h5 id="calculation-logic-1">Calculation logic</h5>
+<div class="sourceCode" id="cb2"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">loss</span> = x.loss <span class="at">-</span> deductible_1</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&lt;</span> 0<span class="kw">)</span> <span class="ex">loss</span> = 0<span class="kw">;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&gt;</span> <span class="er">(</span><span class="ex">attachment_1</span> + limit_1<span class="kw">))</span> <span class="ex">loss</span> = limit_1<span class="kw">;</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span> <span class="ex">loss</span> = loss <span class="at">-</span> attachment_1<span class="kw">;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&lt;</span> 0<span class="kw">)</span> <span class="ex">loss</span> = 0<span class="kw">;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="ex">loss</span> = loss <span class="pp">*</span> share_1<span class="kw">;</span></span></code></pre></div>
+<h3 id="3-franchise-deductible-and-limit">3. Franchise deductible and
+limit</h3>
 <table>
 <thead>
 <tr>
-<th style="text-align:left">Attributes</th>
-<th style="text-align:right">Example</th>
+<th style="text-align: left;">Attributes</th>
+<th style="text-align: right;">Example</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">policytc_id</td>
-<td style="text-align:right">1</td>
+<td style="text-align: left;">policytc_id</td>
+<td style="text-align: right;">1</td>
 </tr>
 <tr>
-<td style="text-align:left">calcrule_id</td>
-<td style="text-align:right">3</td>
+<td style="text-align: left;">calcrule_id</td>
+<td style="text-align: right;">3</td>
 </tr>
 <tr>
-<td style="text-align:left">deductible_1</td>
-<td style="text-align:right">100000</td>
+<td style="text-align: left;">deductible_1</td>
+<td style="text-align: right;">100000</td>
 </tr>
 <tr>
-<td style="text-align:left">limit_1</td>
-<td style="text-align:right">1000000</td>
+<td style="text-align: left;">limit_1</td>
+<td style="text-align: right;">1000000</td>
 </tr>
 </tbody>
 </table>
-<h5 id="calculation-logic">Calculation logic</h5>
-<pre class="hljs"><code><div><span class="hljs-keyword">if</span> (x.loss &lt; deductible_1) loss = 0;
-	<span class="hljs-keyword">else</span> loss = x.loss;
-<span class="hljs-keyword">if</span> (loss &gt; limit_1) loss = limit_1;
-</div></code></pre>
-<h3 id="5-deductible-and-limit-as-a-proportion-of-loss">5. Deductible and limit as a proportion of loss</h3>
+<h5 id="calculation-logic-2">Calculation logic</h5>
+<div class="sourceCode" id="cb3"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">(</span><span class="ex">x.loss</span> <span class="op">&lt;</span> deductible_1<span class="kw">)</span> <span class="ex">loss</span> = 0<span class="kw">;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span> <span class="ex">loss</span> = x.loss<span class="kw">;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&gt;</span> limit_1<span class="kw">)</span> <span class="ex">loss</span> = limit_1<span class="kw">;</span></span></code></pre></div>
+<h3 id="5-deductible-and-limit-as-a-proportion-of-loss">5. Deductible
+and limit as a proportion of loss</h3>
 <table>
 <thead>
 <tr>
-<th style="text-align:left">Attributes</th>
-<th style="text-align:right">Example</th>
+<th style="text-align: left;">Attributes</th>
+<th style="text-align: right;">Example</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">policytc_id</td>
-<td style="text-align:right">1</td>
+<td style="text-align: left;">policytc_id</td>
+<td style="text-align: right;">1</td>
 </tr>
 <tr>
-<td style="text-align:left">calcrule_id</td>
-<td style="text-align:right">5</td>
+<td style="text-align: left;">calcrule_id</td>
+<td style="text-align: right;">5</td>
 </tr>
 <tr>
-<td style="text-align:left">deductible_1</td>
-<td style="text-align:right">0.05</td>
+<td style="text-align: left;">deductible_1</td>
+<td style="text-align: right;">0.05</td>
 </tr>
 <tr>
-<td style="text-align:left">limit_1</td>
-<td style="text-align:right">0.3</td>
+<td style="text-align: left;">limit_1</td>
+<td style="text-align: right;">0.3</td>
 </tr>
 </tbody>
 </table>
-<h5 id="calculation-logic">Calculation logic</h5>
-<pre class="hljs"><code><div>loss = x.loss - (x.loss * deductible_1);
-<span class="hljs-keyword">if</span> (loss &gt; (x.loss * limit_1)) loss = x.loss * lim;
-</div></code></pre>
-<h3 id="9-limit-with-deductible-as-a-proportion-of-limit">9. Limit with deductible as a proportion of limit</h3>
+<h5 id="calculation-logic-3">Calculation logic</h5>
+<div class="sourceCode" id="cb4"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">loss</span> = x.loss <span class="at">-</span> <span class="er">(</span><span class="ex">x.loss</span> <span class="pp">*</span> deductible_1<span class="kw">);</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&gt;</span> <span class="er">(</span><span class="ex">x.loss</span> <span class="pp">*</span> limit_1<span class="kw">))</span> <span class="ex">loss</span> = x.loss <span class="pp">*</span> lim<span class="kw">;</span></span></code></pre></div>
+<h3 id="9-limit-with-deductible-as-a-proportion-of-limit">9. Limit with
+deductible as a proportion of limit</h3>
 <table>
 <thead>
 <tr>
-<th style="text-align:left">Attributes</th>
-<th style="text-align:right">Example</th>
+<th style="text-align: left;">Attributes</th>
+<th style="text-align: right;">Example</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">policytc_id</td>
-<td style="text-align:right">1</td>
+<td style="text-align: left;">policytc_id</td>
+<td style="text-align: right;">1</td>
 </tr>
 <tr>
-<td style="text-align:left">calcrule_id</td>
-<td style="text-align:right">9</td>
+<td style="text-align: left;">calcrule_id</td>
+<td style="text-align: right;">9</td>
 </tr>
 <tr>
-<td style="text-align:left">deductible_1</td>
-<td style="text-align:right">0.05</td>
+<td style="text-align: left;">deductible_1</td>
+<td style="text-align: right;">0.05</td>
 </tr>
 <tr>
-<td style="text-align:left">limit_1</td>
-<td style="text-align:right">100000</td>
+<td style="text-align: left;">limit_1</td>
+<td style="text-align: right;">100000</td>
 </tr>
 </tbody>
 </table>
-<h5 id="calculation-logic">Calculation logic</h5>
-<pre class="hljs"><code><div>loss = x.loss - (deductible_1 * limit_1);
-<span class="hljs-keyword">if</span> (loss &lt; 0) loss = 0;
-<span class="hljs-keyword">if</span> (loss &gt; limit_1) loss = limit_1;
-</div></code></pre>
+<h5 id="calculation-logic-4">Calculation logic</h5>
+<div class="sourceCode" id="cb5"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">loss</span> = x.loss <span class="at">-</span> <span class="er">(</span><span class="ex">deductible_1</span> <span class="pp">*</span> limit_1<span class="kw">);</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&lt;</span> 0<span class="kw">)</span> <span class="ex">loss</span> = 0<span class="kw">;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&gt;</span> limit_1<span class="kw">)</span> <span class="ex">loss</span> = limit_1<span class="kw">;</span></span></code></pre></div>
 <h3 id="10-maximum-deductible">10. Maximum deductible</h3>
-<p>If the effective deductible carried forward from the previous level exceeds the maximum deductible, the effective deductible is decreased to the maximum deductible value</p>
+<p>If the effective deductible carried forward from the previous level
+exceeds the maximum deductible, the effective deductible is decreased to
+the maximum deductible value</p>
 <table>
 <thead>
 <tr>
-<th style="text-align:left">Attributes</th>
-<th style="text-align:right">Example</th>
+<th style="text-align: left;">Attributes</th>
+<th style="text-align: right;">Example</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">policytc_id</td>
-<td style="text-align:right">1</td>
+<td style="text-align: left;">policytc_id</td>
+<td style="text-align: right;">1</td>
 </tr>
 <tr>
-<td style="text-align:left">calcrule_id</td>
-<td style="text-align:right">10</td>
+<td style="text-align: left;">calcrule_id</td>
+<td style="text-align: right;">10</td>
 </tr>
 <tr>
-<td style="text-align:left">deductible_3</td>
-<td style="text-align:right">40000</td>
+<td style="text-align: left;">deductible_3</td>
+<td style="text-align: right;">40000</td>
 </tr>
 </tbody>
 </table>
-<h5 id="calculation-logic">Calculation logic</h5>
-<pre class="hljs"><code><div><span class="hljs-keyword">if</span> (x.effective_deductible &gt; deductible_3) { 
-	loss = x.loss + x.effective_deductible - deductible_3;
-	<span class="hljs-keyword">if</span> (loss &lt; 0) loss = 0;
-	}
-<span class="hljs-keyword">else</span> {
-	loss = x.loss;
-     }
-</div></code></pre>
+<h5 id="calculation-logic-5">Calculation logic</h5>
+<div class="sourceCode" id="cb6"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">(</span><span class="ex">x.effective_deductible</span> <span class="op">&gt;</span> deductible_3<span class="kw">)</span> <span class="kw">{</span> </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="ex">loss</span> = x.loss + x.effective_deductible <span class="at">-</span> deductible_3<span class="kw">;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&lt;</span> 0<span class="kw">)</span> <span class="ex">loss</span> = 0<span class="kw">;</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span> <span class="kw">{</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">loss</span> = x.loss<span class="kw">;</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>     <span class="kw">}</span></span></code></pre></div>
 <h3 id="11-minimum-deductible">11. Minimum deductible</h3>
-<p>If the effective deductible carried forward from the previous level is less than the minimum deductible, the deductible is increased to the total loss or the minimum deductible value, whichever is greater.</p>
+<p>If the effective deductible carried forward from the previous level
+is less than the minimum deductible, the deductible is increased to the
+total loss or the minimum deductible value, whichever is greater.</p>
 <table>
 <thead>
 <tr>
-<th style="text-align:left">Attributes</th>
-<th style="text-align:right">Example</th>
+<th style="text-align: left;">Attributes</th>
+<th style="text-align: right;">Example</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">policytc_id</td>
-<td style="text-align:right">1</td>
+<td style="text-align: left;">policytc_id</td>
+<td style="text-align: right;">1</td>
 </tr>
 <tr>
-<td style="text-align:left">calcrule_id</td>
-<td style="text-align:right">11</td>
+<td style="text-align: left;">calcrule_id</td>
+<td style="text-align: right;">11</td>
 </tr>
 <tr>
-<td style="text-align:left">deductible_2</td>
-<td style="text-align:right">70000</td>
+<td style="text-align: left;">deductible_2</td>
+<td style="text-align: right;">70000</td>
 </tr>
 </tbody>
 </table>
-<h5 id="calculation-logic">Calculation logic</h5>
-<pre class="hljs"><code><div><span class="hljs-keyword">if</span> (x.effective_deductible &lt; deductible_2) { 
-	loss = x.loss + x.effective_deductible - deductible_2;
-	<span class="hljs-keyword">if</span> (loss &lt; 0) loss = 0;
-	}
-<span class="hljs-keyword">else</span> {
-	loss = x.loss;
-     }
-</div></code></pre>
+<h5 id="calculation-logic-6">Calculation logic</h5>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">(</span><span class="ex">x.effective_deductible</span> <span class="op">&lt;</span> deductible_2<span class="kw">)</span> <span class="kw">{</span> </span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="ex">loss</span> = x.loss + x.effective_deductible <span class="at">-</span> deductible_2<span class="kw">;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&lt;</span> 0<span class="kw">)</span> <span class="ex">loss</span> = 0<span class="kw">;</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="kw">}</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span> <span class="kw">{</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="ex">loss</span> = x.loss<span class="kw">;</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>     <span class="kw">}</span></span></code></pre></div>
 <h3 id="12-deductible-only">12. Deductible only</h3>
 <table>
 <thead>
 <tr>
-<th style="text-align:left">Attributes</th>
-<th style="text-align:right">Example</th>
+<th style="text-align: left;">Attributes</th>
+<th style="text-align: right;">Example</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">policytc_id</td>
-<td style="text-align:right">1</td>
+<td style="text-align: left;">policytc_id</td>
+<td style="text-align: right;">1</td>
 </tr>
 <tr>
-<td style="text-align:left">calcrule_id</td>
-<td style="text-align:right">12</td>
+<td style="text-align: left;">calcrule_id</td>
+<td style="text-align: right;">12</td>
 </tr>
 <tr>
-<td style="text-align:left">deductible_1</td>
-<td style="text-align:right">100000</td>
+<td style="text-align: left;">deductible_1</td>
+<td style="text-align: right;">100000</td>
 </tr>
 </tbody>
 </table>
-<h5 id="calculation-logic">Calculation logic</h5>
-<pre class="hljs"><code><div>loss = x.loss - deductible_1;
-<span class="hljs-keyword">if</span> (loss &lt; 0) loss = 0;
-</div></code></pre>
+<h5 id="calculation-logic-7">Calculation logic</h5>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="ex">loss</span> = x.loss <span class="at">-</span> deductible_1<span class="kw">;</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&lt;</span> 0<span class="kw">)</span> <span class="ex">loss</span> = 0<span class="kw">;</span></span></code></pre></div>
 <h3 id="14-limit-only">14. Limit only</h3>
 <table>
 <thead>
 <tr>
-<th style="text-align:left">Attributes</th>
-<th style="text-align:right">Example</th>
+<th style="text-align: left;">Attributes</th>
+<th style="text-align: right;">Example</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">policytc_id</td>
-<td style="text-align:right">1</td>
+<td style="text-align: left;">policytc_id</td>
+<td style="text-align: right;">1</td>
 </tr>
 <tr>
-<td style="text-align:left">calcrule_id</td>
-<td style="text-align:right">14</td>
+<td style="text-align: left;">calcrule_id</td>
+<td style="text-align: right;">14</td>
 </tr>
 <tr>
-<td style="text-align:left">limit</td>
-<td style="text-align:right">100000</td>
+<td style="text-align: left;">limit</td>
+<td style="text-align: right;">100000</td>
 </tr>
 </tbody>
 </table>
-<h5 id="calculation-logic">Calculation logic</h5>
-<pre class="hljs"><code><div>loss = x.loss;
-<span class="hljs-keyword">if</span> (loss &gt; limit_1) loss = limit_1;
-</div></code></pre>
-<h3 id="15-limit-as-a-proportion-of-loss">15. Limit as a proportion of loss</h3>
+<h5 id="calculation-logic-8">Calculation logic</h5>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sh"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="ex">loss</span> = x.loss<span class="kw">;</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&gt;</span> limit_1<span class="kw">)</span> <span class="ex">loss</span> = limit_1<span class="kw">;</span></span></code></pre></div>
+<h3 id="15-limit-as-a-proportion-of-loss">15. Limit as a proportion of
+loss</h3>
 <table>
 <thead>
 <tr>
-<th style="text-align:left">Attributes</th>
-<th style="text-align:right">Example</th>
+<th style="text-align: left;">Attributes</th>
+<th style="text-align: right;">Example</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">policytc_id</td>
-<td style="text-align:right">1</td>
+<td style="text-align: left;">policytc_id</td>
+<td style="text-align: right;">1</td>
 </tr>
 <tr>
-<td style="text-align:left">calcrule_id</td>
-<td style="text-align:right">15</td>
+<td style="text-align: left;">calcrule_id</td>
+<td style="text-align: right;">15</td>
 </tr>
 <tr>
-<td style="text-align:left">limit_1</td>
-<td style="text-align:right">0.3</td>
+<td style="text-align: left;">limit_1</td>
+<td style="text-align: right;">0.3</td>
 </tr>
 </tbody>
 </table>
-<h5 id="calculation-logic">Calculation logic</h5>
-<pre class="hljs"><code><div>loss = x.loss * limit_1;
-</div></code></pre>
-<h3 id="16-deductible-as-a-proportion-of-loss">16. Deductible as a proportion of loss</h3>
+<h5 id="calculation-logic-9">Calculation logic</h5>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="ex">loss</span> = x.loss <span class="pp">*</span> limit_1<span class="kw">;</span></span></code></pre></div>
+<h3 id="16-deductible-as-a-proportion-of-loss">16. Deductible as a
+proportion of loss</h3>
 <table>
 <thead>
 <tr>
-<th style="text-align:left">Attributes</th>
-<th style="text-align:right">Example</th>
+<th style="text-align: left;">Attributes</th>
+<th style="text-align: right;">Example</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">policytc_id</td>
-<td style="text-align:right">1</td>
+<td style="text-align: left;">policytc_id</td>
+<td style="text-align: right;">1</td>
 </tr>
 <tr>
-<td style="text-align:left">calcrule_id</td>
-<td style="text-align:right">16</td>
+<td style="text-align: left;">calcrule_id</td>
+<td style="text-align: right;">16</td>
 </tr>
 <tr>
-<td style="text-align:left">deductible_1</td>
-<td style="text-align:right">0.05</td>
+<td style="text-align: left;">deductible_1</td>
+<td style="text-align: right;">0.05</td>
 </tr>
 </tbody>
 </table>
-<h5 id="calculation-logic">Calculation logic</h5>
-<pre class="hljs"><code><div>loss = x.loss - (x.loss * deductible_1);
-<span class="hljs-keyword">if</span> (loss &lt; 0) loss = 0;
-</div></code></pre>
+<h5 id="calculation-logic-10">Calculation logic</h5>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode sh"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="ex">loss</span> = x.loss <span class="at">-</span> <span class="er">(</span><span class="ex">x.loss</span> <span class="pp">*</span> deductible_1<span class="kw">);</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="kw">(</span><span class="ex">loss</span> <span class="op">&lt;</span> 0<span class="kw">)</span> <span class="ex">loss</span> = 0<span class="kw">;</span></span></code></pre></div>
 <p><a href="#fmprofiles">Return to top</a></p>
-<p><a href="MultiPeril.md">Go to Appendix C Multi-peril model support</a></p>
-<p><a href="Contents.md">Back to Contents</a></p>
-
+<p><a href="MultiPeril.html">Go to Appendix C Multi-peril model
+support</a></p>
+<p><a href="Contents.html">Back to Contents</a></p>
 </body>
 </html>

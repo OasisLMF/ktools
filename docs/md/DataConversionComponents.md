@@ -4,14 +4,18 @@
 The following components convert input data in csv format to the binary format required by the calculation components in the reference model;
 
 **Static data**
+* **[aggregatevulnerabilitytobin](#aggregatevulnerability)** converts the aggregate vulnerability data. 
 * **[damagebintobin](#damagebins)** converts the damage bin dictionary. 
 * **[footprinttobin](#footprint)** converts the event footprint.
+* **[lossfactorstobin](#lossfactors)** converts the lossfactors data. 
 * **[randtobin](#rand)** converts a list of random numbers. 
 * **[vulnerabilitytobin](#vulnerability)** converts the vulnerability data.
+* **[weightstobin](#weights)** converts the weights data.
 
 A reference [intensity bin dictionary](#intensitybins) csv should also exist, although there is no conversion component for this file because it is not needed for calculation purposes. 
 
 **Input data**
+* **[amplificationtobin](#amplifications)** converts the amplifications data.
 * **[coveragetobin](#coverages)** converts the coverages data.
 * **[evetobin](#events)** converts a list of event_ids.
 * **[itemtobin](#items)** converts the items data.
@@ -24,18 +28,23 @@ A reference [intensity bin dictionary](#intensitybins) csv should also exist, al
 * **[occurrencetobin](#occurrence)** converts the event occurrence data.
 * **[returnperiodtobin](#returnperiod)** converts a list of return periods.
 * **[periodstobin](#periods)** converts a list of weighted periods (optional).
+* **[quantiletobin](#quantile)** converts a list of quantiles (optional).
 
 These components are intended to allow users to generate the required input binaries from csv independently of the original data store and technical environment. All that needs to be done is first generate the csv files from the data store (SQL Server database, etc).
 
 The following components convert the binary input data required by the calculation components in the reference model into csv format;
 
 **Static data**
+* **[aggregatevulnerabilitytocsv](#aggregatevulnerability)** converts the aggregate vulnerability data. 
 * **[damagebintocsv](#damagebins)** converts the damage bin dictionary. 
 * **[footprinttocsv](#footprint)** converts the event footprint.
+* **[lossfactorstocsv](#lossfactors)** converts the lossfactors data. 
 * **[randtocsv](#rand)** converts a list of random numbers. 
 * **[vulnerabilitytocsv](#vulnerability)** converts the vulnerability data.
+* **[weightstocsv](#weights)** converts the weights data.
 
 **Input data**
+* **[amplificationtocsv](#amplifications)** converts the amplifications data.
 * **[coveragetocsv](#coverages)** converts the coverages data.
 * **[evetocsv](#events)** converts a list of event_ids.
 * **[itemtocsv](#items)** converts the items data.
@@ -48,10 +57,42 @@ The following components convert the binary input data required by the calculati
 * **[occurrencetocsv](#occurrence)** converts the event occurrence data.
 * **[returnperiodtocsv](#returnperiod)** converts a list of return periods.
 * **[periodstocsv](#returnperiod)** converts a list of weighted periods (optional).
+* **[quantiletocsv](#quantile)** converts a list of quantiles (optional).
 
 These components are provided for the convenience of viewing the data and debugging.
 
 ## Static data
+
+ <a id="aggregatevulnerability"></a>
+### aggregate vulnerability
+***
+The aggregate vulnerability file is  required for the gulmc component. It contains the conditional distributions of damage for each intensity bin and for each vulnerability_id. This file must have the following location and filename;
+
+* static/aggregate_vulnerability.bin
+
+##### File format
+
+The csv file should contain the following fields and include a header row.
+
+
+| Name                           | Type   |  Bytes | Description                                   | Example     |
+|:-------------------------------|--------|--------| :---------------------------------------------|------------:|
+| aggregate_vulnerability_id     | int    |    4   | Oasis vulnerability_id                        |     45      |
+| vulnerability_id               | int    |    4   | Oasis vulnerability_id                        |     45      |
+
+If this file is present, the weights.bin or weights.csv file must also be present. The data should not contain nulls.
+
+##### aggregatevulnerabilitytobin
+```
+$ aggregatevulnerabilitytobin < aggregate_vulnerability.csv > aggregate_vulnerability.bin
+```
+
+##### aggregatevulnerabilitytocsv
+```
+$ aggregatevulnerabilitytocsv < aggregate_vulnerability.bin > aggregate_vulnerability.csv
+```
+
+[Return to top](#dataconversioncomponents)
 
  <a id="damagebins"></a>
 ### damage bin dictionary
@@ -197,6 +238,37 @@ $ footprinttocsv -z > footprint.csv
 
 [Return to top](#dataconversioncomponents)
 
+<a id="lossfactors"></a>
+### Loss Factors
+***
+The lossfactors binary maps the event_id/amplification_id pairs with post loss amplification factors, and is supplied by the model providers. The first 4 bytes are preserved for future use and the data format is as follows. It is required by Post Loss Amplification (PLA) workflow must have the following location and filename;
+
+* static/lossfactors.bin
+
+#### File format
+The csv file should contain the following fields and include a header row.
+
+| Name              | Type   |  Bytes | Description                                               | Example     |
+|:------------------|--------|--------| :---------------------------------------------------------|------------:|
+| event_id          | int    |    4   | Event ID                                                  |     1       |
+| count             | int    |    4   | Number of amplification IDs associated with the event ID  |     1       |
+| amplification_id  | int    |    4   | Amplification ID                                          |     1       |
+| factor            | float  |    4   | The uplift factor                                         |     1.01    |
+
+All fields must not have null values. The csv file will not contain the count, and the conversion tools will add/remove this count.
+
+##### lossfactorstobin
+```
+$ lossfactorstobin < lossfactors.csv > lossfactors.bin
+```
+
+##### lossfactorstocsv
+```
+$ lossfactorstocsv < lossfactors.bin > lossfactors.csv
+```
+
+[Return to top](#dataconversioncomponents)
+
 <a id="rand"></a>
 ### Random numbers 
 ***
@@ -294,7 +366,66 @@ $ vulnerabilitytocsv -z > vulnerability.csv
 ```
 [Return to top](#dataconversioncomponents)
 
+<a id="weights"></a>
+### Weights
+***
+The vulnerability weights binary contains the the weighting of each vulnerability function in all areaperil IDs. The data format is as follows. It is required by gulmc with the aggregate_vulnerability file and must have the following location and filename;
+
+* static/weights.bin
+
+#### File format
+The csv file should contain the following fields and include a header row.
+
+| Name              | Type   |  Bytes | Description                                               | Example     |
+|:------------------|--------|--------| :---------------------------------------------------------|------------:|
+| areaperil_id      | int    |    4   | Areaperil ID                                              |     1       |
+| vulnerability_id  | int    |    4   | Vulnerability ID                                          |     1       |
+| weight            | float  |    4   | The weighting factor                                      |     1.0     |
+
+All fields must not have null values.
+
+##### weightstobin
+```
+$ weightstobin < weights.csv > weights.bin
+```
+
+##### weightstocsv
+```
+$ weightstocsv < weights.bin > weights.csv
+```
+
+[Return to top](#dataconversioncomponents)
+
 ## Input data
+
+<a id="amplifications"></a>
+### Amplifications
+***
+The amplifications binary contains the list of item IDs mapped to amplification IDs. The data format is as follows. It is required by Post Loss Amplification (PLA) workflow must have the following location and filename;
+
+* input/amplifications.bin
+
+#### File format
+The csv file should contain the following fields and include a header row.
+
+| Name              | Type   |  Bytes | Description                                   | Example     |
+|:------------------|--------|--------| :---------------------------------------------|------------:|
+| item_id           | int    |    4   | Item ID                                       |     1       |
+| amplification_id  | int    |    4   | Amplification ID                              |     1       |
+
+The item_id must start from 1 and must be contiguous and not have null values. The binary file only contains the amplification IDs and assumes the item_ids would start from 1 and are contiguous.
+
+##### amplificationtobin
+```
+$ amplificationtobin < amplifications.csv > amplifications.bin
+```
+
+##### amplificationtocsv
+```
+$ amplificationtocsv < amplifications.bin > amplifications.csv
+```
+
+[Return to top](#dataconversioncomponents)
 
 <a id="coverages"></a>
 ### Coverages
@@ -815,6 +946,34 @@ $ periodstobin < periods.csv > periods.bin
 ```
 $ periodstocsv < periods.bin > periods.csv
 ``` 
+
+[Return to top](#dataconversioncomponents)
+
+<a id="quantile"></a>
+### Quantile
+***
+The quantile binary file contains a list of user specified quantile floats. The data format is as follows. It is optionally used by the Quantile Event/Period Loss tables and must have the following location and filename;
+
+* input/quantile.bin
+
+#### File format
+The csv file should contain the following fields and include a header row.
+
+| Name              | Type   |  Bytes | Description                                               | Example     |
+|:------------------|--------|--------| :---------------------------------------------------------|------------:|
+| quantile          | float  |    4   | Quantile float                                            |     0.1     |
+
+All fields must not have null values.
+
+##### quantiletobin
+```
+$ quantiletobin < quantile.csv > quantile.bin
+```
+
+##### quantiletocsv
+```
+$ quantiletocsv < quantile.bin > quantile.csv
+```
 
 [Return to top](#dataconversioncomponents)
 

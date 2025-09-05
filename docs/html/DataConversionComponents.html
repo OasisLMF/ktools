@@ -202,6 +202,8 @@ file because it is not needed for calculation purposes.</p>
 converts the amplifications data.</li>
 <li><strong><a href="#coverages">coveragetobin</a></strong> converts the
 coverages data.</li>
+<li><strong><a href="#ensemble">ensembletobin</a></strong> converts the
+ensemble data.</li>
 <li><strong><a href="#events">evetobin</a></strong> converts a list of
 event_ids.</li>
 <li><strong><a href="#items">itemtobin</a></strong> converts the items
@@ -257,6 +259,8 @@ weights data.</li>
 converts the amplifications data.</li>
 <li><strong><a href="#coverages">coveragetocsv</a></strong> converts the
 coverages data.</li>
+<li><strong><a href="#ensemble">ensembletocsv</a></strong> converts the
+ensemble data.</li>
 <li><strong><a href="#events">evetocsv</a></strong> converts a list of
 event_ids.</li>
 <li><strong><a href="#items">itemtocsv</a></strong> converts the items
@@ -1030,6 +1034,58 @@ starting at 1.</p>
 <h5 id="coveragetocsv">coveragetocsv</h5>
 <pre><code>$ coveragetocsv &lt; coverages.bin &gt; coverages.csv</code></pre>
 <p><a href="#dataconversioncomponents">Return to top</a></p>
+<p><a id="ensemble"></a></p>
+<h3 id="ensemble">ensemble</h3>
+<hr />
+<p>The ensemble file is used for ensemble modelling (multiple views)
+which maps sample IDs to particular ensemble ID groups. It is an
+optional file for use with AAL and LEC. It must have the following
+location and filename;</p>
+<ul>
+<li>input/ensemble.bin</li>
+</ul>
+<h5 id="file-format-9">File format</h5>
+<p>The csv file should contain a list of event_ids (integers) and
+include a header.</p>
+<table>
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 11%" />
+<col style="width: 11%" />
+<col style="width: 29%" />
+<col style="width: 19%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th>Type</th>
+<th>Bytes</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: right;">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">sidx</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">Sample ID</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr>
+<td style="text-align: left;">ensemble_id</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">Ensemble ID</td>
+<td style="text-align: right;">1</td>
+</tr>
+</tbody>
+</table>
+<h5 id="ensembletobin">ensembletobin</h5>
+<pre><code>$ ensembletobin &lt; ensemble.csv &gt; ensemble.bin</code></pre>
+<h5 id="ensembletocsv">ensembletocsv</h5>
+<pre><code>$ ensembletocsv &lt; ensemble.bin &gt; ensemble.csv</code></pre>
+<p><a href="#dataconversioncomponents">Return to top</a></p>
 <p><a id="events"></a></p>
 <h3 id="events">events</h3>
 <hr />
@@ -1038,7 +1094,7 @@ following location and filename;</p>
 <ul>
 <li>input/events.bin</li>
 </ul>
-<h5 id="file-format-9">File format</h5>
+<h5 id="file-format-10">File format</h5>
 <p>The csv file should contain a list of event_ids (integers) and
 include a header.</p>
 <table>
@@ -1083,7 +1139,7 @@ following location and filename;</p>
 <ul>
 <li>input/items.bin</li>
 </ul>
-<h5 id="file-format-10">File format</h5>
+<h5 id="file-format-11">File format</h5>
 <p>The csv file should contain the following fields and include a header
 row.</p>
 <table>
@@ -1160,7 +1216,7 @@ and must have the following location and filename;</p>
 <ul>
 <li>input/gulsummaryxref.bin</li>
 </ul>
-<h5 id="file-format-11">File format</h5>
+<h5 id="file-format-12">File format</h5>
 <p>The csv file should contain the following fields and include a header
 row.</p>
 <table style="width:100%;">
@@ -1381,7 +1437,7 @@ required for fmcalc only.</p>
 <ul>
 <li>input/fm_programme.bin</li>
 </ul>
-<h5 id="file-format-12">File format</h5>
+<h5 id="file-format-13">File format</h5>
 <p>The csv file should contain the following fields and include a header
 row.</p>
 <table>
@@ -1463,7 +1519,7 @@ fields</li>
 <li>input/fm_profile.bin</li>
 <li>input/fm_profile_step.bin</li>
 </ul>
-<h5 id="file-format-13">File format</h5>
+<h5 id="file-format-14">File format</h5>
 <p>The csv file should contain the following fields and include a header
 row.</p>
 <p><strong>fm_profile</strong></p>
@@ -1737,7 +1793,7 @@ fm profile file. This file is required for fmcalc only.</p>
 <ul>
 <li>input/fm_policytc.bin</li>
 </ul>
-<h5 id="file-format-14">File format</h5>
+<h5 id="file-format-15">File format</h5>
 <p>The csv file should contain the following fields and include a header
 row.</p>
 <table>
@@ -1817,7 +1873,7 @@ following location and filename;</p>
 <ul>
 <li>input/fmsummaryxref.bin</li>
 </ul>
-<h5 id="file-format-15">File format</h5>
+<h5 id="file-format-16">File format</h5>
 <p>The csv file should contain the following fields and include a header
 row.</p>
 <table>
@@ -1962,7 +2018,7 @@ required by fmcalc.</p>
 <ul>
 <li>input/fm_xref.bin</li>
 </ul>
-<h5 id="file-format-16">File format</h5>
+<h5 id="file-format-17">File format</h5>
 <p>The csv file should contain the following fields and include a header
 row.</p>
 <table>
@@ -2127,7 +2183,7 @@ occurrence year, month and day.</li>
 <li>occ_hour, occ_monute. These are optional and are all integers
 representing occurrence hour and minute.</li>
 </ul>
-<h5 id="file-format-17">File format</h5>
+<h5 id="file-format-18">File format</h5>
 <p>The csv file should contain the following fields and include a header
 row.</p>
 <table>
@@ -2255,7 +2311,7 @@ results.</p>
 <ul>
 <li>input/returnperiods.bin</li>
 </ul>
-<h5 id="file-format-18">File format</h5>
+<h5 id="file-format-19">File format</h5>
 <p>The csv file should contain the following field and include a
 header.</p>
 <table>
@@ -2301,7 +2357,7 @@ and aalcalc results.</p>
 <ul>
 <li>input/periods.bin</li>
 </ul>
-<h5 id="file-format-19">File format</h5>
+<h5 id="file-format-20">File format</h5>
 <p>The csv file should contain the following field and include a
 header.</p>
 <table>
@@ -2357,7 +2413,7 @@ and filename;</p>
 <ul>
 <li>input/quantile.bin</li>
 </ul>
-<h4 id="file-format-20">File format</h4>
+<h4 id="file-format-21">File format</h4>
 <p>The csv file should contain the following fields and include a header
 row.</p>
 <table style="width:100%;">

@@ -17,6 +17,7 @@ A reference [intensity bin dictionary](#intensitybins) csv should also exist, al
 **Input data**
 * **[amplificationtobin](#amplifications)** converts the amplifications data.
 * **[coveragetobin](#coverages)** converts the coverages data.
+* **[ensembletobin](#ensemble)** converts the ensemble data.
 * **[evetobin](#events)** converts a list of event_ids.
 * **[itemtobin](#items)** converts the items data.
 * **[gulsummaryxreftobin](#gulsummaryxref)** converts the gul summary xref data.
@@ -46,6 +47,7 @@ The following components convert the binary input data required by the calculati
 **Input data**
 * **[amplificationtocsv](#amplifications)** converts the amplifications data.
 * **[coveragetocsv](#coverages)** converts the coverages data.
+* **[ensembletocsv](#ensemble)** converts the ensemble data.
 * **[evetocsv](#events)** converts a list of event_ids.
 * **[itemtocsv](#items)** converts the items data.
 * **[gulsummaryxreftocsv](#gulsummaryxref)** converts the gul summary xref data.
@@ -454,6 +456,31 @@ $ coveragetobin < coverages.csv > coverages.bin
 $ coveragetocsv < coverages.bin > coverages.csv
 ```
 
+[Return to top](#dataconversioncomponents)
+
+<a id="ensemble"></a>
+### ensemble
+***
+The ensemble file is used for ensemble modelling (multiple views) which maps sample IDs to particular ensemble ID groups. It is an optional file for use with AAL and LEC. It must have the following location and filename;
+* input/ensemble.bin
+
+##### File format
+The csv file should contain a list of event_ids (integers) and include a header.
+
+| Name              | Type   |  Bytes | Description         | Example     |
+|:------------------|--------|--------| :-------------------|------------:|
+| sidx              | int    |    4   | Sample ID           |   1         |
+| ensemble_id       | int    |    4   | Ensemble ID         |   1         |
+
+##### ensembletobin
+```
+$ ensembletobin < ensemble.csv > ensemble.bin
+```
+
+##### ensembletocsv
+```
+$ ensembletocsv < ensemble.bin > ensemble.csv
+```
 [Return to top](#dataconversioncomponents)
 
 <a id="events"></a>

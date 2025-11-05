@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>ORDOutputComponents</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+</head>
+<body>
+<h1 id="43-ord-output-components-">4.3 ORD Output Components
+<a id="ordoutputcomponents"></a></h1>
+<p>As well as the set of legacy outputs described in
+OutputComponents.html, ktools also supports Open Results Data "ORD" output
+calculations and reports.</p>
+<p>Open Results Data is a data standard for catastrophe loss model
+results developed as part of Open Data Standards "ODS". ODS is curated
+by OasisLMF and governed by the Open Data Standards Steering Committee
+(SC), comprised of industry experts representing (re)insurers, brokers,
+service providers and catastrophe model vendors. More information about
+ODS can be found <a
+href="https://github.com/OasisLMF/OpenDataStandards">here</a>.</p>
+<p>ktools supports a subset of the fields in each of the ORD reports,
+which are given in more detail below. In most cases, the existing
+components for legacy outputs are used to generate ORD format outputs
+when called with extra command line switches, although there is a
+dedicated component call ordleccalc to generate all of the EPT reports.
+In overview, here are the mappings from component to ORD report:</p>
+<ul>
+<li><strong>summarycalctocsv</strong> generates SELT</li>
+<li><strong>eltcalc</strong> generates MELT, QELT</li>
+<li><strong>pltcalc</strong> generates SPLT, MPLT, QPLT</li>
+<li><strong>ordleccalc</strong> generates EPT and PSEPT</li>
+<li><strong>aalcalc</strong> generates ALT</li>
+</ul>
+<p><a id="summarycalc"></a></p>
+<h3 id="summarycalctocsv">summarycalctocsv</h3>
+<hr />
+<p>Summarycalctocsv takes the summarycalc loss stream, which contains
+the individual loss samples by event and summary_id, and outputs them in
+ORD format. Summarycalc is a core component that aggregates the
+individual building or coverage loss samples into groups that are of
+interest from a reporting perspective. This is covered in <a
+href="DataConversionComponents.html">Core Components</a></p>
+<h5 id="parameters">Parameters</h5>
+<ul>
+<li>-o The ORD output flag</li>
+<li>-p {filename.parquet} outputs the SELT in parquet format</li>
+</ul>
+<h5 id="usage">Usage</h5>
+<pre><code>$ [stdin component] | summarycalctocsv [parameters] &gt; selt.csv
+$ summarycalctocsv [parameters] &gt; selt.csv &lt; [stdin].bin</code></pre>
+<h5 id="example">Example</h5>
+<pre><code>$ eve 1 1 | getmodel | gulcalc -r -S100 -a1 -i - | summarycalc -i -1 - | summarycalctocsv -o &gt; selt.csv
+$ eve 1 1 | getmodel | gulcalc -r -S100 -a1 -i - | summarycalc -i -1 - | summarycalctocsv -p selt.parquet
+$ eve 1 1 | getmodel | gulcalc -r -S100 -a1 -i - | summarycalc -i -1 - | summarycalctocsv -p selt.parquet -o &gt; selt.csv
+$ summarycalctocsv -o &gt; selt.csv &lt; summarycalc.bin
+$ summarycalctocsv -p selt.parquet &lt; summarycalc.bin
+$ summarycalctocsv -p selt.parquet -o &gt; selt.csv &lt; summarycalc.bin</code></pre>
+<h5 id="internal-data">Internal data</h5>
+<p>None.</p>
+<h5 id="output">Output</h5>
+<p>The Sample ELT output is a csv file with the following fields;</p>
+<table>
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 59%" />
+<col style="width: 10%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th>Type</th>
+<th>Bytes</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: right;">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">EventId</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">Model event_id</td>
+<td style="text-align: right;">45567</td>
+</tr>
+<tr>
+<td style="text-align: left;">SummaryId</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">SummaryId representing a grouping of
+losses</td>
+<td style="text-align: right;">10</td>
+</tr>
+<tr>
+<td style="text-align: left;">SampleId</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">The sample number</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr>
+<td style="text-align: left;">Loss</td>
+<td>float</td>
+<td>4</td>
+<td style="text-align: left;">The loss sample</td>
+<td style="text-align: right;">13645.78</td>
+</tr>
+<tr>
+<td style="text-align: left;">ImpactedExposure</td>
+<td>float</td>
+<td>4</td>
+<td style="text-align: left;">Exposure value impacted by the event for
+the sample</td>
+<td style="text-align: right;">70000</td>
+</tr>
+</tbody>
+</table>
+<h3 id="eltcalc-">eltcalc <a id="eltcalc"></a></h3>
+<hr />
+<p>The program calculates loss by SummaryId and EventId. There are two
+variants (in addition to the sample variant SELT output by summarycalc,
+above);</p>
+<ul>
+<li>Moment ELT (MELT) outputs Mean and Standard deviation of loss, as
+well as EventRate, ChanceOfLoss, MaxLoss, FootprintExposure,
+MeanImpactedExposure and MaxImpactedExposure</li>
+<li>Quantile ELT (QELT) outputs loss quantiles for the provided set of
+probabilites.</li>
+</ul>
+<h5 id="parameters-1">Parameters</h5>
+<ul>
+<li>-M {filename.csv} outputs the MELT in csv format</li>
+<li>-Q {filename.csv} outputs the QELT in csv format</li>
+<li>-m {filename.parquet} outputs the MELT in parquet format</li>
+<li>-q {filename.parquet} outputs the QELT in parquet format</li>
+</ul>
+<h5 id="usage-1">Usage</h5>
+<pre><code>$ [stdin component] | eltcalc -M [filename.csv] -Q [filename.csv] -m [filename.parquet] -q [filename.parquet]
+$ eltcalc  -M [filename.csv] -Q [filename.csv] -m [filename.parquet] -q [filename.parquet] &lt; [stdin].bin</code></pre>
+<h5 id="example-1">Example</h5>
+<pre><code>$ eve 1 1 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - | eltcalc -M MELT.csv -Q QELT.csv
+$ eve 1 1 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - | eltcalc -m MELT.parquet -q QELT.parquet
+$ eve 1 1 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - | eltcalc -M MELT.csv -Q QELT.csv -m MELT.parquet -q QELT.parquet
+$ eltcalc  -M MELT.csv -Q QELT.csv &lt; summarycalc.bin
+$ eltcalc  -m MELT.parquet -Q QELT.parquet &lt; summarycalc.bin
+$ eltcalc  -M MELT.csv -Q QELT.csv -m MELT.parquet -q QELT.parquet &lt; summarycalc.bin</code></pre>
+<h5 id="internal-data-1">Internal data</h5>
+<p>The Quantile report requires the quantile.bin file</p>
+<ul>
+<li>input/quantile.bin</li>
+</ul>
+<h5 id="calculation">Calculation</h5>
+<h6 id="melt">MELT</h6>
+<p>For each SummaryId and EventId, the sample mean and standard
+deviation is calculated from the sampled losses in the summarycalc
+stream and output to file. The analytical mean is also output as a
+seperate record, differentiated by a 'SampleType' field. Variations of
+the exposure value are also output (see below for details).</p>
+<h6 id="qelt">QELT</h6>
+<p>For each SummaryId and EventId, this report provides the probability
+and the corresponding loss quantile computed from the samples. The list
+of probabilities is provided as input in the quantile.bin file.</p>
+<p>Quantiles are cut points dividing the range of a probability
+distribution into continuous intervals with equal probabilities, or
+dividing the observations in a sample set in the same way. In this case
+we are computing the quantiles of loss from the sampled losses by event
+and summary for a user-provided list of probabilities. For each provided
+probability p, the loss quantile is the sampled loss which is bigger
+than the proportion p of the observed samples.</p>
+<p>In practice this is calculated by sorting the samples in ascending
+order of loss and using linear interpolation between the ordered
+observations to compute the precise loss quantile for the required
+probability.</p>
+<p>The algorithm used for the quantile estimate type and interpolation
+scheme from a finite sample set is R-7 referred to in Wikipedia <a
+href="https://en.wikipedia.org/wiki/Quantile"
+class="uri">https://en.wikipedia.org/wiki/Quantile</a></p>
+<p>If p is the probability, and the sample size is N, then the position
+of the ordered samples required for the quantile is computed by;</p>
+<p>(N-1)p + 1</p>
+<p>In general, this value will be a fraction rather than an integer,
+representing a value in between two ordered samples. Therefore for an
+integer value of k between 1 and N-1 with k &lt; (N-1)p + 1 &lt; k+1 ,
+the loss quantile Q(p) is calculated by a linear interpolation of the
+kth ordered sample X(k) and the k+1 th ordered sample X(k+1) as
+follows;</p>
+<p>Q(p) = X(k) * (1-h) + X(k+1) * h</p>
+<p>where h = (N-1)p + 1 - k</p>
+<h5 id="output-1">Output</h5>
+<p>The Moment ELT output is a csv file with the following fields;</p>
+<table>
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 59%" />
+<col style="width: 10%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th>Type</th>
+<th>Bytes</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: right;">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">EventId</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">Model event_id</td>
+<td style="text-align: right;">45567</td>
+</tr>
+<tr>
+<td style="text-align: left;">SummaryId</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">SummaryId representing a grouping of
+losses</td>
+<td style="text-align: right;">10</td>
+</tr>
+<tr>
+<td style="text-align: left;">SampleType</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">1 for analytical mean, 2 for sample
+mean</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr>
+<td style="text-align: left;">EventRate</td>
+<td>float</td>
+<td>4</td>
+<td style="text-align: left;">Annual frequency of event computed by
+relative frequency of occurrence</td>
+<td style="text-align: right;">0.01</td>
+</tr>
+<tr>
+<td style="text-align: left;">ChanceOfLoss</td>
+<td>float</td>
+<td>4</td>
+<td style="text-align: left;">Probability of a loss calculated from the
+effective damage distributions</td>
+<td style="text-align: right;">0.95</td>
+</tr>
+<tr>
+<td style="text-align: left;">MeanLoss</td>
+<td>float</td>
+<td>4</td>
+<td style="text-align: left;">Mean</td>
+<td style="text-align: right;">1345.678</td>
+</tr>
+<tr>
+<td style="text-align: left;">SDLoss</td>
+<td>float</td>
+<td>4</td>
+<td style="text-align: left;">Sample standard deviation for
+SampleType=2</td>
+<td style="text-align: right;">945.89</td>
+</tr>
+<tr>
+<td style="text-align: left;">MaxLoss</td>
+<td>float</td>
+<td>4</td>
+<td style="text-align: left;">Maximum possible loss calculated from the
+effective damage distribution</td>
+<td style="text-align: right;">75000</td>
+</tr>
+<tr>
+<td style="text-align: left;">FootprintExposure</td>
+<td>float</td>
+<td>4</td>
+<td style="text-align: left;">Exposure value impacted by the model's
+event footprint</td>
+<td style="text-align: right;">80000</td>
+</tr>
+<tr>
+<td style="text-align: left;">MeanImpactedExposure</td>
+<td>float</td>
+<td>4</td>
+<td style="text-align: left;">Mean exposure impacted by the event across
+the samples (where loss &gt; 0 )</td>
+<td style="text-align: right;">65000</td>
+</tr>
+<tr>
+<td style="text-align: left;">MaxImpactedExposure</td>
+<td>float</td>
+<td>4</td>
+<td style="text-align: left;">Maximum exposure impacted by the event
+across the samples (where loss &gt; 0)</td>
+<td style="text-align: right;">70000</td>
+</tr>
+</tbody>
+</table>
+<p>The Quantile ELT output is a csv file with the following fields;</p>
+<table>
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 59%" />
+<col style="width: 10%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th>Type</th>
+<th>Bytes</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: right;">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">EventId</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">Model event_id</td>
+<td style="text-align: right;">45567</td>
+</tr>
+<tr>
+<td style="text-align: left;">SummaryId</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">SummaryId representing a grouping of
+losses</td>
+<td style="text-align: right;">10</td>
+</tr>
+<tr>
+<td style="text-align: left;">Quantile</td>
+<td>float</td>
+<td>4</td>
+<td style="text-align: left;">The probability associated with the loss
+quantile</td>
+<td style="text-align: right;">0.9</td>
+</tr>
+<tr>
+<td style="text-align: left;">Loss</td>
+<td>float</td>
+<td>4</td>
+<td style="text-align: left;">The loss quantile</td>
+<td style="text-align: right;">1345.678</td>
+</tr>
+</tbody>
+</table>
+<p><a href="#ordoutputcomponents">Return to top</a></p>
+<h3 id="pltcalc-">pltcalc <a id="pltcalc"></a></h3>
+<hr />
+<p>The program calculates loss by Period, EventId and SummaryId and
+outputs the results in ORD format. There are three variants;</p>
+<ul>
+<li>Sample PLT (SPLT) outputs individual loss samples by SampleId, as
+well as PeriodWeight, Year, Month, Day, Hour, Minute and
+ImpactedExposure</li>
+<li>Moment PLT (MPLT) outputs Mean and Standard deviation of loss, as
+well as PeriodWeight, Year, Month, Day, Hour, Minute, ChanceOfLoss,
+MaxLoss, FootprintExposure, MeanImpactedExposure and
+MaxImpactedExposure</li>
+<li>Quantile PLT (QPLT) outputs loss quantiles for the provided set of
+probabilites as well as PeriodWeight, Year, Month, Day, Hour,
+Minute</li>
+</ul>
+<h5 id="parameters-2">Parameters</h5>
+<ul>
+<li>-S {filename.csv} outputs the SPLT in csv format</li>
+<li>-M {filename.csv} outputs the MPLT in csv format</li>
+<li>-Q {filename.csv} outputs the QPLT in csv format</li>
+<li>-s {filename.parquet} outputs the SPLT in parquet format</li>
+<li>-m {filename.parquet} outputs the MPLT in parquet format</li>
+<li>-q {filename.parquet} outputs the QPLT in parquet format</li>
+</ul>
+<h5 id="usage-2">Usage</h5>
+<pre><code>$ [stdin component] | pltcalc -S [filename.csv] -M [filename.csv] -Q [filename.csv] -s [filename.parquet] -m [filename.parquet] -q [filename.parquet]
+$ pltcalc -S [filename.csv] -M [filename.csv] -Q [filename.csv] -s [filename.parquet] -m [filename.parquet] -q [filename.parquet] &lt; [stdin].bin</code></pre>
+<h5 id="example-2">Example</h5>
+<pre><code>$ eve 1 1 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - | pltcalc -S SPLT.csv -M MPLT.csv -Q QPLT.csv
+$ eve 1 1 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - | pltcalc -s SPLT.parquet -m MPLT.parquet -q QPLT.parquet
+$ eve 1 1 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - | pltcalc -S SPLT.csv -M MPLT.csv -Q QPLT.csv -s SPLT.parquet -m MPLT.parquet -q QPLT.parquet
+$ pltcalc -S SPLT.csv -M MPLT.csv -Q QPLT.csv &lt; summarycalc.bin
+$ pltcalc -s SPLT.parquet -m MPLT.parquet -q QPLT.parquet &lt; summarycalc.bin
+$ pltcalc -S SPLT.csv -M MPLT.csv -Q QPLT.csv -s SPLT.parquet -m MPLT.parquet -q QPLT.parquet &lt; summarycalc.bin</code></pre>
+<h5 id="internal-data-2">Internal data</h5>
+<p>pltcalc requires the occurrence.bin file</p>
+<ul>
+<li>input/occurrence.bin</li>
+</ul>
+<p>The Quantile report additionally requires the quantile.bin file</p>
+<ul>
+<li>input/quantile.bin</li>
+</ul>
+<p>pltcalc will optionally use the following file if present</p>
+<ul>
+<li>input/periods.bin</li>
+</ul>
+<h5 id="calculation-1">Calculation</h5>
+<h6 id="splt">SPLT</h6>
+<p>For each Period, EventId and SummaryId, the individual loss samples
+are output by SampleId. The sampled event losses from the summarycalc
+stream are assigned to a Period for each occurrence of the EventId in
+the occurrence file.</p>
+<h6 id="mplt">MPLT</h6>
+<p>For each Period, EventId and SummaryId, the sample mean and standard
+deviation is calculated from the sampled event losses in the summarycalc
+stream and output to file. The analytical mean is also output as a
+seperate record, differentiated by a 'SampleType' field. Variations of
+the exposure value are also output (see below for more details).</p>
+<h6 id="qplt">QPLT</h6>
+<p>For each Period, EventId and SummaryId, this report provides the
+probability and the corresponding loss quantile computed from the
+samples. The list of probabilities is provided in the quantile.bin
+file.</p>
+<p>See QELT for the method of computing the loss quantiles.</p>
+<h5 id="output-2">Output</h5>
+<p>The Sample PLT output is a csv with the folling fields</p>
+<table>
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 59%" />
+<col style="width: 10%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th>Type</th>
+<th>Bytes</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: right;">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Period</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">The period in which the event occurs</td>
+<td style="text-align: right;">500</td>
+</tr>
+<tr>
+<td style="text-align: left;">PeriodWeight</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">The weight of the period (frequency
+relative to the total number of periods)</td>
+<td style="text-align: right;">0.001</td>
+</tr>
+<tr>
+<td style="text-align: left;">EventId</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">Model event_id</td>
+<td style="text-align: right;">45567</td>
+</tr>
+<tr>
+<td style="text-align: left;">Year</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">The year in which the event occurs</td>
+<td style="text-align: right;">1970</td>
+</tr>
+<tr>
+<td style="text-align: left;">Month</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">The month number in which the event
+occurs</td>
+<td style="text-align: right;">5</td>
+</tr>
+<tr>
+<td style="text-align: left;">Day</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">The day number in which the event
+occurs</td>
+<td style="text-align: right;">22</td>
+</tr>
+<tr>
+<td style="text-align: left;">Hour</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">The hour in which the event occurs</td>
+<td style="text-align: right;">11</td>
+</tr>
+<tr>
+<td style="text-align: left;">Minute</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">The minute in which the event occurs</td>
+<td style="text-align: right;">45</td>
+</tr>
+<tr>
+<td style="text-align: left;">SummaryId</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">SummaryId representing a grouping of
+losses</td>
+<td style="text-align: right;">10</td>
+</tr>
+<tr>
+<td style="text-align: left;">SampleId</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">The sample number</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr>
+<td style="text-align: left;">Loss</td>
+<td>float</td>
+<td>4</td>
+<td style="text-align: left;">The loss sample</td>
+<td style="text-align: right;">13645.78</td>
+</tr>
+<tr>
+<td style="text-align: left;">ImpactedExposure</td>
+<td>float</td>
+<td>4</td>
+<td style="text-align: left;">Exposure impacted by the event for the
+sample</td>
+<td style="text-align: right;">70000</td>
+</tr>
+</tbody>
+</table>
+<p>The Moment PLT output is a csv file with the following fields;</p>
+<table>
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 59%" />
+<col style="width: 10%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th>Type</th>
+<th>Bytes</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: right;">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Period</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">The period in which the event occurs</td>
+<td style="text-align: right;">500</td>
+</tr>
+<tr>
+<td style="text-align: left;">PeriodWeight</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">The weight of the period (frequency
+relative to the total number of periods)</td>
+<td style="text-align: right;">0.001</td>
+</tr>
+<tr>
+<td style="text-align: left;">EventId</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">Model event_id</td>
+<td style="text-align: right;">45567</td>
+</tr>
+<tr>
+<td style="text-align: left;">Year</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">The year in which the event occurs</td>
+<td style="text-align: right;">1970</td>
+</tr>
+<tr>
+<td style="text-align: left;">Month</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">The month number in which the event
+occurs</td>
+<td style="text-align: right;">5</td>
+</tr>
+<tr>
+<td style="text-align: left;">Day</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">The day number in which the event
+occurs</td>
+<td style="text-align: right;">22</td>
+</tr>
+<tr>
+<td style="text-align: left;">Hour</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">The hour in which the event occurs</td>
+<td style="text-align: right;">11</td>
+</tr>
+<tr>
+<td style="text-align: left;">Minute</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">The minute in which the event occurs</td>
+<td style="text-align: right;">45</td>
+</tr>
+<tr>
+<td style="text-align: left;">SummaryId</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">SummaryId representing a grouping of
+losses</td>
+<td style="text-align: right;">10</td>
+</tr>
+<tr>
+<td style="text-align: left;">SampleType</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">1 for analytical mean, 2 for sample
+mean</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr>
+<td style="text-align: left;">ChanceOfLoss</td>
+<td>float</td>
+<td>4</td>
+<td style="text-align: left;">Probability of a loss calculated from the
+effective damage distributions</td>
+<td style="text-align: right;">0.95</td>
+</tr>
+<tr>
+<td style="text-align: left;">MeanLoss</td>
+<td>float</td>
+<td>4</td>
+<td style="text-align: left;">Mean</td>
+<td style="text-align: right;">1345.678</td>
+</tr>
+<tr>
+<td style="text-align: left;">SDLoss</td>
+<td>float</td>
+<td>4</td>
+<td style="text-align: left;">Sample standard deviation for
+SampleType=2</td>
+<td style="text-align: right;">945.89</td>
+</tr>
+<tr>
+<td style="text-align: left;">MaxLoss</td>
+<td>float</td>
+<td>4</td>
+<td style="text-align: left;">Maximum possible loss calculated from the
+effective damage distribution</td>
+<td style="text-align: right;">75000</td>
+</tr>
+<tr>
+<td style="text-align: left;">FootprintExposure</td>
+<td>float</td>
+<td>4</td>
+<td style="text-align: left;">Exposure value impacted by the model's
+event footprint</td>
+<td style="text-align: right;">80000</td>
+</tr>
+<tr>
+<td style="text-align: left;">MeanImpactedExposure</td>
+<td>float</td>
+<td>4</td>
+<td style="text-align: left;">Mean exposure impacted by the event across
+the samples (where loss &gt; 0 )</td>
+<td style="text-align: right;">65000</td>
+</tr>
+<tr>
+<td style="text-align: left;">MaxImpactedExposure</td>
+<td>float</td>
+<td>4</td>
+<td style="text-align: left;">Maximum exposure impacted by the event
+across the samples (where loss &gt; 0)</td>
+<td style="text-align: right;">70000</td>
+</tr>
+</tbody>
+</table>
+<p>The Quantile PLT output is a csv file with the following fields;</p>
+<table>
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 59%" />
+<col style="width: 10%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th>Type</th>
+<th>Bytes</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: right;">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Period</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">The period in which the event occurs</td>
+<td style="text-align: right;">500</td>
+</tr>
+<tr>
+<td style="text-align: left;">PeriodWeight</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">The weight of the period (frequency
+relative to the total number of periods)</td>
+<td style="text-align: right;">0.001</td>
+</tr>
+<tr>
+<td style="text-align: left;">EventId</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">Model event_id</td>
+<td style="text-align: right;">45567</td>
+</tr>
+<tr>
+<td style="text-align: left;">Year</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">The year in which the event occurs</td>
+<td style="text-align: right;">1970</td>
+</tr>
+<tr>
+<td style="text-align: left;">Month</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">The month number in which the event
+occurs</td>
+<td style="text-align: right;">5</td>
+</tr>
+<tr>
+<td style="text-align: left;">Day</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">The day number in which the event
+occurs</td>
+<td style="text-align: right;">22</td>
+</tr>
+<tr>
+<td style="text-align: left;">Hour</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">The hour in which the event occurs</td>
+<td style="text-align: right;">11</td>
+</tr>
+<tr>
+<td style="text-align: left;">Minute</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">The minute in which the event occurs</td>
+<td style="text-align: right;">45</td>
+</tr>
+<tr>
+<td style="text-align: left;">SummaryId</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">SummaryId representing a grouping of
+losses</td>
+<td style="text-align: right;">10</td>
+</tr>
+<tr>
+<td style="text-align: left;">Quantile</td>
+<td>float</td>
+<td>4</td>
+<td style="text-align: left;">The probability associated with the loss
+quantile</td>
+<td style="text-align: right;">0.9</td>
+</tr>
+<tr>
+<td style="text-align: left;">Loss</td>
+<td>float</td>
+<td>4</td>
+<td style="text-align: left;">The loss quantile</td>
+<td style="text-align: right;">1345.678</td>
+</tr>
+</tbody>
+</table>
+<p><a href="#ordoutputcomponents">Return to top</a></p>
+<h3 id="ordleccalc-">ordleccalc <a id="ordleccalc"></a></h3>
+<hr />
+<p>This component produces several variants of loss exceedance curves,
+known as Exceedance Probability Tables "EPT" under ORD.</p>
+<p>An Exceedance Probability Table is a set of user-specified
+percentiles of (typically) annual loss on one of two bases – AEP (sum of
+losses from all events in a year) or OEP (maximum of any one event’s
+losses in a year). In ORD the percentiles are expressed as Return
+Periods, which is the reciprocal of the percentile.</p>
+<p>How EPTs are derived in general depends on the mathematical
+methodology of calculating the underlying ground up and insured
+losses.</p>
+<p>In the Oasis kernel the methodology is Monte Carlo sampling from
+damage distributions, which results in several samples (realisations) of
+an event loss for every event in the model's catalogue. The event losses
+are assigned to a year timeline and the years are rank ordered by loss.
+The method of computing the percentiles is by taking the ratio of the
+frequency of years with a loss exceeding a given threshold over the
+total number of years.</p>
+<p>The OasisLMF approach gives rise to five variations of calculation of
+these statistics:</p>
+<ul>
+<li>EP Table from Mean Damage Losses – this means do the loss
+calculation for a year using the event mean damage loss computed by
+numerical integration of the effective damageability distributions.</li>
+<li>EP Table of Sample Mean Losses – this means do the loss calculation
+for a year using the statistical sample event mean.</li>
+<li>Full Uncertainty EP Table – this means do the calculation across all
+samples (treating the samples effectively as repeat years) - this is the
+most accurate of all the single EP Curves.</li>
+<li>Per Sample EPT (PSEPT) – this means calculate the EP Curve for each
+sample and leave it at the sample level of detail, resulting in multiple
+"curves".</li>
+<li>Per Sample mean EPT – this means average the loss at each return
+period of the Per Sample EPT.</li>
+</ul>
+<p>Exceedance Probability Tables are further generalised in Oasis to
+represent not only annual loss percentiles but loss percentiles over any
+period of time. Thus the typical use of 'Year' label in outputs is
+replaced by the more general term 'Period', which can be any period of
+time as defined in the model data 'occurrence' file (although the normal
+period of interest is a year).</p>
+<h5 id="parameters-3">Parameters</h5>
+<ul>
+<li>-K{sub-directory}. The subdirectory of /work containing the input
+summarycalc binary files. Then the following parameters must be
+specified for at least one analysis type;</li>
+<li>Analysis type. Use -F for Full Uncertainty Aggregate, -f for Full
+Uncertainty Occurrence, -W for Per Sample Aggregate, -w for Per Sample
+Occurrence, -S for Sample Mean Aggregate, -s for Sample Mean Occurrence,
+-M for Per Sample Mean Aggregate, -m for Per Sample Mean Occurrence</li>
+<li>-O {ept.csv} is the output flag for the EPT csv (for analysis types
+-F, -f, -S, -s, -M, -m)</li>
+<li>-o {psept.csv} is the output flag for the PSEPT csv (for analysis
+types -W or -w)</li>
+<li>-P {ept.parquet} is the output flag for the EPT parquet file (for
+analysis types -F, -f, -S, -s, -M, -m)</li>
+<li>-p {psept.parquet} is the output flag for the PSEPT parquet file
+(for analysis types -W or -w)</li>
+</ul>
+<p>An optional parameter is;</p>
+<ul>
+<li>-r. Use return period file - use this parameter if you are providing
+a file with a specific list of return periods. If this file is not
+present then all calculated return periods will be returned, for losses
+greater than zero.</li>
+</ul>
+<h5 id="usage-3">Usage</h5>
+<pre><code>$ ordleccalc [parameters] 
+</code></pre>
+<h5 id="examples">Examples</h5>
+<pre><code>&#39;First generate summarycalc binaries by running the core workflow, for the required summary set
+$ eve 1 2 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - &gt; work/summary1/summarycalc1.bin
+$ eve 2 2 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - &gt; work/summary1/summarycalc2.bin
+
+&#39;Then run ordleccalc, pointing to the specified sub-directory of work containing summarycalc binaries.
+&#39;Write aggregate and occurrence full uncertainty
+$ ordleccalc -Ksummary1 -F -f -O ept.csv
+$ ordleccalc -Ksummary1 -F -f -P ept.parquet
+$ ordleccalc -Ksummary1 -F -f -O ept.csv -P ept.parquet
+
+&#39;Write occurrence per sample (PSEPT)
+$ ordleccalc -Ksummary1 -w -o psept.csv
+$ ordleccalc -Ksummary1 -w -p psept.parquet
+$ ordleccalc -Ksummary1 -w -o psept.csv -p psept.parquet
+
+&#39;Write aggregate and occurrence per sample (written to PSEPT) and per sample mean (written to EPT file)
+$ ordleccalc -Ksummary1 -W -w -M -m -O ept.csv -o psept.csv
+$ ordleccalc -Ksummary1 -W -w -M -m -P ept.parquet -p psept.parquet
+$ ordleccalc -Ksummary1 -W -w -M -m -O ept.csv -o psept.csv -P ept.parquet -p psept.parquet
+
+&#39;Write full output
+$ ordleccalc -Ksummary1 -F -f -W -w -S -s -M -m -O ept.csv -o psept.csv
+$ ordleccalc -Ksummary1 -F -f -W -w -S -s -M -m -P ept.parquet -p psept.parquet
+$ ordleccalc -Ksummary1 -F -f -W -w -S -s -M -m -O ept.csv -o pseept.csv -P ept.parquet -p psept.parquet</code></pre>
+<h5 id="internal-data-3">Internal data</h5>
+<p>ordleccalc requires the occurrence.bin file</p>
+<ul>
+<li>input/occurrence.bin</li>
+</ul>
+<p>and will optionally use the following additional files if present</p>
+<ul>
+<li>input/returnperiods.bin</li>
+<li>input/periods.bin</li>
+</ul>
+<p>ordleccalc does not have a standard input that can be streamed in.
+Instead, it reads in summarycalc binary data from a file in a fixed
+location. The format of the binaries must match summarycalc standard
+output. The location is in the 'work' subdirectory of the present
+working directory. For example;</p>
+<ul>
+<li>work/summarycalc1.bin</li>
+<li>work/summarycalc2.bin</li>
+<li>work/summarycalc3.bin</li>
+</ul>
+<p>The user must ensure the work subdirectory exists. The user may also
+specify a subdirectory of /work to store these files. e.g.</p>
+<ul>
+<li>work/summaryset1/summarycalc1.bin</li>
+<li>work/summaryset1/summarycalc2.bin</li>
+<li>work/summaryset1/summarycalc3.bin</li>
+</ul>
+<p>The reason for ordleccalc not having an input stream is that the
+calculation is not valid on a subset of events, i.e. within a single
+process when the calculation has been distributed across multiple
+processes. It must bring together all event losses before assigning
+event losses to periods and ranking losses by period. The summarycalc
+losses for all events (all processes) must be written to the /work
+folder before running leccalc.</p>
+<h5 id="calculation-2">Calculation</h5>
+<p>All files with extension .bin from the specified subdirectory are
+read into memory, as well as the occurrence.bin. The summarycalc losses
+are grouped together and sampled losses are assigned to period according
+to which period the events are assigned to in the occurrence file.</p>
+<p>If multiple events occur within a period;</p>
+<ul>
+<li>For <strong>aggregate</strong> loss exceedance curves, the sum of
+losses is calculated.</li>
+<li>For <strong>occurrence</strong> loss exceedance curves, the maximum
+loss is calculated.</li>
+</ul>
+<p>The 'EPType' field in the output identifies the basis of loss
+exceedance curve.</p>
+<p>The 'EPTypes' are;</p>
+<ol>
+<li>OEP</li>
+<li>OEP TVAR</li>
+<li>AEP</li>
+<li>AEP TVAR</li>
+</ol>
+<p>TVAR results are generated automatically if the OEP or AEP report is
+selected in the analysis options. TVAR, or Tail Conditional Expectation
+(TCE), is computed by averaging the rank ordered losses exceeding a
+given return period loss from the respective OEP or AEP result.</p>
+<p>Then the calculation differs by EPCalc type, as follows;</p>
+<ol>
+<li><p>The mean damage loss (sidx = -1) is output as a standard
+exceedance probability table. If the calculation is run with 0 samples,
+then leccalc will still return the mean damage loss exceedance
+curve.</p></li>
+<li><p>Full uncertainty - all losses by period are rank ordered to
+produce a single loss exceedance curve.</p></li>
+<li><p>Per Sample mean - the return period losses from the Per Sample
+EPT are averaged, which produces a single loss exceedance
+curve.</p></li>
+<li><p>Sample mean - the losses by period are first averaged across the
+samples, and then a single loss exceedance table is created from the
+period sample mean losses.</p></li>
+</ol>
+<p>All four of the above variants are output into the same file when
+selected.</p>
+<p>Finally, the fifth variant, the Per Sample EPT is output to a
+separate file. In this case, for each sample, losses by period are rank
+ordered to produce a loss exceedance curve for each sample.</p>
+<h5 id="output-3">Output</h5>
+<p>Exceedance Probability Tables (EPT)</p>
+<p>csv files with the following fields;</p>
+<p><strong>Exceedance Probability Table (EPT)</strong></p>
+<table>
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 58%" />
+<col style="width: 11%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th>Type</th>
+<th>Bytes</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: right;">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">SummaryId</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">identifier representing a summary level
+grouping of losses</td>
+<td style="text-align: right;">10</td>
+</tr>
+<tr>
+<td style="text-align: left;">EPCalc</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">1, 2, 3 or 4 with meanings as given
+above</td>
+<td style="text-align: right;">2</td>
+</tr>
+<tr>
+<td style="text-align: left;">EPType</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">1, 2, 3 or 4 with meanings as given
+above</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr>
+<td style="text-align: left;">ReturnPeriod</td>
+<td>float</td>
+<td>4</td>
+<td style="text-align: left;">return period interval</td>
+<td style="text-align: right;">250</td>
+</tr>
+<tr>
+<td style="text-align: left;">loss</td>
+<td>float</td>
+<td>4</td>
+<td style="text-align: left;">loss exceedance threshold or TVAR for
+return period</td>
+<td style="text-align: right;">546577.8</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Per Sample Exceedance Probability Tables (PSEPT)</strong></p>
+<table>
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 58%" />
+<col style="width: 11%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th>Type</th>
+<th>Bytes</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: right;">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">SummaryId</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">identifier representing a summary level
+grouping of losses</td>
+<td style="text-align: right;">10</td>
+</tr>
+<tr>
+<td style="text-align: left;">SampleID</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">Sample number</td>
+<td style="text-align: right;">20</td>
+</tr>
+<tr>
+<td style="text-align: left;">EPType</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">1, 2, 3 or 4</td>
+<td style="text-align: right;">3</td>
+</tr>
+<tr>
+<td style="text-align: left;">ReturnPeriod</td>
+<td>float</td>
+<td>4</td>
+<td style="text-align: left;">return period interval</td>
+<td style="text-align: right;">250</td>
+</tr>
+<tr>
+<td style="text-align: left;">loss</td>
+<td>float</td>
+<td>4</td>
+<td style="text-align: left;">loss exceedance threshold or TVAR for
+return period</td>
+<td style="text-align: right;">546577.8</td>
+</tr>
+</tbody>
+</table>
+<h5 id="period-weightings">Period weightings</h5>
+<p>An additional feature of ordleccalc is available to vary the relative
+importance of the period losses by providing a period weightings file to
+the calculation. In this file, a weight can be assigned to each period
+make it more or less important than neutral weighting (1 divided by the
+total number of periods). For example, if the neutral weight for period
+1 is 1 in 10000 years, or 0.0001, then doubling the weighting to 0.0002
+will mean that period's loss reoccurrence rate would double. Assuming no
+other period losses, the return period of the loss of period 1 in this
+example would be halved.</p>
+<p>All period_nos must appear in the file from 1 to P (no gaps). There
+is no constraint on the sum of weights. Periods with zero weight will
+not contribute any losses to the loss exceedance curve.</p>
+<p>This feature will be invoked automatically if the periods.bin file is
+present in the input directory.</p>
+<p><a href="#ordoutputcomponents">Return to top</a></p>
+<h3 id="aalcalc-">aalcalc <a id="aalcalc"></a></h3>
+<hr />
+<p>aalcalc outputs the Average Loss Table (ALT) which contains the
+average annual loss and standard deviation of annual loss by
+SummaryId.</p>
+<p>Two types of average and standard deviation of loss are calculated;
+analytical (SampleType 1) and sample (SampleType 2). If the analysis is
+run with zero samples, then only SampleType 1 statistics are
+returned.</p>
+<h5 id="internal-data-4">Internal data</h5>
+<p>aalcalc requires the occurrence.bin file</p>
+<ul>
+<li>input/occurrence.bin</li>
+</ul>
+<p>aalcalc does not have a standard input that can be streamed in.
+Instead, it reads in summarycalc binary data from a file in a fixed
+location. The format of the binaries must match summarycalc standard
+output. The location is in the 'work' subdirectory of the present
+working directory. For example;</p>
+<ul>
+<li>work/summarycalc1.bin</li>
+<li>work/summarycalc2.bin</li>
+<li>work/summarycalc3.bin</li>
+</ul>
+<p>The user must ensure the work subdirectory exists. The user may also
+specify a subdirectory of /work to store these files. e.g.</p>
+<ul>
+<li>work/summaryset1/summarycalc1.bin</li>
+<li>work/summaryset1/summarycalc2.bin</li>
+<li>work/summaryset1/summarycalc3.bin</li>
+</ul>
+<p>The reason for aalcalc not having an input stream is that the
+calculation is not valid on a subset of events, i.e. within a single
+process when the calculation has been distributed across multiple
+processes. It must bring together all event losses before assigning
+event losses to periods and finally computing the final statistics.</p>
+<h5 id="parameters-4">Parameters</h5>
+<ul>
+<li>-K{sub-directory}. The sub-directory of /work containing the input
+aalcalc binary files.</li>
+<li>-o. The ORD format flag</li>
+<li>-p {filename}. The ORD parquet format flag</li>
+</ul>
+<h5 id="usage-4">Usage</h5>
+<pre><code>$ aalcalc [parameters] &gt; alt.csv</code></pre>
+<h5 id="examples-1">Examples</h5>
+<pre><code>&#39;First generate summarycalc binaries by running the core workflow, for the required summary set
+$ eve 1 2 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - &gt; work/summary1/summarycalc1.bin
+$ eve 2 2 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - &gt; work/summary1/summarycalc2.bin
+
+&#39;Then run aalcalc, pointing to the specified sub-directory of work containing summarycalc binaries.
+$ aalcalc -o -Ksummary1 &gt; alt.csv
+$ aalcalc -p alt.parquet -Ksummary1
+$ allcalc -o -p alt.parquet -Ksummary1 &gt; alt.csv</code></pre>
+<h5 id="output-4">Output</h5>
+<p>csv file containing the following fields;</p>
+<table>
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 57%" />
+<col style="width: 11%" />
+</colgroup>
+<thead>
+<tr>
+<th style="text-align: left;">Name</th>
+<th>Type</th>
+<th>Bytes</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: right;">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">SummaryId</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">SummaryId representing a grouping of
+losses</td>
+<td style="text-align: right;">10</td>
+</tr>
+<tr>
+<td style="text-align: left;">SampleType</td>
+<td>int</td>
+<td>4</td>
+<td style="text-align: left;">1 for analytical statistics, 2 for sample
+statistics</td>
+<td style="text-align: right;">1</td>
+</tr>
+<tr>
+<td style="text-align: left;">MeanLoss</td>
+<td>float</td>
+<td>8</td>
+<td style="text-align: left;">average annual loss</td>
+<td style="text-align: right;">6785.9</td>
+</tr>
+<tr>
+<td style="text-align: left;">SDLoss</td>
+<td>float</td>
+<td>8</td>
+<td style="text-align: left;">standard deviation of loss</td>
+<td style="text-align: right;">54657.8</td>
+</tr>
+</tbody>
+</table>
+<h5 id="calculation-3">Calculation</h5>
+<p>The occurrence file and summarycalc files from the specified
+subdirectory are read into memory. Event losses are assigned to period
+according to which period the events occur in and summed by period and
+by sample.</p>
+<p>For type 1, the mean and standard deviation of numerically integrated
+mean period losses are calculated across the periods. For type 2 the
+mean and standard deviation of the sampled period losses are calculated
+across all samples (sidx &gt; 1) and periods.</p>
+<h5 id="period-weightings-1">Period weightings</h5>
+<p>An additional feature of aalcalc is available to vary the relative
+importance of the period losses by providing a period weightings file to
+the calculation. In this file, a weight can be assigned to each period
+make it more or less important than neutral weighting (1 divided by the
+total number of periods). For example, if the neutral weight for period
+1 is 1 in 10000 years, or 0.0001, then doubling the weighting to 0.0002
+will mean that period's loss reoccurrence rate would double and the loss
+contribution to the average annual loss would double.</p>
+<p>All period_nos must appear in the file from 1 to P (no gaps). There
+is no constraint on the sum of weights. Periods with zero weight will
+not contribute any losses to the AAL.</p>
+<p>This feature will be invoked automatically if the periods.bin file is
+present in the input directory.</p>
+<p><a href="#ordoutputcomponents">Return to top</a></p>
+<p><a href="DataConversionComponents.html">Go to 4.4 Data conversion
+components section</a></p>
+<p><a href="Contents.html">Back to Contents</a></p>
+</body>
+</html>

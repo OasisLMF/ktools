@@ -1311,7 +1311,7 @@ void aggreports::WheatsheafAndWheatsheafMeanWithWeighting(
 
   std::vector<int> fileIDs;
   if (outputFlags_[handles[WHEATSHEAF]] == true) {
-    std::vector<int> fileIDs = GetFileIDs(handles[WHEATSHEAF], PSEPT);
+    fileIDs = GetFileIDs(handles[WHEATSHEAF], PSEPT);
   }
   WritePerSampleExceedanceProbabilityTable(fileIDs, items, eptype, eptype_tvar,
 					   unusedperiodstoweighting, temp_map);

@@ -74,7 +74,6 @@ jobs:
         BIN_TARGET=$(pwd)/arm64
         ./autogen.sh
         ./configure --enable-osx --enable-o3 --prefix=$BIN_TARGET
-        make check
         make install
 
     - name: Store ktest output

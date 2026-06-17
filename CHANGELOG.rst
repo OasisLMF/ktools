@@ -1,6 +1,8 @@
 Ktools Changelog
 ================
 
+.. _`v3.12.5`:  https://github.com/OasisLMF/ktools/compare/v3.12.4...v3.12.5
+
 `v3.12.4`_
  ---------
 * [#386](https://github.com/OasisLMF/ktools/pull/386) - Release 3.12.3

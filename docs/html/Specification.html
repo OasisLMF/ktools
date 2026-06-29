@@ -1,374 +1,180 @@
 <!DOCTYPE html>
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
 <head>
-<title>Specification.md</title>
-<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
-
-<style>
-/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) Microsoft Corporation. All rights reserved.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
-
-body {
-	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
-	font-size: var(--vscode-markdown-font-size, 14px);
-	padding: 0 26px;
-	line-height: var(--vscode-markdown-line-height, 22px);
-	word-wrap: break-word;
-}
-
-#code-csp-warning {
-	position: fixed;
-	top: 0;
-	right: 0;
-	color: white;
-	margin: 16px;
-	text-align: center;
-	font-size: 12px;
-	font-family: sans-serif;
-	background-color:#444444;
-	cursor: pointer;
-	padding: 6px;
-	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
-}
-
-#code-csp-warning:hover {
-	text-decoration: none;
-	background-color:#007acc;
-	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
-}
-
-body.scrollBeyondLastLine {
-	margin-bottom: calc(100vh - 22px);
-}
-
-body.showEditorSelection .code-line {
-	position: relative;
-}
-
-body.showEditorSelection .code-active-line:before,
-body.showEditorSelection .code-line:hover:before {
-	content: "";
-	display: block;
-	position: absolute;
-	top: 0;
-	left: -12px;
-	height: 100%;
-}
-
-body.showEditorSelection li.code-active-line:before,
-body.showEditorSelection li.code-line:hover:before {
-	left: -30px;
-}
-
-.vscode-light.showEditorSelection .code-active-line:before {
-	border-left: 3px solid rgba(0, 0, 0, 0.15);
-}
-
-.vscode-light.showEditorSelection .code-line:hover:before {
-	border-left: 3px solid rgba(0, 0, 0, 0.40);
-}
-
-.vscode-light.showEditorSelection .code-line .code-line:hover:before {
-	border-left: none;
-}
-
-.vscode-dark.showEditorSelection .code-active-line:before {
-	border-left: 3px solid rgba(255, 255, 255, 0.4);
-}
-
-.vscode-dark.showEditorSelection .code-line:hover:before {
-	border-left: 3px solid rgba(255, 255, 255, 0.60);
-}
-
-.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
-	border-left: none;
-}
-
-.vscode-high-contrast.showEditorSelection .code-active-line:before {
-	border-left: 3px solid rgba(255, 160, 0, 0.7);
-}
-
-.vscode-high-contrast.showEditorSelection .code-line:hover:before {
-	border-left: 3px solid rgba(255, 160, 0, 1);
-}
-
-.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
-	border-left: none;
-}
-
-img {
-	max-width: 100%;
-	max-height: 100%;
-}
-
-a {
-	text-decoration: none;
-}
-
-a:hover {
-	text-decoration: underline;
-}
-
-a:focus,
-input:focus,
-select:focus,
-textarea:focus {
-	outline: 1px solid -webkit-focus-ring-color;
-	outline-offset: -1px;
-}
-
-hr {
-	border: 0;
-	height: 2px;
-	border-bottom: 2px solid;
-}
-
-h1 {
-	padding-bottom: 0.3em;
-	line-height: 1.2;
-	border-bottom-width: 1px;
-	border-bottom-style: solid;
-}
-
-h1, h2, h3 {
-	font-weight: normal;
-}
-
-table {
-	border-collapse: collapse;
-}
-
-table > thead > tr > th {
-	text-align: left;
-	border-bottom: 1px solid;
-}
-
-table > thead > tr > th,
-table > thead > tr > td,
-table > tbody > tr > th,
-table > tbody > tr > td {
-	padding: 5px 10px;
-}
-
-table > tbody > tr + tr > td {
-	border-top: 1px solid;
-}
-
-blockquote {
-	margin: 0 7px 0 5px;
-	padding: 0 16px 0 10px;
-	border-left-width: 5px;
-	border-left-style: solid;
-}
-
-code {
-	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
-	font-size: 1em;
-	line-height: 1.357em;
-}
-
-body.wordWrap pre {
-	white-space: pre-wrap;
-}
-
-pre:not(.hljs),
-pre.hljs code > div {
-	padding: 16px;
-	border-radius: 3px;
-	overflow: auto;
-}
-
-pre code {
-	color: var(--vscode-editor-foreground);
-	tab-size: 4;
-}
-
-/** Theming */
-
-.vscode-light pre {
-	background-color: rgba(220, 220, 220, 0.4);
-}
-
-.vscode-dark pre {
-	background-color: rgba(10, 10, 10, 0.4);
-}
-
-.vscode-high-contrast pre {
-	background-color: rgb(0, 0, 0);
-}
-
-.vscode-high-contrast h1 {
-	border-color: rgb(0, 0, 0);
-}
-
-.vscode-light table > thead > tr > th {
-	border-color: rgba(0, 0, 0, 0.69);
-}
-
-.vscode-dark table > thead > tr > th {
-	border-color: rgba(255, 255, 255, 0.69);
-}
-
-.vscode-light h1,
-.vscode-light hr,
-.vscode-light table > tbody > tr + tr > td {
-	border-color: rgba(0, 0, 0, 0.18);
-}
-
-.vscode-dark h1,
-.vscode-dark hr,
-.vscode-dark table > tbody > tr + tr > td {
-	border-color: rgba(255, 255, 255, 0.18);
-}
-
-</style>
-
-<style>
-/* Tomorrow Theme */
-/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
-/* Original theme - https://github.com/chriskempson/tomorrow-theme */
-
-/* Tomorrow Comment */
-.hljs-comment,
-.hljs-quote {
-	color: #8e908c;
-}
-
-/* Tomorrow Red */
-.hljs-variable,
-.hljs-template-variable,
-.hljs-tag,
-.hljs-name,
-.hljs-selector-id,
-.hljs-selector-class,
-.hljs-regexp,
-.hljs-deletion {
-	color: #c82829;
-}
-
-/* Tomorrow Orange */
-.hljs-number,
-.hljs-built_in,
-.hljs-builtin-name,
-.hljs-literal,
-.hljs-type,
-.hljs-params,
-.hljs-meta,
-.hljs-link {
-	color: #f5871f;
-}
-
-/* Tomorrow Yellow */
-.hljs-attribute {
-	color: #eab700;
-}
-
-/* Tomorrow Green */
-.hljs-string,
-.hljs-symbol,
-.hljs-bullet,
-.hljs-addition {
-	color: #718c00;
-}
-
-/* Tomorrow Blue */
-.hljs-title,
-.hljs-section {
-	color: #4271ae;
-}
-
-/* Tomorrow Purple */
-.hljs-keyword,
-.hljs-selector-tag {
-	color: #8959a8;
-}
-
-.hljs {
-	display: block;
-	overflow-x: auto;
-	color: #4d4d4c;
-	padding: 0.5em;
-}
-
-.hljs-emphasis {
-	font-style: italic;
-}
-
-.hljs-strong {
-	font-weight: bold;
-}
-</style>
-
-<style>
-/*
- * Markdown PDF CSS
- */
-
- body {
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
-	padding: 0 12px;
-}
-
-pre {
-	background-color: #f8f8f8;
-	border: 1px solid #cccccc;
-	border-radius: 3px;
-	overflow-x: auto;
-	white-space: pre-wrap;
-	overflow-wrap: break-word;
-}
-
-pre:not(.hljs) {
-	padding: 23px;
-	line-height: 19px;
-}
-
-blockquote {
-	background: rgba(127, 127, 127, 0.1);
-	border-color: rgba(0, 122, 204, 0.5);
-}
-
-.emoji {
-	height: 1.4em;
-}
-
-code {
-	font-size: 14px;
-	line-height: 19px;
-}
-
-/* for inline code */
-:not(pre):not(.hljs) > code {
-	color: #C9AE75; /* Change the old color so it seems less like an error */
-	font-size: inherit;
-}
-
-/* Page Break : use <div class="page"/> to insert page break
--------------------------------------------------------- */
-.page {
-	page-break-after: always;
-}
-
-</style>
-
-<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>Specification</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
 </head>
 <body>
-  <script>
-    mermaid.initialize({
-      startOnLoad: true,
-      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
-          ? 'dark'
-          : 'default'
-    });
-  </script>
-<p><img src="../img/banner.jpg" alt="alt text" title="banner"></p>
-<h1 id="3-specification-a-id%22specification%22a">3. Specification <a id="specification"></a></h1>
+<p><img src="../img/banner.jpg" title="banner" alt="alt text" /></p>
+<h1 id="3-specification-">3. Specification
+<a id="specification"></a></h1>
 <h3 id="introduction">Introduction</h3>
-<p>This section specifies the data stream structures and core components in the in-memory kernel.</p>
+<p>This section specifies the data stream structures and core components
+in the in-memory kernel.</p>
 <p>The data stream structures are;</p>
 <ul>
 <li><strong><a href="#cdf">cdf stream</a></strong></li>
@@ -376,7 +182,14 @@ code {
 <li><strong><a href="#loss">loss stream</a></strong></li>
 <li><strong><a href="#summary">summary stream</a></strong></li>
 </ul>
-<p>The stream data structures have been designed to minimise the volume flowing through the pipeline, using data packet 'headers' to remove redundant data. For example, indexes which are common to a block of data are defined as a header record and then only the variable data records that are relevant to the header key are part of the data stream. The names of the data fields given below are unimportant, only their position in the data stream is important in order to perform the calculations defined in the program.</p>
+<p>The stream data structures have been designed to minimise the volume
+flowing through the pipeline, using data packet 'headers' to remove
+redundant data. For example, indexes which are common to a block of data
+are defined as a header record and then only the variable data records
+that are relevant to the header key are part of the data stream. The
+names of the data fields given below are unimportant, only their
+position in the data stream is important in order to perform the
+calculations defined in the program.</p>
 <p>The components are;</p>
 <ul>
 <li><strong><a href="#eve">eve</a></strong></li>
@@ -386,116 +199,149 @@ code {
 <li><strong><a href="#summarycalc">summarycalc</a></strong></li>
 <li><strong><a href="#outputcalc">outputcalc</a></strong></li>
 </ul>
-<p>The components have a standard input (stdin) and/or output (stdout) data stream structure. eve is the stream-initiating component which only has a standard output stream, whereas &quot;outputcalc&quot; (a generic name representing an extendible family of output calculation components) is a stream-terminating component with only a standard input stream.</p>
-<p>An implementation of each of the above components is provided in the <a href="ReferenceModelOverview.md">Reference Model</a>, where usage instructions and command line parameters are provided. A functional overview is given below.</p>
+<p>The components have a standard input (stdin) and/or output (stdout)
+data stream structure. eve is the stream-initiating component which only
+has a standard output stream, whereas "outputcalc" (a generic name
+representing an extendible family of output calculation components) is a
+stream-terminating component with only a standard input stream.</p>
+<p>An implementation of each of the above components is provided in the
+<a href="ReferenceModelOverview.html">Reference Model</a>, where usage
+instructions and command line parameters are provided. A functional
+overview is given below.</p>
 <h4 id="stream-types">Stream types</h4>
-<p>The architecture supports multiple stream types. Therefore a developer can define a new type of data stream within the framework by specifying a unique stream_id of the stdout of one or more of the components, or even write a new component which performs an intermediate calculation between the existing components.</p>
-<p>The stream_id is the first 4 byte header of the stdout streams. The higher byte is reserved to identify the type of stream, and the 2nd to 4th bytes hold the identifier of the stream. This is used for validation of pipeline commands to report errors if the components are not being used in the correct order.</p>
+<p>The architecture supports multiple stream types. Therefore a
+developer can define a new type of data stream within the framework by
+specifying a unique stream_id of the stdout of one or more of the
+components, or even write a new component which performs an intermediate
+calculation between the existing components.</p>
+<p>The stream_id is the first 4 byte header of the stdout streams. The
+higher byte is reserved to identify the type of stream, and the 2nd to
+4th bytes hold the identifier of the stream. This is used for validation
+of pipeline commands to report errors if the components are not being
+used in the correct order.</p>
 <p>The current reserved values are as follows;</p>
 <p>Higher byte;</p>
 <table>
 <thead>
 <tr>
-<th style="text-align:left">Byte 1</th>
-<th style="text-align:left">Stream name</th>
+<th style="text-align: left;">Byte 1</th>
+<th style="text-align: left;">Stream name</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">0</td>
-<td style="text-align:left">cdf</td>
+<td style="text-align: left;">0</td>
+<td style="text-align: left;">cdf</td>
 </tr>
 <tr>
-<td style="text-align:left">1</td>
-<td style="text-align:left">gulcalc (deprecated)</td>
+<td style="text-align: left;">1</td>
+<td style="text-align: left;">gulcalc (deprecated)</td>
 </tr>
 <tr>
-<td style="text-align:left">2</td>
-<td style="text-align:left">loss</td>
+<td style="text-align: left;">2</td>
+<td style="text-align: left;">loss</td>
 </tr>
 <tr>
-<td style="text-align:left">3</td>
-<td style="text-align:left">summary</td>
+<td style="text-align: left;">3</td>
+<td style="text-align: left;">summary</td>
 </tr>
 </tbody>
 </table>
 <p>Reserved stream_ids;</p>
 <table>
+<colgroup>
+<col style="width: 9%" />
+<col style="width: 13%" />
+<col style="width: 77%" />
+</colgroup>
 <thead>
 <tr>
-<th style="text-align:left">Byte 1</th>
+<th style="text-align: left;">Byte 1</th>
 <th>Bytes 2-4</th>
-<th style="text-align:left">Description</th>
+<th style="text-align: left;">Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">0</td>
+<td style="text-align: left;">0</td>
 <td>1</td>
-<td style="text-align:left">cdf - Oasis format effective damageability CDF output</td>
+<td style="text-align: left;">cdf - Oasis format effective damageability
+CDF output</td>
 </tr>
 <tr>
-<td style="text-align:left">1</td>
+<td style="text-align: left;">1</td>
 <td>1</td>
-<td style="text-align:left">gulcalc - Oasis format item level ground up loss sample output (deprecated)</td>
+<td style="text-align: left;">gulcalc - Oasis format item level ground
+up loss sample output (deprecated)</td>
 </tr>
 <tr>
-<td style="text-align:left">1</td>
+<td style="text-align: left;">1</td>
 <td>2</td>
-<td style="text-align:left">gulcalc - Oasis format coverage level ground up loss sample output (deprecated)</td>
+<td style="text-align: left;">gulcalc - Oasis format coverage level
+ground up loss sample output (deprecated)</td>
 </tr>
 <tr>
-<td style="text-align:left">2</td>
+<td style="text-align: left;">2</td>
 <td>1</td>
-<td style="text-align:left">loss -  Oasis format loss sample output (any loss perspective)</td>
+<td style="text-align: left;">loss - Oasis format loss sample output
+(any loss perspective)</td>
 </tr>
 <tr>
-<td style="text-align:left">3</td>
+<td style="text-align: left;">3</td>
 <td>1</td>
-<td style="text-align:left">summary - Oasis format summary level loss sample output</td>
+<td style="text-align: left;">summary - Oasis format summary level loss
+sample output</td>
 </tr>
 </tbody>
 </table>
-<p>The supported standard input and output streams of the reference model components are summarized here;</p>
+<p>The supported standard input and output streams of the reference
+model components are summarized here;</p>
 <table>
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 28%" />
+<col style="width: 28%" />
+<col style="width: 32%" />
+</colgroup>
 <thead>
 <tr>
-<th style="text-align:left">Component</th>
-<th style="text-align:left">Standard input</th>
-<th style="text-align:left">Standard output</th>
-<th style="text-align:left">Stream option parameters</th>
+<th style="text-align: left;">Component</th>
+<th style="text-align: left;">Standard input</th>
+<th style="text-align: left;">Standard output</th>
+<th style="text-align: left;">Stream option parameters</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">getmodel</td>
-<td style="text-align:left">none</td>
-<td style="text-align:left">0/1 cdf</td>
-<td style="text-align:left">none</td>
+<td style="text-align: left;">getmodel</td>
+<td style="text-align: left;">none</td>
+<td style="text-align: left;">0/1 cdf</td>
+<td style="text-align: left;">none</td>
 </tr>
 <tr>
-<td style="text-align:left">gulcalc</td>
-<td style="text-align:left">0/1 cdf</td>
-<td style="text-align:left">2/1 loss</td>
-<td style="text-align:left">-i -a{}</td>
+<td style="text-align: left;">gulcalc</td>
+<td style="text-align: left;">0/1 cdf</td>
+<td style="text-align: left;">2/1 loss</td>
+<td style="text-align: left;">-i -a{}</td>
 </tr>
 <tr>
-<td style="text-align:left">fmcalc</td>
-<td style="text-align:left">2/1 loss</td>
-<td style="text-align:left">2/1 loss</td>
-<td style="text-align:left">none</td>
+<td style="text-align: left;">fmcalc</td>
+<td style="text-align: left;">2/1 loss</td>
+<td style="text-align: left;">2/1 loss</td>
+<td style="text-align: left;">none</td>
 </tr>
 <tr>
-<td style="text-align:left">summarycalc</td>
-<td style="text-align:left">2/1 loss</td>
-<td style="text-align:left">3/1 summary</td>
-<td style="text-align:left">-i input from gulcalc, -f input from fmcalc</td>
+<td style="text-align: left;">summarycalc</td>
+<td style="text-align: left;">2/1 loss</td>
+<td style="text-align: left;">3/1 summary</td>
+<td style="text-align: left;">-i input from gulcalc, -f input from
+fmcalc</td>
 </tr>
 <tr>
-<td style="text-align:left">outputcalc</td>
-<td style="text-align:left">3/1 summary</td>
-<td style="text-align:left">none</td>
-<td style="text-align:left">none</td>
+<td style="text-align: left;">outputcalc</td>
+<td style="text-align: left;">3/1 summary</td>
+<td style="text-align: left;">none</td>
+<td style="text-align: left;">none</td>
 </tr>
 </tbody>
 </table>
@@ -504,92 +350,116 @@ code {
 <h3 id="cdf-stream">cdf stream</h3>
 <p>Stream header packet structure</p>
 <table>
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 58%" />
+<col style="width: 11%" />
+</colgroup>
 <thead>
 <tr>
-<th style="text-align:left">Name</th>
+<th style="text-align: left;">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th style="text-align:left">Description</th>
-<th style="text-align:right">Example</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: right;">Example</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">stream_id</td>
+<td style="text-align: left;">stream_id</td>
 <td>int</td>
 <td>1/3</td>
-<td style="text-align:left">Identifier of the data stream type.</td>
-<td style="text-align:right">0/1</td>
+<td style="text-align: left;">Identifier of the data stream type.</td>
+<td style="text-align: right;">0/1</td>
 </tr>
 </tbody>
 </table>
 <p>Data header packet structure</p>
 <table>
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 58%" />
+<col style="width: 11%" />
+</colgroup>
 <thead>
 <tr>
-<th style="text-align:left">Name</th>
+<th style="text-align: left;">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th style="text-align:left">Description</th>
-<th style="text-align:right">Example</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: right;">Example</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">event_id</td>
+<td style="text-align: left;">event_id</td>
 <td>int</td>
 <td>4</td>
-<td style="text-align:left">Oasis event_id</td>
-<td style="text-align:right">4545</td>
+<td style="text-align: left;">Oasis event_id</td>
+<td style="text-align: right;">4545</td>
 </tr>
 <tr>
-<td style="text-align:left">areaperil_id</td>
+<td style="text-align: left;">areaperil_id</td>
 <td>int</td>
 <td>4</td>
-<td style="text-align:left">Oasis areaperil_id</td>
-<td style="text-align:right">345456</td>
+<td style="text-align: left;">Oasis areaperil_id</td>
+<td style="text-align: right;">345456</td>
 </tr>
 <tr>
-<td style="text-align:left">vulnerability_id</td>
+<td style="text-align: left;">vulnerability_id</td>
 <td>int</td>
 <td>4</td>
-<td style="text-align:left">Oasis vulnerability_id</td>
-<td style="text-align:right">345</td>
+<td style="text-align: left;">Oasis vulnerability_id</td>
+<td style="text-align: right;">345</td>
 </tr>
 <tr>
-<td style="text-align:left">no_of_bins</td>
+<td style="text-align: left;">no_of_bins</td>
 <td>int</td>
 <td>4</td>
-<td style="text-align:left">Number of records (bins) in the data package</td>
-<td style="text-align:right">20</td>
+<td style="text-align: left;">Number of records (bins) in the data
+package</td>
+<td style="text-align: right;">20</td>
 </tr>
 </tbody>
 </table>
 <p>Data packet structure (record repeated no_of_bin times)</p>
 <table>
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 58%" />
+<col style="width: 11%" />
+</colgroup>
 <thead>
 <tr>
-<th style="text-align:left">Name</th>
+<th style="text-align: left;">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th style="text-align:left">Description</th>
-<th style="text-align:right">Example</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: right;">Example</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">prob_to</td>
+<td style="text-align: left;">prob_to</td>
 <td>float</td>
 <td>4</td>
-<td style="text-align:left">The cumulative probability at the upper damage bin threshold</td>
-<td style="text-align:right">0.765</td>
+<td style="text-align: left;">The cumulative probability at the upper
+damage bin threshold</td>
+<td style="text-align: right;">0.765</td>
 </tr>
 <tr>
-<td style="text-align:left">bin_mean</td>
+<td style="text-align: left;">bin_mean</td>
 <td>float</td>
 <td>4</td>
-<td style="text-align:left">The conditional mean of the damage bin</td>
-<td style="text-align:right">0.45</td>
+<td style="text-align: left;">The conditional mean of the damage
+bin</td>
+<td style="text-align: right;">0.45</td>
 </tr>
 </tbody>
 </table>
@@ -598,241 +468,299 @@ code {
 <h3 id="loss-stream">loss stream</h3>
 <p>Stream header packet structure</p>
 <table>
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 43%" />
+<col style="width: 15%" />
+</colgroup>
 <thead>
 <tr>
-<th style="text-align:left">Name</th>
+<th style="text-align: left;">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th style="text-align:left">Description</th>
-<th style="text-align:right">Example</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: right;">Example</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">stream_id</td>
+<td style="text-align: left;">stream_id</td>
 <td>int</td>
 <td>1/3</td>
-<td style="text-align:left">Identifier of the data stream type.</td>
-<td style="text-align:right">2/1</td>
+<td style="text-align: left;">Identifier of the data stream type.</td>
+<td style="text-align: right;">2/1</td>
 </tr>
 <tr>
-<td style="text-align:left">no_of_samples</td>
+<td style="text-align: left;">no_of_samples</td>
 <td>int</td>
 <td>4</td>
-<td style="text-align:left">Number of samples</td>
-<td style="text-align:right">100</td>
+<td style="text-align: left;">Number of samples</td>
+<td style="text-align: right;">100</td>
 </tr>
 </tbody>
 </table>
 <p>Data header packet structure</p>
-<table>
+<table style="width:100%;">
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 7%" />
+<col style="width: 7%" />
+<col style="width: 53%" />
+<col style="width: 12%" />
+</colgroup>
 <thead>
 <tr>
-<th style="text-align:left">Name</th>
+<th style="text-align: left;">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th style="text-align:left">Description</th>
-<th style="text-align:right">Example</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: right;">Example</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">event_id</td>
+<td style="text-align: left;">event_id</td>
 <td>int</td>
 <td>4</td>
-<td style="text-align:left">Oasis event_id</td>
-<td style="text-align:right">4545</td>
+<td style="text-align: left;">Oasis event_id</td>
+<td style="text-align: right;">4545</td>
 </tr>
 <tr>
-<td style="text-align:left">item_id /output_id</td>
+<td style="text-align: left;">item_id /output_id</td>
 <td>int</td>
 <td>4</td>
-<td style="text-align:left">Oasis item_id (gulcalc) or output_id (fmcalc)</td>
-<td style="text-align:right">300</td>
+<td style="text-align: left;">Oasis item_id (gulcalc) or output_id
+(fmcalc)</td>
+<td style="text-align: right;">300</td>
 </tr>
 </tbody>
 </table>
 <p>Data packet structure</p>
 <table>
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 43%" />
+<col style="width: 15%" />
+</colgroup>
 <thead>
 <tr>
-<th style="text-align:left">Name</th>
+<th style="text-align: left;">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th style="text-align:left">Description</th>
-<th style="text-align:right">Example</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: right;">Example</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">sidx</td>
+<td style="text-align: left;">sidx</td>
 <td>int</td>
 <td>4</td>
-<td style="text-align:left">Sample index</td>
-<td style="text-align:right">10</td>
+<td style="text-align: left;">Sample index</td>
+<td style="text-align: right;">10</td>
 </tr>
 <tr>
-<td style="text-align:left">loss</td>
+<td style="text-align: left;">loss</td>
 <td>float</td>
 <td>4</td>
-<td style="text-align:left">The  loss for the sample</td>
-<td style="text-align:right">5625.675</td>
+<td style="text-align: left;">The loss for the sample</td>
+<td style="text-align: right;">5625.675</td>
 </tr>
 </tbody>
 </table>
-<p>The data packet may be a variable length and so a sidx of 0 identifies the end of the data packet.</p>
+<p>The data packet may be a variable length and so a sidx of 0
+identifies the end of the data packet.</p>
 <p>There are five values of sidx with special meaning as follows;</p>
 <table>
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 62%" />
+<col style="width: 26%" />
+</colgroup>
 <thead>
 <tr>
-<th style="text-align:left">sidx</th>
-<th style="text-align:left">Meaning</th>
+<th style="text-align: left;">sidx</th>
+<th style="text-align: left;">Meaning</th>
 <th>Required / optional</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">-5</td>
-<td style="text-align:left">maximum loss</td>
+<td style="text-align: left;">-5</td>
+<td style="text-align: left;">maximum loss</td>
 <td>optional</td>
 </tr>
 <tr>
-<td style="text-align:left">-4</td>
-<td style="text-align:left">chance of loss</td>
+<td style="text-align: left;">-4</td>
+<td style="text-align: left;">chance of loss</td>
 <td>optional</td>
 </tr>
 <tr>
-<td style="text-align:left">-3</td>
-<td style="text-align:left">impacted exposure</td>
+<td style="text-align: left;">-3</td>
+<td style="text-align: left;">impacted exposure</td>
 <td>required</td>
 </tr>
 <tr>
-<td style="text-align:left">-2</td>
-<td style="text-align:left">numerical integration standard deviation loss</td>
+<td style="text-align: left;">-2</td>
+<td style="text-align: left;">numerical integration standard deviation
+loss</td>
 <td>optional</td>
 </tr>
 <tr>
-<td style="text-align:left">-1</td>
-<td style="text-align:left">numerical integration mean loss</td>
+<td style="text-align: left;">-1</td>
+<td style="text-align: left;">numerical integration mean loss</td>
 <td>required</td>
 </tr>
 </tbody>
 </table>
-<p>sidx -5 to -1 must come at the beginning of the data packet before the other samples in ascending order (-5 to -1).</p>
+<p>sidx -5 to -1 must come at the beginning of the data packet before
+the other samples in ascending order (-5 to -1).</p>
 <p><a href="#specification">Return to top</a></p>
-<h3 id="summary-stream-a-id%22summary%22a">summary stream <a id="summary"></a></h3>
+<h3 id="summary-stream-">summary stream <a id="summary"></a></h3>
 <p>Stream header packet structure</p>
 <table>
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 43%" />
+<col style="width: 15%" />
+</colgroup>
 <thead>
 <tr>
-<th style="text-align:left">Name</th>
+<th style="text-align: left;">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th style="text-align:left">Description</th>
-<th style="text-align:right">Example</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: right;">Example</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">stream_id</td>
+<td style="text-align: left;">stream_id</td>
 <td>int</td>
 <td>1/3</td>
-<td style="text-align:left">Identifier of the data stream type.</td>
-<td style="text-align:right">3/1</td>
+<td style="text-align: left;">Identifier of the data stream type.</td>
+<td style="text-align: right;">3/1</td>
 </tr>
 <tr>
-<td style="text-align:left">no_of_samples</td>
+<td style="text-align: left;">no_of_samples</td>
 <td>int</td>
 <td>4</td>
-<td style="text-align:left">Number of samples</td>
-<td style="text-align:right">100</td>
+<td style="text-align: left;">Number of samples</td>
+<td style="text-align: right;">100</td>
 </tr>
 <tr>
-<td style="text-align:left">summary_set</td>
+<td style="text-align: left;">summary_set</td>
 <td>int</td>
 <td>4</td>
-<td style="text-align:left">Identifier of the summary set</td>
-<td style="text-align:right">2</td>
+<td style="text-align: left;">Identifier of the summary set</td>
+<td style="text-align: right;">2</td>
 </tr>
 </tbody>
 </table>
 <p>Data header packet structure</p>
 <table>
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 7%" />
+<col style="width: 7%" />
+<col style="width: 53%" />
+<col style="width: 12%" />
+</colgroup>
 <thead>
 <tr>
-<th style="text-align:left">Name</th>
+<th style="text-align: left;">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th style="text-align:left">Description</th>
-<th style="text-align:right">Example</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: right;">Example</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">event_id</td>
+<td style="text-align: left;">event_id</td>
 <td>int</td>
 <td>4</td>
-<td style="text-align:left">Oasis event_id</td>
-<td style="text-align:right">4545</td>
+<td style="text-align: left;">Oasis event_id</td>
+<td style="text-align: right;">4545</td>
 </tr>
 <tr>
-<td style="text-align:left">summary_id</td>
+<td style="text-align: left;">summary_id</td>
 <td>int</td>
 <td>4</td>
-<td style="text-align:left">Oasis summary_id</td>
-<td style="text-align:right">300</td>
+<td style="text-align: left;">Oasis summary_id</td>
+<td style="text-align: right;">300</td>
 </tr>
 <tr>
-<td style="text-align:left">exposure_value</td>
+<td style="text-align: left;">exposure_value</td>
 <td>float</td>
 <td>4</td>
-<td style="text-align:left">Impacted exposure (sum of sidx -3 losses for summary_id)</td>
-<td style="text-align:right">987878</td>
+<td style="text-align: left;">Impacted exposure (sum of sidx -3 losses
+for summary_id)</td>
+<td style="text-align: right;">987878</td>
 </tr>
 </tbody>
 </table>
 <p>Data packet structure</p>
 <table>
+<colgroup>
+<col style="width: 22%" />
+<col style="width: 9%" />
+<col style="width: 9%" />
+<col style="width: 43%" />
+<col style="width: 15%" />
+</colgroup>
 <thead>
 <tr>
-<th style="text-align:left">Name</th>
+<th style="text-align: left;">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th style="text-align:left">Description</th>
-<th style="text-align:right">Example</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: right;">Example</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">sidx</td>
+<td style="text-align: left;">sidx</td>
 <td>int</td>
 <td>4</td>
-<td style="text-align:left">Sample index</td>
-<td style="text-align:right">10</td>
+<td style="text-align: left;">Sample index</td>
+<td style="text-align: right;">10</td>
 </tr>
 <tr>
-<td style="text-align:left">loss</td>
+<td style="text-align: left;">loss</td>
 <td>float</td>
 <td>4</td>
-<td style="text-align:left">The loss for the sample</td>
-<td style="text-align:right">5625.675</td>
+<td style="text-align: left;">The loss for the sample</td>
+<td style="text-align: right;">5625.675</td>
 </tr>
 </tbody>
 </table>
-<p>The data packet may be a variable length and so a sidx of 0 identifies the end of the data packet.</p>
+<p>The data packet may be a variable length and so a sidx of 0
+identifies the end of the data packet.</p>
 <p>The sidx -1 mean loss may be present (if non-zero)</p>
 <table>
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 62%" />
+<col style="width: 26%" />
+</colgroup>
 <thead>
 <tr>
-<th style="text-align:left">sidx</th>
-<th style="text-align:left">Meaning</th>
+<th style="text-align: left;">sidx</th>
+<th style="text-align: left;">Meaning</th>
 <th>Required / optional</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">-1</td>
-<td style="text-align:left">numerical integration mean loss</td>
+<td style="text-align: left;">-1</td>
+<td style="text-align: left;">numerical integration mean loss</td>
 <td>optional</td>
 </tr>
 </tbody>
@@ -841,24 +769,52 @@ code {
 <h2 id="components">Components</h2>
 <p><a id="eve"></a></p>
 <h3 id="eve">eve</h3>
-<p>eve is an 'event emitter' and its job is to read a list of events from file and send out a subset of events as a binary data stream. It has no standard input and emits a list of event_ids, which are 4 byte integers.</p>
-<p>eve is used to partition lists of events such that a workflow can be distributed across multiple processes.</p>
+<p>eve is an 'event emitter' and its job is to read a list of events
+from file and send out a subset of events as a binary data stream. It
+has no standard input and emits a list of event_ids, which are 4 byte
+integers.</p>
+<p>eve is used to partition lists of events such that a workflow can be
+distributed across multiple processes.</p>
 <p><a id="getmodel"></a></p>
 <h3 id="getmodel">getmodel</h3>
-<p>getmodel is the component which generates a stream of effective damageability cdfs for a given set of event_ids and the impacted exposed items on the basis of their areaperil_ids (location) and vulnerability_ids (damage function).</p>
+<p>getmodel is the component which generates a stream of effective
+damageability cdfs for a given set of event_ids and the impacted exposed
+items on the basis of their areaperil_ids (location) and
+vulnerability_ids (damage function).</p>
 <p><a id="gulcalc"></a></p>
 <h3 id="gulcalc">gulcalc</h3>
-<p>gulcalc is the component which calculates ground up loss. It takes the getmodel output as standard input and based on the sampling parameters specified, performs Monte Carlo sampling and numerical integration. The output is a stream of ground up loss samples in Oasis kernel format with random samples identified by positive sample indexes (sidx 1 and greater), and special meaning samples assigned to negative sample indexes.</p>
-<p>gulcalc also supports the combining and back-allocation of losses arising from multiple subperils impacting the same coverage with some options.</p>
+<p>gulcalc is the component which calculates ground up loss. It takes
+the getmodel output as standard input and based on the sampling
+parameters specified, performs Monte Carlo sampling and numerical
+integration. The output is a stream of ground up loss samples in Oasis
+kernel format with random samples identified by positive sample indexes
+(sidx 1 and greater), and special meaning samples assigned to negative
+sample indexes.</p>
+<p>gulcalc also supports the combining and back-allocation of losses
+arising from multiple subperils impacting the same coverage with some
+options.</p>
 <p><a id="fmcalc"></a></p>
 <h3 id="fmcalc">fmcalc</h3>
-<p>fmcalc is the component which takes the loss stream as standard input and output and applies the policy terms and conditions to produce insured loss samples. fmcalc can be called recursively to perform multiple sequential applications of financial terms (e.g for inuring reinsurance following direct insurance). The output is a table of loss samples in Oasis kernel format, including the (re)insured loss for the numerical integration mean (sidx=-1), and the impacted exposure (sidx=-3).</p>
+<p>fmcalc is the component which takes the loss stream as standard input
+and output and applies the policy terms and conditions to produce
+insured loss samples. fmcalc can be called recursively to perform
+multiple sequential applications of financial terms (e.g for inuring
+reinsurance following direct insurance). The output is a table of loss
+samples in Oasis kernel format, including the (re)insured loss for the
+numerical integration mean (sidx=-1), and the impacted exposure
+(sidx=-3).</p>
 <p><a id="summarycalc"></a></p>
 <h3 id="summarycalc">summarycalc</h3>
-<p>summarycalc is a component which sums the sampled losses from either gulcalc or fmcalc to the users required level(s) for reporting results.  This is a simple sum of the loss value by event_id, sidx and summary_id, where summary_id is a grouping of coverage_id or item_id for gulcalc or output_id for fmcalc defined in the user's input files.</p>
+<p>summarycalc is a component which sums the sampled losses from either
+gulcalc or fmcalc to the users required level(s) for reporting results.
+This is a simple sum of the loss value by event_id, sidx and summary_id,
+where summary_id is a grouping of coverage_id or item_id for gulcalc or
+output_id for fmcalc defined in the user's input files.</p>
 <p><a id="outputcalc"></a></p>
 <h3 id="outputcalc">outputcalc</h3>
-<p>Outputcalc is a general term for an end-of-pipeline component which represents one of a potentially unlimited set of output components. Some examples are provided in the Reference Model. These are;</p>
+<p>Outputcalc is a general term for an end-of-pipeline component which
+represents one of a potentially unlimited set of output components. Some
+examples are provided in the Reference Model. These are;</p>
 <ul>
 <li>eltcalc</li>
 <li>leccalc</li>
@@ -866,10 +822,11 @@ code {
 <li>pltcalc</li>
 <li>ordleccalc</li>
 </ul>
-<p>The output components generate results such as an event loss table or loss exceedance curve from the sampled output from summarycalc.  The output is a results table in csv format or parquet format.</p>
+<p>The output components generate results such as an event loss table or
+loss exceedance curve from the sampled output from summarycalc. The
+output is a results table in csv format or parquet format.</p>
 <p><a href="#specification">Return to top</a></p>
-<p><a href="ReferenceModelOverview.md">Go to 4. Reference model</a></p>
-<p><a href="Contents.md">Back to Contents</a></p>
-
+<p><a href="ReferenceModelOverview.html">Go to 4. Reference model</a></p>
+<p><a href="Contents.html">Back to Contents</a></p>
 </body>
 </html>

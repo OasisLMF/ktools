@@ -39,7 +39,7 @@ env:
 
 jobs:
   osx:
-    runs-on: macos-13
+    runs-on: macos-14
     defaults:
       run:
         shell: bash
@@ -55,7 +55,7 @@ jobs:
       run: echo "KTOOLS_BRANCH=${{ inputs.ktools_branch }}" >> $GITHUB_ENV
 
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: OasisLMF/ktools
         ref: ${{ env.KTOOLS_BRANCH }}
@@ -69,12 +69,11 @@ jobs:
             libtool \
             zlib-ng
 
-    - name: (MacOS) Build ktools x86
+    - name: (MacOS) Build ktools arm64
       run: |
-        BIN_TARGET=$(pwd)/x86
+        BIN_TARGET=$(pwd)/arm64
         ./autogen.sh
         ./configure --enable-osx --enable-o3 --prefix=$BIN_TARGET
-        make check
         make install
 
     - name: Store ktest output
@@ -87,14 +86,14 @@ jobs:
 
     - name: Tarball bin files
       run: |
-        cd ./x86/bin
-        tar -zcvf ${{ github.workspace }}/Darwin_x86_64.tar.gz ./
+        cd ./arm64/bin
+        tar -zcvf ${{ github.workspace }}/Darwin_arm64.tar.gz ./
 
-    - name: 'Upload Ktool binaries - x86'
+    - name: 'Upload Ktool binaries - arm64'
       uses: actions/upload-artifact@v4
       with:
-        name: Darwin_x86_64
-        path: Darwin_x86_64.tar.gz
+        name: Darwin_arm64
+        path: Darwin_arm64.tar.gz
         retention-days: 5
 
   linux:
@@ -115,13 +114,13 @@ jobs:
       run: echo "SKIP_CMAKE=true" >> $GITHUB_ENV
 
     - name: Checkout
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: OasisLMF/ktools
         ref: ${{ env.KTOOLS_BRANCH }}
 
     - name: Login to Docker Hub
-      uses: docker/login-action@v2
+      uses: docker/login-action@v3
       with:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}

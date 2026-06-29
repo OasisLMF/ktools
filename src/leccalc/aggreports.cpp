@@ -953,6 +953,7 @@ void aggreports::WriteWheatsheafMean(const std::vector<int> &fileIDs,
     int i = 1;
 
     for (auto mc : rmc) {
+      if (mc.count == 0) continue;   // Skip unpopulated entries
 
       if (WriteEPTOutput != nullptr) {
 	(this->*WriteEPTOutput)(fileIDs, s.first, epcalc, eptype, mc.retperiod,
@@ -1311,7 +1312,7 @@ void aggreports::WheatsheafAndWheatsheafMeanWithWeighting(
 
   std::vector<int> fileIDs;
   if (outputFlags_[handles[WHEATSHEAF]] == true) {
-    std::vector<int> fileIDs = GetFileIDs(handles[WHEATSHEAF], PSEPT);
+    fileIDs = GetFileIDs(handles[WHEATSHEAF], PSEPT);
   }
   WritePerSampleExceedanceProbabilityTable(fileIDs, items, eptype, eptype_tvar,
 					   unusedperiodstoweighting, temp_map);

@@ -1,489 +1,338 @@
 <!DOCTYPE html>
-<html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
 <head>
-<title>OutputComponents.md</title>
-<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
-
-<style>
-/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) Microsoft Corporation. All rights reserved.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
-
-body {
-	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
-	font-size: var(--vscode-markdown-font-size, 14px);
-	padding: 0 26px;
-	line-height: var(--vscode-markdown-line-height, 22px);
-	word-wrap: break-word;
-}
-
-#code-csp-warning {
-	position: fixed;
-	top: 0;
-	right: 0;
-	color: white;
-	margin: 16px;
-	text-align: center;
-	font-size: 12px;
-	font-family: sans-serif;
-	background-color:#444444;
-	cursor: pointer;
-	padding: 6px;
-	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
-}
-
-#code-csp-warning:hover {
-	text-decoration: none;
-	background-color:#007acc;
-	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
-}
-
-body.scrollBeyondLastLine {
-	margin-bottom: calc(100vh - 22px);
-}
-
-body.showEditorSelection .code-line {
-	position: relative;
-}
-
-body.showEditorSelection .code-active-line:before,
-body.showEditorSelection .code-line:hover:before {
-	content: "";
-	display: block;
-	position: absolute;
-	top: 0;
-	left: -12px;
-	height: 100%;
-}
-
-body.showEditorSelection li.code-active-line:before,
-body.showEditorSelection li.code-line:hover:before {
-	left: -30px;
-}
-
-.vscode-light.showEditorSelection .code-active-line:before {
-	border-left: 3px solid rgba(0, 0, 0, 0.15);
-}
-
-.vscode-light.showEditorSelection .code-line:hover:before {
-	border-left: 3px solid rgba(0, 0, 0, 0.40);
-}
-
-.vscode-light.showEditorSelection .code-line .code-line:hover:before {
-	border-left: none;
-}
-
-.vscode-dark.showEditorSelection .code-active-line:before {
-	border-left: 3px solid rgba(255, 255, 255, 0.4);
-}
-
-.vscode-dark.showEditorSelection .code-line:hover:before {
-	border-left: 3px solid rgba(255, 255, 255, 0.60);
-}
-
-.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
-	border-left: none;
-}
-
-.vscode-high-contrast.showEditorSelection .code-active-line:before {
-	border-left: 3px solid rgba(255, 160, 0, 0.7);
-}
-
-.vscode-high-contrast.showEditorSelection .code-line:hover:before {
-	border-left: 3px solid rgba(255, 160, 0, 1);
-}
-
-.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
-	border-left: none;
-}
-
-img {
-	max-width: 100%;
-	max-height: 100%;
-}
-
-a {
-	text-decoration: none;
-}
-
-a:hover {
-	text-decoration: underline;
-}
-
-a:focus,
-input:focus,
-select:focus,
-textarea:focus {
-	outline: 1px solid -webkit-focus-ring-color;
-	outline-offset: -1px;
-}
-
-hr {
-	border: 0;
-	height: 2px;
-	border-bottom: 2px solid;
-}
-
-h1 {
-	padding-bottom: 0.3em;
-	line-height: 1.2;
-	border-bottom-width: 1px;
-	border-bottom-style: solid;
-}
-
-h1, h2, h3 {
-	font-weight: normal;
-}
-
-table {
-	border-collapse: collapse;
-}
-
-table > thead > tr > th {
-	text-align: left;
-	border-bottom: 1px solid;
-}
-
-table > thead > tr > th,
-table > thead > tr > td,
-table > tbody > tr > th,
-table > tbody > tr > td {
-	padding: 5px 10px;
-}
-
-table > tbody > tr + tr > td {
-	border-top: 1px solid;
-}
-
-blockquote {
-	margin: 0 7px 0 5px;
-	padding: 0 16px 0 10px;
-	border-left-width: 5px;
-	border-left-style: solid;
-}
-
-code {
-	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
-	font-size: 1em;
-	line-height: 1.357em;
-}
-
-body.wordWrap pre {
-	white-space: pre-wrap;
-}
-
-pre:not(.hljs),
-pre.hljs code > div {
-	padding: 16px;
-	border-radius: 3px;
-	overflow: auto;
-}
-
-pre code {
-	color: var(--vscode-editor-foreground);
-	tab-size: 4;
-}
-
-/** Theming */
-
-.vscode-light pre {
-	background-color: rgba(220, 220, 220, 0.4);
-}
-
-.vscode-dark pre {
-	background-color: rgba(10, 10, 10, 0.4);
-}
-
-.vscode-high-contrast pre {
-	background-color: rgb(0, 0, 0);
-}
-
-.vscode-high-contrast h1 {
-	border-color: rgb(0, 0, 0);
-}
-
-.vscode-light table > thead > tr > th {
-	border-color: rgba(0, 0, 0, 0.69);
-}
-
-.vscode-dark table > thead > tr > th {
-	border-color: rgba(255, 255, 255, 0.69);
-}
-
-.vscode-light h1,
-.vscode-light hr,
-.vscode-light table > tbody > tr + tr > td {
-	border-color: rgba(0, 0, 0, 0.18);
-}
-
-.vscode-dark h1,
-.vscode-dark hr,
-.vscode-dark table > tbody > tr + tr > td {
-	border-color: rgba(255, 255, 255, 0.18);
-}
-
-</style>
-
-<style>
-/* Tomorrow Theme */
-/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
-/* Original theme - https://github.com/chriskempson/tomorrow-theme */
-
-/* Tomorrow Comment */
-.hljs-comment,
-.hljs-quote {
-	color: #8e908c;
-}
-
-/* Tomorrow Red */
-.hljs-variable,
-.hljs-template-variable,
-.hljs-tag,
-.hljs-name,
-.hljs-selector-id,
-.hljs-selector-class,
-.hljs-regexp,
-.hljs-deletion {
-	color: #c82829;
-}
-
-/* Tomorrow Orange */
-.hljs-number,
-.hljs-built_in,
-.hljs-builtin-name,
-.hljs-literal,
-.hljs-type,
-.hljs-params,
-.hljs-meta,
-.hljs-link {
-	color: #f5871f;
-}
-
-/* Tomorrow Yellow */
-.hljs-attribute {
-	color: #eab700;
-}
-
-/* Tomorrow Green */
-.hljs-string,
-.hljs-symbol,
-.hljs-bullet,
-.hljs-addition {
-	color: #718c00;
-}
-
-/* Tomorrow Blue */
-.hljs-title,
-.hljs-section {
-	color: #4271ae;
-}
-
-/* Tomorrow Purple */
-.hljs-keyword,
-.hljs-selector-tag {
-	color: #8959a8;
-}
-
-.hljs {
-	display: block;
-	overflow-x: auto;
-	color: #4d4d4c;
-	padding: 0.5em;
-}
-
-.hljs-emphasis {
-	font-style: italic;
-}
-
-.hljs-strong {
-	font-weight: bold;
-}
-</style>
-
-<style>
-/*
- * Markdown PDF CSS
- */
-
- body {
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
-	padding: 0 12px;
-}
-
-pre {
-	background-color: #f8f8f8;
-	border: 1px solid #cccccc;
-	border-radius: 3px;
-	overflow-x: auto;
-	white-space: pre-wrap;
-	overflow-wrap: break-word;
-}
-
-pre:not(.hljs) {
-	padding: 23px;
-	line-height: 19px;
-}
-
-blockquote {
-	background: rgba(127, 127, 127, 0.1);
-	border-color: rgba(0, 122, 204, 0.5);
-}
-
-.emoji {
-	height: 1.4em;
-}
-
-code {
-	font-size: 14px;
-	line-height: 19px;
-}
-
-/* for inline code */
-:not(pre):not(.hljs) > code {
-	color: #C9AE75; /* Change the old color so it seems less like an error */
-	font-size: inherit;
-}
-
-/* Page Break : use <div class="page"/> to insert page break
--------------------------------------------------------- */
-.page {
-	page-break-after: always;
-}
-
-</style>
-
-<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>OutputComponents</title>
+  <style>
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
 </head>
 <body>
-  <script>
-    mermaid.initialize({
-      startOnLoad: true,
-      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
-          ? 'dark'
-          : 'default'
-    });
-  </script>
-<h1 id="42-output-components-a-id%22outputcomponents%22a">4.2 Output Components <a id="outputcomponents"></a></h1>
-<h3 id="eltcalc-a-id%22eltcalc%22a">eltcalc <a id="eltcalc"></a></h3>
-<hr>
-<p>The program calculates mean and standard deviation of loss by summary_id and by event_id.</p>
+<h1 id="42-output-components-">4.2 Output Components
+<a id="outputcomponents"></a></h1>
+<h3 id="eltcalc-">eltcalc <a id="eltcalc"></a></h3>
+<hr />
+<p>The program calculates mean and standard deviation of loss by
+summary_id and by event_id.</p>
 <h5 id="parameters">Parameters</h5>
 <p>None</p>
 <h5 id="usage">Usage</h5>
-<pre class="hljs"><code><div>$ [stdin component] | eltcalc &gt; elt.csv
-$ eltcalc &lt; [stdin].bin &gt; elt.csv
-</div></code></pre>
+<pre><code>$ [stdin component] | eltcalc &gt; elt.csv
+$ eltcalc &lt; [stdin].bin &gt; elt.csv</code></pre>
 <h5 id="example">Example</h5>
-<pre class="hljs"><code><div>$ eve 1 1 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - | eltcalc &gt; elt.csv
-$ eltcalc &lt; summarycalc.bin &gt; elt.csv 
-</div></code></pre>
+<pre><code>$ eve 1 1 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - | eltcalc &gt; elt.csv
+$ eltcalc &lt; summarycalc.bin &gt; elt.csv </code></pre>
 <h5 id="internal-data">Internal data</h5>
-<p>No additional data is required, all the information is contained within the input stream.</p>
+<p>No additional data is required, all the information is contained
+within the input stream.</p>
 <h5 id="calculation">Calculation</h5>
-<p>For each summary_id and event_id, the sample mean and standard deviation is calculated from the sampled losses in the summarycalc stream and output to file.  The analytical mean is also output as a seperate record, differentiated by a 'type' field. The exposure_value, which is carried in the event_id, summary_id header of the stream is also output.</p>
+<p>For each summary_id and event_id, the sample mean and standard
+deviation is calculated from the sampled losses in the summarycalc
+stream and output to file. The analytical mean is also output as a
+seperate record, differentiated by a 'type' field. The exposure_value,
+which is carried in the event_id, summary_id header of the stream is
+also output.</p>
 <h5 id="output">Output</h5>
 <p>csv file with the following fields;</p>
 <table>
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 7%" />
+<col style="width: 7%" />
+<col style="width: 55%" />
+<col style="width: 12%" />
+</colgroup>
 <thead>
 <tr>
-<th style="text-align:left">Name</th>
+<th style="text-align: left;">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th style="text-align:left">Description</th>
-<th style="text-align:right">Example</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: right;">Example</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">summary_id</td>
+<td style="text-align: left;">summary_id</td>
 <td>int</td>
 <td>4</td>
-<td style="text-align:left">summary_id representing a grouping of losses</td>
-<td style="text-align:right">10</td>
+<td style="text-align: left;">summary_id representing a grouping of
+losses</td>
+<td style="text-align: right;">10</td>
 </tr>
 <tr>
-<td style="text-align:left">type</td>
+<td style="text-align: left;">type</td>
 <td>int</td>
 <td>4</td>
-<td style="text-align:left">1 for analytical mean, 2 for sample mean</td>
-<td style="text-align:right">2</td>
+<td style="text-align: left;">1 for analytical mean, 2 for sample
+mean</td>
+<td style="text-align: right;">2</td>
 </tr>
 <tr>
-<td style="text-align:left">event_id</td>
+<td style="text-align: left;">event_id</td>
 <td>int</td>
 <td>4</td>
-<td style="text-align:left">Oasis event_id</td>
-<td style="text-align:right">45567</td>
+<td style="text-align: left;">Oasis event_id</td>
+<td style="text-align: right;">45567</td>
 </tr>
 <tr>
-<td style="text-align:left">mean</td>
+<td style="text-align: left;">mean</td>
 <td>float</td>
 <td>4</td>
-<td style="text-align:left">mean</td>
-<td style="text-align:right">1345.678</td>
+<td style="text-align: left;">mean</td>
+<td style="text-align: right;">1345.678</td>
 </tr>
 <tr>
-<td style="text-align:left">standard_deviation</td>
+<td style="text-align: left;">standard_deviation</td>
 <td>float</td>
 <td>4</td>
-<td style="text-align:left">sample standard deviation</td>
-<td style="text-align:right">945.89</td>
+<td style="text-align: left;">sample standard deviation</td>
+<td style="text-align: right;">945.89</td>
 </tr>
 <tr>
-<td style="text-align:left">exposure_value</td>
+<td style="text-align: left;">exposure_value</td>
 <td>float</td>
 <td>4</td>
-<td style="text-align:left">exposure value for summary_id affected by the event</td>
-<td style="text-align:right">70000</td>
+<td style="text-align: left;">exposure value for summary_id affected by
+the event</td>
+<td style="text-align: right;">70000</td>
 </tr>
 </tbody>
 </table>
 <p><a href="#outputcomponents">Return to top</a></p>
-<h3 id="leccalc-a-id%22leccalc%22a">leccalc <a id="leccalc"></a></h3>
-<hr>
-<p>Loss exceedance curves, also known as exceedance probability curves, are computed by a rank ordering a set of losses by period and computing the probability of exceedance for each level of loss based on relative frequency. Losses are first assigned to periods of time (typically years) by reference to the <strong>occurrence</strong> file which contains the event occurrences in each period over a timeline of, say, 10,000 periods. Event losses are summed within each period for an aggregate loss exceedance curve, or the maximum of the event losses in each period is taken for an occurrence loss exceedance curve.  From this point, there are a few variants available as follows;</p>
+<h3 id="leccalc-">leccalc <a id="leccalc"></a></h3>
+<hr />
+<p>Loss exceedance curves, also known as exceedance probability curves,
+are computed by a rank ordering a set of losses by period and computing
+the probability of exceedance for each level of loss based on relative
+frequency. Losses are first assigned to periods of time (typically
+years) by reference to the <strong>occurrence</strong> file which
+contains the event occurrences in each period over a timeline of, say,
+10,000 periods. Event losses are summed within each period for an
+aggregate loss exceedance curve, or the maximum of the event losses in
+each period is taken for an occurrence loss exceedance curve. From this
+point, there are a few variants available as follows;</p>
 <ul>
-<li>
-<p>Wheatsheaf/multiple EP - losses by period are rank ordered for each sample, which produces many loss exceedance curves - one for each sample across the same timeline. The wheatsheaf shows the variation in return period loss due to sampled damage uncertainty, for a given timeline of occurrences.</p>
-</li>
-<li>
-<p>Full uncertainty/single EP - all sampled losses by period are rank ordered to produce a single loss exceedance curve. This treats each sample as if it were another period of losses in an extrapolated timeline. Stacking the curves end-to-end rather then viewing side-by-side as in the wheatsheaf is a form of averaging with respect to a particular return period loss and provides stability in the point estimate, for a given timeline of occurrences.</p>
-</li>
-<li>
-<p>Sample mean - the losses by period are first averaged across the samples, and then a single loss exceedance curve is created from the period sample mean losses.</p>
-</li>
-<li>
-<p>Wheatsheaf mean - the loss exceedance curves from the Wheatsheaf are averaged across each return period, which produces a single loss exceedance curve.</p>
-</li>
+<li><p>Wheatsheaf/multiple EP - losses by period are rank ordered for
+each sample, which produces many loss exceedance curves - one for each
+sample across the same timeline. The wheatsheaf shows the variation in
+return period loss due to sampled damage uncertainty, for a given
+timeline of occurrences.</p></li>
+<li><p>Full uncertainty/single EP - all sampled losses by period are
+rank ordered to produce a single loss exceedance curve. This treats each
+sample as if it were another period of losses in an extrapolated
+timeline. Stacking the curves end-to-end rather then viewing
+side-by-side as in the wheatsheaf is a form of averaging with respect to
+a particular return period loss and provides stability in the point
+estimate, for a given timeline of occurrences.</p></li>
+<li><p>Sample mean - the losses by period are first averaged across the
+samples, and then a single loss exceedance curve is created from the
+period sample mean losses.</p></li>
+<li><p>Wheatsheaf mean - the loss exceedance curves from the Wheatsheaf
+are averaged across each return period, which produces a single loss
+exceedance curve.</p></li>
 </ul>
-<p>The ranked losses represent the first, second, third,  etc.. largest loss periods within the total number of periods of say 10,000 years.  The relative frequency of these periods of loss is interpreted as the probability of loss exceedance, that is to say that the top ranked loss has an exceedance probability of 1 in 10000, or 0.01%, the second largest loss has an exceedance probability of 0.02%, and so on.  In the output file, the exceedance probability is expressed as a return period, which is the reciprocal of the exceedance probability multiplied by the total number of periods.  Only non-zero loss periods are returned.</p>
-<h5 id="parameters">Parameters</h5>
+<p>The ranked losses represent the first, second, third, etc.. largest
+loss periods within the total number of periods of say 10,000 years. The
+relative frequency of these periods of loss is interpreted as the
+probability of loss exceedance, that is to say that the top ranked loss
+has an exceedance probability of 1 in 10000, or 0.01%, the second
+largest loss has an exceedance probability of 0.02%, and so on. In the
+output file, the exceedance probability is expressed as a return period,
+which is the reciprocal of the exceedance probability multiplied by the
+total number of periods. Only non-zero loss periods are returned.</p>
+<h5 id="parameters-1">Parameters</h5>
 <ul>
-<li>-K{sub-directory}. The subdirectory of /work containing the input summarycalc binary files.
-Then the following tuple of parameters must be specified for at least one analysis type;</li>
-<li>Analysis type. Use -F for Full Uncertainty Aggregate, -f for Full Uncertainty Occurrence, -W for Wheatsheaf Aggregate,  -w for Wheatsheaf Occurrence, -S for Sample Mean Aggregate, -s for Sample Mean Occurrence, -M for Mean of Wheatsheaf Aggregate, -m for Mean of Wheatsheaf Occurrence</li>
+<li>-K{sub-directory}. The subdirectory of /work containing the input
+summarycalc binary files. Then the following tuple of parameters must be
+specified for at least one analysis type;</li>
+<li>Analysis type. Use -F for Full Uncertainty Aggregate, -f for Full
+Uncertainty Occurrence, -W for Wheatsheaf Aggregate, -w for Wheatsheaf
+Occurrence, -S for Sample Mean Aggregate, -s for Sample Mean Occurrence,
+-M for Mean of Wheatsheaf Aggregate, -m for Mean of Wheatsheaf
+Occurrence</li>
 <li>Output filename</li>
 </ul>
 <p>An optional parameter is;</p>
 <ul>
-<li>-r. Use return period file - use this parameter if you are providing a file with a specific list of return periods. If this file is not present then all calculated return periods will be returned, for losses greater than zero.</li>
+<li>-r. Use return period file - use this parameter if you are providing
+a file with a specific list of return periods. If this file is not
+present then all calculated return periods will be returned, for losses
+greater than zero.</li>
 </ul>
-<h5 id="usage">Usage</h5>
-<pre class="hljs"><code><div>$ leccalc [parameters] &gt; lec.csv
-
-</div></code></pre>
+<h5 id="usage-1">Usage</h5>
+<pre><code>$ leccalc [parameters] &gt; lec.csv
+</code></pre>
 <h5 id="examples">Examples</h5>
-<pre class="hljs"><code><div>'First generate summarycalc binaries by running the core workflow, for the required summary set
+<pre><code>&#39;First generate summarycalc binaries by running the core workflow, for the required summary set
 $ eve 1 2 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - &gt; work/summary1/summarycalc1.bin
 $ eve 2 2 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - &gt; work/summary1/summarycalc2.bin
-'Then run leccalc, pointing to the specified sub-directory of work containing summarycalc binaries.
+&#39;Then run leccalc, pointing to the specified sub-directory of work containing summarycalc binaries.
 $ leccalc -Ksummary1 -F lec_full_uncertainty_agg.csv -f lec_full_uncertainty_occ.csv 
-' With return period file
-$  leccalc -r -Ksummary1 -F lec_full_uncertainty_agg.csv -f lec_full_uncertainty_occ.csv 
-</div></code></pre>
-<h5 id="internal-data">Internal data</h5>
+&#39; With return period file
+$  leccalc -r -Ksummary1 -F lec_full_uncertainty_agg.csv -f lec_full_uncertainty_occ.csv </code></pre>
+<h5 id="internal-data-1">Internal data</h5>
 <p>leccalc requires the occurrence.bin file</p>
 <ul>
 <li>input/occurrence.bin</li>
@@ -493,511 +342,676 @@ $  leccalc -r -Ksummary1 -F lec_full_uncertainty_agg.csv -f lec_full_uncertainty
 <li>input/returnperiods.bin</li>
 <li>input/periods.bin</li>
 </ul>
-<p>leccalc does not have a standard input that can be streamed in. Instead, it reads in summarycalc binary data from a file in a fixed location.  The format of the binaries must match summarycalc standard output. The location is in the 'work' subdirectory of the present working directory. For example;</p>
+<p>leccalc does not have a standard input that can be streamed in.
+Instead, it reads in summarycalc binary data from a file in a fixed
+location. The format of the binaries must match summarycalc standard
+output. The location is in the 'work' subdirectory of the present
+working directory. For example;</p>
 <ul>
 <li>work/summarycalc1.bin</li>
 <li>work/summarycalc2.bin</li>
 <li>work/summarycalc3.bin</li>
 </ul>
-<p>The user must ensure the work subdirectory exists.  The user may also specify a subdirectory of /work to store these files. e.g.</p>
+<p>The user must ensure the work subdirectory exists. The user may also
+specify a subdirectory of /work to store these files. e.g.</p>
 <ul>
 <li>work/summaryset1/summarycalc1.bin</li>
 <li>work/summaryset1/summarycalc2.bin</li>
 <li>work/summaryset1/summarycalc3.bin</li>
 </ul>
-<p>The reason for leccalc not having an input stream is that the calculation is not valid on a subset of events, i.e. within a single process when the calculation has been distributed across multiple processes.  It must bring together all event losses before assigning event losses to periods and ranking losses by period.  The summarycalc losses for all events (all processes) must be written to the /work folder before running leccalc.</p>
-<h5 id="calculation">Calculation</h5>
-<p>All files with extension .bin from the specified subdirectory are read into memory, as well as the occurrence.bin. The summarycalc losses are grouped together and sampled losses are assigned to period according to which period the events occur in.</p>
+<p>The reason for leccalc not having an input stream is that the
+calculation is not valid on a subset of events, i.e. within a single
+process when the calculation has been distributed across multiple
+processes. It must bring together all event losses before assigning
+event losses to periods and ranking losses by period. The summarycalc
+losses for all events (all processes) must be written to the /work
+folder before running leccalc.</p>
+<h5 id="calculation-1">Calculation</h5>
+<p>All files with extension .bin from the specified subdirectory are
+read into memory, as well as the occurrence.bin. The summarycalc losses
+are grouped together and sampled losses are assigned to period according
+to which period the events occur in.</p>
 <p>If multiple events occur within a period;</p>
 <ul>
-<li>For <strong>aggregate</strong> loss exceedance curves, the sum of losses is calculated.</li>
-<li>For <strong>occurrence</strong> loss exceedance curves, the maximum loss is calculated.</li>
+<li>For <strong>aggregate</strong> loss exceedance curves, the sum of
+losses is calculated.</li>
+<li>For <strong>occurrence</strong> loss exceedance curves, the maximum
+loss is calculated.</li>
 </ul>
 <p>Then the calculation differs by lec type, as follows;</p>
 <ul>
-<li>Full uncertainty - all losses by period are rank ordered to produce a single loss exceedance curve.</li>
-<li>Wheatsheaf - losses by period are rank ordered for each sample, which produces many loss exceedance curves - one for each sample across the same timeline.</li>
-<li>Sample mean - the losses by period are first averaged across the samples, and then a single loss exceedance curve is created from the period sample mean losses.</li>
-<li>Wheatsheaf mean - the return period losses from the Wheatsheaf are averaged, which produces a single loss exceedance curve.</li>
+<li>Full uncertainty - all losses by period are rank ordered to produce
+a single loss exceedance curve.</li>
+<li>Wheatsheaf - losses by period are rank ordered for each sample,
+which produces many loss exceedance curves - one for each sample across
+the same timeline.</li>
+<li>Sample mean - the losses by period are first averaged across the
+samples, and then a single loss exceedance curve is created from the
+period sample mean losses.</li>
+<li>Wheatsheaf mean - the return period losses from the Wheatsheaf are
+averaged, which produces a single loss exceedance curve.</li>
 </ul>
-<p>For all curves, the analytical mean loss (sidx = -1) is output as a separate exceedance probability curve.  If the calculation is run with 0 samples, then leccalc will still return the analytical mean loss exceedance curve.  The 'type' field in the output identifies the type of loss exceedance curve, which is 1 for analytical mean, and 2 for curves calculated from the samples.</p>
-<h5 id="output">Output</h5>
+<p>For all curves, the analytical mean loss (sidx = -1) is output as a
+separate exceedance probability curve. If the calculation is run with 0
+samples, then leccalc will still return the analytical mean loss
+exceedance curve. The 'type' field in the output identifies the type of
+loss exceedance curve, which is 1 for analytical mean, and 2 for curves
+calculated from the samples.</p>
+<h5 id="output-1">Output</h5>
 <p>csv file with the following fields;</p>
-<p><strong>Full uncertainty, Sample mean and Wheatsheaf mean loss exceedance curve</strong></p>
+<p><strong>Full uncertainty, Sample mean and Wheatsheaf mean loss
+exceedance curve</strong></p>
 <table>
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 58%" />
+<col style="width: 11%" />
+</colgroup>
 <thead>
 <tr>
-<th style="text-align:left">Name</th>
+<th style="text-align: left;">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th style="text-align:left">Description</th>
-<th style="text-align:right">Example</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: right;">Example</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">summary_id</td>
+<td style="text-align: left;">summary_id</td>
 <td>int</td>
 <td>4</td>
-<td style="text-align:left">summary_id representing a grouping of losses</td>
-<td style="text-align:right">10</td>
+<td style="text-align: left;">summary_id representing a grouping of
+losses</td>
+<td style="text-align: right;">10</td>
 </tr>
 <tr>
-<td style="text-align:left">type</td>
+<td style="text-align: left;">type</td>
 <td>int</td>
 <td>4</td>
-<td style="text-align:left">1 for analytical mean, 2 for sample mean</td>
-<td style="text-align:right">2</td>
+<td style="text-align: left;">1 for analytical mean, 2 for sample
+mean</td>
+<td style="text-align: right;">2</td>
 </tr>
 <tr>
-<td style="text-align:left">return_period</td>
+<td style="text-align: left;">return_period</td>
 <td>float</td>
 <td>4</td>
-<td style="text-align:left">return period interval</td>
-<td style="text-align:right">250</td>
+<td style="text-align: left;">return period interval</td>
+<td style="text-align: right;">250</td>
 </tr>
 <tr>
-<td style="text-align:left">loss</td>
+<td style="text-align: left;">loss</td>
 <td>float</td>
 <td>4</td>
-<td style="text-align:left">loss exceedance threshold for return period</td>
-<td style="text-align:right">546577.8</td>
+<td style="text-align: left;">loss exceedance threshold for return
+period</td>
+<td style="text-align: right;">546577.8</td>
 </tr>
 </tbody>
 </table>
 <p><strong>Wheatsheaf loss exceedance curve</strong></p>
 <table>
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 58%" />
+<col style="width: 11%" />
+</colgroup>
 <thead>
 <tr>
-<th style="text-align:left">Name</th>
+<th style="text-align: left;">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th style="text-align:left">Description</th>
-<th style="text-align:right">Example</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: right;">Example</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">summary_id</td>
+<td style="text-align: left;">summary_id</td>
 <td>int</td>
 <td>4</td>
-<td style="text-align:left">summary_id representing a grouping of losses</td>
-<td style="text-align:right">10</td>
+<td style="text-align: left;">summary_id representing a grouping of
+losses</td>
+<td style="text-align: right;">10</td>
 </tr>
 <tr>
-<td style="text-align:left">sidx</td>
+<td style="text-align: left;">sidx</td>
 <td>int</td>
 <td>4</td>
-<td style="text-align:left">Oasis sample index</td>
-<td style="text-align:right">50</td>
+<td style="text-align: left;">Oasis sample index</td>
+<td style="text-align: right;">50</td>
 </tr>
 <tr>
-<td style="text-align:left">return_period</td>
+<td style="text-align: left;">return_period</td>
 <td>float</td>
 <td>4</td>
-<td style="text-align:left">return period interval</td>
-<td style="text-align:right">250</td>
+<td style="text-align: left;">return period interval</td>
+<td style="text-align: right;">250</td>
 </tr>
 <tr>
-<td style="text-align:left">loss</td>
+<td style="text-align: left;">loss</td>
 <td>float</td>
 <td>4</td>
-<td style="text-align:left">loss exceedance threshold for return period</td>
-<td style="text-align:right">546577.8</td>
+<td style="text-align: left;">loss exceedance threshold for return
+period</td>
+<td style="text-align: right;">546577.8</td>
 </tr>
 </tbody>
 </table>
 <h5 id="period-weightings">Period weightings</h5>
-<p>An additional feature of leccalc is available to vary the relative importance of the period losses by providing a period weightings file to the calculation. In this file, a weight can be assigned to each period make it more or less important than neutral weighting (1 divided by the total number of periods). For example, if the neutral weight for period 1 is 1 in 10000 years, or 0.0001, then doubling the weighting to 0.0002 will mean that period's loss reoccurrence rate would double.  Assuming no other period losses, the return period of the loss of period 1 in this example would be halved.</p>
-<p>All period_nos must appear in the file from 1 to P (no gaps). There is no constraint on the sum of weights. Periods with zero weight will not contribute any losses to the loss exceedance curve.</p>
-<p>This feature will be invoked automatically if the periods.bin file is present in the input directory.</p>
+<p>An additional feature of leccalc is available to vary the relative
+importance of the period losses by providing a period weightings file to
+the calculation. In this file, a weight can be assigned to each period
+make it more or less important than neutral weighting (1 divided by the
+total number of periods). For example, if the neutral weight for period
+1 is 1 in 10000 years, or 0.0001, then doubling the weighting to 0.0002
+will mean that period's loss reoccurrence rate would double. Assuming no
+other period losses, the return period of the loss of period 1 in this
+example would be halved.</p>
+<p>All period_nos must appear in the file from 1 to P (no gaps). There
+is no constraint on the sum of weights. Periods with zero weight will
+not contribute any losses to the loss exceedance curve.</p>
+<p>This feature will be invoked automatically if the periods.bin file is
+present in the input directory.</p>
 <p><a href="#outputcomponents">Return to top</a></p>
-<h3 id="pltcalc-a-id%22pltcalc%22a">pltcalc <a id="pltcalc"></a></h3>
-<hr>
-<p>The program outputs sample mean and standard deviation by summary_id,  event_id and period_no.  The analytical mean is also output as a seperate record, differentiated by a 'type' field.  It also outputs an event occurrence date.</p>
-<h5 id="parameters">Parameters</h5>
+<h3 id="pltcalc-">pltcalc <a id="pltcalc"></a></h3>
+<hr />
+<p>The program outputs sample mean and standard deviation by summary_id,
+event_id and period_no. The analytical mean is also output as a seperate
+record, differentiated by a 'type' field. It also outputs an event
+occurrence date.</p>
+<h5 id="parameters-2">Parameters</h5>
 <p>None</p>
-<h5 id="usage">Usage</h5>
-<pre class="hljs"><code><div>$ [stdin component] | pltcalc &gt; plt.csv
-$ pltcalc &lt; [stdin].bin &gt; plt.csv
-</div></code></pre>
+<h5 id="usage-2">Usage</h5>
+<pre><code>$ [stdin component] | pltcalc &gt; plt.csv
+$ pltcalc &lt; [stdin].bin &gt; plt.csv</code></pre>
 <h5 id="examplea">Examplea</h5>
-<pre class="hljs"><code><div>$ eve 1 1 | getmodel | gulcalc -r -S100 -C1 | summarycalc -1 - | pltcalc &gt; plt.csv
-$ pltcalc &lt; summarycalc.bin &gt; plt.csv 
-</div></code></pre>
-<h5 id="internal-data">Internal data</h5>
+<pre><code>$ eve 1 1 | getmodel | gulcalc -r -S100 -C1 | summarycalc -1 - | pltcalc &gt; plt.csv
+$ pltcalc &lt; summarycalc.bin &gt; plt.csv </code></pre>
+<h5 id="internal-data-2">Internal data</h5>
 <p>pltcalc requires the occurrence.bin file</p>
 <ul>
 <li>input/occurrence.bin</li>
 </ul>
-<h5 id="calculation">Calculation</h5>
-<p>The occurrence.bin file is read into memory.  For each summary_id,  event_id and period_no, the sample mean and standard deviation is calculated from the sampled losses in the summarycalc stream and output to file.  The exposure_value, which is carried in the event_id, summary_id header of the stream is also output, as well as the date field(s) from the occurrence file.</p>
-<h5 id="output">Output</h5>
-<p>There are two output formats, depending on whether an event occurrence date is an integer offset to some base date that most external programs can interpret as a real date, or a calendar day in a numbered scenario year. The output format will depend on the format of the date fields in the occurrence.bin file.</p>
+<h5 id="calculation-2">Calculation</h5>
+<p>The occurrence.bin file is read into memory. For each summary_id,
+event_id and period_no, the sample mean and standard deviation is
+calculated from the sampled losses in the summarycalc stream and output
+to file. The exposure_value, which is carried in the event_id,
+summary_id header of the stream is also output, as well as the date
+field(s) from the occurrence file.</p>
+<h5 id="output-2">Output</h5>
+<p>There are two output formats, depending on whether an event
+occurrence date is an integer offset to some base date that most
+external programs can interpret as a real date, or a calendar day in a
+numbered scenario year. The output format will depend on the format of
+the date fields in the occurrence.bin file.</p>
 <p>In the former case, the output format is;</p>
 <table>
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 58%" />
+<col style="width: 11%" />
+</colgroup>
 <thead>
 <tr>
-<th style="text-align:left">Name</th>
+<th style="text-align: left;">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th style="text-align:left">Description</th>
-<th style="text-align:right">Example</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: right;">Example</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">type</td>
+<td style="text-align: left;">type</td>
 <td>int</td>
 <td>4</td>
-<td style="text-align:left">1 for analytical mean, 2 for sample mean</td>
-<td style="text-align:right">1</td>
+<td style="text-align: left;">1 for analytical mean, 2 for sample
+mean</td>
+<td style="text-align: right;">1</td>
 </tr>
 <tr>
-<td style="text-align:left">summary_id</td>
+<td style="text-align: left;">summary_id</td>
 <td>int</td>
 <td>4</td>
-<td style="text-align:left">summary_id representing a grouping of losses</td>
-<td style="text-align:right">10</td>
+<td style="text-align: left;">summary_id representing a grouping of
+losses</td>
+<td style="text-align: right;">10</td>
 </tr>
 <tr>
-<td style="text-align:left">event_id</td>
+<td style="text-align: left;">event_id</td>
 <td>int</td>
 <td>4</td>
-<td style="text-align:left">Oasis event_id</td>
-<td style="text-align:right">45567</td>
+<td style="text-align: left;">Oasis event_id</td>
+<td style="text-align: right;">45567</td>
 </tr>
 <tr>
-<td style="text-align:left">period_no</td>
+<td style="text-align: left;">period_no</td>
 <td>int</td>
 <td>4</td>
-<td style="text-align:left">identifying an abstract period of time, such as a year</td>
-<td style="text-align:right">56876</td>
+<td style="text-align: left;">identifying an abstract period of time,
+such as a year</td>
+<td style="text-align: right;">56876</td>
 </tr>
 <tr>
-<td style="text-align:left">mean</td>
+<td style="text-align: left;">mean</td>
 <td>float</td>
 <td>4</td>
-<td style="text-align:left">mean</td>
-<td style="text-align:right">1345.678</td>
+<td style="text-align: left;">mean</td>
+<td style="text-align: right;">1345.678</td>
 </tr>
 <tr>
-<td style="text-align:left">standard_deviation</td>
+<td style="text-align: left;">standard_deviation</td>
 <td>float</td>
 <td>4</td>
-<td style="text-align:left">sample standard deviation</td>
-<td style="text-align:right">945.89</td>
+<td style="text-align: left;">sample standard deviation</td>
+<td style="text-align: right;">945.89</td>
 </tr>
 <tr>
-<td style="text-align:left">exposure_value</td>
+<td style="text-align: left;">exposure_value</td>
 <td>float</td>
 <td>4</td>
-<td style="text-align:left">exposure value for summary_id affected by the event</td>
-<td style="text-align:right">70000</td>
+<td style="text-align: left;">exposure value for summary_id affected by
+the event</td>
+<td style="text-align: right;">70000</td>
 </tr>
 <tr>
-<td style="text-align:left">date_id</td>
+<td style="text-align: left;">date_id</td>
 <td>int</td>
 <td>4</td>
-<td style="text-align:left">the date_id of the event occurrence</td>
-<td style="text-align:right">28616</td>
+<td style="text-align: left;">the date_id of the event occurrence</td>
+<td style="text-align: right;">28616</td>
 </tr>
 </tbody>
 </table>
-<p>Using a base date of 1/1/1900 the integer 28616 is interpreted as 16/5/1978.</p>
+<p>Using a base date of 1/1/1900 the integer 28616 is interpreted as
+16/5/1978.</p>
 <p>In the latter case, the output format is;</p>
 <table>
+<colgroup>
+<col style="width: 16%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 58%" />
+<col style="width: 11%" />
+</colgroup>
 <thead>
 <tr>
-<th style="text-align:left">Name</th>
+<th style="text-align: left;">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th style="text-align:left">Description</th>
-<th style="text-align:right">Example</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: right;">Example</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">type</td>
+<td style="text-align: left;">type</td>
 <td>int</td>
 <td>4</td>
-<td style="text-align:left">1 for analytical mean, 2 for sample mean</td>
-<td style="text-align:right">1</td>
+<td style="text-align: left;">1 for analytical mean, 2 for sample
+mean</td>
+<td style="text-align: right;">1</td>
 </tr>
 <tr>
-<td style="text-align:left">summary_id</td>
+<td style="text-align: left;">summary_id</td>
 <td>int</td>
 <td>4</td>
-<td style="text-align:left">summary_id representing a grouping of losses</td>
-<td style="text-align:right">10</td>
+<td style="text-align: left;">summary_id representing a grouping of
+losses</td>
+<td style="text-align: right;">10</td>
 </tr>
 <tr>
-<td style="text-align:left">event_id</td>
+<td style="text-align: left;">event_id</td>
 <td>int</td>
 <td>4</td>
-<td style="text-align:left">Oasis event_id</td>
-<td style="text-align:right">45567</td>
+<td style="text-align: left;">Oasis event_id</td>
+<td style="text-align: right;">45567</td>
 </tr>
 <tr>
-<td style="text-align:left">period_no</td>
+<td style="text-align: left;">period_no</td>
 <td>int</td>
 <td>4</td>
-<td style="text-align:left">identifying an abstract period of time, such as a year</td>
-<td style="text-align:right">56876</td>
+<td style="text-align: left;">identifying an abstract period of time,
+such as a year</td>
+<td style="text-align: right;">56876</td>
 </tr>
 <tr>
-<td style="text-align:left">mean</td>
+<td style="text-align: left;">mean</td>
 <td>float</td>
 <td>4</td>
-<td style="text-align:left">mean</td>
-<td style="text-align:right">1345.678</td>
+<td style="text-align: left;">mean</td>
+<td style="text-align: right;">1345.678</td>
 </tr>
 <tr>
-<td style="text-align:left">standard_deviation</td>
+<td style="text-align: left;">standard_deviation</td>
 <td>float</td>
 <td>4</td>
-<td style="text-align:left">sample standard deviation</td>
-<td style="text-align:right">945.89</td>
+<td style="text-align: left;">sample standard deviation</td>
+<td style="text-align: right;">945.89</td>
 </tr>
 <tr>
-<td style="text-align:left">exposure_value</td>
+<td style="text-align: left;">exposure_value</td>
 <td>float</td>
 <td>4</td>
-<td style="text-align:left">exposure value for summary_id affected by the event</td>
-<td style="text-align:right">70000</td>
+<td style="text-align: left;">exposure value for summary_id affected by
+the event</td>
+<td style="text-align: right;">70000</td>
 </tr>
 <tr>
-<td style="text-align:left">occ_year</td>
+<td style="text-align: left;">occ_year</td>
 <td>int</td>
 <td>4</td>
-<td style="text-align:left">the year number of the event occurrence</td>
-<td style="text-align:right">56876</td>
+<td style="text-align: left;">the year number of the event
+occurrence</td>
+<td style="text-align: right;">56876</td>
 </tr>
 <tr>
-<td style="text-align:left">occ_month</td>
+<td style="text-align: left;">occ_month</td>
 <td>int</td>
 <td>4</td>
-<td style="text-align:left">the month of the event occurrence</td>
-<td style="text-align:right">5</td>
+<td style="text-align: left;">the month of the event occurrence</td>
+<td style="text-align: right;">5</td>
 </tr>
 <tr>
-<td style="text-align:left">occ_year</td>
+<td style="text-align: left;">occ_year</td>
 <td>int</td>
 <td>4</td>
-<td style="text-align:left">the day of the event occurrence</td>
-<td style="text-align:right">16</td>
+<td style="text-align: left;">the day of the event occurrence</td>
+<td style="text-align: right;">16</td>
 </tr>
 </tbody>
 </table>
 <p><a href="#outputcomponents">Return to top</a></p>
-<h3 id="aalcalc-a-id%22aalcalc%22a">aalcalc <a id="aalcalc"></a></h3>
-<hr>
-<p>aalcalc computes the overall average annual loss and standard deviation of annual loss.</p>
-<p>Two types of aal and standard deviation of loss are calculated; analytical (type 1) and sample (type 2).  If the analysis is run with zero samples, then only type 1 statistics are returned by aalcalc.</p>
-<p>The Average Loss Converence Table 'ALCT' is a second optional output which can be generated from aalcalc. This provides extra statistical output which can be used to estimate the amount of simulation error in the average annual loss estimate from samples (type 2).</p>
-<h5 id="internal-data">Internal data</h5>
+<h3 id="aalcalc-">aalcalc <a id="aalcalc"></a></h3>
+<hr />
+<p>aalcalc computes the overall average annual loss and standard
+deviation of annual loss.</p>
+<p>Two types of aal and standard deviation of loss are calculated;
+analytical (type 1) and sample (type 2). If the analysis is run with
+zero samples, then only type 1 statistics are returned by aalcalc.</p>
+<p>The Average Loss Converence Table 'ALCT' is a second optional output
+which can be generated from aalcalc. This provides extra statistical
+output which can be used to estimate the amount of simulation error in
+the average annual loss estimate from samples (type 2).</p>
+<h5 id="internal-data-3">Internal data</h5>
 <p>aalcalc requires the occurrence.bin file</p>
 <ul>
 <li>input/occurrence.bin</li>
 </ul>
-<p>aalcalc does not have a standard input that can be streamed in. Instead, it reads in summarycalc binary data from a file in a fixed location.  The format of the binaries must match summarycalc standard output. The location is in the 'work' subdirectory of the present working directory. For example;</p>
+<p>aalcalc does not have a standard input that can be streamed in.
+Instead, it reads in summarycalc binary data from a file in a fixed
+location. The format of the binaries must match summarycalc standard
+output. The location is in the 'work' subdirectory of the present
+working directory. For example;</p>
 <ul>
 <li>work/summarycalc1.bin</li>
 <li>work/summarycalc2.bin</li>
 <li>work/summarycalc3.bin</li>
 </ul>
-<p>The user must ensure the work subdirectory exists.  The user may also specify a subdirectory of /work to store these files. e.g.</p>
+<p>The user must ensure the work subdirectory exists. The user may also
+specify a subdirectory of /work to store these files. e.g.</p>
 <ul>
 <li>work/summaryset1/summarycalc1.bin</li>
 <li>work/summaryset1/summarycalc2.bin</li>
 <li>work/summaryset1/summarycalc3.bin</li>
 </ul>
-<p>The reason for aalcalc not having an input stream is that the calculation is not valid on a subset of events, i.e. within a single process when the calculation has been distributed across multiple processes.  It must bring together all event losses before assigning event losses to periods and finally computing the final statistics.</p>
-<h5 id="parameters">Parameters</h5>
+<p>The reason for aalcalc not having an input stream is that the
+calculation is not valid on a subset of events, i.e. within a single
+process when the calculation has been distributed across multiple
+processes. It must bring together all event losses before assigning
+event losses to periods and finally computing the final statistics.</p>
+<h5 id="parameters-3">Parameters</h5>
 <ul>
-<li>-K{sub-directory}. The sub-directory of /work containing the input aalcalc binary files.</li>
-<li>-o -l {confidence_level} -c {file path} - Generates the alct report in addition to the aalcalc report (optional)</li>
+<li>-K{sub-directory}. The sub-directory of /work containing the input
+aalcalc binary files.</li>
+<li>-o -l {confidence_level} -c {file path} - Generates the alct report
+in addition to the aalcalc report (optional)</li>
 </ul>
-<h5 id="usage">Usage</h5>
-<pre class="hljs"><code><div>$ aalcalc [parameters] &gt; aal.csv
-</div></code></pre>
-<h5 id="examples">Examples</h5>
-<pre class="hljs"><code><div>First generate summarycalc binaries by running the core workflow, for the required summary set
+<h5 id="usage-3">Usage</h5>
+<pre><code>$ aalcalc [parameters] &gt; aal.csv</code></pre>
+<h5 id="examples-1">Examples</h5>
+<pre><code>First generate summarycalc binaries by running the core workflow, for the required summary set
 $ eve 1 2 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - &gt; work/summary1/summarycalc1.bin
 $ eve 2 2 | getmodel | gulcalc -r -S100 -c - | summarycalc -g -1 - &gt; work/summary1/summarycalc2.bin
 Then run aalcalc, pointing to the specified sub-directory of work containing summarycalc binaries.
 $ aalcalc -Ksummary1 &gt; aal.csv  
 Add alct output at 95% confidence level
-$ aalcalc -Ksummary1 -o -l 0.95 -c alct.csv &gt; aal.csv  
-</div></code></pre>
-<h5 id="output">Output</h5>
+$ aalcalc -Ksummary1 -o -l 0.95 -c alct.csv &gt; aal.csv  </code></pre>
+<h5 id="output-3">Output</h5>
 <p><strong>AAL:</strong></p>
 <p>csv file containing the following fields;</p>
 <table>
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 57%" />
+<col style="width: 11%" />
+</colgroup>
 <thead>
 <tr>
-<th style="text-align:left">Name</th>
+<th style="text-align: left;">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th style="text-align:left">Description</th>
-<th style="text-align:right">Example</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: right;">Example</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">summary_id</td>
+<td style="text-align: left;">summary_id</td>
 <td>int</td>
 <td>4</td>
-<td style="text-align:left">summary_id representing a grouping of losses</td>
-<td style="text-align:right">1</td>
+<td style="text-align: left;">summary_id representing a grouping of
+losses</td>
+<td style="text-align: right;">1</td>
 </tr>
 <tr>
-<td style="text-align:left">type</td>
+<td style="text-align: left;">type</td>
 <td>int</td>
 <td>4</td>
-<td style="text-align:left">1 for analytical statistics, 2 for sample statistics</td>
-<td style="text-align:right">2</td>
+<td style="text-align: left;">1 for analytical statistics, 2 for sample
+statistics</td>
+<td style="text-align: right;">2</td>
 </tr>
 <tr>
-<td style="text-align:left">mean</td>
+<td style="text-align: left;">mean</td>
 <td>float</td>
 <td>8</td>
-<td style="text-align:left">average annual loss</td>
-<td style="text-align:right">1014.23</td>
+<td style="text-align: left;">average annual loss</td>
+<td style="text-align: right;">1014.23</td>
 </tr>
 <tr>
-<td style="text-align:left">standard_deviation</td>
+<td style="text-align: left;">standard_deviation</td>
 <td>float</td>
 <td>8</td>
-<td style="text-align:left">standard deviation of annual loss</td>
-<td style="text-align:right">11039.78</td>
+<td style="text-align: left;">standard deviation of annual loss</td>
+<td style="text-align: right;">11039.78</td>
 </tr>
 </tbody>
 </table>
 <p><strong>ALCT:</strong></p>
 <p>csv file containing the following fields;</p>
 <table>
+<colgroup>
+<col style="width: 17%" />
+<col style="width: 6%" />
+<col style="width: 6%" />
+<col style="width: 57%" />
+<col style="width: 11%" />
+</colgroup>
 <thead>
 <tr>
-<th style="text-align:left">Name</th>
+<th style="text-align: left;">Name</th>
 <th>Type</th>
 <th>Bytes</th>
-<th style="text-align:left">Description</th>
-<th style="text-align:right">Example</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: right;">Example</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left">SummaryId</td>
+<td style="text-align: left;">SummaryId</td>
 <td>int</td>
 <td>4</td>
-<td style="text-align:left">summary_id representing a grouping of losses</td>
-<td style="text-align:right">1</td>
+<td style="text-align: left;">summary_id representing a grouping of
+losses</td>
+<td style="text-align: right;">1</td>
 </tr>
 <tr>
-<td style="text-align:left">MeanLoss</td>
+<td style="text-align: left;">MeanLoss</td>
 <td>float</td>
 <td>4</td>
-<td style="text-align:left">the average annual loss estimate from samples</td>
-<td style="text-align:right">1014.23</td>
+<td style="text-align: left;">the average annual loss estimate from
+samples</td>
+<td style="text-align: right;">1014.23</td>
 </tr>
 <tr>
-<td style="text-align:left">SDLoss</td>
+<td style="text-align: left;">SDLoss</td>
 <td>float</td>
 <td>8</td>
-<td style="text-align:left">the standard deviation of annual loss from samples</td>
-<td style="text-align:right">11039.78</td>
+<td style="text-align: left;">the standard deviation of annual loss from
+samples</td>
+<td style="text-align: right;">11039.78</td>
 </tr>
 <tr>
-<td style="text-align:left">SampleSize</td>
+<td style="text-align: left;">SampleSize</td>
 <td>int</td>
 <td>8</td>
-<td style="text-align:left">the number of samples used to produce the statistics</td>
-<td style="text-align:right">100</td>
+<td style="text-align: left;">the number of samples used to produce the
+statistics</td>
+<td style="text-align: right;">100</td>
 </tr>
 <tr>
-<td style="text-align:left">LowerCI</td>
+<td style="text-align: left;">LowerCI</td>
 <td>float</td>
 <td>8</td>
-<td style="text-align:left">the lower threshold of the confidence interval for the mean estimate</td>
-<td style="text-align:right">1004.52</td>
+<td style="text-align: left;">the lower threshold of the confidence
+interval for the mean estimate</td>
+<td style="text-align: right;">1004.52</td>
 </tr>
 <tr>
-<td style="text-align:left">UpperCI</td>
+<td style="text-align: left;">UpperCI</td>
 <td>float</td>
 <td>8</td>
-<td style="text-align:left">the upper threshold of the confidence interval for the mean estimate</td>
-<td style="text-align:right">1023.94</td>
+<td style="text-align: left;">the upper threshold of the confidence
+interval for the mean estimate</td>
+<td style="text-align: right;">1023.94</td>
 </tr>
 <tr>
-<td style="text-align:left">StandardError</td>
+<td style="text-align: left;">StandardError</td>
 <td>float</td>
 <td>8</td>
-<td style="text-align:left">the total standard error of the mean estimate</td>
-<td style="text-align:right">5.90</td>
+<td style="text-align: left;">the total standard error of the mean
+estimate</td>
+<td style="text-align: right;">5.90</td>
 </tr>
 <tr>
-<td style="text-align:left">RelativeError</td>
+<td style="text-align: left;">RelativeError</td>
 <td>float</td>
 <td>8</td>
-<td style="text-align:left">the StandardError divided by the mean estimate</td>
-<td style="text-align:right">0.005</td>
+<td style="text-align: left;">the StandardError divided by the mean
+estimate</td>
+<td style="text-align: right;">0.005</td>
 </tr>
 <tr>
-<td style="text-align:left">VarElementHaz</td>
+<td style="text-align: left;">VarElementHaz</td>
 <td>float</td>
 <td>8</td>
-<td style="text-align:left">the contribution to variance of the estimate from the hazard</td>
-<td style="text-align:right">8707.40</td>
+<td style="text-align: left;">the contribution to variance of the
+estimate from the hazard</td>
+<td style="text-align: right;">8707.40</td>
 </tr>
 <tr>
-<td style="text-align:left">StandardErrorHaz</td>
+<td style="text-align: left;">StandardErrorHaz</td>
 <td>float</td>
 <td>8</td>
-<td style="text-align:left">the square root of VarElementHaz</td>
-<td style="text-align:right">93.31</td>
+<td style="text-align: left;">the square root of VarElementHaz</td>
+<td style="text-align: right;">93.31</td>
 </tr>
 <tr>
-<td style="text-align:left">RelativeErrorHaz</td>
+<td style="text-align: left;">RelativeErrorHaz</td>
 <td>float</td>
 <td>8</td>
-<td style="text-align:left">the StandardErrorHaz divided by the mean estimate</td>
-<td style="text-align:right">0.092</td>
+<td style="text-align: left;">the StandardErrorHaz divided by the mean
+estimate</td>
+<td style="text-align: right;">0.092</td>
 </tr>
 <tr>
-<td style="text-align:left">VarElementVuln</td>
+<td style="text-align: left;">VarElementVuln</td>
 <td>float</td>
 <td>8</td>
-<td style="text-align:left">the contribution to variance of the estimate from the vulnerability</td>
-<td style="text-align:right">34.81</td>
+<td style="text-align: left;">the contribution to variance of the
+estimate from the vulnerability</td>
+<td style="text-align: right;">34.81</td>
 </tr>
 <tr>
-<td style="text-align:left">StandardErrorVuln</td>
+<td style="text-align: left;">StandardErrorVuln</td>
 <td>float</td>
 <td>8</td>
-<td style="text-align:left">the square root of VarElementVuln</td>
-<td style="text-align:right">5.90</td>
+<td style="text-align: left;">the square root of VarElementVuln</td>
+<td style="text-align: right;">5.90</td>
 </tr>
 <tr>
-<td style="text-align:left">RelativeErrorVuln</td>
+<td style="text-align: left;">RelativeErrorVuln</td>
 <td>float</td>
 <td>8</td>
-<td style="text-align:left">the StandardErrorVuln divided by the mean estimate</td>
-<td style="text-align:right">0.005</td>
+<td style="text-align: left;">the StandardErrorVuln divided by the mean
+estimate</td>
+<td style="text-align: right;">0.005</td>
 </tr>
 </tbody>
 </table>
-<h5 id="calculation">Calculation</h5>
-<p>The occurrence file and summarycalc files from the specified subdirectory are read into memory. Event losses are assigned to periods based on when the events occur and summed by period and by sample. These are referred to as 'annual loss samples'.</p>
+<h5 id="calculation-3">Calculation</h5>
+<p>The occurrence file and summarycalc files from the specified
+subdirectory are read into memory. Event losses are assigned to periods
+based on when the events occur and summed by period and by sample. These
+are referred to as 'annual loss samples'.</p>
 <p><strong>AAL calculation:</strong></p>
-<p>For type 1, calculations are performed on the type 1 (numerically integrated)  mean annual losses by period. The AAL is the mean annual losses summed across the periods and divided by the number of periods.  The standard deviation is the square root of the sum of squared errors between each annual mean loss and the AAL mean divided by the degrees of freedom (periods - 1).</p>
-<p>For type 2 the mean and standard deviation of the annual loss samples are calculated across all samples and periods. The mean estimates the average annual loss, calculated as the sum of all annual loss samples divided by the total number of periods times the number of samples. The standard deviation is the square root of the sum of squared errors between each annual loss sample and the type 2 mean, divided by the degrees of freedom (periods × samples - 1).</p>
+<p>For type 1, calculations are performed on the type 1 (numerically
+integrated) mean annual losses by period. The AAL is the mean annual
+losses summed across the periods and divided by the number of periods.
+The standard deviation is the square root of the sum of squared errors
+between each annual mean loss and the AAL mean divided by the degrees of
+freedom (periods - 1).</p>
+<p>For type 2 the mean and standard deviation of the annual loss samples
+are calculated across all samples and periods. The mean estimates the
+average annual loss, calculated as the sum of all annual loss samples
+divided by the total number of periods times the number of samples. The
+standard deviation is the square root of the sum of squared errors
+between each annual loss sample and the type 2 mean, divided by the
+degrees of freedom (periods × samples - 1).</p>
 <p><strong>ALCT calculation:</strong></p>
-<p>In ALCT, MeanLoss and SDLoss are the same as the type 2 mean and standard deviation from the AAL report. StandardError indicates how much the average annual loss estimate might vary if the simulation were rerun with different random numbers, reflecting the simulation error in the estimate. RelativeError, the StandardError as a percentage of the mean, is convenient for assessing simulation error and acceptable levels are typically expressed in percentage terms. StandardError is derived from the ANOVA metrics described below.</p>
-<p>LowerCI and UpperCI represent the absolute lower and upper thresholds for the confidence interval for the AAL estimate, indicating the range of losses within a specified confidence level. A higher confidence level results in a wider confidence interval.</p>
+<p>In ALCT, MeanLoss and SDLoss are the same as the type 2 mean and
+standard deviation from the AAL report. StandardError indicates how much
+the average annual loss estimate might vary if the simulation were rerun
+with different random numbers, reflecting the simulation error in the
+estimate. RelativeError, the StandardError as a percentage of the mean,
+is convenient for assessing simulation error and acceptable levels are
+typically expressed in percentage terms. StandardError is derived from
+the ANOVA metrics described below.</p>
+<p>LowerCI and UpperCI represent the absolute lower and upper thresholds
+for the confidence interval for the AAL estimate, indicating the range
+of losses within a specified confidence level. A higher confidence level
+results in a wider confidence interval.</p>
 <p><strong>Variance components:</strong></p>
-<p>VarElementHaz and VarElementVuln arise from attributing variance in the annual loss to hazard effects (variation due to event intensity across years) and vulnerability effects (variation due to sampling from exposure's damage uncertainty distributions). This is done using a one-factor effects model and standard analysis of variance 'ANOVA' on the annual loss samples.</p>
-<p>In the one-factor model, annual loss in year i and sample m, denoted L(i,m), is expressed as:</p>
+<p>VarElementHaz and VarElementVuln arise from attributing variance in
+the annual loss to hazard effects (variation due to event intensity
+across years) and vulnerability effects (variation due to sampling from
+exposure's damage uncertainty distributions). This is done using a
+one-factor effects model and standard analysis of variance 'ANOVA' on
+the annual loss samples.</p>
+<p>In the one-factor model, annual loss in year i and sample m, denoted
+L(i,m), is expressed as:</p>
 <p>L(i,m) = AAL + h(i) + v(i,m)</p>
 <p>where;</p>
 <ul>
@@ -1008,51 +1022,84 @@ $ aalcalc -Ksummary1 -o -l 0.95 -c alct.csv &gt; aal.csv
 <li>I is the total number of years (periods) in the model</li>
 <li>M is the number of samples specified at runtime by the user</li>
 </ul>
-<p>Total variance in annual loss is partitioned into independent hazard and vulnerability effects:</p>
+<p>Total variance in annual loss is partitioned into independent hazard
+and vulnerability effects:</p>
 <p>Var(L) = Var(h) + Var(v)</p>
-<p>ANOVA is used to estimate the variance components Var(h) and Var(v). For standard Oasis models, since the events are fixed across years, the simulation error in the AAL estimate arises only from the vulnerability component.</p>
-<p>The StandardError of the AAL estimate in ALCT follows from the calculation of the Variance of the AAL estimate as follows;</p>
+<p>ANOVA is used to estimate the variance components Var(h) and Var(v).
+For standard Oasis models, since the events are fixed across years, the
+simulation error in the AAL estimate arises only from the vulnerability
+component.</p>
+<p>The StandardError of the AAL estimate in ALCT follows from the
+calculation of the Variance of the AAL estimate as follows;</p>
 <p>Var(AAL estimate) = VarElementVuln = Var(v) / (I * M)</p>
 <p>StandardErrorVuln = sqrt(VarElementVuln)</p>
 <p>StandardError = StandardErrorVuln</p>
-<p>Finally, ALCT provides statistics for multiple increasing sample subsets, showing the convergence of the AAL estimate with increasing sample sizes. These subsets are non-overlapping and fixed, starting with SampleSize=1 (m=1), SampleSize=2 (m=2 to 3), SampleSize=4 (m=4 to 7), up to the maximum subset size. The final row gives statistics for the total samples M, using all available samples.</p>
-<h5 id="period-weightings">Period weightings</h5>
-<p>An additional feature of aalcalc is available to vary the relative importance of the period losses by providing a period weightings file to the calculation. In this file, a weight can be assigned to each period make it more or less important than neutral weighting (1 divided by the total number of periods). For example, if the neutral weight for period 1 is 1 in 10000 years, or 0.0001, then doubling the weighting to 0.0002 will mean that period's loss reoccurrence rate would double and the loss contribution to the average annual loss would double.</p>
-<p>All period_nos must appear in the file from 1 to P (no gaps). There is no constraint on the sum of weights. Periods with zero weight will not contribute any losses to the AAL.</p>
-<p>This feature will be invoked automatically if the periods.bin file is present in the input directory.</p>
+<p>Finally, ALCT provides statistics for multiple increasing sample
+subsets, showing the convergence of the AAL estimate with increasing
+sample sizes. These subsets are non-overlapping and fixed, starting with
+SampleSize=1 (m=1), SampleSize=2 (m=2 to 3), SampleSize=4 (m=4 to 7), up
+to the maximum subset size. The final row gives statistics for the total
+samples M, using all available samples.</p>
+<h5 id="period-weightings-1">Period weightings</h5>
+<p>An additional feature of aalcalc is available to vary the relative
+importance of the period losses by providing a period weightings file to
+the calculation. In this file, a weight can be assigned to each period
+make it more or less important than neutral weighting (1 divided by the
+total number of periods). For example, if the neutral weight for period
+1 is 1 in 10000 years, or 0.0001, then doubling the weighting to 0.0002
+will mean that period's loss reoccurrence rate would double and the loss
+contribution to the average annual loss would double.</p>
+<p>All period_nos must appear in the file from 1 to P (no gaps). There
+is no constraint on the sum of weights. Periods with zero weight will
+not contribute any losses to the AAL.</p>
+<p>This feature will be invoked automatically if the periods.bin file is
+present in the input directory.</p>
 <p><a href="#outputcomponents">Return to top</a></p>
-<h4 id="parameters">Parameters</h4>
+<h4 id="parameters-4">Parameters</h4>
 <p>Optional parameter for aalcalc;</p>
 <ul>
 <li>-c {file path} - Generate the alct report</li>
 </ul>
-<h3 id="kat-a-id%22kat%22a">kat <a id="kat"></a></h3>
-<hr>
-<p>In cases where events have been distributed to multiple processes, the output files can be concatenated to standard output.</p>
-<h4 id="parameters">Parameters</h4>
+<h3 id="kat-">kat <a id="kat"></a></h3>
+<hr />
+<p>In cases where events have been distributed to multiple processes,
+the output files can be concatenated to standard output.</p>
+<h4 id="parameters-5">Parameters</h4>
 <p>Optional parameters are:</p>
 <ul>
-<li>-d {file path} - The directory containing output files to be concatenated.</li>
-<li>-s - Sort by event ID (currently only supported for eltcalc output).</li>
+<li>-d {file path} - The directory containing output files to be
+concatenated.</li>
+<li>-s - Sort by event ID (currently only supported for eltcalc
+output).</li>
 </ul>
-<p>The sort by event ID option assumes that events have not been distributed to processes randomly and the list of event IDs in events.bin is sequential and contiguous. Should either of these conditions be false, the output will still contain all events but sorting cannot be guaranteed.</p>
-<h4 id="usage">Usage</h4>
-<pre class="hljs"><code><div>$ kat [parameters] [file]... &gt; [stdout component]
-</div></code></pre>
-<h4 id="examples">Examples</h4>
-<pre class="hljs"><code><div>$ kat -d pltcalc_output/ &gt; pltcalc.csv
+<p>The sort by event ID option assumes that events have not been
+distributed to processes randomly and the list of event IDs in
+events.bin is sequential and contiguous. Should either of these
+conditions be false, the output will still contain all events but
+sorting cannot be guaranteed.</p>
+<h4 id="usage-4">Usage</h4>
+<pre><code>$ kat [parameters] [file]... &gt; [stdout component]</code></pre>
+<h4 id="examples-2">Examples</h4>
+<pre><code>$ kat -d pltcalc_output/ &gt; pltcalc.csv
 $ kat eltcalc_P1 eltcalc_P2 eltcalc_P3 &gt; eltcalc.csv
 $ kat -s eltcalc_P1 eltcalc_P2 eltcalc_P3 &gt; eltcalc.csv
-$ kat -s -d eltcalc_output/ &gt; eltcalc.csv
-</div></code></pre>
-<p>Files are concatenated in the order in which they are presented on the command line. Should a file path be specified, files are concatenated in alphabetical order. When asked to sort by event ID, the order of input files is irrelevant.</p>
+$ kat -s -d eltcalc_output/ &gt; eltcalc.csv</code></pre>
+<p>Files are concatenated in the order in which they are presented on
+the command line. Should a file path be specified, files are
+concatenated in alphabetical order. When asked to sort by event ID, the
+order of input files is irrelevant.</p>
 <p><a href="#outputcomponents">Return to top</a></p>
-<h3 id="katparquet-a-id%22katparquet%22a">katparquet <a id="katparquet"></a></h3>
-<hr>
-<p>The output parquet files from multiple processes can be concatenated to a single parquet file. The results are automatically sorted by event ID. Unlike <a href="#kat">kat</a>, the <a href="ORDOutputComponents.md">ORD table name</a> for the input files must be specified on the command line.</p>
-<h4 id="parameters">Parameters</h4>
+<h3 id="katparquet-">katparquet <a id="katparquet"></a></h3>
+<hr />
+<p>The output parquet files from multiple processes can be concatenated
+to a single parquet file. The results are automatically sorted by event
+ID. Unlike <a href="#kat">kat</a>, the <a
+href="ORDOutputComponents.html">ORD table name</a> for the input files
+must be specified on the command line.</p>
+<h4 id="parameters-6">Parameters</h4>
 <ul>
-<li>-d {file path} - The directory containing output files to be concatenated.</li>
+<li>-d {file path} - The directory containing output files to be
+concatenated.</li>
 <li>-M - Concatenate MPLT files</li>
 <li>-Q - Concatenate QPLT files</li>
 <li>-S - Concatenate SPLT files</li>
@@ -1061,16 +1108,14 @@ $ kat -s -d eltcalc_output/ &gt; eltcalc.csv
 <li>-s - Concatenate SELT files</li>
 <li>-o {filename} - Output concatenated file</li>
 </ul>
-<h4 id="usage">Usage</h4>
-<pre class="hljs"><code><div>$ katparquet [parameters] -o [filename.parquet] [file]...
-</div></code></pre>
-<h4 id="examples">Examples</h4>
-<pre class="hljs"><code><div>$ katparquet -d mplt_files/ -M -o MPLT.parquet
-$ katparquet -q -o QPLT.parquet qplt_P1.parquet qplt_P2.parquet qplt_P3.parquet
-</div></code></pre>
+<h4 id="usage-5">Usage</h4>
+<pre><code>$ katparquet [parameters] -o [filename.parquet] [file]...</code></pre>
+<h4 id="examples-3">Examples</h4>
+<pre><code>$ katparquet -d mplt_files/ -M -o MPLT.parquet
+$ katparquet -q -o QPLT.parquet qplt_P1.parquet qplt_P2.parquet qplt_P3.parquet</code></pre>
 <p><a href="#outputcomponents">Return to top</a></p>
-<p><a href="DataConversionComponents.md">Go to 4.3 Data conversion components section</a></p>
-<p><a href="Contents.md">Back to Contents</a></p>
-
+<p><a href="DataConversionComponents.html">Go to 4.3 Data conversion
+components section</a></p>
+<p><a href="Contents.html">Back to Contents</a></p>
 </body>
 </html>

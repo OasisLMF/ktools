@@ -111,7 +111,7 @@ jobs:
     - name: Download Darwin binaies
       uses: actions/download-artifact@v4
       with:
-        name: Darwin_x86_64
+        name: Darwin_arm64 
         path: ${{ github.workspace }}/
 
     - name: Extract linux build
@@ -257,8 +257,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.BUILD_GIT_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ${{ github.workspace }}/Darwin_x86_64.tar.gz
-        asset_name: Darwin_x86_64.tar.gz
+        asset_path: ${{ github.workspace }}/Darwin_arm64.tar.gz
+        asset_name: Darwin_arm64.tar.gz
         asset_content_type: application/octet-stream
 
     - name: slack message vars

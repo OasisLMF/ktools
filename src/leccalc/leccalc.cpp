@@ -558,10 +558,12 @@ namespace leccalc {
 					}
 				}
 			}
-			summaryids.clear();
-			summaryids.insert(last_summary_id);
-			outputaggreports(agg, summaryids, out_loss, samplesize,
-					 fileIDs_occ, fileIDs_agg, hasEPT);
+			if (last_summary_id != -1) {
+				summaryids.clear();
+				summaryids.insert(last_summary_id);
+				outputaggreports(agg, summaryids, out_loss, samplesize,
+						 fileIDs_occ, fileIDs_agg, hasEPT);
+			}
 		} else {
 			if (indexFiles.size() > 0) {
 				fprintf(stderr, "%d summary index files missing: "

@@ -61,7 +61,21 @@ installertest()
 	
 	# test fmcalc
 	 ../src/fmcalc/fmcalc > ../ktest/testout/fmcalc.bin < ../ktest/testout/gulcalci.bin
-	
+
+	# test fmcalc back allocation rules on multi level, multi layer structures
+	# see examples/fm_alloc/README.md
+	for case in case1 case2; do
+		mkdir -p ../ktest/testout/fm_alloc/$case
+		../src/fmprogrammetobin/fmprogrammetobin < fm_alloc/$case/fm_programme.csv > ../ktest/testout/fm_alloc/$case/fm_programme.bin
+		../src/fmpolicytctobin/fmpolicytctobin < fm_alloc/$case/fm_policytc.csv > ../ktest/testout/fm_alloc/$case/fm_policytc.bin
+		../src/fmprofiletobin/fmprofiletobin < fm_alloc/$case/fm_profile.csv > ../ktest/testout/fm_alloc/$case/fm_profile.bin
+		../src/fmxreftobin/fmxreftobin < fm_alloc/$case/fm_xref.csv > ../ktest/testout/fm_alloc/$case/fm_xref.bin
+		../src/gultobin/gultobin -S2 < fm_alloc/$case/guls.csv > ../ktest/testout/fm_alloc/$case/guls.bin
+		for allocrule in 1 2 3; do
+			../src/fmcalc/fmcalc -p ../ktest/testout/fm_alloc/$case -a$allocrule < ../ktest/testout/fm_alloc/$case/guls.bin | ../src/fmtocsv/fmtocsv > ../ktest/testout/fmcalc_${case}_alloc$allocrule.csv
+		done
+	done
+
 	# test summary samples
 	 ../src/summarycalc/summarycalc -i -1 ../ktest/testout/gulsummarycalc1.bin  < ../ktest/testout/gulcalci.bin  
 	 ../src/summarycalc/summarycalc -i -2 ../ktest/testout/gulsummarycalc2.bin  < ../ktest/testout/gulcalci.bin  

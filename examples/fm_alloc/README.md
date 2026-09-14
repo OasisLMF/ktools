@@ -1,7 +1,7 @@
 # fmcalc back-allocation test cases
 
-Two small financial structures for testing the fmcalc back-allocation rules (`-a1`, `-a2`,
-`-a3`). Both have more than one policy layer and are run by `ktest/runtests.sh`.
+Four small financial structures for testing the fmcalc back-allocation rules (`-a1`, `-a2`,
+`-a3`). All have more than one policy layer and are run by `ktest/runtests.sh`.
 
 ## case1 - layers with different loss distributions
 
@@ -54,3 +54,35 @@ aggregations with no loss in layer 1 but a loss in a later layer. Alloc rule 2 o
 in the item proportions for layer 1, and skips the aggregations that had no loss, so the
 later layers were left with no proportions to allocate with and fmcalc segmentation
 faulted. The expected output is pinned for all three allocation rules.
+
+## case3 - a layer with no loss at the top level, with layers below it
+
+Two items with ground up losses of 1000 and 3000, three levels, a single layer at level 1 and
+two layers at levels 2 and 3. Layer 1 is wiped out at the top level by a deductible larger than
+the loss; layer 2 is limited to 4000.
+
+`compute_item_proportions` has a second branch for the case where the level below does not carry
+the current layer, and it copied layer 1's proportions *at the same level* rather than computing
+them. The walk down the levels that alloc rule 2 performs terminates in that branch, and where
+layer 1 has no loss there its proportions are null, so fmcalc dereferenced a null pointer and
+segmentation faulted. This case is the regression test for that crash, which showed up under
+`-a2` only.
+
+## case4 - a single layer on the level below a layered level
+
+The same structure as case3 with a single layer at level 2, so the top level takes the copy
+branch directly rather than through the recursion. Layer 1's proportions there are all zeros
+rather than null, so every other layer copied the zeros, no item received a share, and layer 2's
+whole 4000 loss was dropped instead of being allocated - back-allocated losses summed to zero
+against a non-zero layer loss. This affected `-a2` and `-a3` alike, so this case is the
+regression test for alloc rule 3 as well.
+
+In both cases layer 1 back-allocates 0 and layer 2 back-allocates its 4000 as 1000 and 3000, in
+ground up proportion, and all three allocation rules agree:
+
+| output_id | item | layer | -a1, -a2 and -a3 |
+|-----------|------|-------|------------------|
+| 1         | 1    | 1     | 0                |
+| 2         | 1    | 2     | 1000             |
+| 3         | 2    | 1     | 0                |
+| 4         | 2    | 2     | 3000             |

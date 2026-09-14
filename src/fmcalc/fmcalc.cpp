@@ -238,7 +238,7 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 		}
 	}
 	else {
-		if (previous_layer_ < layer_) {
+		if (level_ == 1 && previous_layer_ < layer_) {
 			vector <LossRec> &prev_agg_vec = agg_vecs[level_][1];
 			vector <LossRec> &current_agg_vec = agg_vecs[level_][layer_];
 			size_t iMax =  prev_agg_vec.size();

@@ -64,7 +64,7 @@ installertest()
 
 	# test fmcalc back allocation rules on multi level, multi layer structures
 	# see examples/fm_alloc/README.md
-	for case in case1 case2; do
+	for case in case1 case2 case3 case4; do
 		mkdir -p ../ktest/testout/fm_alloc/$case
 		../src/fmprogrammetobin/fmprogrammetobin < fm_alloc/$case/fm_programme.csv > ../ktest/testout/fm_alloc/$case/fm_programme.bin
 		../src/fmpolicytctobin/fmpolicytctobin < fm_alloc/$case/fm_policytc.csv > ../ktest/testout/fm_alloc/$case/fm_policytc.bin

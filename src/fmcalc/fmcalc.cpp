@@ -319,7 +319,7 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 					// 2 use below loop to create a set which will then be used to iterate and get previous_gul_total
 					std::unordered_set<int> s;
 					while (it != agg_vecs[level_][layer_][y].item_idx->end()) {
-						s.insert(v[*it]);
+						if (v[*it] >= 0) s.insert(v[*it]);
 						//prev_gul_total += prev_agg_vec[*it].loss;
 						it++;
 					}
@@ -337,7 +337,7 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 						if (agg_vecs[level_][layer_][y].item_prop == nullptr) {
 							agg_vecs[level_][layer_][y].item_prop = std::make_shared<std::vector<OASIS_FLOAT>>(std::vector<OASIS_FLOAT>());
 						}
-						if (prev_gul_total > 0) {
+						if (prev_gul_total > 0 && v[*it] >= 0 && prev_agg_vec[v[*it]].item_idx != nullptr) {
 							int j = -1;
 							const std::vector<int>& z = *(prev_agg_vec[v[*it]].item_idx);
 							for (size_t i = 0; i < z.size(); i++) {

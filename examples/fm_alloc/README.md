@@ -1,6 +1,6 @@
 # fmcalc back-allocation test cases
 
-Four small financial structures for testing the fmcalc back-allocation rules (`-a1`, `-a2`,
+Five small financial structures for testing the fmcalc back-allocation rules (`-a1`, `-a2`,
 `-a3`). All have more than one policy layer and are run by `ktest/runtests.sh`.
 
 ## case1 - layers with different loss distributions
@@ -86,3 +86,23 @@ ground up proportion, and all three allocation rules agree:
 | 2         | 1    | 2     | 1000             |
 | 3         | 2    | 1     | 0                |
 | 4         | 2    | 2     | 3000             |
+
+## case5 - an item with no aggregation at the previous level
+
+Two items, four levels, four layers, reduced from the client structure in
+[#2055](https://github.com/OasisLMF/OasisLMF/issues/2055) by dropping items until the fault
+stopped reproducing. The aggregation ids at level 1 are not contiguous - aggs 1 and 4 carry no
+items - so the level 1 loss vector holds entries that no item maps to, and the item to
+previous-level-index lookup yields -1 for the items that do carry loss. That -1 was then used to
+index the previous level's vector, both when totalling the previous level's loss and when reading
+back `item_idx`, so fmcalc read out of bounds and segmentation faulted on a null `item_idx`.
+
+Released 3.12.4 faults here under `-a3`, and the per-layer recursion added earlier on this branch
+made it fault under `-a2` as well. Both are fixed by skipping items that have no entry at the
+previous level.
+
+`-a2` and `-a3` back-allocate the whole of each layer's loss - 520.00 for layer 1 and 92.50 for
+layer 2, matching the `-a0` gross. `-a1` allocates only 54.41 to layer 2 on this structure, which
+does not match its gross; that is a separate pre-existing problem in the rule 1 path and is out of
+scope here. The `-a1` expected output is pinned so that a change in it is noticed, not because it
+is correct.

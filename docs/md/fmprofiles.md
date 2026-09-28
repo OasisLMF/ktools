@@ -121,6 +121,8 @@ The choices are as follows;
 | Back-allocate losses to items in proportion to prior level loss              | 2           |
 | Back-allocate losses to items in proportion to prior level loss (reinsurance)| 3           |
 
+Allocrules 2 and 3 perform the same calculation and give the same answer. Rule 3 works out the item proportions at every level and layer as the calculation proceeds, while rule 2 only works them out when they are needed at the final level. Where there is more than one layer, each layer is allocated using its own prior level losses under both rules.
+
 ## Effective deductibles
 
 Often there are more than one hierarchal levels with deductibles, and there is a choice of methods of accumulation of deductibles through the hierarchy. Whenever a rule with a deductible is used in the loss calculation then it is accumulated through the calculation in an **effective_deductible** variable. The effective deductible is the smaller of the deductible amount and the loss. 

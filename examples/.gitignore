@@ -21,3 +21,4 @@ getmodel.bin
 gul_mode2_items2.bin
 log
 !static/validation/*
+!fm_alloc/*/*.csv

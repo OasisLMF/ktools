@@ -238,7 +238,7 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 		}
 	}
 	else {
-		if (previous_layer_ < layer_) {
+		if (level_ == 1 && previous_layer_ < layer_) {
 			vector <LossRec> &prev_agg_vec = agg_vecs[level_][1];
 			vector <LossRec> &current_agg_vec = agg_vecs[level_][layer_];
 			size_t iMax =  prev_agg_vec.size();
@@ -249,6 +249,42 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 			}			
 		}
 		else {			
+			if (level_ > 2) {
+				// allocrule 2 only computes proportions at the top level, so this layer's proportions for the previous level may not exist yet
+				vector <LossRec> &previous_layer_agg_vec = agg_vecs[level_ - 1][previous_layer_];
+				bool item_props_missing = false;
+				for (size_t i = 0; i < previous_layer_agg_vec.size(); i++) {
+					if (previous_layer_agg_vec[i].item_idx != nullptr && previous_layer_agg_vec[i].item_prop == nullptr) {
+						item_props_missing = true;
+						break;
+					}
+				}
+				if (item_props_missing) {
+					unsigned int previous_previous_layer = 1;
+					if (previous_layer_ <= (unsigned int) level_to_max_layer_[level_ - 2]) {
+						previous_previous_layer = previous_layer_;
+					}
+					compute_item_proportions(agg_vecs, guls, level_ - 1, previous_layer_, previous_previous_layer, allowzeros);
+				}
+			}
+			else {
+				// first level proportions are the ground up loss shares and are the same for every layer, but layer 1 skips aggregations that had no loss
+				vector <LossRec> &first_agg_vec = agg_vecs[1][1];
+				for (size_t i = 0; i < first_agg_vec.size(); i++) {
+					LossRec &first = first_agg_vec[i];
+					if (first.item_idx == nullptr || first.item_prop != nullptr) continue;
+					OASIS_FLOAT gul_total = 0;
+					for (int idx : *(first.item_idx)) gul_total += guls[idx];
+					first.item_prop = std::make_shared<std::vector<OASIS_FLOAT>>(std::vector<OASIS_FLOAT>(first.item_idx->size(), 0));
+					if (gul_total > 0) {
+						size_t j = 0;
+						for (int idx : *(first.item_idx)) {
+							first.item_prop->at(j) = guls[idx] / gul_total;
+							j++;
+						}
+					}
+				}
+			}
 			vector <LossRec> &prev_agg_vec = agg_vecs[level_ - 1][previous_layer_];
 			vector <LossRec> &prev_agg_vec_base = agg_vecs[level_ - 1][1];
 			for (size_t i = 0; i < prev_agg_vec.size(); i++) {
@@ -283,7 +319,7 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 					// 2 use below loop to create a set which will then be used to iterate and get previous_gul_total
 					std::unordered_set<int> s;
 					while (it != agg_vecs[level_][layer_][y].item_idx->end()) {
-						s.insert(v[*it]);
+						if (v[*it] >= 0) s.insert(v[*it]);
 						//prev_gul_total += prev_agg_vec[*it].loss;
 						it++;
 					}
@@ -301,7 +337,7 @@ void fmcalc::compute_item_proportions(std::vector<std::vector<std::vector <LossR
 						if (agg_vecs[level_][layer_][y].item_prop == nullptr) {
 							agg_vecs[level_][layer_][y].item_prop = std::make_shared<std::vector<OASIS_FLOAT>>(std::vector<OASIS_FLOAT>());
 						}
-						if (prev_gul_total > 0) {
+						if (prev_gul_total > 0 && v[*it] >= 0 && prev_agg_vec[v[*it]].item_idx != nullptr) {
 							int j = -1;
 							const std::vector<int>& z = *(prev_agg_vec[v[*it]].item_idx);
 							for (size_t i = 0; i < z.size(); i++) {
